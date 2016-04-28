@@ -182,7 +182,7 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
  prologSideEffects/1,prologHybrid/1,prologListValued/1]).
 
 
-% % :- '$set_source_module'(baseKB).
+% % :- '$set_source_module'(tbox).
 
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -200,20 +200,20 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
         t(7,?,?,?,?,?,?,?).   
 
 :- meta_predicate((
-      baseKB:resolveConflict((*)),
-      baseKB:resolveConflict0((*)),
-      baseKB:mpred_isa(?,1),
-      baseKB:resolverConflict_robot((*)))).
+      resolveConflict((*)),
+      resolveConflict0((*)),
+      mpred_isa(?,1),
+      resolverConflict_robot((*)))).
 
 
 :- thread_local(t_l:user_abox/2).
 
-t_l:user_abox(baseKB,baseKB).
+t_l:user_abox(tbox,tbox).
 
 :- show_call(source_context_module(_CM)).
 
 
-% % :- '$set_source_module'(baseKB).
+% % :- '$set_source_module'(tbox).
 
 :- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),must(split_into_mts(E))).
 % :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
@@ -224,13 +224,13 @@ t_l:user_abox(baseKB,baseKB).
 %:- initialization(import_module_to_user(logicmoo_user)).
 
 
-% :- module_property(baseKB, exports(List)),forall(member(E,List),kb_dynamic(E)).
+% :- module_property(tbox, exports(List)),forall(member(E,List),kb_dynamic(E)).
 
 % :- use_module(mpred_pfc).
 
 :- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
 
-% % :- '$set_source_module'(baseKB).
+% % :- '$set_source_module'(tbox).
 
 %= 	 	 
 
@@ -238,7 +238,7 @@ t_l:user_abox(baseKB,baseKB).
 %
 % Prolog Negated By Failure.
 %
-baseKB:prologNegByFailure(prologNegByFailure).
+prologNegByFailure(prologNegByFailure).
 
 %= 	 	 
 
@@ -246,10 +246,10 @@ baseKB:prologNegByFailure(prologNegByFailure).
 %
 % Completely Asserted Collection.
 %
-baseKB:completelyAssertedCollection(prologNegByFailure).
+completelyAssertedCollection(prologNegByFailure).
 
-:- dynamic(baseKB:t/2).
-:- dynamic(baseKB:t/1).
+:- dynamic(t/2).
+:- dynamic(t/1).
 % t(C,I):- trace_or_throw(t(C,I)),t(C,I). % ,fail,loop_check_term(isa_backchaing(I,C),t(C,I),fail).
 
 %t([P|LIST]):- !,mpred_plist_t(P,LIST).
@@ -262,7 +262,7 @@ baseKB:completelyAssertedCollection(prologNegByFailure).
 %
 % True Structure.
 %
-baseKB:t(X,Y):- cwc, isa(Y,X).
+t(X,Y):- cwc, isa(Y,X).
 
 %= 	 	 
 
@@ -270,15 +270,15 @@ baseKB:t(X,Y):- cwc, isa(Y,X).
 %
 % True Structure.
 %
-baseKB:t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST).
+t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST).
 :- meta_predicate(t(?,?,?,?,?)).
 :- meta_predicate(t(?,?,?,?)).
 :- meta_predicate(t(?,?,?)).
-:- meta_predicate baseKB:t(5,?,?,?,?,?).
-:- meta_predicate baseKB:t(7,?,?,?,?,?,?,?).
-:- meta_predicate baseKB:t(6,?,?,?,?,?,?).
+:- meta_predicate t(5,?,?,?,?,?).
+:- meta_predicate t(7,?,?,?,?,?,?,?).
+:- meta_predicate t(6,?,?,?,?,?,?).
 
-:-asserta_if_new(baseKB:(~(G):- (cwc, neg_in_code(G)))).
+:-asserta_if_new((~(G):- (cwc, neg_in_code(G)))).
 
 %= 	 	 
 
@@ -288,7 +288,7 @@ baseKB:t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t
 %
 :-asserta('~'(tCol('$VAR'))).
 
-% baseKB:import(I):-system:import(baseKB:I).
+% import(I):-system:import(I).
 
 
 
@@ -373,7 +373,7 @@ t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
 %
 % Current World.
 %
-baseKB:current_world(current).
+current_world(current).
 
 
 
@@ -390,9 +390,9 @@ mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_c
 :- use_module(logicmoo(mpred/'mpred_stubs.pl')).
 :- use_module(logicmoo(mpred/'mpred_*.pl')).
 
-baseKB:resolveConflict(C):- cwc, must((resolveConflict0(C),
+resolveConflict(C):- cwc, must((resolveConflict0(C),
   show_if_debug(is_resolved(C)),mpred_remove(conflict(C)))).
-baseKB:resolveConflict(C) :- cwc,
+resolveConflict(C) :- cwc,
   wdmsg("Halting with conflict ~p", [C]),   
   must(mpred_halt(conflict(C))),fail.
 */
@@ -404,8 +404,8 @@ baseKB:resolveConflict(C) :- cwc,
 %
 % Resolve Conflict Primary Helper.
 %
-resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),mpred_why(N))))),
-  ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),mpred_why(C)))), 
+resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_failure(why,(nop(resolveConflict(C)),mpred_why(N))))),
+  ignore(show_failure(why,(nop(resolveConflict(C)),mpred_why(C)))), 
     doall((call_u(resolverConflict_robot(C)),\+ is_resolved(C),!)),
     is_resolved(C),!.
 
@@ -492,7 +492,7 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).
 
 
-:- add_import_module(baseKB,basePFC,end).
-:- initialization(add_import_module(baseKB,basePFC,end)).
+:- add_import_module(tbox,basePFC,end).
+:- initialization(add_import_module(tbox,basePFC,end)).
 
 

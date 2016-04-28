@@ -34,8 +34,9 @@
 
 :- meta_predicate scce_orig(0,0,0).
 scce_orig(Setup,Goal,Cleanup):-
+  must_atomic(Setup),
      catch((
-        call((must_atomic(Setup),Goal,deterministic(Det),true))
+        call((Goal,deterministic(Det),true))
         *->
         (Det == true
           -> (must_atomic(Cleanup),!)
@@ -46,8 +47,10 @@ scce_orig(Setup,Goal,Cleanup):-
 
 :- meta_predicate scce_orig2(0,0,0).
 scce_orig2(Setup,Goal,Cleanup):- 
-  setup_call_cleanup(Setup, (call((Goal,deterministic(Det),true))
-     *-> (Det == true -> ! ; (Cleanup;((must_atomic(Setup),fail)))) ; fail),Cleanup).
+  setup_call_cleanup(Setup, 
+    (call((Goal,deterministic(Det),true))
+       *-> (Det == true -> ! ; 
+        (once(Cleanup);(once(Setup),fail))) ; (!,fail)) ,Cleanup).
 
 make_nb_setter(Term,G):-make_nb_setter(Term,_Copy,nb_setarg,G).
 

@@ -78,7 +78,8 @@
             db_quf_l/5,
             db_quf_l_0/5,
             default_te/3,
-            demodulize/3,
+            remodualize/3,
+            replaced_module/3,
             do_expand_args/3,
             do_expand_args/3,
             do_expand_args_l/3,
@@ -363,7 +364,7 @@ instTypePropsToType(instTypeProps,ttSpatialType).
 %
 % Reduce Clause.
 %
-reduce_clause(Op,C,HB):-must(nonvar(C)),demodulize(Op,C,CB),CB\=@=C,!,reduce_clause(Op,CB,HB).
+reduce_clause(Op,C,HB):-must(nonvar(C)),remodualize(Op,C,CB),CB\=@=C,!,reduce_clause(Op,CB,HB).
 reduce_clause(Op,clause(C, B),HB):-!,reduce_clause(Op,(C :- B),HB).
 reduce_clause(Op,(C:- B),HB):- is_true(B),!,reduce_clause(Op,C,HB).
 reduce_clause(_,C,C).
@@ -506,9 +507,8 @@ fully_expand_now(Op,Sent,SentO):-
 %
 is_stripped_module(A):-var(A),!,fail.
 is_stripped_module(lmconf):-!,fail.
-% is_stripped_module(user).
-is_stripped_module(logicmoo_user).
-is_stripped_module(umt).
+is_stripped_module(user).
+%is_stripped_module(logicmoo_user).
 is_stripped_module(system).
 %is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
 %is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
@@ -521,7 +521,10 @@ is_stripped_module(system).
 %
 % Expand isEach/Ns.
 
-expand_isEach_or_fail(Sent,SentO):- bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L.
+expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),remodualize(clause(_,_),
+   Sent,SentM),Sent\=@=SentM,!,bagof(O,do_expand_args(isEach,SentM,O),SentO).
+expand_isEach_or_fail(Sent,SentO):-
+    bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L.
 
 %% expand_kif_string_or_fail( ++Op, ++Sent, --SentO) is semidet.
 %
@@ -914,6 +917,7 @@ db_expand_0(Op,(G:-B),(GG:-BB)):-!,db_expand_0(Op,G,GG),fully_expand_goal(Op,B,B
 % db_expand_0(_,Term,CL):- bagof(O,do_expand_args(isEach,Term,O),L),L\=@=[Term],!,list_to_conjuncts(L,CL).
 
 db_expand_0(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_0(Op,Sent,SentO).
+db_expand_0(Op,M:Sent,R:SentO):- replaced_module(Op,M,R),!,db_expand_0(Op,Sent,SentO).
 
 
 db_expand_0(Op,pddlSomethingIsa(I,EL),O):- listToE(EL,E),fully_expand_clause(Op,isa(I,E),O).
@@ -1046,19 +1050,26 @@ db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_e
 
 % db_expand_0(query(HLDS,Must),props(Obj,Props)):- is_ftNonvar(Obj),is_ftVar(Props),!,gather_props_for(query(HLDS,Must),Obj,Props).
 
+replaced_module(_,V,_):- \+ atom(V),!,fail.
+replaced_module(_,umt,ABox):-get_abox(ABox).
+replaced_module(_,abox,ABox):-get_abox(ABox).
+replaced_module(_,tbox,TBox):-get_tbox(TBox).
 
-%= 	 	 
-
-%% demodulize( ?Op, ?H, ?HH) is semidet.
+%% remodualize( ?Op, ?H, ?HH) is semidet.
 %
-% Demodulize.
+% Re-Modulize.
 %
-demodulize(_ ,H,HH):-as_is_term(H),!,HH=H.
-demodulize(Op,H,HHH):-once(strip_module(H,_,HH)),H\==HH,!,demodulize(Op,HH,HHH).
-demodulize(Op,H,HH):-is_list(H),!,must_maplist(demodulize(Op),H,HH),!.
-demodulize(Op,H,HH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(demodulize(Op),HL,HHL),HH=..[F|HHL],!.
-demodulize(_ ,HB,HB).
-
+remodualize(_, H,H):-is_ftVar(H),!.
+remodualize(_, H,HH):-exact_args(H),!,HH=H.
+remodualize(Op,M:H,M:HHH):-is_ftVar(M),!,remodualize(Op,H,HHH).
+remodualize(Op,M:H,R:HHH):-replaced_module(Op,M,R),remodualize(Op,H,HHH).
+remodualize(Op,M:H,HHH):- is_stripped_module(M),!,remodualize(Op,H,HHH).
+remodualize(Op,H,HH):-is_list(H),!,must_maplist(remodualize(Op),H,HH),!.
+remodualize(Op,':-'(G),':-'(GG)):-!,remodualize(call(Op),G,GG).
+remodualize(Op,(H:-G),(HH:-GG)):-!,remodualize(Op,H,HH),remodualize(call(Op),G,GG).
+remodualize(Op,H,HH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodualize(Op),HL,HHL),HH=..[F|HHL],!.
+remodualize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
+remodualize(_ ,HB,HB).
 
 
 
@@ -1091,7 +1102,8 @@ from_univ(Prefix,Op,In,Out):-Mid=..[t|In],!,db_expand_up(Prefix,Op,Mid,Out).
 %
 % Database Expand Up.
 %
-db_expand_up(Prefix,Op,Mid,OOUT):- fully_expand_head(Op,Mid,Out), is_ftCompound(Prefix),subst(Prefix,value,Out,OOUT).
+db_expand_up(Prefix,Op,Mid,OOUT):- fully_expand_head(Op,Mid,Out), 
+  is_ftCompound(Prefix),subst(Prefix,value,Out,OOUT).
 db_expand_up(_,Op,Mid,Out):- fully_expand_head(Op,Mid,Out).
 
 

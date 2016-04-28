@@ -33,7 +33,9 @@ vim: set filetype=md:
 */
 
 
-
+:- dynamic(pfclog/1).
+:- dynamic(boxlog/1).
+:- dynamic(clif/1).
 
 arity(clif,1).
 arity(boxlog,1).

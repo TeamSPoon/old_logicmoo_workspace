@@ -243,8 +243,9 @@ world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 %
 % Get Pifunctor.
 %
-get_pifunctor(t,PHead):-!,between(1,9,A),get_pifunctor(t/A,PHead).
-get_pifunctor(Head,PHead):-must(get_pifunctor(Head,PHead,_,_)).
+get_pifunctor(t,PHead):-!,between(1,9,A),functor(PHead,t,A).
+get_pifunctor(isa,isa(_,_)).
+get_pifunctor(Head,PHead):- get_pifunctor(Head,PHead,_,_),!.
 
 %= 	 	 
 
@@ -252,7 +253,7 @@ get_pifunctor(Head,PHead):-must(get_pifunctor(Head,PHead,_,_)).
 %
 % Get Pifunctor.
 %
-get_pifunctor(Head,PHead,F):-must(get_pifunctor(Head,PHead,F,_)).
+get_pifunctor(Head,PHead,F):- get_pifunctor(Head,PHead,F,_).
 
 
 %= 	 	 
@@ -261,12 +262,12 @@ get_pifunctor(Head,PHead,F):-must(get_pifunctor(Head,PHead,F,_)).
 %
 % Get Pifunctor.
 %
-get_pifunctor(M:Head,M:PHead,F,A):-atom(H),!,get_pifunctor(Head,PHead,F,A).
-get_pifunctor(Head,PHead,F,A):-var(Head),!,sanity(atom(F)),must(ensure_arity(F,A)),functor(PHead,F,A),ignore(PHead=Head).
+get_pifunctor(M:Head,M:PHead,F,A):-atom(M),!,get_pifunctor(Head,PHead,F,A).
 get_pifunctor((F/A),PHead,F,A):- integer(A),!,must(atom(F)),functor(PHead,F,A).
 get_pifunctor(Head,PHead,F,A):-atom(Head),F=Head,!,with_umt(arity(F,A)),must(integer(A)),functor(PHead,F,A).
 %get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(Head/A,PHead,F,A).
-get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),A>0,functor(PHead,F,A),ignore(PHead=Head),!.
+get_pifunctor(Head,PHead,F,A):-var(Head),!,sanity(atom(F)),must(ensure_arity(F,A)),functor(PHead,F,A),ignore(PHead=Head).
+get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(PHead=Head),!.
 
 
 %= 	 	 

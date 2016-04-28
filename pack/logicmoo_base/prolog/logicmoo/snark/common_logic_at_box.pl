@@ -255,17 +255,19 @@ set_guessed_abox(From,ABox):-
  %'$module'(CM,CM),(is_undefaulted(CM)->true;(set_abox_for(CM,ABox),Is_Changed=1)),
  %!.
 
-set_guessed_tbox(ABox,_From):- \+ atom(ABox),!.
-set_guessed_tbox(From,ABox):-
+set_guessed_tbox(_From,TBox):- \+ atom(TBox),!.
+set_guessed_tbox(From,TBox):-
  must_det_l((
- sanity(atom(ABox)), 
-  ((t_l:user_tbox(SM,Was),ABox\==Was)-> wdmsg(set_tbox(Was-->ABox));true),
- (which_file(File)->(\+ lmconf:tbox_for(File,_)->set_tbox_for(File,ABox);true);true),
- quietly_must(ensure_tbox(ABox)), (\+ is_undefaulted(SM) -> set_tbox_for(From,ABox) ; true))).
- %'$set_source_module'(SM,SM),(is_undefaulted(SM)->true;(set_tbox_for(SM,ABox),Is_Changed=1)),
- %'$module'(CM,CM),(is_undefaulted(CM)->true;(set_tbox_for(CM,ABox),Is_Changed=1)),
+ sanity(atom(TBox)), 
+  ((t_l:user_tbox(SM,Was),TBox\==Was)-> wdmsg(set_tbox(Was-->TBox));true),
+ (which_file(File)->(\+ lmconf:tbox_for(File,_)->set_tbox_for(File,TBox);true);true),
+ quietly_must(doall(ensure_tbox(TBox))), (\+ is_undefaulted(SM) -> set_tbox_for(From,TBox) ; true))).
+ %'$set_source_module'(SM,SM),(is_undefaulted(SM)->true;(set_tbox_for(SM,TBox),Is_Changed=1)),
+ %'$module'(CM,CM),(is_undefaulted(CM)->true;(set_tbox_for(CM,TBox),Is_Changed=1)),
  %!.
 
+
+ensure_tbox(_ABox).
 
 %% get_abox(-Ctx) is det.
 %
@@ -275,22 +277,23 @@ set_guessed_tbox(From,ABox):-
 % not just user modules
 
 get_abox(A):- nonvar(A),!.
-get_abox(A):- quietly_must(quietly(((get_abox0(A),A\=user);get_abox0(A)))),!.
+get_abox(A):- get_abox0(A),A\==user,!.
+get_abox(logicmoo_user).
 
 get_abox0(A):- which_file(File)->get_abox_for(File,A).
-get_abox0(A):-'$current_typein_module'(M),get_abox_for(M,A).
-get_abox0(A):-'$current_source_module'(M),get_abox_for(M,A).
+get_abox0(A):-'$current_source_module'(M)->get_abox_for(M,A).
 get_abox0(A):- source_module(SM)->get_abox_for(SM,A).
+get_abox0(A):-'$current_typein_module'(M)->get_abox_for(M,A).
 get_abox0(A):- guess_abox(From,A),set_guessed_abox(From,A).
 
 
 get_tbox(A):- nonvar(A),!.
 get_tbox(A):- quietly_must(quietly(((get_tbox0(A),A\=user);get_tbox0(A)))),!.
 
+get_tbox0(A):-'$current_typein_module'(M),get_tbox_for(M,A).
 get_tbox0(A):-'$current_source_module'(M),get_tbox_for(M,A).
 get_tbox0(A):- source_module(SM)->get_tbox_for(SM,A).
 get_tbox0(A):- which_file(File)->get_tbox_for(File,A).
-get_tbox0(A):-'$current_typein_module'(M),get_tbox_for(M,A).
 get_tbox0(A):- guess_tbox(From,A),set_guessed_tbox(From,A).
 
 
@@ -581,6 +584,7 @@ correct_module(tbox,F,A,T):- !,get_tbox(M),!,correct_module(M,F,A,T).
 correct_module(sbox,F,A,T):- !,get_tbox(M),!,correct_module(M,F,A,T).
 correct_module(M,F,A,T):- box_type(F,A,Type),!,to_box_type(M,Type,T).
 correct_module(MT,_,_,MT):-!.
+
 :- add_import_module(logicmoo_user,logicmoo_base,start).
 
 

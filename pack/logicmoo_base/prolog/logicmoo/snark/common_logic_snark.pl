@@ -179,7 +179,7 @@
         
 */
 
-:- dynamic(baseKB:(if/2,iif/2)).
+% :- dynamic(baseKB:(if/2,iif/2)).
 
 
 :- include('../mpred/mpred_header.pi').

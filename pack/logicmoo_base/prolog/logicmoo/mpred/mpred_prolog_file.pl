@@ -137,39 +137,39 @@ prolog_load_file_loop_checked(ModuleSpec, Options) :- loop_check(show_success(pr
 % prolog load file loop checked  Primary Helper.
 %
 prolog_load_file_loop_checked_0(ModuleSpec, Options) :- current_predicate(_,_:exists_file_safe(_)),
-   catch(prolog_load_file_nlc_pre(ModuleSpec, Options),E,(nop((trace,baseKB:prolog_load_file_nlc(ModuleSpec, Options))),throw(E))).
+   catch(prolog_load_file_nlc_pre(ModuleSpec, Options),E,(nop((trace,prolog_load_file_nlc(ModuleSpec, Options))),throw(E))).
 
 
 prolog_load_file_nlc_pre(Module:Spec, Options) :- 
-  call_from_module(Module,baseKB:prolog_load_file_nlc(Module:Spec, Options)).
+  call_from_module(Module,prolog_load_file_nlc(Module:Spec, Options)).
 
-%% baseKB:prolog_load_file_nlc( :TermModule, ?Options) is semidet.
+%% prolog_load_file_nlc( :TermModule, ?Options) is semidet.
 %
 % Prolog Load File Nlc.
 %
-% :- export(baseKB:prolog_load_file_nlc/2).
-baseKB:prolog_load_file_nlc(Module:Spec, Options) :- 
+% :- export(prolog_load_file_nlc/2).
+prolog_load_file_nlc(Module:Spec, Options) :- 
    filematch(Module:Spec,Where1),Where1\=Spec,!,forall(filematch(Module:Spec,Where),Module:load_files(Module:Where,Options)).
 
-baseKB:prolog_load_file_nlc(Module:Spec, Options):- lmconf:never_reload_file(Spec),
+prolog_load_file_nlc(Module:Spec, Options):- lmconf:never_reload_file(Spec),
    wdmsg(warn(error(skip_prolog_load_file_nlc(lmconf:never_reload_file(Module:Spec, Options))))),!.
 
-baseKB:prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID), \+ is_main_thread,
+prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID), \+ is_main_thread,
    nop(wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options)))))),!.
 
-baseKB:prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID), \+ is_main_thread,
+prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID), \+ is_main_thread,
    nop(wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options)))))),!,fail,dumpST.
 
-baseKB:prolog_load_file_nlc(Module:DirName, Options):-  atom(DirName), is_directory(DirName)->
+prolog_load_file_nlc(Module:DirName, Options):-  atom(DirName), is_directory(DirName)->
   current_predicate(_,_:'load_file_dir'/2)->loop_check(show_call(why,call(load_file_dir,Module:DirName, Options))).
 
-baseKB:prolog_load_file_nlc(Module:Spec, Options):- absolute_file_name(Spec,AFN,[extensions(['pl'])]), 
-   (Spec\==AFN),exists_file_safe(AFN),!,baseKB:prolog_load_file_nlc(Module:AFN, Options).
+prolog_load_file_nlc(Module:Spec, Options):- absolute_file_name(Spec,AFN,[extensions(['pl'])]), 
+   (Spec\==AFN),exists_file_safe(AFN),!,prolog_load_file_nlc(Module:AFN, Options).
 
-baseKB:prolog_load_file_nlc(Module:FileName, Options):- exists_file_safe(FileName),!,
+prolog_load_file_nlc(Module:FileName, Options):- exists_file_safe(FileName),!,
    prolog_load_file_nlc_0(Module:FileName, Options).
 
-baseKB:prolog_load_file_nlc(Module:Spec, Options):- term_to_atom(Spec,String),member(S,['?','*']),sub_atom(String,_,1,_,S),!, 
+prolog_load_file_nlc(Module:Spec, Options):- term_to_atom(Spec,String),member(S,['?','*']),sub_atom(String,_,1,_,S),!, 
  foreach(lmconf:filematch(Module:Spec,FileName),
     (loop_check((prolog_load_file_nlc_0(Module:FileName, Options))),TF=true)),!,
   nonvar(TF).
@@ -185,7 +185,7 @@ prolog_load_file_nlc_0(Module:Spec, Options):- thread_self(TID), \+ is_main_thre
 prolog_load_file_nlc_0(Module:FileName, Options):- 
   '$set_source_module'(SM,SM),
  (source_file_property(FileName,load_context(MC,SubFile:Line)),MC\==user,SM==user),!,
-  wdmsg(skipping(baseKB:prolog_load_file_nlc(Module:FileName, Options):source_file_property(FileName,load_context(MC,SubFile:Line)))),!.
+  wdmsg(skipping(prolog_load_file_nlc(Module:FileName, Options):source_file_property(FileName,load_context(MC,SubFile:Line)))),!.
 
 prolog_load_file_nlc_0(Module:FileName, Options):-  
   file_name_extension(_Base,Ext,FileName),
@@ -282,9 +282,9 @@ load_file_some_type(M:File,Options):-call_from_module(M,must(load_files(M:File,O
 
 user:prolog_load_file(Module:Spec, Options):- fail,
   Spec \== 'MKINDEX.pl',
-  system:predicate_property(baseKB:prolog_load_file_loop_checked(_,_),dynamic),
+  system:predicate_property(prolog_load_file_loop_checked(_,_),dynamic),
   \+ never_load_special(Module:Spec, Options),  
-  catch(baseKB:prolog_load_file_loop_checked(Module:Spec, Options),E,
-    ((wdmsg(E),trace,baseKB:prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))).
+  catch(prolog_load_file_loop_checked(Module:Spec, Options),E,
+    ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))).
 
 

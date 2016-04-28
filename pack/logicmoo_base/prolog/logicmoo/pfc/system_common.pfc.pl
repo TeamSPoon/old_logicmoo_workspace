@@ -883,7 +883,6 @@ prologHybrid(quotedDefnIff(ttExpressionType,ftTerm)).
 prologHybrid(defnNecessary(ttExpressionType,ftTerm)).
 prologHybrid(quotedDefnIff(ttExpressionType,ftTerm)).
 
-:- break.
 
 tFuncton(isLikeFn(tPred,tCol)).
 tRelation('==>'(ftAskable,ftAssertable)).
@@ -992,9 +991,7 @@ disjointWith(ttTemporalType,ttAbstractType).
 
 prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
-:- break.
 quotedDefnIff(X,_)==>ttExpressionType(X).
-:- break.
 
 quotedDefnIff(ftInt,integer).
 quotedDefnIff(ftFloat,float).

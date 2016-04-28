@@ -214,3 +214,5 @@ prologHybrid(defnIff(ttExpressionType,ftTerm)).
 
 defnIff(X,_)==>ttExpressionType(X).
 
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
+

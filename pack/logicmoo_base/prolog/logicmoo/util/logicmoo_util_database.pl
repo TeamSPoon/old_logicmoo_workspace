@@ -196,16 +196,19 @@ mpred_mop(M,Op,Term):-append_term(Op,Term,CALL),find_and_call(M,M,CALL).
 
 :-meta_predicate(find_and_call(+,+,?)).
 
+
+find_and_call(C,G):-loop_check(on_x_rtrace(C:G)).
+
 %= 	 	 
 
 %% find_and_call( +OUT1, +C, ?G) is semidet.
 %
 % Find And Call.
 %
-find_and_call(_,_,C:G):-current_predicate(_,C:G),!,on_x_rtrace(C:G).
-find_and_call(_,C,  G):-current_predicate(_,C:G),!,on_x_rtrace(C:G).
-find_and_call(C,_,  G):-current_predicate(_,C:G),!,on_x_rtrace(C:G).
-find_and_call(_,_,  G):-current_predicate(_,C:G),!,on_x_rtrace(C:G).
+find_and_call(_,_,C:G):-current_predicate(_,C:G),!,find_and_call(C,G).
+find_and_call(_,C,  G):-current_predicate(_,C:G),!,find_and_call(C,G).
+find_and_call(C,_,  G):-current_predicate(_,C:G),!,find_and_call(C,G).
+find_and_call(_,_,  G):-current_predicate(_,C:G),!,find_and_call(C,G).
 find_and_call(C,M,  G):-trace,C:on_x_rtrace(M:G).
 
 
@@ -215,10 +218,10 @@ find_and_call(C,M,  G):-trace,C:on_x_rtrace(M:G).
 %
 % Find And Call.
 %
-find_and_call(C:G):-current_predicate(_,C:G),!,on_x_rtrace(C:G).
-find_and_call(_:G):-current_predicate(_,R:G),!,on_x_rtrace(R:G).
-find_and_call(G):-current_predicate(_,G),!,on_x_rtrace(G).
-find_and_call(G):-current_predicate(_,R:G),!,on_x_rtrace(R:G).
+find_and_call(C:G):-current_predicate(_,C:G),!,find_and_call(C,G).
+find_and_call(_:G):-current_predicate(_,R:G),!,find_and_call(R:G).
+find_and_call(G):-current_predicate(_,G),!,loop_check(on_x_rtrace(G)).
+find_and_call(G):-current_predicate(_,R:G),!,find_and_call(R:G).
 
 
 %= 	 	 
