@@ -122,7 +122,7 @@ w_tl(WM:THeadWM,CM:Call):-w_tl_e(WM:THeadWM,CM:Call).
 w_tl_e(WM:THeadWM,CM:Call):-
  notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     scce_orig(key_asserta(M:HAssert),CM:Call,key_erase).
+     setup_call_cleanup(\+ \+ key_asserta(M:HAssert),CM:Call,key_erase).
 
 
 key_asserta(M:HAssert):- asserta(M:HAssert,REF),(nb_current('$w_tl_e',Was)->nb_setval('$w_tl_e',[REF|Was]);nb_setval('$w_tl_e',[REF])).

@@ -14,7 +14,7 @@
 :- module(logicmoo_util_filesystem,
           [ 
           swi_module/2,
-           
+            is_file_based_expansion/5,
             add_library_search_path/2,
             add_file_search_path/2,
             add_to_search_path/2,
@@ -77,8 +77,6 @@
             add_genlMt/2
             
           ]).
-
-swi_module(M,Preds):- forall(member(P,Preds),M:export(P)). % ,dmsg(swi_module(M)).
 
 :- multifile
         local_directory_search/1.
@@ -900,14 +898,27 @@ add_genlMt(From,imports(To)):-
 :- export(glean_prolog_impl_file/4).
 :- module_transparent(glean_prolog_impl_file/4).
 
+swi_module(M,Preds):- forall(member(P,Preds),M:export(P)). % ,dmsg(swi_module(M)).
+
+is_file_based_expansion(term,I,PosI,_O,_PosO):-!,
+   compound(PosI),nonvar(I),
+   b_getval('$term',Was), Was==I,
+   b_getval('$term_position', Pos),
+   compound(Pos),arg(1,Pos,At),arg(1,PosI,At),!.
+
+is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
+   compound(PosI),nonvar(I),
+   b_getval('$term_position', Pos),
+   compound(Pos),arg(1,Pos,At),arg(1,PosI,At),!.
+
 glean_prolog_impl_file(_,_,_,_):-current_prolog_flag(xref,true),!.
 glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- !,
    assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),
-   add_genlMt(logicmoo_user,imports(baseKB)),
-   add_genlMt(SM,maybe(TypeIn)),
+  % add_genlMt(logicmoo_user,imports(baseKB)),
+  % add_genlMt(SM,maybe(TypeIn)),
    add_genlMt(logicmoo_utils,imports(SM)),
-   add_genlMt(SM,imports(logicmoo_user)),
-   add_genlMt(SM,uses(baseKB)),
+  % add_genlMt(SM,imports(logicmoo_user)),
+   add_genlMt(SM,imports(baseKB)),
    forall(source_file(SM:H,File),
        ignore((functor(H,F,A),
          (predicate_property(SM:H,imported_from(Where))

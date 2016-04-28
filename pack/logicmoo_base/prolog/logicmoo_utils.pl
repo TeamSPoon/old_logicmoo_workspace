@@ -19,8 +19,10 @@
 
 :- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
 :- module_transparent(user:term_expansion/1).
-user:term_expansion(EOF,_):-
+user:term_expansion(EOF,POS,O,POS2):- 
+ is_file_based_expansion(term,EOF,POS,O,POS2),
  nonvar(EOF),
+ EOF==end_of_file,
  prolog_load_context(module,M),
  M\==logicmoo_utils, 
  ignore((
@@ -174,6 +176,8 @@ lmconf:logicmoo_scan_autoloads:-false.
 
 :- thread_local logicmoo_utils_test_tl/0.
 :- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
+
+% :- autoload([verbose(false)]).
 
 % ?- logicmoo_util_term_listing:xlisting(get_gtime).
 

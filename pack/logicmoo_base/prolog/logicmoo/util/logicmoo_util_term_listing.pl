@@ -197,6 +197,8 @@
 
 :- export(mstatistics/0).
 
+:- prolog_load_context(directory,Dir),asserta(lmconf:mpred_loader_dir(Dir)).
+
 %= 	 	 
 
 %% mstatistics is semidet.

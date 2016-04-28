@@ -12,6 +12,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_kb_ops.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_kb_ops,
           [ deducedSimply/1,
 
@@ -241,6 +242,7 @@ attvar_op/2,
 mpred_facts_and_universe/1
             
           ]).
+:- endif.
 
 :- meta_predicate 
       pred_head(1,*),
@@ -902,7 +904,7 @@ all_different_head_vals_2(_,_).
 % PFC Rule Head+body.
 %
 mpred_rule_hb(Outcome,OutcomeO,AnteO):-notrace((mpred_rule_hb_0(Outcome,OutcomeO,Ante),mpred_rule_hb_0(Ante,AnteO,_))),!.
-:-mpred_trace_nochilds(mpred_rule_hb/3).
+% :-mpred_trace_nochilds(mpred_rule_hb/3).
 
 
 %% mpred_rule_hb_0( +Outcome, ?OutcomeO, ?VALUE3) is semidet.
@@ -1174,7 +1176,7 @@ mpred_current_op_support((p,p)):-!.
 pfcVersion(6.6).
 
 
-:- '$set_source_module'(mpred_kb_ops).
+% % :- '$set_source_module'(mpred_kb_ops).
 
 %% correctify_support( +S, ?S) is semidet.
 %
@@ -1673,7 +1675,7 @@ mpred_call_with_no_triggers_uncaugth(Clause) :-  strip_module(Clause,_,F),
 %
 mpred_bc_only(M:G):- call_u(M,mpred_bc_only0(G)).
 
-:- '$set_source_module'(mpred_kb_ops).
+% % :- '$set_source_module'(mpred_kb_ops).
 
 %% mpred_bc_only0( +G) is semidet.
 %
@@ -2393,10 +2395,14 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- retractall(t_l:mpred_debug_local).
 
 :- thread_local(t_l:in_rescan_mpred_hook/0).
+
+/*
+
 :- logicmoo_util_shared_dynamic:asserta_if_new((ereq(G):- !, call_u(G))).
 :- ignore((logicmoo_util_shared_dynamic:retract((ereq(G):- find_and_call(G))),fail)).
 % :- logicmoo_util_shared_dynamic:listing(ereq/1).
 
+*/
 
 % =================================================
 % ==============  UTILS END          ==============
@@ -2583,14 +2589,14 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent(pred_head/2).
 :- module_transparent(if_missing/1).
 
-:- shared_multifile(infoF/1).
+% :- shared_multifile(infoF/1).
 :- was_dynamic(infoF/1).
 :- was_export(infoF/1).
 
 
 mpred_kb_ops_file.
 
-:- '$set_source_module'(mpred_kb_ops).
+% % :- '$set_source_module'(mpred_kb_ops).
 
 
 

@@ -7,6 +7,7 @@
 %
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_wff.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_type_wff,
           [ 
             head_singletons/2, head_singles0/2,head_singles01/2,
@@ -93,6 +94,8 @@
 
             mpred_type_wff_file/0
           ]).
+:- endif.
+
 :- meta_predicate 
         call_last_is_var(0).
 
@@ -258,7 +261,7 @@ isNonVar(Denotation):-not(isSlot(Denotation)).
 %
 % If Is A Slot.
 %
-isSlot(Denotation):-((isVarProlog(Denotation);isVarObject(Denotation))),!.
+other:isSlot(Denotation):-((isVarProlog(Denotation);isVarObject(Denotation))),!.
 :- endif.
 
 

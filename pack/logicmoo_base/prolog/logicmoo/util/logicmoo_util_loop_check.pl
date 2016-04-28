@@ -675,7 +675,7 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 % Hook To [system:goal_expansion/2] For Module Logicmoo_util_loop_check.
 % Goal Expansion.
 %
-user:goal_expansion(LC,LCOO):- notrace((source_location(_,_), current_predicate(_,_:logicmoo_bugger_loaded),lco_goal_expansion(LC,LCOO),LC\=@=LCOO)).
+user:goal_expansion(LC,PIn,LCOO,POut):- notrace((is_file_based_expansion(goal,LC,PIn,LCOO,POut),source_location(_,_),lco_goal_expansion(LC,LCOO),LC\=@=LCOO)).
 
 
 

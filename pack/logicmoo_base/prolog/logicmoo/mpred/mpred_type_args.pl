@@ -9,6 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_type_args,
           [ any_to_number/2,
             any_to_relation/2,
@@ -82,8 +83,9 @@
             trans_subft/2,
             mpred_type_args_file/0
           ]).
+:- endif.
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
-:- '$set_source_module'(mpred_type_args).
+% % :- '$set_source_module'(mpred_type_args).
 
 :- shared_multifile(coerce/3).
 
@@ -106,12 +108,12 @@
 %
 % assert Argument  (isa/2).
 %
-:- '$set_source_module'(mpred_type_args).
+% % :- '$set_source_module'(mpred_type_args).
 assert_argIsa(Prop,N,Type):-show_failure(why,ain_fast(argIsa(Prop,N,Type))).
 
 
 
-:- '$set_source_module'(mpred_type_args).
+% % :- '$set_source_module'(mpred_type_args).
 
 %% assert_predArgTypes( ?ArgTs) is semidet.
 %
@@ -134,7 +136,7 @@ assert_predArgTypes_fa(F,ArgsList):- length(ArgsList,L),assert_predArgTypes_l(F,
 
 %assert_predArgTypes_l(F,L,ArgsList):- arity(F,A),!,must( (A>=L) -> assert_predArgTypes_from_right(F,A,ArgsList);true).
 
-:- '$set_source_module'(mpred_type_args).
+% % :- '$set_source_module'(mpred_type_args).
 
 
 %% assert_predArgTypes_l( ?F, ?L, ?ArgsList) is semidet.
@@ -255,7 +257,7 @@ is_declarations(C):-compound(C),ground(C),!, (\+ (arg(_,C,T), \+ is_spec(T))).
 is_spec(T):- call_u(tCol(T))->true;is_declarations(T).
 
 
-:- '$set_source_module'(mpred_type_args).
+% % :- '$set_source_module'(mpred_type_args).
 
 %% is_rest( :TermARG1) is semidet.
 %
@@ -312,7 +314,7 @@ pl_arg_type(Arg,Type):-
 
 
 
-:- '$set_source_module'(mpred_type_args).
+% % :- '$set_source_module'(mpred_type_args).
 
 %% is_ftText( ?Arg) is semidet.
 %

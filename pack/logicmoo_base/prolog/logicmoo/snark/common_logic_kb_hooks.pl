@@ -57,7 +57,7 @@ noGenlPreds/1,
           ]).
 
 % :- shared_multifile kbp_t_list_prehook/2.
-:- '$set_source_module'(common_logic_kb_hooks).
+% % :- '$set_source_module'(common_logic_kb_hooks).
 :- include('../mpred/mpred_header.pi').
 :-
             op(1150,fx,(was_dynamic)),
@@ -470,7 +470,7 @@ kbp_t_list_prehook(PLIST,PLIST).
 %
 % Knowledge Base P- True Structure List.
 %
-:- '$set_source_module'(common_logic_kb_hooks).
+% % :- '$set_source_module'(common_logic_kb_hooks).
 kbp_t_list(PLIST):- t_l:useDbase_t, t(PLIST).
 kbp_t_list(PLIST):- apply(cyckb_t,PLIST).
 
@@ -544,7 +544,7 @@ kb_mt(C,MT):- into_plist(C,PLIST),!,  append([el_assertions:el_holds|PLIST],[MT,
 kb_mt(C,t):- t_l:useDbase_t, t(C).
 
 
-:- '$set_source_module'(common_logic_kb_hooks).
+% % :- '$set_source_module'(common_logic_kb_hooks).
 
 %= 	 	 
 
@@ -728,6 +728,6 @@ write_assertions:-
    told.
 
 
-:- '$set_source_module'(common_logic_kb_hooks).
+% % :- '$set_source_module'(common_logic_kb_hooks).
 
 

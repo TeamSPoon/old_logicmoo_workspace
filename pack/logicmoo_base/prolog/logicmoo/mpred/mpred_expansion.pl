@@ -53,6 +53,7 @@
 % clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2,  (==>)/1,  (==>)/2, (<-)/1,  (<-)/2, (<==>)/2, fact/1
 %
 */
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_expansion,
           [ acceptable_xform/2,
             additiveOp/1,
@@ -84,6 +85,7 @@
             do_expand_args_pa/4,
             ex_argIsa/3,
             exact_args/1,
+            expand_isEach_or_fail/2,
             expand_goal_correct_argIsa/2,
             expand_props/3,
             expand_props/4,
@@ -144,6 +146,7 @@
             was_isa_syntax/3,
           mpred_expansion_file/0
           ]).
+:- endif.
 
 :- meta_predicate 
    % mpred_expansion
@@ -255,13 +258,9 @@ alt_calls(is_entailed_u).
 alt_calls(call_u).
 alt_calls(ireq).
 
- :- meta_predicate logicmoo_util_bugger:do_ref_job(0,*).
- :- meta_predicate mpred_loader:show_bool(0).
 
- :- meta_predicate mpred_expansion:compare_op(*,2,?,?).
- :- meta_predicate logicmoo_util_preddefs:only_3rd(1,*,*,*).
- :- meta_predicate logicmoo_util_preddefs:with_pfa(1,+).
- :- meta_predicate logicmoo_util_preddefs:with_pfa(1,+,+,+).
+
+:- meta_predicate compare_op(*,2,?,?).
 
 
 :- meta_predicate show_doall(0).
@@ -483,7 +482,7 @@ fully_expand(X,Y):-fully_expand(clause(unknown,cuz),X,Y).
 fully_expand(Op,Sent,SentO):-
   once((/*hotrace*/((cyclic_break((Sent)),
      must(hotrace((deserialize_attvars(Sent,SentI)))),
-     with_no_kif_var_coroutines(((fully_expand_now(Op,SentI,SentO)))),
+     w_tl_e(t_l:no_kif_var_coroutines(true),(((fully_expand_now(Op,SentI,SentO))))),
      cyclic_break((SentO)))))).
 
 %% fully_expand_now( ++Op, ^Sent, --SentO) is det.
@@ -617,8 +616,6 @@ recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..
 
 
 
-:- mpred_trace_none(as_is_term(_)).
-:- '$set_predicate_attribute'(as_is_term(_), hide_childs, 1).
 :- export(as_is_term/1).
 
 %% as_is_term( :TermNC) is semidet.
@@ -637,6 +634,9 @@ as_is_term(_:NC):-!,as_is_term(NC).
 as_is_term(NC):-exact_args(NC),!.
 as_is_term(NC):-functor(NC,Op,2),infix_op(Op,_).
 as_is_term(NC):-loop_check(is_unit(NC)),!.
+
+:- mpred_trace_none(as_is_term(_)).
+:- '$set_predicate_attribute'(as_is_term(_), hide_childs, 1).
 
 %=  :- was_export(infix_op/2).
 

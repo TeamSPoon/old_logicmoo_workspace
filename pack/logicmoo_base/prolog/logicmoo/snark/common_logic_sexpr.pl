@@ -2,7 +2,7 @@
   codelist_to_forms/2,svar_fixvarname/2,input_to_forms/2,input_to_forms/3,
   sexpr_sterm_to_pterm_list/2,
   sexpr//1,
-  to_untyped/2,
+  to_untyped/2,ok_varname/1,svar_fixvarname/2,
   sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
 
 
@@ -870,4 +870,5 @@ process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure):-
 */
 
 :- add_import_module(baseKB,common_logic_sexpr,end).
+
 

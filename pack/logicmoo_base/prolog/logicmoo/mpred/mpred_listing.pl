@@ -11,6 +11,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_list_triggers.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_listing,
           [ draw_line/0,
             loop_check_just/1,
@@ -45,7 +46,7 @@
             show_pred_info_0/1,
             mpred_listing_file/0
           ]).
-
+:- endif.
 
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 

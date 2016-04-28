@@ -12,6 +12,7 @@
 
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_stubs,
           [ 
 agenda_rescan_mpred_props/0,
@@ -85,6 +86,8 @@ wff_check_mpred_t_throw/1,
 mpred_stubs_file/0
           ]).
 
+:- endif.
+
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -103,7 +106,7 @@ cwdl(0,+),
 must_op(*,0),
 % mpred_stubs
 registerCycPredMtWhy(0),
-mpred_stubs:call_provided_mpred_storage_op(*,0,*).
+call_provided_mpred_storage_op(*,0,*).
 
 :- module_transparent
 agenda_rescan_mpred_props/0,
@@ -943,8 +946,11 @@ mpred_t_mpred_storage_clauses_facts(H,true,t(H)):-compound(H),!,current_predicat
 % Hook To [isa_lmconf:mpred_provide_storage_op/2] For Module Mpred_stubs.
 % Managed Predicate Provide Storage Oper..
 %
-lmconf:mpred_provide_storage_op(Op,HB):-hotrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==t;a(prologHybrid,F)), must(is_mpred_op(Op)), 
-    w_tl(t_l:already_in_file_term_expansion,mpred_t_storage_op(Op,HeadBody)).
+lmconf:mpred_provide_storage_op(Op,HB):-
+  must(baseKB:is_mpred_op(Op)),
+  (hotrace(baseKB:demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),
+    once(F==t; baseKB:a(prologHybrid,F)),   
+    w_tl(t_l:already_in_file_term_expansion,mpred_t_storage_op(Op,HeadBody))).
 
 % ====================================================
 % mpred_t_storage_op/2
@@ -980,13 +986,13 @@ mpred_t_storage_op(Op,(Head:-Body)):-
    (mud_call_store_op(Op2,(Head:-Body))).  
 
 % OLD RULE HOOK (but we are using it in parallel)
-mpred_t_storage_op(Op,(Head:-Body)):- \+ use_kif(Head,Body),
+mpred_t_storage_op(Op,(Head:-Body)):- \+ call_u(baseKB:use_kif(Head,Body)),
   wdmsg(saved_clause_in_hybridRule(Op,Head,Body)),!,
       (mud_call_store_op(Op,ruleBackward(Head,Body))).  
 
 % PTTP RULE HOOK   
 mpred_t_storage_op(Op,(Head:-Body)):- 
-   call_u(use_kif(Head,Body)),!, 
+   call_u(baseKB:use_kif(Head,Body)),!, 
    reduce_mpred_op(Op,Op2), 
    CALL0 = (call(Op2,ruleBackward(Head,Body))), % remember outside of KIF just in case
    must(((CALL0,mpred_t_tell_kif(Op2,(Head:-Body))))),!.
@@ -1065,7 +1071,7 @@ mpred_t_call_op(_,FACT):- get_functor(FACT, F,A), !,
 %
 % Call For Literal.
 %
-call_for_literal(_,_,HEAD):- use_kif(HEAD,true),!,kif_ask(HEAD).
+call_for_literal(_,_,HEAD):- call_u(baseKB:use_kif(HEAD,true)),!,kif_ask(HEAD).
 call_for_literal(_,_,HEAD):- use_ideep_swi,!,  call_for_literal_ideep_ilc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
 call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
 
@@ -1120,7 +1126,7 @@ call_for_literal_db0(F,A,HEAD):-no_repeats(HEAD,call_for_literal_db2(F,A,HEAD)).
 call_for_literal_db2(_,_,HEAD):- clause_u(HEAD).
 call_for_literal_db2(F,_,   _):- (isa(F,completelyAssertedCollection);t(completeExtentAsserted,F)),!,fail.
 call_for_literal_db2(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
-call_for_literal_db2(F,A,HEAD):- not(use_kif(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(clause_u(genlPreds(P2,P1)),gp(P1),fail),
+call_for_literal_db2(F,A,HEAD):- \+ call_u(baseKB:use_kif(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(clause_u(genlPreds(P2,P1)),gp(P1),fail),
    call(t,P2,A1,A2).
 
 
@@ -1131,7 +1137,7 @@ call_for_literal_db2(F,A,HEAD):- not(use_kif(HEAD,true)),HEAD=..[P1,A1,A2],dif(P
 %
 % Out Of Managed Predicate True Stucture.
 %
-out_of_mpred_t(HEAD):-clause_safe(HEAD,true)*->true;show_success(why,lmconf:fact_always_true(HEAD)).
+out_of_mpred_t(HEAD):-clause_safe(HEAD,true)*->true;show_success(why,call_u(fact_always_true(HEAD))).
 
 
 
@@ -1142,7 +1148,7 @@ out_of_mpred_t(HEAD):-clause_safe(HEAD,true)*->true;show_success(why,lmconf:fact
 % Call Rule Database.
 %
 call_rule_db(F,A,HEAD):- isa(F,completelyAssertedCollection),!,fail.
-call_rule_db(F,A,HEAD):- use_kif(HEAD,_),!,kif_ask(HEAD).
+call_rule_db(F,A,HEAD):- call_u(baseKB:use_kif(HEAD,_)),!,kif_ask(HEAD).
 call_rule_db(F,A,HEAD):- ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 
 :- style_check(+singleton).
@@ -1327,7 +1333,7 @@ registerCycPredMtWhy_3(M,_PI,F/A2):-
 %
 % Register Cyc Predicate User Microtheory Generation Of Proof.
 %
-registerCycPredMtWhy(P):-!,lmconf:with_pi(P,registerCycPredMtWhy_3).
+registerCycPredMtWhy(P):-!,lmconf:with_pi(P,baseKB:registerCycPredMtWhy_3).
 
 
 

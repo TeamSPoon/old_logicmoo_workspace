@@ -16,6 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_props.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_props,
           [ add_mpred_prop_gleaned/2,
             add_mpred_prop_gleaned_4/4,
@@ -57,6 +58,7 @@
             pred_type_test2/2,
             mpred_props_file/0
           ]).
+:- endif.
 
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 

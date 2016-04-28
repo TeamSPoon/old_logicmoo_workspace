@@ -16,6 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_storage.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_storage,
           [ % ain/1,
           %  add_0/1,
@@ -105,6 +106,7 @@
             world_clear/1,
             mpred_storage_file/0
           ]).
+:- endif.
 
 :- meta_predicate 
         % ain(-),
@@ -241,6 +243,7 @@ world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 %
 % Get Pifunctor.
 %
+get_pifunctor(t,PHead):-!,between(1,9,A),get_pifunctor(t/A,PHead).
 get_pifunctor(Head,PHead):-must(get_pifunctor(Head,PHead,_,_)).
 
 %= 	 	 
@@ -258,9 +261,12 @@ get_pifunctor(Head,PHead,F):-must(get_pifunctor(Head,PHead,F,_)).
 %
 % Get Pifunctor.
 %
+get_pifunctor(M:Head,M:PHead,F,A):-atom(H),!,get_pifunctor(Head,PHead,F,A).
+get_pifunctor(Head,PHead,F,A):-atom(Head),F=Head,!,arity(F,A),functor(PHead,F,A).
 get_pifunctor(Head,PHead,F,A):-var(Head),!,sanity(atom(F)),must(ensure_arity(F,A)),functor(PHead,F,A),ignore(PHead=Head).
-get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(PHead=Head),!.
+get_pifunctor((F/A),PHead,F,A):- integer(A),!,must(atom(F)),functor(PHead,F,A).
 get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(Head/A,PHead,F,A).
+get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(PHead=Head),!.
 
 
 %= 	 	 

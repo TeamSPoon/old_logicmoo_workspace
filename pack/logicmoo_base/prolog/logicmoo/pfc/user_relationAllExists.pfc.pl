@@ -116,6 +116,7 @@ ptTransitiveBinaryPredicate(genls).
 
 :- dynamic(transitiveViaArgInverse/3).
 
+
 ((transitiveViaArg(PRED,BPRED,2),arity(PRED,2)) /ground(PRED:BPRED)) ==> clif((t(PRED,A,B) , t(BPRED,B,C)) => t(PRED,A,C)).
 ((transitiveViaArgInverse(PRED,BPRED,2),arity(PRED,2))/ground(PRED:BPRED)) ==> clif((t(PRED,A,B) & t(BPRED,C,B)) => t(PRED,A,C)).
 
@@ -124,6 +125,9 @@ ptTransitiveBinaryPredicate(genls).
 
 ((transitiveViaArg(PRED,BPRED,3),arity(PRED,3)) /ground(PRED:BPRED)) ==> clif((t(PRED,Z,A,B) , t(BPRED,B,C)) => t(PRED,Z,A,C)).
 ((transitiveViaArgInverse(PRED,BPRED,3),arity(PRED,3))/ground(PRED:BPRED)) ==> clif((t(PRED,Z,A,B) , t(BPRED,C,B)) => t(PRED,Z,A,C)).
+
+:- dynamic(relationAllExists/3).
+
 
 (relationAllExists(Pred,Col1,Col2) ==> (ptBinaryPredicate(Pred),tCol(Col1),tCol(Col2))).
 
@@ -147,6 +151,7 @@ relationAllExists(Pred,Col1,Col2) ==>
 
 */
 
+:- decl_mpred_hybrid(relationInstanceExists/3).
 
 relationInstanceExists(Pred,VAL,D_COL) ==>
  ({SK= skRelationInstanceExistsFn(Pred,VAL,D_COL), G1=..[Pred,VAL,Missing],G2=..[Pred,VAL,SK],ISA=..[D_COL,SK]},
@@ -162,24 +167,24 @@ relationInstanceExists(Pred,VAL,D_COL) ==>
     ((((~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing))))) ==> (G2,ISA)))))).
 
 
-
+:- decl_mpred_hybrid(relationExistsAll/3).
 relationExistsAll(Pred,D_COL,I_COL) ==>
  ({SK= skRelationExistsAllFn(VAL,Pred,D_COL,I_COL), G1=..[Pred,Missing,VAL],G2=..[Pred,SK,VAL],ISA=..[D_COL,SK]},
    (isa(VAL,I_COL) ==>   
   (( ~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing)))) ==> (G2,ISA)))).
 
+:- decl_mpred_hybrid(relationExistsInstance/3).
 relationExistsInstance(Pred,D_COL,VAL) ==>
  ({SK= skRelationExistsInstanceFn(Pred,D_COL,VAL), G1=..[Pred,Missing,VAL],G2=..[Pred,SK,VAL],ISA=..[D_COL,SK]},
   (( ~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing)))) ==> (G2,ISA))).
 
 
 
+prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
 relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),tRolePredicate(BP)).
 prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
 relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 
-
-prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
 relationMostInstance(BP,_,_)==>ptBinaryPredicate(BP).
 (relationMostInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type))==> isa(Value,Type).
 %((relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value],GI=..[Pred,Inst,_]})) ==> (({GI=..[Pred,Inst,_]},isa(Inst,Type), ~GI) ==> G ).
@@ -195,6 +200,8 @@ relationAllInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type)==>(isa(V
 relationAllInstance(Pred,I_COL,VAL) ==>
  ({G1=..[Pred,INST,_Missing],G2=..[Pred,INST,VAL]},
   (isa(INST,I_COL) ==> ( ~ G1 ==> G2))).
+
+prologHybrid(relationInstanceAll(ptBinaryPredicate,vtValue,tCol)).
 
 relationInstanceAll(Pred,VAL,I_COL) ==>
  ({G2=..[Pred,VAL,INST]},

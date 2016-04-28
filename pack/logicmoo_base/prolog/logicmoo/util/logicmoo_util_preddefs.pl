@@ -106,6 +106,10 @@
 
 :- include('logicmoo_util_header.pi').
 
+:- meta_predicate only_3rd(1,*,*,*).
+:- meta_predicate with_pfa(1,+).
+:- meta_predicate with_pfa(1,+,+,+).
+
 
 % ----------
 :- export(with_pi/2).
@@ -242,7 +246,7 @@ make_transparent(_CM,M,PI,F/A):-
 % Context Module Of File.
 %
 context_module_of_file(CM):- prolog_load_context(source,F), make_module_name(F,CM),current_module(CM0),CM==CM0,!.
-context_module_of_file(CM):- '$set_source_module'(CM,CM),!.
+context_module_of_file(CM):-  '$set_source_module'(CM,CM),!.
 context_module_of_file(CM):- source_context_module(CM),!.
 
 :- op(1150,fx,lmconf:dynamic_safe).

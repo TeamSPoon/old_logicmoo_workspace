@@ -281,7 +281,7 @@ When the query succeeds, the SWI-Prolog top level prints the content of the CHR 
 
 % The program below implements a simple finite domain constraint solver.
 
-% :- '$set_source_module'(dom).
+% % % :- '$set_source_module'(dom).
 :- export(dom/2).
 :- use_module(library(chr)).
 

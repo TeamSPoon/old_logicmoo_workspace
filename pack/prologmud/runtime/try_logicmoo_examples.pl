@@ -34,7 +34,7 @@ If we obeyed the limitations set forth upon Horn clauses only being "positive" t
 */
 
 :- module(kb).
-:- '$set_source_module'(kb).
+% % :- '$set_source_module'(kb).
 :- '$set_typein_module'(kb).
 
 

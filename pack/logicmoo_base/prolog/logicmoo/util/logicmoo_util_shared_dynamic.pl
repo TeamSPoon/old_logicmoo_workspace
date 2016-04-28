@@ -97,16 +97,16 @@ decl_shared((A,B)):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared([A|B]):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared([A]):-!,decl_shared(A),!.
 
-decl_shared(F/A):-atom(F),!,asserta_if_new(wsh_w:wrap_shared(F,A,ereq)),(integer(A)->ain(arity(F,A));true),ain((prologHybrid(F))).
-decl_shared(M:F/A):-atom(F),!,asserta_if_new(wsh_w:wrap_shared(F,A,M:ereq)),ain(M:prologHybrid(F)),(integer(A)->ain(arity(F,A));true).
+decl_shared(F/A):-atom(F),!,asserta_if_new(wsh_w:wrap_shared(F,A,ereq)),(integer(A)->ain(baseKB:arity(F,A));true),ain((baseKB:prologHybrid(F))).
+decl_shared(M:F/A):-atom(F),!,asserta_if_new(wsh_w:wrap_shared(F,A,M:ereq)),ain(M:prologHybrid(F)),(integer(A)->ain(baseKB:arity(F,A));true).
 decl_shared(M:P):-compound(P),!,functor(P,F,A),!,decl_shared(M:F/A).
 decl_shared(F:P):-atom(P),!,decl_shared(F:P/_).
 decl_shared(F):-atom(F),!,asserta_if_new(wsh_w:wrap_shared(F,_,ereq)),ain(prologHybrid(F)).
 
 % loading_module 
-:- decl_shared(arity/2).
-:- decl_shared(t).
-:- decl_shared(meta_argtypes/1).
+%:- decl_shared(arity/2).
+%:- decl_shared(t).
+%:- decl_shared(meta_argtypes/1).
 
 
 

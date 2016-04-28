@@ -9,6 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_naming.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_type_naming,
           [ convertOneSpawnArg/4,
             convertSpawnArgs/4,
@@ -41,6 +42,8 @@
 
 
 :- include('mpred_header.pi').
+:- endif.
+
 
 :- dynamic(lmconf:current_source_suffix/1).
 

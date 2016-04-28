@@ -29,8 +29,8 @@ with_ukb_snark(KB,G):- source_module(SM), w_tl(t_l:user_abox(SM,KB),baseKB:G).
 
 % :- ensure_loaded(library(logicmoo_base)).
 
-:- maybe_add_import_module(baseKB,system,end).
-:- initialization(maybe_add_import_module(baseKB,system,end)).
+%:- add_import_module(baseKB,system,end).
+%:- initialization(maybe_add_import_module(baseKB,system,end)).
 % :- with_ukb_snark(baseKB,baseKB:use_module(baseKB:logicmoo_base)).
 
 :-export(checkKB:m1/0).

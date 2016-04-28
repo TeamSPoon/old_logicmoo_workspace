@@ -50,11 +50,12 @@
 
 %:- autoload.
 
-:- sanity( \+predicate_property(baseKB:_,exported)).
+%:- do_gc.
 
-:- do_gc.
 
-:- time(load_snark).
+:-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
+
+% :- time(load_snark).
 
 :- forall(retract(wsh_w:wrap_shared(F,A,ereq)),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
 

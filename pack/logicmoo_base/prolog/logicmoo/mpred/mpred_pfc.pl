@@ -11,6 +11,7 @@
 % ===================================================================
 */
 
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_pfc, [
   ensure_abox/1,
   mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,fix_mp_abox0/3,
@@ -124,6 +125,7 @@
   mpred_unfwc_check_triggers0/1,mpred_unfwc1/1,mpred_why1/1,mpred_blast/1
   % trigger_trigger1/2  , trigger_trigger/3,
   ]).
+:- endif.
 
  :- meta_predicate 
       each_E(:,+,+),
@@ -177,7 +179,7 @@
   asserta_u(IN),clause_asserted_u(OUT),!. % ,nl,writeq(A=@=B).
 */
 
-:- '$set_source_module'(mpred_pfc).
+% % :- '$set_source_module'(mpred_pfc).
 
 :- op(700,xfx,'=@@=').
 
@@ -217,11 +219,11 @@ mnotrace(G):- no_trace(G),!.
 % =================================================
 % ==============  UTILS BEGIN        ==============
 % =================================================
-copy_term_vn(B,A):- need_speed,copy_term(B,A).
 copy_term_vn(B,A):- ground(B),!,A=B.
 % copy_term_vn(A,A):-!.
-copy_term_vn(B,A):- nb_current('$variable_names',Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),b_setval('$variable_names',Vs3).
-copy_term_vn(B,A):- nb_current('$old_variable_names',Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),b_setval('$old_variable_names',Vs3).
+copy_term_vn(B,A):- need_speed,!,copy_term(B,A).
+copy_term_vn(B,A):- nb_current('$variable_names',Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),b_setval('$variable_names',Vs3),!.
+copy_term_vn(B,A):- nb_current('$old_variable_names',Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),b_setval('$old_variable_names',Vs3),!.
 copy_term_vn(B,A):- copy_term(B,A).
 
 setup_mpred_ops:-
@@ -568,7 +570,7 @@ mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
 
 ain_fast(P):- get_source_ref(UU), ain_fast(P,UU).
 ain_fast(P,S):- 
-  filter_buffer_trim('$last_mpred_fwc1s',2),
+  filter_buffer_trim('$last_mpred_fwc1s',1),
   filter_buffer_trim('$last_mpred_post1s',2),
   each_E(mpred_post1,P,[S]),
   mpred_run.
@@ -584,7 +586,7 @@ fresh_mode :- fail.
 mpred_pfc:plus_fwc:-true.
 
 mpred_pfc:plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
-mpred_pfc:plus_fwc(support_hilog(_,_)):-!.
+% mpred_pfc:plus_fwc(support_hilog(_,_)):-!.
 % mpred_pfc:plus_fwc('==>'(_,_)):-!.
 mpred_pfc:plus_fwc(P):- gripe_time(0.6,(mpred_pfc:plus_fwc->loop_check_term(mpred_fwc(P),mpred_pfc:plus_fwc(P),true);true)).
 
@@ -1277,6 +1279,8 @@ filter_buffer_get_n(Name,FactS,N):-
    (length(FactS,N),append(FactS,_,Fact1s))).
 filter_buffer_get_n(_,[],_).
 
+
+filter_buffer_n_test(_Name,_,_Fact):- \+ need_speed, !,fail.
 filter_buffer_n_test(Name,_,Fact):- 
    nb_current(Name,Fact1s),
    member(FF,Fact1s),Fact=@=FF,!.
@@ -1290,7 +1294,7 @@ filter_buffer_n_test(Name,N,Fact):- filter_buffer_get_n(Name,FactS,N),
 %
 mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc\==cwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
-mpred_fwc1(support_hilog(_,_)):-!.
+% mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
   dmsg(mpred_fwc1(Fact)),
   mpred_do_rule(Fact),
@@ -2388,8 +2392,9 @@ mpred_warn(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Ar
 mpred_error(Info):- not_not_ignore_mnotrace(((tracing -> wdmsg(error(pfc,Info)) ; mpred_warn(error(Info))))).
 mpred_error(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_error(Info))))).
 
-mpred_watch:- assert_u(mpred_is_tracing_exec).
 mpred_trace_exec:- assert_u(mpred_is_tracing_exec).
+mpred_watch:- mpred_trace_exec.
+mpred_trace_all:- mpred_trace_exec,mpred_trace,mpred_set_warnings(true).
 mpred_notrace_exec:- retractall_u(mpred_is_tracing_exec).
 
 mpred_nowatch:-  retractall_u(mpred_is_tracing_exec).
@@ -2960,10 +2965,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :-multifile(logicmoo_util_database:aina/1).
 :-multifile(logicmoo_util_database:ainz/1).
 
-:-asserta_new((logicmoo_util_database:ainz(G):- !, call(mpred_pfc:mpred_ainz,G))).
-:-asserta_new((logicmoo_util_database:ain(G):- !, call(mpred_pfc:mpred_ain,G))).
-:-asserta_new((logicmoo_util_database:aina(G):- !, call(mpred_pfc:mpred_aina,G))).
-
 % :- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
 :- asserta_new(mpred_warnings(true)).
 
@@ -3225,7 +3226,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(filter_buffer_get_n/3).
 :- module_transparent(filter_buffer_trim/2).
 
-:- forall(mpred_database_term(F/A,_),(abolish(mpred_pfc:F/A),mpred_userkb:split_into_mts(F/A))).
+:- forall(mpred_database_term(F/A,_),(abolish(mpred_pfc:F/A),split_into_mts(F/A))).
 :- '$current_source_module'(M),add_import_module(M,baseKB,end).
 % :- initialization(ensure_abox(baseKB)).
 

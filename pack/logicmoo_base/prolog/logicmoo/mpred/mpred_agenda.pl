@@ -9,6 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_agenda.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_agenda,
           [ will_call_after/2,
             add_later/1,
@@ -69,6 +70,8 @@
             wfAssert/1,
             mpred_agenda_file/0
           ]).
+:- endif.
+
 :- meta_predicate 
    agenda_slow_op_enqueue(0),
         call_after_mpred_load(0),
@@ -90,7 +93,7 @@ time_tick(*,0),
 :- dynamic
         agenda_slow_op_todo/1,
         suspend_timers/0,
-        will_call_after/2.
+        lmconf:will_call_after/2.
 
 /*
 :- was_dynamic((
@@ -142,7 +145,7 @@ after_mpred_load:- \+(t_l:loading_mpred_file(_,_)),lmconf:loaded_mpred_file(_,_)
 %
 % After Managed Predicate Load Pass Extended Helper.
 %
-after_mpred_load_pass2:- not(lmconf:will_call_after(lmconf:after_mpred_load,_)).
+after_mpred_load_pass2:- \+ (lmconf:will_call_after(lmconf:after_mpred_load,_)).
 :- meta_predicate(call_after_mpred_load(0)).
 % call_after_mpred_load(Code):- lmconf:after_mpred_load,!, call_after_next(after_mpred_load_pass2,Code).
 
@@ -275,10 +278,10 @@ agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true),!.
 agenda_slow_op_restart:-doing_agenda_slow_op,!.
 agenda_slow_op_restart:-
  w_tl(doing_agenda_slow_op,
-  forall(lmconf:agenda_slow_op_todo(Slow),
+  forall(agenda_slow_op_todo(Slow),
     wno_tl(t_l:side_effect_ok,
       ((copy_term(Slow,CopySlow),
-          must((is_callable(Slow),must(Slow),ignore(retract(lmconf:agenda_slow_op_todo(CopySlow)))))))))).
+          must((is_callable(Slow),must(Slow),ignore(retract(agenda_slow_op_todo(CopySlow)))))))))).
 
 :- was_export(agenda_rescan_mpred_ops/0).
 

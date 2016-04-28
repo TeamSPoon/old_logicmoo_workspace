@@ -311,6 +311,8 @@
         with_no_term_expansions(0),
         with_skip_bugger(0).
 
+ :- meta_predicate do_ref_job(0,*).
+
 :- module_transparent
                     show_failure/1,
         asserta_if_ground/1,

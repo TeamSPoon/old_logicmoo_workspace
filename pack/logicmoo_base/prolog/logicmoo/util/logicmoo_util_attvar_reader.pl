@@ -193,7 +193,7 @@ system_expanded_attvars(I,O):- (var(I);compound(I)),!,loop_check(deserialize_att
 end_of_file.
 
 
-:- '$set_source_module'( system).
+% % :- '$set_source_module'( system).
 
 
 :- public '$store_clause'/2.

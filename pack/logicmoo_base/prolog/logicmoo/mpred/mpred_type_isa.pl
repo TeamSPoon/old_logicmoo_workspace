@@ -12,6 +12,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_isa.pl
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_type_isa,
           [ a/2,
             assert_compound_isa/3,
@@ -102,6 +103,7 @@
           type_suffix/2,
           mpred_type_isa_file/0
           ]).
+:- endif.
 
 :-
             op(1150,fx,(was_dynamic)),

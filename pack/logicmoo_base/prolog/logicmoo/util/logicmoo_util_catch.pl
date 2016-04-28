@@ -1452,7 +1452,7 @@ unsafe_safe(_,O):- \+ allow_unsafe_code, !, call(O).
 unsafe_safe(N,O):- on_diff_throw(N,O).
 
 :- export(need_speed/0).
-need_speed.
+need_speed:-fail.
 
 :- export(is_release/0).
 %% is_release is semidet.

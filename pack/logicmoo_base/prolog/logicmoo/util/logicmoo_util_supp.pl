@@ -18,7 +18,7 @@
 % :- if(\+ current_predicate(system:must_or_die/1)).
 :- module(logicmoo_util_supp,[must_or_die/1,must_atomic/1,nop/1,setup_call_cleanup_each/3]).
 %:- endif.
-:- '$set_source_module'(system).
+% % :- '$set_source_module'(system).
 :- meta_predicate
       must_atomic(0),
       must_notrace(0),

@@ -19,13 +19,15 @@
 % DWhitten> ... but is there a reason why "Absurdity" is the word used for something that doesn't exist?  
 % SOWA> It's stronger than that.  The absurd type is defined by axioms that are contradictory. 
 %  Therefore, by definition, nothing of that type can exist. 
+:- if(current_prolog_flag(xref,true)).
 :- module(mpred_userkb, [mpred_userkb_file/0]).
 
 :- include('mpred_header.pi').
+:- endif.
 
 mpred_userkb_file.
 
-:- '$set_source_module'(mpred_userkb).
+% % :- '$set_source_module'(mpred_userkb).
 
 :- dynamic(base_kb_pred_list/1).
 
@@ -35,7 +37,7 @@ mpred_userkb_file.
 %
 % Base Knowledge Base Predicate List.
 %
-base_kb_pred_list([
+mpred_userkb:base_kb_pred_list([
 % prolog_load_file_loop_checked/2,
  (::::)/2,
  (<-)/2,
@@ -180,6 +182,9 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
  prologSideEffects/1,prologHybrid/1,prologListValued/1]).
 
 
+% % :- '$set_source_module'(baseKB).
+
+
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -200,31 +205,32 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
       baseKB:mpred_isa(?,1),
       baseKB:resolverConflict_robot((*)))).
 
-% MAYBE :- :- '$set_source_module'(baseKB).
+
 :- thread_local(t_l:user_abox/2).
+
 t_l:user_abox(baseKB,baseKB).
 
 :- show_call(source_context_module(_CM)).
 
 
-% MAYBE :- :- '$set_source_module'(baseKB).
+% % :- '$set_source_module'(baseKB).
 
-:- base_kb_pred_list(List),mpred_loader:forall((member(E,List),E\='$pldoc'/4),must(mpred_loader:split_into_mts(E))).
+:- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),must(split_into_mts(E))).
 % :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
 
 
-% MAYBE :- import_module_to_user(logicmoo_user).
+:- import_module_to_user(logicmoo_user).
 
-% MAYBE :- initialization(import_module_to_user(logicmoo_user)).
+:- initialization(import_module_to_user(logicmoo_user)).
 
 
 % :- module_property(baseKB, exports(List)),forall(member(E,List),kb_dynamic(E)).
 
 % :- use_module(mpred_pfc).
 
-% MAYBE :- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
+:- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
 
-% MAYBE :- '$set_source_module'(baseKB).
+% % :- '$set_source_module'(baseKB).
 
 %= 	 	 
 
@@ -264,15 +270,15 @@ baseKB:t(X,Y):- cwc, isa(Y,X).
 %
 % True Structure.
 %
-logicmoo_user:t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST).
+baseKB:t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST).
 :- meta_predicate(t(?,?,?,?,?)).
 :- meta_predicate(t(?,?,?,?)).
 :- meta_predicate(t(?,?,?)).
-:- meta_predicate logicmoo_user:t(5,?,?,?,?,?).
-:- meta_predicate logicmoo_user:t(7,?,?,?,?,?,?,?).
-:- meta_predicate logicmoo_user:t(6,?,?,?,?,?,?).
+:- meta_predicate baseKB:t(5,?,?,?,?,?).
+:- meta_predicate baseKB:t(7,?,?,?,?,?,?,?).
+:- meta_predicate baseKB:t(6,?,?,?,?,?,?).
 
-:-asserta_if_new(logicmoo_user:(~(G):- (cwc, neg_in_code(G)))).
+:-asserta_if_new(baseKB:(~(G):- (cwc, neg_in_code(G)))).
 
 %= 	 	 
 
@@ -280,7 +286,7 @@ logicmoo_user:t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_
 %
 % ~.
 %
-'~'(tCol('$VAR')).
+:-asserta('~'(tCol('$VAR'))).
 
 % baseKB:import(I):-system:import(baseKB:I).
 
