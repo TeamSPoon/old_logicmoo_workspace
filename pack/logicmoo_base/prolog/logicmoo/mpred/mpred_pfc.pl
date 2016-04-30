@@ -133,6 +133,7 @@
       pfcl_do(+), % not all arg1s are callable
       lookup_u(:),
       mnotrace(0),
+      fix_mp(+,0),
       clause_asserted_u(+),
       mpred_get_support(+,-),
       mpred_fact(?,0),
@@ -161,6 +162,7 @@
 
 :- module_transparent(clause_asserted_u/1).
 :- module_transparent(show_if_debug/1).
+:- module_transparent(fix_mp/2).
 :- module_transparent(bagof_or_nil/3).
 :- module_transparent(with_fc_mode/2).
 :- module_transparent(with_mpred_trace_exec/1).
@@ -199,15 +201,18 @@
 
 :- module_transparent((ensure_abox)/1).
 :- dynamic(lmcache:has_pfc_database_preds/1).
+ensure_abox(baseKB):-!.
 ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
 ensure_abox(logicmoo_user):-!, ensure_abox(baseKB).
+ensure_abox(logicmoo_user):-!,throw(logicmoo_user(  ensure_abox(baseKB))).
+/*
 ensure_abox(user):- !, ensure_abox(logicmoo_user),!.
 ensure_abox(M):- 
    asserta(lmcache:has_pfc_database_preds(M)),
    asserta_if_new(lmconf:is_box_module(M,abox)),
    mpred_ops(M), 
    ensure_imports(M),
-   maybe_add_import_module(M,mpred_pfc,end),
+   maybe_add_import_module(M,baseKB,end),
    forall(mpred_database_term(F/A,_),
      (functor(P,F,A),
       must(\+((predicate_property(M:P,imported_from(W)),wdmsg(predicate_property(P,imported_from(W)))))))),
@@ -215,7 +220,7 @@ ensure_abox(M):-
        (M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         M:multifile(M:F/A))),!.
-
+*/
 mnotrace(G):- no_trace(G),!.
 
 % =================================================
@@ -292,9 +297,17 @@ get_source_ref10(M):- fail,trace,
 
 is_source_ref1(_).
 
+unassertable(Var):-var(Var).
+unassertable((_:V)):-!,unassertable(V).
+unassertable((_;_)).
+unassertable((_,_)).
+
 fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
+fix_mp(Unassertable,_):- unassertable(Unassertable),!,trace_or_throw(unassertable_fix_mp(Unassertable)).
+fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
 fix_mp(_:P,ABOX:P):- current_abox(ABOX),!.
 fix_mp(P,ABOX:P):- current_abox(ABOX),!.
+/*
 % probably never makes it past the above
 fix_mp(MP,M:P):-  strip_module(MP,Cm,P),current_abox(U),!,
    (((modulize_head_fb(U,P,Cm,M:P),\+ predicate_property(M:P,static)))*-> true;
@@ -309,7 +322,7 @@ fix_mp(G0,CALL):-
        (current_predicate(_,logicmoo_user:G)->CALL=logicmoo_user:G;
        (current_predicate(_,baseKB:G)->CALL=baseKB:G;
         fail)))),!.
-
+*/
 fix_mp_abox(G0,U,G):-fix_mp(G0,U:G).
 
   
@@ -399,8 +412,8 @@ with_umt(G0):-
 */
 
 with_umt(G):-
-  gripe_time(0.2,fix_mp_abox(G,U,CALL)),
-  call_from_module(U,CALL).
+  gripe_time(0.3,
+   (current_abox(U),call_from_module(U,G))).
 
 
 
@@ -1896,14 +1909,14 @@ mpred_mark_as(Sup,~(P),Type):- !,mpred_mark_as(Sup,P,Type).
 mpred_mark_as(Sup,-(P),Type):- !,mpred_mark_as(Sup,P,Type).
 mpred_mark_as(Sup,not(P),Type):- !,mpred_mark_as(Sup,P,Type).
 mpred_mark_as(Sup,[P|PL],Type):- is_list([P|PL]), !,must_maplist(mpred_mark_as_ml(Sup,Type),[P|PL]).
-mpred_mark_as(Sup,( P / CC ),Type):- !, mpred_mark_as(Sup,P,Type),mpred_mark_as(Sup,( CC ),pfcCallCode).
-mpred_mark_as(Sup,'{}'(  CC ), _Type):- mpred_mark_as(Sup,( CC ),pfcCallCode).
+mpred_mark_as(Sup,( P / CC ),Type):- !, mpred_mark_as(Sup,P,Type),mpred_mark_as(Sup,( CC ),pfcCallCodePreCond).
+mpred_mark_as(Sup,'{}'(  CC ), _Type):- mpred_mark_as(Sup,( CC ),pfcCallCodeBody).
 mpred_mark_as(Sup,( A , B), Type):- !, mpred_mark_as(Sup,A, Type),mpred_mark_as(Sup,B, Type).
 mpred_mark_as(Sup,( A ; B), Type):- !, mpred_mark_as(Sup,A, Type),mpred_mark_as(Sup,B, Type).
 mpred_mark_as(Sup,( A ==> B), Type):- !, mpred_mark_as(Sup,A, Type),mpred_mark_as(Sup,B, pfcRHS).
 mpred_mark_as(Sup,( B <- A), Type):- !, mpred_mark_as(Sup,A, Type),mpred_mark_as(Sup,B, pfcRHS).
 %mpred_mark_as(_Sup,( _ :- _ ),_Type):-!.
-mpred_mark_as(Sup,( P :- CC ),Type):- !, mpred_mark_as(Sup,P,Type),mpred_mark_as(Sup,( CC ),pfcCallCode).
+mpred_mark_as(Sup,( P :- CC ),Type):- !, mpred_mark_as(Sup,P,Type),mpred_mark_as(Sup,( CC ),pfcCallCodeAnte).
 mpred_mark_as(Sup,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup,P,F,A,Type)),!.
 
 
@@ -1916,6 +1929,8 @@ mpred_mark_as(Sup,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup,P,F,A,
 
 % mpred_mark_fa_as(_Sup,_P,'\=',2,_):- trace.
 mpred_mark_fa_as(_Sup,_P,isa,_,_):- !.
+mpred_mark_fa_as(_Sup,_P,_,_,pfcCallCodeBody):- !.
+mpred_mark_fa_as(_Sup,_P,_,_,pfcCallCodeTst):- !.
 mpred_mark_fa_as(_Sup,_P,t,_,_):- !.
 mpred_mark_fa_as(_Sup,_P,argIsa,N,_):- !,must(N=3).
 mpred_mark_fa_as(_Sup,_P,arity,N,_):- !,must(N=2).
@@ -1957,7 +1972,7 @@ build_code_test(_Sup,!,cut_c):-!.
 build_code_test(WS,rhs(Test),rhs(TestO)) :- !,build_code_test(WS,Test,TestO).
 build_code_test(WS,Test,TestO):- is_list(Test),must_maplist(build_code_test(WS),Test,TestO).
 build_code_test(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],must_maplist(build_code_test(WS),TestL,TestLO),TestO=..[F|TestLO],!.
-build_code_test(WS,Test,Test):- must(mpred_mark_as(WS,Test,pfcCallCode)),!.
+build_code_test(WS,Test,Test):- must(mpred_mark_as(WS,Test,pfcCallCodeTst)),!.
 build_code_test(_,Test,Test).
 
 
@@ -2047,9 +2062,8 @@ mpred_assertz_w_support(P,Support):-
 % PFC Clause For User Interface.
 %
 
-clause_asserted_u(MH):-must_be(nonvar,MH),fail.
-clause_asserted_u(_:H):-must_be(nonvar,H),fail.
 
+clause_asserted_u(MH):- sanity((nonvar(MH), \+  predicate_property(MH, static))),fail.
 %clause_asserted_u(MH):- \+ ground(MH),must(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
 clause_asserted_u((MH:-B)):- must(mnotrace(fix_mp(MH,M:H))),!,clause_asserted_i((M:H :-B )).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(MH,M:H))),clause_asserted_i(M:H).

@@ -13,7 +13,7 @@
 % Load logicmoo REPL Base
 % ==============================
 :- asserta(load_mud_www).
-:- user:ensure_loaded(library(logicmoo_user)).
+%USER :- user:ensure_loaded(library(logicmoo_user)).
 
 
 :- statistics.
@@ -40,7 +40,7 @@ setup_rl_read_history:-
 :- endif.
 
 % [Required] Load the Logicmoo Base System
-:- time(user:ensure_loaded(logicmoo_user)).
+%USER :- time(user:ensure_loaded(logicmoo_user)).
 % :- meta_predicate testml(//).
 
 
@@ -59,7 +59,7 @@ setup_rl_read_history:-
 
 :- (if_file_exists(user:ensure_loaded(library(logicmoo_base)))).
 
-:- (if_file_exists(user:ensure_loaded(library(logicmoo_user)))).
+%USER :- (if_file_exists(user:ensure_loaded(library(logicmoo_user)))).
 
 % ==============================
 % Load the infernce engine

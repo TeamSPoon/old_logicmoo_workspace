@@ -249,7 +249,7 @@
 
 :- (thread_local t_l:into_form_code/0, t_l:mpred_module_expansion/1).
 %:- (volatile t_l:into_form_code/0, t_l:mpred_module_expansion/1).
-%:- was_export((convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, guess_if_mpred_file0/1, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2, xfile_module_term_expansion_pass_3/7)).
+%:-  /**/ export((convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, guess_if_mpred_file0/1, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2, xfile_module_term_expansion_pass_3/7)).
 %:- dynamic((registered_module_type/2, current_op_alias/2, lmconf:mpred_skipped_module/1, prolog_load_file_loop_checked/2, lmcache:mpred_directive_value/3, current_abox/1, lmconf:loaded_file_world_time/3, lmconf:never_reload_file/1, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, current_abox/1, disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_directive_value/3, lmconf:mpred_skipped_module/1, never_reload_file/1, prolog_load_file_loop_checked/2, registered_module_type/2, t_l:disable_mpred_term_expansions_globally/0, user:prolog_load_file/2, user:term_expansion/2)).
 %:- dynamic(registered_module_type/2).        
 
@@ -261,20 +261,21 @@
 %
 % Knowledge Base Dynamic.
 %
-kb_dynamic(FA):- is_ftVar(FA),!,fail.
-kb_dynamic(P):-atom(P),get_arity(P,F,A),!,kb_dynamic(F/A).
-kb_dynamic(_:FA):- is_ftVar(FA),!,fail.
-kb_dynamic(_:F/_):- is_ftVar(F),!,fail.
-kb_dynamic(F/A):- !, current_abox(KB),!,kb_dynamic(KB:F/A).
-kb_dynamic([FA1|FA2]):-!,kb_dynamic(FA1),kb_dynamic(FA2).
-kb_dynamic((FA1,FA2)):-!,kb_dynamic(FA1),kb_dynamic(FA2).
+kb_dynamic(FA):- loop_check(kb_dynamic0(FA)).
+kb_dynamic0(FA):- is_ftVar(FA),!,fail.
+kb_dynamic0(P):-atom(P),must(get_arity(P,F,A)),!,kb_dynamic(F/A).
+kb_dynamic0(_:FA):- is_ftVar(FA),!,fail.
+kb_dynamic0(_:F/_):- is_ftVar(F),!,fail.
+kb_dynamic0(F/A):- !, current_abox(KB),!,kb_dynamic(KB:F/A).
+kb_dynamic0([FA1|FA2]):-!,kb_dynamic(FA1),kb_dynamic(FA2).
+kb_dynamic0((FA1,FA2)):-!,kb_dynamic(FA1),kb_dynamic(FA2).
 % kb_dynamic(CM:M:FA):- atom(CM),atom(M),!,(CM==M -> kb_dynamic(M:FA);(CM:kb_dynamic(M:FA))).
 % kb_dynamic(CM:M:F/A):- atom(CM),atom(M),!,(CM==M -> kb_dynamic(M:FA);(CM:kb_dynamic(M:F/A))).
-kb_dynamic(M:(FA1,FA2)):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
-kb_dynamic(M:[FA1|FA2]):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
-kb_dynamic(M:F/A):-!,quietly_must((make_declared(M:F/A,T),current_abox(CM),make_reachable(CM,T:F/A))).
-kb_dynamic(M:P):-functor(P,F,A),!,kb_dynamic(M:F/A).
-kb_dynamic(P):-compound(P),functor(P,F,A),!,kb_dynamic(F/A).
+kb_dynamic0(M:(FA1,FA2)):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
+kb_dynamic0(M:[FA1|FA2]):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
+kb_dynamic0(M:F/A):-!,quietly_must((make_declared(M:F/A,T),must(current_abox(CM)),make_reachable(CM,T:F/A))).
+kb_dynamic0(M:P):-functor(P,F,A),!,kb_dynamic(M:F/A).
+kb_dynamic0(P):-compound(P),functor(P,F,A),!,kb_dynamic(F/A).
 
 
 
@@ -307,6 +308,7 @@ make_declared_now(M:F/A):-!,
     (predicate_property(P,static)->debug(make_declared,'~p',make_declared_now(M:F/A));
        M:dynamic(M:F/A))),!,
    M:multifile(M:F/A),
+   M:dynamic(M:F/A),
    M:module_transparent(M:F/A),
    import_to_user(M:F/A))), !.
 make_declared_now(M:P):-functor(P,F,A),!,make_declared_now(M:F/A). 
@@ -316,7 +318,7 @@ split_into_mts(F/A):- M=baseKB,
       asserta(M:P,Ref),erase(Ref).
 /*
    make_declared_now(baseKB:F/A),
-   nop(make_declared_now(logicmoo_user:F/A)).  
+   
 */
 
 
@@ -436,7 +438,7 @@ mpred_file_term_expansion(_,_,I,_):- is_ftVar(I),!,fail.
 mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !, Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
 mpred_file_term_expansion(_,_,_,_):- get_lang(pl),!,fail.
 mpred_file_term_expansion(Type,LoaderMod,(I:-B),OO):-B==true,!,mpred_file_term_expansion(Type,LoaderMod,I,OO).
-mpred_file_term_expansion(Type,LoaderMod,I,( :- ain(I))):-!.
+mpred_file_term_expansion(Type,LoaderMod,I,( :- must(ain(I)))):-!.
 mpred_file_term_expansion(Type,LoaderMod,I,OO):-
  ((
   sanity((ground(Type:LoaderMod),nonvar(I),var(OO))),
@@ -578,7 +580,7 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 
 
 
-:- was_export(etrace/0).
+:-  /**/ export(etrace/0).
 
 
 
@@ -765,7 +767,7 @@ check_term_expansions:- not(do_term_expansions).
 
 :- op(1120,fx,export),op(1120,fx,export).
 
-:- was_export(((current_context_module/1,
+:-  /**/ export(((current_context_module/1,
     module_typed_term_expand/2,
          register_module_type/1,          
          end_module_type/1))).
@@ -1813,7 +1815,7 @@ load_language_file(Name0):-
 disable_mpreds_in_current_file:- loading_source_file(F),show_call(why,asserta((t_l:disable_px:-loading_source_file(F),!))).
 
 :- thread_local(tlbugger:no_buggery_tl/0).
-:- was_export(with_no_mpred_expansions/1).
+:-  /**/ export(with_no_mpred_expansions/1).
 :- meta_predicate(with_no_mpred_expansions(0)).
 
 
@@ -1827,7 +1829,7 @@ with_no_mpred_expansions(Goal):-
     w_tl(t_l:disable_px,Goal)).
 
 
-:- was_export(with_mpred_expansions/1).
+:-  /**/ export(with_mpred_expansions/1).
 :- meta_predicate(with_mpred_expansions(0)).
 
 
@@ -1840,7 +1842,7 @@ with_mpred_expansions(Goal):-
   wno_tl(tlbugger:no_buggery_tl,
     wno_tl(t_l:disable_px,Goal)).
 
-:- was_export(ensure_loaded_no_mpreds/1).
+:-  /**/ export(ensure_loaded_no_mpreds/1).
 :- meta_predicate(ensure_loaded_no_mpreds(0)).
 
 
@@ -1894,7 +1896,7 @@ register_module_type(Type):-current_context_module(CM),register_module_type(CM,T
 register_module_type(CM,Types):-is_list(Types),!,forall(member(T,Types),register_module_type(CM,T)).
 register_module_type(CM,Type):-asserta_new(lmconf:registered_module_type(CM,Type)).
 
-:- was_export(end_module_type/2).
+:-  /**/ export(end_module_type/2).
 
 
 
@@ -1932,7 +1934,7 @@ ensure_mpred_file_loaded(M:F0,List):-
 ******/
 
 
-:- was_export(declare_load_dbase/1).
+:-  /**/ export(declare_load_dbase/1).
 
 
 
@@ -1942,7 +1944,7 @@ ensure_mpred_file_loaded(M:F0,List):-
 %
 declare_load_dbase(Spec):- forall(no_repeats_old(File,must_locate_file(Spec,File)),show_call(why,asserta_if_new(lmconf:registered_mpred_file(File)))).
 
-% :- was_export((is_compiling_sourcecode/1)).
+% :-  /**/ export((is_compiling_sourcecode/1)).
 
 
 
@@ -1954,7 +1956,7 @@ is_compiling_sourcecode:-is_compiling,!.
 is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),\+((t_l:loading_mpred_file(_,_))),F=user,!.
 is_compiling_sourcecode:-compiling,dmsg(system_compiling),!.
 
-:- was_export(load_mpred_files/0).
+:-  /**/ export(load_mpred_files/0).
 
 
 
@@ -2110,7 +2112,7 @@ force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_),
     (wdmsg(error(Error,File)),retractall(lmconf:loaded_mpred_file(World,File)),
      retractall(lmconf:loaded_file_world_time(File,World,_AnyTime)))))))))).
 
-:- was_export(load_mpred_on_file_end/2).
+:-  /**/ export(load_mpred_on_file_end/2).
 
 
 

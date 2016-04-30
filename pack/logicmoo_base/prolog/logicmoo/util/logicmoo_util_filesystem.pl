@@ -876,6 +876,8 @@ os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \== OSP,!,os_to_prol
 :- multifile(lmconf:known_prolog_file_prop/2).
 :- dynamic(lmconf:known_prolog_file_prop/2).
 
+% add_genlMt(_,_):-!.
+
 add_genlMt(From,Prop):-atom(Prop),!,add_genlMt(From,imports(Prop)).
 add_genlMt(From,CTo):-arg(1,CTo,To),From==To,!.
 add_genlMt(From,imports(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.

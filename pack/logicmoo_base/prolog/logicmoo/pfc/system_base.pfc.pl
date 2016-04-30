@@ -37,10 +37,14 @@
 
 
 % catching of misinterpreations
-((mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static))) ==> 
-  {break,trace_or_throw(warn(pfcPosTrigger,P,static))}).
-(mpred_mark(pfcNegTrigger,F,A)/(fa_to_p(F,A,P),  P\={_}, predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
-(mpred_mark(pfcBcTrigger,F,A)/(fa_to_p(F,A,P), predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
+((mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static), predicate_property(P,defined))) ==> 
+  {listing(P),trace_or_throw(warn(pfcPosTrigger,P,static))}).
+
+(mpred_mark(pfcNegTrigger,F,A)/(fa_to_p(F,A,P),  P\={_}, predicate_property(P,static), predicate_property(P,defined))) ==> {
+  listing(P),dmsg(warn(pfcNegTrigger,P,static))}.
+
+(mpred_mark(pfcBcTrigger,F,A)/(fa_to_p(F,A,P),
+   predicate_property(P,static), predicate_property(P,defined))) ==> {listing(P),dmsg(warn(pfcNegTrigger,P,static))}.
 
 
 
@@ -136,6 +140,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 %:- kb_dynamic(hybrid_support/2).
 %prologBuiltin(resolveConflict/1).
 
+:- dynamic(bt/2).
 bt(P,Trig)==> (P:- mpred_bc_only(P)).
 
 ((prologHybrid(F),arity(F,A)/is_ftNameArity(F,A))==>hybrid_support(F,A)).
@@ -198,10 +203,6 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 ((marker_supported(F,A)/is_ftNameArity(F,A),prologHybrid(F))==>hybrid_support(F,A)).
 (hybrid_support(F,A) ==>{ must(kb_dynamic(F/A))}).
 
-
-prologHybrid(defnIff(ttExpressionType,ftTerm)).
-
-defnIff(X,_)==>ttExpressionType(X).
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
 

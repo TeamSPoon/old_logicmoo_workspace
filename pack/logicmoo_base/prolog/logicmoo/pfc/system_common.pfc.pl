@@ -37,6 +37,8 @@
 
 arity(genlPreds,2).
 
+:- dynamic(mpred_undo_sys/3).
+pfcControlled(mpred_undo_sys(ftAssertion, ftCallable, ftCallable)).
 mpred_undo_sys(P, WhenAdded, WhenRemoved) ==> (P ==> {WhenAdded}), mpred_do_and_undo_method(WhenAdded,WhenRemoved).
 
 % DONT mpred_undo_sys(added(P),ain(P),mpred_retract(P)).
@@ -97,7 +99,7 @@ prologHybrid(genls/2).
 % remove conflicts early 
 % (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
 
-:- assertz((never_retract_u(~(X),is_ftVar(X)):- cwc,is_ftVar(X))).
+:- ain((never_retract_u(~(X),is_ftVar(X)):- cwc,is_ftVar(X))).
 
 
 % These next 2 might be best as builtins?
@@ -249,6 +251,7 @@ ttPredType(prologSingleValued).
 
 ttPredType(pfcWatched).
 ttPredType(pfcCreates).
+:- dynamic(pfcNegTrigger/1).
 ttPredType(pfcNegTrigger).
 ttPredType(pfcPosTrigger).
 ttPredType(pfcBcTrigger).
@@ -260,6 +263,9 @@ ttPredType(pfcMustFC).
 
 
 ttPredType(P)==>(tSet(P),completelyAssertedCollection(P)).
+
+:- dynamic(baseKB:ttTypeType/1).
+
 ttTypeType(C)==>completelyAssertedCollection(C).
 
 %overkill
@@ -288,9 +294,8 @@ prologSideEffects(write/1).
 prologSideEffects(resolveConflict/1).
 
 
-mpred_mark(pfcCallCode,false,0).
-mpred_mark(pfcCallCode,true,0).
 
+/*
 ((hybrid_support(F,A)/(is_ftNameArity(F,A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
   ({    
     functor(G,F,A),
@@ -303,7 +308,7 @@ mpred_mark(pfcCallCode,true,0).
      show_failure(hybrid_support, \+ static_predicate(F/A))}),
      prologHybrid(F),
     arity(F,A)).
-
+*/
 
 % :- prolog.
 % tPred
@@ -351,7 +356,7 @@ pfcControlled(argIsa).
 ==>tSet(tSet).
 
 
-tSet(C)==>
+:- must(ain((tSet(C)==>
  ( {atom(C), functor(Head,C,1),
   ( \+(predicate_property(Head,S1))-> kb_dynamic(C/1); true),
   Head=..[C,S2],nop((S1:S2)),
@@ -360,7 +365,7 @@ tSet(C)==>
    pfcControlled(C),
    arity(C,1),
    % (isa(I,C)/ground(I:C)==>Head),
-   tCol(C)).
+   tCol(C))))).
 
 
 ttExpressionType(P) ==> {get_functor(P,C), functor(Head,C,1),
@@ -669,16 +674,16 @@ equal(A,C),notequal(A,B) ==> notequal(C,B).
 % ((P,Q ==> false) ==> (P ==> ~(Q)), (Q ==> ~(P))).
 
 
-:- was_export(member/2).
-:- was_export(arg/3).
-%:- was_export(call_u/1).
+:-  /**/ export(member/2).
+:-  /**/ export(arg/3).
+%:-  /**/ export(call_u/1).
 % prologDynamic(cycAssert/2).
-:- was_export(integer/1).
-% :- was_export(makeConstant/1).
-% :- was_export(naf/1).
-:- was_export(number/1).
-:- was_export(string/1).
-:- was_export(var/1).
+:-  /**/ export(integer/1).
+% :-  /**/ export(makeConstant/1).
+% :-  /**/ export(naf/1).
+:-  /**/ export(number/1).
+:-  /**/ export(string/1).
+:-  /**/ export(var/1).
 
 tCol(completeExtentAsserted).
 tCol(ttExpressionType).
@@ -786,7 +791,7 @@ argIsa(Prop,N,Type),{number(N)},ttExpressionType(Type) ==> argQuotedIsa(Prop,N,T
 :- kb_dynamic(mudLabelTypeProps/3).
 :- shared_multifile(mudLabelTypeProps/3).
 :- forall(ttPredType(F),must((decl_type(F),ain(isa(F,functorDeclares)),ain(genls(F,tPred))))).
-:- was_export(mtForPred/2).
+:-  /**/ export(mtForPred/2).
 
 /*
 :- rtrace.

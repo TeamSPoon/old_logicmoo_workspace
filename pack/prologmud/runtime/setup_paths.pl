@@ -25,9 +25,9 @@ in_logicmoo_repl_source_file.
 :- initialization(attach_packs).
 
 :- if((exists_source(library(logicmoo_utils)))).
-:- use_module(library(logicmoo_utils)).
-:- use_module(logicmoo(mpred/mpred_pfc)).
-:- use_module(library(logicmoo_user)).
+:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(logicmoo(mpred/mpred_pfc)).
+%USER :- ensure_loaded(library(logicmoo_user)).
 
 :- else.
 

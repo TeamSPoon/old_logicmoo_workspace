@@ -45,6 +45,12 @@ scce_orig(Setup,Goal,Cleanup):-
      E, (ignore(must_atomic(Cleanup)),throw(E))).
 
 
+
+:- if(\+ current_predicate(system:nop/1)).
+:- system:ensure_loaded(systyem:logicmoo_util_supp).
+:- endif.
+
+
 :- meta_predicate scce_orig2(0,0,0).
 scce_orig2(Setup,Goal,Cleanup):- 
   setup_call_cleanup(Setup, 

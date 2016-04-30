@@ -15,17 +15,32 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-% :- if(\+ current_predicate(system:must_or_die/1)).
-:- module(logicmoo_util_supp,[must_or_die/1,must_atomic/1,nop/1,setup_call_cleanup_each/3]).
+:- if(\+ current_predicate(system:must_or_die/1)).
+:- module(logicmoo_util_supp,[must_or_die/1,must_atomic/1,nop/1,no_trace/1,setup_call_cleanup_each/3]).
 %:- endif.
 % % :- '$set_source_module'(system).
 :- meta_predicate
       must_atomic(0),
       must_notrace(0),
       must_or_die(0),      
+      no_trace(0),
+      nop(0),
       setup_call_cleanup_each(0,0,0),
       call_cleanup_each(0,0).
 
+:- if(\+ current_predicate(system:nop/1)).
+:- system:ensure_loaded(systyem:logicmoo_util_supp).
+:- endif.
+
+
+%% nop( ?VALUE1) is semidet.
+%
+% Nop.
+%
+:- if( \+ current_predicate(nop/1)).
+:- export(nop/1).
+nop(_).
+:- endif.
 
 :- if(\+ current_predicate(system:must_or_die/1)).
 
@@ -36,7 +51,7 @@ must_or_die(Goal):- (Goal *-> true ; throw(failed_must_or_die(Goal))).
 
 :- module_transparent(must_atomic/1).
 :- '$hide'(must_atomic/1).
-must_atomic(Goal):- notrace(must_or_die('$sig_atomic'(Goal))).
+must_atomic(Goal):- must_or_die(notrace(('$sig_atomic'(Goal)))).
 
 :- module_transparent(must_notrace/1).
 :- '$hide'(must_notrace/1).
@@ -76,12 +91,5 @@ setup_call_cleanup_each(Setup,Goal,Cleanup):-
 
 :- endif.
 
-%% nop( ?VALUE1) is semidet.
-%
-% Nop.
-%
-:- if( \+ current_predicate(nop/1)).
-:- export(nop/1).
-nop(_).
 :- endif.
 

@@ -488,10 +488,10 @@ dtrace:- wdmsg("DUMP_TRACE_BREAK/0"), break,dtrace(trace).
 % (debug) Trace.
 %
 
-dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),break,dumptrace(G). % setup_call_cleanup_each(notrace,(leash(+call),dtrace(G)),trace).
+dtrace(G):- has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
+dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dtrace(G))),trace).
 
 dtrace(G):- notrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
-dtrace(G):- has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
 dtrace(G):- dumptrace(G).
@@ -524,7 +524,7 @@ to_wmsg(G,WG):- (G=WG).
 with_source_module(G):-
   '$current_source_module'(M),
   '$current_typein_module'(WM),
-  setup_call_cleanup_each('$set_typein_module'(M),G,'$set_typein_module'(WM)).
+  scce_orig('$set_typein_module'(M),G,'$set_typein_module'(WM)).
    
 
 % =====================
@@ -538,23 +538,19 @@ with_source_module(G):-
 %
 % Dump Trace.
 %
-
-
-
-dumptrace(G):- non_user_console,!,trace_or_throw(dumptrace(G)).
+dumptrace(G):- non_user_console,!,trace_or_throw(non_user_console_dumptrace(G)).
 dumptrace(G):-
-    current_prolog_flag(gui_tracer, Was),
-    setup_call_cleanup_each(
-        set_prolog_flag(gui_tracer, false),
-        dumptrace0(G),
-        set_prolog_flag(gui_tracer, Was)).
+  w_tl(set_prolog_flag(gui_tracer, false),
+   w_tl(set_prolog_flag(gui, false),
+     dumptrace0(G))).
 
-dumptrace0(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dumptrace(G)),setup_call_cleanup_each(notrace,(leash(+call),dumptrace0(G)),trace).
+dumptrace0(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dumptrace0(G))),trace).
 dumptrace0(G):- 
   ignore((debug,
-    catchv(attach_console,_,true),
-    leash(+exception),visible(+exception))),fresh_line,
-    (repeat,(tracing -> (!,fail) ; true)),
+    catch(attach_console,_,true),
+    leash(+exception),visible(+exception))),
+    (repeat,
+      (tracing -> (!,fail) ; true)),
     to_wmsg(G,WG),
     notrace((
      fmt(in_dumptrace(G)),
@@ -570,8 +566,8 @@ dumptrace0(G):-
 %
 % Dump Trace.
 %
-dumptrace(_,0'g):-!,hotrace(dumpST(500000000)),!,fail.
-dumptrace(_,0'G):-!,notrace(dumpST0(500000000)),!,fail.
+dumptrace(_,0'g):-!,hotrace(dumpST(500000)),!,fail.
+dumptrace(_,0'G):-!,notrace(dumpST0(500000)),!,fail.
 dumptrace(G,0'l):-!, 
   restore_trace(( notrace(ggtrace),G)),!,notrace.
 dumptrace(G,0's):-!,hotrace(ggtrace),!,(hotrace(G)*->true;true).
@@ -603,6 +599,6 @@ dumptrace(_,C):-fmt(unused_keypress(C)),!,fail.
 %
 % Dump Trace Ret.
 %
-dumptrace_ret(G):-leash(+all),visible(+all),visible(+unify),trace,G.
+dumptrace_ret(G):- notrace((leash(+all),visible(+all),visible(+unify),trace)),G.
 
 

@@ -124,6 +124,13 @@
 
 
           ]).
+
+
+
+:- if(\+ current_predicate(system:nop/1)).
+:- system:ensure_loaded(systyem:logicmoo_util_supp).
+:- endif.
+
 :- meta_predicate
 
 
@@ -767,7 +774,7 @@ is_ftVar('$VAR'(_)).
 is_ftVar('$VAR'(_,_)).
 is_ftVar('avar'(_)).
 is_ftVar('avar'(_,_)).
-:- mpred_trace_nochilds(is_ftVar/1).
+%:- mpred_trace_nochilds(is_ftVar/1).
 
 
 :- export(is_ftNonvar/1).
@@ -1197,8 +1204,9 @@ for obvious reasons.
 %
 %  Trace or throw.
 %
-trace_or_throw(E):- non_user_console,notrace((thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),!,throw(abort),thread_exit(trace_or_throw(E)))).
-trace_or_throw(E):- wdmsg(E),trace,throw(E).
+trace_or_throw(E):- non_user_console,notrace((thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),!,throw(abort),
+                    thread_exit(trace_or_throw(E)))).
+trace_or_throw(E):- wdmsg(E),dtrace((trace,throw(E))).
 
  %:-interactor.
 
@@ -1560,6 +1568,6 @@ get_must(Goal,CGoal):-
 :- initialization(save_streams).
 :- save_streams.
 
-:- 'mpred_trace_none'(ddmsg(_)).
-:- 'mpred_trace_none'(ddmsg(_,_)).
+%:- 'mpred_trace_none'(ddmsg(_)).
+%:- 'mpred_trace_none'(ddmsg(_,_)).
 

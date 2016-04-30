@@ -220,7 +220,7 @@ with_output_to_each(Output,Goal):- Output= atom(A),!,
    nb_setarg(1,Output,""),
    new_memory_file(Handle),
    open_memory_file(Handle,write,Stream,[free_on_close(true)]),
-     setup_call_cleanup_each(set_output(Stream),
+     scce_orig(set_output(Stream),
       setup_call_cleanup(true,Goal,
         (close(Stream),memory_file_to_atom(Handle,Atom),nb_setarg(1,Output,Atom),ignore(A=Atom))),
       (set_output(Was))).
@@ -230,13 +230,13 @@ with_output_to_each(Output,Goal):- Output= string(A),!,
    nb_setarg(1,Output,""),
    new_memory_file(Handle),
    open_memory_file(Handle,write,Stream,[free_on_close(true)]),
-     setup_call_cleanup_each(set_output(Stream),
+     scce_orig(set_output(Stream),
       setup_call_cleanup(true,Goal,
         (close(Stream),memory_file_to_string(Handle,Atom),nb_setarg(1,Output,Atom),ignore(A=Atom))),
       (set_output(Was))).
 
 with_output_to_each(Output,Goal):- 
-   current_output(Was), setup_call_cleanup_each(set_output(Output),Goal,set_output(Was)).
+   current_output(Was), scce_orig(set_output(Output),Goal,set_output(Was)).
     
 
 % ==========================================================
@@ -523,7 +523,7 @@ dfmt(X,Y):- thread_current_error_stream(Err), with_output_to_stream(Err,fmt(X,Y)
 %
 with_output_to_stream(Stream,Goal):-
     current_output(Saved),
-   setup_call_cleanup_each(set_output(Stream),
+   scce_orig(set_output(Stream),
          Goal,
          set_output(Saved)).
 
@@ -1468,6 +1468,7 @@ cls:- shell(cls).
 :- use_module(logicmoo_util_varnames).
 % :- autoload([verbose(false)]).
 
+/*
 :- 'mpred_trace_none'(fmt(_)).
 :- 'mpred_trace_none'(fmt(_,_)).
 :- 'mpred_trace_none'(dfmt(_)).
@@ -1475,4 +1476,4 @@ cls:- shell(cls).
 :- 'mpred_trace_none'(dmsg(_)).
 :- 'mpred_trace_none'(dmsg(_,_)).
 :- 'mpred_trace_none'(portray_clause_w_vars(_)).
-
+*/

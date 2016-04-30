@@ -151,7 +151,7 @@ relationAllExists(Pred,Col1,Col2) ==>
 
 */
 
-:- decl_mpred_hybrid(relationInstanceExists/3).
+:- dynamic(relationInstanceExists/3).
 
 relationInstanceExists(Pred,VAL,D_COL) ==>
  ({SK= skRelationInstanceExistsFn(Pred,VAL,D_COL), G1=..[Pred,VAL,Missing],G2=..[Pred,VAL,SK],ISA=..[D_COL,SK]},
@@ -167,13 +167,13 @@ relationInstanceExists(Pred,VAL,D_COL) ==>
     ((((~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing))))) ==> (G2,ISA)))))).
 
 
-:- decl_mpred_hybrid(relationExistsAll/3).
+:- dynamic(relationExistsAll/3).
 relationExistsAll(Pred,D_COL,I_COL) ==>
  ({SK= skRelationExistsAllFn(VAL,Pred,D_COL,I_COL), G1=..[Pred,Missing,VAL],G2=..[Pred,SK,VAL],ISA=..[D_COL,SK]},
    (isa(VAL,I_COL) ==>   
   (( ~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing)))) ==> (G2,ISA)))).
 
-:- decl_mpred_hybrid(relationExistsInstance/3).
+:- dynamic(relationExistsInstance/3).
 relationExistsInstance(Pred,D_COL,VAL) ==>
  ({SK= skRelationExistsInstanceFn(Pred,D_COL,VAL), G1=..[Pred,Missing,VAL],G2=..[Pred,SK,VAL],ISA=..[D_COL,SK]},
   (( ~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing)))) ==> (G2,ISA))).
@@ -322,4 +322,6 @@ isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),nonvar(C).
 
 
 
+%prologHybrid(defnIff(ttExpressionType,ftTerm)).
+%defnIff(X,_)==>ttExpressionType(X).
 
