@@ -125,7 +125,7 @@
             mpred_expander/6,
             mpred_file_term_expansion/4,
             dont_term_expansion/2,
-            mpred_expander0/4,
+            mpred_file_term_expansion/4,
             
             mpred_expand_file_module_clause/4,
             mpred_expand_file_module_clause/4,
@@ -401,7 +401,6 @@ mpred_prolog_only_file(File):- file_name_extension(_,pfc,File),!,fail.
 
 mpred_expander(Type,_,I,_,_,_):- dont_term_expansion(Type,I),!,fail.
 mpred_expander(_Type,_Module,I,PosI,O,PosI):- get_lang(pl), expand_isEach_or_fail(I,O).
-
 mpred_expander(Type,Module,I,PosI,O,PosO):-
    is_file_based_expansion(Type,I,PosI,O,PosO),
    mpred_file_term_expansion(Type,Module,I,O).
@@ -415,21 +414,23 @@ dont_term_expansion(Type,I):-
    (Type \== term , Type \= _:term ) ; 
    t_l:disable_px.
 
-:- meta_predicate mpred_file_term_expansion(+,+,+,-).
-mpred_file_term_expansion(_,_,_,_):- \+ current_predicate(_,_:mpred_loader_file),!,fail.
-mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !,Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
-mpred_file_term_expansion(Type,LoaderMod,I,OO):- loop_check(mpred_expander0(Type,LoaderMod,I,O)),quietly_must(nonvar(O)),O=OO.
 
 
 
-
-%% mpred_expander0( ?Type, ?LoaderMod, ?I, ?OO) is semidet.
+%% mpred_file_term_expansion( ?Type, ?LoaderMod, ?I, ?OO) is semidet.
 %
 % Managed Predicate Expander Primary Helper.
 %
-
-mpred_expander0(Type,LoaderMod,(I:-B),OO):- B==true,!,mpred_expander0(Type,LoaderMod,I,OO).
-mpred_expander0(Type,LoaderMod,I,OO):- 
+:- meta_predicate mpred_file_term_expansion(+,+,+,-).
+% mpred_file_term_expansion(_,_,_,_):- \+ current_predicate(_,_:mpred_loader_file),!,fail.
+mpred_file_term_expansion(_,_,I,_):- is_directive_form(I),!,fail.
+mpred_file_term_expansion(_,_,I,_):- is_ftVar(I),!,fail.
+mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !, Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
+mpred_file_term_expansion(_,_,_,_):- get_lang(pl),!,fail.
+mpred_file_term_expansion(Type,LoaderMod,(I:-B),OO):-B==true,!,mpred_file_term_expansion(Type,LoaderMod,I,OO).
+mpred_file_term_expansion(Type,LoaderMod,I,( :- ain(I))):-!.
+mpred_file_term_expansion(Type,LoaderMod,I,OO):-
+ ((
   sanity((ground(Type:LoaderMod),nonvar(I),var(OO))),
   quietly_must(get_source_ref1(mfl(_,F,L))),!,
 
@@ -444,13 +445,15 @@ mpred_expander0(Type,LoaderMod,I,OO):-
      ( \+ t_l:mpred_already_in_file_expansion(Key) ),
       w_tl(t_l:mpred_already_in_file_expansion(Key),
       w_tl(t_l:current_why_source(mfl(M,F,L)),
-        (( 
+        ((  
            get_original_term_source(Orig), 
            b_setval('$orig_term',Orig),
            b_setval('$term',[]),
            quietly_must(mpred_expand_file_module_clause(F,M,I,O)))))))),
-    ('$set_typein_module'(UM),b_setval('$term',TermWas))),
-  !,I\=@=O,O=OO.
+    (b_setval('$term',TermWas))),
+  !,
+  must(I\=@=O),O=OO,
+  notrace(wdmsg(I-->OO)))).
   
 
            
@@ -459,13 +462,13 @@ mpred_expander0(Type,LoaderMod,I,OO):-
 %
 % Managed Predicate Expander Now One Cc.
 %
-mpred_expand_file_module_clause(_,_,I,O):- var(I),!,quietly_must(I=O).
+%mpred_expand_file_module_clause(_,_,I,O):- var(I),!,quietly_must(I=O).
 
-mpred_expand_file_module_clause(_,_,(?-(G0)),(?-(G1))):-!,quietly_must(fully_expand_goal(change(assert,ain),G0,G1)).
-mpred_expand_file_module_clause(F,M,I,O):- is_directive_form(I),!,quietly_must(fully_expand(change(assert,load(F,M)),I,O)).
-mpred_expand_file_module_clause(F,M,(H:-B),O):- get_lang(pl),!,quietly_must(fully_expand(change(assert,load(F,M)),(H:-B),O)).
-mpred_expand_file_module_clause(_,_,I,O):- t_l:verify_side_effect_buffer,!,loader_side_effect_verify_only(I,O).
-mpred_expand_file_module_clause(_,_,I,O):- t_l:use_side_effect_buffer,!,loader_side_effect_capture_only(I,O).
+%mpred_expand_file_module_clause(_,_,(?-(G0)),(?-(G1))):-!,quietly_must(fully_expand_goal(change(assert,ain),G0,G1)).
+%mpred_expand_file_module_clause(F,M,I,O):- is_directive_form(I),!,quietly_must(fully_expand(change(assert,load(F,M)),I,O)).
+%mpred_expand_file_module_clause(F,M,(H:-B),O):- get_lang(pl),!,quietly_must(fully_expand(change(assert,load(F,M)),(H:-B),O)).
+%mpred_expand_file_module_clause(_,_,I,O):- t_l:verify_side_effect_buffer,!,loader_side_effect_verify_only(I,O).
+%mpred_expand_file_module_clause(_,_,I,O):- t_l:use_side_effect_buffer,!,loader_side_effect_capture_only(I,O).
 mpred_expand_file_module_clause(_,M,I,O):- mpred_expander_now_physically(M,I,O).
   
 
@@ -474,7 +477,7 @@ mpred_expand_file_module_clause(_,M,I,O):- mpred_expander_now_physically(M,I,O).
 %
 % Managed Predicate Expander Now Physically.
 %
-mpred_expander_now_physically(M,I,OO):-   
+mpred_expander_now_physically(M,I,OO):-  
  '$set_source_module'(Old,M),
  call_cleanup(M:((
    quietly_must((source_context_module(CM),CM\==mpred_pfc,CM\==mpred_loader)),
@@ -834,7 +837,7 @@ get_file_type(File,Type):-file_name_extension(_,Type,File).
 is_mpred_file(F):- var(F),!,quietly_must(loading_source_file(F)),F\==user,!, is_mpred_file(F),!.
 is_mpred_file(F):- lmconf:registered_mpred_file(F),!.
 is_mpred_file(F):- lmconf:ignore_file_mpreds(F),!,fail.
-is_mpred_file(F):- guess_if_mpred_file0(F),!,asserta(lmconf:registered_mpred_file(F)),!.
+is_mpred_file(F):- guess_if_mpred_file0(F),!,rtrace(guess_if_mpred_file0(F)),asserta(lmconf:registered_mpred_file(F)),!.
 %is_mpred_file(F):- asserta(lmconf:ignore_file_mpreds(F)),!,fail.
 
 %% guess_if_mpred_file0( ?F) is semidet.
@@ -1024,9 +1027,12 @@ make_file_command(_IN,'$si$':'$was_imported_kb_content$'(IN2,WHY),'$si$':'$was_i
 %
 % Call File Command.
 %
-call_file_command(I,cl_assert(OTHER,OO),OO,I):- get_lang(kif),is_kif_clause(OO),!,call_file_command(I,cl_assert(kif(OTHER),OO),OO,I).
-call_file_command(I,CALL,[(:- quietly_must(CALL2)),(:- quietly_must(CALL)),OO],(:-CALL2)):- CALL2\=@=CALL, was_exported_content(I,CALL,OO),!.
-call_file_command(I,CALL,[(:- quietly_must(CALL)),OO],(:-CALL)):- was_exported_content(I,CALL,OO),!.
+call_file_command(I,CALL,OO,O):- call_file_command0(I,CALL,OO,O),wdmsg(call_file_command(I,CALL,OO,O)).
+
+call_file_command0(I,cl_assert(OTHER,OO),OO,I):- get_lang(kif),is_kif_clause(OO),!,call_file_command(I,cl_assert(kif(OTHER),OO),OO,I).
+call_file_command0(I,CALL,[(:- quietly_must(CALL2)),(:- quietly_must(CALL)),OO],(:-CALL2)):- CALL2\=@=CALL, 
+  was_exported_content(I,CALL,OO),!.
+call_file_command0(I,CALL,[(:- quietly_must(CALL)),OO],(:-CALL)):- was_exported_content(I,CALL,OO),!.
 % call_file_command(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((quietly_must(call(CALL)),was_exported_content(I,CALL,OO))); OO=[O,:-CALL]).
 
 

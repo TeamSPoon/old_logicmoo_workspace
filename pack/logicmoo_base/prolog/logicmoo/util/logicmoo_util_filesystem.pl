@@ -78,6 +78,7 @@
             
           ]).
 
+
 :- multifile
         local_directory_search/1.
 :- meta_predicate
@@ -140,7 +141,7 @@
 :- dynamic
         local_directory_search/1.
 
-
+:- use_module(library(dialect)).
 
 :- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
 :- module(logicmoo_util_filesystem,
@@ -904,7 +905,9 @@ is_file_based_expansion(term,I,PosI,_O,_PosO):-!,
    compound(PosI),nonvar(I),
    b_getval('$term',Was), Was==I,
    b_getval('$term_position', Pos),
-   compound(Pos),arg(1,Pos,At),arg(1,PosI,At),!.
+   Pos = '$stream_position'(PosAt,_,_,_),
+   PosAt>0,
+   arg(1,PosI,At),!,At>=PosAt.
 
 is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
    compound(PosI),nonvar(I),
@@ -912,7 +915,7 @@ is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
    compound(Pos),arg(1,Pos,At),arg(1,PosI,At),!.
 
 glean_prolog_impl_file(_,_,_,_):-current_prolog_flag(xref,true),!.
-glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- !,
+glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_concat([_,_|_],'.pfc',File),!,
    assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),
   % add_genlMt(logicmoo_user,imports(baseKB)),
   % add_genlMt(SM,maybe(TypeIn)),
@@ -922,7 +925,7 @@ glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- !,
    forall(source_file(SM:H,File),
        ignore((functor(H,F,A),
          (predicate_property(SM:H,imported_from(Where))
-           -> add_prolog_predicate(skip,Where,H,F,A,File)
+           -> add_prolog_predicate(SM,Where,H,F,A,File)
           ; add_prolog_predicate(TypeIn,SM,H,F,A,File))))),
          fail.
 

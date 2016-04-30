@@ -11,7 +11,7 @@
 % Licience: LGPL
 % ===================================================================
 */
-:- if(current_predicate(_:combine_logicmoo_utils/0)).
+:- if(\+current_predicate(_:combine_logicmoo_utils/0)).
 :- module(logicmoo_util_bb_env, [
 abolish_and_make_static/2,
 add_push_prefix_arg/4,

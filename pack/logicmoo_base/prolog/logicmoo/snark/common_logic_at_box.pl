@@ -203,7 +203,7 @@ get_file_tbox(TBox):-
    get_tbox_for(ABox,TBox))).
 
 
-make_module_name_local(A,B):-make_module_name_local0(A,B),B\==logicmoo_base.
+make_module_name_local(A,B):-make_module_name_local0(A,B),B\==logicmoo_base,\+ exists_file(B).
 
 make_module_name_local0(Source,baseKB):-is_default_shared(Source).
 make_module_name_local0(Source,Source):-lmcache:has_pfc_database_preds(Source).
@@ -245,6 +245,7 @@ must_det_l((
 
 :- thread_local(t_l:user_abox/2).
 set_guessed_abox(ABox,_From):- \+ atom(ABox),!.
+set_guessed_abox(_From,_ABox):-!.
 set_guessed_abox(From,ABox):-
  must_det_l((
  sanity(atom(ABox)), 
@@ -300,7 +301,9 @@ get_tbox0(A):- guess_tbox(From,A),set_guessed_tbox(From,A).
 set_abox_for(SM,ABox):-assert_setting(lmconf:abox_for(SM,ABox)).
 
 get_abox_for(SM,ABox):-lmconf:abox_for(SM,ABox),!.
-get_abox_for(SM,ABox):- SM\== user, SM\==baseKB, make_module_name_local(SM,ABox),assert_setting01(lmconf:abox_for(SM,ABox)),!.
+get_abox_for(SM,ABox):- SM\== user, SM\==baseKB, make_module_name_local(SM,ABox),
+  current_module(ABox),\+ exists_file(ABox),
+  assert_setting01(lmconf:abox_for(SM,ABox)),!.
 get_abox_for(_,logicmoo_user).
 
 :- thread_local(t_l:user_abox/2).
@@ -310,7 +313,7 @@ set_tbox_for(SM,TBox):-assert_setting(lmconf:tbox_for(SM,TBox)).
 
 get_tbox_for(SM,TBox):- lmconf:tbox_for(SM,TBox),!.
 get_tbox_for(M,TBox):- M \== user, M \==logicmoo_user, 
-   make_module_name_local(M,TBox),
+   make_module_name_local(M,TBox),current_module(TBox),
    M\=TBox,
     \+ lmconf:tbox_for(TBox,_),
    assert_setting01(lmconf:tbox_for(M,TBox)),!.
@@ -416,7 +419,7 @@ is_undefaulted(mpred_userkb).
 %
 % Best Module.
 %
-best_module0(List,M,ABox):-member(M,List),get_abox_for(ABox,M).
+best_module0(List,M,ABox):-member(M,List),get_abox_for(M,ABox).
 % best_module0(List,ABox,ABox):-member(M,List),lmcache:has_pfc_database_preds(ABox).
 
 best_module(List,M,ABox):-best_module0(List,M,ABox), \+ is_undefaulted(M), \+ is_system_box(ABox),!.

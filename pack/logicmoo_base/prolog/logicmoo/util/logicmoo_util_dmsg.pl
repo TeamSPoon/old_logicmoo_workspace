@@ -1468,4 +1468,11 @@ cls:- shell(cls).
 :- use_module(logicmoo_util_varnames).
 % :- autoload([verbose(false)]).
 
+:- 'mpred_trace_none'(fmt(_)).
+:- 'mpred_trace_none'(fmt(_,_)).
+:- 'mpred_trace_none'(dfmt(_)).
+:- 'mpred_trace_none'(dfmt(_,_)).
+:- 'mpred_trace_none'(dmsg(_)).
+:- 'mpred_trace_none'(dmsg(_,_)).
+:- 'mpred_trace_none'(portray_clause_w_vars(_)).
 

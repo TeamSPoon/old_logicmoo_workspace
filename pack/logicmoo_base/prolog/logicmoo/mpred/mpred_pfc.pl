@@ -565,12 +565,12 @@ remove_negative_version(P):-
 
      
 fresh_mode :- fail.
-mpred_pfc:plus_fwc:-true.
+plus_fwc:-true.
 
-mpred_pfc:plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
-% mpred_pfc:plus_fwc(support_hilog(_,_)):-!.
-% mpred_pfc:plus_fwc('==>'(_,_)):-!.
-mpred_pfc:plus_fwc(P):- gripe_time(0.6,(mpred_pfc:plus_fwc->loop_check_term(mpred_fwc(P),mpred_pfc:plus_fwc(P),true);true)).
+plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
+plus_fwc(support_hilog(_,_)):-!.
+plus_fwc('==>'(_,_)):-!.
+plus_fwc(P):- gripe_time(0.6,(plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true)).
 
 %% mpred_post(+Ps,+S) 
 %
@@ -615,7 +615,7 @@ mpred_post1(P,S):-
      !,
      mpred_enqueue(P,S),
      !)),
-  (mpred_pfc:plus_fwc->loop_check_term(mpred_fwc(P),mpred_pfc:plus_fwc(P),true);true).
+  (plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true).
   
 /*
 % this would be the very inital by Tim Finnin...
@@ -704,7 +704,7 @@ mpred_post_update4(unique,P,S,none):-!,
   !,
   must(mpred_enqueue(P,S)),
   !,
-  must(mpred_pfc:plus_fwc(P)).
+  (must(plus_fwc(P))->!;(rtrace(plus_fwc(P)),break)),!.
 
 mpred_post_update4(partial(_Other),P,S,none):-!,
  must( \+ \+ mpred_add_support(P,S)),
@@ -825,7 +825,7 @@ set_fc_mode(Mode):- asserta(t_l:mpred_fc_mode(Mode)).
 % mpred_enqueue(P,S):- get_fc_mode(P,S,Mode), must(Mode=direct),fail.
 mpred_enqueue(P,S):-
   (get_fc_mode(P,S,Mode)
-    -> (Mode=direct  -> loop_check_term(mpred_fwc(P),mpred_pfc:plus_fwc(P),true) ;
+    -> (Mode=direct  -> loop_check_term(mpred_fwc(P),plus_fwc(P),true) ;
 	Mode=depth   -> mpred_asserta_w_support(que(P),S) ;
 	Mode=breadth -> mpred_assert_w_support(que(P),S) ;
 	true         -> mpred_error("Unrecognized pm mode: ~p", Mode))
@@ -3199,8 +3199,8 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(get_first_user_reason/2).
 :- module_transparent(is_user_fact/1).
 :- module_transparent(mpred_post1/2).
-:- module_transparent(mpred_pfc:plus_fwc/0).
-:- module_transparent(mpred_pfc:plus_fwc/1).
+:- module_transparent(plus_fwc/0).
+:- module_transparent(plus_fwc/1).
 :- module_transparent(fresh_mode/0).
 :- module_transparent(mnotrace/1).
 :- module_transparent(filter_buffer_n_test/3).

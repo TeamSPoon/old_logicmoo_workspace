@@ -17,7 +17,11 @@
 */
 :- module(logicmoo_utils,[]).
 
-:- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
+:- user:use_module(user:library('logicmoo/util/logicmoo_util_filesystem.pl')).
+% :- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
+% :- autoload([verbose(false)]).
+% :- set_prolog_flag(autoload, false).
+
 :- module_transparent(user:term_expansion/1).
 user:term_expansion(EOF,POS,O,POS2):- 
  is_file_based_expansion(term,EOF,POS,O,POS2),
@@ -30,16 +34,44 @@ user:term_expansion(EOF,POS,O,POS2):-
     '$current_typein_module'(TM),
     glean_prolog_impl_file(EOF,S,M,TM))),fail.
 
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_first.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_catch.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_dmsg.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_rtrace.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_varnames.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_bugger.pl')).
+
+
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_attvar_reader.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_with_assertions.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_ctx_frame.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_database.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_dcg.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_dra.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_dumpst.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_engines.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_filestreams.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_help.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_loop_check.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_no_repeats.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_preddefs.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_prolog_frames.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_prolog_streams.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_scce.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_strings.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_structs.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_supp.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_term_listing.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_terms.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_varfunctors.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_bb_gvar.pl')).
+% :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_bb_env.pl')).
+
+
 :- dynamic(lmconf:logicmoo_utils_separate/0).
 :- retractall(lmconf:logicmoo_utils_separate).
 :- set_prolog_flag(generate_debug_info, true).
-
-/*
-:- ensure_loaded('./logicmoo/util/logicmoo_util_catch').
-:- ensure_loaded('./logicmoo/util/logicmoo_util_varnames').
-:- ensure_loaded('./logicmoo/util/logicmoo_util_dumpst').
-:- ensure_loaded('./logicmoo/util/logicmoo_util_dmsg').
-*/
 
 
 % ======================================================
@@ -176,8 +208,6 @@ lmconf:logicmoo_scan_autoloads:-false.
 
 :- thread_local logicmoo_utils_test_tl/0.
 :- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
-
-% :- autoload([verbose(false)]).
 
 % ?- logicmoo_util_term_listing:xlisting(get_gtime).
 

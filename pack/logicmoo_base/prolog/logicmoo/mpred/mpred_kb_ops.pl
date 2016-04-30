@@ -458,9 +458,6 @@ is_callable(C):-current_predicate(_,C),!.
 
 
 
-
-:- was_dynamic(lmconf:module_local_init/0).
-:- discontiguous(lmconf:module_local_init/0).
 :- include('mpred_header.pi').
 :- style_check(+singleton).
 

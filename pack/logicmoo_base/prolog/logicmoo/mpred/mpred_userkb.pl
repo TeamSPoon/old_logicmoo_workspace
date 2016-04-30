@@ -215,6 +215,8 @@ t_l:user_abox(tbox,tbox).
 
 % % :- '$set_source_module'(tbox).
 
+:- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),must((discontiguous(baseKB:E),dynamic(baseKB:E),
+  multifile(baseKB:E),module_transparent(baseKB:E)))).
 :- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),must(split_into_mts(E))).
 % :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
 

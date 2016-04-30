@@ -767,6 +767,8 @@ is_ftVar('$VAR'(_)).
 is_ftVar('$VAR'(_,_)).
 is_ftVar('avar'(_)).
 is_ftVar('avar'(_,_)).
+:- mpred_trace_nochilds(is_ftVar/1).
+
 
 :- export(is_ftNonvar/1).
 
@@ -1557,4 +1559,7 @@ get_must(Goal,CGoal):-
 
 :- initialization(save_streams).
 :- save_streams.
+
+:- 'mpred_trace_none'(ddmsg(_)).
+:- 'mpred_trace_none'(ddmsg(_,_)).
 

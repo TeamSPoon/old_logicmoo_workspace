@@ -60,7 +60,7 @@ prologHybrid(genls/2).
 /*
 :- 
  With = kb_dynamic, % [multifile,kb_dynamic,discontiguous],
- with_pfa(With,((logical_functor_pttp/1, pfcControlled/1, pfcRHS/1,  conflict/1,   baseKB:argsQuoted/1,     add_args/15,argIsa_known/3,call_mt_t/11))),
+ with_pfa(With,((logical_functor_pttp/1, pfcControlled/1, pfcRHS/1,  conflict/1,   argsQuoted/1,     add_args/15,argIsa_known/3,call_mt_t/11))),
 
 % with_pfa(With,((( call_which_t/9,constrain_args_pttp/2,contract_output_proof/2,get_clause_vars_for_print/2,holds_f_p2/2,input_to_forms/2,is_wrapper_pred/1,lambda/5,mpred_f/1,
 %          pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2)))),
@@ -75,11 +75,11 @@ prologHybrid(genls/2).
           (hs/1),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,prologMacroHead/1,pfcControlled/1,
            resolveConflict/1,resolverConflict_robot/1)))),
  with_pfa(With,((mpred_isa/2,arity/2,mpred_module/2))),
- with_pfa(With,((baseKB:vtColor/1))).
+ with_pfa(With,((vtColor/1))).
  */
 
 % :-  dynamic((disjointWith/2,genls/2,isa/2,argIsa/3)).
-% :- baseKB:discontiguous((disjointWith/2,genls/2,isa/2,argIsa/3,typeGenls/2)).
+% :- discontiguous((disjointWith/2,genls/2,isa/2,argIsa/3,typeGenls/2)).
 
 % :- autoload.
 
@@ -137,7 +137,7 @@ conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 %
 % Prolog Builtin.
 %
-prologBuiltin(resolveConflict/1,mpred_module(baseKB)).
+prologBuiltin(resolveConflict/1,mpred_module(tbox)).
 prologBuiltin(mpred_select/2,mpred_module(lmconf)).
 %:-rtrace.
 prologBuiltin(agent_text_command/4,prologDynamic).
@@ -176,7 +176,7 @@ completelyAssertedCollection(C)==>tCol(C).
 completelyAssertedCollection(tCol).  % a type is a type
 completelyAssertedCollection(tSpec). % A specification is sort of a type
 
-:- discontiguous baseKB:tSpec/1.
+:- discontiguous tSpec/1.
 tSpec(tCol).  % A specification may be a type
 tSpec(meta_argtypes).  % A specification may be a syntactic description
 
@@ -258,7 +258,6 @@ ttPredType(pfcMustFC).
 
 ((ttPredType(X)/atom(X)) ==>support_hilog(X,1)).
 
-:- set_abox(baseKB).
 
 ttPredType(P)==>(tSet(P),completelyAssertedCollection(P)).
 ttTypeType(C)==>completelyAssertedCollection(C).
@@ -287,6 +286,23 @@ ttPredType(predCanHaveSingletons).
 ttPredType(prologSideEffects).
 prologSideEffects(write/1).
 prologSideEffects(resolveConflict/1).
+
+
+mpred_mark(pfcCallCode,false,0).
+mpred_mark(pfcCallCode,true,0).
+
+((hybrid_support(F,A)/(is_ftNameArity(F,A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
+  ({    
+    functor(G,F,A),
+     (var(M)->must(get_abox(M));true),
+     (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
+     (var(M)->predicate_property(M:G,exported);true),
+     % must(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         
+     % (predicate_property(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
+     kb_dynamic(M:F/A),
+     show_failure(hybrid_support, \+ static_predicate(F/A))}),
+     prologHybrid(F),
+    arity(F,A)).
 
 
 % :- prolog.
@@ -645,7 +661,6 @@ equal(A,B),{ \+ (A=B}),equal(B,C),{ \+ (A=C)} ==> equal(A,C).
 notequal(A,B) ==> notequal(B,A).
 equal(A,C),notequal(A,B) ==> notequal(C,B).
 */
-:- set_abox(baseKB).
 
 :- dynamic(either/2).
 % is this how to define constraints?
@@ -730,22 +745,22 @@ isa(vRed,vtColor).
 completelyAssertedCollection(vtValue).
 
 
-:- system:op(1199,fx,baseKB:('==>')).
-:- system:op(1190,xfx,baseKB:('::::')).
-:- system:op(1180,xfx,baseKB:('==>')).
-:- system:op(1170,xfx,baseKB:('<==>')).
-:- system:op(1160,xfx,baseKB:('<-')).
+:- system:op(1199,fx,('==>')).
+:- system:op(1190,xfx,('::::')).
+:- system:op(1180,xfx,('==>')).
+:- system:op(1170,xfx,('<==>')).
+:- system:op(1160,xfx,('<-')).
 
-:- system:op(1150,xfx,baseKB:('=>')).
-:- system:op(1140,xfx,baseKB:('<=')).
-:- system:op(1130,xfx,baseKB:('<=>')).
+:- system:op(1150,xfx,('=>')).
+:- system:op(1140,xfx,('<=')).
+:- system:op(1130,xfx,('<=>')).
 
 
-:-  system:op(600,yfx,baseKB:('&')).
-:-  system:op(600,yfx,baseKB:('v')).
-:-  system:op(350,xfx,baseKB:('xor')).
-:-  system:op(300,fx,baseKB:('~')).
-:-  system:op(300,fx,baseKB:('-')).
+:-  system:op(600,yfx,('&')).
+:-  system:op(600,yfx,('v')).
+:-  system:op(350,xfx,('xor')).
+:-  system:op(300,fx,('~')).
+:-  system:op(300,fx,('-')).
 
 isa(vtColor,ttValueType).
 
@@ -775,7 +790,7 @@ argIsa(Prop,N,Type),{number(N)},ttExpressionType(Type) ==> argQuotedIsa(Prop,N,T
 
 /*
 :- rtrace.
-:- debug,trace,baseKB:(kb_dynamic(baseKB:(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
+:- debug,trace,(kb_dynamic((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
     isa/2,  genls/2, pddlSomethingIsa/2, 
     resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, 
     ttExpressionType/1, typeProps/2))).
@@ -856,7 +871,7 @@ ttExpressionType(ftVar).
 ttExpressionType(ftVoprop).
 
 tCol(ftSpec).
-:- asserta(baseKB:ftSpec(ftSpec)).
+:- asserta(ftSpec(ftSpec)).
 
 resultIsa(_F,C)/ground(C)==>ftSpec(C).
 

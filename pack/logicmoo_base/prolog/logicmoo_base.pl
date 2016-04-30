@@ -5,12 +5,12 @@
 
 */
 :- if(('$current_source_module'(SM),'$current_typein_module'(M),
-   system:multifile(logicmoo_base:user_module_uses_base/2),
+   system:multifile(baseKB:user_module_uses_base/2),
    add_import_module(SM,baseKB,start),
-   system:dynamic(logicmoo_base:user_module_uses_base/2),
-   system:asserta(logicmoo_base:user_module_uses_base(SM,M)))).
+   system:dynamic(baseKB:user_module_uses_base/2),
+   system:asserta(baseKB:user_module_uses_base(SM,M)))).
 :- endif.
-:- module(logicmoo_base,
+:- module(baseKB,
  [
    config_mpred_system/0,
    enable_mpred_system/0,
@@ -23,6 +23,9 @@
 
 :- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
 
+:- dynamic(baseKB:'$exported_op'/3).
+:- multifile(baseKB:'$exported_op'/3).
+:- discontiguous(baseKB:'$exported_op'/3).
 % ========================================
 % lmconf:mpred_system_kb/1
 % ========================================
@@ -39,7 +42,7 @@ lmconf:tbox_for(user,baseKB).
 lmconf:abox_for(user,logicmoo_user).
 
 config_mpred_system:- 
-  logicmoo_base:user_module_uses_base(SM,M),
+  baseKB:user_module_uses_base(SM,M),
   config_mpred_system(SM,M).
 
 config_mpred_system(SM,M):-
@@ -49,7 +52,7 @@ config_mpred_system(SM,M):-
 
 
 show_kb_structure:-
-   logicmoo_base:user_module_uses_base(SM,M),
+   baseKB:user_module_uses_base(SM,M),
    get_tbox_for(M,Sys),
    Sys:ensure_loaded(library(logicmoo_utils)),   
    get_abox_for(SM,Usr),
@@ -92,7 +95,7 @@ show_kb_structure:-
 :- multifile(lmconf:mpred_system_kb/1).
 :- dynamic(lmconf:mpred_system_kb/1).
 
-:- autoload([verbose(false)]).
+% :- autoload([verbose(false)]).
 lmconf:mpred_skipped_module(eggdrop).
 :- forall(current_module(CM),system:assert(lmconf:mpred_skipped_module(CM))).
 :- retractall(lmconf:mpred_skipped_module(pfc)).
@@ -144,6 +147,25 @@ lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_kb_ops.pl')).
 lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_userkb.pl')).
 lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_*.pl')).
 
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/snark/common_logic_at_box.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_expansion.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_kb_ops.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_listing.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_loader.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_pfc.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_prolog_file.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_props.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_storage.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_stubs.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_type_constraints.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_type_isa.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_type_naming.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_type_wff.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_hooks.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_userkb.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_type_args.pl')).
+:- baseKB:ensure_loaded(baseKB:library('logicmoo/mpred/mpred_agenda.pl')).
+
 %% assert_setting00( ?X) is semidet.
 assert_setting00(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),system:retractall(M:DP),system:asserta(M:P).
 
@@ -151,16 +173,17 @@ assert_setting00(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),system
 %
 % Load Managed Predicate System.
 %
+load_mpred_system(_Sys):-!.
 load_mpred_system(Sys):-
  assert_setting00(lmconf:tbox_for(user,Sys)),
  with_mutex(mpred_system_mutex,
-   (Sys:use_module(logicmoo_utils), 
+   (Sys:ensure_loaded(logicmoo_utils), 
     forall(
       lmconf:mpred_is_impl_file(Match),     
      (( 
         forall(filematch(Sys:Match,File),
           call((w_tl(t_l:disable_px,
-                      ensure_loaded(Sys:File)))))))))).
+               baseKB:ensure_loaded(baseKB:File)))))))))).
 
 current_smt(SM,M):-
  '$current_source_module'(SM),'$current_typein_module'(M).
@@ -245,12 +268,13 @@ lmconf:disable_mpred_system0(Usr):-
 :- config_mpred_system.
 
 % Load Utils
-:- user_module_uses_base(SM,M),M:use_module(SM:library(logicmoo_utils)).
+:- logicmoo_utils:ensure_loaded(logicmoo_utils:library(logicmoo_utils)).
 
 % Load System
-:- user_module_uses_base(_,M),get_tbox_for(M,T),dmsg(system_kb=T),load_mpred_system(T).
+:- user_module_uses_base(_,M),get_tbox_for(M,T),dmsg(system_kb=T),load_mpred_system(baseKB).
 
-:- autoload([verbose(false)]).
+%:- autoload([verbose(false)]).
+%:- set_prolog_flag(autoload, false).
 
 :- user_module_uses_base(SM,M),fix_ops_for(M),(SM==M->true;fix_ops_for(SM)).
 
@@ -276,31 +300,31 @@ lmconf:disable_mpred_system0(Usr):-
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
 
-:- system:add_import_module(logicmoo_base,baseKB,start).
-:- autoload([verbose(false)]).
+:- system:add_import_module(baseKB,baseKB,start).
+%:- autoload([verbose(false)]).
 
-:- forall(current_op(X,Y,user:Z),assert(was_op(user,X,Y,Z))).
+:- forall(current_op(X,Y,baseKB:Z),assert(was_op(baseKB,X,Y,Z))).
 :- forall(current_op(X,Y,system:Z),assert(was_op(system,X,Y,Z))).
 
 :- forall(was_op(system,X,Y,Z),op_safe(X,Y,baseKB:Z)).
-:- forall(was_op(user,X,Y,Z),op_safe(X,Y,baseKB:Z)).
+:- forall(was_op(baseKB,X,Y,Z),op_safe(X,Y,baseKB:Z)).
 
 :- set_prolog_flag(access_level,system).
 
 :-
    system:add_import_module(baseKB,system,end),
    system:ignore(system:delete_import_module(baseKB,user)),
-   system:add_import_module(user,baseKB,start).
-   % system:ignore(system:delete_import_module(user,system))
+   system:add_import_module(user,baseKB,start),
+   system:ignore(system:delete_import_module(user,system)).
 
 
-:- forall(was_op(user,X,Y,Z),system:op(X,Y,user:Z)).
-:- forall(was_op(system,X,Y,Z),system:op(X,Y,user:Z)).
-:- forall(was_op(user,X,Y,Z),system:op(X,Y,user:Z)).
+:- forall(was_op(baseKB,X,Y,Z),system:op(X,Y,baseKB:Z)).
+:- forall(was_op(system,X,Y,Z),system:op(X,Y,baseKB:Z)).
+:- forall(was_op(baseKB,X,Y,Z),system:op(X,Y,baseKB:Z)).
 
-:- autoload([verbose(false)]).
+% :- autoload([verbose(false)]).
 
-%:- asserta_if_new((user:term_expansion(I,P1,O,P2):- mpred_expander(term,user,I,P1,O,P2))).
+%:- asserta_if_new((baseKB:term_expansion(I,P1,O,P2):- mpred_expander(term,baseKB,I,P1,O,P2))).
 %:- asserta_if_new((system:goal_expansion(I,P1,O,P2):- mpred_expander(goal,system,I,P1,O,P2))).
 
 

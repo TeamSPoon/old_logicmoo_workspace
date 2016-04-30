@@ -37,7 +37,8 @@
 
 
 % catching of misinterpreations
-(mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static))) ==> {break,trace_or_throw(warn(pfcPosTrigger,P,static))}.
+((mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static))) ==> 
+  {break,trace_or_throw(warn(pfcPosTrigger,P,static))}).
 (mpred_mark(pfcNegTrigger,F,A)/(fa_to_p(F,A,P),  P\={_}, predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
 (mpred_mark(pfcBcTrigger,F,A)/(fa_to_p(F,A,P), predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
 
@@ -195,19 +196,6 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 
 ((marker_supported(F,A)/is_ftNameArity(F,A),prologHybrid(F))==>hybrid_support(F,A)).
 (hybrid_support(F,A) ==>{ must(kb_dynamic(F/A))}).
-
-((hybrid_support(F,A)/(is_ftNameArity(F,A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
-  ({    
-    functor(G,F,A),
-     (var(M)->must(get_abox(M));true),
-     (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
-     (var(M)->predicate_property(M:G,exported);true),
-     % must(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         
-     % (predicate_property(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
-     kb_dynamic(M:F/A),
-     show_failure(hybrid_support, \+ static_predicate(F/A))}),
-     prologHybrid(F),
-    arity(F,A)).
 
 
 prologHybrid(defnIff(ttExpressionType,ftTerm)).
