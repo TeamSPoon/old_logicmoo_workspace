@@ -948,7 +948,7 @@ mpred_t_mpred_storage_clauses_facts(H,true,t(H)):-compound(H),!,current_predicat
 %
 lmconf:mpred_provide_storage_op(Op,HB):-
   must(baseKB:is_mpred_op(Op)),
-  (hotrace(baseKB:demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),
+  (hotrace(baseKB:remodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),
     once(F==t; baseKB:a(prologHybrid,F)),   
     w_tl(t_l:already_in_file_term_expansion,mpred_t_storage_op(Op,HeadBody))).
 
@@ -1375,7 +1375,7 @@ ensure_universal_stub_plus_mt_why(F,A2):-
    AMinus2 is A2 -2,
    assert_if_new((HEAD:-HEADMinus2)),!,
   % compile_predicates([HEAD]),
-   get_abox(M),
+   current_abox(M),
    decl_mpred_hybrid(M,F,AMinus2).
 
 

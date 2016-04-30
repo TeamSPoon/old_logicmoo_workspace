@@ -143,6 +143,8 @@
             variants_are_equal/3
           ]).
 
+:- file_begin(pl).
+
 % % :- '$set_source_module'(common_logic_compiler).
 
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).

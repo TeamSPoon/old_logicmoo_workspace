@@ -200,6 +200,7 @@
 :- module_transparent((ensure_abox)/1).
 :- dynamic(lmcache:has_pfc_database_preds/1).
 ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
+ensure_abox(logicmoo_user):-!, ensure_abox(baseKB).
 ensure_abox(user):- !, ensure_abox(logicmoo_user),!.
 ensure_abox(M):- 
    asserta(lmcache:has_pfc_database_preds(M)),
@@ -278,31 +279,31 @@ get_source_ref1(_).
 
 % get_source_ref1(_):- fail,check_context_module,fail.
 get_source_ref10(M):- current_why(M), nonvar(M) , M =mfl(_,_,_).
-get_source_ref10(mfl(M,F,L)):- get_abox(M), source_location(F,L).
-get_source_ref10(M):- (get_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
-get_source_ref10(mfl(M,F,L)):- get_abox(M), current_source_file(F:L).
-get_source_ref10(mfl(M,F,_L)):- get_abox(M), current_source_file(F).
-get_source_ref10(mfl(M,_,_L)):- get_abox(M).
-get_source_ref10(M):- (get_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
+get_source_ref10(mfl(M,F,L)):- current_abox(M), source_location(F,L).
+get_source_ref10(M):- (current_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
+get_source_ref10(mfl(M,F,L)):- current_abox(M), current_source_file(F:L).
+get_source_ref10(mfl(M,F,_L)):- current_abox(M), current_source_file(F).
+get_source_ref10(mfl(M,_,_L)):- current_abox(M).
+get_source_ref10(M):- (current_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
 get_source_ref10(M):- fail,trace, 
- ((get_abox(M) -> !;
+ ((current_abox(M) -> !;
  (atom(M)->(module_property(M,class(_)),!);
     mpred_error(no_source_ref(M))))).
 
 is_source_ref1(_).
 
 fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
-fix_mp(_:P,ABOX:P):- get_abox(ABOX),!.
-fix_mp(P,ABOX:P):- get_abox(ABOX),!.
+fix_mp(_:P,ABOX:P):- current_abox(ABOX),!.
+fix_mp(P,ABOX:P):- current_abox(ABOX),!.
 % probably never makes it past the above
-fix_mp(MP,M:P):-  strip_module(MP,Cm,P),get_abox(U),!,
+fix_mp(MP,M:P):-  strip_module(MP,Cm,P),current_abox(U),!,
    (((modulize_head_fb(U,P,Cm,M:P),\+ predicate_property(M:P,static)))*-> true;
       (P==MP -> M=U; M=Cm)
      ),!.
 fix_mp(M:P,M:P):- current_predicate(_,M:P), predicate_property(M:P,dynamic),!.
 fix_mp(G0,CALL):-
   strip_module(G0,WM,G),
-  must((get_abox(U),atom(U))),!,
+  must((current_abox(U),atom(U))),!,
        (current_predicate(_,U:G)->CALL=U:G;
        (current_predicate(_,WM:G)->CALL=WM:G;
        (current_predicate(_,logicmoo_user:G)->CALL=logicmoo_user:G;
@@ -389,7 +390,7 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(MH,M:H))),
 /*
 with_umt(G0):-
   strip_module(G0,WM,G),
-  get_abox(U),  
+  current_abox(U),  
   must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
  '$set_source_module'(S,U),
  '$module'(M,U),
@@ -1518,7 +1519,7 @@ trigger_trigger1(Trigger,Body):-
 %  Note: a bug almost fixed is that this sometimes the side effect of catching 
 %  facts and not assigning the correct justifications
 % 
-call_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
+% call_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
 call_u(P):- mpred_METACALL(mpred_BC_w_cache, P).
 mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_call_no_bc(P).
 
@@ -3207,7 +3208,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(filter_buffer_get_n/3).
 :- module_transparent(filter_buffer_trim/2).
 
-:- forall(mpred_database_term(F/A,_),(abolish(mpred_pfc:F/A),split_into_mts(F/A))).
+:- '$current_source_module'(M),forall(mpred_database_term(F/A,_),(abolish(mpred_pfc:F/A),make_declared_now(M:F/A))).
 :- '$current_source_module'(M),add_import_module(M,baseKB,end).
 % :- initialization(ensure_abox(baseKB)).
 
@@ -3222,7 +3223,7 @@ end_of_file.
 
 :- must(mpred_reset).
 
-:- get_abox(M),dynamic((M:current_ooZz/1,M:default_ooZz/1,M:if_mooZz/2)).
+:- current_abox(M),dynamic((M:current_ooZz/1,M:default_ooZz/1,M:if_mooZz/2)).
 
 :- mpred_trace.
 :- mpred_watch.

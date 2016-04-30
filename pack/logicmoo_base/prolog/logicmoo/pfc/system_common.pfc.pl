@@ -119,7 +119,7 @@ prologBuiltin(mpred_select/2).
 % a conflict triggers a Prolog action to resolve it.
 conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 
-:- kb_dynamic(ttTypeType/1).
+% :- kb_dynamic(ttTypeType/1).
 
 % meta rules to schedule inferencing.
 % resolve conflicts asap
@@ -294,7 +294,7 @@ mpred_mark(pfcCallCode,true,0).
 ((hybrid_support(F,A)/(is_ftNameArity(F,A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
   ({    
     functor(G,F,A),
-     (var(M)->must(get_abox(M));true),
+     (var(M)->must(current_abox(M));true),
      (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
      (var(M)->predicate_property(M:G,exported);true),
      % must(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         

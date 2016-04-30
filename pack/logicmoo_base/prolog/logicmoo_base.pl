@@ -213,7 +213,7 @@ enable_mpred_system(Usr,Sys):- with_mutex(mpred_system_mutex,lmconf:enable_mpred
 % Disable tasks that considering forward and meta programming rules into a Prolog module.
 %
 :- export(disable_mpred_system/2).
-disable_mpred_system(Usr,Sys):- with_mutex(mpred_system_mutex,lmconf:disable_mpred_system0(Usr,Sys)).
+disable_mpred_system(Usr,_Sys):- with_mutex(mpred_system_mutex,lmconf:disable_mpred_system0(Usr)).
 
 
 
@@ -309,18 +309,23 @@ lmconf:disable_mpred_system0(Usr):-
 :- forall(was_op(system,X,Y,Z),op_safe(X,Y,baseKB:Z)).
 :- forall(was_op(baseKB,X,Y,Z),op_safe(X,Y,baseKB:Z)).
 
-:- set_prolog_flag(access_level,system).
+% :- set_prolog_flag(access_level,system).
 
 :-
    system:add_import_module(baseKB,system,end),
+   system:add_import_module(logicmoo_user,system,end),
    system:ignore(system:delete_import_module(baseKB,user)),
-   system:add_import_module(user,baseKB,start),
-   system:ignore(system:delete_import_module(user,system)).
+   system:add_import_module(user,baseKB,start).
+% :-  system:ignore(system:delete_import_module(user,system)).
 
+
+:- set_prolog_flag(access_level,system).
 
 :- forall(was_op(baseKB,X,Y,Z),system:op(X,Y,baseKB:Z)).
 :- forall(was_op(system,X,Y,Z),system:op(X,Y,baseKB:Z)).
 :- forall(was_op(baseKB,X,Y,Z),system:op(X,Y,baseKB:Z)).
+
+:- set_prolog_flag(access_level,user).
 
 % :- autoload([verbose(false)]).
 

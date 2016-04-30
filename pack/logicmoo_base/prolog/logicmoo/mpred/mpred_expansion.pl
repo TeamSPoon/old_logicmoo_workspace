@@ -508,12 +508,12 @@ fully_expand_now(Op,Sent,SentO):-
 is_stripped_module(A):-var(A),!,fail.
 is_stripped_module(lmconf):-!,fail.
 is_stripped_module(user).
-%is_stripped_module(logicmoo_user).
+is_stripped_module(logicmoo_user).
 is_stripped_module(system).
 %is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
 %is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
 % is_stripped_module(baseKB).
-% is_stripped_module(A):- get_abox(AB),!,AB=A.
+% is_stripped_module(A):- current_abox(AB),!,AB=A.
 
 
 
@@ -637,9 +637,9 @@ as_is_term(_:NC):-!,as_is_term(NC).
 as_is_term(NC):-exact_args(NC),!.
 as_is_term(NC):-functor(NC,Op,2),infix_op(Op,_).
 as_is_term(NC):-loop_check(is_unit(NC)),!.
-
 :- mpred_trace_none(as_is_term(_)).
 :- '$set_predicate_attribute'(as_is_term(_), hide_childs, 1).
+:- lock_predicate(as_is_term(_)).
 
 %=  :- was_export(infix_op/2).
 
@@ -1044,15 +1044,15 @@ compound_all_open(C):-compound(C),functor(C,_,A),A>1,\+((arg(_,C,Arg),is_ftNonva
 
 /*
 db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,w_tl(t_l:caller_module(baseKB,MT),db_expand_0(Op,Term,O)).
-db_expand_0(Op,DB:Term,DB:O):- get_abox(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
+db_expand_0(Op,DB:Term,DB:O):- current_abox(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
 db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_expand_0(Op,Term,O)).
 */
 
 % db_expand_0(query(HLDS,Must),props(Obj,Props)):- is_ftNonvar(Obj),is_ftVar(Props),!,gather_props_for(query(HLDS,Must),Obj,Props).
 
 replaced_module(_,V,_):- \+ atom(V),!,fail.
-replaced_module(_,umt,ABox):-get_abox(ABox).
-replaced_module(_,abox,ABox):-get_abox(ABox).
+replaced_module(_,umt,ABox):-current_abox(ABox).
+replaced_module(_,abox,ABox):-current_abox(ABox).
 replaced_module(_,tbox,TBox):-get_tbox(TBox).
 
 %% remodualize( ?Op, ?H, ?HH) is semidet.
@@ -1748,7 +1748,7 @@ mpred_expansion_file.
 
 with_umt_l2(G):-
   notrace(current_prolog_flag(mpred_pfc_file,true)),
-   get_abox(U),
+   current_abox(U),
    nonvar(U),
    '$set_source_module'(Was,U),
    nonvar(Was),

@@ -853,7 +853,7 @@ prop_set_nvlist(Struct,[N=V|More]):-must_det_l((prop_set(N,Struct,V),( More==[]-
 %
 % Prop Get Nvlist.
 %
-prop_get_nvlist(Struct,[N=V|More]):-must_det_l((ignore(show_call_failure(why,prop_get(N,Struct,V))),( More==[]->true;prop_get_nvlist(Struct,More)))).
+prop_get_nvlist(Struct,[N=V|More]):-must_det_l((ignore(show_failure(why,prop_get(N,Struct,V))),( More==[]->true;prop_get_nvlist(Struct,More)))).
 
 
 %= 	 	 

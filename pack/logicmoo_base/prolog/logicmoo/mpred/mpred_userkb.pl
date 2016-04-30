@@ -475,7 +475,6 @@ never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
 
 %:- rtrace.
 %:- trace.
-:- set_prolog_flag(access_level,system).
 defined_predicate(M:P):- (current_predicate(_,M:P),( \+ predicate_property(M:P,imported_from(_)))).
 :- nortrace.
 :- notrace.

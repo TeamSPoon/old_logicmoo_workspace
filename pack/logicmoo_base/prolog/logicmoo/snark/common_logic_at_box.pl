@@ -19,9 +19,9 @@
    
           set_current_module/1,
           assert_setting01/1,
-make_module_name_local/2,
-make_module_name_local0/2,
-          get_abox/1,
+          make_module_name_local/2,
+          make_module_name_local0/2,
+          current_abox/1,
           get_abox0/1,
           get_abox_for/2,
           guess_abox/2,
@@ -86,7 +86,7 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
 
 :- module_transparent
             which_file/1,
-   get_abox/1,
+   current_abox/1,
    get_abox0/1,
    get_abox_for/2,
    guess_abox/2,
@@ -127,7 +127,7 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
 %
 % In Managed Predicate Knowledge Base Module.
 %
-in_mpred_kb_module:- source_context_module(MT),get_abox(MT2),!,MT==MT2.
+in_mpred_kb_module:- source_context_module(MT),current_abox(MT2),!,MT==MT2.
 
 
 
@@ -136,7 +136,7 @@ in_mpred_kb_module:- source_context_module(MT),get_abox(MT2),!,MT==MT2.
 % Converted To Tbox.
 %
 to_tbox(ABox,T):-sanity((nonvar(ABox),var(T))),is_system_box(ABox),!,T=baseKB.
-to_tbox(A,T):-get_abox(TT),A==TT,get_tbox(T),!.
+to_tbox(A,T):-current_abox(TT),A==TT,get_tbox(T),!.
 to_tbox(A,A).
 
 
@@ -144,8 +144,8 @@ to_tbox(A,A).
 %
 % Converted To ABox.
 %
-to_abox(A,T):-sanity((nonvar(A),var(T))),is_system_box(A),!,get_abox(T).
-to_abox(A,T):-get_tbox(TT),A==TT,get_abox(T),!.
+to_abox(A,T):-sanity((nonvar(A),var(T))),is_system_box(A),!,current_abox(T).
+to_abox(A,T):-get_tbox(TT),A==TT,current_abox(T),!.
 to_abox(A,A).
 
 :- export(to_box_type0/3).
@@ -215,6 +215,7 @@ source_module_non_user(From):- which_file(File),make_module_name_local(File,From
 source_module_non_user(From):- '$current_source_module'(From).
 source_module_non_user(From):- '$current_typein_module'(From).
 
+guess_abox(_,baseKB):- simple_boxes,!.
 guess_abox(From,ABox):- nonvar(From),t_l:user_abox(From,ABox),!.
 guess_abox(From,ABox):- source_module_non_user(From),From\==user,t_l:user_abox(From,ABox),!.
 guess_abox(From,ABox):- source_module_non_user(From),From\==user,get_abox_for(From,ABox),set_abox_for(From,ABox),!.
@@ -270,27 +271,32 @@ set_guessed_tbox(From,TBox):-
 
 ensure_tbox(_ABox).
 
-%% get_abox(-Ctx) is det.
+simple_boxes.
+
+%% current_abox(-Ctx) is det.
 %
 % ABox is an "assertion component" Prolog Module
 % within a knowledge base.
 %
 % not just user modules
 
-get_abox(A):- nonvar(A),!.
-get_abox(A):- get_abox0(A),A\==user,!.
-get_abox(logicmoo_user).
+current_abox(baseKB):- simple_boxes,!.
+current_abox(A):- nonvar(A),!.
+current_abox(A):- get_abox0(A),A\==user,!.
+current_abox(logicmoo_user).
 
+get_abox0(baseKB):- simple_boxes,!.
 get_abox0(A):- which_file(File)->get_abox_for(File,A).
 get_abox0(A):-'$current_source_module'(M)->get_abox_for(M,A).
 get_abox0(A):- source_module(SM)->get_abox_for(SM,A).
 get_abox0(A):-'$current_typein_module'(M)->get_abox_for(M,A).
 get_abox0(A):- guess_abox(From,A),set_guessed_abox(From,A).
 
-
+get_tbox(baseKB):- simple_boxes,!.
 get_tbox(A):- nonvar(A),!.
 get_tbox(A):- quietly_must(quietly(((get_tbox0(A),A\=user);get_tbox0(A)))),!.
 
+get_tbox0(baseKB):- simple_boxes,!.
 get_tbox0(A):-'$current_typein_module'(M),get_tbox_for(M,A).
 get_tbox0(A):-'$current_source_module'(M),get_tbox_for(M,A).
 get_tbox0(A):- source_module(SM)->get_tbox_for(SM,A).
@@ -300,6 +306,7 @@ get_tbox0(A):- guess_tbox(From,A),set_guessed_tbox(From,A).
 
 set_abox_for(SM,ABox):-assert_setting(lmconf:abox_for(SM,ABox)).
 
+get_abox_for(_,baseKB):- simple_boxes,!.
 get_abox_for(SM,ABox):-lmconf:abox_for(SM,ABox),!.
 get_abox_for(SM,ABox):- SM\== user, SM\==baseKB, make_module_name_local(SM,ABox),
   current_module(ABox),\+ exists_file(ABox),
@@ -311,6 +318,7 @@ get_abox_for(_,logicmoo_user).
 
 set_tbox_for(SM,TBox):-assert_setting(lmconf:tbox_for(SM,TBox)).
 
+get_tbox_for(_,baseKB):- simple_boxes,!.
 get_tbox_for(SM,TBox):- lmconf:tbox_for(SM,TBox),!.
 get_tbox_for(M,TBox):- M \== user, M \==logicmoo_user, 
    make_module_name_local(M,TBox),current_module(TBox),
@@ -326,7 +334,7 @@ get_tbox_for(_,baseKB).
 %
 % Set Current Module.
 %
-set_current_module(user):- get_abox(U),set_mpred_module(U),!.
+set_current_module(user):- current_abox(U),set_mpred_module(U),!.
 set_current_module(ABox):- '$set_typein_module'(ABox),'$set_source_module'(ABox).
 
 
@@ -352,7 +360,7 @@ box_type(_,_,abox).
 
 
 % ========================================
-% get_abox/1
+% current_abox/1
 % ========================================
 
 %% reset_abox( ?M) is semidet.
@@ -371,7 +379,7 @@ reset_tbox(M):- source_module(SM), ignore(show_failure(M\=user)),
 %
 % Set User Tbox.
 %
-set_tbox(TBoxM):- get_abox(M),ensure_abox(TBoxM),set_tbox(M,TBoxM).
+set_tbox(TBoxM):- current_abox(M),ensure_abox(TBoxM),set_tbox(M,TBoxM).
 set_tbox(M,TBoxM):- 
    ( is_system_box(M) -> true ; maybe_add_import_module(M,TBoxM,end)).
 
@@ -469,7 +477,7 @@ import_to_user_mfa0(_MM,_SM,decl_type(A),baseKB:decl_type/1):-trace_or_throw(bas
 
 
 import_to_user_mfa0(_MM,_SM,_,M:F/A):- functor(P,F,A), 
- U=logicmoo_user,
+ U=everythingPSC,
  Rule = ((U:P:- user:loop_check_nr(M:P))),
  (clause_asserted(Rule)-> true; 
   must((
@@ -582,12 +590,12 @@ correct_module(M,X,T):-functor(X,F,A),quietly_must(correct_module(M,F,A,T)),!.
 %
 % Correct Module.
 %
-correct_module(abox,F,A,T):- !,get_abox(M),!,correct_module(M,F,A,T).
+correct_module(abox,F,A,T):- !,current_abox(M),!,correct_module(M,F,A,T).
 correct_module(tbox,F,A,T):- !,get_tbox(M),!,correct_module(M,F,A,T).
 correct_module(sbox,F,A,T):- !,get_tbox(M),!,correct_module(M,F,A,T).
 correct_module(M,F,A,T):- box_type(F,A,Type),!,to_box_type(M,Type,T).
 correct_module(MT,_,_,MT):-!.
 
-:- add_import_module(logicmoo_user,logicmoo_base,start).
+% :- add_import_module(logicmoo_user,logicmoo_base,start).
 
 

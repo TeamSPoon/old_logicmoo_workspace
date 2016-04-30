@@ -2047,10 +2047,13 @@ atom_contains666(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 % Real Builtin Predicate.
 %
 real_builtin_predicate(G):- predicate_property(G,foreign),!.
+real_builtin_predicate(G):- predicate_property(G,imported_from(system)),!.
 real_builtin_predicate(G):- strip_module(G,_,GS),(predicate_property(prolog:GS,built_in);predicate_property(system:GS,built_in)),!.
 real_builtin_predicate(G):- predicate_property(G,built_in),functor(G,F,_), 
+   \+ predicate_property(G,dynamic),
    if_defined(lmconf:mpred_system_kb(M)), 
    (if_defined(M:mpred_isa(F,prologHybrid));if_defined(baseKB:mpred_isa(F,prologHybrid))).
+
 
 
 %= 	 	 

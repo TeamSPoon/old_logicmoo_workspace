@@ -17,7 +17,7 @@
 :- mpred_reset.
 
 
-:- get_abox(M),dynamic((M:current_ooQ1/1,M:default_ooQ1/1,M:if_mooQ1/2)).
+:- current_abox(M),dynamic((M:current_ooQ1/1,M:default_ooQ1/1,M:if_mooQ1/2)).
 :- mpred_trace.
 :- mpred_watch.
 :- mpred_reset.
@@ -27,7 +27,7 @@
 
 :- must(call_u(default_ooQ1(whenMissingQ1))).
 
-:- get_abox(M),M:must((default_ooQ1(whenMissingQ1))).
+:- current_abox(M),M:must((default_ooQ1(whenMissingQ1))).
 
 :- mpred_why(default_ooQ1(whenMissingQ1)).
 
@@ -72,7 +72,7 @@
 :- mpred_test(current_ooQ1(whenMissingQ1)).
 
 
-:- get_abox(M),dynamic((M:current_ooTt/1,M:default_ooTt/1,M:if_mooTt/2)).
+:- current_abox(M),dynamic((M:current_ooTt/1,M:default_ooTt/1,M:if_mooTt/2)).
 
 :- mpred_trace.
 :- mpred_watch.

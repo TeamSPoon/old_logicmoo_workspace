@@ -362,7 +362,7 @@ get_where0(lmconf:0):-!.
 % Lco Goal Expansion.
 %
 
-lco_goal_expansion(_,_):-!,fail.
+% lco_goal_expansion(_,_):-!,fail.
 lco_goal_expansion(B,A):-nonvar(A),!,lco_goal_expansion(B,M),!,M=A.
 lco_goal_expansion(V,V):- \+ compound(V),!.
 lco_goal_expansion(loop_check(G),O):-!,lco_goal_expansion(loop_check(G,fail),O).
@@ -675,7 +675,12 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 % Hook To [system:goal_expansion/2] For Module Logicmoo_util_loop_check.
 % Goal Expansion.
 %
-user:goal_expansion(LC,PIn,LCOO,POut):- notrace((is_file_based_expansion(goal,LC,PIn,LCOO,POut),source_location(_,_),lco_goal_expansion(LC,LCOO),LC\=@=LCOO)).
+
+usera:goal_expansion(LC,PIn,LCOO,POut):- 
+   notrace((is_file_based_expansion(goal,LC,PIn,LCOO,POut),
+   source_location(_,_),
+   lco_goal_expansion(LC,LCOO),
+   LC\=@=LCOO)).
 
 
 

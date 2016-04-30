@@ -880,7 +880,7 @@ add_genlMt(From,Prop):-atom(Prop),!,add_genlMt(From,imports(Prop)).
 add_genlMt(From,CTo):-arg(1,CTo,To),From==To,!.
 add_genlMt(From,imports(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
 add_genlMt(From,maybe(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
-add_genlMt(baseKB,imports(logicmoo_user)):-!.
+add_genlMt(baseKB,imports(logicmoo_user)):-!. % this means never will happen
 
 % add_genlMt(_From,imports(To)):-arg(_,v(baseKB,logicmoo_user),To),!.
 % add_genlMt(logicmoo_user,imports(baseKB)):-!.
@@ -911,8 +911,11 @@ is_file_based_expansion(term,I,PosI,_O,_PosO):-!,
 
 is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
    compound(PosI),nonvar(I),
+   % b_getval('$term',Was), Was==[],
    b_getval('$term_position', Pos),
-   compound(Pos),arg(1,Pos,At),arg(1,PosI,At),!.
+   Pos = '$stream_position'(PosAt,_,_,_),
+   PosAt>0,
+   arg(1,PosI,At),!,At>=PosAt.
 
 glean_prolog_impl_file(_,_,_,_):-current_prolog_flag(xref,true),!.
 glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_concat([_,_|_],'.pfc',File),!,

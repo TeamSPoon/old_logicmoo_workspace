@@ -237,7 +237,6 @@ noncol_type('LogicalConnective').
 % Never Type Generation Of Proof.
 %
 never_type_why(V,ftVar(isThis)):-is_ftVar(V),!.
-never_type_why(M:C,Why):-atomic(M),!,never_type_why(C,Why).
 never_type_why(cheaply_u,cheaply_u(isThis)):-!.
 never_type_why(C,_):-a(tCol,C),!,fail. % already declared to be a type
 never_type_why(C,_):-isa(C,tCol),!,fail.
@@ -249,6 +248,7 @@ never_type_why(F,Why):-atom(F),functor(G,F,1),real_builtin_predicate(G),!,Why=(w
 never_type_why(F,Why):-never_type_f(F),Why=is_never_type(F).
 never_type_why(F,Why):-prologSideEffects(F),Why=prologSideEffects(F).
 never_type_why(F,Why):- atom(F), arity(F,A),!,F\==isa, isa(F,_), A > 1,Why=(whynot( arity(F,A) )).
+never_type_why(M:C,Why):-atomic(M),!,never_type_why(C,Why).
 
 
 % ========================================

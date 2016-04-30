@@ -34,6 +34,8 @@ user:term_expansion(EOF,POS,O,POS2):-
     '$current_typein_module'(TM),
     glean_prolog_impl_file(EOF,S,M,TM))),fail.
 
+:- set_prolog_flag(access_level,system).
+
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_first.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_catch.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_dmsg.pl')).
@@ -46,7 +48,6 @@ user:term_expansion(EOF,POS,O,POS2):-
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_with_assertions.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_ctx_frame.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_database.pl')).
-:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_dcg.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_dra.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_dumpst.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_engines.pl')).
@@ -60,14 +61,17 @@ user:term_expansion(EOF,POS,O,POS2):-
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_scce.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_strings.pl')).
-:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_structs.pl')).
-:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_supp.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_term_listing.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_terms.pl')).
-:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_varfunctors.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_bb_gvar.pl')).
+% the next are loaded idomaticalyl later (if needed)
 % :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_bb_env.pl')).
+% :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_dcg.pl')).
+% :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_varfunctors.pl')).
+% :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_structs.pl')).
+% :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_supp.pl')).
 
+:- set_prolog_flag(access_level,user).
 
 :- dynamic(lmconf:logicmoo_utils_separate/0).
 :- retractall(lmconf:logicmoo_utils_separate).

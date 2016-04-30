@@ -81,6 +81,12 @@
 :- meta_predicate suggestVar(2,*,?).
 :- meta_predicate theAll(//,?,?).
 :- meta_predicate theCode(?,?,?).
+
+% :- meta_predicate decl_dcgTest(?,//).
+% :- meta_predicate decl_dcgTest_startsWith(?,*,0).
+% :- meta_predicate decl_dcgTest(?,//,0).
+% :- meta_predicate theCode(0,*,*).
+
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 
 :- if(current_prolog_flag(dialect,swi)).

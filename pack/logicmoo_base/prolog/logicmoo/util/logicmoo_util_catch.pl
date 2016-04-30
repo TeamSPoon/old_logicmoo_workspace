@@ -1461,7 +1461,7 @@ need_speed:-fail.
 %
 % If Is A Release.
 
-% is_release:-!.
+is_release:-!.
 % is_release:- 1 is random(4),!.
 is_release:- !,fail.
 is_release :- \+ not_is_release.
