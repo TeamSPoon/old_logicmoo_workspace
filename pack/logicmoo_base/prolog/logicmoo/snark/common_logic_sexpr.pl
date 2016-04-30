@@ -869,6 +869,6 @@ process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure):-
 
 */
 
-:- maybe_add_import_module(baseKB,common_logic_sexpr,end).
+:- add_genlMt(baseKB,common_logic_sexpr,end).
 
 

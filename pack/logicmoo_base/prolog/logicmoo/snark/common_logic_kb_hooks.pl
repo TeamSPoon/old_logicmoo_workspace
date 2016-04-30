@@ -18,6 +18,7 @@
           get_b_dnf/2,
           get_dnf_props/6,
           get_props/4,
+          cycAssert/1,cycAssert/2,
           get_varsp/2,
           hide_empty_strings/0,
           hide_term_rewrites/0,
@@ -98,6 +99,8 @@ noGenlPreds/1,
 
 */
 
+
+
 :- was_dynamic el_assertions:el_holds/4.
 :- was_dynamic el_assertions:el_holds/5.
 :- was_dynamic el_assertions:el_holds/6.
@@ -121,7 +124,8 @@ noGenlPreds/1,
 :- was_export(kbp_t/1). 
 
 
-
+cycAssert(O):-assert_kif(O).
+cycAssert(O,Mt):-assert_kif(Mt:O).
 
 %= 	 	 
 

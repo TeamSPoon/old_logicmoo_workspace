@@ -16,7 +16,7 @@
 must_is_entailed(G):- cwc, must(is_entailed_u(G)).
 
 
-show_test(G):- cwc, current_abox(KB),printAll(must(KB:G)).
+show_test(G):- cwc, defaultAssertMt(KB),printAll(must(KB:G)).
 
 
 %= ````

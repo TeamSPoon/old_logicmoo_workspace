@@ -4,7 +4,7 @@
 % :- use_listing_vars.
 
 
-% :- (( must((current_abox(M)->M==red_test01)))).
+% :- (( must((defaultAssertMt(M)->M==red_test01)))).
 
 % :- set_prolog_flag(umt_local,true).
 
@@ -18,7 +18,7 @@
 :- mpred_reset.
 
 
-:- current_abox(M),dynamic((M:current_ooQ2/1,M:default_ooQ2/1,M:if_mooQ2/2)).
+:- defaultAssertMt(M),dynamic((M:current_ooQ2/1,M:default_ooQ2/1,M:if_mooQ2/2)).
 :- mpred_trace.
 :- mpred_watch.
 :- mpred_reset.
@@ -71,7 +71,7 @@
 :- mpred_test(current_ooQ2(booQ2)).
 
 
-:- current_abox(M),dynamic((M:current_ooTt/1,M:default_ooTt/1,M:if_mooTt/2)).
+:- defaultAssertMt(M),dynamic((M:current_ooTt/1,M:default_ooTt/1,M:if_mooTt/2)).
 
 :- mpred_trace.
 :- mpred_watch.

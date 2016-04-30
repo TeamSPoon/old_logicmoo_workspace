@@ -291,7 +291,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 
 
 % ========================================
-% current_abox/1
+% defaultAssertMt/1
 % ========================================
 
 % TODO uncomment the next line without breaking it all!

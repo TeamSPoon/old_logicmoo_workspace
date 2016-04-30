@@ -16,47 +16,54 @@
 % Douglas Miles
 */
 :- module(common_logic_at_box,[
-   
-          set_current_module/1,
-          assert_setting01/1,
-          make_module_name_local/2,
-          make_module_name_local0/2,
-          current_abox/1,
-          get_abox0/1,
-          get_abox_for/2,
-          guess_abox/2,
-          set_abox/1,
-          set_abox_for/2,
-          set_file_abox/1,
-          set_file_abox/1,
-          set_guessed_abox/2,
-          to_abox/2,
-          reset_abox/1,
 
-          get_tbox/1,
-          get_tbox0/1,
-          get_tbox_for/2,          
-          guess_tbox/2,
-          set_tbox/1,
-          set_tbox_for/2,
-          set_file_tbox/1,
-          set_file_tbox/1,
-          set_guessed_tbox/2,
-          to_tbox/2,
-          reset_tbox/1,
+         assert_setting01/1,
+         make_module_name_local/2,
+         make_module_name_local0/2,
+         
+         get_user_module/1,
+         set_user_module/1,
+         
+         defaultAssertMt/1,
+         set_abox/1,
+         get_abox_for/2,
+         set_abox_for/2,
 
-          best_module/3,
-          correct_module/3,
-          correct_module/4,
-          ensure_imports/1,
-          import_to_user/1,
-          import_to_user0/3,
-          in_mpred_kb_module/0,
-          lmconf:is_box_module/2,
-          is_default_shared/1,
-          is_system_box/1,
-   which_file/1,
-          user_m_check/1
+         
+         which_file/1,
+         get_file_abox/1,
+         set_file_abox/1,
+         
+         
+         get_current_tbox/1,
+         set_tbox/1,
+         get_tbox_for/2,
+         set_tbox_for/2,
+         
+         
+         best_module/3,
+         correct_module/3,
+         correct_module/4,
+         ensure_imports/1,
+         import_to_user/1,
+         import_to_user0/3,
+         in_mpred_kb_module/0,
+         lmconf:is_box_module/2,
+         is_default_shared/1,
+         is_system_box/1,
+         
+         best_module/3,
+         correct_module/3,
+         correct_module/4,
+         ensure_imports/1,
+         import_to_user/1,
+         import_to_user0/3,
+         in_mpred_kb_module/0,
+         lmconf:is_box_module/2,
+         is_default_shared/1,
+         is_system_box/1,
+         which_file/1,
+         user_m_check/1
     ]).
 
 user_m_check(_Out).
@@ -83,28 +90,22 @@ assert_setting01(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),system
 which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(F)).
 
 :- module_transparent
-            which_file/1,
-   current_abox/1,
-   get_abox0/1,
-   get_abox_for/2,
-   guess_abox/2,
+   defaultAssertMt/1,
    set_abox/1,
+   get_abox_for/2,
    set_abox_for/2,
+   %reset_abox/1,
+
+   which_file/1,
+   get_file_abox/1,
    set_file_abox/1,
-   set_guessed_abox/2,
-   to_abox/2,
-   reset_abox/1,
+
    
-   get_tbox/1,
-   get_tbox0/1,
-   get_tbox_for/2,
-   guess_tbox/2,
+   get_current_tbox/1,
    set_tbox/1,
+   get_tbox_for/2,
    set_tbox_for/2,
-   set_file_tbox/1,
-   set_guessed_tbox/2,
-   to_tbox/2,
-   reset_tbox/1,
+   %reset_tbox/1,
    
    best_module/3,
    correct_module/3,
@@ -115,34 +116,272 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
    in_mpred_kb_module/0,
    is_box_module/2,
    is_default_shared/1,
-   is_system_box/1.
-
+   is_system_box/1   .
 
 
 %% in_mpred_kb_module is semidet.
 %
 % In Managed Predicate Knowledge Base Module.
 %
-in_mpred_kb_module:- source_context_module(MT),current_abox(MT2),!,MT==MT2.
+in_mpred_kb_module:- source_context_module(MT),defaultAssertMt(MT2),!,MT==MT2.
 
 
+make_module_name_local(A,B):-make_module_name_local0(A,B),B\==logicmoo_base,\+ exists_file(B).
+make_module_name_local0(Source,baseKB):-is_default_shared(Source).
+make_module_name_local0(Source,Source):-lmcache:has_pfc_database_preds(Source).
+make_module_name_local0(Source,FM):-make_module_name(Source,FM).
 
-%% to_tbox( ?Box, -TBox) is det.
+:- thread_local(t_l:current_module_override/1).
+
+ensure_tbox(_ABox).
+
+simple_boxes.
+
+%% defaultAssertMt(-Ctx) is det.
 %
-% Converted To Tbox.
+% ABox is an "assertion component" Prolog Module
+% within a knowledge base.
 %
-to_tbox(ABox,T):-sanity((nonvar(ABox),var(T))),is_system_box(ABox),!,T=baseKB.
-to_tbox(A,T):-current_abox(TT),A==TT,get_tbox(T),!.
-to_tbox(A,A).
+% not just user modules
+
+:- thread_local(t_l:user_abox/2).
+:- thread_local(t_l:user_tbox/2).
+:- dynamic(lmconf:abox_for/2).
+:- dynamic(lmconf:tbox_for/2).
+
+get_user_module(M):- t_l:current_module_override(M),!.
+get_user_module(M):- '$current_source_module'(M),M\==user,!.
+get_user_module(M):- '$current_typein_module'(M),M\==user,!.
+% get_user_module(M):- source_module(M),M\==user.
+get_user_module(M):- get_file_module(M).
 
 
-%% to_abox( ?Box, -ABox) is det.
+get_file_module(baseKB):- simple_boxes,!.
+get_file_module(M):- which_file(File)->make_module_name_local(File,M),File\==M,!.
+
+user:exception(undefined_predicate, Mt:F/A ,retry):- t(tMicrotheory,Mt) -> registerCycPred(Mt,F,A).
+   
+makeConstant(_Mt).
+
+% ============================================
+% Make new Microtheory
+% ============================================
+
+ensureMt(Mt):-
+   makeConstant(Mt),
+   cycAssert(baseKB:isa(Mt,tMicrotheory)).
+
+ensureGenlMt(Sub,Super):-ensureMt(Sub),ensureMt(Super),
+   cycAssert(baseKB:'genlMt'(Sub,Super)).
+
+
+% ============================================
+:-dynamic(isRegisterCycPred/3).
+
+:-module_transparent(isRegisterCycPred/3).
+
+% ?- registerCycPred(baseKB:isa/2). 
+registerCycPred(Mt:Pred/Arity):-!,
+   registerCycPred(Mt,Pred,Arity).
+% ?- registerCycPred(baseKB:isa(_,_)). 
+registerCycPred(Mt:Term):-
+   functor(Term,Pred,Arity),
+   registerCycPred(Mt,Pred,Arity).
+registerCycPred(Term):-
+   functor(Term,Pred,Arity),
+   currentMt(Mt),
+   registerCycPred(Mt,Pred,Arity).
+   
+
+
+% ?- registerCycPred(isa(_,_),baseKB). 
+registerCycPred(Term,Mt):-
+   functor(Term,Pred,Arity),
+   registerCycPred(Mt,Pred,Arity).
+   
+% ?- registerCycPred(baseKB,isa,2). 
+registerCycPred(Mt,Pred,0):-!,registerCycPred(Mt,Pred,2).
+registerCycPred(Mt,Pred,Arity):-isRegisterCycPred(Mt,Pred,Arity),!.
+registerCycPred(Mt,Pred,Arity):-
+      functor(Term,Pred,Arity),
+      ignore(defaultAssertMt(Mt)),
+      % asserta(( user:Term :- common_logic_snark:kif_ask(Term,Mt))),
+      ain(( Mt:Term :- istAbove(Mt,Term))),
+      ain(isRegisterCycPred(Mt,Pred,Arity)),!.
+
+
+% ============================================
+% Assert Side Effect Prolog to Cyc Predicate Mapping
 %
-% Converted To ABox.
+% ?- assert(isa('Fido','Dog')).
+% Will assert (isa Fido Dog) into BaseKB
 %
-to_abox(A,T):-sanity((nonvar(A),var(T))),is_system_box(A),!,current_abox(T).
-to_abox(A,T):-get_tbox(TT),A==TT,current_abox(T),!.
-to_abox(A,A).
+% ?- assert('DogsMt':isa('Fido','Dog')).
+% Will assert (isa Fido Dog) into DogsMt
+% ============================================
+%'$toplevel':assert(X):-ain(Term).
+
+ifHookRedef(_):-!.
+%ifHookRedef(C):-C,!.
+
+:-ifHookRedef((redefine_system_predicate(system:assert(_)),assert((system:assert(Term):-nonvar(Term),assertThrough(Term))))).
+
+assertThrough(Mt:CycL):-assertThrough(Mt,CycL).
+assertThrough(CycL):-mtForCycL(CycL,Mt),assertThrough(Mt,CycL).
+
+assertThrough(ToMt,CycL):-
+      functor(CycL,Pred,Arity),
+      (isRegisterCycPred(Mt,Pred,Arity);atom_concat('#$',_,Pred)),!,
+      ignore(ToMt=Mt),cycAssert(CycL,ToMt),!.
+
+assertThrough(ToMt,CycL):-
+      (predicate_property(Mt:CycL,_);context_module(Mt);Mt=ToMt),!,
+      ignore(Mt=ToMt),
+      ain(Mt:CycL),!.
+
+% ============================================
+% Retract (All) Side Effect Prolog to Cyc Predicate Mapping
+%
+% ?- retractall(isa('Fido','Dog')).
+% Will mpred_rem (isa Fido Dog) from BaseKB
+%
+% ?- retractall('DogsMt':isa('Fido','Dog')).
+% Will mpred_rem (isa Fido Dog) from DogsMt
+% ============================================
+:-ifHookRedef((redefine_system_predicate(retractall(_)),asserta((retractall(Term):-nonvar(Term),retractAllThrough(Term))))).
+
+retractAllThrough(Mt:CycL):-
+      retractAllThrough(Mt,CycL).
+
+retractAllThrough(CycL):-
+      retractAllThrough(_Mt,CycL).
+
+retractAllThrough(ToMt,CycL):-
+      functor(CycL,Pred,Arity),
+      isRegisterCycPred(Mt,Pred,Arity),!,
+      ignore(ToMt=Mt),
+      cycRetract(CycL,ToMt),!.
+
+retractAllThrough(ToMt,CycL):-
+      (predicate_property(Mt:CycL,_);context_module(Mt);Mt=ToMt),!,
+      ignore(Mt=ToMt),
+      system:retractall(Mt:CycL),!.
+            
+% ============================================
+% Retract (First) Side Effect Prolog to Cyc Predicate Mapping
+%
+% ?- retractall(isa('Fido','Dog')).
+% Will mpred_rem (isa Fido Dog) from BaseKB
+%
+% ?- retractall('DogsMt':isa('Fido','Dog')).
+% Will mpred_rem (isa Fido Dog) from DogsMt
+% ============================================
+:-ifHookRedef((redefine_system_predicate(mpred_rem(_)),asserta((mpred_rem(Term):-nonvar(Term),retractOnceThrough(Term))))).
+
+retractOnceThrough(Mt:CycL):-
+      retractOnceThrough(Mt,CycL).
+
+retractOnceThrough(CycL):-
+      retractOnceThrough(_Mt,CycL).
+
+retractOnceThrough(ToMt,CycL):-
+      functor(CycL,Pred,Arity),
+      isRegisterCycPred(Mt,Pred,Arity),!,
+      ignore(ToMt=Mt),
+      cycRetract(CycL,ToMt),!.
+
+retractOnceThrough(ToMt,CycL):-
+      (predicate_property(Mt:CycL,_);context_module(Mt);Mt=ToMt),!,
+      ignore(Mt=ToMt),
+      system:mpred_rem(Mt:CycL),!.
+
+
+defaultAssertMt(ABox):- get_user_module(M),!,get_abox_for(M,ABox).
+defaultAssertMt(baseKB):- simple_boxes,!.
+
+get_current_tbox(TBox):- defaultAssertMt(M),!,get_tbox_for(M,TBox).
+get_current_tbox(baseKB):- simple_boxes,!.
+
+%% set_user_module( ?ABox) is semidet.
+%
+% Set Current Module.
+%
+set_user_module(M):- assert_setting(t_l:current_module_override(M)),
+                        '$set_source_module'(M),'$set_typein_module'(M),
+                        get_abox_for(M,ABox),get_tbox_for(ABox,TBox),setup_module_ops(ABox),
+                        inherit_into_module(M,TBox,end).
+
+inherit_into_module(Child,Parent):-  ensureGenlMt(Child,Parent),ignore(maybe_remove_import_module(Child,Parent)).
+inherit_into_modules(Child):-forall(import_module(Child,Parent) ,inherit_into_module(Child,Parent)).
+
+
+set_abox(ABox):- '$set_source_module'(ABox), get_user_module(M),set_abox_for(M,ABox),setup_module_ops(ABox).
+
+set_tbox(TBox):- '$set_typein_module'(TBox), get_user_module(M),set_tbox_for(M,TBox),setup_module_ops(TBox).
+
+
+get_abox_for(M,ABox):- t_l:user_abox(M,ABox),!.
+get_abox_for(M,ABox):-lmconf:abox_for(M,ABox),!.
+get_abox_for(M,M):- M\==user,current_module(M),!.
+get_abox_for(_,baseKB):- simple_boxes,!.
+
+set_abox_for(M,ABox):-assert_setting(lmconf:abox_for(M,ABox)).
+
+get_tbox_for(M,TBox):- t_l:user_abox(M,TBox),!.
+get_tbox_for(M,TBox):- lmconf:tbox_for(M,TBox),!.
+%get_tbox_for(M,M):- M\==user,!,current_module(M),!.
+get_tbox_for(_,baseKB):- simple_boxes,!.
+
+set_tbox_for(M,TBox):-assert_setting(lmconf:tbox_for(M,TBox)).
+
+%% box_type( ?F, ?A, ?VALUE3) is semidet.
+%
+% Datalog Type.
+%
+box_type(F,A,tbox):-current_predicate(baseKB:F/A).
+box_type(_,_,abox).
+
+
+%% set_tbox( ?M, ?TBoxM) is semidet.
+%
+% Set User Tbox.
+%
+set_tbox(TBoxM):- defaultAssertMt(M),ensure_abox(TBoxM),set_tbox(M,TBoxM).
+set_tbox(M,TBoxM):- 
+   ( is_system_box(M) -> true ; inherit_into_module(M,TBoxM,end)).
+
+%% set_file_abox( ?M) is semidet.
+%
+% Set User ABox.
+%
+
+get_file_abox(ABox):- which_file(Source),get_abox_for(Source,ABox).
+get_file_abox(ABox):- get_file_module(Source),get_abox_for(Source,ABox).
+
+set_file_abox(ABox):- get_file_abox(Was),ABox==Was,!.
+set_file_abox(ABox):- 
+ must_det_l((
+   get_current_tbox(TBox),
+   TBox:ensure_abox(ABox),
+   user_m_check(ABox), 
+   '$current_typein_module'(CM),setup_module_ops(CM),
+   '$current_source_module'(SM),setup_module_ops(SM),  
+   which_file(Source),set_abox_for(Source,ABox),
+   ((t_l:user_abox(SM,Prev),Prev\==ABox)->(assert_until_eof(t_l:user_abox(SM,ABox)))))),
+   % onEndOfFile(reset_abox(Prev)));true),   
+   onEndOfFile('$set_source_module'(SM)),
+   onEndOfFile('$set_typein_module'(CM)),
+   set_user_module(ABox),
+   !.
+
+
+%% is_box_module( ?M, ?VALUE2) is semidet.
+%
+% If Is A Datalog Module.
+%
+lmconf:is_box_module(M,tbox):- is_system_box(M).
+lmconf:is_box_module(user,abox).
+
 
 :- export(to_box_type0/3).
 
@@ -157,237 +396,8 @@ to_box_type(M,B,T):-quietly_must(to_box_type0(M,B,TT)),!,T=TT.
 %
 % Converted To Datalog Type Primary Helper.
 %
-to_box_type0(M,abox,T):-!,to_abox(M,T).
-to_box_type0(M,tbox,T):-to_tbox(M,T).
-
-
-%% set_file_abox( ?M) is semidet.
-%
-% Set User ABox.
-%
-
-get_file_abox(ABox):- which_file(Source),get_abox_for(Source,ABox).
-
-set_file_abox(ABox):- get_file_abox(Was),ABox==Was,!.
-set_file_abox(ABox):- 
- must_det_l((
-   get_tbox(TBox),
-   TBox:ensure_abox(ABox),
-   user_m_check(ABox), 
-   '$current_typein_module'(CM),mpred_ops(CM),
-   '$current_source_module'(SM),mpred_ops(SM),  
-   which_file(Source),set_abox_for(Source,ABox),
-   ((t_l:user_abox(SM,Prev),Prev\==ABox)->(assert_until_eof(t_l:user_abox(SM,ABox)),onEndOfFile(reset_abox(Prev)));true),   
-   onEndOfFile('$set_source_module'(SM)),
-   onEndOfFile('$set_typein_module'(CM)),
-   set_current_module(ABox))),
-   !. 
-
-%% set_file_tbox( ?M) is semidet.
-%
-% Set User ABox.
-%
-set_file_tbox(TBox):- get_file_tbox(Was),TBox==Was,!.
-set_file_tbox(TBox):- 
- must_det_l((
-   get_file_abox(ABox),
-   set_tbox_for(ABox,TBox))).
-
-get_file_tbox(TBox):- 
- must_det_l((
-   get_file_abox(ABox),
-   get_tbox_for(ABox,TBox))).
-
-
-make_module_name_local(A,B):-make_module_name_local0(A,B),B\==logicmoo_base,\+ exists_file(B).
-
-make_module_name_local0(Source,baseKB):-is_default_shared(Source).
-make_module_name_local0(Source,Source):-lmcache:has_pfc_database_preds(Source).
-make_module_name_local0(Source,FM):-make_module_name(Source,FM).
-
-source_module_non_user(From):- source_module(From). 
-source_module_non_user(From):- prolog_load_context(source,Source),make_module_name_local(Source,From).
-source_module_non_user(From):- which_file(File),make_module_name_local(File,From).
-source_module_non_user(From):- '$current_source_module'(From).
-source_module_non_user(From):- '$current_typein_module'(From).
-
-guess_abox(_,baseKB):- simple_boxes,!.
-guess_abox(From,ABox):- nonvar(From),t_l:user_abox(From,ABox),!.
-guess_abox(From,ABox):- source_module_non_user(From),From\==user,t_l:user_abox(From,ABox),!.
-guess_abox(From,ABox):- source_module_non_user(From),From\==user,get_abox_for(From,ABox),set_abox_for(From,ABox),!.
-guess_abox(From,ABox):- get_abox_for(From,ABox),set_abox_for(From,ABox),!.
-
-guess_tbox(From,TBox):- guess_abox(From,ABox),get_tbox_for(ABox,TBox),!.
-guess_tbox(From,ABox):-  
- hide_trace((
-  (prolog_load_context(module,Source)->true;prolog_load_context(source,Source)),
-  make_module_name_local(Source,FM),
-  Source\==user -> (ABox = FM, which_file(File),set_tbox_for(File,ABox),set_tbox_for(Source,ABox),From=ABox,set_file_tbox(ABox),set_tbox(ABox));
-  (('$set_source_module'(SM,SM),
-   '$current_typein_module'(CM),
-   best_module([FM,SM,CM],From,ABox),
-   nop(dmsg(best_module([FM,SM,CM],From,ABox))))))),!.
-
-:- thread_local(t_l:user_abox/2).
-set_abox(User):-User==user,!,set_abox(baseKB).
-set_abox(ABox):-
-must_det_l((
- quietly_must(ensure_abox(ABox)),
- quietly_must((which_file(File),set_abox_for(File,ABox))),
- '$current_source_module'(SM),set_abox_for(SM,ABox),
- '$current_typein_module'(CM),set_abox_for(CM,ABox),
- ((t_l:user_abox(SM,Was),ABox\==Was)-> wdmsg(set_abox(Was->ABox));true),
- retractall(t_l:user_abox(SM,_M)),
- asserta(t_l:user_abox(SM,ABox)))).
-
-:- thread_local(t_l:user_abox/2).
-set_guessed_abox(ABox,_From):- \+ atom(ABox),!.
-set_guessed_abox(_From,_ABox):-!.
-set_guessed_abox(From,ABox):-
- must_det_l((
- sanity(atom(ABox)), 
-  ((t_l:user_abox(SM,Was),ABox\==Was)-> wdmsg(set_abox(Was-->ABox));true),
- (which_file(File)->(\+ lmconf:abox_for(File,_)->set_abox_for(File,ABox);true);true),
- quietly_must(ensure_abox(ABox)), (\+ is_undefaulted(SM) -> set_abox_for(From,ABox) ; true))).
- %'$set_source_module'(SM,SM),(is_undefaulted(SM)->true;(set_abox_for(SM,ABox),Is_Changed=1)),
- %'$module'(CM,CM),(is_undefaulted(CM)->true;(set_abox_for(CM,ABox),Is_Changed=1)),
- %!.
-
-set_guessed_tbox(_From,TBox):- \+ atom(TBox),!.
-set_guessed_tbox(From,TBox):-
- must_det_l((
- sanity(atom(TBox)), 
-  ((t_l:user_tbox(SM,Was),TBox\==Was)-> wdmsg(set_tbox(Was-->TBox));true),
- (which_file(File)->(\+ lmconf:tbox_for(File,_)->set_tbox_for(File,TBox);true);true),
- quietly_must(doall(ensure_tbox(TBox))), (\+ is_undefaulted(SM) -> set_tbox_for(From,TBox) ; true))).
- %'$set_source_module'(SM,SM),(is_undefaulted(SM)->true;(set_tbox_for(SM,TBox),Is_Changed=1)),
- %'$module'(CM,CM),(is_undefaulted(CM)->true;(set_tbox_for(CM,TBox),Is_Changed=1)),
- %!.
-
-
-ensure_tbox(_ABox).
-
-simple_boxes.
-
-%% current_abox(-Ctx) is det.
-%
-% ABox is an "assertion component" Prolog Module
-% within a knowledge base.
-%
-% not just user modules
-
-current_abox(baseKB):- simple_boxes,!.
-current_abox(A):- nonvar(A),!.
-current_abox(A):- get_abox0(A),A\==user,!.
-current_abox(logicmoo_user).
-
-get_abox0(baseKB):- simple_boxes,!.
-get_abox0(A):- which_file(File)->get_abox_for(File,A).
-get_abox0(A):-'$current_source_module'(M)->get_abox_for(M,A).
-get_abox0(A):- source_module(SM)->get_abox_for(SM,A).
-get_abox0(A):-'$current_typein_module'(M)->get_abox_for(M,A).
-get_abox0(A):- guess_abox(From,A),set_guessed_abox(From,A).
-
-get_tbox(baseKB):- simple_boxes,!.
-get_tbox(A):- nonvar(A),!.
-get_tbox(A):- quietly_must(quietly(((get_tbox0(A),A\=user);get_tbox0(A)))),!.
-
-get_tbox0(baseKB):- simple_boxes,!.
-get_tbox0(A):-'$current_typein_module'(M),get_tbox_for(M,A).
-get_tbox0(A):-'$current_source_module'(M),get_tbox_for(M,A).
-get_tbox0(A):- source_module(SM)->get_tbox_for(SM,A).
-get_tbox0(A):- which_file(File)->get_tbox_for(File,A).
-get_tbox0(A):- guess_tbox(From,A),set_guessed_tbox(From,A).
-
-
-set_abox_for(SM,ABox):-assert_setting(lmconf:abox_for(SM,ABox)).
-
-get_abox_for(_,baseKB):- simple_boxes,!.
-get_abox_for(SM,ABox):-lmconf:abox_for(SM,ABox),!.
-get_abox_for(SM,ABox):- SM\== user, SM\==baseKB, make_module_name_local(SM,ABox),
-  current_module(ABox),\+ exists_file(ABox),
-  assert_setting01(lmconf:abox_for(SM,ABox)),!.
-get_abox_for(_,logicmoo_user).
-
-:- thread_local(t_l:user_abox/2).
-:- thread_local(t_l:user_tbox/2).
-
-set_tbox_for(SM,TBox):-assert_setting(lmconf:tbox_for(SM,TBox)).
-
-get_tbox_for(_,baseKB):- simple_boxes,!.
-get_tbox_for(SM,TBox):- lmconf:tbox_for(SM,TBox),!.
-get_tbox_for(M,TBox):- M \== user, M \==logicmoo_user, 
-   make_module_name_local(M,TBox),current_module(TBox),
-   M\=TBox,
-    \+ lmconf:tbox_for(TBox,_),
-   assert_setting01(lmconf:tbox_for(M,TBox)),!.
-
-get_tbox_for(_,baseKB).
-
-
-
-%% set_current_module( ?ABox) is semidet.
-%
-% Set Current Module.
-%
-set_current_module(user):- current_abox(U),set_mpred_module(U),!.
-set_current_module(ABox):- '$set_typein_module'(ABox),'$set_source_module'(ABox).
-
-
-%% chop_box( ?Chop, ?Was) is semidet.
-%
-% Chop Datalog.
-%
-chop_box(Chop,Was):-sanity(atom(Chop)),atom_concat(Was,'ABox',Chop),!.
-chop_box(Chop,Was):-atom_concat(Was,'TBox',Chop),!.
-chop_box(Chop,Was):-atom_concat(Was,'SBox',Chop),!.
-chop_box(Chop,Chop).
-
-
-
-%% box_type( ?F, ?A, ?VALUE3) is semidet.
-%
-% Datalog Type.
-%
-box_type(F,A,tbox):-current_predicate(baseKB:F/A).
-box_type(_,_,abox).
-
-
-
-
-% ========================================
-% current_abox/1
-% ========================================
-
-%% reset_abox( ?M) is semidet.
-%
-% Reset User ABox.
-%
-reset_abox(M):- source_module(SM), ignore(show_failure(M\=user)),
-   retractall(t_l:user_abox(SM,_Prev)),ensure_abox(M),!,asserta(t_l:user_abox(SM,M)).
-
-reset_tbox(M):- source_module(SM), ignore(show_failure(M\=user)),
-   retractall(t_l:user_tbox(SM,_Prev)),ensure_abox(M),!,asserta(t_l:user_tbox(SM,M)).
-
-
-
-%% set_tbox( ?M, ?TBoxM) is semidet.
-%
-% Set User Tbox.
-%
-set_tbox(TBoxM):- current_abox(M),ensure_abox(TBoxM),set_tbox(M,TBoxM).
-set_tbox(M,TBoxM):- 
-   ( is_system_box(M) -> true ; maybe_add_import_module(M,TBoxM,end)).
-
-
-
-%% is_box_module( ?M, ?VALUE2) is semidet.
-%
-% If Is A Datalog Module.
-%
-lmconf:is_box_module(M,tbox):- is_system_box(M).
-lmconf:is_box_module(user,abox).
-
+to_box_type0(M,abox,T):-!,get_abox_for(M,T).
+to_box_type0(M,tbox,T):-get_tbox_for(M,T).
 
 
 %% is_system_box( ?VALUE1) is semidet.
@@ -489,8 +499,8 @@ import_to_user_mfa0(_MM,_SM,_,M:F/A):- functor(P,F,A),
 %
 system:import_module_to_user(M):- (default_module(user,M);import_module(user,M)),!.
 system:import_module_to_user(M):- ignore(maybe_delete_import_module(M,user)),
-                           maybe_add_import_module(M,system,end),
-                           maybe_add_import_module(user,M,end),
+                           inherit_into_module(M,system,end),
+                           inherit_into_module(user,M,end),
                            % find system thru M
                            maybe_delete_import_module(user,system).
 
@@ -513,7 +523,7 @@ ensure_imports(M):-ensure_imports_tbox(M,baseKB).
 % Skip User.
 %
 skip_user(M):-
-  maybe_add_import_module(M,system,end),  
+  inherit_into_module(M,system,end),  
   ignore(maybe_delete_import_module(M,user)).
   %ignore(maybe_delete_import_module(user,system)).
   %asserta((M:import(P):-system:import(P))),
@@ -532,23 +542,23 @@ ensure_imports_tbox(M,BaseKB):-
   asserta(lmcache:is_ensured_imports_tbox(M,BaseKB)),
   
   must_det((
-   %maybe_add_import_module(BaseKB,mpred_loader,end),
-   %maybe_add_import_module(M,mpred_loader,end),
-   forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),maybe_add_import_module(M,IM,end)),
-   forall((system:current_module(IM),\+ lmconf:is_box_module(IM,_)),maybe_add_import_module(BaseKB,IM,end)),
+   %inherit_into_module(BaseKB,mpred_loader,end),
+   %inherit_into_module(M,mpred_loader,end),
+   forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(M,IM,end)),
+   forall((system:current_module(IM),\+ lmconf:is_box_module(IM,_)),inherit_into_module(BaseKB,IM,end)),
    % skip_user(BaseKB),
    %ignore(maybe_delete_import_module(user,BaseKB)),
    %ignore(maybe_delete_import_module(BaseKB,user)),
    ignore(maybe_delete_import_module(M,BaseKB)),
    ignore(maybe_delete_import_module(BaseKB,M)),
    forall((prolog:current_predicate(_,BaseKB:P),\+predicate_property(BaseKB:P,imported_from(_))),import_shared_pred(M,BaseKB,P)),
-   % maybe_add_import_module(user,BaseKB,end),
-   % maybe_add_import_module(BaseKB,system,end),
-   maybe_add_import_module(M,user,end),
-   %maybe_add_import_module(BaseKB,M,end),
+   % inherit_into_module(user,BaseKB,end),
+   % inherit_into_module(BaseKB,system,end),
+   inherit_into_module(M,user,end),
+   %inherit_into_module(BaseKB,M,end),
    %skip_user(M),
    ignore(maybe_delete_import_module(M,user)),
-   maybe_add_import_module(user,M,end),
+   inherit_into_module(user,M,end),
    ignore(maybe_delete_import_module(user,system)), % gets from M now
    !)).
 
@@ -567,12 +577,12 @@ correct_module(M,X,T):-functor(X,F,A),quietly_must(correct_module(M,F,A,T)),!.
 %
 % Correct Module.
 %
-correct_module(abox,F,A,T):- !,current_abox(M),!,correct_module(M,F,A,T).
-correct_module(tbox,F,A,T):- !,get_tbox(M),!,correct_module(M,F,A,T).
-correct_module(sbox,F,A,T):- !,get_tbox(M),!,correct_module(M,F,A,T).
+correct_module(abox,F,A,T):- !,defaultAssertMt(M),!,correct_module(M,F,A,T).
+correct_module(tbox,F,A,T):- !,get_current_tbox(M),!,correct_module(M,F,A,T).
+correct_module(sbox,F,A,T):- !,get_current_tbox(M),!,correct_module(M,F,A,T).
 correct_module(M,F,A,T):- box_type(F,A,Type),!,to_box_type(M,Type,T).
 correct_module(MT,_,_,MT):-!.
 
-% :- maybe_add_import_module(logicmoo_user,logicmoo_base,start).
+% :- inherit_into_module(logicmoo_user,logicmoo_base,start).
 
 

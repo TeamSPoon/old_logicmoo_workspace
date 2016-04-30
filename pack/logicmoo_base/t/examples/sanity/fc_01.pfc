@@ -11,6 +11,9 @@
 :- module(sanity,[]).
 
 :- use_module(library(logicmoo_base)).
+
+:- add_import_module(sanity,baseKB,start).
+
 :- show_kb_structure.
 
 :- file_begin(pfc).

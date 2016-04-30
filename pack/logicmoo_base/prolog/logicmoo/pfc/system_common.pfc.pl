@@ -299,7 +299,7 @@ prologSideEffects(resolveConflict/1).
 ((hybrid_support(F,A)/(is_ftNameArity(F,A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
   ({    
     functor(G,F,A),
-     (var(M)->must(current_abox(M));true),
+     (var(M)->must(defaultAssertMt(M));true),
      (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
      (var(M)->predicate_property(M:G,exported);true),
      % must(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         

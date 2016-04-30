@@ -72,6 +72,7 @@
             with_filematch/1,
             with_filematches/1,
 
+            maybe_add_import_module/3,
             add_prolog_predicate/6,
             glean_prolog_impl_file/4,
             add_genlMt/2
@@ -137,6 +138,7 @@
         time_file_safe/2,
         to_filename/2,
         upcase_atom_safe/2,
+        maybe_add_import_module/2,
         with_filematches/1.
 :- dynamic
         local_directory_search/1.
@@ -894,6 +896,11 @@ add_genlMt(From,Prop):-write('% '), writeln(add_genlMt(From,Prop)),fail.
 
 add_genlMt(From,imports(To)):-
    catch(add_import_module(From,To,start),E,writeln(E=add_import_module(From,To))).
+
+
+system:maybe_add_import_module(A,B,C):-  catch(add_import_module(A,B,C),_,true).
+
+system:maybe_remove_import_module(A,B):-  ignore(remove_import_module(A,B)).
 
 :- meta_predicate
         glean_prolog_impl_file(+,+,+,+).

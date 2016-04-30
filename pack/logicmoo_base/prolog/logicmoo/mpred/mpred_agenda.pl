@@ -560,7 +560,7 @@ lmconf:hook_one_minute_timer_tick:-agenda_slow_op_restart.
 
 
 %:-meta_predicate(rescandb/0).
-% rescandb:- forall(current_abox(World),(findall(File,lmconf:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),call_u(finish_processing_world))).
+% rescandb:- forall(defaultAssertMt(World),(findall(File,lmconf:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),call_u(finish_processing_world))).
 
 %= 	 	 
 

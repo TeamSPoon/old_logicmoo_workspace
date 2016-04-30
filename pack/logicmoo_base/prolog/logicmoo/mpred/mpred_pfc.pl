@@ -284,14 +284,14 @@ get_source_ref1(_).
 
 % get_source_ref1(_):- fail,check_context_module,fail.
 get_source_ref10(M):- current_why(M), nonvar(M) , M =mfl(_,_,_).
-get_source_ref10(mfl(M,F,L)):- current_abox(M), source_location(F,L).
-get_source_ref10(M):- (current_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
-get_source_ref10(mfl(M,F,L)):- current_abox(M), current_source_file(F:L).
-get_source_ref10(mfl(M,F,_L)):- current_abox(M), current_source_file(F).
-get_source_ref10(mfl(M,_,_L)):- current_abox(M).
-get_source_ref10(M):- (current_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
+get_source_ref10(mfl(M,F,L)):- defaultAssertMt(M), source_location(F,L).
+get_source_ref10(M):- (defaultAssertMt(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
+get_source_ref10(mfl(M,F,L)):- defaultAssertMt(M), current_source_file(F:L).
+get_source_ref10(mfl(M,F,_L)):- defaultAssertMt(M), current_source_file(F).
+get_source_ref10(mfl(M,_,_L)):- defaultAssertMt(M).
+get_source_ref10(M):- (defaultAssertMt(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
 get_source_ref10(M):- fail,trace, 
- ((current_abox(M) -> !;
+ ((defaultAssertMt(M) -> !;
  (atom(M)->(module_property(M,class(_)),!);
     mpred_error(no_source_ref(M))))).
 
@@ -305,18 +305,18 @@ unassertable((_,_)).
 fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
 fix_mp(Unassertable,_):- unassertable(Unassertable),!,trace_or_throw(unassertable_fix_mp(Unassertable)).
 fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
-fix_mp(_:P,ABOX:P):- current_abox(ABOX),!.
-fix_mp(P,ABOX:P):- current_abox(ABOX),!.
+fix_mp(_:P,ABOX:P):- defaultAssertMt(ABOX),!.
+fix_mp(P,ABOX:P):- defaultAssertMt(ABOX),!.
 /*
 % probably never makes it past the above
-fix_mp(MP,M:P):-  strip_module(MP,Cm,P),current_abox(U),!,
+fix_mp(MP,M:P):-  strip_module(MP,Cm,P),defaultAssertMt(U),!,
    (((modulize_head_fb(U,P,Cm,M:P),\+ predicate_property(M:P,static)))*-> true;
       (P==MP -> M=U; M=Cm)
      ),!.
 fix_mp(M:P,M:P):- current_predicate(_,M:P), predicate_property(M:P,dynamic),!.
 fix_mp(G0,CALL):-
   strip_module(G0,WM,G),
-  must((current_abox(U),atom(U))),!,
+  must((defaultAssertMt(U),atom(U))),!,
        (current_predicate(_,U:G)->CALL=U:G;
        (current_predicate(_,WM:G)->CALL=WM:G;
        (current_predicate(_,logicmoo_user:G)->CALL=logicmoo_user:G;
@@ -403,7 +403,7 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(MH,M:H))),
 /*
 with_umt(G0):-
   strip_module(G0,WM,G),
-  current_abox(U),  
+  defaultAssertMt(U),  
   must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
  '$set_source_module'(S,U),
  '$module'(M,U),
@@ -413,7 +413,7 @@ with_umt(G0):-
 
 with_umt(G):-
   gripe_time(0.3,
-   (current_abox(U),call_from_module(U,G))).
+   (defaultAssertMt(U),call_from_module(U,G))).
 
 
 
@@ -3237,7 +3237,7 @@ end_of_file.
 
 :- must(mpred_reset).
 
-:- current_abox(M),dynamic((M:current_ooZz/1,M:default_ooZz/1,M:if_mooZz/2)).
+:- defaultAssertMt(M),dynamic((M:current_ooZz/1,M:default_ooZz/1,M:if_mooZz/2)).
 
 :- mpred_trace.
 :- mpred_watch.

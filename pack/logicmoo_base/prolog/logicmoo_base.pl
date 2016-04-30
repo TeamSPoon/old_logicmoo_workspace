@@ -5,10 +5,10 @@
 
 */
 :- if(('$current_source_module'(SM),'$current_typein_module'(M),
-   system:multifile(baseKB:user_module_uses_base/2),
+   system:multifile(baseKB:user_module_uses_base/3),
+   system:dynamic(baseKB:user_module_uses_base/3),
    catch(maybe_add_import_module(SM,baseKB,start),_,true),
-   system:dynamic(baseKB:user_module_uses_base/2),
-   system:asserta(baseKB:user_module_uses_base(SM,M)))).
+   system:asserta(baseKB:user_module_uses_base(SM,M,SM:baseKB)))).
 :- endif.
 :- module(baseKB,
  [
@@ -17,7 +17,7 @@
    config_mpred_system/2,
    enable_mpred_system/2,
    show_kb_structure/0,
-  user_module_uses_base/2,
+  baseKB:user_module_uses_base/3,
   disable_mpred_system/2,
   fix_ops_for/1]).
 
@@ -42,20 +42,23 @@ lmconf:tbox_for(user,baseKB).
 lmconf:abox_for(user,logicmoo_user).
 
 config_mpred_system:- 
-  baseKB:user_module_uses_base(SM,M),
+  '$current_source_module'(SM),
+  '$current_typein_module'(M),
   config_mpred_system(SM,M).
 
 config_mpred_system(SM,M):-
-  get_abox_for(SM,_),
-  get_tbox_for(M,_), 
-  show_kb_structure.
+  get_abox_for(SM,Usr),
+  get_tbox_for(M,Sys),
+  fix_ops_for(SM),
+  fix_ops_for(M),
+  fix_ops_for(Usr),
+  Sys:ensure_loaded(library(logicmoo_utils)),
+  assert_setting00(baseKB:user_module_uses_base(SM,M,Usr:Sys)).
 
 
 show_kb_structure:-
-   baseKB:user_module_uses_base(SM,M),
-   get_tbox_for(M,Sys),
-   Sys:ensure_loaded(library(logicmoo_utils)),   
-   get_abox_for(SM,Usr),
+   config_mpred_system,
+   baseKB:user_module_uses_base(SM,M,Usr:Sys),
    wdmsg((source/typein=SM/M-->abox/tbox=Usr/Sys)),!.
 
 /*
@@ -267,18 +270,10 @@ lmconf:disable_mpred_system0(Usr):-
 % Config System
 :- config_mpred_system.
 
-% Load Utils
-:- logicmoo_utils:ensure_loaded(logicmoo_utils:library(logicmoo_utils)).
-
-% Load System
-:- user_module_uses_base(_,M),get_tbox_for(M,T),dmsg(system_kb=T),load_mpred_system(baseKB).
-
 %:- autoload([verbose(false)]).
 %:- set_prolog_flag(autoload, false).
 
-:- user_module_uses_base(SM,M),fix_ops_for(M),(SM==M->true;fix_ops_for(SM)).
-
-import_2:- user_module_uses_base(SM,M),
+import_2:- baseKB:user_module_uses_base(SM,M,Usr:Sys),
    get_abox_for(SM,Usr),
    get_tbox_for(M,Sys),
    maybe_add_import_module(SM,Usr,start),
@@ -333,7 +328,6 @@ import_3:-
 %:- asserta_if_new((system:goal_expansion(I,P1,O,P2):- mpred_expander(goal,system,I,P1,O,P2))).
 
 
-:-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))).
 
 :- do_gc.
 
@@ -342,4 +336,6 @@ import_3:-
 :- set_prolog_flag(access_level,user).
 
 :- statistics.
+
+:-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))).
 
