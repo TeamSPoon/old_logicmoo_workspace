@@ -3223,7 +3223,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(filter_buffer_trim/2).
 
 :- '$current_source_module'(M),forall(mpred_database_term(F/A,_),(abolish(mpred_pfc:F/A),make_declared_now(M:F/A))).
-:- '$current_source_module'(M),add_import_module(M,baseKB,end).
+% :- '$current_source_module'(M),add_import_module(M,baseKB,end).
 % :- initialization(ensure_abox(baseKB)).
 
 

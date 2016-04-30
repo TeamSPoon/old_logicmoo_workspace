@@ -30,7 +30,7 @@
 
 :- include('logicmoo_util_header.pi').
 
-
+:- '$set_source_module'(system).
 
 :- meta_predicate scce_orig(0,0,0).
 scce_orig(Setup,Goal,Cleanup):-
@@ -45,6 +45,9 @@ scce_orig(Setup,Goal,Cleanup):-
      E, (ignore(must_atomic(Cleanup)),throw(E))).
 
 
+:- if(\+ current_predicate(must_atomic/1)).
+:- ensure_loaded(logicmoo_util_supp).
+:- endif.
 
 :- if(\+ current_predicate(system:nop/1)).
 :- system:ensure_loaded(systyem:logicmoo_util_supp).
@@ -518,3 +521,4 @@ scce(S,G,C):-
 key_call(Key,Arg):- nb_current(Key,In),arg(Arg,In,Goal),Goal,nb_setval(Key,In).
 scce_key(In,Key):- format(atom(Key),'~q',[In]),nb_setval(Key,In).
 
+:- '$set_source_module'(system_scce).

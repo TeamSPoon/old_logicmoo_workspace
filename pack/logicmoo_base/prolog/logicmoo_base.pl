@@ -6,7 +6,7 @@
 */
 :- if(('$current_source_module'(SM),'$current_typein_module'(M),
    system:multifile(baseKB:user_module_uses_base/2),
-   add_import_module(SM,baseKB,start),
+   catch(maybe_add_import_module(SM,baseKB,start),_,true),
    system:dynamic(baseKB:user_module_uses_base/2),
    system:asserta(baseKB:user_module_uses_base(SM,M)))).
 :- endif.
@@ -278,13 +278,13 @@ lmconf:disable_mpred_system0(Usr):-
 
 :- user_module_uses_base(SM,M),fix_ops_for(M),(SM==M->true;fix_ops_for(SM)).
 
-:- user_module_uses_base(SM,M),
+import_2:- user_module_uses_base(SM,M),
    get_abox_for(SM,Usr),
    get_tbox_for(M,Sys),
-   add_import_module(SM,Usr,start),
-   add_import_module(M,Sys,start),
-   add_import_module(M,baseKB,start),
-   add_import_module(M,baseKB,start).
+   maybe_add_import_module(SM,Usr,start),
+   maybe_add_import_module(M,Sys,start),
+   maybe_add_import_module(M,baseKB,start),
+   maybe_add_import_module(M,baseKB,start).
 
 % Enable System
 :- enable_mpred_system.
@@ -300,7 +300,7 @@ lmconf:disable_mpred_system0(Usr):-
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
 
-:- system:add_import_module(baseKB,baseKB,start).
+%:- system:maybe_add_import_module(baseKB,baseKB,start).
 %:- autoload([verbose(false)]).
 
 :- forall(current_op(X,Y,baseKB:Z),assert(was_op(baseKB,X,Y,Z))).
@@ -311,11 +311,11 @@ lmconf:disable_mpred_system0(Usr):-
 
 % :- set_prolog_flag(access_level,system).
 
-:-
-   system:add_import_module(baseKB,system,end),
-   system:add_import_module(logicmoo_user,system,end),
+import_3:-
+   system:maybe_add_import_module(baseKB,system,end),
+   system:maybe_add_import_module(logicmoo_user,system,end),
    system:ignore(system:delete_import_module(baseKB,user)),
-   system:add_import_module(user,baseKB,start).
+   system:maybe_add_import_module(user,baseKB,start).
 % :-  system:ignore(system:delete_import_module(user,system)).
 
 

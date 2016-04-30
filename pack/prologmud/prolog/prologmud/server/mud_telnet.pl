@@ -36,8 +36,8 @@
 */ 
 
 % % :- '$set_source_module'(mud_telnet).
-:- add_import_module(mud_telnet,baseKB,start).
-%:- add_import_module(logicmoo_user,mud_telnet,start).
+:- maybe_add_import_module(mud_telnet,baseKB,start).
+%:- maybe_add_import_module(logicmoo_user,mud_telnet,start).
 
 % learnLaterWhenToCallProceedure(What):- ... code ...
 

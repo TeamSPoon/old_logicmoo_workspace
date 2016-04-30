@@ -6,7 +6,6 @@
           put_variable_names/1,
           nput_variable_names/1,
           check_variable_names/2,
-
                   unnumbervars4/4,
 user_ensure_loaded/1,
 user_use_module/1,
@@ -64,6 +63,12 @@ quiet_all_module_predicates_are_transparent/1,
             unnumbervars_and_save/2,
             var_to_name/3
           ]).
+
+
+:- if(\+ current_predicate(system:nop/1)).
+system:nop(_).
+:- endif.
+
 
 :- meta_predicate
 
@@ -933,8 +938,4 @@ quiet_all_module_predicates_are_transparent(ModuleName):-
             not(predicate_property(ModuleName:P,(transparent))),
                    nop(dmsg(todo(module_transparent(ModuleName:F/A)))),
                    (module_transparent(ModuleName:F/A))))).
-
-% % :- use_module(logicmoo_util_varnames).
-
-
 

@@ -493,7 +493,7 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).
 
 
-:- add_import_module(tbox,basePFC,end).
-:- initialization(add_import_module(tbox,basePFC,end)).
+%:- maybe_add_import_module(tbox,basePFC,end).
+%:- initialization(maybe_add_import_module(tbox,basePFC,end)).
 
 

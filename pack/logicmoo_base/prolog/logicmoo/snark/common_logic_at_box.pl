@@ -56,8 +56,6 @@
           is_default_shared/1,
           is_system_box/1,
    which_file/1,
-          maybe_add_import_module/3,
-          maybe_delete_import_module/2,
           user_m_check/1
     ]).
 
@@ -117,9 +115,7 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
    in_mpred_kb_module/0,
    is_box_module/2,
    is_default_shared/1,
-   is_system_box/1,
-   maybe_add_import_module/3,
-   maybe_delete_import_module/2.
+   is_system_box/1.
 
 
 
@@ -558,25 +554,6 @@ ensure_imports_tbox(M,BaseKB):-
 
 
 
-maybe_hack_import_modules :- fail.
-
-%% maybe_add_import_module( ?A, ?A, ?VALUE3) is semidet.
-%
-% Maybe Add Import Module.
-%
-maybe_add_import_module(_,baseKBTBox,end):-!,dumpST,dtrace,fail.
-maybe_add_import_module(A,A,_):-!.
-maybe_add_import_module(basePFC,_,end):-!.
-maybe_add_import_module(baseKB,_,end):-!.
-maybe_add_import_module(logicmoo_user, baseKB, end):-!.
-maybe_add_import_module(user, baseKB, end):-!.
-maybe_add_import_module(_,_,_):- \+ maybe_hack_import_modules,!.
-maybe_add_import_module(A,B,C):- catch(add_import_module(A,B,C),_,logicmoo_util_dmsg:dmsg(failed(maybe_add_import_module(A,B,C)))),!.
-
-maybe_delete_import_module(_,_):- \+ maybe_hack_import_modules,!.
-maybe_delete_import_module(A,B):- catch(delete_import_module(A,B),_,logicmoo_util_dmsg:dmsg(failed(maybe_delete_import_module(A,B)))),!.
-
-
 %% correct_module( ?M, ?X, ?T) is semidet.
 %
 % Correct Module.
@@ -596,6 +573,6 @@ correct_module(sbox,F,A,T):- !,get_tbox(M),!,correct_module(M,F,A,T).
 correct_module(M,F,A,T):- box_type(F,A,Type),!,to_box_type(M,Type,T).
 correct_module(MT,_,_,MT):-!.
 
-% :- add_import_module(logicmoo_user,logicmoo_base,start).
+% :- maybe_add_import_module(logicmoo_user,logicmoo_base,start).
 
 

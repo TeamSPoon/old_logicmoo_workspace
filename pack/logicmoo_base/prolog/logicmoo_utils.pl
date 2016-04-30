@@ -71,6 +71,10 @@ user:term_expansion(EOF,POS,O,POS2):-
 % :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_structs.pl')).
 % :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_supp.pl')).
 
+:- if( \+ current_predicate(baseKB:setup_call_cleanup_each/3)).
+:- user:ensure_loaded(system:library('logicmoo/util/logicmoo_util_supp.pl')).
+:- endif.
+
 :- set_prolog_flag(access_level,user).
 
 :- dynamic(lmconf:logicmoo_utils_separate/0).
