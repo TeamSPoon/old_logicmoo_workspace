@@ -667,6 +667,8 @@ genlsInheritable(ttPredType).
 
 (genls(C,SC)/ground(genls(C,SC))==>(tCol(C),tCol(SC))).
 
+:- dynamic(nearestIsa/2).
+
 (genls(C,SC)/ground(genls(C,SC)),nearestIsa(SC,W),\+ genlsInheritable(W) )==>isa(C,W).
 
 % throw(sane_transitivity (genls( tCarryAble, tThrowAble))).
@@ -797,7 +799,7 @@ action_info(C,_)==>vtActionTemplate(C).
 argsQuoted(cachedPredicate).
 
 ttPredType(cachedPredicate).
-cachedPredicate(P)/predicate_to_goal(P,Goal)==>{forall(req1(Goal),ain(Goal))}.
+cachedPredicate(P)/predicate_to_goal(P,Goal)==>{forall(call_u(Goal),ain(Goal))}.
 
 cachedPredicate(vtActionTemplate(_)).
 
