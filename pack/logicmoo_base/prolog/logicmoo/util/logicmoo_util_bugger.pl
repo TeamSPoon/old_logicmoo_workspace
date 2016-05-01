@@ -1683,14 +1683,14 @@ singletons(_).
 
 /*
  Stop turning GC on/off
-:- set_prolog_flag(backtrace_depth,   200).
 :- set_prolog_flag(backtrace_goal_depth, 2000).
-:- set_prolog_flag(backtrace_show_lines, true).
 :- set_prolog_flag(debugger_show_context,true).
 :- set_prolog_flag(trace_gc,true).
-:- set_prolog_flag(debug,true).
 :- set_prolog_flag(gc,true).
 */
+:- set_prolog_flag(backtrace_depth,   200).
+:- set_prolog_flag(debug,true).
+:- set_prolog_flag(backtrace_show_lines, true).
 
 %= 	 	 
 
@@ -3082,12 +3082,15 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 % Hook Message Hook.
 %
 hook_message_hook:- asserta((
-
+%  current_predicate(logicmoo_bugger_loaded/0),
 user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_error(_), 
-   current_predicate(logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,
+    backtrace(40), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,
   dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(20)),dmsg(message_hook(Term, Kind, Lines)),
 
-   (repeat,get_single_char(C),dumptrace(true,C),!),
+   (sleep(1.0),read_pending_codes(user_input, Chars, []),
+                format(error_error, '~s', [Chars]),
+                flush_output(error_error),!,Chars=[C],
+                dumptrace(true,C),!),
 
    fail)).
 

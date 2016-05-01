@@ -31,7 +31,10 @@
 % Douglas Miles
 */
 
+:- '$set_source_module'(baseKB).
+
 :- file_begin(pfc).
+
 
 :- set_mpred_module(baseKB).
 
@@ -115,6 +118,30 @@ argsQuoted({}).
 argsQuoted(second_order).
 % argsQuoted((':-')).
 
+
+tMicrotheory(baseKB).
+tMicrotheory(everythingPCS).
+tMicrotheory(inferencePCS).
+tMicrotheory(sanity).
+
+tMicrotheory(Mt)==>{set_prolog_flag(Mt:unknown,warning)}.
+
+isRegisterCycPred(apply,maplist,3).
+
+:- dynamic(isRegisterCycPred/3).
+
+({current_module(M),module_property(M,class(library)),
+   predicate_property(M:P,defined), 
+ \+ predicate_property(M:P,imported_from(_)),
+ functor(P,F,A),baseKB:import(M:F/A)}
+  ==>isRegisterCycPred(M,F,A)).
+(forall((current_module(M),module_property(M,class(user)),atom_concat('logicmoo_util',_,M),
+  predicate_property(M:P,defined), \+ predicate_property(M:P,imported_from(_)),
+   functor(P,F,A)))==>isRegisterCycPred(M,F,A)).
+
+
+
+:- prolog_listing:listing(baseKB:isRegisterCycPred/3).
 
 % ~(tCol({})).
 

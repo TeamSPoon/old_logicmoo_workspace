@@ -159,6 +159,7 @@
           
 :- include('mpred_header.pi').
 
+:- use_module(library(apply)).
 %= :- shared_multifile(was_chain_rule/1).
 %= :- shared_multifile(baseKB:ptReformulatorDirectivePredicate/1).
 %= :- shared_multifile(props/2).
@@ -613,7 +614,7 @@ recommify(A,B,C):- \+ compound(B),!,conjoin(A,B,C).
 recommify(A,(B,C),D):- \+ compound(B),!, conjoin(A,B,AB), recommify(AB,C,D).
 recommify(A,((X,B),C),D):- !, recommify(A,X,AX),recommify(AX,(B,C),D).
 recommify(A,(B,C),D):- !, conjoin(A,B,AB), recommify(AB,C,D).
-recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..[P|AArgs],conjoin(A,B,C),!.
+recommify(A,PredArgs,C):- PredArgs=..[P|Args],apply:maplist(baseKB:recommify,Args,AArgs),B=..[P|AArgs],conjoin(A,B,C),!.
 
 
 

@@ -15,6 +15,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+:- if(current_prolog_flag(xref,true)).
 :- module(common_logic_at_box,[
 
          assert_setting01/1,
@@ -65,6 +66,8 @@
          which_file/1,
          user_m_check/1
     ]).
+:- endif.
+:- '$set_source_module'(baseKB).
 
 user_m_check(_Out).
 
@@ -159,8 +162,18 @@ get_user_module(M):- get_file_module(M).
 get_file_module(baseKB):- simple_boxes,!.
 get_file_module(M):- which_file(File)->make_module_name_local(File,M),File\==M,!.
 
-user:exception(undefined_predicate, Mt:F/A ,retry):- t(tMicrotheory,Mt) -> registerCycPred(Mt,F,A).
-   
+
+% :- set_prolog_flag(baseKB:unknown,warn).
+
+user:exception(undefined_predicate, Mt:F/A ,retry):- F\=istAbove, % t(tMicrotheory,Mt) -> 
+  registerCycPred(Mt,F,A).
+
+dontOverrideMt(user).
+dontOverrideMt(system).
+dontOverrideMt(M):-module_property(M,class(library)).
+% dontOverrideMt(M):-module_property(M,class(user)).
+
+
 makeConstant(_Mt).
 
 % ============================================
@@ -198,17 +211,44 @@ registerCycPred(Term):-
 registerCycPred(Term,Mt):-
    functor(Term,Pred,Arity),
    registerCycPred(Mt,Pred,Arity).
-   
-% ?- registerCycPred(baseKB,isa,2). 
-registerCycPred(Mt,Pred,0):-!,registerCycPred(Mt,Pred,2).
-registerCycPred(Mt,Pred,Arity):-isRegisterCycPred(Mt,Pred,Arity),!.
-registerCycPred(Mt,Pred,Arity):-
-      functor(Term,Pred,Arity),
-      ignore(defaultAssertMt(Mt)),
-      % asserta(( user:Term :- common_logic_snark:kif_ask(Term,Mt))),
-      ain(( Mt:Term :- istAbove(Mt,Term))),
-      ain(isRegisterCycPred(Mt,Pred,Arity)),!.
 
+% ?- registerCycPred(baseKB,isa,2). 
+% registerCycPred(Mt,Pred,0):-!,registerCycPred(Mt,Pred,2).
+registerCycPred(Mt,Pred,Arity):-isRegisterCycPred(Mt,Pred,Arity),!.
+registerCycPred(Mt,Pred,Arity):-functor(Goal,Pred,Arity),registerCycPred(Mt,Goal,Pred,Arity).
+registerCycPred(Mt,Goal,Pred,Arity):-
+   predicate_property(user:Goal,built_in),
+   (predicate_property(user:Goal,imported_from(OtherMt));predicate_property(OtherMt:Goal,file(_))),
+   OtherMt\==Mt,
+   module_property(OtherMt,class(library)),
+   Mt:import(OtherMt:Pred/Arity),
+   add_import_module(Mt,OtherMt,end).
+registerCycPred(Mt,Goal,Pred,Arity):-
+   predicate_property(user:Goal,built_in),
+   (predicate_property(user:Goal,imported_from(OtherMt));predicate_property(OtherMt:Goal,file(_))),!,
+   ignore(defaultAssertMt(Mt)),
+   clearKb(OtherMt),clearKb(Mt),
+   ain(isRegisterCycPred(Mt,Pred,Arity)),
+   ignore(remove_import_module(Mt,OtherMt)),
+   ignore(remove_import_module(OtherMt,Mt)),
+   clearKb(OtherMt),
+   ain(isRegisterCycPred(OtherMt,Pred,Arity)),
+   ain(( Mt:Goal :- OtherMt:Goal)).
+
+registerCycPred(Mt,Goal,Pred,Arity):-
+      ignore(defaultAssertMt(Mt)),
+      ain(isRegisterCycPred(Mt,Pred,Arity)),
+      ain(( Mt:Goal :- istAbove(Mt,Goal))).
+
+clearKb(KB):- dontOverrideMt(KB),!.
+clearKb(KB):- forall(import_module(KB,O),
+                  remove_import_module(KB,O)),
+     forall(( current_module(X),import_module(X,KB)),
+                  remove_import_module(X,KB)).
+
+
+:-dynamic(genlMt/2).
+istAbove(Mt,Query):-genlMt(Mt,MtAbove),trace,MtAbove:Query.
 
 % ============================================
 % Assert Side Effect Prolog to Cyc Predicate Mapping
@@ -569,9 +609,6 @@ ensure_imports_tbox(M,BaseKB):-
 % Correct Module.
 %
 correct_module(M,X,T):-functor(X,F,A),quietly_must(correct_module(M,F,A,T)),!.
-
-
-
 
 %% correct_module( ?M, ?F, ?A, ?T) is semidet.
 %
