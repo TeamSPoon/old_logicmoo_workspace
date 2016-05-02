@@ -35,9 +35,7 @@
 
 :- file_begin(pfc).
 
-
-:- set_mpred_module(baseKB).
-
+:- set_fileAssertMt(baseKB).
 
 % catching of misinterpreations
 ((mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static), predicate_property(P,defined))) ==> 
@@ -59,9 +57,10 @@
 
 :- dynamic(mpred_mark_C/1).
 
-
 :- kb_dynamic(tCol/1).
+
 :- kb_dynamic(subFormat/2).
+
 :- kb_dynamic(singleValuedInArg/2).
 :- kb_dynamic(ptReformulatorDirectivePredicate/1).
 :- kb_dynamic(support_hilog/2).
@@ -118,30 +117,53 @@ argsQuoted({}).
 argsQuoted(second_order).
 % argsQuoted((':-')).
 
+nondet.
+
+mtGlobal(baseKB).
+mtGlobal(system).
+{module_property(M,class(user)),
+   (atom_concat('common_logic_',_,M);atom_concat('logicmoo_util_',_,M);atom_concat('mpred_',_,M))} 
+    ==>  mtGlobal(M).
+
+{module_property(M,class(library))} ==> mtGlobal(M).
+
+mtGlobal(Mt)==>mtCore(Mt).
+
+mtCore(user).
+mtCore(Mt)==>tMicrotheory(Mt).
+
+(tMicrotheory(Mt), ~ mtCore(Mt)) <==> mtLocal(Mt).
+
+(genlMt(Mt,baseKB)/(Mt==baseKB)) ==> mtLocal(Mt).
+mtLocal(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
+mtGlobal(Mt)==>genlMt(baseKB,Mt).
 
 tMicrotheory(baseKB).
 tMicrotheory(everythingPCS).
 tMicrotheory(inferencePCS).
 tMicrotheory(sanity).
 
-tMicrotheory(Mt)==>{set_prolog_flag(Mt:unknown,warning)}.
+baseKB:isRegisteredCycPred(apply,maplist,3).
 
-isRegisterCycPred(apply,maplist,3).
 
-:- dynamic(isRegisterCycPred/3).
 
-({current_module(M),module_property(M,class(library)),
+(genlMt(Child,Parent), \+ mtCore(Child)) ==>
+   {ignore((system:delete_import_module(Parent,user))),
+    ignore((system:delete_import_module(Parent,Child))),
+    system:add_import_module(Child,Parent,start)}.
+
+
+:- dynamic(baseKB:isRegisteredCycPred/3).
+
+({fail,current_module(M),
    predicate_property(M:P,defined), 
  \+ predicate_property(M:P,imported_from(_)),
- functor(P,F,A),baseKB:import(M:F/A)}
-  ==>isRegisterCycPred(M,F,A)).
-(forall((current_module(M),module_property(M,class(user)),atom_concat('logicmoo_util',_,M),
-  predicate_property(M:P,defined), \+ predicate_property(M:P,imported_from(_)),
-   functor(P,F,A)))==>isRegisterCycPred(M,F,A)).
+ functor(P,F,A)})
+  ==>baseKB:isRegisteredCycPred(M,F,A).
 
 
-
-:- prolog_listing:listing(baseKB:isRegisterCycPred/3).
+/* prolog_listing:listing */
+% :- printAll(baseKB:isRegisteredCycPred/3).
 
 % ~(tCol({})).
 
@@ -168,7 +190,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 %prologBuiltin(resolveConflict/1).
 
 :- dynamic(bt/2).
-bt(P,Trig)==> (P:- mpred_bc_only(P)).
+bt(P,_)==> (P:- mpred_bc_only(P)).
 
 ((prologHybrid(F),arity(F,A)/is_ftNameArity(F,A))==>hybrid_support(F,A)).
 (hybrid_support(F,A)/is_ftNameArity(F,A))==>prologHybrid(F),arity(F,A).

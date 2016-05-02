@@ -1435,7 +1435,9 @@ on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
 
 :- meta_predicate quietly(0).
 quietly(G):- is_release,!,call(G).
-quietly(G):- on_x_f(hide_trace(G),rtrace(G),rtrace(G)).
+quietly(G):- on_x_f(hide_trace(G),
+                     call_setup_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),
+                     fail).
 
 
 % -- CODEBLOCK
@@ -1451,7 +1453,7 @@ quietly(G):- on_x_f(hide_trace(G),rtrace(G),rtrace(G)).
 sanity(_):- notrace((is_release;bad_idea)),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(why,Goal)).
 sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
-sanity(Goal):- quietly(Goal).
+sanity(Goal):- quietly(Goal)*->true;call_setup_cleanup(wdmsg(begin_FAIL_in(G)),rtrace(G),wdmsg(end_FAIL_in(G))).
 
 compare_results(N+NVs,O+OVs):-
    NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).
@@ -1537,7 +1539,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 % Must Be Successfull.
 %
 must(Goal):-  is_release,!,call(Goal).
-must(Goal):-  ((must_be(nonvar,Goal),get_must(Goal,MGoal))),!,MGoal.
+must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal),!)),MGoal.
 
 
 %= 	 	 

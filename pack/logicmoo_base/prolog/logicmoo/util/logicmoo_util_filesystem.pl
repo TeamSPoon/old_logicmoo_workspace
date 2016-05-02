@@ -887,7 +887,7 @@ add_genlMt(From,maybe(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To
 add_genlMt(baseKB,imports(logicmoo_user)):-!. % this means never will happen
 
 % add_genlMt(_From,imports(To)):-arg(_,v(baseKB,logicmoo_user),To),!.
-% add_genlMt(logicmoo_user,imports(baseKB)):-!.
+% add_genlMt(logicmoo_utils,imports(baseKB)):-!.
 add_genlMt(From,Prop):-lmconf:known_prolog_file_prop(From,Prop),!.
 add_genlMt(From,Prop):-assertz(lmconf:known_prolog_file_prop(From,Prop)),fail.
 add_genlMt(_,file(_)):-!.
@@ -898,9 +898,12 @@ add_genlMt(From,imports(To)):-
    catch(add_import_module(From,To,start),E,writeln(E=add_import_module(From,To))).
 
 
-system:maybe_add_import_module(A,B,C):-  catch(add_import_module(A,B,C),_,true).
+system:maybe_add_import_module(A,baseKB,C):-!,system:maybe_add_import_module(baseKB,A,C).
+system:maybe_add_import_module(From,To,Start):-  
+   catch(add_import_module(From,To,Start),E,writeln(E=add_import_module(From,To))).
 
-system:maybe_remove_import_module(A,B):-  ignore(remove_import_module(A,B)).
+
+system:maybe_delete_import_module(A,B):-  ignore(delete_import_module(A,B)).
 
 :- meta_predicate
         glean_prolog_impl_file(+,+,+,+).
@@ -931,9 +934,9 @@ glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_c
    assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),
   % add_genlMt(logicmoo_user,imports(baseKB)),
   % add_genlMt(SM,maybe(TypeIn)),
-   add_genlMt(logicmoo_utils,imports(SM)),
+  add_genlMt(logicmoo_utils,imports(SM)),
   % add_genlMt(SM,imports(logicmoo_user)),
-   add_genlMt(SM,imports(baseKB)),
+  % add_genlMt(SM,imports(baseKB)),
    forall(source_file(SM:H,File),
        ignore((functor(H,F,A),
          (predicate_property(SM:H,imported_from(Where))

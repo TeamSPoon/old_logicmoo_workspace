@@ -19,7 +19,7 @@
 % DWhitten> ... but is there a reason why "Absurdity" is the word used for something that doesn't exist?  
 % SOWA> It's stronger than that.  The absurd type is defined by axioms that are contradictory. 
 %  Therefore, by definition, nothing of that type can exist. 
-:- if(current_prolog_flag(xref,true)).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(mpred_userkb, [mpred_userkb_file/0]).
 
 :- include('mpred_header.pi').

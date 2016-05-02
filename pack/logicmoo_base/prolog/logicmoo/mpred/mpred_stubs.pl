@@ -12,7 +12,7 @@
 
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl
-:- if(current_prolog_flag(xref,true)).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(mpred_stubs,
           [ 
 agenda_rescan_mpred_props/0,

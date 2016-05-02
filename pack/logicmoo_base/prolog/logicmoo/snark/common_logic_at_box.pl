@@ -15,34 +15,23 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if(current_prolog_flag(xref,true)).
+% :- if((\+ current_prolog_flag(common_logic_at_box_true,true),set_prolog_flag(common_logic_at_box_true,true))).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(common_logic_at_box,[
 
          assert_setting01/1,
          make_module_name_local/2,
          make_module_name_local0/2,
          
-         get_user_module/1,
-         set_user_module/1,
-         
          defaultAssertMt/1,
-         set_abox/1,
-         get_abox_for/2,
-         set_abox_for/2,
-
+         set_defaultAssertMt/1,
          
          which_file/1,
-         get_file_abox/1,
-         set_file_abox/1,
+         fileAssertMt/1,
+         set_fileAssertMt/1,
          
+                  
          
-         get_current_tbox/1,
-         set_tbox/1,
-         get_tbox_for/2,
-         set_tbox_for/2,
-         
-         
-         best_module/3,
          correct_module/3,
          correct_module/4,
          ensure_imports/1,
@@ -53,7 +42,7 @@
          is_default_shared/1,
          is_system_box/1,
          
-         best_module/3,
+         
          correct_module/3,
          correct_module/4,
          ensure_imports/1,
@@ -72,14 +61,11 @@
 user_m_check(_Out).
 
 
+:- meta_predicate transitive_path(2,*,*).
 
 
 :- multifile(lmcache:has_pfc_database_preds/1).
-:- multifile(lmconf:tbox_for/2).
-:- multifile(lmconf:abox_for/2).
 :- dynamic(lmcache:has_pfc_database_preds/1).
-:- dynamic(lmconf:tbox_for/2).
-:- dynamic(lmconf:abox_for/2).
 
 
 %% assert_setting01( ?X) is semidet.
@@ -93,33 +79,39 @@ assert_setting01(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),system
 which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(F)).
 
 :- module_transparent
-   defaultAssertMt/1,
-   set_abox/1,
-   get_abox_for/2,
-   set_abox_for/2,
-   %reset_abox/1,
-
-   which_file/1,
-   get_file_abox/1,
-   set_file_abox/1,
-
-   
-   get_current_tbox/1,
-   set_tbox/1,
-   get_tbox_for/2,
-   set_tbox_for/2,
-   %reset_tbox/1,
-   
-   best_module/3,
-   correct_module/3,
-   correct_module/4,
-   ensure_imports/1,
-   import_to_user/1,
-   import_to_user0/3,
-   in_mpred_kb_module/0,
-   is_box_module/2,
-   is_default_shared/1,
-   is_system_box/1   .
+ 
+         assert_setting01/1,
+         make_module_name_local/2,
+         make_module_name_local0/2,
+         
+         defaultAssertMt/1,
+         set_defaultAssertMt/1,
+         
+         which_file/1,
+         fileAssertMt/1,
+         set_fileAssertMt/1,
+                           
+         correct_module/3,
+         correct_module/4,
+         ensure_imports/1,
+         import_to_user/1,
+         import_to_user0/3,
+         in_mpred_kb_module/0,
+         lmconf:is_box_module/2,
+         is_default_shared/1,
+         is_system_box/1,
+         
+         correct_module/3,
+         correct_module/4,
+         ensure_imports/1,
+         import_to_user/1,
+         import_to_user0/3,
+         in_mpred_kb_module/0,
+         lmconf:is_box_module/2,
+         is_default_shared/1,
+         is_system_box/1,
+         which_file/1,
+         user_m_check/1 .
 
 
 %% in_mpred_kb_module is semidet.
@@ -128,70 +120,26 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
 %
 in_mpred_kb_module:- source_context_module(MT),defaultAssertMt(MT2),!,MT==MT2.
 
-
-make_module_name_local(A,B):-make_module_name_local0(A,B),B\==logicmoo_base,\+ exists_file(B).
-make_module_name_local0(Source,baseKB):-is_default_shared(Source).
-make_module_name_local0(Source,Source):-lmcache:has_pfc_database_preds(Source).
-make_module_name_local0(Source,FM):-make_module_name(Source,FM).
-
-:- thread_local(t_l:current_module_override/1).
-
-ensure_tbox(_ABox).
-
-simple_boxes.
-
-%% defaultAssertMt(-Ctx) is det.
-%
-% ABox is an "assertion component" Prolog Module
-% within a knowledge base.
-%
-% not just user modules
-
-:- thread_local(t_l:user_abox/2).
-:- thread_local(t_l:user_tbox/2).
-:- dynamic(lmconf:abox_for/2).
-:- dynamic(lmconf:tbox_for/2).
-
-get_user_module(M):- t_l:current_module_override(M),!.
-get_user_module(M):- '$current_source_module'(M),M\==user,!.
-get_user_module(M):- '$current_typein_module'(M),M\==user,!.
-% get_user_module(M):- source_module(M),M\==user.
-get_user_module(M):- get_file_module(M).
+:- set_prolog_flag(baseKB:unknown,warning).
 
 
-get_file_module(baseKB):- simple_boxes,!.
-get_file_module(M):- which_file(File)->make_module_name_local(File,M),File\==M,!.
 
+% mtGlobal
+% mtCore
 
-% :- set_prolog_flag(baseKB:unknown,warn).
-
-user:exception(undefined_predicate, Mt:F/A ,retry):- F\=istAbove, % t(tMicrotheory,Mt) -> 
-  registerCycPred(Mt,F,A).
-
-dontOverrideMt(user).
-dontOverrideMt(system).
-dontOverrideMt(M):-module_property(M,class(library)).
-% dontOverrideMt(M):-module_property(M,class(user)).
 
 
 makeConstant(_Mt).
 
-% ============================================
-% Make new Microtheory
-% ============================================
 
-ensureMt(Mt):-
-   makeConstant(Mt),
-   cycAssert(baseKB:isa(Mt,tMicrotheory)).
-
-ensureGenlMt(Sub,Super):-ensureMt(Sub),ensureMt(Super),
-   cycAssert(baseKB:'genlMt'(Sub,Super)).
+%:- (system:trace, rtrace, trace,cls ).
+%:- (break,notrace,nortrace).
 
 
 % ============================================
-:-dynamic(isRegisterCycPred/3).
+:-dynamic(baseKB:isRegisteredCycPred/3).
 
-:-module_transparent(isRegisterCycPred/3).
+:-module_transparent(baseKB:isRegisteredCycPred/3).
 
 % ?- registerCycPred(baseKB:isa/2). 
 registerCycPred(Mt:Pred/Arity):-!,
@@ -214,47 +162,110 @@ registerCycPred(Term,Mt):-
 
 % ?- registerCycPred(baseKB,isa,2). 
 % registerCycPred(Mt,Pred,0):-!,registerCycPred(Mt,Pred,2).
-registerCycPred(Mt,Pred,Arity):-isRegisterCycPred(Mt,Pred,Arity),!.
-registerCycPred(Mt,Pred,Arity):-functor(Goal,Pred,Arity),registerCycPred(Mt,Goal,Pred,Arity).
-registerCycPred(Mt,Goal,Pred,Arity):-
-   predicate_property(user:Goal,built_in),
-   (predicate_property(user:Goal,imported_from(OtherMt));predicate_property(OtherMt:Goal,file(_))),
-   OtherMt\==Mt,
-   module_property(OtherMt,class(library)),
-   Mt:import(OtherMt:Pred/Arity),
-   add_import_module(Mt,OtherMt,end).
-registerCycPred(Mt,Goal,Pred,Arity):-
-   predicate_property(user:Goal,built_in),
-   (predicate_property(user:Goal,imported_from(OtherMt));predicate_property(OtherMt:Goal,file(_))),!,
-   ignore(defaultAssertMt(Mt)),
-   clearKb(OtherMt),clearKb(Mt),
-   ain(isRegisterCycPred(Mt,Pred,Arity)),
-   ignore(remove_import_module(Mt,OtherMt)),
-   ignore(remove_import_module(OtherMt,Mt)),
-   clearKb(OtherMt),
-   ain(isRegisterCycPred(OtherMt,Pred,Arity)),
-   ain(( Mt:Goal :- OtherMt:Goal)).
+
+registerCycPred(Mt,Pred,Arity):-
+   baseKB:isRegisteredCycPred(Mt,Pred,Arity),!.
+
+registerCycPred(Mt,Pred,Arity):-
+   assert_if_new(baseKB:isRegisteredCycPred(Mt,Pred,Arity)),!,
+   functor(Goal,Pred,Arity),
+   registerCycPred(Mt,Goal,Pred,Arity),!.
+
+guessMtFromGoal(HintMt,Goal,_OtherMt):-
+  predicate_property(HintMt:Goal,exported).
+guessMtFromGoal(HintMt,Goal,OtherMt):-
+  predicate_property(HintMt:Goal,imported_from(OtherMt)).
+guessMtFromGoal(_,Goal,OtherMt):-
+  predicate_property(Goal,imported_from(OtherMt)).
+
+guessMtFromGoal(_,Goal,OtherMt):- var(OtherMt),!,
+  predicate_property(OtherMt:Goal,file(_)).
+
+guessMtFromGoal(_,Goal,OtherMt):-
+  mtGlobal(OtherMt),
+  predicate_property(OtherMt:Goal,file(_)).
+
+
+add_import_predicate(Mt,Goal,OtherMt):- fail,
+   mtGlobal(Mt),
+   mtGlobal(OtherMt),
+   \+ import_module(OtherMt,Mt),
+   catch(add_import_module(Mt,OtherMt,end),
+       error(permission_error(add_import,module,baseKB),
+       context(system:add_import_module/3,'would create a cycle')),fail),
+   must(predicate_property(Mt:Goal,imported_from(OtherMt))),!.
+add_import_predicate(Mt,Goal,OtherMt):- catch(Mt:import(OtherMt:Goal),_,fail),!.
+add_import_predicate(Mt,Goal,OtherMt):- 
+   functor(Goal,Pred,Arity),
+   make_as_dynamic(imported_from(OtherMt),Mt,Pred,Arity),
+   assert_if_new(( Mt:Goal :- OtherMt:Goal)).
+  
+
+dump_break:- prolog_stack:backtrace(8000),system:break.
+
+make_as_dynamic(Reason,Mt,Pred,Arity):- dynamic( Mt:Pred/Arity),
+   functor(Goal,Pred,Arity),
+   assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))).
+
 
 registerCycPred(Mt,Goal,Pred,Arity):-
-      ignore(defaultAssertMt(Mt)),
-      ain(isRegisterCycPred(Mt,Pred,Arity)),
-      ain(( Mt:Goal :- istAbove(Mt,Goal))).
+   guessMtFromGoal(Mt,Goal,OtherMt), 
+   sanity(Mt \== OtherMt),
+   must(Mt \== OtherMt),
+   ain(tMicrotheory(Mt)),
+   registerCycPred(Mt,Goal,Pred,Arity,OtherMt),!.
 
-clearKb(KB):- dontOverrideMt(KB),!.
+registerCycPred(Mt,Goal,Pred,Arity):-
+   dynamic(Mt:Pred/Arity), % (1 is random(180)->dump_break;true),
+   assert_if_new(( Mt:Goal :- istAbove(Mt,Goal))).
+
+
+transitive_path(Pred,[Arg1,Arg2],Arg2):-
+  call(Pred,Arg1,Arg2),!.
+transitive_path(Pred,[Arg1,SecondNodeMt|REST],Arg2):-
+  call(Pred,Arg1,SecondNodeMt),
+  transitive_path(Pred,[SecondNodeMt|REST],Arg2).
+
+registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
+  mtGlobal(OtherMt),
+  add_import_predicate(Mt,Goal,OtherMt),!.
+  
+
+registerCycPred(Mt,Goal,Pred,Arity,OtherMt):- 
+   transitive_path(genlMt,[Mt,SecondNodeMt|_],OtherMt),
+   make_as_dynamic(genlMt(Mt,OtherMt),Mt,Pred,Arity),
+   assert_if_new(( Mt:Goal :- SecondNodeMt:call(Goal))),!.
+
+registerCycPred(Mt,_Goal,Pred,Arity,OtherMt):-
+  dump_break,
+  make_as_dynamic(need_genlMt(Mt,OtherMt),Mt,Pred,Arity),!.
+   
+
+
+clearKb(KB):- mtCore(KB),!.
 clearKb(KB):- forall(import_module(KB,O),
-                  remove_import_module(KB,O)),
+                  delete_import_module(KB,O)),
      forall(( current_module(X),import_module(X,KB)),
-                  remove_import_module(X,KB)).
+                  delete_import_module(X,KB)).
 
 
 :-dynamic(genlMt/2).
-istAbove(Mt,Query):-genlMt(Mt,MtAbove),trace,MtAbove:Query.
+istAbove(Mt,Query):-Mt\==baseKB,genlMt(Mt,MtAbove),MtAbove:Query.
+
+user:exception(undefined_predicate, Mt:F/A ,retry):-
+  current_prolog_flag(retry_undefined,true),
+  set_prolog_flag(retry_undefined,false),
+   F\=istAbove, % t(tMicrotheory,Mt) -> 
+  logicmoo_util_loop_check:loop_check_term(baseKB:registerCycPred(Mt,F,A),
+    registerCycPredsIntoMt(Mt),baseKB:dump_break),
+  set_prolog_flag(retry_undefined,true).
+
 
 % ============================================
 % Assert Side Effect Prolog to Cyc Predicate Mapping
 %
 % ?- assert(isa('Fido','Dog')).
-% Will assert (isa Fido Dog) into BaseKB
+% Will assert (isa Fido Dog) into TBox
 %
 % ?- assert('DogsMt':isa('Fido','Dog')).
 % Will assert (isa Fido Dog) into DogsMt
@@ -269,10 +280,11 @@ ifHookRedef(_):-!.
 assertThrough(Mt:CycL):-assertThrough(Mt,CycL).
 assertThrough(CycL):-mtForCycL(CycL,Mt),assertThrough(Mt,CycL).
 
+assertThrough(_,ToMt:CycL):-!,assertThrough(ToMt,CycL).
 assertThrough(ToMt,CycL):-
       functor(CycL,Pred,Arity),
-      (isRegisterCycPred(Mt,Pred,Arity);atom_concat('#$',_,Pred)),!,
-      ignore(ToMt=Mt),cycAssert(CycL,ToMt),!.
+      (baseKB:isRegisteredCycPred(Mt,Pred,Arity);atom_concat('#$',_,Pred)),!,
+      ignore(ToMt=Mt),ain(CycL,ToMt),!.
 
 assertThrough(ToMt,CycL):-
       (predicate_property(Mt:CycL,_);context_module(Mt);Mt=ToMt),!,
@@ -283,7 +295,7 @@ assertThrough(ToMt,CycL):-
 % Retract (All) Side Effect Prolog to Cyc Predicate Mapping
 %
 % ?- retractall(isa('Fido','Dog')).
-% Will mpred_rem (isa Fido Dog) from BaseKB
+% Will mpred_rem (isa Fido Dog) from TBox
 %
 % ?- retractall('DogsMt':isa('Fido','Dog')).
 % Will mpred_rem (isa Fido Dog) from DogsMt
@@ -298,7 +310,7 @@ retractAllThrough(CycL):-
 
 retractAllThrough(ToMt,CycL):-
       functor(CycL,Pred,Arity),
-      isRegisterCycPred(Mt,Pred,Arity),!,
+      baseKB:isRegisteredCycPred(Mt,Pred,Arity),!,
       ignore(ToMt=Mt),
       cycRetract(CycL,ToMt),!.
 
@@ -311,7 +323,7 @@ retractAllThrough(ToMt,CycL):-
 % Retract (First) Side Effect Prolog to Cyc Predicate Mapping
 %
 % ?- retractall(isa('Fido','Dog')).
-% Will mpred_rem (isa Fido Dog) from BaseKB
+% Will mpred_rem (isa Fido Dog) from TBox
 %
 % ?- retractall('DogsMt':isa('Fido','Dog')).
 % Will mpred_rem (isa Fido Dog) from DogsMt
@@ -326,7 +338,7 @@ retractOnceThrough(CycL):-
 
 retractOnceThrough(ToMt,CycL):-
       functor(CycL,Pred,Arity),
-      isRegisterCycPred(Mt,Pred,Arity),!,
+      baseKB:isRegisteredCycPred(Mt,Pred,Arity),!,
       ignore(ToMt=Mt),
       cycRetract(CycL,ToMt),!.
 
@@ -336,43 +348,9 @@ retractOnceThrough(ToMt,CycL):-
       system:mpred_rem(Mt:CycL),!.
 
 
-defaultAssertMt(ABox):- get_user_module(M),!,get_abox_for(M,ABox).
-defaultAssertMt(baseKB):- simple_boxes,!.
 
-get_current_tbox(TBox):- defaultAssertMt(M),!,get_tbox_for(M,TBox).
-get_current_tbox(baseKB):- simple_boxes,!.
+map_inheritence(Child):-forall(import_module(Child,Parent),inherit_into_module(Child,Parent)).
 
-%% set_user_module( ?ABox) is semidet.
-%
-% Set Current Module.
-%
-set_user_module(M):- assert_setting(t_l:current_module_override(M)),
-                        '$set_source_module'(M),'$set_typein_module'(M),
-                        get_abox_for(M,ABox),get_tbox_for(ABox,TBox),setup_module_ops(ABox),
-                        inherit_into_module(M,TBox,end).
-
-inherit_into_module(Child,Parent):-  ensureGenlMt(Child,Parent),ignore(maybe_remove_import_module(Child,Parent)).
-inherit_into_modules(Child):-forall(import_module(Child,Parent) ,inherit_into_module(Child,Parent)).
-
-
-set_abox(ABox):- '$set_source_module'(ABox), get_user_module(M),set_abox_for(M,ABox),setup_module_ops(ABox).
-
-set_tbox(TBox):- '$set_typein_module'(TBox), get_user_module(M),set_tbox_for(M,TBox),setup_module_ops(TBox).
-
-
-get_abox_for(M,ABox):- t_l:user_abox(M,ABox),!.
-get_abox_for(M,ABox):-lmconf:abox_for(M,ABox),!.
-get_abox_for(M,M):- M\==user,current_module(M),!.
-get_abox_for(_,baseKB):- simple_boxes,!.
-
-set_abox_for(M,ABox):-assert_setting(lmconf:abox_for(M,ABox)).
-
-get_tbox_for(M,TBox):- t_l:user_abox(M,TBox),!.
-get_tbox_for(M,TBox):- lmconf:tbox_for(M,TBox),!.
-%get_tbox_for(M,M):- M\==user,!,current_module(M),!.
-get_tbox_for(_,baseKB):- simple_boxes,!.
-
-set_tbox_for(M,TBox):-assert_setting(lmconf:tbox_for(M,TBox)).
 
 %% box_type( ?F, ?A, ?VALUE3) is semidet.
 %
@@ -382,38 +360,88 @@ box_type(F,A,tbox):-current_predicate(baseKB:F/A).
 box_type(_,_,abox).
 
 
-%% set_tbox( ?M, ?TBoxM) is semidet.
-%
-% Set User Tbox.
-%
-set_tbox(TBoxM):- defaultAssertMt(M),ensure_abox(TBoxM),set_tbox(M,TBoxM).
-set_tbox(M,TBoxM):- 
-   ( is_system_box(M) -> true ; inherit_into_module(M,TBoxM,end)).
 
-%% set_file_abox( ?M) is semidet.
-%
-% Set User ABox.
-%
 
-get_file_abox(ABox):- which_file(Source),get_abox_for(Source,ABox).
-get_file_abox(ABox):- get_file_module(Source),get_abox_for(Source,ABox).
+:- thread_local(t_l:current_defaultAssertMt/1).
+:- dynamic(lmconf:file_to_module/2).
+get_current_tbox(baseKB).
 
-set_file_abox(ABox):- get_file_abox(Was),ABox==Was,!.
-set_file_abox(ABox):- 
+
+%% defaultAssertMt(-Ctx) is det.
+%
+% ABox is an "assertion component" Prolog Module
+% within a knowledge base.
+%
+% not just user modules
+defaultAssertMt(ABox):- nonvar(ABox),defaultAssertMt(ABoxVar),!,must(ABox=@=ABoxVar).
+defaultAssertMt(ABox):- 
+    (t_l:current_defaultAssertMt(ABox);
+    ((('$current_source_module'(ABox);
+    '$current_typein_module'(ABox);
+     get_current_tbox(ABox))),ABox\==user)),!.
+
+defaultAssertMt(ABox):- fileAssertMt(ABox).
+
+%% fileAssertMt(-ABox) is det.
+%
+% Gets ABox is an "assertion component" Prolog Module
+% within a knowledge base.
+%
+% not just user modules
+fileAssertMt(ABox):- nonvar(ABox),fileAssertMt(ABoxVar),!,ABox=@=ABoxVar.
+fileAssertMt(ABox):- which_file(File)->current_module(ABox),module_property(ABox,file(File)),File\==ABox,!.
+fileAssertMt(ABox):-
+ (t_l:current_defaultAssertMt(ABox);
+    ((('$current_source_module'(ABox))),ABox\==user)),!.
+fileAssertMt(ABox):- which_file(File)->make_module_name_local(File,ABox),File\==ABox,!.
+fileAssertMt(ABox):-
+ (((('$current_typein_module'(ABox);
+     get_current_tbox(ABox))),ABox\==user)),!.
+fileAssertMt(baseKB).
+
+
+%% set_defaultAssertMt( ?ABox) is semidet.
+%
+% Sets Current Module.
+%
+set_defaultAssertMt(ABox):- 
+    assert_setting(t_l:current_defaultAssertMt(ABox)),
+    baseKB:get_current_tbox(TBox),
+    '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
+    setup_module_ops(ABox), 
+    inherit_into_module(ABox,TBox).
+
+%% set_fileAssertMt( ABox) is semidet.
+%
+% Sets the File''s Module.
+%
+set_fileAssertMt(ABox):- 
  must_det_l((
    get_current_tbox(TBox),
    TBox:ensure_abox(ABox),
-   user_m_check(ABox), 
-   '$current_typein_module'(CM),setup_module_ops(CM),
-   '$current_source_module'(SM),setup_module_ops(SM),  
-   which_file(Source),set_abox_for(Source,ABox),
-   ((t_l:user_abox(SM,Prev),Prev\==ABox)->(assert_until_eof(t_l:user_abox(SM,ABox)))))),
-   % onEndOfFile(reset_abox(Prev)));true),   
-   onEndOfFile('$set_source_module'(SM)),
-   onEndOfFile('$set_typein_module'(CM)),
-   set_user_module(ABox),
-   !.
+   '$current_typein_module'(CM),
+   '$current_source_module'(SM),
+   defaultAssertMt(Was),
 
+   set_defaultAssertMt(ABox),
+   which_file(File),assert_setting(lmconf:file_to_module(File,ABox)),
+   assert_until_eof(lmcache:mpred_directive_value(File,module,ABox)),
+
+   onEndOfFile(set_defaultAssertMt(Was)),
+   onEndOfFile('$set_source_module'(SM)),
+   onEndOfFile('$set_typein_module'(CM)))).
+
+
+
+make_module_name_local(A,B):- make_module_name_local0(A,B), \+ exists_file(B).
+
+make_module_name_local0(Source,KB):- is_default_shared(Source),defaultAssertMt(KB).
+make_module_name_local0(Source,SetName):- lmconf:file_to_module(Source,SetName),!.
+make_module_name_local0(Source,Source):- lmcache:has_pfc_database_preds(Source).
+make_module_name_local0(Source,GetName):- make_module_name(Source,GetName).
+
+
+ensure_tbox(_ABox).
 
 %% is_box_module( ?M, ?VALUE2) is semidet.
 %
@@ -423,34 +451,16 @@ lmconf:is_box_module(M,tbox):- is_system_box(M).
 lmconf:is_box_module(user,abox).
 
 
-:- export(to_box_type0/3).
-
-%% to_box_type( ?M, ?B, ?T) is semidet.
-%
-% Converted To Datalog Type.
-%
-to_box_type(M,B,T):-quietly_must(to_box_type0(M,B,TT)),!,T=TT.
-
-
-%% to_box_type0( ?M, ?VALUE2, ?T) is semidet.
-%
-% Converted To Datalog Type Primary Helper.
-%
-to_box_type0(M,abox,T):-!,get_abox_for(M,T).
-to_box_type0(M,tbox,T):-get_tbox_for(M,T).
-
-
 %% is_system_box( ?VALUE1) is semidet.
 %
 % If Is A System Datalog.
 %
 is_system_box(baseKB).
-is_system_box(logicmoo_user).
 
 
-%% abox_for(M,Box).
+%% is_default_shared(M,Box).
 %
-% Not Boot Module.
+% Boot Modules.
 %
 %is_default_shared(mpred_loader).
 is_default_shared(baseKB).
@@ -464,36 +474,22 @@ is_default_shared(system_mdefault).
 is_default_shared(user).
 
 is_undefaulted(user).
-is_undefaulted(logicmoo_user).
-is_undefaulted(mpred_userkb).
 
 
 
-%% best_module( ?List, ?ABox) is semidet.
-%
-% Best Module.
-%
-best_module0(List,M,ABox):-member(M,List),get_abox_for(M,ABox).
-% best_module0(List,ABox,ABox):-member(M,List),lmcache:has_pfc_database_preds(ABox).
-
-best_module(List,M,ABox):-best_module0(List,M,ABox), \+ is_undefaulted(M), \+ is_system_box(ABox),!.
-best_module(List,M,ABox):-best_module0(List,M,ABox), \+ is_default_shared(M), \+ is_system_box(ABox),!.
-best_module(List,M,ABox):-best_module0(List,M,ABox), \+ is_undefaulted(M),\+ is_undefaulted(ABox).
-best_module(List,M,M):-member(M,List).
-best_module(_List,baseKB,baseKB):-!.
 
 
-
-%% import_shared_pred( ?M, ?BaseKB, ?P) is semidet.
+%% import_shared_pred( ?M, ?TBox, ?P) is semidet.
 %
 % Import Shared Predicate.
 %
+import_shared_pred(_From,_To,_PI):-!.
 import_shared_pred(baseKB,_,_):-!.
-import_shared_pred(M,BaseKB,P):- 
+import_shared_pred(M,TBox,P):- 
   functor(P,F,A),
-  %dynamic(BaseKB:F/A),
-  user:catch(mpred_op_prolog(pain,((M:P:- user:BaseKB:P))),E,dmsg(import_shared_pred(M:F/A:-BaseKB:F/A)=E)),
-  quietly_must(ignore(show_failure( \+ predicate_property(BaseKB:P,exported)))),
+  %dynamic(TBox:F/A),
+  user:catch(mpred_op_prolog(pain,((M:P:- user:TBox:P))),E,dmsg(import_shared_pred(M:F/A:-TBox:F/A)=E)),
+  quietly_must(ignore(show_failure( \+ predicate_property(TBox:P,exported)))),
   import_to_user(M:P).
 
 
@@ -501,6 +497,7 @@ import_shared_pred(M,BaseKB,P):-
 %
 % Import Converted To User.
 %
+import_to_user(_):-!.
 import_to_user(P):- '$current_typein_module'(MM),'$current_source_module'(SM),
    quietly_must(import_to_user0(MM,SM,P)).
 
@@ -510,8 +507,6 @@ import_to_user0(MM,SM,M:F/A):- !,functor(P,F,A),import_to_user_mfa0(MM,SM,P,M:F/
 import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user_mfa0(MM,SM,P,M:F/A).
 import_to_user0(MM,SM,P):- source_module(SSM),user_abox_or(SSM,M),import_to_user0(MM,SM,M:P),!.
 
-user_abox_or(SSM,M):- t_l:user_abox(SSM,M),!.
-user_abox_or(M,M).
 
 import_to_user_mfa0(_MM,_SM,_P,_M:F/A):- current_predicate(system:F/A),!.
 import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,static),!.
@@ -524,7 +519,7 @@ import_to_user_mfa0(_MM,_SM,decl_type(A),baseKB:decl_type/1):-trace_or_throw(bas
 
 import_to_user_mfa0(_MM,_SM,_,M:F/A):- functor(P,F,A), 
  U=everythingPSC,
- Rule = ((U:P:- user:loop_check_nr(M:P))),
+ Rule = ((U:P:- U:loop_check_nr(M:P))),
  (clause_asserted(Rule)-> true; 
   must((
    user:catch(mpred_op_prolog(pain,Rule),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
@@ -539,10 +534,10 @@ import_to_user_mfa0(_MM,_SM,_,M:F/A):- functor(P,F,A),
 %
 system:import_module_to_user(M):- (default_module(user,M);import_module(user,M)),!.
 system:import_module_to_user(M):- ignore(maybe_delete_import_module(M,user)),
-                           inherit_into_module(M,system,end),
-                           inherit_into_module(user,M,end),
-                           % find system thru M
-                           maybe_delete_import_module(user,system).
+      inherit_into_module(M,system),
+      inherit_into_module(user,M),
+      % find system thru M
+      maybe_delete_import_module(user,system).
 
 
 
@@ -560,45 +555,37 @@ ensure_imports(M):-ensure_imports_tbox(M,baseKB).
 
 %% skip_user( ?M) is semidet.
 %
-% Skip User.
+% Skip over 'user' module and still see 'system'.
 %
-skip_user(M):-
-  inherit_into_module(M,system,end),  
-  ignore(maybe_delete_import_module(M,user)).
-  %ignore(maybe_delete_import_module(user,system)).
-  %asserta((M:import(P):-system:import(P))),
+skip_user(Mt):- import_module(Mt,system), \+ import_module(Mt,user), !.
+skip_user(Mt):- !, add_import_module(Mt,system,start),ignore(delete_import_module(Mt,user)).
   
+inherit_into_module(Child,Parent):- ==(Child,Parent),!.
+inherit_into_module(Child,Parent):-ain(genlMt(Child,Parent)).
 
-
-
-%% ensure_imports_tbox( ?M, ?BaseKB) is semidet.
+%% ensure_imports_tbox( ?M, ?TBox) is semidet.
 %
 % Ensure Imports Tbox.
 %
-ensure_imports_tbox(M,BaseKB):-M==BaseKB,!.
-ensure_imports_tbox(M,BaseKB):-
-  lmcache:is_ensured_imports_tbox(M,BaseKB),!.
-ensure_imports_tbox(M,BaseKB):-
-  asserta(lmcache:is_ensured_imports_tbox(M,BaseKB)),
+ensure_imports_tbox(M,TBox):-M==TBox,!.
+ensure_imports_tbox(M,TBox):-
+  lmcache:is_ensured_imports_tbox(M,TBox),!.
+ensure_imports_tbox(M,TBox):-
+  asserta(lmcache:is_ensured_imports_tbox(M,TBox)),
   
   must_det((
-   %inherit_into_module(BaseKB,mpred_loader,end),
-   %inherit_into_module(M,mpred_loader,end),
-   forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(M,IM,end)),
-   forall((system:current_module(IM),\+ lmconf:is_box_module(IM,_)),inherit_into_module(BaseKB,IM,end)),
-   % skip_user(BaseKB),
-   %ignore(maybe_delete_import_module(user,BaseKB)),
-   %ignore(maybe_delete_import_module(BaseKB,user)),
-   ignore(maybe_delete_import_module(M,BaseKB)),
-   ignore(maybe_delete_import_module(BaseKB,M)),
-   forall((prolog:current_predicate(_,BaseKB:P),\+predicate_property(BaseKB:P,imported_from(_))),import_shared_pred(M,BaseKB,P)),
-   % inherit_into_module(user,BaseKB,end),
-   % inherit_into_module(BaseKB,system,end),
-   inherit_into_module(M,user,end),
-   %inherit_into_module(BaseKB,M,end),
-   %skip_user(M),
+   forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(M,IM)),
+   forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(TBox,IM)),
+   skip_user(TBox),
+   ignore(maybe_delete_import_module(M,TBox)),
+   ignore(maybe_delete_import_module(TBox,M)),
+   forall((user:current_predicate(_,TBox:P),
+      \+ predicate_property(TBox:P,imported_from(_))),
+      import_shared_pred(M,TBox,P)),
+   inherit_into_module(M,user),
+   skip_user(M),
    ignore(maybe_delete_import_module(M,user)),
-   inherit_into_module(user,M,end),
+   inherit_into_module(user,M),
    ignore(maybe_delete_import_module(user,system)), % gets from M now
    !)).
 
@@ -614,12 +601,243 @@ correct_module(M,X,T):-functor(X,F,A),quietly_must(correct_module(M,F,A,T)),!.
 %
 % Correct Module.
 %
-correct_module(abox,F,A,T):- !,defaultAssertMt(M),!,correct_module(M,F,A,T).
-correct_module(tbox,F,A,T):- !,get_current_tbox(M),!,correct_module(M,F,A,T).
-correct_module(sbox,F,A,T):- !,get_current_tbox(M),!,correct_module(M,F,A,T).
-correct_module(M,F,A,T):- box_type(F,A,Type),!,to_box_type(M,Type,T).
+correct_module(abox,F,A,T):- !,defaultAssertMt(M),correct_module(M,F,A,T).
+correct_module(tbox,F,A,T):- !,get_current_tbox(M),correct_module(M,F,A,T).
+correct_module(user,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,F,A,T).
 correct_module(MT,_,_,MT):-!.
 
-% :- inherit_into_module(logicmoo_user,logicmoo_base,start).
+% :- inherit_into_module(logicmoo_user,logicmoo_base).
+
+fixup_module(system,_).
+fixup_module(M,_L):-mtGlobal(M),skip_user(M).
+fixup_module(logicmoo_utils,_L):-skip_user(logicmoo_utils).
+fixup_module(_,[user]).
+fixup_module(M,_L):- skip_user(M).
+
+
+fixup_modules:- 
+   doall((current_module(M),once((findall(I,import_module(M,I),L))),once(fixup_module(M,L)))).
+
+:- set_prolog_flag(retry_undefined,false).
+:- autoload([verbose(false)]).
+:- set_prolog_flag(retry_undefined,true).
+
+:- fixup_modules.
+
+
+% :- endif.
+
+
+end_of_file.
+
+
+
+[]=system
+[baseKB]=logicmoo_util_attvar_reader
+[baseKB]=logicmoo_util_bugger
+[baseKB,user]=logicmoo_util_catch
+[baseKB,user]=logicmoo_util_ctx_frame
+[baseKB,user]=logicmoo_util_database
+[baseKB,user]=logicmoo_util_dmsg
+[baseKB,user]=logicmoo_util_dra
+[baseKB,user]=logicmoo_util_dumpst
+[baseKB,user]=logicmoo_util_engines
+[baseKB,user]=logicmoo_util_filestreams
+[baseKB,user]=logicmoo_util_first
+[baseKB,user]=logicmoo_util_rtrace
+[baseKB,user]=logicmoo_util_varnames
+[baseKB,user]=logicmoo_util_with_assertions
+[logicmoo_util_filestreams,logicmoo_util_engines,logicmoo_util_dumpst,logicmoo_util_dra,
+ logicmoo_util_database,logicmoo_util_ctx_frame,logicmoo_util_with_assertions,
+ logicmoo_util_attvar_reader,logicmoo_util_bugger,logicmoo_util_rtrace,logicmoo_util_dmsg,logicmoo_util_varnames,logicmoo_util_catch,
+ logicmoo_util_first,user]=logicmoo_utils
+[system]= $apply
+[system]= $attvar
+[system]= $autoload
+[system]= $bags
+[system]= $dcg
+[system]= $dicts
+[system]= $dwim
+[system]= $expand
+[system]= $history
+[system]= $messages
+[system]= $pack
+[system]= $parms
+[system]= $predopts
+[system]= $qlf
+[system]= $rc
+[system]= $syspreds
+[system]= $toplevel
+[system]= $var_info
+[system]=aggregate
+[system]=ansi_term
+[system]=apply
+[system]=archive
+[system]=arithmetic
+[system]=assoc
+[system]=backward_compatibility
+[system]=base32
+[system]=base64
+[system]=broadcast
+[system]=charsio
+[system]=check
+[system]=codesio
+[system]=crypto_hash
+[system]=date
+[system]=dcg_basics
+[system]=dif
+[system]=doc_access
+[system]=doc_util
+[system]=edinburgh
+[system]=editor_buttons
+[system]=error
+[system]=files_ex
+[system]=gensym
+[system]=git
+[system]=gui_tracer
+[system]=help_index
+[system]=html_head
+[system]=html_quasi_quotations
+[system]=html_write
+[system]=http_client
+[system]=http_dispatch
+[system]=http_exception
+[system]=http_header
+[system]=http_hook
+[system]=http_host
+[system]=http_multipart_plugin
+[system]=http_open
+[system]=http_parameters
+[system]=http_path
+[system]=http_server_files
+[system]=http_stream
+[system]=httpd_wrapper
+[system]=iostream
+[system]=jquery
+[system]=license
+[system]=link_xpce
+[system]=lists
+[system]=make
+[system]=memory_file
+[system]=mime_pack
+[system]=mimetype
+[system]=occurs
+[system]=ordsets
+[system]=oset
+[system]=pairs
+[system]=pce
+[system]=pce_autoload
+[system]=pce_compatibility_layer
+[system]=pce_dispatch
+[system]=pce_error
+[system]=pce_expand
+[system]=pce_expansion
+[system]=pce_global
+[system]=pce_goal_expansion
+[system]=pce_host
+[system]=pce_keybinding
+[system]=pce_messages
+[system]=pce_meta
+[system]=pce_nedit
+[system]=pce_portray
+[system]=pce_principal
+[system]=pce_realise
+[system]=pce_swi_hooks
+[system]=pce_util
+[system]=pldoc
+[system]=pldoc_colours
+[system]=pldoc_files
+[system]=pldoc_html
+[system]=pldoc_htmlsrc
+[system]=pldoc_http
+[system]=pldoc_index
+[system]=pldoc_man
+[system]=pldoc_modes
+[system]=pldoc_pack
+[system]=pldoc_process
+[system]=pldoc_register
+[system]=pldoc_search
+[system]=pldoc_wiki
+[system]=predicate_options
+[system]=process
+[system]=prolog_autoload
+[system]=prolog_breakpoints
+[system]=prolog_clause
+[system]=prolog_codewalk
+[system]=prolog_colour
+[system]=prolog_debug
+[system]=prolog_dialect
+[system]=prolog_edit
+[system]=prolog_history
+[system]=prolog_listing
+[system]=prolog_metainference
+[system]=prolog_operator
+[system]=prolog_pack
+[system]=prolog_source
+[system]=prolog_stack
+[system]=prolog_statistics
+[system]=prolog_system_predicate_options
+[system]=prolog_xref
+[system]=pure_input
+[system]=quasi_quotations
+[system]=quintus
+[system]=random
+[system]=rbtrees
+[system]=read_util
+[system]=record
+[system]=settings
+[system]=sgml
+[system]=sgml_write
+[system]=shell
+[system]=shlib
+[system]=socket
+[system]=ssl
+[system]=start_emacs
+[system]=swi_option
+[system]=swi_system_utilities
+[system]=terms
+[system]=thread_httpd
+[system]=thread_pool
+[system]=thread_util
+[system]=time
+[system]=toplevel_variables
+[system]=ugraphs
+[system]=uri
+[system]=url
+[system]=user
+[system]=utf8
+[system]=when
+[system]=www_browser
+[system]=xpath
+
+[user]=baseKB
+[user]=emacs_prolog_colours
+[user]=happy1
+[user]=http
+[user]=listing
+[user]=lmcache
+[user]=lmconf
+[user]=logicmoo_util_filesystem
+[user]=logicmoo_util_help
+[user]=logicmoo_util_term_listing
+[user]=mfree
+[user]=mime
+[user]=predopts_analysis
+[user]=prolog
+[user]=rdf_db
+[user]=sandbox
+[user]=star
+[user]=t_l
+[user]=t_l_global
+[user]=tlbugger
+[user]=varname_cache
+[user]=vn
+happy1:  ?-
+true.
+
+ = class(user) ;
+MP = exports([]) ;
+MP = program_size(0) ;
+
 
 

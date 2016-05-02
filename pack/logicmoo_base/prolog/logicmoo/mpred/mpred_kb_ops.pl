@@ -12,7 +12,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_kb_ops.pl
-:- if(current_prolog_flag(xref,true)).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(mpred_kb_ops,
           [ deducedSimply/1,
 
@@ -2586,8 +2586,8 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent(if_missing/1).
 
 % :- shared_multifile(infoF/1).
-:- was_dynamic(infoF/1).
-:- was_export(infoF/1).
+:- dynamic(system:infoF/1).
+:- export(system:infoF/1).
 
 
 mpred_kb_ops_file.

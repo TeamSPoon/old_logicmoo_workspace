@@ -11,7 +11,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_list_triggers.pl
-:- if(current_prolog_flag(xref,true)).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(mpred_listing,
           [ draw_line/0,
             loop_check_just/1,

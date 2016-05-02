@@ -7,6 +7,7 @@
           nput_variable_names/1,
           check_variable_names/2,
                   unnumbervars4/4,
+                  icatch/1,
 user_ensure_loaded/1,
 user_use_module/1,
 alldiscontiguous/0,
@@ -82,6 +83,7 @@ system:nop(_).
 
         module_meta_transparent(:),
         mustvv(0),
+        icatch(0),
         renumbervars_prev(?, ?),
         snumbervars(?),
         snumbervars(*, ?, ?),
@@ -90,6 +92,7 @@ system:nop(_).
 source_context_module/1,
 
 user_ensure_loaded/1,
+icatch/1,
 user_use_module/1,
 alldiscontiguous/0,
 arg_is_transparent/1,
@@ -225,6 +228,9 @@ with_unlocked_pred(Pred,Goal):-
  ('$get_predicate_attribute'(Pred, system, 0) -> Goal ;
  ('$set_predicate_attribute'(Pred, system, 0),
    catch(Goal,_,true),'$set_predicate_attribute'(Pred, system, 1))))).
+
+
+icatch(Goal):- ignore(catch(Goal,_,true)).
 
 :- export(mpred_trace_less/1).
 

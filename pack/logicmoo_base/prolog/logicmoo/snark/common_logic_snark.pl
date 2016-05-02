@@ -9,6 +9,7 @@
 */
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(common_logic_snark,
           [ add_nesc/2,
             add_poss/2,
@@ -112,7 +113,7 @@
             wdmsgl_4/3,
             why_to_id/3,
             write_list/1,
-            is_entailed_u/1,
+            (is_entailed_u)/1,
             is_not_entailed/1,
             % if/2,iif/2,
           op(300,fx,'-'),
@@ -123,6 +124,7 @@
           op(500,yfx,'v')
            
           ]).
+:- endif.
 
 :-
             op(1150,fx,(was_dynamic)),

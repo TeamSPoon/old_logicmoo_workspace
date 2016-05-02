@@ -7,7 +7,7 @@
 %
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_wff.pl
-:- if(current_prolog_flag(xref,true)).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(mpred_type_wff,
           [ 
             head_singletons/2, head_singles0/2,head_singles01/2,

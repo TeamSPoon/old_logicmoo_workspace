@@ -56,6 +56,7 @@ Per-Litteral features
 */
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_boxlog.pl
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(common_logic_boxlog,
           [ avoidHeadLoop/2,
             body_for_mpred_1/5,
@@ -98,6 +99,8 @@ Per-Litteral features
             vg/3]).
 
 :- include('../mpred/mpred_header.pi').
+:- endif.
+
 :- common_logic_boxlog:use_module(library(dialect/hprolog),[]).
 
 :-

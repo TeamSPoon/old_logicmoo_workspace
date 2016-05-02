@@ -4,7 +4,7 @@
 
 :- file_begin(pfc).
 
-:- set_mpred_module(baseKB).
+:- set_fileAssertMt(baseKB).
 
 ((genls(X,Y),genls(Y,X),{X\==Y}) ==> {mpred_withdraw(genls(Y,X))}).
 

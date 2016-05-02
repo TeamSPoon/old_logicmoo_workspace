@@ -15,13 +15,30 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if(current_prolog_flag(xref,true)).
-:- module(mpred_prolog_file,[ ]).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+:- module(mpred_prolog_file,[
+          guess_file_type_loader/2,
+          process_this_script/0,
+          process_this_script/1,
+          process_this_script0/1,
+          prolog_load_file_loop_checked/2,
+          prolog_load_file_loop_checked_0/2, 
+          prolog_load_file_nlc/2,
+          prolog_load_file_nlc_0/2,
+          load_file_dir/2,
+          load_file_some_type/2,
+          user:prolog_load_file/2,
+          mpred_process_input/2,
+          mpred_process_input_1/1
+          
+           
+ ]).
 :- include('mpred_header.pi').
 :- endif.
 
-
-
+:- multifile(user:prolog_load_file/2).
+:- dynamic(user:prolog_load_file/2).
+:- '$set_source_module'(system).
 
 %% mpred_process_input_1( :TermT) is semidet.
 %
@@ -287,4 +304,4 @@ user:prolog_load_file(Module:Spec, Options):- fail,
   catch(prolog_load_file_loop_checked(Module:Spec, Options),E,
     ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))).
 
-
+:- '$set_source_module'(baseKB).

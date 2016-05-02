@@ -11,7 +11,7 @@
 % ===================================================================
 */
 
-:- if(current_prolog_flag(xref,true)).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(mpred_pfc, [
   ensure_abox/1,
   mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,
@@ -88,7 +88,7 @@
   mpred_classifyFacts/4,mpred_collect_supports/1,mpred_unhandled_command/3,mpred_compile_rhs_term/3,mpred_conjoin/3,mpred_connective/1,
   mpred_database_item/1,mpred_database_term/2,
   mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
-  mpred_descendants/2,mpred_enqueue/2,mpred_error/1,mpred_error/2,mpred_eval_lhs/2,mpred_eval_lhs_nondet/2,mpred_eval_lhs_det/2,mpred_eval_rhs/2,mpred_fact/1,
+  mpred_descendants/2,mpred_enqueue/2,mpred_error/1,mpred_error/2,mpred_eval_lhs/2,mpred_eval_lhs_0/2,mpred_eval_rhs/2,mpred_fact/1,
   mpred_fact/2,mpred_facts/1,mpred_facts/2,mpred_facts/3,mpred_fwc/1,mpred_get_support/2,lookup_u/1,lookup_u/2,
   mpred_literal/1,mpred_load/1,mpred_make_supports/1,mpred_ain_object/1,mpred_aina/2,mpred_ainz/2,
   mpred_negated_literal/1,mpred_negation/2,mpred_nf/2,mpred_nf1_negation/2,mpred_nf_negation/2,mpred_nf_negations/2,mpred_notrace/0,mpred_nowatch/0,
@@ -109,12 +109,13 @@
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
   fa_to_p/3,
   mpred_call_no_bc/1,with_umt/1,
+  with_umt/2,
           asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,
           retract_u0/1,retractall_u0/1,
   clause_u/1,clause_u/2,clause_u/3,
   lookup_u/1,
 
-          get_fc_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,with_umt/1,
+          get_fc_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,
 
   stop_trace/1,with_mpred_trace_exec/1,
   select_next_fact/1,supporters_list/2,triggerSupports/2,well_founded/1,well_founded_list/2,
@@ -127,7 +128,9 @@
   ]).
 :- endif.
 
- :- meta_predicate 
+:- '$set_source_module'(baseKB).
+
+:- meta_predicate 
       each_E(:,+,+),
       pfcl_do(0),
       pfcl_do(+), % not all arg1s are callable
@@ -154,6 +157,7 @@
       clause_u(:),
       mpred_call_no_bc(+),
       with_umt(0),
+      with_umt(+,0),
       brake(0),
       with_no_mpred_trace_exec(0),
       with_mpred_trace_exec(0),
@@ -205,7 +209,6 @@ ensure_abox(baseKB):-!.
 ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
 ensure_abox(logicmoo_user):-!, ensure_abox(baseKB).
 ensure_abox(logicmoo_user):-!,throw(logicmoo_user(  ensure_abox(baseKB))).
-/*
 ensure_abox(user):- !, ensure_abox(logicmoo_user),!.
 ensure_abox(M):- 
    asserta(lmcache:has_pfc_database_preds(M)),
@@ -220,7 +223,7 @@ ensure_abox(M):-
        (M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         M:multifile(M:F/A))),!.
-*/
+
 mnotrace(G):- no_trace(G),!.
 
 % =================================================
@@ -412,8 +415,14 @@ with_umt(G0):-
 */
 
 with_umt(G):-
-  gripe_time(0.3,
-   (defaultAssertMt(U),call_from_module(U,G))).
+  defaultAssertMt(U),
+  with_umt(U,G).
+
+with_umt(U,G):-  
+  gripe_time(30.0,
+   call_from_module(U,
+    w_tl(t_l:current_defaultAssertMt(U),
+      (set_defaultAssertMt(U),G)))).
 
 
 
@@ -548,15 +557,16 @@ mpred_aina(G,S):-mpred_ain(G,S).
 %  mpred_ain/2 and mpred_post/2 are the proper ways to add new clauses into the
 %  database and have forward reasoning done.
 %
-mpred_ain(P):- must((with_umt((get_source_ref(UU),mpred_ain(P,UU))))).
+mpred_ain(P):- get_source_ref(UU),mpred_ain(P,UU).
 
 %%  ain(P,S) 
 %
 %  asserts P into the dataBase with support from S.
 %
-ain(P,S):- mpred_ain((P),S).
+ain(P,S):- mpred_ain(P,S).
 
-
+mpred_ain(MTP,S):- strip_module(MTP,MT,P),P\==MTP,!,
+  with_umt(MT,mpred_ain(P,S)).
 mpred_ain(P,S):- 
   gripe_time(0.6,
    with_umt((if_defined_else(fully_expand(clause(assert,ain),P,P0),P0=P) -> ain_fast(P0,S)))),!.
@@ -1394,51 +1404,28 @@ cut_c:-
 % 
 mpred_eval_lhs(X,S):-
    prolog_current_choice(CP),push_current_choice(CP),
-   with_current_why(S,mpred_eval_lhs_nondet(X,S)).
+   with_current_why(S,mpred_eval_lhs_0(X,S)).
 
 
-%% mpred_eval_lhs_nondet(X,Support) is det.
+%% mpred_eval_lhs_0(X,Support) is det.
 %
-%  eval something on the LHS of a rule.
+%  Helper of evaling something on the LHS of a rule.
 % 
-mpred_eval_lhs_nondet((Test->Body),Support):- 
+mpred_eval_lhs_0((Test->Body),Support):- 
   !,
   mpred_call_no_bc(Test),
-   mpred_eval_lhs_nondet(Body,Support).
+   mpred_eval_lhs_0(Body,Support).
 
-mpred_eval_lhs_nondet(rhs(X),Support):- !,
+mpred_eval_lhs_0(rhs(X),Support):- !,
    mpred_eval_rhs(X,Support).
 
-mpred_eval_lhs_nondet(X,Support):- mpred_db_type(X,trigger), !, mpred_ain_trigger_reprop(X,Support).
-mpred_eval_lhs_nondet(X,_):- mpred_warn("Unrecognized item found in trigger body, namely ~p.",[X]).
-
-
-%% mpred_eval_lhs_det(X,Support) is det.
-%
-%  eval something on the LHS of a rule.
-% 
-mpred_eval_lhs_det((Test->Body),Support):- 
-  !, 
-  (mpred_call_no_bc(Test) -> mpred_eval_lhs_det(Body,Support)),
-  !.
-
-mpred_eval_lhs_det(rhs(X),Support):-
-  !,
-  mpred_eval_rhs(X,Support),
-  !.
-
-mpred_eval_lhs_det(X,Support):-
-  mpred_db_type(X,trigger),
-  !,
-  mpred_ain_trigger_reprop(X,Support),
-  !.
-
-%mpred_eval_lhs_det(snip(X),Support):- 
+%mpred_eval_lhs_0(snip(X),Support):- 
 %  snip(Support),
-%  mpred_eval_lhs_det(X,Support).
+%  mpred_eval_lhs_0(X,Support).
 
-mpred_eval_lhs_det(X,_):-
-  mpred_warn("Unrecognized item found in trigger body, namely ~p.",[X]).
+mpred_eval_lhs_0(X,Support):- mpred_db_type(X,trigger), !, mpred_ain_trigger_reprop(X,Support).
+mpred_eval_lhs_0(X,_):- mpred_warn("Unrecognized item found in trigger body, namely ~p.",[X]).
+
 
 
 %%  mpred_eval_rhs1(What,Support) is nondet.
@@ -1570,8 +1557,8 @@ mpred_METACALL(How,P):- mpred_METACALL(How, Cut, P), (var(Cut)->true;(Cut=cut(Cu
 %  this is probably not advisable due to extreme inefficiency.
 mpred_METACALL(How, Cut,Var):- var(Var),!,trace_or_throw(var_mpred_METACALL_MI(How,Cut,Var)).
 mpred_METACALL(How, Cut, mpred_call_no_bc(G0)):- !,mpred_METACALL(How, Cut, (G0)).
+mpred_METACALL(_How, Cut, mpred_METACALL(How2, G0)):- !,mpred_METACALL(How2, Cut, (G0)).
 mpred_METACALL(How, Cut, mpred_METACALL(G0)):- !,mpred_METACALL(How, Cut, (G0)).
-mpred_METACALL(How, Cut, mpred_call_no_bc(G0)):- !,mpred_METACALL(How, Cut, (G0)).
 mpred_METACALL(_How, cut(true), !):- !.
 mpred_METACALL(How, Cut, (P1,P2)):- !, mpred_METACALL(How, Cut, P1), mpred_METACALL(How, Cut, P2).
 mpred_METACALL(How, Cut, (P1;P2)):- !, mpred_METACALL(How, Cut, P1); mpred_METACALL(How, Cut, P2).
@@ -1602,9 +1589,12 @@ action_is_undoable(A):- lookup_u(do_and_undo(A,_)).
 %% mpred_nf(+In,-Out)
 % 
 % maps the LHR of a Pfc rule In to one normal form 
-%  Out.  It also does certmpred_ain optimizations.  Backtracking into this
+%  Out.  It also does certain optimizations.  Backtracking into this
 %  predicate will produce additional clauses.
 %
+
+mpred_nf({LHS},List):- !,
+  mpred_nf((nondet,{LHS}),List).
 
 mpred_nf(LHS,List):-
   mpred_nf1(LHS,List2),
@@ -1810,7 +1800,7 @@ build_rule(Lhs,Rhs,Support):-
   mpred_mark_as(WS,Lhs,pfcLHS),
   build_trigger(WS,Lhs,Rhs,Trigger),
   cyclic_break((Lhs,Rhs,WS,Trigger)),
-  mpred_eval_lhs(Trigger,Support).
+  doall(mpred_eval_lhs(Trigger,Support)).
 
 build_trigger(WS,[],Consequent,ConsequentO):-
    build_consequent(WS,Consequent,ConsequentO).
@@ -2370,9 +2360,8 @@ not_not_ignore_mnotrace(G):- ignore(mnotrace(\+ \+ G)).
 
 % needed:  mpred_trace_rule(Name)  ...
 
-log_failure(_):- between(1,3,_),wdmsg(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"),fail.
-log_failure(ALL):- maybe_mpred_break(ALL),fail.
-log_failure(_):- between(1,3,_),wdmsg(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"),fail.
+log_failure(ALL):- notrace((log_failure_red,maybe_mpred_break(ALL),log_failure_red)).
+log_failure_red:- notrace(doall((between(1,3,_),wdmsg(color(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")),fail))).
 
 maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(mpred)->dtrace(dmsg(Info));(dmsg(Info)))).
 
@@ -3186,8 +3175,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((maybe_mpred_break)/1).
 :- module_transparent((to_u)/2).
 :- module_transparent((mpred_BC_CACHE0)/1).
-:- module_transparent((mpred_eval_lhs_det)/2).
-:- module_transparent((mpred_eval_lhs_nondet)/2).
+:- module_transparent((mpred_eval_lhs_0)/2).
 :- module_transparent((cut_c)/0).
 :- module_transparent((push_current_choice)/1).
 :- module_transparent((set_fc_mode)/1).
@@ -3222,7 +3210,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(filter_buffer_get_n/3).
 :- module_transparent(filter_buffer_trim/2).
 
-:- '$current_source_module'(M),forall(mpred_database_term(F/A,_),(abolish(mpred_pfc:F/A),make_declared_now(M:F/A))).
+% :- '$current_source_module'(M),forall(mpred_database_term(F/A,_),(abolish(mpred_pfc:F/A),make_declared_now(M:F/A))).
 % :- '$current_source_module'(M),add_import_module(M,baseKB,end).
 % :- initialization(ensure_abox(baseKB)).
 

@@ -10,7 +10,7 @@
 
 
 % :- set_prolog_flag(umt_local,false).
-:- use_module(library(logicmoo/mpred/mpred_pfc)).
+% :- use_module(library(logicmoo/mpred/mpred_pfc)).
 % :- use_module(library(logicmoo_base)).
 %:- use_module(library(logicmoo_base)).
 % :- use_module(library(pfc)).

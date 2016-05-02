@@ -9,7 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_naming.pl
-:- if(current_prolog_flag(xref,true)).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(mpred_type_naming,
           [ convertOneSpawnArg/4,
             convertSpawnArgs/4,

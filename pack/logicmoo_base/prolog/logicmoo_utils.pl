@@ -218,12 +218,12 @@ lmconf:logicmoo_scan_autoloads:-false.
 :- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
 
 :- autoload([verbose(true)]).
-:- autoload([verbose(false)]).
+%:- autoload([verbose(false)]).
 % ?- logicmoo_util_term_listing:xlisting(get_gtime).
 
 % ?- list_undefined.
 
-:- predicate_property(M:maplist(_,_,_),exported),add_import_module(baseKB,M,end).
+% :- predicate_property(M:maplist(_,_,_),exported),maybe_add_import_module(baseKB,M,end).
 /*
 :- 'mpred_trace_none'(tlbugger:dont_skip_bugger/0).
 :- 'mpred_trace_none'(tlbugger:skip_bugger/0).

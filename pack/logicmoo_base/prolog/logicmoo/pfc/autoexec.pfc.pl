@@ -100,8 +100,8 @@
          op(700,xfx,('==')).
 
 :- ensure_abox(baseKB).
-:- set_abox(baseKB).
-:- set_mpred_module(baseKB).
+:- set_defaultAssertMt(baseKB).
+:- set_fileAssertMt(baseKB).
 
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_common.pfc')).

@@ -1279,9 +1279,6 @@ show_failure(Why,Goal):-one_must(dcall0(Goal),(debugm(Why,sc_failed(Why,Goal)),!
 %
 show_failure(Goal):- show_failure(mpred,Goal).
 
-%= :- meta_predicate  show_success(why,0).
-
-%= 	 	 
 
 %% show_success( +Why, :GoalGoal) is semidet.
 %
@@ -2048,11 +2045,15 @@ atom_contains666(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 %
 real_builtin_predicate(G):- predicate_property(G,foreign),!.
 real_builtin_predicate(G):- predicate_property(G,imported_from(system)),!.
-real_builtin_predicate(G):- strip_module(G,_,GS),(predicate_property(prolog:GS,built_in);predicate_property(system:GS,built_in)),!.
-real_builtin_predicate(G):- predicate_property(G,built_in),functor(G,F,_), 
+real_builtin_predicate(G):- strip_module(G,_,GS),predicate_property(system:GS,built_in),!.
+real_builtin_predicate(G):- 
+   predicate_property(G,built_in),
    \+ predicate_property(G,dynamic),
-   if_defined(lmconf:mpred_system_kb(M)), 
-   (if_defined(M:mpred_isa(F,prologHybrid));if_defined(baseKB:mpred_isa(F,prologHybrid))).
+   functor(G,F,_),!,
+   (if_defined(lmconf:mpred_system_kb(M),fail),
+   (if_defined(M:mpred_isa(F,prologHybrid),fail);
+     if_defined(baseKB:mpred_isa(F,prologHybrid),fail))),
+   !.
 
 
 
@@ -2281,7 +2282,7 @@ must_each0(List):-var(List),trace_or_throw(var_must_each(List)).
 must_each0([]):-!.
 must_each0([E|List]):-E,must_each0(List).
 
-% :- mpred_trace_childs(logicmoo_util_catch:one_must/2).
+% :- mpred_trace_childs(one_must/2).
 :- meta_predicate one_must(0,0,0).
 
 %= 	 	 
@@ -3034,7 +3035,9 @@ bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
 
 
 % Installs exception reporter.
-:- multifile(user:prolog_exception_hook/4).
+:- multifile(user:
+
+prolog_exception_hook/4).
 :- dynamic(user:prolog_exception_hook/4).
 % Writes exceptions with stacktrace into stderr.
 % Fail/0 call at the end allows the exception to be
@@ -3062,11 +3065,11 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
     ignore((thread_current_input(main,In),see(In))),
     dumpST9(Frame,20),
 
-    dtrace(Goal),
+    nop(dtrace(Goal)),
     format_to_error( 'Error ST-End: ~p', [Term]), nl(ERR),
     nl(ERR), fail)).
 
-
+:-disabled_this.
 
 :- dynamic(lmconf:no_buggery/0).
 % show the warnings origins
@@ -3081,23 +3084,31 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 %
 % Hook Message Hook.
 %
-hook_message_hook:- asserta((
-%  current_predicate(logicmoo_bugger_loaded/0),
-user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_error(_), 
-    backtrace(40), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,
-  dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(20)),dmsg(message_hook(Term, Kind, Lines)),
+% hook_message_hook
+hook_message_hook:- 
+ asserta((
+ 
+%  current_predicate(logicmoo_bugger_loaded/0)
 
-   (sleep(1.0),read_pending_codes(user_input, Chars, []),
-                format(error_error, '~s', [Chars]),
-                flush_output(error_error),!,Chars=[C],
+user:message_hook(Term, Kind, Lines):- 
+ ignore((
+ \+ \+ 
+ catch(((
+ (Kind= warning;Kind= error), 
+ Term\=syntax_error(_), 
+ backtrace(40), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,
+  dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(10)),dmsg(message_hook(Term, Kind, Lines)),
+   !,fail,
+   (sleep(1.0),read_pending_codes(user_input, Chars, []), format(error_error, '~s', [Chars]),flush_output(error_error),!,Chars=[C],
                 dumptrace(true,C),!),
 
-   fail)).
+   fail)),_,true))),fail)).
 
 % :-hook_message_hook.
 
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
-:- user:use_module(library(prolog_stack)).
+:- load_files(library(prolog_stack), [silent(true)]).
+prolog_stack:stack_guard(none).
 
 %user:prolog_exception_hook(A,B,C,D):- fail,
 %   once(copy_term(A,AA)),catchv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.

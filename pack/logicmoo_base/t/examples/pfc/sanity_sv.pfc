@@ -41,7 +41,7 @@
 :- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
 
-:- set_abox(sanity_sv).
+:- set_defaultAssertMt(sanity_sv).
 
 :- file_begin(pfc).
 

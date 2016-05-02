@@ -9,7 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_agenda.pl
-:- if(current_prolog_flag(xref,true)).
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :- module(mpred_agenda,
           [ will_call_after/2,
             add_later/1,

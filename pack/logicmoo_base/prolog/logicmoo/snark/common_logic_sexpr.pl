@@ -1,10 +1,11 @@
+:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
 :-module(common_logic_sexpr,[
   codelist_to_forms/2,svar_fixvarname/2,input_to_forms/2,input_to_forms/3,
   sexpr_sterm_to_pterm_list/2,
   sexpr//1,
   to_untyped/2,ok_varname/1,svar_fixvarname/2,
   sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
-
+:- endif.
 
 
 :- dynamic user:file_search_path/2.
@@ -864,11 +865,11 @@ process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure):-
    once(((CU==was(first,first)->OnFirst;true),
    (CU==was(second,first)->OnRetry;true),
    (CU==was(second,second)->OnFailure;true),
-   (CU==was(first,second)->OnSuccess;true))).
+   (CU==was(first,second)-e>OnSuccess;true))).
 
 
 */
 
-:- add_genlMt(baseKB,common_logic_sexpr,end).
+% :- add_import_module(baseKB,common_logic_sexpr,end).
 
 

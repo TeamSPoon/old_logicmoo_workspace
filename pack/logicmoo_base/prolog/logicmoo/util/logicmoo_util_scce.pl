@@ -33,7 +33,7 @@
 :- '$set_source_module'(system).
 
 :- meta_predicate scce_orig(0,0,0).
-scce_orig(Setup,Goal,Cleanup):-
+system:scce_orig(Setup,Goal,Cleanup):-
   must_atomic(Setup),
      catch((
         call((Goal,deterministic(Det),true))
@@ -55,7 +55,7 @@ scce_orig(Setup,Goal,Cleanup):-
 
 
 :- meta_predicate scce_orig2(0,0,0).
-scce_orig2(Setup,Goal,Cleanup):- 
+system:scce_orig2(Setup,Goal,Cleanup):- 
   setup_call_cleanup(Setup, 
     (call((Goal,deterministic(Det),true))
        *-> (Det == true -> ! ; 
