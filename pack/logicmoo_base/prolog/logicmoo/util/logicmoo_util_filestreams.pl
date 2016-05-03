@@ -26,9 +26,9 @@
             with_stream_pos/2
           ]).
 :- multifile
-        accept_hook/2,
-        make_socket_hook/3,
-        open_client_hook/5,
+        thread_httpd:accept_hook/2,
+        thread_httpd:make_socket_hook/3,
+        thread_httpd:open_client_hook/5,
         open_options/2,
         package_path/2.
 :- meta_predicate

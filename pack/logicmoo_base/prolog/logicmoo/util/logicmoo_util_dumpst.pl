@@ -476,9 +476,9 @@ end_dump(GG):-compound(GG),functor(GG,F,_),atom_concat(dump,_,F).
 %
 % (debug) Trace.
 %
-dtrace:- wdmsg("DUMP_TRACE_BREAK/0"), break,dtrace(trace).
+dtrace:- wdmsg("DUMP_TRACE_BREAK/0"), dtrace(system:break).
 
-:- thread_local(has_auto_trace/1).
+:- thread_local(tlbugger:has_auto_trace/1).
 :-meta_predicate(dtrace(0)).
 
 %= 	 	 
@@ -488,7 +488,7 @@ dtrace:- wdmsg("DUMP_TRACE_BREAK/0"), break,dtrace(trace).
 % (debug) Trace.
 %
 
-dtrace(G):- has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
+dtrace(G):- tlbugger:has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
 dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dtrace(G))),trace).
 
 dtrace(G):- notrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
@@ -566,8 +566,12 @@ dumptrace0(G):-
 %
 % Dump Trace.
 %
+dumptrace(_,0'h):- listing(dumptrace/2),!,fail.
 dumptrace(_,0'g):-!,hotrace(dumpST(500000)),!,fail.
 dumptrace(_,0'G):-!,notrace(dumpST0(500000)),!,fail.
+dumptrace(_,0'D):-!,prolog_stack:backtrace(8000),!,fail.
+dumptrace(_,0'd):-!,prolog_stack:backtrace(800),!,fail.
+
 dumptrace(G,0'l):-!, 
   restore_trace(( notrace(ggtrace),G)),!,notrace.
 dumptrace(G,0's):-!,hotrace(ggtrace),!,(hotrace(G)*->true;true).
@@ -579,6 +583,7 @@ dumptrace(_,0'a):-!,abort,!,fail.
 dumptrace(_,0'x):-!,must((lex,ex)),!,fail.
 dumptrace(_,0'e):-!,halt(1),!.
 dumptrace(_,0'm):-!,make,fail.
+dumptrace(G,0'L):-!,xlisting(G),!,fail.
 dumptrace(G,0'l):-!,visible(+all),show_and_do(rtrace(G)).
 dumptrace(G,0'c):-!, show_and_do((G))*->true;true.
 dumptrace(G,0'r):-!, notrace,(rtrace((G,notrace))),!,fail.

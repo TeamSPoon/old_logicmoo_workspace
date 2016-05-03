@@ -86,7 +86,7 @@
   setup_mpred_ops/0,
   mpred_assert_w_support/2,mpred_asserta_w_support/2,mpred_assertz_w_support/2,mpred_basis_list/2,mpred_bt_pt_combine/3,mpred_child/2,mpred_children/2,
   mpred_classifyFacts/4,mpred_collect_supports/1,mpred_unhandled_command/3,mpred_compile_rhs_term/3,mpred_conjoin/3,mpred_connective/1,
-  mpred_database_item/1,mpred_database_term/2,
+  mpred_database_item/1,mpred_database_term/3,
   mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
   mpred_descendants/2,mpred_enqueue/2,mpred_error/1,mpred_error/2,mpred_eval_lhs/2,mpred_eval_lhs_0/2,mpred_eval_rhs/2,mpred_fact/1,
   mpred_fact/2,mpred_facts/1,mpred_facts/2,mpred_facts/3,mpred_fwc/1,mpred_get_support/2,lookup_u/1,lookup_u/2,
@@ -212,14 +212,13 @@ ensure_abox(logicmoo_user):-!,throw(logicmoo_user(  ensure_abox(baseKB))).
 ensure_abox(user):- !, ensure_abox(logicmoo_user),!.
 ensure_abox(M):- 
    asserta(lmcache:has_pfc_database_preds(M)),
-   asserta_if_new(lmconf:is_box_module(M,abox)),
    mpred_ops(M), 
    ensure_imports(M),
    maybe_add_import_module(M,baseKB,end),
-   forall(mpred_database_term(F/A,_),
+   forall(mpred_database_term(F,A,_),
      (functor(P,F,A),
       must(\+((predicate_property(M:P,imported_from(W)),wdmsg(predicate_property(P,imported_from(W)))))))),
-  forall(mpred_database_term(F/A,_),
+  forall(mpred_database_term(F,A,_),
        (M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         M:multifile(M:F/A))),!.
@@ -300,33 +299,45 @@ get_source_ref10(M):- fail,trace,
 
 is_source_ref1(_).
 
-unassertable(Var):-var(Var).
+unassertable(Var):-var(Var),!.
 unassertable((_:V)):-!,unassertable(V).
 unassertable((_;_)).
 unassertable((_,_)).
 
+fix_mp_abox(G0,U,G):-fix_mp(G0,U:G).
+
 fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
+fix_mp('?-'(G0), '?-'(M:CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
 fix_mp(Unassertable,_):- unassertable(Unassertable),!,trace_or_throw(unassertable_fix_mp(Unassertable)).
+fix_mp((G :- B),( M:GO :- B)):- fix_mp(G,M:GO),!.
+fix_mp((G :- B),M:( GO :- B)):- !, fix_mp(G,M:GO).
+fix_mp(Mt:P,Mt:P):- mtExact(Mt).
+fix_mp(abox:P,ABOX:P):- defaultAssertionMt(ABOX), !.
+fix_mp(tbox:P,TBOX:P):- defaultTBoxMt(TBOX), !.
+fix_mp(G,M:GO):- strip_module(G,_,GO), !,functor(GO,F,A),convention_or_default(F,A,M).
+%fix_mp(baseKB:P,baseKB:P):-!.
+fix_mp(M:P,M:P):-baseKB:mtLocal(M),!.
 fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
-fix_mp(_:P,ABOX:P):- defaultAssertMt(ABOX),!.
-fix_mp(P,ABOX:P):- defaultAssertMt(ABOX),!.
+fix_mp(M:P,M:P):-!.
+
+convention_or_default(genlMt,2,baseKB):-!.
+convention_or_default(F,A,M):- mpred_database_term(F,A,_),defaultAssertMt(M),!.
+convention_or_default(_,_,M):- defaultAssertMt(M),!.
 /*
 % probably never makes it past the above
-fix_mp(MP,M:P):-  strip_module(MP,Cm,P),defaultAssertMt(U),!,
-   (((modulize_head_fb(U,P,Cm,M:P),\+ predicate_property(M:P,static)))*-> true;
-      (P==MP -> M=U; M=Cm)
+fix_mp_abox(MG,M,GO):-  strip_module(MG,Cm,GO),
+  defaultAssertMt(Um),!,
+   (((modulize_head_fb(Um,GO,Cm,M:GO),\+ predicate_property(M:GO,static)))*-> true;
+      (GO==MG -> M=Um; M=Cm)
      ),!.
-fix_mp(M:P,M:P):- current_predicate(_,M:P), predicate_property(M:P,dynamic),!.
-fix_mp(G0,CALL):-
-  strip_module(G0,WM,G),
-  must((defaultAssertMt(U),atom(U))),!,
-       (current_predicate(_,U:G)->CALL=U:G;
-       (current_predicate(_,WM:G)->CALL=WM:G;
-       (current_predicate(_,logicmoo_user:G)->CALL=logicmoo_user:G;
-       (current_predicate(_,baseKB:G)->CALL=baseKB:G;
-        fail)))),!.
+fix_mp_abox(M:GO,M,GO):- current_predicate(_,M:GO), predicate_property(M:GO,dynamic),!.
+fix_mp_abox(G,M,GO):-
+  strip_module(G,WM,GO),
+  must((defaultAssertMt(Um),atom(Um))),!,
+  member(M,[Um,WM,baseKB]),
+  current_predicate(_,M:GO),!.
 */
-fix_mp_abox(G0,U,G):-fix_mp(G0,U:G).
+
 
   
 
@@ -373,7 +384,7 @@ clause_u(MH,B,R):- nonvar(R),!,must(clause_i(M:H,B,R)),(MH=(M:H);MH=(H)),!.
 clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u((H:-B),BB,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u(MH,B,R):-  (mnotrace(fix_mp(MH,M:H)),clause_i(M:H,B,R))*->true;
-   (fix_mp_abox(MH,_,CALL),clause_i(CALL,B,R)).
+   (fix_mp_abox(MH,M:CALL),clause_i(M:CALL,B,R)).
 % clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
 %clause_u(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
@@ -415,14 +426,14 @@ with_umt(G0):-
 */
 
 with_umt(G):-
-  defaultAssertMt(U),
+  baseKB:defaultAssertMt(U),
   with_umt(U,G).
 
 with_umt(U,G):-  
   gripe_time(30.0,
    call_from_module(U,
     w_tl(t_l:current_defaultAssertMt(U),
-      (set_defaultAssertMt(U),G)))).
+      (baseKB:set_defaultAssertMt(U),G)))).
 
 
 
@@ -565,7 +576,8 @@ mpred_ain(P):- get_source_ref(UU),mpred_ain(P,UU).
 %
 ain(P,S):- mpred_ain(P,S).
 
-mpred_ain(MTP,S):- strip_module(MTP,MT,P),P\==MTP,!,
+
+mpred_ain(MTP,S):- stack_check, strip_module(MTP,MT,P),P\==MTP,!,
   with_umt(MT,mpred_ain(P,S)).
 mpred_ain(P,S):- 
   gripe_time(0.6,
@@ -1411,7 +1423,7 @@ mpred_eval_lhs(X,S):-
 %
 %  Helper of evaling something on the LHS of a rule.
 % 
-mpred_eval_lhs_0((Test->Body),Support):- 
+mpred_eval_lhs_0((Test*->Body),Support):-  % Noncutted ->
   !,
   mpred_call_no_bc(Test),
    mpred_eval_lhs_0(Body,Support).
@@ -1822,9 +1834,9 @@ build_trigger(WS,[(T1)|Triggers],Consequent,nt(T2,Test,X)):-
   build_neg_test(WS,T2,true,Test),
   build_trigger(WS,Triggers,Consequent,X).
 
-build_trigger(WS,[{Test}|Triggers],Consequent,(Test->X)):-
+build_trigger(WS,[{Test}|Triggers],Consequent,(Test*->Body)):- % Noncutted ->
   !,
-  build_trigger(WS,Triggers,Consequent,X).
+  build_trigger(WS,Triggers,Consequent,Body).
 
 build_trigger(WS,[T/Test|Triggers],Consequent,pt(T,X)):-
   !, 
@@ -2127,43 +2139,45 @@ mpred_conjoin(C1,C2,(C1,C2)).
 % is true iff F/A is something that Pfc adds to
 % the database and should not be present in an empty Pfc database
 %
-:- dynamic(mpred_database_term/2).
+
+
+:- dynamic(mpred_database_term/3).
 % mined from program database      
 
 % :- dynamic(spft/3).
 
-mpred_database_term(do_and_undo/2,rule).
-mpred_database_term(('::::')/2,rule).
-mpred_database_term((<-)/2,rule).
-mpred_database_term((<==>)/2,rule).
-mpred_database_term((==>)/2,rule).
+mpred_database_term(do_and_undo,2,rule).
+mpred_database_term(('::::'),2,rule).
+mpred_database_term((<-),2,rule).
+mpred_database_term((<==>),2,rule).
+mpred_database_term((==>),2,rule).
 
-mpred_database_term((==>)/1,fact(_)).
-mpred_database_term((~)/1,fact(_)).
+mpred_database_term((==>),1,fact(_)).
+mpred_database_term((~),1,fact(_)).
 
-% forward/backward chaining database
-mpred_database_term(spft/3,support).
-mpred_database_term(nt/3,trigger).
-mpred_database_term(pt/2,trigger).
-mpred_database_term(bt/2,trigger).
+% forward,backward chaining database
+mpred_database_term(spft,3,support).
+mpred_database_term(nt,3,trigger).
+mpred_database_term(pt,2,trigger).
+mpred_database_term(bt,2,trigger).
 
 % transient state
-mpred_database_term(actn/1,state).
-mpred_database_term(que/1,state).
-mpred_database_term(hs/1,state).
+mpred_database_term(actn,1,state).
+mpred_database_term(que,1,state).
+mpred_database_term(hs,1,state).
 
-% forward/backward settings
-mpred_database_term(mpred_current_db/1,setting).
-mpred_database_term(mpred_select_hook/1,setting).
-mpred_database_term(tms/1,setting).
-mpred_database_term(pm/1,setting). 
+% forward,backward settings
+mpred_database_term(mpred_current_db,1,setting).
+mpred_database_term(mpred_select_hook,1,setting).
+mpred_database_term(tms,1,setting).
+mpred_database_term(pm,1,setting). 
 
 % debug settings
-mpred_database_term(mpred_is_tracing_pred/1,debug).
-mpred_database_term(mpred_is_tracing_exec/0,debug).
-mpred_database_term(mpred_is_spying_pred/2,debug).
-mpred_database_term(mpred_warnings/1,debug).
-mpred_database_term(why_buffer/2,debug).
+mpred_database_term(mpred_is_tracing_pred,1,debug).
+mpred_database_term(mpred_is_tracing_exec,0,debug).
+mpred_database_term(mpred_is_spying_pred,2,debug).
+mpred_database_term(mpred_warnings,1,debug).
+mpred_database_term(why_buffer,2,debug).
 
 
 %% mpred_reset() is det.
@@ -2184,7 +2198,7 @@ mpred_reset:- mpred_trace_msg("Reset DB complete").
 
 % true if there is some Pfc crud still in the database.
 mpred_database_item(P):-
-  mpred_database_term(F/A,Type),
+  mpred_database_term(F,A,Type),
   Type\=debug,
   P \= ~(_),
   Type\=setting,
@@ -3062,7 +3076,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_retract_i_or_warn)/1).
 :- module_transparent((mpred_database_item)/1).
 :- module_transparent((mpred_reset)/0).
-:- module_transparent((mpred_database_term)/2).
+:- module_transparent((mpred_database_term)/3).
 :- module_transparent(lmcache:(has_pfc_database_preds)/1).
 :- module_transparent((mpred_conjoin)/3).
 :- module_transparent((mpred_union)/3).
@@ -3210,7 +3224,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(filter_buffer_get_n/3).
 :- module_transparent(filter_buffer_trim/2).
 
-% :- '$current_source_module'(M),forall(mpred_database_term(F/A,_),(abolish(mpred_pfc:F/A),make_declared_now(M:F/A))).
+% :- '$current_source_module'(M),forall(mpred_database_term(F,A,_),(abolish(mpred_pfc:F/A),make_declared_now(M:F/A))).
 % :- '$current_source_module'(M),add_import_module(M,baseKB,end).
 % :- initialization(ensure_abox(baseKB)).
 

@@ -525,7 +525,9 @@ when_defined(Goal):-if_defined(Goal,true).
 %
 to_pi(P,M:P):-var(P),!,current_module(M).
 to_pi(M:P,M:P):-var(P),!,current_module(M).
-to_pi(Find,(M:PI)):- once(catch(match_predicates(Find,Found),_,fail)),Found=[_|_],!,member(M:F/A,Found),functor(PI,F,A).
+to_pi(Find,(M:PI)):- 
+ w_tl(set_prolog_flag(retry_undefined,false),
+   (once(catch(match_predicates(Find,Found),_,fail)),Found=[_|_],!,member(M:F/A,Found),functor(PI,F,A))).
 to_pi(M:Find,M:PI):-!,current_module(M),to_pi0(M,Find,M:PI).
 to_pi(Find,M:PI):-current_module(M),to_pi0(M,Find,M:PI).
 
@@ -1436,7 +1438,7 @@ on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
 :- meta_predicate quietly(0).
 quietly(G):- is_release,!,call(G).
 quietly(G):- on_x_f(hide_trace(G),
-                     call_setup_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),
+                     setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),
                      fail).
 
 
@@ -1453,7 +1455,7 @@ quietly(G):- on_x_f(hide_trace(G),
 sanity(_):- notrace((is_release;bad_idea)),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(why,Goal)).
 sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
-sanity(Goal):- quietly(Goal)*->true;call_setup_cleanup(wdmsg(begin_FAIL_in(G)),rtrace(G),wdmsg(end_FAIL_in(G))).
+sanity(Goal):- quietly(Goal)*->true;setup_call_cleanup(wdmsg(begin_FAIL_in(G)),rtrace(G),wdmsg(end_FAIL_in(G))).
 
 compare_results(N+NVs,O+OVs):-
    NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).

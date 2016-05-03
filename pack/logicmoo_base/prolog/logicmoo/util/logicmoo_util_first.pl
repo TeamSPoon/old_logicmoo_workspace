@@ -81,7 +81,6 @@ system:nop(_).
    mpred_trace_childs(:),
    mpred_trace_nochilds(:),
 
-        module_meta_transparent(:),
         mustvv(0),
         icatch(0),
         renumbervars_prev(?, ?),
@@ -127,11 +126,7 @@ quiet_all_module_predicates_are_transparent/1,
         renumbervars1/2,
         renumbervars1/4,
         samify/2,
-        export_file_preds/0,
-        export_file_preds/1,
-        export_file_preds/6,
-        some_flocation/3,
-        some_location/3,
+        
         term_to_string/2,
         unnumbervars/2,
         add_var_to_env/2,
@@ -144,6 +139,10 @@ quiet_all_module_predicates_are_transparent/1,
 :- meta_predicate snumbervars(?,?,?,?).
 :- meta_predicate snumbervars(?,?,?).
 :- meta_predicate safe_numbervars(?).
+/*
+        module_meta_transparent(:),
+   some_flocation/3,
+
 :- meta_predicate contains_singletons(?).
 % Restarting analysis ...
 % Found new meta-predicates in iteration 2 (0.206 sec)
@@ -154,7 +153,11 @@ quiet_all_module_predicates_are_transparent/1,
 % Found new meta-predicates in iteration 3 (0.121 sec)
 :- meta_predicate programmer_error(0).
 :- meta_predicate safe_numbervars(*,?).
-
+        export_file_preds/1,
+        export_file_preds/6,
+   export_file_preds/0,
+some_location/3,
+*/
 
 %= 	 	 
 

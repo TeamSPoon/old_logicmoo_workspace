@@ -4,10 +4,12 @@
 % Douglas Miles
 
 */
-:- if(('$current_source_module'(SM),'$current_typein_module'(M),
+:- if((
+   '$current_source_module'(SM),'$current_typein_module'(M),
    system:multifile(baseKB:user_module_uses_base/3),
    system:dynamic(baseKB:user_module_uses_base/3),
-   catch(add_import_module(SM,baseKB,start),_,true),
+   % catch(system:delete_import_module(baseKB,SM),_,true),
+   % catch(system:add_import_module(SM,baseKB,start),_,true),
    system:asserta(baseKB:user_module_uses_base(SM,M,SM:baseKB)))).
 :- endif.
 :- module(baseKB,
@@ -24,6 +26,7 @@
 :- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
 
 :- dynamic(baseKB:'$exported_op'/3).
+
 :- multifile(baseKB:'$exported_op'/3).
 :- discontiguous(baseKB:'$exported_op'/3).
 % ========================================
@@ -43,7 +46,7 @@ config_mpred_system:-
 config_mpred_system(SM,M):-
   SM:ensure_loaded(library(logicmoo_utils)),
   load_mpred_system(SM),
-  get_current_tbox(Sys),
+  defaultTBoxMt(Sys),
   %Sys:ensure_loaded(library(logicmoo_utils)),
   defaultAssertMt(Usr),
   
@@ -193,7 +196,7 @@ current_smt(SM,M):-
 % Ensure the "managed predicate" system and subsystems are available
 %
 enable_mpred_system:-
-    defaultAssertMt(Usr),get_current_tbox(Sys),
+    defaultAssertMt(Usr),defaultTBoxMt(Sys),
    enable_mpred_system(Usr,Sys).
 
 %% enable_mpred_system(+Usr,+Sys) is det.
@@ -202,7 +205,7 @@ enable_mpred_system:-
 %
 % Begin considering forward and meta programming rules into a Prolog module.
 :- export(enable_mpred_system/2).
-enable_mpred_system(Usr,Sys):- with_mutex(mpred_system_mutex,lmconf:enable_mpred_system0(Usr,Sys)).
+enable_mpred_system(Usr,Sys):- with_mutex(mpred_system_mutex,enable_mpred_system0(Usr,Sys)).
 
 
 
@@ -220,12 +223,12 @@ disable_mpred_system(Usr,_Sys):- with_mutex(mpred_system_mutex,lmconf:disable_mp
 
 %% enable_mpred_system0( ?Usr) is semidet.
 %
-% Hook To [lmconf:enable_mpred_system0/1] For Usr Logicmoo_base.
+% Hook To [enable_mpred_system0/1] For Usr Logicmoo_base.
 % Enable Managed Predicate System Primary Helper.
 %
-lmconf:enable_mpred_system0(Usr,_):- lmconf:mpred_system_status(Usr,enabled),!.
-lmconf:enable_mpred_system0(Usr,_):- lmconf:mpred_system_status(Usr,loading),!.
-lmconf:enable_mpred_system0(Usr,Sys):- 
+enable_mpred_system0(Usr,_):- lmconf:mpred_system_status(Usr,enabled),!.
+enable_mpred_system0(Usr,_):- lmconf:mpred_system_status(Usr,loading),!.
+enable_mpred_system0(Usr,Sys):- 
    assert_setting00(lmconf:mpred_system_status(Usr,loading)),
    load_mpred_system(Sys),
    must(current_predicate(_,Sys:mpred_expander(_,_,_,_,_,_))),
@@ -261,6 +264,8 @@ lmconf:disable_mpred_system0(Usr):-
 
 % Config System
 :- must(config_mpred_system).
+
+:- set_prolog_flag(gc,false).
 
 %:- autoload([verbose(false)]).
 %:- set_prolog_flag(autoload, false).

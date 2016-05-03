@@ -59,6 +59,8 @@ el_assertions:el_holds/8, %el_assertions
 el_assertions:el_holds/9, %el_assertions
 el_assertions:el_holds_pred_impl/1, %el_assertions
 el_assertions:is_cyckb_t_pred/2, %el_assertions
+lmcache:has_pfc_database_preds/1,
+lmconf:abox_for/2,
 lmconf:after_mpred_load/0,
 lmconf:agent_call_command/2,
 lmconf:decl_coerce/3,
@@ -78,8 +80,6 @@ lmconf:mpred_provide_storage_clauses/3,
 lmconf:mpred_provide_storage_op/2, 
 lmconf:mpred_provide_write_attributes/2, 
 lmconf:mpred_skipped_module/1, 
-lmconf:abox_for/2,
-lmcache:has_pfc_database_preds/1,
 lmconf:mud_test/2,
 lmconf:never_reload_file/1, 
 lmconf:pfcManageHybrids/0, 

@@ -17,12 +17,12 @@ end_of_file.
 :- user:ensure_loaded_no_mpreds(library(logicmoo/logicmoo_base)).
 :- asserta(t_l:disable_px).
 
-:- multifile(user:type_action_info/3).
-:- multifile(user:agent_call_command/2).
-:- multifile(user:mud_test/2).
-:- multifile(user:sanity_test/0).
-:- multifile(user:regression_test/0).
-:- multifile(user:feature_test/0).
+:- multifile(lmconf:type_action_info/3).
+:- multifile(lmconf:agent_call_command/2).
+:- multifile(lmconf:mud_test/2).
+:- multifile(lmconf:sanity_test/0).
+:- multifile(lmconf:regression_test/0).
+:- multifile(lmconf:feature_test/0).
 
 
 
@@ -359,18 +359,18 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 :- dmsg(parser_all_complete).
 
 
-user:sanity_test:- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
-user:regression_test:- run_pipleine(acetext='What is the ocean that borders african countries and, that borders asian countries?',[foo=_],O),wdmsg(O).
-user:regression_test_TODO:- run_pipleine(acetext='A person who loves all animals is loved by someone.',[foo=_],O),wdmsg(O).
+lmconf:sanity_test:- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
+lmconf:regression_test:- run_pipleine(acetext='What is the ocean that borders african countries and, that borders asian countries?',[foo=_],O),wdmsg(O).
+lmconf:regression_test_TODO:- run_pipleine(acetext='A person who loves all animals is loved by someone.',[foo=_],O),wdmsg(O).
 
-user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
+lmconf:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 
 % som3how this next directive changes  -/1 op?
 :- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 :- op(300,fx,(-)).
 
 
-user:regression_test:- gripe_time(5,test_chat80_sanity).
+lmconf:regression_test:- gripe_time(5,test_chat80_sanity).
 
 
 % :- must(retract(t_l:disable_px)).

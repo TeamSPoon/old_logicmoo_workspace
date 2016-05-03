@@ -20,9 +20,9 @@
 :- include(prologmud(mud_header)).
 
 :- thread_local was_test_name/1.
-:- multifile(mud_regression_test/0).
-:- multifile(mud_test_local/0).
-:- multifile(mud_test_full/0).
+:- multifile(lmconf:mud_regression_test/0).
+:- multifile(lmconf:mud_test_local/0).
+:- multifile(lmconf:mud_test_full/0).
 
 :- meta_predicate test_call(+).
 :- meta_predicate run_mud_test(+,+).

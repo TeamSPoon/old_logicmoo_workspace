@@ -86,6 +86,9 @@ arity('<=>',2).
 arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
 arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
+arity(tSet,1).
+arity(argsQuoted,1).
+arity(quasiQuote,1).
 
 prologHybrid(arity/2).
 
@@ -119,32 +122,47 @@ argsQuoted(second_order).
 
 nondet.
 
+predicateConventionMt(genlMt,baseKB).
+predicateConventionMt(regression_test,lmconf).
+
+% mtExact(Mt)==>{import_to_user(Mt)}.
+
+
+
+tSet(mtGlobal,comment("mtGlobal(?Mt) states the Mt is always findable during inheritance")).
 mtGlobal(baseKB).
 mtGlobal(system).
-{module_property(M,class(user)),
-   (atom_concat('common_logic_',_,M);atom_concat('logicmoo_util_',_,M);atom_concat('mpred_',_,M))} 
-    ==>  mtGlobal(M).
 
-{module_property(M,class(library))} ==> mtGlobal(M).
+tSet(mtExact,comment("mtExact(?Mt) states that all predicates the Mt specified should not inherit past ?Mt.  Thus:  mtExact(Mt)==> ~genlMt(Mt,_)")).
+mtExact(lmconf).
+mtExact(lmcache).
+mtExact(t_l).
+mtExact(system).
+mtExact(Mt)==>mtGloal(Mt).
+mtExact(Mt)==> ~genlMt(Mt,_).
 
-mtGlobal(Mt)==>mtCore(Mt).
-
+tSet(mtCore,comment("mtCore(?Mt) states Mt specified is builtin")).
 mtCore(user).
+mtCore(everythingPCS).
+mtCore(inferencePCS).
 mtCore(Mt)==>tMicrotheory(Mt).
+
+{module_property(Mt,class(user)),
+   (atom_concat('common_logic_',_,Mt);atom_concat('logicmoo_util_',_,Mt);atom_concat('mpred_',_,Mt))} 
+    ==>  mtGlobal(Mt).
+
+{module_property(Mt,class(library))} ==> mtGlobal(Mt).
+
+mtGlobal(Mt)==>(mtCore(Mt),~mtLocal(Mt)).
 
 (tMicrotheory(Mt), ~ mtCore(Mt)) <==> mtLocal(Mt).
 
-(genlMt(Mt,baseKB)/(Mt==baseKB)) ==> mtLocal(Mt).
+(genlMt(Mt,baseKB)/(Mt \==baseKB )) ==> mtLocal(Mt).
+
 mtLocal(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
 mtGlobal(Mt)==>genlMt(baseKB,Mt).
 
-tMicrotheory(baseKB).
-tMicrotheory(everythingPCS).
-tMicrotheory(inferencePCS).
-tMicrotheory(sanity).
-
 baseKB:isRegisteredCycPred(apply,maplist,3).
-
 
 
 (genlMt(Child,Parent), \+ mtCore(Child)) ==>
@@ -155,11 +173,11 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 
 :- dynamic(baseKB:isRegisteredCycPred/3).
 
-({fail,current_module(M),
-   predicate_property(M:P,defined), 
- \+ predicate_property(M:P,imported_from(_)),
+({fail,current_module(Mt),
+   predicate_property(Mt:P,defined), 
+ \+ predicate_property(Mt:P,imported_from(_)),
  functor(P,F,A)})
-  ==>baseKB:isRegisteredCycPred(M,F,A).
+  ==>baseKB:isRegisteredCycPred(Mt,F,A).
 
 
 /* prolog_listing:listing */

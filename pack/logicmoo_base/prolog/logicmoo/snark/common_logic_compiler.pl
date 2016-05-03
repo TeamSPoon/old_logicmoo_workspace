@@ -155,15 +155,13 @@
             op(1150,fx,(was_export)),
             op(1150,fx,(shared_multifile)).
 
-:- shared_multifile((
-        
-        agent_call_command/2,
-        feature_test/0,
-        mud_test/2,
-        regression_test/0,
-        sanity_test/0,
-        type_action_info/3))
-.
+:- shared_multifile((        
+        lmconf:agent_call_command/2,
+        lmconf:feature_test/0,
+        lmconf:mud_test/2,
+        lmconf:regression_test/0,
+        lmconf:sanity_test/0,
+        lmconf:type_action_info/3)).
 
 :- include('../mpred/mpred_header.pi').
 % % :- '$set_source_module'(common_logic_compiler).

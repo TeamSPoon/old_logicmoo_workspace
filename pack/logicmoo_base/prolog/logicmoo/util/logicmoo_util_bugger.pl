@@ -1043,7 +1043,7 @@ nodebugx(X):-
 :- dynamic was_module/2.
 :- module_transparent was_module/2.
 
-:- thread_local(has_auto_trace/1).
+:- thread_local(tlbugger:has_auto_trace/1).
 
 %term_expansion(G,G2):- loop_check(bugger_term_expansion(G,G2)).
 %goal_expansion(G,G2):- loop_check(bugger_goal_expansion(G,G2)).
@@ -3065,7 +3065,7 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
     ignore((thread_current_input(main,In),see(In))),
     dumpST9(Frame,20),
 
-    nop(dtrace(Goal)),
+    dtrace(Goal),
     format_to_error( 'Error ST-End: ~p', [Term]), nl(ERR),
     nl(ERR), fail)).
 

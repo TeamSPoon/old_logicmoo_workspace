@@ -127,7 +127,7 @@ process_this_script0(S):-
 never_load_special(_, Options) :-memberchk(must_be_module(true),Options).
 never_load_special(_Module:Spec, _) :- atom(Spec), atomic_list_concat(M,'.',Spec),length(M,L),L>7.
 never_load_special(_Module:library(Atom), Options) :- atom(Atom),member(must_be_module(true),Options),member(if(_),Options).
-% [if(true),imports([mpred_database_term/2]),register(false),silent(false)]
+% [if(true),imports([mpred_database_term/3]),register(false),silent(false)]
 never_load_special(_Module:_Spec, Options) :- member(must_be_module(true),Options),member(if(not_loaded),Options),member(imports([_/_]),Options).   
 
 

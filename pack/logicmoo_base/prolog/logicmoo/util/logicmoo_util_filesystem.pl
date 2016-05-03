@@ -886,8 +886,10 @@ add_genlMt(From,imports(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),
 add_genlMt(From,maybe(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
 add_genlMt(baseKB,imports(logicmoo_user)):-!. % this means never will happen
 
+add_genlMt(logicmoo_utils,imports(baseKB)):- !, add_genlMt(baseKB,imports(logicmoo_utils)).
+add_genlMt(logicmoo_utils,imports(baseKB)):-!.
+
 % add_genlMt(_From,imports(To)):-arg(_,v(baseKB,logicmoo_user),To),!.
-% add_genlMt(logicmoo_utils,imports(baseKB)):-!.
 add_genlMt(From,Prop):-lmconf:known_prolog_file_prop(From,Prop),!.
 add_genlMt(From,Prop):-assertz(lmconf:known_prolog_file_prop(From,Prop)),fail.
 add_genlMt(_,file(_)):-!.
@@ -937,11 +939,11 @@ glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_c
   add_genlMt(logicmoo_utils,imports(SM)),
   % add_genlMt(SM,imports(logicmoo_user)),
   % add_genlMt(SM,imports(baseKB)),
-   forall(source_file(SM:H,File),
+   forall(source_file(M:H,File),
        ignore((functor(H,F,A),
-         (predicate_property(SM:H,imported_from(Where))
+         (predicate_property(M:H,imported_from(Where))
            -> add_prolog_predicate(SM,Where,H,F,A,File)
-          ; add_prolog_predicate(TypeIn,SM,H,F,A,File))))),
+          ; add_prolog_predicate(TypeIn,M,H,F,A,File))))),
          fail.
 
 glean_prolog_impl_file((:- module(Want,_PubList)),File,SM,TypeIn):-!,
@@ -960,14 +962,13 @@ glean_prolog_impl_file(_,File,SM,_TypeIn):-
 :- export(add_prolog_predicate/6).
 :- module_transparent(add_prolog_predicate/6).
 add_prolog_predicate(skip,_M,_H,_F,_A,_S):-!.
-add_prolog_predicate(_CM,M,H,F,A,_S):-
+add_prolog_predicate(_ImportTo,M,H,F,A,_S):-
   ignore((
        F\=='$mode',
        F\=='$pldoc',
        F\=='$exported_op',
-       ignore(((\+ atom_concat('$',_,F),export(F/A)))),
+       ignore(((\+ atom_concat('$',_,F),export(M:F/A)))),
        \+ predicate_property(M:H,transparent),
-       M:module_transparent(M:F/A),
-       ignore(((\+ atom_concat('__aux',_,F),call(call,nop(format('~N:- module_transparent(~q/~q).~n',[F,A])))))))).
+       M:module_transparent(M:F/A))).
       
 

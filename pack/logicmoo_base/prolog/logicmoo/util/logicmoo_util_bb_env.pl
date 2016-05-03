@@ -152,7 +152,7 @@ in_dyn_pred(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property
 
 
 get_mp_arity(F,A):- defaultAssertMt(M),if_defined(M:arity(F,A)).
-get_mp_arity(F,A):- get_current_tbox(M),if_defined(M:arity(F,A)).
+get_mp_arity(F,A):- defaultTBoxMt(M),if_defined(M:arity(F,A)).
 get_mp_arity(F,A):- lmconf:mpred_system_kb(M),M:mpred_arity(F,A).
 
 prop_mpred(Prop,F,A):- lmconf:mpred_system_kb(M),M:isa(F,Prop),get_mp_arity(F,A).

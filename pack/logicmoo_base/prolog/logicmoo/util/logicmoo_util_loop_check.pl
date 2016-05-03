@@ -45,7 +45,7 @@
             transitive_lc/3
           ]).
 :- multifile
-        goal_expansion/2.
+        system:goal_expansion/2.
 :- meta_predicate
         call_setof_tabled(?, ?, 0, -),
         call_t(0),
@@ -107,7 +107,7 @@ go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(C
         expire_tabled_list/1,
         get_where/1,
         get_where0/1,
-        goal_expansion/2,
+        system:goal_expansion/2,
         is_loop_checked/1,
         lco_goal_expansion/2,
         lex/0,
@@ -116,7 +116,7 @@ go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(C
         really_can_table/0,
         retract_can_table/0.
 :- dynamic
-        goal_expansion/2.
+        system:goal_expansion/2.
 
 
 :- include('logicmoo_util_header.pi').
@@ -676,7 +676,7 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 % Goal Expansion.
 %
 
-usera:goal_expansion(LC,PIn,LCOO,POut):- 
+system:goal_expansion(LC,PIn,LCOO,POut):- 
    notrace((is_file_based_expansion(goal,LC,PIn,LCOO,POut),
    source_location(_,_),
    lco_goal_expansion(LC,LCOO),

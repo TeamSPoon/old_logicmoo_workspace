@@ -506,11 +506,9 @@ fully_expand_now(Op,Sent,SentO):-
 %
 %  Is a stripped Module (Meaning it will be found via inheritance)
 %
+is_stripped_module(_):-!,fail.
 is_stripped_module(A):-var(A),!,fail.
-is_stripped_module(lmconf):-!,fail.
-is_stripped_module(user).
-is_stripped_module(logicmoo_user).
-is_stripped_module(system).
+is_stripped_module(Mt):-mtExact(Mt),!,fail.
 %is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
 %is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
 % is_stripped_module(baseKB).
@@ -732,7 +730,7 @@ transitive_lc_nr(_,A,A).
 %
 % Managed Predicate Expand.
 %
-mpred_expand_rule(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_database_term(F/A,_),
+mpred_expand_rule(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_database_term(F,A,_),
    PfcRule=[F|Args],maplist(fully_expand_goal(assert),Args,ArgsO),!,Out=..[F|ArgsO].
 
 
@@ -1044,7 +1042,7 @@ ex_argIsa(P,N,C):- clause(_:argIsa(P,N,C),true).
 compound_all_open(C):-compound(C),functor(C,_,A),A>1,\+((arg(_,C,Arg),is_ftNonvar(Arg))),!.
 
 /*
-db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,w_tl(t_l:caller_module(baseKB,MT),db_expand_0(Op,Term,O)).
+db_expand_0(Op,Mt:Term,Mt:O):- is_kb_module(Mt),!,w_tl(t_l:caller_module(baseKB,Mt),db_expand_0(Op,Term,O)).
 db_expand_0(Op,DB:Term,DB:O):- defaultAssertMt(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
 db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_expand_0(Op,Term,O)).
 */
@@ -1054,24 +1052,24 @@ db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_e
 replaced_module(_,V,_):- \+ atom(V),!,fail.
 replaced_module(_,umt,ABox):-defaultAssertMt(ABox).
 replaced_module(_,abox,ABox):-defaultAssertMt(ABox).
-replaced_module(_,tbox,TBox):-get_current_tbox(TBox).
+replaced_module(_,tbox,TBox):-defaultTBoxMt(TBox).
 
 %% remodualize( ?Op, ?H, ?HH) is semidet.
 %
 % Re-Modulize.
 %
 remodualize(_, H,H):-is_ftVar(H),!.
-remodualize(_, H,HH):-exact_args(H),!,HH=H.
-remodualize(Op,M:H,M:HHH):-is_ftVar(M),!,remodualize(Op,H,HHH).
+remodualize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
+remodualize(Op,M:H,M:HHH)):-is_ftVar(M),!,remodualize(mvar(Op),H,HHH).
 remodualize(Op,M:H,R:HHH):-replaced_module(Op,M,R),remodualize(Op,H,HHH).
 remodualize(Op,M:H,HHH):- is_stripped_module(M),!,remodualize(Op,H,HHH).
 remodualize(Op,H,HH):-is_list(H),!,must_maplist(remodualize(Op),H,HH),!.
 remodualize(Op,':-'(G),':-'(GG)):-!,remodualize(call(Op),G,GG).
 remodualize(Op,(H:-G),(HH:-GG)):-!,remodualize(Op,H,HH),remodualize(call(Op),G,GG).
-remodualize(Op,H,HH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodualize(Op),HL,HHL),HH=..[F|HHL],!.
-remodualize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
-remodualize(_ ,HB,HB).
-
+remodualize(Op,(H,G),(HH,GG)):-!,remodualize(call(Op),H,HH),remodualize(call(Op),G,GG).
+remodualize(Op,(H;G),(HH;GG)):-!,remodualize(call(Op),H,HH),remodualize(call(Op),G,GG).
+remodualize(Op,H,HHH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodualize(Op),HL,HHL),HH=..[F|HHL],!,fix_mp(HH,HHH).
+remodualize(Op,HB,HB):-sanity(trace_or_throw(unkown_remodualize(Op,HB,HB))).
 
 
 %= 	 	 
@@ -1715,6 +1713,10 @@ to_predicate_isas(C,CO):-C=..[F|CL],must_maplist(to_predicate_isas,CL,CLO),!,CO=
 % Exact Arguments.
 %
 exact_args(Q):-is_ftVar(Q),!,fail.
+exact_args(isEach):-!,fail.
+exact_args(Q):- \+ compound(Q), !.
+%exact_args(cwc).
+%exact_args(true).
 exact_args(argsQuoted(_)):-!,fail.
 exact_args(==>(_,_)):-!,fail.
 exact_args(Q):- cheaply_u(argsQuoted(Q)).
@@ -1729,8 +1731,6 @@ exact_args(mpred_ain(_)).
 exact_args(dynamic(_)).
 exact_args((A/B)):- (is_ftVar(A);is_ftVar(B)).
 exact_args((_ =.. _)).
-exact_args(cwc).
-exact_args(true).
 
 % exact_args((_:-_)).
 % exact_args((:-( _))).

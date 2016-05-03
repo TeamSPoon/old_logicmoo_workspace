@@ -103,7 +103,7 @@ feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 % [Optionaly] Run a battery of tests
-% :- if_startup_script( doall(regression_test)).
+% :- if_startup_script( doall(lmconf:regression_test)).
 
 
 sanity_test0a:- enqueue_agent_action("hide").

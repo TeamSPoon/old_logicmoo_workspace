@@ -31,29 +31,17 @@
          set_fileAssertMt/1,
          
                   
-         
+                 
          correct_module/3,
          correct_module/4,
          ensure_imports/1,
          import_to_user/1,
          import_to_user0/3,
          in_mpred_kb_module/0,
-         lmconf:is_box_module/2,
-         is_default_shared/1,
-         is_system_box/1,
-         
-         
-         correct_module/3,
-         correct_module/4,
-         ensure_imports/1,
-         import_to_user/1,
-         import_to_user0/3,
-         in_mpred_kb_module/0,
-         lmconf:is_box_module/2,
-         is_default_shared/1,
-         is_system_box/1,
-         which_file/1,
-         user_m_check/1
+         mtGlobal/1,
+        
+         user_m_check/1,
+         which_file/1
     ]).
 :- endif.
 :- '$set_source_module'(baseKB).
@@ -90,26 +78,14 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
          which_file/1,
          fileAssertMt/1,
          set_fileAssertMt/1,
-                           
+                          
          correct_module/3,
          correct_module/4,
          ensure_imports/1,
          import_to_user/1,
          import_to_user0/3,
          in_mpred_kb_module/0,
-         lmconf:is_box_module/2,
-         is_default_shared/1,
-         is_system_box/1,
-         
-         correct_module/3,
-         correct_module/4,
-         ensure_imports/1,
-         import_to_user/1,
-         import_to_user0/3,
-         in_mpred_kb_module/0,
-         lmconf:is_box_module/2,
-         is_default_shared/1,
-         is_system_box/1,
+         mtGlobal/1,
          which_file/1,
          user_m_check/1 .
 
@@ -201,7 +177,7 @@ add_import_predicate(Mt,Goal,OtherMt):-
    assert_if_new(( Mt:Goal :- OtherMt:Goal)).
   
 
-dump_break:- prolog_stack:backtrace(8000),system:break.
+dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
 
 make_as_dynamic(Reason,Mt,Pred,Arity):- dynamic( Mt:Pred/Arity),
    functor(Goal,Pred,Arity),
@@ -221,9 +197,10 @@ registerCycPred(Mt,Goal,Pred,Arity):-
 
 
 transitive_path(Pred,[Arg1,Arg2],Arg2):-
-  call(Pred,Arg1,Arg2),!.
+  dif(Arg1,Arg2),call(Pred,Arg1,Arg2),!.
 transitive_path(Pred,[Arg1,SecondNodeMt|REST],Arg2):-
-  call(Pred,Arg1,SecondNodeMt),
+  dif(Arg1,Arg2),dif(Arg1,SecondNodeMt),
+  call(Pred,Arg1,SecondNodeMt),stack_check,
   transitive_path(Pred,[SecondNodeMt|REST],Arg2).
 
 registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
@@ -252,12 +229,17 @@ clearKb(KB):- forall(import_module(KB,O),
 :-dynamic(genlMt/2).
 istAbove(Mt,Query):-Mt\==baseKB,genlMt(Mt,MtAbove),MtAbove:Query.
 
+:- use_module(baseKB:library(debug)).
+:- use_module(baseKB:library(lists)).
+
+user:exception(undefined_predicate,baseKB:debug/1,retry):- use_module(baseKB:library(debug)),!.
+user:exception(undefined_predicate,baseKB:member/2,retry):- use_module(baseKB:library(lists)),!.
 user:exception(undefined_predicate, Mt:F/A ,retry):-
   current_prolog_flag(retry_undefined,true),
   set_prolog_flag(retry_undefined,false),
    F\=istAbove, % t(tMicrotheory,Mt) -> 
   logicmoo_util_loop_check:loop_check_term(baseKB:registerCycPred(Mt,F,A),
-    registerCycPredsIntoMt(Mt),baseKB:dump_break),
+    registerCycPredsIntoMt(Mt,F),baseKB:dump_break),
   set_prolog_flag(retry_undefined,true).
 
 
@@ -364,7 +346,7 @@ box_type(_,_,abox).
 
 :- thread_local(t_l:current_defaultAssertMt/1).
 :- dynamic(lmconf:file_to_module/2).
-get_current_tbox(baseKB).
+defaultTBoxMt(baseKB).
 
 
 %% defaultAssertMt(-Ctx) is det.
@@ -378,7 +360,7 @@ defaultAssertMt(ABox):-
     (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);
     '$current_typein_module'(ABox);
-     get_current_tbox(ABox))),ABox\==user)),!.
+     defaultTBoxMt(ABox))),ABox\==user)),!.
 
 defaultAssertMt(ABox):- fileAssertMt(ABox).
 
@@ -396,7 +378,7 @@ fileAssertMt(ABox):-
 fileAssertMt(ABox):- which_file(File)->make_module_name_local(File,ABox),File\==ABox,!.
 fileAssertMt(ABox):-
  (((('$current_typein_module'(ABox);
-     get_current_tbox(ABox))),ABox\==user)),!.
+     defaultTBoxMt(ABox))),ABox\==user)),!.
 fileAssertMt(baseKB).
 
 
@@ -405,8 +387,8 @@ fileAssertMt(baseKB).
 % Sets Current Module.
 %
 set_defaultAssertMt(ABox):- 
-    assert_setting(t_l:current_defaultAssertMt(ABox)),
-    baseKB:get_current_tbox(TBox),
+    baseKB:defaultTBoxMt(TBox),
+    (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
     '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
     setup_module_ops(ABox), 
     inherit_into_module(ABox,TBox).
@@ -417,7 +399,7 @@ set_defaultAssertMt(ABox):-
 %
 set_fileAssertMt(ABox):- 
  must_det_l((
-   get_current_tbox(TBox),
+   defaultTBoxMt(TBox),
    TBox:ensure_abox(ABox),
    '$current_typein_module'(CM),
    '$current_source_module'(SM),
@@ -435,7 +417,7 @@ set_fileAssertMt(ABox):-
 
 make_module_name_local(A,B):- make_module_name_local0(A,B), \+ exists_file(B).
 
-make_module_name_local0(Source,KB):- is_default_shared(Source),defaultAssertMt(KB).
+make_module_name_local0(Source,KB):- mtGlobal(Source),defaultAssertMt(KB).
 make_module_name_local0(Source,SetName):- lmconf:file_to_module(Source,SetName),!.
 make_module_name_local0(Source,Source):- lmcache:has_pfc_database_preds(Source).
 make_module_name_local0(Source,GetName):- make_module_name(Source,GetName).
@@ -443,35 +425,28 @@ make_module_name_local0(Source,GetName):- make_module_name(Source,GetName).
 
 ensure_tbox(_ABox).
 
-%% is_box_module( ?M, ?VALUE2) is semidet.
-%
-% If Is A Datalog Module.
-%
-lmconf:is_box_module(M,tbox):- is_system_box(M).
-lmconf:is_box_module(user,abox).
 
-
-%% is_system_box( ?VALUE1) is semidet.
+%% mtCore( ?VALUE1) is semidet.
 %
 % If Is A System Datalog.
 %
-is_system_box(baseKB).
+mtCore(baseKB).
 
 
-%% is_default_shared(M,Box).
+%% mtGlobal(M,Box).
 %
 % Boot Modules.
 %
-%is_default_shared(mpred_loader).
-is_default_shared(baseKB).
-is_default_shared(boot_system).
-is_default_shared(system_markers).
-is_default_shared(system_singleValued).
-is_default_shared(system_genls).
-is_default_shared(system_if_missing).
-is_default_shared(common_logic_clif).
-is_default_shared(system_mdefault).
-is_default_shared(user).
+%mtGlobal(mpred_loader).
+mtGlobal(baseKB).
+mtGlobal(boot_system).
+mtGlobal(system_markers).
+mtGlobal(system_singleValued).
+mtGlobal(system_genls).
+mtGlobal(system_if_missing).
+mtGlobal(common_logic_clif).
+mtGlobal(system_mdefault).
+mtGlobal(user).
 
 is_undefaulted(user).
 
@@ -497,6 +472,7 @@ import_shared_pred(M,TBox,P):-
 %
 % Import Converted To User.
 %
+
 import_to_user(_):-!.
 import_to_user(P):- '$current_typein_module'(MM),'$current_source_module'(SM),
    quietly_must(import_to_user0(MM,SM,P)).
@@ -561,7 +537,7 @@ skip_user(Mt):- import_module(Mt,system), \+ import_module(Mt,user), !.
 skip_user(Mt):- !, add_import_module(Mt,system,start),ignore(delete_import_module(Mt,user)).
   
 inherit_into_module(Child,Parent):- ==(Child,Parent),!.
-inherit_into_module(Child,Parent):-ain(genlMt(Child,Parent)).
+inherit_into_module(Child,Parent):-ain(baseKB:genlMt(Child,Parent)).
 
 %% ensure_imports_tbox( ?M, ?TBox) is semidet.
 %
@@ -574,8 +550,8 @@ ensure_imports_tbox(M,TBox):-
   asserta(lmcache:is_ensured_imports_tbox(M,TBox)),
   
   must_det((
-   forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(M,IM)),
-   forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(TBox,IM)),
+   %forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(M,IM)),
+   %forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(TBox,IM)),
    skip_user(TBox),
    ignore(maybe_delete_import_module(M,TBox)),
    ignore(maybe_delete_import_module(TBox,M)),
@@ -602,7 +578,7 @@ correct_module(M,X,T):-functor(X,F,A),quietly_must(correct_module(M,F,A,T)),!.
 % Correct Module.
 %
 correct_module(abox,F,A,T):- !,defaultAssertMt(M),correct_module(M,F,A,T).
-correct_module(tbox,F,A,T):- !,get_current_tbox(M),correct_module(M,F,A,T).
+correct_module(tbox,F,A,T):- !,defaultTBoxMt(M),correct_module(M,F,A,T).
 correct_module(user,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,F,A,T).
 correct_module(MT,_,_,MT):-!.
 
@@ -619,7 +595,7 @@ fixup_modules:-
    doall((current_module(M),once((findall(I,import_module(M,I),L))),once(fixup_module(M,L)))).
 
 :- set_prolog_flag(retry_undefined,false).
-:- autoload([verbose(false)]).
+% :- autoload([verbose(false)]).
 :- set_prolog_flag(retry_undefined,true).
 
 :- fixup_modules.

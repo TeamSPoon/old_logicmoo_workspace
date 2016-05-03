@@ -421,23 +421,11 @@ resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_f
 resolverConflict_robot(N) :- cwc, forall(must(mpred_negation_w_neg(N,C)),forall(compute_resolve(C,N,TODO),on_x_rtrace(show_if_debug(TODO)))).
 resolverConflict_robot(C) :- cwc, must((mpred_remove(C),wdmsg("Rem-3 with conflict ~p", [C]),mpred_run,sanity(\+C))).
 
-% never_assert_u(pt(_,Pre,Post),head_singletons(Pre,Post)):- cwc, head_singletons(Pre,Post).
 
-%= 	 	 
-
-%% never_assert_u( :TermRule, ?Rule) is semidet.
+%% never_declare( :TermRule, ?Rule) is semidet.
 %
-% Never Assert For User Code.
+% Never Declare For User Code.
 %
-:- dynamic((never_assert_u/2)).
-:- multifile((never_assert_u/2)).
-never_assert_u(Rule,is_var(Rule)):- cwc, is_ftVar(Rule),!.
-never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred_rule_hb(Rule,Post,Pre)), head_singletons(Pre,Post).
-never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
-% never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, trace, cwc,!.
-
-never_assert_u(A,B):-ground(A),never_declare(A,B).
-
 never_declare(declared(M:F/A),never_declared(M:F/A)):- M:F/A = qrTBox:p/1.
 never_declare(declared(P),Why):- nonvar(P),functor(P,F,A),F\=(:),F\=(/),never_declare(declared(F/A),Why).
 never_declare(declared(mpred_run_resume/0),cuz).
@@ -449,8 +437,24 @@ never_declare(_:declared(_:FA),Why):-nonvar(FA),never_declare(declared(FA),Why).
 never_declare(_:declared(FA),Why):-nonvar(FA),never_declare(declared(FA),Why).
 
 
-never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
+%= 	 	 
 
+%% never_assert_u( :TermRule, ?Rule) is semidet.
+%
+% Never Assert For User Code.
+%
+:- dynamic((never_assert_u/2)).
+:- multifile((never_assert_u/2)).
+% never_assert_u(pt(_,Pre,Post),head_singletons(Pre,Post)):- cwc, head_singletons(Pre,Post).
+never_assert_u(Rule,is_var(Rule)):- cwc, is_ftVar(Rule),!.
+never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred_rule_hb(Rule,Post,Pre)), head_singletons(Pre,Post).
+never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
+% never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, trace, cwc,!.
+
+never_assert_u(A,B):-ground(A),never_declare(A,B).
+
+
+never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
 
 /*
 never_assert_u(pt(_,
@@ -473,21 +477,13 @@ never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
   is_static_why(M,P,F,A,R),
   Why = static(M:P-F/A,R).
 
+
 %:- rtrace.
 %:- trace.
-defined_predicate(M:P):- (current_predicate(_,M:P),( \+ predicate_property(M:P,imported_from(_)))).
+:- add_import_module(baseKB,logicmoo_utils,start).
 :- nortrace.
 :- notrace.
 
-
-%% is_static_why( ?M, ?P, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
-%
-% If Static Pred, Generate a Proof.
-%
-is_static_why(M,P,_,_,_):- predicate_property(M:P,dynamic),!,fail.
-is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=static(M:F/A).
-
-  
 
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).

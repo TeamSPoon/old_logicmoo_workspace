@@ -8,6 +8,13 @@
 :-multifile(lmconf:sanity_test/0).
 :-multifile(lmconf:regression_test/0).
 :-multifile(lmconf:feature_test/0).
+:- shared_multifile((        
+        lmconf:agent_call_command/2,
+        lmconf:feature_test/0,
+        lmconf:mud_test/2,
+        lmconf:regression_test/0,
+        lmconf:sanity_test/0,
+        lmconf:type_action_info/3)).
 
 
 :- user:ensure_loaded(logicmoo_repl).
@@ -39,7 +46,7 @@
 % ==========================================================
 
 :- if((gethostname(ubuntu),fail)). % INFO this fail is so we can start faster
-:- show_entry(gripe_time(40, doall(regression_test))).
+:- show_entry(gripe_time(40, doall(lmconf:regression_test))).
 :- endif.
 
 

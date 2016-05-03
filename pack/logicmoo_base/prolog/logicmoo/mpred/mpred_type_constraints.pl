@@ -669,6 +669,6 @@ mpred_type_constraints_file.
 % Hook To [system:goal_expansion/2] For Module Mpred_type_constraints.
 % Goal Expansion.
 %
-system:goal_expansion(G,O):- \+ current_prolog_flag(xref,true),\+ pldoc_loading, nonvar(G),boxlog_goal_expansion(G,O).
+% system:goal_expansion(G,O):- \+ current_prolog_flag(xref,true),\+ pldoc_loading, nonvar(G),boxlog_goal_expansion(G,O).
 
 

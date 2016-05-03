@@ -771,6 +771,16 @@ pred_prop(M:F/A,(lock_predicate(M:F/A)),(built_in),unlock_predicate(M:F/A)).
 pred_prop(M:F/A, (dynamic(M:F/A)) ,(dynamic), show_call(why,compile_predicates([F/A]))).
 
 
+%% is_static_why( ?M, ?P, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%
+% If Static Pred, Generate a Proof.
+%
+:- module_transparent(is_static_why/5).
+is_static_why(M,P,_,_,_):- predicate_property(M:P,dynamic),!,fail.
+is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=static(M:F/A).
+
+defined_predicate(M:P):- (current_predicate(_,M:P),( \+ predicate_property(M:P,imported_from(_)))).
+
 %= 	 	 
 
 %% pred_prop( :TermARG1, :TermSpec, ?Spec) is semidet.

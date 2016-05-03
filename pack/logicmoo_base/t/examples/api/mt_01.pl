@@ -17,7 +17,8 @@
 
 :- begin_pfc.
 
-:- ain(socialMt:loves(joe,sally)).
+:- rtrace((ain(socialMt:loves(joe,sally)))).
+:- break.
 socialMt:loves(sally,joe).
 
 % set_defaultAssertMt/1 worked good?
