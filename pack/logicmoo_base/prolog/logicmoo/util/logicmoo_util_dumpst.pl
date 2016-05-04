@@ -67,7 +67,7 @@
 %
 % Dump Stack Trace.
 %
-dump_st:- dumpST0(10).
+dump_st:- prolog_current_frame(Frame),dumpST0(Frame,10).
 
 
 %= 	 	 
@@ -76,7 +76,7 @@ dump_st:- dumpST0(10).
 %
 % Dump S True Stucture Primary Helper.
 %
-dumpST0:-notrace(dumpST0(800)),!.
+dumpST0:- prolog_current_frame(Frame),(tracing->notrace((CU=trace,notrace));CU=true),dumpST0(Frame,800),!,CU.
 
 %= 	 	 
 
@@ -253,7 +253,7 @@ pushFrame(N,Frame,_Opts):- nb_getval('$current_stack_frame_list',Current),nb_set
 % Print Frame.
 %
 printFrame(N,Frame,Opts):-
-  must(frame_to_fmsg(N,Frame,Opts,Out)),must(fmsg_rout(Out)),!.
+  ignore(((frame_to_fmsg(N,Frame,Opts,Out)),must(fmsg_rout(Out)))),!.
 
 
 %= 	 	 
@@ -550,13 +550,13 @@ dumptrace0(G):-
     catch(attach_console,_,true),
     leash(+exception),visible(+exception))),
     (repeat,
-      (tracing -> (!,fail) ; true)),
+      (tracing -> (!,fail) ; true)),    
     to_wmsg(G,WG),
-    notrace((
-     fmt(in_dumptrace(G)),
-     wdmsg(WG),
-     show_failure(why,get_single_char(C)))),
-     with_all_dmsg(with_source_module(dumptrace(G,C))),!.
+    fmt(in_dumptrace(G)),
+    wdmsg(WG),
+    show_failure(why,get_single_char(C)),
+    leash(+exception),visible(+exception),
+    with_all_dmsg(with_source_module(dumptrace(G,C))),!.
 
 :-meta_predicate(dumptrace(0,+)).
 
@@ -567,7 +567,7 @@ dumptrace0(G):-
 % Dump Trace.
 %
 dumptrace(_,0'h):- listing(dumptrace/2),!,fail.
-dumptrace(_,0'g):-!,hotrace(dumpST(500000)),!,fail.
+dumptrace(_,0'g):-!,dumpST,!,fail.
 dumptrace(_,0'G):-!,notrace(dumpST0(500000)),!,fail.
 dumptrace(_,0'D):-!,prolog_stack:backtrace(8000),!,fail.
 dumptrace(_,0'd):-!,prolog_stack:backtrace(800),!,fail.

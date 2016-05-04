@@ -612,7 +612,7 @@ recommify(A,B,C):- \+ compound(B),!,conjoin(A,B,C).
 recommify(A,(B,C),D):- \+ compound(B),!, conjoin(A,B,AB), recommify(AB,C,D).
 recommify(A,((X,B),C),D):- !, recommify(A,X,AX),recommify(AX,(B,C),D).
 recommify(A,(B,C),D):- !, conjoin(A,B,AB), recommify(AB,C,D).
-recommify(A,PredArgs,C):- PredArgs=..[P|Args],apply:maplist(baseKB:recommify,Args,AArgs),B=..[P|AArgs],conjoin(A,B,C),!.
+recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..[P|AArgs],conjoin(A,B,C),!.
 
 
 
@@ -1058,7 +1058,8 @@ replaced_module(_,tbox,TBox):-defaultTBoxMt(TBox).
 %
 % Re-Modulize.
 %
-remodualize(_, H,H):-is_ftVar(H),!.
+remodualize(_, H,H):- \+ compound(H),!.
+remodualize(_, H,H):- is_ftVar(H),!.
 remodualize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
 remodualize(Op,M:H,M:HHH):-is_ftVar(M),!,remodualize(mvar(Op),H,HHH).
 remodualize(Op,M:H,R:HHH):-replaced_module(Op,M,R),remodualize(Op,H,HHH).
@@ -1069,7 +1070,7 @@ remodualize(Op,(H:-G),(HH:-GG)):-!,remodualize(Op,H,HH),remodualize(call(Op),G,G
 remodualize(Op,(H,G),(HH,GG)):-!,remodualize(call(Op),H,HH),remodualize(call(Op),G,GG).
 remodualize(Op,(H;G),(HH;GG)):-!,remodualize(call(Op),H,HH),remodualize(call(Op),G,GG).
 remodualize(Op,H,HHH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodualize(Op),HL,HHL),HH=..[F|HHL],!,fix_mp(HH,HHH).
-remodualize(Op,HB,HB):-sanity(trace_or_throw(unkown_remodualize(Op,HB,HB))).
+remodualize(Op,HB,HB):-sanity(trace_or_throw(unknown_remodualize(Op,HB,HB))).
 
 
 %= 	 	 

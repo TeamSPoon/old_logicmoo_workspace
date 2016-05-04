@@ -16,8 +16,8 @@
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/2).
+:- dynamic(lmconf:mpred_is_impl_file/2).
 :- multifile(lmconf:module_local_init/2).
 :- dynamic(lmconf:module_local_init/2).
 :- discontiguous(lmconf:module_local_init/2).

@@ -15,7 +15,9 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-:- module(logicmoo_utils,[]).
+:- module(logicmoo_utils_file,[]).
+
+:- '$set_source_module'('logicmoo_utils').
 
 :- user:use_module(user:library('logicmoo/util/logicmoo_util_filesystem.pl')).
 % :- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
@@ -101,8 +103,9 @@ user:term_expansion(EOF,POS,O,POS2):-
 % Save a directory of *this* file into logicmoo(..)
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
-:- if( \+ exists_source(logicmoo(logicmoo_utils))).
+:- if( \+ exists_source(logicmoo(logicmoo_engine))).
 :- add_file_search_path(logicmoo,'./logicmoo/').
+:- exists_source(logicmoo(logicmoo_engine)).
 :- endif.
 
 
@@ -175,40 +178,40 @@ lmconf:logicmoo_scan_autoloads:-false.
 % Included separated logicmoo util files
 % ======================================================
 %:- export(use_libraries/1). 
-%use_libraries(M):- F= (util/_),foreach(lmconf:mpred_is_impl_file(F),(writeln(M:use_module(F)),M:ensure_loaded(F))).
+%use_libraries(M):- F= (util/_),foreach(lmconf:mpred_is_impl_file(logicmoo_utils,F),(writeln(M:use_module(F)),M:ensure_loaded(F))).
 
 %:- export(use_libraries/0). 
 %use_libraries:- source_context_module(M),use_libraries(M).
 
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/2).
+:- dynamic(lmconf:mpred_is_impl_file/2).
 
 %= 	 	 
 
-%% mpred_is_impl_file( ?A) is semidet.
+%% mpred_is_impl_file(?Type, ?A) is semidet.
 %
-% Hook To [lmconf:mpred_is_impl_file/1] For Module Logicmoo_utils.
+% Hook To [lmconf:mpred_is_impl_file/2] For Module Logicmoo_utils.
 % Managed Predicate If Is A Implimentation File.
 %
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_first).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_database).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_catch).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_with_assertions).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_loop_check).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_dmsg).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_ctx_frame).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_filestreams).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_bugger).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_filesystem).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_multivar).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_no_repeats).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_preddefs).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_prolog_frames).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_prolog_streams).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_term_listing).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_terms).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_varnames). 
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_strings). 
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_first).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_database).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_catch).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_with_assertions).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_loop_check).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_dmsg).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_ctx_frame).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_filestreams).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_bugger).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_filesystem).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_multivar).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_no_repeats).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_preddefs).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_prolog_frames).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_prolog_streams).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_term_listing).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_terms).
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_varnames). 
+ lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_strings). 
 
 %:- use_module(library(logicmoo/util/logicmoo_util_bugger)).
 %:- use_module(library(logicmoo/util/logicmoo_util_first)).

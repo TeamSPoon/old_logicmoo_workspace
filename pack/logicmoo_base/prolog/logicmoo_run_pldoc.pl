@@ -246,7 +246,7 @@ end_of_file.
 :- multifile lmconf:startup_option/2. 
 :- dynamic lmconf:startup_option/2. 
 
-:- ensure_loaded(logicmoo_utils).
+:- ensure_loaded(library(logicmoo_utils)).
 
 lmconf:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
 lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
@@ -267,7 +267,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 :- initialization(user:attach_packs).
 
 % [Required] Load the Logicmoo Library Utils
-% lmconf:mpred_is_impl_file(logicmoo(logicmoo_utils)).
+% lmconf:mpred_is_impl_file(error,logicmoo(logicmoo_utils)).
 
 :- user:file_search_path(logicmoo,_)-> true; (user:prolog_load_context(directory,Dir),asserta_if_new(user:file_search_path(logicmoo,Dir))).
 

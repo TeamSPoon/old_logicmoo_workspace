@@ -200,7 +200,7 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
         t(7,?,?,?,?,?,?,?).   
 
 :- meta_predicate((
-      resolveConflict((*)),
+      baseKB:resolveConflict((*)),
       resolveConflict0((*)),
       mpred_isa(?,1),
       resolverConflict_robot((*)))).
@@ -480,6 +480,7 @@ never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
 
 %:- rtrace.
 %:- trace.
+:- ignore(delete_import_module(baseKB,user)).
 :- add_import_module(baseKB,logicmoo_utils,start).
 :- nortrace.
 :- notrace.

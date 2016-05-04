@@ -676,9 +676,10 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 % Goal Expansion.
 %
 
-system:goal_expansion(LC,PIn,LCOO,POut):- 
+system:goal_expansion(LC,PIn,LCOO,POut):- source_location(_,_),
+   compound(LC),
+   must(var(LCOO)),
    notrace((is_file_based_expansion(goal,LC,PIn,LCOO,POut),
-   source_location(_,_),
    lco_goal_expansion(LC,LCOO),
    LC\=@=LCOO)).
 

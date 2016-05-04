@@ -196,7 +196,6 @@
             mpred_loader_file/0
           ]).
 :- endif.
-:- '$set_source_module'(baseKB).
 
  :- module_transparent((with_umt_l/1,load_file_term_to_command_1b/3,pfc_dcg/0, mpred_term_expansion_by_pred_class/3,
    must_expand_term_to_command/2, pl_to_mpred_syntax0/2, 
@@ -404,7 +403,7 @@ mpred_prolog_only_file(File):- file_name_extension(File,_,pfc),!,fail.
 
 :- prolog_load_context(directory,Dir),asserta(lmconf:mpred_loader_dir(Dir)).
 
-mpred_expander(Type,_,I,_,_,_):- dont_term_expansion(Type,I),!,fail.
+mpred_expander(Type,_,I,_,_,_):- notrace(dont_term_expansion(Type,I)),!,fail.
 mpred_expander(_Type,_Module,I,PosI,O,PosI):- get_lang(pl), expand_isEach_or_fail(I,O).
 mpred_expander(Type,Module,I,PosI,O,PosO):-
    is_file_based_expansion(Type,I,PosI,O,PosO),
@@ -864,8 +863,7 @@ guess_if_mpred_file0(F):- atom(F),exists_file(F), file_name_extension(_,WAS,F),W
 %
 % Decache File Type.
 %
-decache_file_type(F):- 
-  retractall(lmconf:mpred_is_impl_file(F)),
+decache_file_type(F):-
   retractall(lmconf:registered_mpred_file(F)),
   retractall(lmconf:ignore_file_mpreds(F)).
 
@@ -1257,8 +1255,6 @@ predicate_is_undefined_fa(F,A):-
 :-multifile(lmconf:locked_baseKB/0).
 :-dynamic(lmconf:locked_baseKB/0).
 
-:- '$set_source_module'(baseKB).
-
 simplify_language_name(W,W2):-var(W),!,W2=W.
 simplify_language_name(mpred,pfc).
 simplify_language_name(plmoo,pfc).
@@ -1269,7 +1265,6 @@ simplify_language_name(W,W).
 %
 % File Begin.
 %
-:- must('$current_source_module'(baseKB)).
 file_begin(WIn):- 
  must_det_l((
    simplify_language_name(WIn,W),
@@ -1773,7 +1768,14 @@ loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(sou
 load_language_file(Name0):- 
  forall(filematch_ext('qlf',Name0,Name),
   ((
-   w_tl([(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
+   w_tl([(user:term_expansion(_,_):-!,fail),
+         (user:term_expansion(_,_,_,_):-!,fail),
+         (user:goal_expansion(_,_):-!,fail),
+         (user:goal_expansion(_,_,_,_):-!,fail),
+         (system:term_expansion(_,_):-!,fail),
+         (system:term_expansion(_,_,_,_):-!,fail),
+         (system:goal_expansion(_,_,_,_):-!,fail),
+         (system:goal_expansion(_,_):-!,fail)],
      gripe_time(1,(lmconf:load_files(Name,[qcompile(auto),register(false),if(not_loaded  )])->asserta(lmconf:never_reload_file(Name));retract(lmconf:never_reload_file(Name)))))))),!.
  
 
@@ -2063,7 +2065,7 @@ force_reload_mpred_file(FileIn):-
 %
 force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_), 
  with_source_module(NewModule,((
- NewModule:ensure_loaded(logicmoo(mpred/mpred_userkb)),
+ % NewModule:ensure_loaded(logicmoo(mpred/mpred_userkb)),
  forall(must_locate_file(MFileIn,File),
    must_det_l((
    once(show_success(prolog_load_file,defaultAssertMt(DBASE));DBASE=NewModule),
@@ -2082,7 +2084,6 @@ force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_),
     (wdmsg(error(Error,File)),retractall(lmconf:loaded_mpred_file(World,File)),
      retractall(lmconf:loaded_file_world_time(File,World,_AnyTime)))))))))).
 
-:-  /**/ export(load_mpred_on_file_end/2).
 
 
 
@@ -2090,6 +2091,7 @@ force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_),
 %
 % Load Managed Predicate Whenever File End.
 %
+:- export(load_mpred_on_file_end/2).
 load_mpred_on_file_end(World,File):- atom(File),
    quietly_must(atom(File)),
    asserta_new(lmconf:loaded_mpred_file(World,File)),

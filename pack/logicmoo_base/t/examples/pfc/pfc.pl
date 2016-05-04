@@ -9,7 +9,7 @@ end_of_file.
 user:file_search_path(pack,'/devel/PrologMUD/packs').
 :- attach_packs.
 
-:-  'lmbase':ensure_loaded(logicmoo(logicmoo_utils)).
+:-  'lmbase':ensure_loaded(library(logicmoo_utils)).
 
 %   File   : pfc
 %   Author : Tim Finin, finin@umbc.edu

@@ -97,7 +97,7 @@ prologHybrid(genls/2).
 */
 
 % remove conflicts early 
-% (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
+% (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_remove(P)}, (\+P ))).
 
 :- ain((never_retract_u(~(X),is_ftVar(X)):- cwc,is_ftVar(X))).
 
@@ -537,7 +537,7 @@ genls(tSpatialThing,tTemporalThing).
 
 
 % remove conflicts early 
-% (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
+% (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_remove(P)}, (\+P ))).
 
 tCol(ttNonGenled).
 % genls(ttExpressionType,ttNonGenled).

@@ -13,11 +13,11 @@
 	user:prolog_list_goal/1,
 	user:prolog_predicate_name/2,
 	user:prolog_clause_name/2,
-        lmconf:mpred_is_impl_file/1.
+        lmconf:mpred_is_impl_file/2.
 :- dynamic
 	user:portray/1,
 %	user:'$pldoc'/4,
-        lmconf:mpred_is_impl_file/1.
+        lmconf:mpred_is_impl_file/2.
 
 :- (current_prolog_flag(xref,true)->true;(prolog_load_context(source,F),
    initialization((

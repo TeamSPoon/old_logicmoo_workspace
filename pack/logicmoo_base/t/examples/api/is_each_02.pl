@@ -50,7 +50,7 @@ isEach(aa(X),bb(Y)) :- related(X,Y).
 
 :- listing([aa,bb]).
 
-:-  time((baseKB:ensure_loaded(baseKB:library(logicmoo/pfc/'system_markers.pfc')))).
+:-  time((ensure_loaded(baseKB:library(logicmoo/pfc/'system_markers.pfc')))).
 
 /*
 ?- fully_expand(arity(isEach(X,TY),4),O). 

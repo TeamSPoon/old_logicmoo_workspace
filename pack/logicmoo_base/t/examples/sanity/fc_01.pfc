@@ -8,15 +8,18 @@
 
 %  cls ; kill -9 %1 ; swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/base/'sanity_abc.pfc'))."
 
-:- module(sanity,[]).
+:- module(fc_01,[]).
 
 :- use_module(library(logicmoo_base)).
 
-:- add_import_module(sanity,baseKB,start).
+:- add_import_module(fc_01,baseKB,start).
 
-:- show_kb_structure.
+:- rtrace(show_kb_structure).
+
+:- break.
 
 :- file_begin(pfc).
+
 :- show_kb_structure.
 
 % :- autoload.
@@ -32,16 +35,18 @@
 :- mpred_trace_msg(beginxxxxxxxxxxxxxxxxXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxxxxxxxxxxxxxxxxx_abc).
 
 :- dynamic(baseKB:a/0).
-:- dynamic(sanity:a/0).
+:- dynamic(fc_01:a/0).
 
 /*
 :- mpred_ain((a ==> b)).
 :- break.
 :- mpred_ain(a).
 */
+
 a ==> b.
 a.
-:- pp_DB.
+
+%:- pp_DB.
 
 :- mpred_test(a).
 :- mpred_test(b).

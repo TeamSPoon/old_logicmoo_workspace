@@ -35,9 +35,9 @@
 % :- lmconf:mpred_system_kb(_)->true;('$current_typein_module'(M),asserta(lmconf:mpred_system_kb(M))).
 
 
-:- dynamic(lmconf:mpred_is_impl_file/1).
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- volatile(lmconf:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/2).
+:- multifile(lmconf:mpred_is_impl_file/2).
+:- volatile(lmconf:mpred_is_impl_file/2).
 
 
 */

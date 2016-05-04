@@ -38,6 +38,10 @@
 :- set_fileAssertMt(baseKB).
 
 % catching of misinterpreations
+
+((mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static), predicate_property(P,defined))) ==> 
+  {listing(P),trace_or_throw(warn(pfcPosTrigger,P,static))}).
+
 ((mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static), predicate_property(P,defined))) ==> 
   {listing(P),trace_or_throw(warn(pfcPosTrigger,P,static))}).
 
@@ -46,7 +50,6 @@
 
 (mpred_mark(pfcBcTrigger,F,A)/(fa_to_p(F,A,P),
    predicate_property(P,static), predicate_property(P,defined))) ==> {listing(P),dmsg(warn(pfcNegTrigger,P,static))}.
-
 
 
 %(mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb_dynamic(tbox:F/A)}.
@@ -131,6 +134,7 @@ predicateConventionMt(regression_test,lmconf).
 
 tSet(mtGlobal,comment("mtGlobal(?Mt) states the Mt is always findable during inheritance")).
 mtGlobal(baseKB).
+mtGlobal(logicmoo_utils).
 mtGlobal(system).
 
 tSet(mtExact,comment("mtExact(?Mt) states that all predicates the Mt specified should not inherit past ?Mt.  Thus:  mtExact(Mt)==> ~genlMt(Mt,_)")).
@@ -157,7 +161,7 @@ mtGlobal(Mt)==>(mtCore(Mt),~mtLocal(Mt)).
 
 (tMicrotheory(Mt), ~ mtCore(Mt)) <==> mtLocal(Mt).
 
-(genlMt(Mt,baseKB)/(Mt \==baseKB )) ==> mtLocal(Mt).
+(genlMt(Mt,baseKB)/(Mt \==baseKB ), \+ mtCore(Mt)) ==> mtLocal(Mt).
 
 mtLocal(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
 mtGlobal(Mt)==>genlMt(baseKB,Mt).
@@ -271,5 +275,5 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 (hybrid_support(F,A) ==>{ must(kb_dynamic(F/A))}).
 
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
+% :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
 

@@ -230,7 +230,7 @@ with_mfa_of(Pred3,_CM,M,_P,F/A):-M:call(Pred3,M,F,A).
 make_transparent(_CM,M,_PI,F/0):-!, compound_name_arity(C,F,0), M:meta_predicate(C).
 make_transparent(CM,_,PI,M:F/A):-!,make_transparent(CM,M,PI,F/A).
 make_transparent(_CM,M,PI,F/A):-
-   motrace(((var(PI)->functor_safe(PI,F,A);true),
+   (((var(PI)->functor_safe(PI,F,A);true),
    M:module_transparent(F/A),
    fill_args(PI,('?')),!,
    dbgsubst(PI, (^),(^),PI1),
@@ -249,9 +249,20 @@ make_transparent(_CM,M,PI,F/A):-
 %
 % Context Module Of File.
 %
-context_module_of_file(CM):- prolog_load_context(source,F), make_module_name(F,CM),current_module(CM0),CM==CM0,!.
+context_module_of_file(CM):- prolog_load_context(source,F), make_module_name00(F,CM),current_module(CM0),CM==CM0,!.
 context_module_of_file(CM):-  '$set_source_module'(CM,CM),!.
 context_module_of_file(CM):- source_context_module(CM),!.
+
+%% make_module_name00( ?P, ?Module) is semidet.
+%
+% Make Module Name.
+%
+make_module_name00(P,Module):- module_property(Module,file(P)),!.
+
+make_module_name00(P,O):-atom(P),!,file_base_name(P,F),file_name_extension(M,_Ext,F),(M\==F->make_module_name00(M,O);O=M).
+make_module_name00(mpred/P,M):-nonvar(P),!,make_module_name00(P,M).
+make_module_name00(util/P,M):-nonvar(P),!,make_module_name00(P,M).
+make_module_name00(P,M):-must(filematch(P,F)),F\=P,!,make_module_name00(F,M).
 
 :- op(1150,fx,lmconf:dynamic_safe).
 
@@ -336,8 +347,8 @@ save_was(Was,CM, M, P):-functor(P,F,A), save_was(Was,CM, M, F/A).
 %
 % Make Shared Multifile.
 %
-make_shared_multifile(_, baseKB, F/A):- decl_shared(F/A),!.
-make_shared_multifile(CM, t_l, F/A):-!,CM:thread_local(t_l:F/A).
+% make_shared_multifile(_, baseKB, F/A):- decl_shared(baseKB:F/A),!.
+make_shared_multifile(CM, t_l, F/A):-!,CM:thread_local(t_l:F/A),!,CM:multifile(t_l:F/A).
 % make_shared_multifile(_, basePFC, _):-!.
 make_shared_multifile(CM, M, F/A):-!,M:dynamic(M:F/A),!,M:multifile(M:F/A),!,CM:multifile(M:F/A).
 

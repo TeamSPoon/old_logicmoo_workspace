@@ -304,4 +304,3 @@ user:prolog_load_file(Module:Spec, Options):- fail,
   catch(prolog_load_file_loop_checked(Module:Spec, Options),E,
     ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))).
 
-:- '$set_source_module'(baseKB).

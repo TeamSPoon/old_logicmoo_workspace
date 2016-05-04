@@ -21,6 +21,7 @@
             ansifmt/2,
             ansifmt/3,
             colormsg/2,
+            contains_atom/2,
             contrasting_color/2,
             defined_message_color/2,
 
@@ -65,6 +66,8 @@
             is_tty/1,
             keep_line_pos_w_w/2,
             last_used_fg_color/1,
+          matches_term/2,
+          matches_term0/2,
             mesg_arg1/2,
             mesg_color/2,
             msg_to_string/2,
@@ -301,6 +304,32 @@ with_no_dmsg(TypeUnShown,Call):-w_tl(set_prolog_flag(opt_debug,filter),
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,false),!.
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,true),!,fail.
 dmsg_hides_message(C):-  tlbugger:dmsg_match(HideShow,Matcher),matches_term(Matcher,C),!,HideShow=hidden.
+
+
+:- export(matches_term/2).
+
+%% matches_term( ?Filter, ?VALUE2) is semidet.
+%
+% Matches Term.
+%
+matches_term(Filter,_):- var(Filter),!.
+matches_term(Filter,Term):- var(Term),!,Filter=var.
+matches_term(Filter,Term):- ( \+ \+ (matches_term0(Filter,Term))),!.
+
+%% contains_atom( ?V, ?A) is semidet.
+%
+% Contains Atom.
+%
+contains_atom(V,A):-sub_term(VV,V),nonvar(VV),functor_safe(VV,A,_).
+
+%% matches_term0( :TermFilter, ?Term) is semidet.
+%
+% Matches Term Primary Helper.
+%
+matches_term0(Filter,Term):- Term = Filter.
+matches_term0(Filter,Term):- atomic(Filter),!,contains_atom(Term,Filter).
+matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Filter,F,A), matches_term0(Filter,Term).
+matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
 
 %= 	 	 
@@ -1143,7 +1172,7 @@ mesg_color(T,C):-functor_safe(T,F,_),member(F,[succeed,must,mpred_op_prolog]),co
 mesg_color(T,C):-functor_safe(T,F,_),member(F,[fmt0,msg]),compound(T),arg(2,T,E),nonvar(E),!,mesg_color(E,C).
 mesg_color(T,C):-predef_functor_color(F,C),mesg_arg1(T,F).
 mesg_color(T,C):-nonvar(T),defined_message_color(F,C),matches_term(F,T),!.
-mesg_color(T,C):-functor_h0(T,F,_),!,functor_color(F,C),!.
+mesg_color(T,C):-functor(T,F,_),!,functor_color(F,C),!.
 
 
 
@@ -1169,8 +1198,8 @@ f_word(T,A):- string_to_atom(T,A),!.
 mesg_arg1(T,_TT):-var(T),!,fail.
 mesg_arg1(_:T,C):-nonvar(T),!,mesg_arg1(T,C).
 mesg_arg1(T,TT):-not(compound(T)),!,T=TT.
-mesg_arg1(T,F):-functor_h0(T,F,_).
-mesg_arg1(T,C):-compound(T),arg(1,T,F),!,nonvar(F),mesg_arg1(F,C).
+mesg_arg1(T,C):-compound(T),arg(1,T,F),nonvar(F),!,mesg_arg1(F,C).
+mesg_arg1(T,F):-functor(T,F,_).
 
 
 % = :- export(defined_message_color/2).

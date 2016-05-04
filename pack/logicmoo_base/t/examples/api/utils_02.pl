@@ -24,8 +24,8 @@
 % :- meta_predicate baseKB:resolverConflict_robot(0).
 % :- meta_predicate logicmoo_util_dumpst:dtrace(*,0).
 % :- meta_predicate logicmoo_util_dumpst:dumptrace_ret(0).
-% :- meta_predicate logicmoo_util_dumpst:dumptrace(0).
-% :- meta_predicate logicmoo_util_rtrace:hotrace_prev(0).
+% :- meta_predicate logicmoo_util_dumpst:dtrace(0).
+% :- meta_predicate logicmoo_util_rtrace:hotrace(0).
 % :- meta_predicate with_umt_l(0).
 % :- meta_predicate logicmoo_util_bugger:bugger_t_expansion(:,0,*).
 % :- meta_predicate logicmoo_util_bugger:prolog_must_l(0).
@@ -132,7 +132,7 @@ continue
 Action (h for help) ?
 continue
 ^CAction (h for help) ? goals
-[306] [logicmoo_util_rtrace] logicmoo_util_catch:catchv(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)),_G53202,(wdmsg(on_x_rtrace(_G53202)),catchv(rtrace(with_skip_bugger(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)))),_G53202,wdmsg(_G53202)),dumptrace(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)))))
+[306] [logicmoo_util_rtrace] logicmoo_util_catch:catchv(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)),_G53202,(wdmsg(on_x_rtrace(_G53202)),catchv(rtrace(with_skip_bugger(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)))),_G53202,wdmsg(_G53202)),dtrace(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)))))
 [305] [logicmoo_util_rtrace] logicmoo_util_rtrace:on_x_rtrace(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)))
 [304] [logicmoo_util_catch] '<meta-call>'((on_x_rtrace(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)))*->true;debugCallWhy(failed(on_f_debug(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)))),mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)))))
 [303] [logicmoo_util_catch] logicmoo_util_catch:must(mpred_pfc:cnotrace(fix_mp(baseKB:mpred_is_tracing_pred((ftInt(_G52182)==>{ignore(retract(isa(_G52182,ftInt)))})),_G53158:_G53159)))

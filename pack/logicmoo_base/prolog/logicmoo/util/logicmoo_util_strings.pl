@@ -72,6 +72,8 @@
             longest_string/3,
             ltrim/2,
             map_tree_to_list/3,
+          must_assign/1,
+          must_assign/2,
             member_ci/2,
             merge_vars/3,
             must_nonvar/1,
@@ -466,7 +468,7 @@ atomic_list_concat_safe([V],_Sep,V):-!.
 % Convert Converted To String.
 %
 convert_to_string(I,ISO):-
-                term_to_string(I,IS),!,
+                logicmoo_util_first:term_to_string(I,IS),!,
 		string_to_list(IS,LIST),!,
 		list_replace(LIST,92,[92,92],LISTM),
 		list_replace(LISTM,34,[92,34],LISTO),!,
@@ -1248,7 +1250,25 @@ interleave([Atom|More],Space,[Atom,Space|Result]):-interleave(More,Space,Result)
 %================================================================
 
 
+
+%% must_assign( :TermFrom) is semidet.
+%
+% Must Be Successfull Assign.
+%
+must_assign(From=To):-must_assign(From,To).
+
 %= 	 	 
+
+%% must_assign( ?From, ?To) is semidet.
+%
+% Must Be Successfull Assign.
+%
+must_assign(From,To):-To=From,!.
+must_assign(From,To):- tlbugger:skipMust,!,ignore(To=From),!.
+must_assign(From,To):-dmsg(From),dmsg(=),dmsg(From),dmsg(must_assign),!,trace,To=From.
+
+
+	 	 
 
 %% map_tree_to_list( :PRED2VALUE1, ?PATTERN, ?Output) is semidet.
 %

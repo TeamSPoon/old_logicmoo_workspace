@@ -128,8 +128,10 @@
 
 
 :- if(\+ current_predicate(system:nop/1)).
-:- system:ensure_loaded(systyem:logicmoo_util_supp).
+:- system:ensure_loaded(system:logicmoo_util_supp).
 :- endif.
+
+
 
 :- meta_predicate
 
@@ -421,25 +423,25 @@ is_hiding_dmsgs:- \+always_show_dmsg, tlbugger:ifHideTrace,!.
 
 % bugger_debug=false turns off just debugging about the debugger
 % opt_debug=false turns off all the rest of debugging
-% logicmoo_util_catch:ddmsg(_):-current_prolog_flag(bugger_debug,false),!.
-% logicmoo_util_catch:ddmsg(D):- current_predicate(_:wdmsg/1),wdmsg(D),!.
+% ddmsg(_):-current_prolog_flag(bugger_debug,false),!.
+% ddmsg(D):- current_predicate(_:wdmsg/1),wdmsg(D),!.
 
 %= 	 	 
 
-%% logicmoo_util_catch:ddmsg( ?D) is semidet.
+%% ddmsg( ?D) is semidet.
 %
 % Ddmsg.
 %
-logicmoo_util_catch:ddmsg(D):- logicmoo_util_catch:ddmsg('~q',[D]).
-%logicmoo_util_catch:ddmsg(F,A):- current_predicate(_:wdmsg/2),wdmsg(F,A),!.
+ddmsg(D):- ddmsg('~q',[D]).
+%ddmsg(F,A):- current_predicate(_:wdmsg/2),wdmsg(F,A),!.
 
 %= 	 	 
 
-%% logicmoo_util_catch:ddmsg( ?F, ?A) is semidet.
+%% ddmsg( ?F, ?A) is semidet.
 %
 % Ddmsg.
 %
-logicmoo_util_catch:ddmsg(F,A):- format_to_error(F,A),!.
+ddmsg(F,A):- format_to_error(F,A),!.
 
 %= 	 	 
 
@@ -447,7 +449,7 @@ logicmoo_util_catch:ddmsg(F,A):- format_to_error(F,A),!.
 %
 % Ddmsg Call.
 %
-ddmsg_call(D):- ( (logicmoo_util_catch:ddmsg(ddmsg_call(D)),call(D),logicmoo_util_catch:ddmsg(ddmsg_exit(D))) *-> true ; logicmoo_util_catch:ddmsg(ddmsg_failed(D))).
+ddmsg_call(D):- ( (ddmsg(ddmsg_call(D)),call(D),ddmsg(ddmsg_exit(D))) *-> true ; ddmsg(ddmsg_failed(D))).
 
 
 
@@ -842,7 +844,7 @@ bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 %
 % Warn Bad Functor.
 %
-warn_bad_functor(L):-ignore((hotrace(bad_functor(L)),!,trace,nop(logicmoo_util_catch:ddmsg(bad_functor(L))))).
+warn_bad_functor(L):-ignore((hotrace(bad_functor(L)),!,trace,nop(ddmsg(bad_functor(L))))).
 
 :- export(strip_f_module/2).
 
@@ -910,7 +912,7 @@ catchv(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (th
 %
 functor_catch(P,F,A):- catchv(functor(P,F,A),_,compound_name_arity(P,F,A)).
 % functor_catch(F,F,0):-atomic(F),!.
-% functor_catch(P,F,A):-catchv(compound_name_arity(P,F,A),E,(trace,logicmoo_util_catch:ddmsg(E:functor(P,F,A)),trace)).
+% functor_catch(P,F,A):-catchv(compound_name_arity(P,F,A),E,(trace,ddmsg(E:functor(P,F,A)),trace)).
 
 
 :- export(functor_safe/3).
@@ -1083,7 +1085,7 @@ with_preds(H,M,F,A,PI,Goal):-forall(to_m_f_arity_pi(H,M,F,A,PI),Goal).
 % Dbgsubst.
 %
 dbgsubst(A,B,Goal,A):- B==Goal,!.
-dbgsubst(A,B,Goal,D):-var(A),!,logicmoo_util_catch:ddmsg(dbgsubst(A,B,Goal,D)),dumpST,dtrace(dbgsubst0(A,B,Goal,D)).
+dbgsubst(A,B,Goal,D):-var(A),!,ddmsg(dbgsubst(A,B,Goal,D)),dumpST,dtrace(dbgsubst0(A,B,Goal,D)).
 dbgsubst(A,B,Goal,D):-dbgsubst0(A,B,Goal,D).
 
 
@@ -1094,7 +1096,7 @@ dbgsubst(A,B,Goal,D):-dbgsubst0(A,B,Goal,D).
 % Dbgsubst Primary Helper.
 %
 dbgsubst0(A,B,Goal,D):- 
-      catchv(hotrace(nd_dbgsubst(A,B,Goal,D)),E,(dumpST,logicmoo_util_catch:ddmsg(E:nd_dbgsubst(A,B,Goal,D)),fail)),!.
+      catchv(hotrace(nd_dbgsubst(A,B,Goal,D)),E,(dumpST,ddmsg(E:nd_dbgsubst(A,B,Goal,D)),fail)),!.
 dbgsubst0(A,_B,_C,A).
 
 
@@ -1258,7 +1260,7 @@ on_x_log_fail(Goal):- catchv(Goal,E,(dmsg(E:Goal),fail)).
 %
 % If there If Is A an exception in  :Goal goal then log throw.
 %
-on_x_log_throw(Goal):- catchv(Goal,E,(logicmoo_util_catch:ddmsg(on_x_log_throw(E,Goal)),throw(E))).
+on_x_log_throw(Goal):- catchv(Goal,E,(ddmsg(on_x_log_throw(E,Goal)),throw(E))).
 %on_x_log_throwEach(Goal):-with_each(1,on_x_log_throw,Goal).
 
 %= 	 	 
@@ -1267,7 +1269,7 @@ on_x_log_throw(Goal):- catchv(Goal,E,(logicmoo_util_catch:ddmsg(on_x_log_throw(E
 %
 % If there If Is A an exception in  :Goal goal then log cont.
 %
-on_x_log_cont(Goal):- catchv((Goal*->true;logicmoo_util_catch:ddmsg(failed_on_x_log_cont(Goal))),E,logicmoo_util_catch:ddmsg(E:Goal)).
+on_x_log_cont(Goal):- catchv((Goal*->true;ddmsg(failed_on_x_log_cont(Goal))),E,ddmsg(E:Goal)).
 
 :- thread_local( tlbugger:skipMust/0).
 %MAIN tlbugger:skipMust.
@@ -1473,8 +1475,8 @@ need_speed:-fail.
 %
 % If Is A Release.
 
-is_release:-!.
-% is_release:- 1 is random(4),!.
+% is_release:-!.
+%is_release:- 1 is random(4),!.
 is_release:- !,fail.
 is_release :- \+ not_is_release.
 :- export(not_is_release/0).
@@ -1555,17 +1557,17 @@ get_must(M:notrace(Goal),CGoal):- !,get_must(M:Goal,CGoal).
 % get_must(notrace(Goal),CGoal):- !,get_must((notrace(Goal)*->true;Goal),CGoal).
 % get_must(Goal,CGoal):-  (is_release;tlbugger:skipMust),!,CGoal = Goal.
 get_must(Goal,CGoal):- fail, skipWrapper,!, CGoal = (Goal *-> true ;
-   ((logicmoo_util_catch:ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
+   ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
 get_must(Goal,CGoal):-  fail, tlbugger:show_must_go_on,!,
  CGoal = ((catchv(Goal,E,
-     notrace(((dumpST,logicmoo_util_catch:ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
+     notrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
             *-> true ; notrace((dumpST,wdmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
 
 %get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
-%get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,logicmoo_util_catch:ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((logicmoo_util_catch:ddmsg(failed(must(Goal))),trace,Goal))).
+%get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
 get_must(Goal,CGoal):-    
    (CGoal = (catchv(Goal,E,
-     (dumpST,logicmoo_util_catch:ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),
+     (dumpST,ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),
          ignore_each((rtrace(Goal),nortrace,trace,dtrace(Goal),badfood(Goal)))))
          *-> true ; (dumpST,ignore_each(((trace,dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).
 

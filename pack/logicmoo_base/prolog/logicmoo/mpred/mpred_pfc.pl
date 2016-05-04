@@ -128,7 +128,7 @@
   ]).
 :- endif.
 
-:- '$set_source_module'(baseKB).
+:- '$set_source_module'(logicmoo_utils).
 
 :- meta_predicate 
       each_E(:,+,+),
@@ -320,6 +320,7 @@ fix_mp(M:P,M:P):-baseKB:mtLocal(M),!.
 fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
 fix_mp(M:P,M:P):-!.
 
+convention_or_default(_,_,M):-nonvar(M),!.
 convention_or_default(genlMt,2,baseKB):-!.
 convention_or_default(F,A,M):- mpred_database_term(F,A,_),defaultAssertMt(M),!.
 convention_or_default(_,_,M):- defaultAssertMt(M),!.
@@ -725,7 +726,8 @@ same_file_facts(mfl(M,F,_),mfl(M,FF,_)):-nonvar(M),!, FF=@=F.
 %
 mpred_post_update4(Was,P,S,What):- 
  not_not_ignore_mnotrace(((get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
-  must(S=(F,T)),wdmsg(call_mpred_post4:- (Was,post1=P,fact=F,T,What)))),
+  fix_mp(P,MP),
+  must(S=(F,T)),wdmsg(call_mpred_post4:- (Was,post1=MP,fact=F,trig=T,What)))),
   fail.
 mpred_post_update4(identical,_P,_S,exact):-!.
 
@@ -1561,6 +1563,7 @@ mpred_BC_CACHE0(M,P):-
 
 % I''d like to remove this soon
 mpred_call_no_bc(P):- var(P),!,fail,trace,  mpred_fact(P).
+mpred_call_no_bc(baseKB:true):-!.
 mpred_call_no_bc(M:P):- nonvar(P),current_predicate(_,M:P),!, M:P.
 mpred_call_no_bc(P):- mpred_METACALL(with_umt, P).
 

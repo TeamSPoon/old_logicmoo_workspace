@@ -10,7 +10,7 @@
 human(hum1).
 
 %= Was to catch a regression bug that may couse trudy to lose human assertion
-:- mpred_rem(mpred_rem(baseKB:never_retract_u(human(trudy), sanity_test))).
+:- mpred_remove(baseKB:never_retract_u(human(trudy), sanity_test)).
 
 %= confirm no inheritance twoards father
 % :- show_call(\+ father(douglas,_)).

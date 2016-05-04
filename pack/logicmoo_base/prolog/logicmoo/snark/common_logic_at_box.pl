@@ -38,13 +38,11 @@
          import_to_user/1,
          import_to_user0/3,
          in_mpred_kb_module/0,
-         mtGlobal/1,
-        
+         
          user_m_check/1,
          which_file/1
     ]).
 :- endif.
-:- '$set_source_module'(baseKB).
 
 user_m_check(_Out).
 
@@ -85,7 +83,6 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
          import_to_user/1,
          import_to_user0/3,
          in_mpred_kb_module/0,
-         mtGlobal/1,
          which_file/1,
          user_m_check/1 .
 
@@ -95,9 +92,6 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
 % In Managed Predicate Knowledge Base Module.
 %
 in_mpred_kb_module:- source_context_module(MT),defaultAssertMt(MT2),!,MT==MT2.
-
-:- set_prolog_flag(baseKB:unknown,warning).
-
 
 
 % mtGlobal
@@ -188,7 +182,7 @@ registerCycPred(Mt,Goal,Pred,Arity):-
    guessMtFromGoal(Mt,Goal,OtherMt), 
    sanity(Mt \== OtherMt),
    must(Mt \== OtherMt),
-   ain(tMicrotheory(Mt)),
+   ain(baseKB:tMicrotheory(Mt)),
    registerCycPred(Mt,Goal,Pred,Arity,OtherMt),!.
 
 registerCycPred(Mt,Goal,Pred,Arity):-
@@ -209,7 +203,7 @@ registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):-
   
 
 registerCycPred(Mt,Goal,Pred,Arity,OtherMt):- 
-   transitive_path(genlMt,[Mt,SecondNodeMt|_],OtherMt),
+   transitive_path(baseKB:genlMt,[Mt,SecondNodeMt|_],OtherMt),
    make_as_dynamic(genlMt(Mt,OtherMt),Mt,Pred,Arity),
    assert_if_new(( Mt:Goal :- SecondNodeMt:call(Goal))),!.
 
@@ -221,25 +215,46 @@ registerCycPred(Mt,_Goal,Pred,Arity,OtherMt):-
 
 clearKb(KB):- mtCore(KB),!.
 clearKb(KB):- forall(import_module(KB,O),
-                  delete_import_module(KB,O)),
+                  ignore(delete_import_module(KB,O))),
      forall(( current_module(X),import_module(X,KB)),
-                  delete_import_module(X,KB)).
+                  ignore(delete_import_module(X,KB))).
 
+autoload_library_index(F,A,M,File):- functor(P,F,A),'$autoload':library_index(P,M,File).
 
-:-dynamic(genlMt/2).
-istAbove(Mt,Query):-Mt\==baseKB,genlMt(Mt,MtAbove),MtAbove:Query.
+:-dynamic(baseKB:genlMt/2).
+istAbove(Mt,Query):- Mt\==baseKB,Mt\==logicmoo_utils,genlMt(Mt,MtAbove),MtAbove:Query.
 
-:- use_module(baseKB:library(debug)).
-:- use_module(baseKB:library(lists)).
+user:exception(A,B,C):-!,system_exception(A,B,C).
+system:exception(A,B,C):-!,system_exception(A,B,C).
 
-user:exception(undefined_predicate,baseKB:debug/1,retry):- use_module(baseKB:library(debug)),!.
-user:exception(undefined_predicate,baseKB:member/2,retry):- use_module(baseKB:library(lists)),!.
-user:exception(undefined_predicate, Mt:F/A ,retry):-
+system_exception(undefined_predicate,M:debug/1,retry):- use_module(M:library(debug)),!.
+system_exception(undefined_predicate,M:debugging/1,retry):- use_module(M:library(debug)),!.
+system_exception(undefined_predicate,M:member/2,retry):- use_module(M:library(lists)),!.
+system_exception(undefined_predicate,M:directory_file_path/3,retry):- use_module(M:library(filesex)),!.
+system_exception(undefined_predicate,M:F/A,retry):- fail,
+       autoload_library_index(F,A,_,File),
+       load_files(M:File,[if(true),imports([F/A]),register(false),silent(false)]),!.
+system_exception(undefined_predicate,M:F/A,retry):-
+       autoload_library_index(F,A,_,File),
+       ensure_loaded(M:File),!.
+system_exception(undefined_predicate,M:F/A,retry):-
+      autoload_library_index(F,A,NewMod,File),
+      (current_module(NewMod) 
+       -> add_import_module(M,NewMod,start) ;
+       (NewMod:ensure_loaded(NewMod:File),add_import_module(M,NewMod,start))),!.
+
+system_exception(undefined_predicate,M:'$pldoc'/4,retry):-multifile(M:'$pldoc'/4),dynamic(M:'$pldoc'/4),!.
+system_exception(undefined_predicate,lmconf:F/A,retry):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
+system_exception(undefined_predicate,lmcache:F/A,retry):-multifile(lmcache:F/A),volatile(lmcache:F/A),!.
+
+system_exception(undefined_predicate,M:must/1,retry) :- add_import_module(M,logicmoo_util_catch,start),!.
+system_exception(undefined_predicate,M:debugm/2,retry) :- add_import_module(M,logicmoo_util_dmsg,start),!.
+system_exception(undefined_predicate, Mt:F/A,retry):-
   current_prolog_flag(retry_undefined,true),
   set_prolog_flag(retry_undefined,false),
    F\=istAbove, % t(tMicrotheory,Mt) -> 
-  logicmoo_util_loop_check:loop_check_term(baseKB:registerCycPred(Mt,F,A),
-    registerCycPredsIntoMt(Mt,F),baseKB:dump_break),
+   loop_check_term(registerCycPred(Mt,F,A),
+    registerCycPredsIntoMt(Mt,F),dump_break),
   set_prolog_flag(retry_undefined,true).
 
 
@@ -310,7 +325,7 @@ retractAllThrough(ToMt,CycL):-
 % ?- retractall('DogsMt':isa('Fido','Dog')).
 % Will mpred_rem (isa Fido Dog) from DogsMt
 % ============================================
-:-ifHookRedef((redefine_system_predicate(mpred_rem(_)),asserta((mpred_rem(Term):-nonvar(Term),retractOnceThrough(Term))))).
+% :-ifHookRedef((redefine_system_predicate(retract(_)),asserta((retract(Term):-nonvar(Term),retractOnceThrough(Term))))).
 
 retractOnceThrough(Mt:CycL):-
       retractOnceThrough(Mt,CycL).
@@ -327,7 +342,7 @@ retractOnceThrough(ToMt,CycL):-
 retractOnceThrough(ToMt,CycL):-
       (predicate_property(Mt:CycL,_);context_module(Mt);Mt=ToMt),!,
       ignore(Mt=ToMt),
-      system:mpred_rem(Mt:CycL),!.
+      mpred_remove(Mt:CycL),!.
 
 
 
@@ -346,7 +361,7 @@ box_type(_,_,abox).
 
 :- thread_local(t_l:current_defaultAssertMt/1).
 :- dynamic(lmconf:file_to_module/2).
-defaultTBoxMt(baseKB).
+baseKB:defaultTBoxMt(baseKB).
 
 
 %% defaultAssertMt(-Ctx) is det.
@@ -430,6 +445,7 @@ ensure_tbox(_ABox).
 %
 % If Is A System Datalog.
 %
+:- dynamic(mtCore/1).
 mtCore(baseKB).
 
 
@@ -438,6 +454,8 @@ mtCore(baseKB).
 % Boot Modules.
 %
 %mtGlobal(mpred_loader).
+
+:- dynamic(mtGlobal/1).
 mtGlobal(baseKB).
 mtGlobal(boot_system).
 mtGlobal(system_markers).
@@ -446,7 +464,7 @@ mtGlobal(system_genls).
 mtGlobal(system_if_missing).
 mtGlobal(common_logic_clif).
 mtGlobal(system_mdefault).
-mtGlobal(user).
+
 
 is_undefaulted(user).
 
@@ -533,8 +551,9 @@ ensure_imports(M):-ensure_imports_tbox(M,baseKB).
 %
 % Skip over 'user' module and still see 'system'.
 %
-skip_user(Mt):- import_module(Mt,system), \+ import_module(Mt,user), !.
-skip_user(Mt):- !, add_import_module(Mt,system,start),ignore(delete_import_module(Mt,user)).
+skip_user(Mt):- import_module(Mt,system), \+ default_module(Mt,user), !.
+skip_user(Mt):- !, add_import_module(Mt,system,start),ignore(delete_import_module(Mt,user)),
+  forall((import_module(Mt,X),default_module(X,user)),skip_user(X)).
   
 inherit_into_module(Child,Parent):- ==(Child,Parent),!.
 inherit_into_module(Child,Parent):-ain(baseKB:genlMt(Child,Parent)).

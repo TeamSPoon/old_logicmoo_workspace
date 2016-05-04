@@ -42,13 +42,13 @@ with_ukb_snark(KB,G):- source_module(SM), w_tl(t_l:user_abox(SM,KB),baseKB:G).
 % Module Secondary Helper.
 %
 :- add_library_search_path('./mpred_online/',[ '*.pl']).
-checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpred_www))),if_defined(ensure_webserver), make,list_undefined.
+checkKB:m1:- gripe_time(40,ensure_loaded(baseKB:logicmoo(mpred_online/mpred_www))),if_defined(ensure_webserver), make,list_undefined.
 
 % :- hook_message_hook.
 % :- set_prolog_flag(verbose_autoload,false).
 % :- set_prolog_flag(verbose_load,true).
 % m9   :-asserta_if_new((user:term_expansion(I,O):- lmbase_expansion(term,user,I,O))).
-%m31 :-   (F = mpred/_),foreach(must(lmconf:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
+%m31 :-   (F = mpred/_),foreach(must(lmconf:mpred_is_impl_file(_,F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
 %m32:- rtrace(ensure_mpred_system).
 % m33:- must(filematch_ext(['',mpred,ocl,moo,plmoo,pl,plt,pro,p,'pl.in',pfc,pfct],logicmoo_user:pfc/mpred,W)),dmsg(W),!.
 

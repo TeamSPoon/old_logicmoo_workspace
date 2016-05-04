@@ -393,7 +393,7 @@ text_to_stream(Text,Stream):-text_to_string(Text,String),string_codes(String,Cod
 file_to_stream((StreamIn),Stream):-is_stream(StreamIn),!,copy_stream(StreamIn,Stream).
 file_to_stream(stream(StreamIn),Stream):-copy_stream(StreamIn,Stream).
 file_to_stream('$socket'(Sock),Stream):-tcp_open_socket('$socket'(Sock),StreamIn),copy_stream(StreamIn,Stream).
-file_to_stream(ftTerm(Text),Stream):-term_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
+file_to_stream(ftTerm(Text),Stream):-term_to_atom(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
 file_to_stream(text(Text),Stream):-text_to_stream(Text,Stream).
 file_to_stream(codes(Text),Stream):-text_to_stream(Text,Stream).
 file_to_stream(chars(Text),Stream):-text_to_stream(Text,Stream).

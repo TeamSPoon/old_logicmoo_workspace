@@ -41,7 +41,6 @@
             caller_module/2,
             callsc/1,
             cli_ntrace/1,
-            contains_atom/2,
             cleanup_strings/0,
             debugFmt/1,
             debugFmtList/1,
@@ -111,14 +110,10 @@
             loggerReFmt/2,
             logger_property/3,
             logicmoo_bugger_loaded/0,
-            matches_term/2,
-            matches_term0/2,
             meta_interp/2,
             meta_interp_signal/1,
             module_hotrace/1,
             module_stack/2,
-            must_assign/1,
-            must_assign/2,
             must_each/1,
             must_each0/1,
             must_maplist/2,
@@ -330,7 +325,6 @@
         call_skipping_n_clauses/2,
         caller_module/1,
         caller_module/2,
-        contains_atom/2,
         debugFmt/1,
         debugFmtList/1,
         debugFmtList0/2,
@@ -382,13 +376,9 @@
         loggerReFmt/2,
         logger_property/3,
         logicmoo_bugger_loaded/0,
-        matches_term/2,
-        matches_term0/2,
         meta_interp_signal/1,
         module_hotrace/1,
         module_stack/2,
-        must_assign/1,
-        must_assign/2,
         must_each0/1,
         new_a2s/3,
         new_a2s0/3,
@@ -1792,26 +1782,6 @@ forall_member(C,C1,Call):-forall(member(C,C1),once(Call)).
 
 %= 	 	 
 
-%% must_assign( :TermFrom) is semidet.
-%
-% Must Be Successfull Assign.
-%
-must_assign(From=To):-must_assign(From,To).
-
-%= 	 	 
-
-%% must_assign( ?From, ?To) is semidet.
-%
-% Must Be Successfull Assign.
-%
-must_assign(From,To):-To=From,!.
-must_assign(From,To):- tlbugger:skipMust,!,ignore(To=From),!.
-must_assign(From,To):-dmsg(From),dmsg(=),dmsg(From),dmsg(must_assign),!,trace,To=From.
-
-
-
-%= 	 	 
-
 %% prolog_must( :GoalCall) is semidet.
 %
 % Prolog Must Be Successfull.
@@ -2425,38 +2395,6 @@ logger_property(todo,once,true).
 
 
 
-%= 	 	 
-
-%% contains_atom( ?V, ?A) is semidet.
-%
-% Contains Atom.
-%
-contains_atom(V,A):-sub_term(VV,V),nonvar(VV),functor_safe(VV,A,_).
-
-
-:- export(matches_term/2).
-
-%= 	 	 
-
-%% matches_term( ?Filter, ?VALUE2) is semidet.
-%
-% Matches Term.
-%
-matches_term(Filter,_):- var(Filter),!.
-matches_term(Filter,Term):- var(Term),!,Filter=var.
-matches_term(Filter,Term):- ( \+ \+ (matches_term0(Filter,Term))),!.
-
-%= 	 	 
-
-%% matches_term0( :TermFilter, ?Term) is semidet.
-%
-% Matches Term Primary Helper.
-%
-matches_term0(Filter,Term):- Term = Filter.
-matches_term0(Filter,Term):- atomic(Filter),!,contains_atom(Term,Filter).
-matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Filter,F,A), matches_term0(Filter,Term).
-matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
-
 
 % = %= :- meta_predicate (gripe_time(+,0)).
 :- export(gripe_time/2).
@@ -2879,7 +2817,7 @@ asserta_if_ground(_).
 %:- mpred_trace_childs(must/2).
 %:- mpred_trace_childs(must_flag/3).
 
-% though maybe dumptrace
+% though maybe dtrace
 
 %= 	 	 
 
@@ -3061,12 +2999,12 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
     Term \= existence_error(procedure,iCrackers1),
     prolog_frame_attribute(Frame,parent,PFrame),
     prolog_frame_attribute(PFrame,goal,Goal),
-    format_to_error( 'Error ST-Begin: ~p', [Term]), nl(ERR),
+    format(ERR, 'Error ST-Begin: ~p', [Term]), nl(ERR),
     ignore((thread_current_input(main,In),see(In))),
     dumpST9(Frame,20),
 
     dtrace(Goal),
-    format_to_error( 'Error ST-End: ~p', [Term]), nl(ERR),
+    format(ERR, 'Error ST-End: ~p', [Term]), nl(ERR),
     nl(ERR), fail)).
 
 :-disabled_this.
@@ -3100,7 +3038,7 @@ user:message_hook(Term, Kind, Lines):-
   dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(10)),dmsg(message_hook(Term, Kind, Lines)),
    !,fail,
    (sleep(1.0),read_pending_codes(user_input, Chars, []), format(error_error, '~s', [Chars]),flush_output(error_error),!,Chars=[C],
-                dumptrace(true,C),!),
+                dtrace(true,C),!),
 
    fail)),_,true))),fail)).
 
