@@ -1060,7 +1060,7 @@ replaced_module(_,tbox,TBox):-defaultTBoxMt(TBox).
 %
 remodualize(_, H,H):-is_ftVar(H),!.
 remodualize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
-remodualize(Op,M:H,M:HHH)):-is_ftVar(M),!,remodualize(mvar(Op),H,HHH).
+remodualize(Op,M:H,M:HHH):-is_ftVar(M),!,remodualize(mvar(Op),H,HHH).
 remodualize(Op,M:H,R:HHH):-replaced_module(Op,M,R),remodualize(Op,H,HHH).
 remodualize(Op,M:H,HHH):- is_stripped_module(M),!,remodualize(Op,H,HHH).
 remodualize(Op,H,HH):-is_list(H),!,must_maplist(remodualize(Op),H,HH),!.

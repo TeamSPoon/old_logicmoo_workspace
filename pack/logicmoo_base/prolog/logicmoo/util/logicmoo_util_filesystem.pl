@@ -138,7 +138,7 @@
         time_file_safe/2,
         to_filename/2,
         upcase_atom_safe/2,
-        maybe_add_import_module/2,
+        maybe_add_import_module/3,
         with_filematches/1.
 :- dynamic
         local_directory_search/1.
@@ -900,8 +900,8 @@ add_genlMt(From,imports(To)):-
    catch(add_import_module(From,To,start),E,writeln(E=add_import_module(From,To))).
 
 
-system:maybe_add_import_module(A,baseKB,C):-!,system:maybe_add_import_module(baseKB,A,C).
-system:maybe_add_import_module(From,To,Start):-  
+maybe_add_import_module(A,baseKB,C):-!,maybe_add_import_module(baseKB,A,C).
+maybe_add_import_module(From,To,Start):-  
    catch(add_import_module(From,To,Start),E,writeln(E=add_import_module(From,To))).
 
 
@@ -917,8 +917,8 @@ swi_module(M,Preds):- forall(member(P,Preds),M:export(P)). % ,dmsg(swi_module(M)
 
 is_file_based_expansion(term,I,PosI,_O,_PosO):-!,
    compound(PosI),nonvar(I),
-   b_getval('$term',Was), Was==I,
-   b_getval('$term_position', Pos),
+   nb_current('$term',Was), Was==I,
+   nb_current('$term_position', Pos),
    Pos = '$stream_position'(PosAt,_,_,_),
    PosAt>0,
    arg(1,PosI,At),!,At>=PosAt.
@@ -926,7 +926,7 @@ is_file_based_expansion(term,I,PosI,_O,_PosO):-!,
 is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
    compound(PosI),nonvar(I),
    % b_getval('$term',Was), Was==[],
-   b_getval('$term_position', Pos),
+   nb_current('$term_position', Pos),
    Pos = '$stream_position'(PosAt,_,_,_),
    PosAt>0,
    arg(1,PosI,At),!,At>=PosAt.
