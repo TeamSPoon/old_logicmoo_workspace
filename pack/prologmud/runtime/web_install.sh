@@ -17,6 +17,6 @@ git submodule update
 git submodule sync --recursive
 
 
-( source ./scripts/preconfig.sh )
+( source ./pack/prologmud/runtime/preconfig.sh )
 
 
