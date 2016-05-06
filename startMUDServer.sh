@@ -1,8 +1,9 @@
 #!/bin/bash
 
-if [ "$(id -u)" = "0" ]; then
-#   exec sudo -u prologmud  /bin/bash -c "$0 $*"
-#   exit 0
+if [ "$(id -u)" = "0" ]
+ then
+   exec sudo -u prologmud  /bin/bash -c "$0 $*"
+   exit 0
 fi
 
 
@@ -21,7 +22,7 @@ fi
 if [ $# -eq 0 ] 
  then
    echo "No arguments supplied thus this will NOT restart when crashed"
-   export RUNFILE="./pack/prologmud/t/run_mud_game.pl"
+   export RUNFILE="./pack/prologmud/runtime/run_mud_game.pl"
  else
     export RUNFILE="$1"
 fi

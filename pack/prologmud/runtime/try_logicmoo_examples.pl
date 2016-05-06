@@ -64,7 +64,7 @@ example_proven_false(G):- example_impossible_is_success(G),example_known_is_fail
 example_inconsistent(G):- example_known_is_success(G),example_impossible_is_success(G).
 example_unknown(G):- example_known_is_failure(G),example_impossible_is_failure(G).
 
-:- multifile shared_hide_data/1.
+:- multifile lmconf:shared_hide_data/1.
 %= shared_hide_data(hideMeta):- is_main_thread.
 %= shared_hide_data(hideTriggers):- is_main_thread.
 

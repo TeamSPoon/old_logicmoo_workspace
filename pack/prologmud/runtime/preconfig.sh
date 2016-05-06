@@ -43,9 +43,9 @@ fi
 # safe to run more than once
 sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prologmud
 
-mkdir -p /opt/PrologMUD/runtime/cache
-chmod 777 /opt/PrologMUD/runtime/cache
-chmod 777 /opt/PrologMUD/runtime
+mkdir -p /opt/PrologMUD/pack/prologmud/runtime/cache
+chmod 777 /opt/PrologMUD/pack/prologmud/runtime/cache
+chmod 777 /opt/PrologMUD/pack/prologmud/runtime
 
 echo "to start the MUD type: ./startMUDServer.sh"
 
