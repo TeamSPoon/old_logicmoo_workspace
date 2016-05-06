@@ -751,7 +751,9 @@ check_undefined_predicate(_, '[|]', _, error) :- !. %dumpST.
 check_undefined_predicate(CallerMt,F,A,retry):-
        autoload_library_index(F,A,PredMt,File),
        asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
-       reexport(CallerMt:File),!.
+       reexport(logicmoo_base:File),!,
+       add_module_import(CallerMt,logicmoo_base,start).
+
 check_undefined_predicate(Module, Name, Arity, Action) :-
 	current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
