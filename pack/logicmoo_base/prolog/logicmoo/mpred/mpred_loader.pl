@@ -8,33 +8,34 @@
 */
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_loader.pl
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_loader,
           [ add_from_file/1,
           % unused_assertion/1,
           with_umt_l/1,
+          assert_until_eof/2,
+          assert_until_eof/1,
           make_declared/1,
           make_declared/2,
           make_declared_now/1,
           mpred_ops/0,setup_module_ops/1,
-          
+          set_file_lang/1,
           pfc_dcg/0,
           get_original_term_source/1,
            
            simplify_language_name/2,
-           is_undefaulted/1,
+           %is_undefaulted/1,
           
-            user_m_check/1,
             split_into_mts/1,
             add_term/2,
             assert_kif/1,
             % system:import_module_to_user/1,
             assert_kif_dolce/1,
-            assert_until_eof/1,
+            
             make_file_command/3,
-            import_shared_pred/3,
-            import_to_user0/3,
-            import_to_user_mfa0/4,
+            % import_shared_pred/3,
+            % import_to_user0/3,
+            % import_to_user_mfa0/4,
 
             predicate_is_undefined_fa/2,
             
@@ -71,10 +72,11 @@
             end_module_type/1,
             end_module_type/2,
             ensure_loaded_no_mpreds/1,
-            ensure_mpred_file_consulted/2,
+
+            % ensure_prolog_file_consulted/2, ensure_mpred_file_consulted/2,
             ensure_mpred_file_loaded/1,
             ensure_mpred_file_loaded/2,
-            ensure_prolog_file_consulted/2,
+            
             etrace/0,
             expand_in_mpred_kb_module/2,
             expanded_already_functor/1,
@@ -160,9 +162,9 @@
             simplify_why_r/4,
             stream_pos/1,
             term_expand_local_each/5,
-            to_box_type0/3,
+            
             transform_opers/3,
-            use_file_type_loader/2,
+            
             use_was_isa/3,
             was_exported_content/3,
             with_mpred_expansions/1,
@@ -175,11 +177,11 @@
             lmconf:never_reload_file/1,
             always_expand_on_thread/1,
             t_l:current_lang/1,
-            kb_dynamic/1,
+            kb_dynamic_good/1,
             make_reachable/2,
             import_predicate/2,
             lmconf:mpred_skipped_module/1,
-            prolog_load_file_loop_checked/2,
+            %prolog_load_file_loop_checked/2,
 %            registered_module_type/2,
             %t_l:disable_mpred_term_expansions_globally/0,
             %t_l:into_form_code/0,
@@ -195,7 +197,7 @@
             transform_opers_0/2, transform_opers_1/2,
             mpred_loader_file/0
           ]).
-:- endif.
+%:- endif.
 
  :- module_transparent((with_umt_l/1,load_file_term_to_command_1b/3,pfc_dcg/0, mpred_term_expansion_by_pred_class/3,
    must_expand_term_to_command/2, pl_to_mpred_syntax0/2, 
@@ -203,7 +205,7 @@
     transform_opers_0/2, transform_opers_1/2)).
 
  :- meta_predicate
-        kb_dynamic(?),       
+        kb_dynamic_good(?),       
         make_reachable(?,?),
         call_file_command(?, ?, ?, ?),
         call_from_module(+, 0),
@@ -229,10 +231,11 @@
         with_mpred_expansions(0),
         with_no_mpred_expansions(0),
         mpred_loader_module_transparent(?),
+         with_umt_l(0),
         lmconf:loaded_file_world_time(+, +, +).
 :- multifile((t_l:into_form_code/0, t_l:mpred_module_expansion/1, user:term_expansion/2)).
 :- (dynamic   user:term_expansion/2).
-% :- (module_transparent add_from_file/1, add_term/2, assert_kif/1, assert_kif_dolce/1, assert_until_eof/1, begin_pfc/0, call_file_command/4, 
+% :- (module_transparent add_from_file/1, add_term/2, assert_kif/1, assert_kif_dolce/1, assert_until_eof/2,assert_until_eof/1, begin_pfc/0, call_file_command/4, 
 % call_from_module/2, with_source_module/2, can_be_dynamic/1, cl_assert/2, clear_predicates/1, collect_expansions/3, compile_clause/1,
 %  mpred_term_expansion_by_storage_type/3, convert_side_effect/2, convert_side_effect/3, convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, 
 % convert_side_effect_buggy/2, current_context_module/1, current_op_alias/2, cwc/0, decache_file_type/1, ensure_abox/1, declare_load_dbase/1, 
@@ -247,29 +250,95 @@
 %:- dynamic((registered_module_type/2, current_op_alias/2, lmconf:mpred_skipped_module/1, prolog_load_file_loop_checked/2, lmcache:mpred_directive_value/3, defaultAssertMt/1, lmconf:loaded_file_world_time/3, lmconf:never_reload_file/1, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, defaultAssertMt/1, disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_directive_value/3, lmconf:mpred_skipped_module/1, never_reload_file/1, prolog_load_file_loop_checked/2, registered_module_type/2, t_l:disable_mpred_term_expansions_globally/0, user:prolog_load_file/2, user:term_expansion/2)).
 %:- dynamic(registered_module_type/2).        
 
+:- use_module(user:library(backcomp), [ '$arch'/2,
+	    '$version'/1,
+	    '$home'/1,
+	    '$argv'/1,
+	    '$set_prompt'/1,
+	    '$strip_module'/3,
+	    '$declare_module'/3,
+	    '$module'/2,
+	    at_initialization/1,	% :Goal
+	    displayq/1,
+	    displayq/2,
+	    sformat/2,			% -String, +Fmt
+	    sformat/3,			% -String, +Fmt, +Args
+	    concat/3,
+	    concat_atom/2,		% +List, -Atom
+	    concat_atom/3,		% +List, +Sep, -Atom
+	    '$apropos_match'/2,		% +Needle, +Hashstack
+	    read_clause/1,		% -Term
+	    read_clause/2,		% +Stream, -Term
+	    read_variables/2,		% -Term, -VariableNames
+	    read_variables/3,		% +Stream, -Term, -VariableNames
+	    read_pending_input/3,	% +Stream, -List, ?Tail
+	    feature/2,
+	    set_feature/2,
+	    substring/4,
+	    string_to_list/2,		% ?String, ?Codes
+	    string_to_atom/2,		% ?String, ?Atom
+	    flush/0,
+	    write_ln/1,			% +Term
+	    proper_list/1,		% @Term
+	    free_variables/2,		% +Term, -Variables
+	    subsumes_chk/2,		% @Generic, @Specific
+	    subsumes/2,			% @Generic, @Specific
+	    hash_term/2,		% +Term, -Hash
+	    checklist/2,		% :Goal, +List
+	    sublist/3,			% :Goal, +List, -Sublist
+	    sumlist/2,			% +List, -Sum
+	    convert_time/2,		% +Stamp, -String
+	    convert_time/8,		% +String, -YMDmhs.ms
+	    'C'/3,			% +List, -Head, -Tail
+	    current_thread/2,		% ?Thread, ?Status
+	    current_mutex/3,		% ?Mutex, ?Owner, ?Count
+	    message_queue_size/2,	% +Queue, -TermsWaiting
+	    lock_predicate/2,		% +Name, +Arity
+	    unlock_predicate/2,		% +Name, +Arity
+	    current_module/2,		% ?Module, ?File
+	    export_list/2,		% +Module, -Exports
+	    setup_and_call_cleanup/3,	% :Setup, :Goal, :Cleanup
+	    setup_and_call_cleanup/4,	% :Setup, :Goal, ?Catcher, :Cleanup
+	    merge/3,			% +List1, +List2, -Union
+	    merge_set/3,		% +Set1, +Set2, -Union
+	    index/1,			% :Head
+	    hash/1,			% :PI
+	    set_base_module/1		% :Base
+	  ]).
+:- use_module(user:library(terms),[term_hash/2,		% @Term, -HashKey
+	    term_hash/4,		% @Term, +Depth, +Range, -HashKey
+	   % term_variables/2,		% @Term, -Variables
+	    term_variables/3,		% @Term, -Variables, +Tail
+	    variant/2,			% @Term1, @Term2
+	   % subsumes/2,			% +Generic, @Specific
+	   % subsumes_chk/2,		% +Generic, @Specific
+	    cyclic_term/1,		% @Term
+	   % acyclic_term/1,		% @Term
+	    term_subsumer/3,		% +Special1, +Special2, -General
+	    term_factorized/3]).
 
 :- lmconf:dynamic((lmconf:registered_mpred_file/1,lmconf:ignore_file_mpreds/1,lmconf:registered_module_type/2)).
 :- multifile((lmconf:registered_mpred_file/1,lmconf:ignore_file_mpreds/1,lmconf:registered_module_type/2)).
 
-%% kb_dynamic( ?P) is semidet.
+%% kb_dynamic_good( ?P) is semidet.
 %
 % Knowledge Base Dynamic.
 %
-kb_dynamic(FA):- loop_check(kb_dynamic0(FA)).
+kb_dynamic_good(FA):- loop_check(kb_dynamic0(FA)).
 kb_dynamic0(FA):- is_ftVar(FA),!,fail.
-kb_dynamic0(P):-atom(P),must(get_arity(P,F,A)),!,kb_dynamic(F/A).
+kb_dynamic0(P):-atom(P),must(get_arity(P,F,A)),!,kb_dynamic_good(F/A).
 kb_dynamic0(_:FA):- is_ftVar(FA),!,fail.
 kb_dynamic0(_:F/_):- is_ftVar(F),!,fail.
-kb_dynamic0(F/A):- !, defaultAssertMt(KB),!,kb_dynamic(KB:F/A).
-kb_dynamic0([FA1|FA2]):-!,kb_dynamic(FA1),kb_dynamic(FA2).
-kb_dynamic0((FA1,FA2)):-!,kb_dynamic(FA1),kb_dynamic(FA2).
-% kb_dynamic(CM:M:FA):- atom(CM),atom(M),!,(CM==M -> kb_dynamic(M:FA);(CM:kb_dynamic(M:FA))).
-% kb_dynamic(CM:M:F/A):- atom(CM),atom(M),!,(CM==M -> kb_dynamic(M:FA);(CM:kb_dynamic(M:F/A))).
-kb_dynamic0(M:(FA1,FA2)):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
-kb_dynamic0(M:[FA1|FA2]):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
+kb_dynamic0(F/A):- !, defaultAssertMt(KB),!,kb_dynamic_good(KB:F/A).
+kb_dynamic0([FA1|FA2]):-!,kb_dynamic_good(FA1),kb_dynamic_good(FA2).
+kb_dynamic0((FA1,FA2)):-!,kb_dynamic_good(FA1),kb_dynamic_good(FA2).
+% kb_dynamic_good(CM:M:FA):- atom(CM),atom(M),!,(CM==M -> kb_dynamic_good(M:FA);(CM:kb_dynamic_good(M:FA))).
+% kb_dynamic_good(CM:M:F/A):- atom(CM),atom(M),!,(CM==M -> kb_dynamic_good(M:FA);(CM:kb_dynamic_good(M:F/A))).
+kb_dynamic0(M:(FA1,FA2)):-!,kb_dynamic_good(M:FA1),kb_dynamic_good(M:FA2).
+kb_dynamic0(M:[FA1|FA2]):-!,kb_dynamic_good(M:FA1),kb_dynamic_good(M:FA2).
 kb_dynamic0(M:F/A):-!,quietly_must((make_declared(M:F/A,T),must(defaultAssertMt(CM)),make_reachable(CM,T:F/A))).
-kb_dynamic0(M:P):-functor(P,F,A),!,kb_dynamic(M:F/A).
-kb_dynamic0(P):-compound(P),functor(P,F,A),!,kb_dynamic(F/A).
+kb_dynamic0(M:P):-functor(P,F,A),!,kb_dynamic_good(M:F/A).
+kb_dynamic0(P):-compound(P),functor(P,F,A),!,kb_dynamic_good(F/A).
 
 
 
@@ -1716,7 +1785,7 @@ make_dynamic((H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(H)).
 make_dynamic(M:(H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(M:H)).
 make_dynamic(C):- compound(C),strip_module(C,M,_),get_functor(C,F,A),quietly_must(F\=='$VAR'),
   functor(P,F,A),
-  ( \+predicate_property(M:P,_) -> kb_dynamic(M:F/A) ; (predicate_property(M:P,dynamic)->true;dynamic_safe(M:P))),!,
+  ( \+predicate_property(M:P,_) -> kb_dynamic_good(M:F/A) ; (predicate_property(M:P,dynamic)->true;dynamic_safe(M:P))),!,
   import_to_user(M:F/A),
   quietly_must((predicate_property(M:P,dynamic))).
 
@@ -2069,7 +2138,8 @@ force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_),
  forall(must_locate_file(MFileIn,File),
    must_det_l((
    once(show_success(prolog_load_file,defaultAssertMt(DBASE));DBASE=NewModule),
-   sanity(exists_file(File)),sanity(defaultAssertMt(World)),
+   sanity(exists_file(File)),
+   sanity((true,defaultAssertMt(World))),
    nop(mpred_remove_file_support(File)),
    assert_if_new(lmconf:registered_mpred_file(File)),
    quietly_must(time_file_safe(File,NewTime)),

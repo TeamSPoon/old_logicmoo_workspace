@@ -28,11 +28,11 @@
 :- multifile(lmconfig:defaultAssertMt/1).
 :- dynamic(lmconfig:defaultAssertMt/1).
 :- endif.
-:- if( \+ current_predicate(lmconf:mpred_system_kb/1)).
-:- multifile(lmconf:mpred_system_kb/1).
-:- dynamic(lmconf:mpred_system_kb/1).
+:- if( \+ current_predicate(defaultTBoxMt/1)).
+:- multifile(defaultTBoxMt/1).
+:- dynamic(defaultTBoxMt/1).
 :- endif.
-% :- lmconf:mpred_system_kb(_)->true;('$current_typein_module'(M),asserta(lmconf:mpred_system_kb(M))).
+% :- defaultTBoxMt(_)->true;('$current_typein_module'(M),asserta(defaultTBoxMt(M))).
 
 
 :- dynamic(lmconf:mpred_is_impl_file/2).

@@ -245,9 +245,9 @@ mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):-calc_from_center_xyz(Region,Dir,2,
 
 % :-kif_tell(localityOfObject(A,B) &  localityOfObject(B,C) ==> localityOfObject(A,C)).
 
-:- decl_mpred_hybrid(mudSubPart/2).
-:- decl_mpred_hybrid(predInterArgIsa/1).
-:- decl_mpred_hybrid(relationAllExists/3).
+:- kb_dynamic(mudSubPart/2).
+:- kb_dynamic(predInterArgIsa/1).
+:- kb_dynamic(relationAllExists/3).
 
 
 genls(tPlayer,tHominid).

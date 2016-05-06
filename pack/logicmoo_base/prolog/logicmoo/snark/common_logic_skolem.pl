@@ -10,7 +10,7 @@
 % Dec 13, 2035
 %
 */
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(common_logic_skolem,
 	  [ form_sk/2,
 	    sk_form/2,
@@ -21,7 +21,7 @@
             push_cond/2,
             with_no_kif_var_coroutines/1
 	  ]).
-:- endif.
+%:- endif.
 
 :- ensure_loaded(library(logicmoo/util/logicmoo_util_attvar_reader)).
 

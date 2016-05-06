@@ -1,7 +1,82 @@
 #!/usr/bin/env swipl
 
 :- module(sanity_fi_sk,[]).
+
 /*
+
+<
+>
+\==
+
+
+?- N #> 3, N #< 9, N #< 19,  dom(N,[ 5 ,6,7, 20] ), dom(N,[ 7, 20] ), 
+   print(N).
+
+N=(min,max,dom)
+   4   [6,7]    8 
+
+
+N = 7.
+
+
+
+CLP(FD)
+
+CHR 
+
+[m]
+
+
+?- isa(N,juvinile) , isa(N,dog), isa(N,puppy), (isAt(N,petStoreA) ;isAt(N,petStoreB)).
+N = snoopySon{isa(N,juvinile) , isa(N,dog), isa(N,puppy), (isAt(N,petStoreA) ;isAt(N,petStoreB))}
+
+?- isa(X,male).
+X = _:{isa(X,male)}.
+
+?- N=X.
+Yes.
+
+N =  _{value(N,snoopySon) isa(N,male), isa(N,juvinile) , isa(N,dog), isa(N,puppy), (isAt(N,petStoreA) ;isAt(N,petStoreB))}
+
+N =  snoopySon{isa(N,male), isa(N,juvinile) , isa(N,dog), isa(N,puppy), (isAt(N,petStoreA) ;isAt(N,petStoreB))}
+
+
+
+
+
+?- isa(N,juvinile) , isa(N,dog), isa(N,puppy), (isAt(N,petStoreA) ;isAt(N,petStoreB)).
+N = snoopySon.
+
+?- isa(X,oldDog).
+X = snoopy
+
+?- N=X.
+No.
+
+
+
+
+snoopySon = myFriendFn(dog).
+
+
+(isa(N,dog),  isa(N,juvinile) , isa(N,puppy), isAt(N,petStoreA), isAt(N,petStoreB) ==> what_you_want(N)).
+
+(isa(N,puppy), isAt(N,petStoreA), isAt(N,petStoreB) ==> what_you_want(N)).
+
+?- what_you_want(N).
+
+
+
+N = isa() 
+N = puppy
+
+N=((min_isa, max_isa),dom,[pred])
+  puppy, [],  +petStoreA  +petStoreB
+   
+
+
+
+
 :- nodebug(_).
 :- use_module(library(gui_tracer)).
 :- noguitracer.

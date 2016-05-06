@@ -59,6 +59,7 @@
           dumpST9/0,dumpST9/1,dumpST9/2.
 
 
+:- ensure_loaded(library(debug)).
 
 
 %= 	 	 

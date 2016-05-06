@@ -11,7 +11,7 @@
 isa(tHumanPlayer,ttAgentType).
 %genls(ttAgentType,tCol).
 
-:- shared_multifile type_action_info/3.
+:- kb_dynamic type_action_info/3.
 
 type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
 
@@ -42,7 +42,7 @@ first_pl((BODY,_),PL):-!,
  first_pl(BODY,PL).
 first_pl(PL,PL).
 
-:- decl_mpred_hybrid(action_info_db/3).
+:- kb_dynamic(action_info_db/3).
 
 action_info_db(TEMPL,INFO,WAS):- (PRED=agent_call_command(_,WAS);PRED=agent_text_command(_,_,_,WAS)) ,
    clause(PRED,BODY,REF),clause_property(REF,file(S)),

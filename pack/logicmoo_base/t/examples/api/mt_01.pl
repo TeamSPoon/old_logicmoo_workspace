@@ -7,19 +7,28 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(sanity,[]).
+:- module(mt_01,[]).
 
-:- use_module(library(logicmoo_base)).
+:- user:use_module(library(logicmoo_utils)).
+:- user:use_module(library(logicmoo_base)).
+% :- user:use_module(library(logicmoo_user)).
 
-:- add_import_module(sanity,baseKB,end).
+:- add_import_module(mt_01,baseKB,end).
 
 :- set_defaultAssertMt(myMt).
 
 :- begin_pfc.
 
-:- rtrace((ain(socialMt:loves(joe,sally)))).
-:- break.
+
+:- ain(socialMt:loves(joe,sally)).
 socialMt:loves(sally,joe).
+
+:- push_modules.
+
+:- module(user).
+:- listing(loves/2).
+
+:- pop_module.
 
 % set_defaultAssertMt/1 worked good?
 :- mpred_test(defaultAssertMt(myMt)).

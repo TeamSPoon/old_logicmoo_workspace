@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % :- if((\+ current_prolog_flag(common_logic_at_box_true,true),set_prolog_flag(common_logic_at_box_true,true))).
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(common_logic_at_box,[
 
          assert_setting01/1,
@@ -29,9 +29,8 @@
          which_file/1,
          fileAssertMt/1,
          set_fileAssertMt/1,
+         defaultTBoxMt/1,
          
-                  
-                 
          correct_module/3,
          correct_module/4,
          ensure_imports/1,
@@ -42,7 +41,7 @@
          user_m_check/1,
          which_file/1
     ]).
-:- endif.
+%:- endif.
 
 user_m_check(_Out).
 
@@ -94,258 +93,6 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
 in_mpred_kb_module:- source_context_module(MT),defaultAssertMt(MT2),!,MT==MT2.
 
 
-% mtGlobal
-% mtCore
-
-
-
-makeConstant(_Mt).
-
-
-%:- (system:trace, rtrace, trace,cls ).
-%:- (break,notrace,nortrace).
-
-
-% ============================================
-:-dynamic(baseKB:isRegisteredCycPred/3).
-
-:-module_transparent(baseKB:isRegisteredCycPred/3).
-
-% ?- registerCycPred(baseKB:isa/2). 
-registerCycPred(Mt:Pred/Arity):-!,
-   registerCycPred(Mt,Pred,Arity).
-% ?- registerCycPred(baseKB:isa(_,_)). 
-registerCycPred(Mt:Term):-
-   functor(Term,Pred,Arity),
-   registerCycPred(Mt,Pred,Arity).
-registerCycPred(Term):-
-   functor(Term,Pred,Arity),
-   currentMt(Mt),
-   registerCycPred(Mt,Pred,Arity).
-   
-
-
-% ?- registerCycPred(isa(_,_),baseKB). 
-registerCycPred(Term,Mt):-
-   functor(Term,Pred,Arity),
-   registerCycPred(Mt,Pred,Arity).
-
-% ?- registerCycPred(baseKB,isa,2). 
-% registerCycPred(Mt,Pred,0):-!,registerCycPred(Mt,Pred,2).
-
-registerCycPred(Mt,Pred,Arity):-
-   baseKB:isRegisteredCycPred(Mt,Pred,Arity),!.
-
-registerCycPred(Mt,Pred,Arity):-
-   assert_if_new(baseKB:isRegisteredCycPred(Mt,Pred,Arity)),!,
-   functor(Goal,Pred,Arity),
-   registerCycPred(Mt,Goal,Pred,Arity),!.
-
-guessMtFromGoal(HintMt,Goal,_OtherMt):-
-  predicate_property(HintMt:Goal,exported).
-guessMtFromGoal(HintMt,Goal,OtherMt):-
-  predicate_property(HintMt:Goal,imported_from(OtherMt)).
-guessMtFromGoal(_,Goal,OtherMt):-
-  predicate_property(Goal,imported_from(OtherMt)).
-
-guessMtFromGoal(_,Goal,OtherMt):- var(OtherMt),!,
-  predicate_property(OtherMt:Goal,file(_)).
-
-guessMtFromGoal(_,Goal,OtherMt):-
-  mtGlobal(OtherMt),
-  predicate_property(OtherMt:Goal,file(_)).
-
-
-add_import_predicate(Mt,Goal,OtherMt):- fail,
-   mtGlobal(Mt),
-   mtGlobal(OtherMt),
-   \+ import_module(OtherMt,Mt),
-   catch(add_import_module(Mt,OtherMt,end),
-       error(permission_error(add_import,module,baseKB),
-       context(system:add_import_module/3,'would create a cycle')),fail),
-   must(predicate_property(Mt:Goal,imported_from(OtherMt))),!.
-add_import_predicate(Mt,Goal,OtherMt):- catch(Mt:import(OtherMt:Goal),_,fail),!.
-add_import_predicate(Mt,Goal,OtherMt):- 
-   functor(Goal,Pred,Arity),
-   make_as_dynamic(imported_from(OtherMt),Mt,Pred,Arity),
-   assert_if_new(( Mt:Goal :- OtherMt:Goal)).
-  
-
-dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
-
-make_as_dynamic(Reason,Mt,Pred,Arity):- dynamic( Mt:Pred/Arity),
-   functor(Goal,Pred,Arity),
-   assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))).
-
-
-registerCycPred(Mt,Goal,Pred,Arity):-
-   guessMtFromGoal(Mt,Goal,OtherMt), 
-   sanity(Mt \== OtherMt),
-   must(Mt \== OtherMt),
-   ain(baseKB:tMicrotheory(Mt)),
-   registerCycPred(Mt,Goal,Pred,Arity,OtherMt),!.
-
-registerCycPred(Mt,Goal,Pred,Arity):-
-   dynamic(Mt:Pred/Arity), % (1 is random(180)->dump_break;true),
-   assert_if_new(( Mt:Goal :- istAbove(Mt,Goal))).
-
-
-transitive_path(Pred,[Arg1,Arg2],Arg2):-
-  dif(Arg1,Arg2),call(Pred,Arg1,Arg2),!.
-transitive_path(Pred,[Arg1,SecondNodeMt|REST],Arg2):-
-  dif(Arg1,Arg2),dif(Arg1,SecondNodeMt),
-  call(Pred,Arg1,SecondNodeMt),stack_check,
-  transitive_path(Pred,[SecondNodeMt|REST],Arg2).
-
-registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
-  mtGlobal(OtherMt),
-  add_import_predicate(Mt,Goal,OtherMt),!.
-  
-
-registerCycPred(Mt,Goal,Pred,Arity,OtherMt):- 
-   transitive_path(baseKB:genlMt,[Mt,SecondNodeMt|_],OtherMt),
-   make_as_dynamic(genlMt(Mt,OtherMt),Mt,Pred,Arity),
-   assert_if_new(( Mt:Goal :- SecondNodeMt:call(Goal))),!.
-
-registerCycPred(Mt,_Goal,Pred,Arity,OtherMt):-
-  dump_break,
-  make_as_dynamic(need_genlMt(Mt,OtherMt),Mt,Pred,Arity),!.
-   
-
-
-clearKb(KB):- mtCore(KB),!.
-clearKb(KB):- forall(import_module(KB,O),
-                  ignore(delete_import_module(KB,O))),
-     forall(( current_module(X),import_module(X,KB)),
-                  ignore(delete_import_module(X,KB))).
-
-autoload_library_index(F,A,M,File):- functor(P,F,A),'$autoload':library_index(P,M,File).
-
-:-dynamic(baseKB:genlMt/2).
-istAbove(Mt,Query):- Mt\==baseKB,Mt\==logicmoo_utils,genlMt(Mt,MtAbove),MtAbove:Query.
-
-user:exception(A,B,C):-!,system_exception(A,B,C).
-system:exception(A,B,C):-!,system_exception(A,B,C).
-
-system_exception(undefined_predicate,M:debug/1,retry):- use_module(M:library(debug)),!.
-system_exception(undefined_predicate,M:debugging/1,retry):- use_module(M:library(debug)),!.
-system_exception(undefined_predicate,M:member/2,retry):- use_module(M:library(lists)),!.
-system_exception(undefined_predicate,M:directory_file_path/3,retry):- use_module(M:library(filesex)),!.
-system_exception(undefined_predicate,M:F/A,retry):- fail,
-       autoload_library_index(F,A,_,File),
-       load_files(M:File,[if(true),imports([F/A]),register(false),silent(false)]),!.
-system_exception(undefined_predicate,M:F/A,retry):-
-       autoload_library_index(F,A,_,File),
-       ensure_loaded(M:File),!.
-system_exception(undefined_predicate,M:F/A,retry):-
-      autoload_library_index(F,A,NewMod,File),
-      (current_module(NewMod) 
-       -> add_import_module(M,NewMod,start) ;
-       (NewMod:ensure_loaded(NewMod:File),add_import_module(M,NewMod,start))),!.
-
-system_exception(undefined_predicate,M:'$pldoc'/4,retry):-multifile(M:'$pldoc'/4),dynamic(M:'$pldoc'/4),!.
-system_exception(undefined_predicate,lmconf:F/A,retry):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
-system_exception(undefined_predicate,lmcache:F/A,retry):-multifile(lmcache:F/A),volatile(lmcache:F/A),!.
-
-system_exception(undefined_predicate,M:must/1,retry) :- add_import_module(M,logicmoo_util_catch,start),!.
-system_exception(undefined_predicate,M:debugm/2,retry) :- add_import_module(M,logicmoo_util_dmsg,start),!.
-system_exception(undefined_predicate, Mt:F/A,retry):-
-  current_prolog_flag(retry_undefined,true),
-  set_prolog_flag(retry_undefined,false),
-   F\=istAbove, % t(tMicrotheory,Mt) -> 
-   loop_check_term(registerCycPred(Mt,F,A),
-    registerCycPredsIntoMt(Mt,F),dump_break),
-  set_prolog_flag(retry_undefined,true).
-
-
-% ============================================
-% Assert Side Effect Prolog to Cyc Predicate Mapping
-%
-% ?- assert(isa('Fido','Dog')).
-% Will assert (isa Fido Dog) into TBox
-%
-% ?- assert('DogsMt':isa('Fido','Dog')).
-% Will assert (isa Fido Dog) into DogsMt
-% ============================================
-%'$toplevel':assert(X):-ain(Term).
-
-ifHookRedef(_):-!.
-%ifHookRedef(C):-C,!.
-
-:-ifHookRedef((redefine_system_predicate(system:assert(_)),assert((system:assert(Term):-nonvar(Term),assertThrough(Term))))).
-
-assertThrough(Mt:CycL):-assertThrough(Mt,CycL).
-assertThrough(CycL):-mtForCycL(CycL,Mt),assertThrough(Mt,CycL).
-
-assertThrough(_,ToMt:CycL):-!,assertThrough(ToMt,CycL).
-assertThrough(ToMt,CycL):-
-      functor(CycL,Pred,Arity),
-      (baseKB:isRegisteredCycPred(Mt,Pred,Arity);atom_concat('#$',_,Pred)),!,
-      ignore(ToMt=Mt),ain(CycL,ToMt),!.
-
-assertThrough(ToMt,CycL):-
-      (predicate_property(Mt:CycL,_);context_module(Mt);Mt=ToMt),!,
-      ignore(Mt=ToMt),
-      ain(Mt:CycL),!.
-
-% ============================================
-% Retract (All) Side Effect Prolog to Cyc Predicate Mapping
-%
-% ?- retractall(isa('Fido','Dog')).
-% Will mpred_rem (isa Fido Dog) from TBox
-%
-% ?- retractall('DogsMt':isa('Fido','Dog')).
-% Will mpred_rem (isa Fido Dog) from DogsMt
-% ============================================
-:-ifHookRedef((redefine_system_predicate(retractall(_)),asserta((retractall(Term):-nonvar(Term),retractAllThrough(Term))))).
-
-retractAllThrough(Mt:CycL):-
-      retractAllThrough(Mt,CycL).
-
-retractAllThrough(CycL):-
-      retractAllThrough(_Mt,CycL).
-
-retractAllThrough(ToMt,CycL):-
-      functor(CycL,Pred,Arity),
-      baseKB:isRegisteredCycPred(Mt,Pred,Arity),!,
-      ignore(ToMt=Mt),
-      cycRetract(CycL,ToMt),!.
-
-retractAllThrough(ToMt,CycL):-
-      (predicate_property(Mt:CycL,_);context_module(Mt);Mt=ToMt),!,
-      ignore(Mt=ToMt),
-      system:retractall(Mt:CycL),!.
-            
-% ============================================
-% Retract (First) Side Effect Prolog to Cyc Predicate Mapping
-%
-% ?- retractall(isa('Fido','Dog')).
-% Will mpred_rem (isa Fido Dog) from TBox
-%
-% ?- retractall('DogsMt':isa('Fido','Dog')).
-% Will mpred_rem (isa Fido Dog) from DogsMt
-% ============================================
-% :-ifHookRedef((redefine_system_predicate(retract(_)),asserta((retract(Term):-nonvar(Term),retractOnceThrough(Term))))).
-
-retractOnceThrough(Mt:CycL):-
-      retractOnceThrough(Mt,CycL).
-
-retractOnceThrough(CycL):-
-      retractOnceThrough(_Mt,CycL).
-
-retractOnceThrough(ToMt,CycL):-
-      functor(CycL,Pred,Arity),
-      baseKB:isRegisteredCycPred(Mt,Pred,Arity),!,
-      ignore(ToMt=Mt),
-      cycRetract(CycL,ToMt),!.
-
-retractOnceThrough(ToMt,CycL):-
-      (predicate_property(Mt:CycL,_);context_module(Mt);Mt=ToMt),!,
-      ignore(Mt=ToMt),
-      mpred_remove(Mt:CycL),!.
-
-
-
 map_inheritence(Child):-forall(import_module(Child,Parent),inherit_into_module(Child,Parent)).
 
 
@@ -361,7 +108,10 @@ box_type(_,_,abox).
 
 :- thread_local(t_l:current_defaultAssertMt/1).
 :- dynamic(lmconf:file_to_module/2).
-baseKB:defaultTBoxMt(baseKB).
+
+:- multifile(defaultTBoxMt/1).
+:- dynamic(defaultTBoxMt/1).
+defaultTBoxMt(baseKB).
 
 
 %% defaultAssertMt(-Ctx) is det.
@@ -370,12 +120,12 @@ baseKB:defaultTBoxMt(baseKB).
 % within a knowledge base.
 %
 % not just user modules
-defaultAssertMt(ABox):- nonvar(ABox),defaultAssertMt(ABoxVar),!,must(ABox=@=ABoxVar).
+defaultAssertMt(ABox):- nonvar(ABox),defaultAssertMt(ABoxVar),!,show_failure(ABox=@=ABoxVar).
 defaultAssertMt(ABox):- 
     (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);
     '$current_typein_module'(ABox);
-     defaultTBoxMt(ABox))),ABox\==user)),!.
+     defaultTBoxMt(ABox))),ABox\==user,ABox\==logicmoo_utils)),!.
 
 defaultAssertMt(ABox):- fileAssertMt(ABox).
 
@@ -402,7 +152,7 @@ fileAssertMt(baseKB).
 % Sets Current Module.
 %
 set_defaultAssertMt(ABox):- 
-    baseKB:defaultTBoxMt(TBox),
+    defaultTBoxMt(TBox),
     (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
     '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
     setup_module_ops(ABox), 

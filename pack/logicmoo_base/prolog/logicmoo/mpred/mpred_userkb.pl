@@ -19,7 +19,7 @@
 % DWhitten> ... but is there a reason why "Absurdity" is the word used for something that doesn't exist?  
 % SOWA> It's stronger than that.  The absurd type is defined by axioms that are contradictory. 
 %  Therefore, by definition, nothing of that type can exist. 
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo_hooks,true))).
 :- module(mpred_userkb, [mpred_userkb_file/0]).
 
 :- include('mpred_header.pi').
@@ -213,12 +213,20 @@ t_l:user_abox(tbox,tbox).
 :- show_call(source_context_module(_CM)).
 
 
+
+:- kb_dynamic(arity/2).
+:- between(1,9,A),kb_dynamic(t/A).
+:- kb_dynamic(meta_argtypes/1).
+
+
+
 % % :- '$set_source_module'(tbox).
 
-:- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),must((discontiguous(baseKB:E),dynamic(baseKB:E),
+:- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),
+  E\='$pldoc'/4),must((discontiguous(baseKB:E),dynamic(baseKB:E),
   multifile(baseKB:E),module_transparent(baseKB:E)))).
-:- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),must(split_into_mts(E))).
-% :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
+:- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),must(kb_dynamic(E))).
+:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),kb_dynamic(E)).
 
 
 %:- import_module_to_user(logicmoo_user).

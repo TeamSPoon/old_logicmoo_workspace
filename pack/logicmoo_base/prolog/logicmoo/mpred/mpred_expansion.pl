@@ -53,7 +53,7 @@
 % clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2,  (==>)/1,  (==>)/2, (<-)/1,  (<-)/2, (<==>)/2, fact/1
 %
 */
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_expansion,
           [ acceptable_xform/2,
             additiveOp/1,
@@ -147,7 +147,7 @@
             was_isa_syntax/3,
           mpred_expansion_file/0
           ]).
-:- endif.
+%:- endif.
 
 :- meta_predicate 
    % mpred_expansion
@@ -318,7 +318,8 @@ functor_declares_instance(F,C):-functor_declares_instance_0(F,C0),!,C=C0. % ,F\=
 % functor declares instance  Primary Helper.
 %
 functor_declares_instance_0(decl_mpred,tPred).
-functor_declares_instance_0(decl_mpred_hybrid,prologHybrid).
+functor_declares_instance_0(kb_dynamic,prologHybrid).
+functor_declares_instance_0(shared_multifile,prologHybrid).
 functor_declares_instance_0(decl_mpred_prolog,prologBuiltin).
 functor_declares_instance_0(decl_mpred_prolog,prologDynamic).
 

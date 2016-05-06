@@ -12,7 +12,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_isa.pl
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_type_isa,
           [ a/2,
             assert_compound_isa/3,
@@ -103,7 +103,7 @@
           type_suffix/2,
           mpred_type_isa_file/0
           ]).
-:- endif.
+%:- endif.
 
 :-
             op(1150,fx,(was_dynamic)),
@@ -1321,10 +1321,10 @@ assert_isa_hooked(I,T):- assert_hasInstance(T,I),fail.
 assert_isa_hooked(T,tCol):-!,decl_type(T),!.
 assert_isa_hooked(T,ttExpressionType):-!,define_ft(T),!.
 assert_isa_hooked(Term,tPred):-!,decl_mpred(Term).
-assert_isa_hooked(Term,prologHybrid):-!,decl_mpred_hybrid(Term).
+assert_isa_hooked(Term,prologHybrid):-!,kb_dynamic(Term).
 % assert_isa_hooked(Term,prologDynamic):-!,export(Term).
-assert_isa_hooked(Term,prologPTTP):-!,decl_mpred_hybrid(Term,prologPTTP).
-assert_isa_hooked(Term,prologKIF):-!,decl_mpred_hybrid(Term,prologKIF).
+assert_isa_hooked(Term,prologPTTP):-!,kb_dynamic(Term,prologPTTP).
+assert_isa_hooked(Term,prologKIF):-!,kb_dynamic(Term,prologKIF).
 assert_isa_hooked(I,_):- I\=prologHybrid(_),glean_pred_props_maybe(I),fail.
 assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 

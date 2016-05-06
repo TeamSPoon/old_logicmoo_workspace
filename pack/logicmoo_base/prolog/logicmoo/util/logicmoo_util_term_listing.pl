@@ -100,7 +100,7 @@
             xlisting_inner/3
           ]).
 :- multifile     
-        shared_hide_data/1,
+        lmconf:shared_hide_data/1,
         synth_clause_for/5.
 :- meta_predicate maybe_separate(*,0).
 :- meta_predicate maybe_separate_0(*,0).
@@ -173,7 +173,7 @@
         searchable_of_clause_1/3,
         searchable_terms/1,
         searchable_terms_tl/1,
-        shared_hide_data/1,
+        lmconf:shared_hide_data/1,
         sourceTextPredicate/1,
         sourceTextPredicateSource/1,
         synth_clause_for/5,
@@ -1182,7 +1182,7 @@ update_changed_files:-!,thread_signal(main,update_changed_files0).
 %
 % Update Changed Files Primary Helper.
 %
-update_changed_files0 :- current_main_error_stream(Err),with_output_to(Err,update_changed_files1).
+update_changed_files0 :- lmcache:current_main_error_stream(Err),with_output_to(Err,update_changed_files1).
 
 %= 	 	 
 

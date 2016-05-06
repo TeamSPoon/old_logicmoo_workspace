@@ -6,7 +6,7 @@
 % Douglas Miles
 
 
-:- module(sanity,[]).
+:- module(bc_01,[]).
 
 %:- '$set_source_module'(baseKB).
 

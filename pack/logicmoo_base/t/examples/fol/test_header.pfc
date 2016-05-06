@@ -35,9 +35,9 @@ example_proven_false(G):- example_impossible_is_success(G),example_known_is_fail
 example_inconsistent(G):- example_known_is_success(G),example_impossible_is_success(G).
 example_unknown(G):- example_known_is_failure(G),example_impossible_is_failure(G).
   
-:-multifile shared_hide_data/1.
-%= shared_hide_data(hideMeta):-is_main_thread.
-%= shared_hide_data(hideTriggers):-is_main_thread.
+:-multifile lmconf:shared_hide_data/1.
+%= lmconf:shared_hide_data(hideMeta):-is_main_thread.
+%= lmconf:shared_hide_data(hideTriggers):-is_main_thread.
 
 % = clear the screen
 % :- shell(cls).

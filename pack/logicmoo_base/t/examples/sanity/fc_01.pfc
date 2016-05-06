@@ -12,15 +12,15 @@
 
 :- use_module(library(logicmoo_base)).
 
-:- add_import_module(fc_01,baseKB,start).
+%:- add_import_module(fc_01,baseKB,start).
 
-:- rtrace(show_kb_structure).
+%:- rtrace(show_kb_structure).
 
-:- break.
+%:- break.
 
 :- file_begin(pfc).
 
-:- show_kb_structure.
+%:- show_kb_structure.
 
 % :- autoload.
 

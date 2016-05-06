@@ -12,7 +12,7 @@
 
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_stubs,
           [ 
 agenda_rescan_mpred_props/0,
@@ -60,7 +60,6 @@ missing_stub/1,
 mpred_missing_stubs/2,
 mpred_prop_ordered/2,
 mpred_t_call_op/2,
-lmconf:mpred_provide_storage_op/2,
 mpred_t_mpred_storage_clauses_facts/3,
 mpred_t_storage_op/2,
 mud_call_store_op/2,
@@ -86,7 +85,7 @@ wff_check_mpred_t_throw/1,
 mpred_stubs_file/0
           ]).
 
-:- endif.
+%:- endif.
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -600,7 +599,7 @@ call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 %
 call_wdmsg(P,DB,t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),call_u(CALL).
 call_wdmsg(P,MP,F,A):- mpred_isa(F,prologHybrid),must(A>1),into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
-call_wdmsg(P,MP,F,A):-  (\+ mpred_isa(F,prologDynamic)), (\+ mpred_isa(F,prologBuiltin)), decl_mpred_hybrid(F/A), into_functor_form(t,MP,DB),!, 
+call_wdmsg(P,MP,F,A):-  (\+ mpred_isa(F,prologDynamic)), (\+ mpred_isa(F,prologBuiltin)), kb_dynamic(F/A), into_functor_form(t,MP,DB),!, 
   append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
 call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_isa(F,prologDynamic);mpred_isa(F,prologBuiltin)),!,call_u(CALL).
 %call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),call_u(CALL))).
@@ -654,7 +653,7 @@ rescan_missing_stubs:-loop_check(time_call(rescan_missing_stubs_ilc),true).
 % Rescan Missing Stubs Inside Of Loop Checking.
 %
 rescan_missing_stubs_ilc:- once(lmconf:use_cyc_database), once(w_tl(t_l:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,
-   good_pred_relation_name(F,A),not(arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
+   good_pred_relation_name(F,A),not(arity(F,A))),with_no_dmsg(decl_mpred_mfa,kb_dynamic(F/A))))),fail.
 rescan_missing_stubs_ilc:- hotrace((doall((mpred_missing_stubs(F,A),arity(F,A),ensure_universal_stub(F/A))))).
 
 
@@ -892,7 +891,7 @@ assert_mpred_t(G):-add_from_file(G).
 %portray_hb(H,B):- B==true, !, portray_one_line(H).
 %portray_hb(H,B):- portray_one_line((H:-B)).
 
-:- op(1150,fx,decl_mpred_hybrid).
+:- op(1150,fx,kb_dynamic).
 
 
 %= 	 	 
@@ -1083,7 +1082,7 @@ call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
 % Call For Literal Database.
 %
 call_for_literal_db(F,A,HEAD):- P=F, HEAD=..[P|ARGS],
-   ((lmconf:after_mpred_load,missing_stub(HEAD))->decl_mpred_hybrid(F,A);true),
+   ((lmconf:after_mpred_load,missing_stub(HEAD))->kb_dynamic(F,A);true),
    constrain_args(P,ARGS),call_for_literal_db0(F,A,HEAD),constrain_args(P,ARGS).
 
 
@@ -1344,7 +1343,7 @@ registerCycPredMtWhy(P):-!,lmconf:with_pi(P,baseKB:registerCycPredMtWhy_3).
 % Ensure Universal Stub Plus Presently Unused.
 %
 ensure_universal_stub_plus_HIDE(F,AMinus2):-
-   decl_mpred_hybrid(F/AMinus2).
+   kb_dynamic(F/AMinus2).
 
 
 %= 	 	 
@@ -1376,7 +1375,7 @@ ensure_universal_stub_plus_mt_why(F,A2):-
    assert_if_new((HEAD:-HEADMinus2)),!,
   % compile_predicates([HEAD]),
    defaultAssertMt(M),
-   decl_mpred_hybrid(M,F,AMinus2).
+   kb_dynamic(M,F,AMinus2).
 
 
 

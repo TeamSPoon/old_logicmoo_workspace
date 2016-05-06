@@ -465,9 +465,9 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 :-recreate(can_hold_type/2).
 :-recreate(verb_affordance/5).
 
-:- decl_mpred_hybrid(argIsa/3).
-:- decl_mpred_hybrid(genls/2).
-:- decl_mpred_hybrid(mudActionMaxDistance(vtActionType,ttObjectType,ftInt)).
+:- kb_dynamic(argIsa/3).
+:- kb_dynamic(genls/2).
+:- kb_dynamic(mudActionMaxDistance(vtActionType,ttObjectType,ftInt)).
 
 to_personal(mudEnergy,mudEnergy).
 to_personal(Pred,APred):-atom_concat('',Pred,APred).

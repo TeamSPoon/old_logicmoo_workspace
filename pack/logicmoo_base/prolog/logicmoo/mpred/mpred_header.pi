@@ -119,7 +119,7 @@ user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_
    (prolog_load_context(source,F),
    initialization((
    (if_defined(lmconf:ignore_file_mpreds(F),fail)->true;assertz(lmconf:ignore_file_mpreds(F))),
-   ((lmconf:mpred_is_impl_file(F))->true;assertz(lmconf:mpred_is_impl_file(F)))),now))).
+   ((lmconf:mpred_is_impl_file(tbox,F))->true;assertz(lmconf:mpred_is_impl_file(tbox,F)))),now))).
 
 % ================================================
 % Thread Locals

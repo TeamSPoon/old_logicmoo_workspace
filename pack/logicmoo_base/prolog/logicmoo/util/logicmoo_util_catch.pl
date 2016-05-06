@@ -37,8 +37,8 @@
             catchv/3,
             catchvvnt/3,
             current_source_file/1,current_source_location0/1,
-            current_main_error_stream/1,
-            thread_current_input/2,
+            lmcache:current_main_error_stream/1,
+            lmcache:thread_current_input/2,
             dbgsubst/4,            
             dbgsubst0/4,
             ddmsg/1,
@@ -108,7 +108,7 @@
             slow_sanity/1,
             strip_arity/3,
             strip_f_module/2,
-            thread_current_error_stream/1,
+            lmcache:thread_current_error_stream/1,
             throwNoLib/0,
             to_m_f_arity_pi/5,
             to_pi/2,
@@ -185,7 +185,7 @@
         bubbled_ex/1,
         bubbled_ex_check/1,
         current_source_file/1,
-        current_main_error_stream/1,
+        lmcache:current_main_error_stream/1,
         dbgsubst/4,
         dbgsubst0/4,
         ddmsg/1,
@@ -232,7 +232,7 @@
         skipWrapper/0,
         strip_arity/3,
         strip_f_module/2,
-        thread_current_error_stream/1,
+        lmcache:thread_current_error_stream/1,
         throwNoLib/0,
         to_m_f_arity_pi/5,
         to_pi0/3,
@@ -315,27 +315,27 @@ with_main_error_to_output(Goal):-
 
 %= 	 	 
 
-%% thread_current_error_stream( ?Err) is semidet.
+%% lmcache:thread_current_error_stream( ?Err) is semidet.
 %
 % Thread Current Error Stream.
 %
-thread_current_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
-thread_current_error_stream(Err):- thread_self(ID),thread_current_error_stream(ID,Err),!.
-thread_current_error_stream(Err):- stream_property(Err,alias(current_error)),!.
-thread_current_error_stream(Err):- stream_property(Err,alias(user_error)),!.
-thread_current_error_stream(Err):- current_main_error_stream(Err),!.
+lmcache:thread_current_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
+lmcache:thread_current_error_stream(Err):- thread_self(ID),lmcache:thread_current_error_stream(ID,Err),!.
+lmcache:thread_current_error_stream(Err):- stream_property(Err,alias(current_error)),!.
+lmcache:thread_current_error_stream(Err):- stream_property(Err,alias(user_error)),!.
+lmcache:thread_current_error_stream(Err):- lmcache:current_main_error_stream(Err),!.
 
 %= 	 	 
 
-%% current_main_error_stream( ?Err) is semidet.
+%% lmcache:current_main_error_stream( ?Err) is semidet.
 %
 % Current Main Error Stream.
 %
-current_main_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
-current_main_error_stream(Err):- lmcache:thread_main(user,ID),thread_current_error_stream(ID,Err).
-current_main_error_stream(Err):- thread_current_error_stream(main,Err).
-current_main_error_stream(Err):- stream_property(Err,alias(user_error)),!.
-current_main_error_stream(Err):- stream_property(Err,alias(current_error)),!.
+lmcache:current_main_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
+lmcache:current_main_error_stream(Err):- lmcache:thread_main(user,ID),lmcache:thread_current_error_stream(ID,Err).
+lmcache:current_main_error_stream(Err):- lmcache:thread_current_error_stream(main,Err).
+lmcache:current_main_error_stream(Err):- stream_property(Err,alias(user_error)),!.
+lmcache:current_main_error_stream(Err):- stream_property(Err,alias(current_error)),!.
 
 %= 	 	 
 
@@ -343,7 +343,7 @@ current_main_error_stream(Err):- stream_property(Err,alias(current_error)),!.
 %
 % Format Converted To Error.
 %
-format_to_error(F,A):-current_main_error_stream(Err),!,format(Err,F,A).
+format_to_error(F,A):-lmcache:current_main_error_stream(Err),!,format(Err,F,A).
 
 %= 	 	 
 
@@ -351,12 +351,12 @@ format_to_error(F,A):-current_main_error_stream(Err),!,format(Err,F,A).
 %
 % Fresh Line Converted To Err.
 %
-fresh_line_to_err:- notrace((flush_output_safe,current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
+fresh_line_to_err:- notrace((flush_output_safe,lmcache:current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
 
-:- dynamic(thread_current_input/2).
-:- dynamic(thread_current_error_stream/2).
-:- volatile(thread_current_input/2).
-:- volatile(thread_current_error_stream/2).
+:- dynamic(lmcache:thread_current_input/2).
+:- dynamic(lmcache:thread_current_error_stream/2).
+:- volatile(lmcache:thread_current_input/2).
+:- volatile(lmcache:thread_current_error_stream/2).
 
 %= 	 	 
 
@@ -373,13 +373,13 @@ save_streams:- thread_self(ID), save_streams(ID).
 %
 % Save Streams.
 %
-save_streams(ID):- current_input(In),thread_current_input(ID,In),!.
+save_streams(ID):- current_input(In),lmcache:thread_current_input(ID,In),!.
 save_streams(ID):-
-  current_input(In),asserta(thread_current_input(ID,In)),
-  thread_at_exit(retractall((thread_current_input(ID,_)))),
-  thread_at_exit(retractall((thread_current_error_stream(ID,_)))),
+  current_input(In),asserta(lmcache:thread_current_input(ID,In)),
+  thread_at_exit(retractall((lmcache:thread_current_input(ID,_)))),
+  thread_at_exit(retractall((lmcache:thread_current_error_stream(ID,_)))),
   (stream_property(Err, alias(user_error));current_error(Err)),
-  asserta(thread_current_error_stream(ID,Err)).
+  asserta(lmcache:thread_current_error_stream(ID,Err)).
 
 
 :- meta_predicate(with_main_input(0)).
@@ -392,7 +392,7 @@ with_main_input(Goal):-
     current_output(OutPrev),
     current_input(InPrev),
     stream_property(ErrPrev,alias(user_error)),
-    lmcache:thread_main(user,ID),thread_current_input(ID,In),thread_current_error_stream(ID,Err),
+    lmcache:thread_main(user,ID),lmcache:thread_current_input(ID,In),lmcache:thread_current_error_stream(ID,Err),
     setup_call_cleanup_each(set_prolog_IO(In,OutPrev,Err),Goal,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
 
 
@@ -406,7 +406,9 @@ with_main_input(Goal):-
     current_output(OutPrev),
     current_input(InPrev),
     stream_property(ErrPrev,alias(user_error)),
-    lmcache:thread_main(user,ID),thread_current_input(ID,In),thread_current_error_stream(ID,Err),
+    lmcache:thread_main(user,ID),
+     lmcache:thread_current_input(ID,In),
+       lmcache:thread_current_error_stream(ID,Err),
     setup_call_cleanup_each(set_prolog_IO(In,Err,Err),Goal,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
 
 
@@ -514,7 +516,7 @@ if_defined_else(_:Goal,Else):-current_predicate(_,OM:Goal)->OM:Goal;Else.
 when_defined(Goal):-if_defined(Goal,true).
 
 :- if(current_predicate(run_sanity_tests/0)).
-:- listing(thread_current_error_stream/2).
+:- listing(lmcache:thread_current_error_stream/2).
 :- endif.
 
 % = :- meta_predicate(to_pi(?,?)).

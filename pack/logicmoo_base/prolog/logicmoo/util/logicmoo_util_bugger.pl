@@ -583,7 +583,7 @@ must_maplist( Goal, [Elem1|Tail1], [Elem2|Tail2], [Elem3|Tail3]) :-
 
 
 
-
+:- ensure_loaded(library(lists)).
 %= 	 	 
 
 %% throw_safe( ?Exc) is semidet.
@@ -2020,7 +2020,7 @@ real_builtin_predicate(G):-
    predicate_property(G,built_in),
    \+ predicate_property(G,dynamic),
    functor(G,F,_),!,
-   (if_defined(lmconf:mpred_system_kb(M),fail),
+   (if_defined(defaultTBoxMt(M),fail),
    (if_defined(M:mpred_isa(F,prologHybrid),fail);
      if_defined(baseKB:mpred_isa(F,prologHybrid),fail))),
    !.
@@ -2449,8 +2449,8 @@ setLogLevel(M,L):-retractall(logLevel(M,_)),(nonvar(L)->asserta(logLevel(M,L));t
 %
 % Log Level.
 %
-logLevel(debug,ERR):-thread_current_error_stream(ERR).
-logLevel(error,ERR):-thread_current_error_stream(ERR).
+logLevel(debug,ERR):-lmcache:thread_current_error_stream(ERR).
+logLevel(error,ERR):-lmcache:thread_current_error_stream(ERR).
 logLevel(private,none).
 logLevel(S,Z):-current_stream(_X,write,Z),trace,stream_property(Z,alias(S)).
 
@@ -2988,7 +2988,7 @@ prolog_exception_hook/4).
 % Disabled This.
 %
 disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame, _):- 
- thread_current_error_stream(ERR),
+ lmcache:thread_current_error_stream(ERR),
     (   Exception = error(Term)
     ;   Exception = error(Term, _)),
     Term \= type_error(number,_), 
@@ -3000,7 +3000,7 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
     prolog_frame_attribute(Frame,parent,PFrame),
     prolog_frame_attribute(PFrame,goal,Goal),
     format(ERR, 'Error ST-Begin: ~p', [Term]), nl(ERR),
-    ignore((thread_current_input(main,In),see(In))),
+    ignore((lmcache:thread_current_input(main,In),see(In))),
     dumpST9(Frame,20),
 
     dtrace(Goal),

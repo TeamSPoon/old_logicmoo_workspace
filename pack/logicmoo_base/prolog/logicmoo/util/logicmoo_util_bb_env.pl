@@ -16,7 +16,7 @@
 abolish_and_make_static/2,
 add_push_prefix_arg/4,
 % bb:'$sourcefile_info_env'/1,
-% lmconf:decl_env_mepred/2, lmconf:mpred_system_kb/1,
+% lmconf:decl_env_mepred/2, defaultTBoxMt/1,
 clause_to_hb/3,
 clause_to_hb0/3,
 decl_env_mepred/2,
@@ -77,19 +77,19 @@ term_expansion_add_context/5
         env_mpred_op_1(?, 1, :),
         env_shadow(1, ?).
 
-%:- (multifile bb:'$sourcefile_info_env'/1, lmconf:mpred_system_kb/1, env_push_args/4).
+%:- (multifile bb:'$sourcefile_info_env'/1, defaultTBoxMt/1, env_push_args/4).
 :- (module_transparent env_consult/1, env_mpred_op/2, env_mpred_op/3, env_mpred_op_1/3, env_shadow/2).
 %:- export((clause_to_hb0/3, env_mpred_op_1/3, hb_to_clause0/3, lg_op2/3)).
-%:- (dynamic bb:'$sourcefile_info_env'/1, lmconf:mpred_system_kb/1, env_push_args/4, env_source_file/1, in_dyn/2).
-%:- shared_multifile((bb:'$sourcefile_info_env'/1, lmconf:mpred_system_kb/1, env_push_args/4, env_source_file/1, in_dyn/2)).
+%:- (dynamic bb:'$sourcefile_info_env'/1, defaultTBoxMt/1, env_push_args/4, env_source_file/1, in_dyn/2).
+%:- shared_multifile((bb:'$sourcefile_info_env'/1, defaultTBoxMt/1, env_push_args/4, env_source_file/1, in_dyn/2)).
 :- endif.
 
 :- include('logicmoo_util_header.pi').
 
 :- thread_local(t_l:user_abox/2).
 
-:- multifile(lmconf:mpred_system_kb/1).
-:- dynamic(lmconf:mpred_system_kb/1).
+:- multifile(defaultTBoxMt/1).
+:- dynamic(defaultTBoxMt/1).
 
 :- thread_local(t_l:push_env_ctx).
 :- dynamic(bb:'$sourcefile_info_env'/1).
@@ -153,9 +153,9 @@ in_dyn_pred(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property
 
 get_mp_arity(F,A):- defaultAssertMt(M),if_defined(M:arity(F,A)).
 get_mp_arity(F,A):- defaultTBoxMt(M),if_defined(M:arity(F,A)).
-get_mp_arity(F,A):- lmconf:mpred_system_kb(M),M:mpred_arity(F,A).
+get_mp_arity(F,A):- defaultTBoxMt(M),M:mpred_arity(F,A).
 
-prop_mpred(Prop,F,A):- lmconf:mpred_system_kb(M),M:isa(F,Prop),get_mp_arity(F,A).
+prop_mpred(Prop,F,A):- defaultTBoxMt(M),M:isa(F,Prop),get_mp_arity(F,A).
 
 get_mpred_stubType(_,_,dyn):-!.
 get_mpred_stubType(F,A,StubOut):-    

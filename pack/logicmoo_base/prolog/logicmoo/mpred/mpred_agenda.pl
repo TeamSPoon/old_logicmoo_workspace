@@ -9,9 +9,9 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_agenda.pl
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_agenda,
-          [ will_call_after/2,
+          [ 
             add_later/1,
             
             after_mpred_load_pass2/0,
@@ -70,7 +70,7 @@
             wfAssert/1,
             mpred_agenda_file/0
           ]).
-:- endif.
+%:- endif.
 
 :- meta_predicate 
    agenda_slow_op_enqueue(0),

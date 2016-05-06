@@ -51,6 +51,8 @@
              (shared_multifile)/1,
             with_mfa/2,            
             (make_shared_multifile)/3,
+            check_undefined_predicate/4,
+            retry_undefined/1,
             with_pfa/2,
             with_pfa/4,
             m_m_fa_to_m_p_fa/4,
@@ -83,13 +85,17 @@
         context_module_of_file(-),
          with_pfa(1,*,+,+),
          with_pfa(1,+),
-         only_3rd(1,*,*,*).
+         only_3rd(1,*,*,*),
+         transitive_path(2,*,*).
+
 
 :- module_transparent
         convert_to_dynamic/1,
         convert_to_dynamic/3,
         current_predicate_module/2,
         dynamic_if_missing/1,
+        check_undefined_predicate/4,
+        retry_undefined/1,
         dynamic_multifile/1,
         dynamic_transparent/1,
         only_3rd/4,
@@ -106,6 +112,18 @@
 
 
 :- include('logicmoo_util_header.pi').
+
+:- use_module(logicmoo_util_shared_dynamic).
+
+predicate_property_nt(A,B):- quietly(w_tl(set_prolog_flag(retry_undefined,false),predicate_property(A,B))).
+
+dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
+
+:- decl_shared(genlMt/2).
+:- decl_shared(mtCore/1).
+:- decl_shared(mtExact/1).
+:- decl_shared(mtGlobal/1).
+
 
 :- meta_predicate only_3rd(1,*,*,*).
 :- meta_predicate with_pfa(1,+).
@@ -127,31 +145,31 @@ op_safe(A,B,C):-!, (current_op(_,B,C)->true;op(A,B,C)).
 %
 % Using Predicate Indicator.
 %
-with_pi(M:(P1,P2),Pred3):-!,'@'(( with_pi(M:P1,Pred3),with_pi(M:P2,Pred3) ),M).
-with_pi(M:P,Pred3):-source_context_module(CM),!,with_pi_selected(CM,M,P,Pred3),!.
+with_pi(PredMt:(P1,P2),Pred3):-!,'@'(( with_pi(PredMt:P1,Pred3),with_pi(PredMt:P2,Pred3) ),PredMt).
+with_pi(PredMt:P,Pred3):-source_context_module(CallerMt),!,with_pi_selected(CallerMt,PredMt,P,Pred3),!.
 with_pi([],_):-!.
 with_pi((P1,P2),Pred3):-!, with_pi(P1,Pred3),with_pi(P2,Pred3).
-with_pi(P,Pred3):-source_context_module(CM),with_pi_selected(CM,CM,P,Pred3),!.
+with_pi(P,Pred3):-source_context_module(CallerMt),with_pi_selected(CallerMt,CallerMt,P,Pred3),!.
 
 :- export(with_pi_selected/4).
 % = :- meta_predicate(with_pi_selected(+,+,+,+)).
 
 %= 	 	 
 
-%% with_pi_selected( +CM, +M, +P, +Pred3) is semidet.
+%% with_pi_selected( +CallerMt, +PredMt, +P, +Pred3) is semidet.
 %
 % Using Predicate Indicator Selected.
 %
-with_pi_selected(CM, M,[P|L],Pred3):-!,with_pi_selected(CM,M,P,  Pred3),with_pi_selected(CM,M,L,Pred3).
-with_pi_selected(CM,M,(P,L),Pred3):-!,with_pi_selected(CM,M,P,  Pred3),with_pi_selected(CM,M,L,Pred3).
-with_pi_selected(_CM,_M,[]  ,_Pred3):-!.
-with_pi_selected(CM,M,[P]  ,Pred3):-!,with_pi_selected(CM,M,P,  Pred3).
-with_pi_selected(CM,_, M:F//A,Pred3):-Ap2 is A+2, !,with_pi_selected(CM,M,F/Ap2,Pred3).
-with_pi_selected(CM,M, F//A ,Pred3):-Ap2 is A+2,!,functor_safe(P,F,A),  with_pi_stub(CM,M,P,F/Ap2,Pred3).
-with_pi_selected(CM,_, M:F/A,Pred3):-!,with_pi_selected(CM,M,F/A,Pred3).
-with_pi_selected(CM,_, M:P ,Pred3):-!,with_pi_selected(CM,M,P,  Pred3).
-with_pi_selected(CM,M, F/A ,Pred3):-!,functor_safe(P,F,A),  with_pi_stub(CM,M,P,F/A,Pred3).
-with_pi_selected(CM,M, P ,Pred3):-  functor_safe(P,F,A), with_pi_stub(CM,M,P,F/A,Pred3).
+with_pi_selected(CallerMt, PredMt,[P|L],Pred3):-!,with_pi_selected(CallerMt,PredMt,P,  Pred3),with_pi_selected(CallerMt,PredMt,L,Pred3).
+with_pi_selected(CallerMt,PredMt,(P,L),Pred3):-!,with_pi_selected(CallerMt,PredMt,P,  Pred3),with_pi_selected(CallerMt,PredMt,L,Pred3).
+with_pi_selected(_CallerMt,_M,[]  ,_Pred3):-!.
+with_pi_selected(CallerMt,PredMt,[P]  ,Pred3):-!,with_pi_selected(CallerMt,PredMt,P,  Pred3).
+with_pi_selected(CallerMt,_, PredMt:F//A,Pred3):-Ap2 is A+2, !,with_pi_selected(CallerMt,PredMt,F/Ap2,Pred3).
+with_pi_selected(CallerMt,PredMt, F//A ,Pred3):-Ap2 is A+2,!,functor_safe(P,F,A),  with_pi_stub(CallerMt,PredMt,P,F/Ap2,Pred3).
+with_pi_selected(CallerMt,_, PredMt:F/A,Pred3):-!,with_pi_selected(CallerMt,PredMt,F/A,Pred3).
+with_pi_selected(CallerMt,_, PredMt:P ,Pred3):-!,with_pi_selected(CallerMt,PredMt,P,  Pred3).
+with_pi_selected(CallerMt,PredMt, F/A ,Pred3):-!,functor_safe(P,F,A),  with_pi_stub(CallerMt,PredMt,P,F/A,Pred3).
+with_pi_selected(CallerMt,PredMt, P ,Pred3):-  functor_safe(P,F,A), with_pi_stub(CallerMt,PredMt,P,F/A,Pred3).
 
 
 
@@ -173,21 +191,21 @@ must_pi(X):-trace,X,!.
 
 %= 	 	 
 
-%% with_pi_stub( +CM, +M, +P, +FA, :GoalPred3) is semidet.
+%% with_pi_stub( +CallerMt, +PredMt, +P, +FA, :GoalPred3) is semidet.
 %
 % Using Predicate Indicator Stub.
 %
-with_pi_stub(CM, M,P, F//A , PM:Pred3):- ((integer(A),atom(M),atom(F),Ap2 is A+2, functor_safe(P,F,Ap2))),must_pi(PM:call(Pred3,CM, M,P,F/Ap2)),!.
-with_pi_stub(CM, M,P, F/A , PM:Pred3):- ((integer(A),atom(M),atom(F),functor_safe(P,F,A))),
-  must_pi(PM:call(Pred3,CM, M,P,F/A)),!.
-with_pi_stub(CM, M,P, F//A , Pred3):- ((integer(A),atom(M),atom(F),Ap2 is A+2,functor_safe(P,F,Ap2))),must_pi(call(Pred3,CM, M,P,F/Ap2)),!.
-with_pi_stub(CM, M,P, F/A , Pred3):- ((integer(A),atom(M),atom(F),functor_safe(P,F,A))),
-   must_pi(call(Pred3,CM, M,P,F/A)),!.
-%with_pi_stub(CM, M,P, F/A ,_: Pred3):- ((integer(A),atom(M),atom(F),functor_safe(P,F,A))),  must_pi(call(Pred3,CM, M,P,F/A)),!.
-%with_pi_stub(CM, M,P, F/A ,CP: Pred3):-!, must_pi(CP:call(Pred3,CM, M,P,F/A)),!.
-%with_pi_stub(CM, M,P, F/A , Pred3):-!, must_pi(call(Pred3,CM, M,P,F/A)),!.
+with_pi_stub(CallerMt, PredMt,P, F//A , PM:Pred3):- ((integer(A),atom(PredMt),atom(F),Ap2 is A+2, functor_safe(P,F,Ap2))),must_pi(PM:call(Pred3,CallerMt, PredMt,P,F/Ap2)),!.
+with_pi_stub(CallerMt, PredMt,P, F/A , PM:Pred3):- ((integer(A),atom(PredMt),atom(F),functor_safe(P,F,A))),
+  must_pi(PM:call(Pred3,CallerMt, PredMt,P,F/A)),!.
+with_pi_stub(CallerMt, PredMt,P, F//A , Pred3):- ((integer(A),atom(PredMt),atom(F),Ap2 is A+2,functor_safe(P,F,Ap2))),must_pi(call(Pred3,CallerMt, PredMt,P,F/Ap2)),!.
+with_pi_stub(CallerMt, PredMt,P, F/A , Pred3):- ((integer(A),atom(PredMt),atom(F),functor_safe(P,F,A))),
+   must_pi(call(Pred3,CallerMt, PredMt,P,F/A)),!.
+%with_pi_stub(CallerMt, PredMt,P, F/A ,_: Pred3):- ((integer(A),atom(PredMt),atom(F),functor_safe(P,F,A))),  must_pi(call(Pred3,CallerMt, PredMt,P,F/A)),!.
+%with_pi_stub(CallerMt, PredMt,P, F/A ,CP: Pred3):-!, must_pi(CP:call(Pred3,CallerMt, PredMt,P,F/A)),!.
+%with_pi_stub(CallerMt, PredMt,P, F/A , Pred3):-!, must_pi(call(Pred3,CallerMt, PredMt,P,F/A)),!.
 
-with_pi_stub(CM, M,P,FA,Pred3):- trace_or_throw(invalide_args(CM, M,P,FA,Pred3)).
+with_pi_stub(CallerMt, PredMt,P,FA,Pred3):- trace_or_throw(invalide_args(CallerMt, PredMt,P,FA,Pred3)).
 % ----------
 
 :- export(with_mfa/2).
@@ -207,12 +225,12 @@ with_mfa(P  ,Pred3):- with_pi(P,with_mfa_of(Pred3)).
 
 %= 	 	 
 
-%% with_mfa_of( :PRED3Pred3, +CM, +M, +P, +F) is semidet.
+%% with_mfa_of( :PRED3Pred3, +CallerMt, +PredMt, +P, +F) is semidet.
 %
 % Using Module-functor-arity Of.
 %
-with_mfa_of(Pred3,_CM,M,_P,F//A):- Ap2 is A+2, M:call(Pred3,M,F,Ap2).
-with_mfa_of(Pred3,_CM,M,_P,F/A):-M:call(Pred3,M,F,A).
+with_mfa_of(Pred3,_CallerMt,PredMt,_P,F//A):- Ap2 is A+2, PredMt:call(Pred3,PredMt,F,Ap2).
+with_mfa_of(Pred3,_CallerMt,PredMt,_P,F/A):-PredMt:call(Pred3,PredMt,F,A).
 
 % ----------
 
@@ -223,20 +241,20 @@ with_mfa_of(Pred3,_CM,M,_P,F/A):-M:call(Pred3,M,F,A).
 
 %= 	 	 
 
-%% make_transparent( ?CM, ?M, ?PI, :TermF) is semidet.
+%% make_transparent( ?CallerMt, ?PredMt, ?PI, :TermF) is semidet.
 %
 % Make Transparent.
 %
-make_transparent(_CM,M,_PI,F/0):-!, compound_name_arity(C,F,0), M:meta_predicate(C).
-make_transparent(CM,_,PI,M:F/A):-!,make_transparent(CM,M,PI,F/A).
-make_transparent(_CM,M,PI,F/A):-
+make_transparent(_CallerMt,PredMt,_PI,F/0):-!, compound_name_arity(C,F,0), PredMt:meta_predicate(C).
+make_transparent(CallerMt,_,PI,PredMt:F/A):-!,make_transparent(CallerMt,PredMt,PI,F/A).
+make_transparent(_CallerMt,PredMt,PI,F/A):-
    (((var(PI)->functor_safe(PI,F,A);true),
-   M:module_transparent(F/A),
+   PredMt:module_transparent(F/A),
    fill_args(PI,('?')),!,
    dbgsubst(PI, (^),(^),PI1),
    dbgsubst(PI1,(0),(0),PI2),
    dbgsubst(PI2,(:),(:),PI3),
-   (compound(PI3) -> M:meta_predicate(PI3) ; true))).
+   (compound(PI3) -> PredMt:meta_predicate(PI3) ; true))).
 
 % ----------
 
@@ -245,13 +263,13 @@ make_transparent(_CM,M,PI,F/A):-
 
 %= 	 	 
 
-%% context_module_of_file( -CM) is semidet.
+%% context_module_of_file( -CallerMt) is semidet.
 %
 % Context Module Of File.
 %
-context_module_of_file(CM):- prolog_load_context(source,F), make_module_name00(F,CM),current_module(CM0),CM==CM0,!.
-context_module_of_file(CM):-  '$set_source_module'(CM,CM),!.
-context_module_of_file(CM):- source_context_module(CM),!.
+context_module_of_file(CallerMt):- prolog_load_context(source,F), make_module_name00(F,CallerMt),current_module(CallerMt0),CallerMt==CallerMt0,!.
+context_module_of_file(CallerMt):-  '$set_source_module'(CallerMt,CallerMt),!.
+context_module_of_file(CallerMt):- source_context_module(CallerMt),!.
 
 %% make_module_name00( ?P, ?Module) is semidet.
 %
@@ -259,10 +277,10 @@ context_module_of_file(CM):- source_context_module(CM),!.
 %
 make_module_name00(P,Module):- module_property(Module,file(P)),!.
 
-make_module_name00(P,O):-atom(P),!,file_base_name(P,F),file_name_extension(M,_Ext,F),(M\==F->make_module_name00(M,O);O=M).
-make_module_name00(mpred/P,M):-nonvar(P),!,make_module_name00(P,M).
-make_module_name00(util/P,M):-nonvar(P),!,make_module_name00(P,M).
-make_module_name00(P,M):-must(filematch(P,F)),F\=P,!,make_module_name00(F,M).
+make_module_name00(P,O):-atom(P),!,file_base_name(P,F),file_name_extension(PredMt,_Ext,F),(PredMt\==F->make_module_name00(PredMt,O);O=PredMt).
+make_module_name00(mpred/P,PredMt):-nonvar(P),!,make_module_name00(P,PredMt).
+make_module_name00(util/P,PredMt):-nonvar(P),!,make_module_name00(P,PredMt).
+make_module_name00(P,PredMt):-must(filematch(P,F)),F\=P,!,make_module_name00(F,PredMt).
 
 :- op(1150,fx,lmconf:dynamic_safe).
 
@@ -278,9 +296,9 @@ make_module_name00(P,M):-must(filematch(P,F)),F\=P,!,make_module_name00(F,M).
 %
 % Shared Multifile.
 %
-shared_multifile(user:PI):-!, context_module_of_file(CM),with_pfa_group(make_shared_multifile,CM, baseKB, PI).
-shared_multifile(logicmoo_user:PI):- !, context_module_of_file(CM),with_pfa_group(make_shared_multifile,CM, baseKB, PI).
-shared_multifile(PI):- context_module_of_file(CM),with_pfa_group(make_shared_multifile,CM, baseKB, PI).
+shared_multifile(user:PI):-!, context_module_of_file(CallerMt),with_pfa_group(make_shared_multifile,CallerMt, baseKB, PI).
+shared_multifile(logicmoo_user:PI):- !, context_module_of_file(CallerMt),with_pfa_group(make_shared_multifile,CallerMt, baseKB, PI).
+shared_multifile(PI):- context_module_of_file(CallerMt),with_pfa_group(make_shared_multifile,CallerMt, baseKB, PI).
 
 %= 	 	 
 
@@ -288,7 +306,7 @@ shared_multifile(PI):- context_module_of_file(CM),with_pfa_group(make_shared_mul
 %
 % Was Dynamic.
 %
-was_dynamic(PI):- context_module_of_file(CM),with_pfa_group(save_was(dynamic),CM, baseKB, PI).
+was_dynamic(PI):- context_module_of_file(CallerMt),with_pfa_group(save_was(dynamic),CallerMt, baseKB, PI).
 
 %= 	 	 
 
@@ -296,7 +314,7 @@ was_dynamic(PI):- context_module_of_file(CM),with_pfa_group(save_was(dynamic),CM
 %
 % Was Export.
 %
-was_export(PI):- context_module_of_file(CM),with_pfa_group(save_was(export),CM, baseKB, PI).
+was_export(PI):- context_module_of_file(CallerMt),with_pfa_group(save_was(export),CallerMt, baseKB, PI).
 
 %= 	 	 
 
@@ -304,7 +322,7 @@ was_export(PI):- context_module_of_file(CM),with_pfa_group(save_was(export),CM, 
 %
 % Was Module Transparent.
 %
-was_module_transparent(PI):- context_module_of_file(CM),with_pfa_group(save_was(module_transparent),CM, baseKB, PI).
+was_module_transparent(PI):- context_module_of_file(CallerMt),with_pfa_group(save_was(module_transparent),CallerMt, baseKB, PI).
 
 %= 	 	 
 
@@ -312,7 +330,7 @@ was_module_transparent(PI):- context_module_of_file(CM),with_pfa_group(save_was(
 %
 % Was Multifile.
 %
-was_multifile(PI):- context_module_of_file(CM),with_pfa_group(save_was(multifile),CM, baseKB, PI).
+was_multifile(PI):- context_module_of_file(CallerMt),with_pfa_group(save_was(multifile),CallerMt, baseKB, PI).
 
 :-dynamic(was_was:was_was_once/4).
 :-export(was_was:was_was_once/4).
@@ -324,17 +342,17 @@ was_multifile(PI):- context_module_of_file(CM),with_pfa_group(save_was(multifile
 
 %= 	 	 
 
-%% save_was( ?Was, ?CM, ?M, :TermP) is semidet.
+%% save_was( ?Was, ?CallerMt, ?PredMt, :TermP) is semidet.
 %
 % Save Was.
 %
 save_was(_,_,_,_).
-save_was(_,_, M, F/A):- was_was:skip_def(F/A,M),!.
-save_was(export,_, M, F/A):- !,retractall(was_was:was_was_once(F/A,M,_,_)),!,assert_if_new(was_was:skip_def(F/A,M)),!.
+save_was(_,_, PredMt, F/A):- was_was:skip_def(F/A,PredMt),!.
+save_was(export,_, PredMt, F/A):- !,retractall(was_was:was_was_once(F/A,PredMt,_,_)),!,assert_if_new(was_was:skip_def(F/A,PredMt)),!.
 save_was(module_transparent,_, _, _):- !.
-save_was(_,CM, M, F/A):-  on_x_cont(M:dynamic(F/A)), on_x_cont(CM:dynamic(F/A)), on_x_cont(M:multifile(F/A)), on_x_cont(CM:multifile(F/A)),fail.
-save_was(Was,CM, M, F/A):- !, once(source_location(File,_);File=CM),assert_if_new(was_was:was_was_once(F/A,M,File,Was)),!.
-save_was(Was,CM, M, P):-functor(P,F,A), save_was(Was,CM, M, F/A).
+save_was(_,CallerMt, PredMt, F/A):-  on_x_cont(PredMt:dynamic(F/A)), on_x_cont(CallerMt:dynamic(F/A)), on_x_cont(PredMt:multifile(F/A)), on_x_cont(CallerMt:multifile(F/A)),fail.
+save_was(Was,CallerMt, PredMt, F/A):- !, once(source_location(File,_);File=CallerMt),assert_if_new(was_was:was_was_once(F/A,PredMt,File,Was)),!.
+save_was(Was,CallerMt, PredMt, P):-functor(P,F,A), save_was(Was,CallerMt, PredMt, F/A).
 
 :-module_transparent(make_shared_multifile/3).
 :- export((make_shared_multifile)/3).
@@ -343,57 +361,57 @@ save_was(Was,CM, M, P):-functor(P,F,A), save_was(Was,CM, M, F/A).
 
 %= 	 	 
 
-%% make_shared_multifile( ?CM, ?M, :TermPI) is semidet.
+%% make_shared_multifile( ?CallerMt, ?PredMt, :TermPI) is semidet.
 %
 % Make Shared Multifile.
 %
-% make_shared_multifile(_, baseKB, F/A):- decl_shared(baseKB:F/A),!.
-make_shared_multifile(CM, t_l, F/A):-!,CM:thread_local(t_l:F/A),!,CM:multifile(t_l:F/A).
+% make_shared_multifile(_, baseKB, F/A):- decl_shared(F/A),!.
+make_shared_multifile(CallerMt, t_l, F/A):-!,CallerMt:thread_local(t_l:F/A),!,CallerMt:multifile(t_l:F/A).
 % make_shared_multifile(_, basePFC, _):-!.
-make_shared_multifile(CM, M, F/A):-!,M:dynamic(M:F/A),!,M:multifile(M:F/A),!,CM:multifile(M:F/A).
+make_shared_multifile(CallerMt, PredMt, F/A):-!,PredMt:dynamic(PredMt:F/A),!,PredMt:multifile(PredMt:F/A),!,CallerMt:multifile(PredMt:F/A).
 
-make_shared_multifile(CM, M, F/A):- 
- dmsg(make_shared_multifile(CM, M, F/A)),
+make_shared_multifile(CallerMt, PredMt, F/A):- 
+ dmsg(make_shared_multifile(CallerMt, PredMt, F/A)),
  must_det_l((    
-    dynamic_safe(M,F,A), 
-   '@'(M:export(M:F/A),M),
-   '@'(M:multifile(M:F/A),M),
-   '@'(M:multifile(M:F/A),CM),   
-    (CM\==M->CM:import(M:F/A);true))).
-make_shared_multifile(CM, M, PI):- functor(PI,F,A),make_shared_multifile(CM, M, F/A).
+    dynamic_safe(PredMt,F,A), 
+   '@'(PredMt:export(PredMt:F/A),PredMt),
+   '@'(PredMt:multifile(PredMt:F/A),PredMt),
+   '@'(PredMt:multifile(PredMt:F/A),CallerMt),   
+    (CallerMt\==PredMt->CallerMt:import(PredMt:F/A);true))).
+make_shared_multifile(CallerMt, PredMt, PI):- functor(PI,F,A),make_shared_multifile(CallerMt, PredMt, F/A).
 
 :-module_transparent(with_pfa/2).
 :-export(with_pfa/2).
 
-%= 	 	 mudDescription decl_mpred_hybrid
+%= 	 	 mudDescription kb_dynamic
 
 %% with_pfa( :PRED1With, +PI) is semidet.
 %
 % Using Pfa.
 %
 with_pfa(With, PI):- 
-  context_module_of_file(CM),with_pfa_group(only_3rd(With),CM, user, PI).
+  context_module_of_file(CallerMt),with_pfa_group(only_3rd(With),CallerMt, user, PI).
 
 :-module_transparent(with_pfa/4).
 
 %= 	 	 
 
-%% with_pfa( :PRED1With, +CM, +M, +PI) is semidet.
+%% with_pfa( :PRED1With, +CallerMt, +PredMt, +PI) is semidet.
 %
 % Using Pfa.
 %
-with_pfa(With,CM, M, PI):- context_module_of_file(CM),with_pfa_group(only_3rd(With),CM, M, PI).
+with_pfa(With,CallerMt, PredMt, PI):- context_module_of_file(CallerMt),with_pfa_group(only_3rd(With),CallerMt, PredMt, PI).
 
 :-module_transparent(m_m_fa_to_m_p_fa/4).
 
 %= 	 	 
 
-%% m_m_fa_to_m_p_fa( ?Decl_mpred_hybrid, ?CM, ?M, ?PI) is semidet.
+%% m_m_fa_to_m_p_fa( ?Decl_mpred_hybrid, ?CallerMt, ?PredMt, ?PI) is semidet.
 %
-% Module Module Functor-arity Converted To Module Pred Functor-arity.
+% Module Module Functor-arity Converted To Module F Functor-arity.
 %
-m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CM,M,F/A):-!,atom(F),functor(PI,F,A),CM:call(Decl_mpred_hybrid,M,PI,F/A).
-m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CM,M,PI):-functor(PI,F,A),CM:call(Decl_mpred_hybrid,M,PI,F/A).
+m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,F/A):-!,atom(F),functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A).
+m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,PI):-functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A).
 
 :-module_transparent(m_fa_to_m_p_fa/2).
 
@@ -401,26 +419,26 @@ m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CM,M,PI):-functor(PI,F,A),CM:call(Decl_mpred_
 
 %% m_fa_to_m_p_fa( ?Decl_mpred_hybrid, ?FA) is semidet.
 %
-% Module Functor-arity Converted To Module Pred Functor-arity.
+% Module Functor-arity Converted To Module F Functor-arity.
 %
-m_fa_to_m_p_fa(Decl_mpred_hybrid,M:FA):- !, m_m_fa_to_m_p_fa(Decl_mpred_hybrid,M,M,FA).
-m_fa_to_m_p_fa(Decl_mpred_hybrid,FA):-  m_m_fa_to_m_p_fa(Decl_mpred_hybrid,M,M,FA).
+m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt:FA):- !, m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
+m_fa_to_m_p_fa(Decl_mpred_hybrid,FA):-  m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
 
  
 :-module_transparent(only_3rd/4).
 
 %= 	 	 
 
-%% only_3rd( :PRED1With, ?CM, ?M, ?PI) is semidet.
+%% only_3rd( :PRED1With, ?CallerMt, ?PredMt, ?PI) is semidet.
 %
 % Only 3rd.
 %
-only_3rd([],_CM, _M, _PI):- !.
-only_3rd([With|List],CM, M, PI):- is_list(List),!,only_3rd(With,CM, M, PI),only_3rd(List,CM, M, PI).
+only_3rd([],_CallerMt, _M, _PI):- !.
+only_3rd([With|List],CallerMt, PredMt, PI):- is_list(List),!,only_3rd(With,CallerMt, PredMt, PI),only_3rd(List,CallerMt, PredMt, PI).
 only_3rd(With,user, user, PI):-!, show_call(with_pi,call(With,PI)).
-only_3rd(With,CM, user, PI):-!, show_call(with_pi,call(With,CM:PI)).
-% only_3rd(With,user, M, PI):-!, show_call(with_pi,call(With,M:PI)).
-only_3rd(With,CM, M, PI):- CM:call(With,M:PI).
+only_3rd(With,CallerMt, user, PI):-!, show_call(with_pi,call(With,CallerMt:PI)).
+% only_3rd(With,user, PredMt, PI):-!, show_call(with_pi,call(With,PredMt:PI)).
+only_3rd(With,CallerMt, PredMt, PI):- CallerMt:call(With,PredMt:PI).
 
 :- multifile(lmconf:mpred_is_decl_called/4).
 :- dynamic(lmconf:mpred_is_decl_called/4).
@@ -436,57 +454,57 @@ only_3rd(With,CM, M, PI):- CM:call(With,M:PI).
 %
 % Converted To Canonical Module Predicate Indicator.
 %
-to_canonical_mpi(M:FA,MPI):-atom(M),!,to_canonical_mpi(FA,PI),add_mi(M,PI,MPI).
-to_canonical_mpi((M:F)/A,MPI):- integer(A),!,functor(PI,F,A),add_mi(M,PI,MPI).
-to_canonical_mpi((M:F)//A2,MPI):-integer(A),!,A is A2 + 2, functor(PI,F,A),add_mi(M,PI,MPI).
-to_canonical_mpi(F/A,MPI):- functor(P,F,A), functor(P,F,A),strip_module(P,M,PI),add_mi(M,PI,MPI).
-to_canonical_mpi(F//A2,MPI):- A is A2 + 2, functor(P,F,A),strip_module(P,M,PI),add_mi(M,PI,MPI).
-to_canonical_mpi(P,MPI):- strip_module(P,M,PI),add_mi(M,PI,MPI).
+to_canonical_mpi(PredMt:FA,MPI):-atom(PredMt),!,to_canonical_mpi(FA,PI),add_mi(PredMt,PI,MPI).
+to_canonical_mpi((PredMt:F)/A,MPI):- integer(A),!,functor(PI,F,A),add_mi(PredMt,PI,MPI).
+to_canonical_mpi((PredMt:F)//A2,MPI):-integer(A),!,A is A2 + 2, functor(PI,F,A),add_mi(PredMt,PI,MPI).
+to_canonical_mpi(F/A,MPI):- functor(P,F,A), functor(P,F,A),strip_module(P,PredMt,PI),add_mi(PredMt,PI,MPI).
+to_canonical_mpi(F//A2,MPI):- A is A2 + 2, functor(P,F,A),strip_module(P,PredMt,PI),add_mi(PredMt,PI,MPI).
+to_canonical_mpi(P,MPI):- strip_module(P,PredMt,PI),add_mi(PredMt,PI,MPI).
 
 
 %= 	 	 
 
-%% add_mi( ?M, ?P, :TermM) is semidet.
+%% add_mi( ?PredMt, ?P, :TermM) is semidet.
 %
 % Add Mi.
 %
-add_mi(M,P,M:PI):-strip_module(P,_,PI).
+add_mi(PredMt,P,PredMt:PI):-strip_module(P,_,PI).
 
 
 %= 	 	 
 
-%% with_pfa_group( :PRED3With, +CM, +M, +F) is semidet.
+%% with_pfa_group( :PRED3With, +CallerMt, +PredMt, +F) is semidet.
 %
 % Using Pfa Group.
 %
-with_pfa_group(With,CM, _, M:F/A ):- must(atom(F)), !,with_pfa_group(With,CM, M,F/A ).
-with_pfa_group(With,CM, _, (M:F)/A ):- must(atom(F)), !,with_pfa_group(With,CM, M,F/A ).
-with_pfa_group(With,CM, _, M:PI ):- must(nonvar(PI)),!, with_pfa_group(With,CM,M,PI).
-with_pfa_group(With,CM, M, [A] ):-!,with_pfa_group(With,CM,M, A ).
-with_pfa_group(With,CM, M, [A|B] ):-!,with_pfa_group(With,CM,M, A ),with_pfa_group(With,CM,M, B ).
-with_pfa_group(With,CM, M, (A,B) ):-!,with_pfa_group(With,CM,M, A ),with_pfa_group(With,CM,M, B ).
-with_pfa_group(With,CM, M, ([F1|FL])/A):- !,with_pfa_single(With,CM, M, F1/A),with_pfa_group(With,CM, M, FL/A).
-with_pfa_group(With,CM, M, (F1,FL)/A):- !,with_pfa_single(With,CM, M, F1/A),with_pfa_group(With,CM, M, FL/A).
+with_pfa_group(With,CallerMt, _, PredMt:F/A ):- must(atom(F)), !,with_pfa_group(With,CallerMt, PredMt,F/A ).
+with_pfa_group(With,CallerMt, _, (PredMt:F)/A ):- must(atom(F)), !,with_pfa_group(With,CallerMt, PredMt,F/A ).
+with_pfa_group(With,CallerMt, _, PredMt:PI ):- must(nonvar(PI)),!, with_pfa_group(With,CallerMt,PredMt,PI).
+with_pfa_group(With,CallerMt, PredMt, [A] ):-!,with_pfa_group(With,CallerMt,PredMt, A ).
+with_pfa_group(With,CallerMt, PredMt, [A|B] ):-!,with_pfa_group(With,CallerMt,PredMt, A ),with_pfa_group(With,CallerMt,PredMt, B ).
+with_pfa_group(With,CallerMt, PredMt, (A,B) ):-!,with_pfa_group(With,CallerMt,PredMt, A ),with_pfa_group(With,CallerMt,PredMt, B ).
+with_pfa_group(With,CallerMt, PredMt, ([F1|FL])/A):- !,with_pfa_single(With,CallerMt, PredMt, F1/A),with_pfa_group(With,CallerMt, PredMt, FL/A).
+with_pfa_group(With,CallerMt, PredMt, (F1,FL)/A):- !,with_pfa_single(With,CallerMt, PredMt, F1/A),with_pfa_group(With,CallerMt, PredMt, FL/A).
 
-with_pfa_group(With,CM, M, F):- atom(F),!,must(with_pfa_single(With,CM, M, F/0)).
-with_pfa_group(With,CM, M, F/A):- !,must(with_pfa_single(With,CM, M, F/A)).
-with_pfa_group(With,CM, M, PI):- must(with_pfa_single(With,CM, M, PI)).
+with_pfa_group(With,CallerMt, PredMt, F):- atom(F),!,must(with_pfa_single(With,CallerMt, PredMt, F/0)).
+with_pfa_group(With,CallerMt, PredMt, F/A):- !,must(with_pfa_single(With,CallerMt, PredMt, F/A)).
+with_pfa_group(With,CallerMt, PredMt, PI):- must(with_pfa_single(With,CallerMt, PredMt, PI)).
 
 :-export(with_pfa_single/4).
 :-module_transparent(with_pfa_single/4).
 
 %= 	 	 
 
-%% with_pfa_single( :PRED3With, ?CM, ?M, ?FA) is semidet.
+%% with_pfa_single( :PRED3With, ?CallerMt, ?PredMt, ?FA) is semidet.
 %
 % Using Pfa Single.
 %
-with_pfa_single(With,CM, M, FA):- lmconf:mpred_is_decl_called(With,CM, M, FA),!.
-% with_pfa_single(With,_CM, M, FA):- to_canonical_mpi(FA,P), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property(RM:P,imported_from(_)), M==RM))))),fail.
-with_pfa_single([], _CM, _M, _FA):-!.
-with_pfa_single([With|List],CM, M, FA):- is_list(List),!,with_pfa_single(With,CM, M, FA),!,with_pfa_single(List,CM, M, FA).
-with_pfa_single(With,CM, M, FA):- lmconf:mpred_is_decl_called(With,CM0, M0, FA),M0\==M, dmsg(with_pfa_single(With,CM->CM0, M->M0, FA)),!,asserta(lmconf:mpred_is_decl_called(With,CM, M, FA)),!.
-with_pfa_single(With,CM, M, FA):- asserta(lmconf:mpred_is_decl_called(With,CM, M, FA)), must(call(With,CM, M, FA)).
+with_pfa_single(With,CallerMt, PredMt, FA):- lmconf:mpred_is_decl_called(With,CallerMt, PredMt, FA),!.
+% with_pfa_single(With,_CallerMt, PredMt, FA):- to_canonical_mpi(FA,P), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property_nt(RM:P,imported_from(_)), PredMt==RM))))),fail.
+with_pfa_single([], _CallerMt, _M, _FA):-!.
+with_pfa_single([With|List],CallerMt, PredMt, FA):- is_list(List),!,with_pfa_single(With,CallerMt, PredMt, FA),!,with_pfa_single(List,CallerMt, PredMt, FA).
+with_pfa_single(With,CallerMt, PredMt, FA):- lmconf:mpred_is_decl_called(With,CallerMt0, M0, FA),M0\==PredMt, dmsg(with_pfa_single(With,CallerMt->CallerMt0, PredMt->M0, FA)),!,asserta(lmconf:mpred_is_decl_called(With,CallerMt, PredMt, FA)),!.
+with_pfa_single(With,CallerMt, PredMt, FA):- asserta(lmconf:mpred_is_decl_called(With,CallerMt, PredMt, FA)), must(call(With,CallerMt, PredMt, FA)).
 
 
 % ----------
@@ -517,7 +535,7 @@ fill_args(PI,With):-compound_name_arguments(PI,_,ARGS),fill_args(ARGS,With).
 %
 % Def Meta Predicate.
 %
-def_meta_predicate(M:F,S,E):-!,M:doall(((between(S,E,N),make_list('?',N,List),compound_name_arguments(CALL,F,List),'@'(meta_predicate(CALL),M)))).
+def_meta_predicate(PredMt:F,S,E):-!,PredMt:doall(((between(S,E,N),make_list('?',N,List),compound_name_arguments(CALL,F,List),'@'(meta_predicate(CALL),PredMt)))).
 def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
 
@@ -532,9 +550,9 @@ def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 %
 remove_pred(_,_,_):-!.
 remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
-remove_pred(M,F,A):- functor(P,F,A),
-  (current_predicate(M:F/A) -> ignore((catchv(redefine_system_predicate(M:P),_,true),abolish(M:F,A)));true),
-  M:asserta((P:- wdmsg(error(P)),throw(permission_error(M:F/A)))).
+remove_pred(PredMt,F,A):- functor(P,F,A),
+  (current_predicate(PredMt:F/A) -> ignore((catchv(redefine_system_predicate(PredMt:P),_,true),abolish(PredMt:F,A)));true),
+  PredMt:asserta((P:- wdmsg(error(P)),throw(permission_error(PredMt:F/A)))).
 
 
 
@@ -556,25 +574,25 @@ call_if_defined(G):-current_predicate(_,G),G.
 
 %% p_predicate_property( :TermP, ?PP) is semidet.
 %
-% Pred Predicate Property.
+% F Predicate Property.
 %
-p_predicate_property(P,PP):-predicate_property(P,PP),!.
-p_predicate_property(_:P,PP):-predicate_property(P,PP).
-%current_bugger_predicate(M:FF/FA):-nonvar(FF),!,current_predicate(M:FF,FA).
+p_predicate_property(P,PP):-predicate_property_nt(P,PP),!.
+p_predicate_property(_:P,PP):-predicate_property_nt(P,PP).
+%current_bugger_predicate(PredMt:FF/FA):-nonvar(FF),!,current_predicate(PredMt:FF,FA).
 %current_bugger_predicate(FF/FA):-nonvar(FF),!,!,current_predicate(FF/FA).
 :- module_transparent(current_predicate_module/2).
 
 %= 	 	 
 
-%% current_predicate_module( :TermP, ?M) is semidet.
+%% current_predicate_module( :TermP, ?PredMt) is semidet.
 %
 % Current Predicate Module.
 %
-current_predicate_module(P,M):-var(P),!,current_predicate(F/A),functor_safe(P,F,A),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
-current_predicate_module(OM:F/A,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);(current_predicate(OM:F/A),M=OM);current_predicate(F/A)),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
-current_predicate_module(OM:P,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);(current_predicate(OM:F/A),M=OM);current_predicate(F/A)),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
-current_predicate_module(F/A,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);(current_predicate(OM:F/A),M=OM);current_predicate(F/A)),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
-current_predicate_module(P,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);current_predicate(F/A)),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
+current_predicate_module(P,PredMt):-var(P),!,current_predicate(F/A),functor_safe(P,F,A),(nonvar(PredMt)->true;p_predicate_property(P,imported_from(PredMt))).
+current_predicate_module(OM:F/A,PredMt):-!,functor_safe(P,F,A),(current_predicate(PredMt:F/A);(current_predicate(OM:F/A),PredMt=OM);current_predicate(F/A)),(nonvar(PredMt)->true;p_predicate_property(P,imported_from(PredMt))).
+current_predicate_module(OM:P,PredMt):-!,functor_safe(P,F,A),(current_predicate(PredMt:F/A);(current_predicate(OM:F/A),PredMt=OM);current_predicate(F/A)),(nonvar(PredMt)->true;p_predicate_property(P,imported_from(PredMt))).
+current_predicate_module(F/A,PredMt):-!,functor_safe(P,F,A),(current_predicate(PredMt:F/A);(current_predicate(OM:F/A),PredMt=OM);current_predicate(F/A)),(nonvar(PredMt)->true;p_predicate_property(P,imported_from(PredMt))).
+current_predicate_module(P,PredMt):-!,functor_safe(P,F,A),(current_predicate(PredMt:F/A);current_predicate(F/A)),(nonvar(PredMt)->true;p_predicate_property(P,imported_from(PredMt))).
 
 
 
@@ -584,10 +602,10 @@ current_predicate_module(P,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);c
 %
 % Dynamic Multifile.
 %
-dynamic_multifile(Pred/N):-
-   dynamic(Pred/N),
-   multifile(Pred/N),
-   module_transparent(Pred/N).
+dynamic_multifile(F/N):-
+   dynamic(F/N),
+   multifile(F/N),
+   module_transparent(F/N).
 
 
 %= 	 	 
@@ -599,12 +617,199 @@ dynamic_multifile(Pred/N):-
 dynamic_transparent([]):-!.
 dynamic_transparent([X]):-dynamic_transparent(X),!.
 dynamic_transparent([X|Xs]):-!,dynamic_transparent(X),dynamic_transparent(Xs),!.
-dynamic_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A).
+dynamic_transparent(PredMt:F/A):-!, module_transparent(PredMt:F/A),dynamic(PredMt:F/A).
 dynamic_transparent(F/A):-!,multi_transparent(lmconf:F/A).
 dynamic_transparent(X):-functor_catch(X,F,A),dynamic_transparent(F/A),!.
 
 
-%= 	 	 
+% mtGlobal
+% mtCore
+
+
+
+makeConstant(_Mt).
+
+
+%:- (system:trace, rtrace, trace,cls ).
+%:- (break,notrace,nortrace).
+
+
+% ============================================
+:- dynamic(lmcache:how_registered_pred/4).
+:- module_transparent(lmcache:how_registered_pred/4).
+
+
+guessMtFromGoal(HintMt,_,HintMt):- mtExact(HintMt).
+guessMtFromGoal(HintMt,Goal,HintMt):-
+  predicate_property_nt(HintMt:Goal,exported).
+guessMtFromGoal(HintMt,Goal,OtherMt):-
+  predicate_property_nt(HintMt:Goal,imported_from(OtherMt)).
+guessMtFromGoal(_,Goal,OtherMt):-
+  predicate_property_nt(Goal,imported_from(OtherMt)).
+
+guessMtFromGoal(_,Goal,OtherMt):- var(OtherMt),!,
+  predicate_property_nt(OtherMt:Goal,file(_)).
+
+guessMtFromGoal(_,Goal,OtherMt):-
+  mtGlobal(OtherMt),
+  predicate_property_nt(OtherMt:Goal,file(_)).
+
+
+add_import_predicate(Mt,Goal,OtherMt):- fail,
+   mtGlobal(Mt),
+   mtGlobal(OtherMt),
+   \+ import_module(OtherMt,Mt),
+   catch(add_import_module(Mt,OtherMt,end),
+       error(permission_error(add_import,module,baseKB),
+       context(system:add_import_module/3,'would create a cycle')),fail),
+   must(predicate_property_nt(Mt:Goal,imported_from(OtherMt))),!.
+add_import_predicate(Mt,Goal,OtherMt):- catch(Mt:import(OtherMt:Goal),_,fail),!.
+add_import_predicate(Mt,Goal,OtherMt):- 
+   functor(Goal,F,A),
+   make_as_dynamic(imported_from(OtherMt),Mt,F,A),
+   assert_if_new(( Mt:Goal :- OtherMt:Goal)).
+  
+
+
+make_as_dynamic(Reason,Mt,F,A):- dynamic( Mt:F/A),
+   functor(Goal,F,A),
+   assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))).
+
+
+
+registerCycPred(Mt,_,F,A):-
+   lmcache:how_registered_pred(_,Mt,F,A),!.
+
+registerCycPred(Mt,Goal,F,A):-
+   guessMtFromGoal(Mt,Goal,OtherMt), 
+   sanity(Mt \== OtherMt),
+   must(Mt \== OtherMt),
+   ain(tMicrotheory(Mt)),
+   registerCycPred(Mt,Goal,F,A,OtherMt),!.
+
+registerCycPred(Mt,Goal,F,A):-
+   dynamic(Mt:F/A), % (1 is random(180)->dump_break;true),
+   assert_if_new(( Mt:Goal :- istAbove(Mt,Goal))).
+
+
+transitive_path(F,[Arg1,Arg2],Arg2):-
+  dif(Arg1,Arg2),call(F,Arg1,Arg2),!.
+transitive_path(F,[Arg1,SecondNodeMt|REST],Arg2):-
+  dif(Arg1,Arg2),dif(Arg1,SecondNodeMt),
+  call(F,Arg1,SecondNodeMt),stack_check,
+  transitive_path(F,[SecondNodeMt|REST],Arg2).
+
+registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
+  mtGlobal(OtherMt),
+  add_import_predicate(Mt,Goal,OtherMt),!.
+  
+
+registerCycPred(Mt,Goal,F,A,OtherMt):- 
+   transitive_path(genlMt,[Mt,SecondNodeMt|_],OtherMt),
+   make_as_dynamic(genlMt(Mt,OtherMt),Mt,F,A),
+   assert_if_new(( Mt:Goal :- SecondNodeMt:call(Goal))),!.
+
+registerCycPred(Mt,_Goal,F,A,OtherMt):-
+  dump_break,
+  make_as_dynamic(need_genlMt(Mt,OtherMt),Mt,F,A),!.
+   
+:- reexport(logicmoo_util_with_assertions).
+:- reexport(logicmoo_util_dmsg).
+
+clearKb(KB):- mtCore(KB),!.
+clearKb(KB):- forall(import_module(KB,O),
+                  ignore(delete_import_module(KB,O))),
+     forall(( current_module(X),import_module(X,KB)),
+                  ignore(delete_import_module(X,KB))).
+
+autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_index(P,PredMt,File).
+
+
+:- multifile(baseKB:hybrid_support/2).
+:- dynamic(baseKB:hybrid_support/2).
+baseKB_hybrid_support(F,A):-baseKB:hybrid_support(F,A).
+baseKB_hybrid_support(arity,2).
+baseKB_hybrid_support(mpred_module,2).
+baseKB_hybrid_support(functorDeclares,1).
+
+istAbove(Mt,Query):- Mt \== baseKB, Mt \== logicmoo_utils, genlMt(Mt,MtAbove),MtAbove:Query.
+
+check_undefined_predicate(baseKB,F,A,fail):- baseKB_hybrid_support(F,A),!.
+check_undefined_predicate(M,F,A,error):- lmcache:tried_to_retry_undefined(M,F,A),!.
+check_undefined_predicate(CallerMt,F,A,_):-
+   wdmsg(check_undefined_predicate(CallerMt,F,A)),
+   assert(lmcache:tried_to_retry_undefined(CallerMt,F,A)),fail.
+check_undefined_predicate(CallerMt,F,A,retry):- baseKB_hybrid_support(F,A),!,
+   functor(Goal,F,A),
+   assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
+
+check_undefined_predicate(_, (/), _, error) :- !. %dumpST.
+check_undefined_predicate(_, (:), _, error) :- !. %dumpST.
+check_undefined_predicate(_, '[|]', _, error) :- !. %dumpST.
+
+% Autoloads importing the entire other module
+check_undefined_predicate(CallerMt,F,A,retry):-
+       autoload_library_index(F,A,PredMt,File),
+       asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
+       reexport(CallerMt:File),!.
+check_undefined_predicate(Module, Name, Arity, Action) :-
+	current_prolog_flag(autoload, true),
+	'$autoload'(Module, Name, Arity), !,
+	Action = retry.
+check_undefined_predicate(CallerMt,F,A,retry):- 
+    loop_check(retry_undefined(CallerMt:F/A),true).  % dump_break
+
+:- dynamic(lmcache:tried_to_retry_undefined/3).
+
+user:exception(undefined_predicate,M:F/A,R):-
+   current_prolog_flag(retry_undefined,true),
+     w_tl(set_prolog_flag(retry_undefined,false),
+      check_undefined_predicate(M,F,A,R)),!.
+
+
+% Module defines the type
+retry_undefined(M:F/A):- lmcache:tried_to_retry_undefined(M,F,A),!.
+retry_undefined(M:F/A):- assert(lmcache:tried_to_retry_undefined(M,F,A)),fail.
+
+retry_undefined(lmconf:F/A):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
+retry_undefined(lmcache:F/A):-multifile(lmcache:F/A),volatile(lmcache:F/A),dynamic(lmcache:F/A),!.
+retry_undefined(t_l:F/A):-multifile(t_l:F/A),thread_local(t_l:F/A),!.
+
+% Every module has it''s own
+retry_undefined(CallerMt:'$pldoc'/4):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
+
+
+% System-like Autoloads
+retry_undefined(CallerMt:debug/1):- use_module(CallerMt:library(debug)),!.
+retry_undefined(CallerMt:debugging/1):- use_module(CallerMt:library(debug)),!.
+retry_undefined(CallerMt:member/2):- use_module(CallerMt:library(lists)),!.
+retry_undefined(CallerMt:directory_file_path/3):- use_module(CallerMt:library(filesex)),!.
+
+
+retry_undefined(CallerMt:F/A):- fail,
+       autoload_library_index(F,A,_,File),
+       load_files(CallerMt:File,[if(true),imports([F/A]),register(false),silent(false)]),!.
+
+% Autoloads importing the entire other module
+retry_undefined(CallerMt:F/A):-
+       autoload_library_index(F,A,PredMt,File),
+       asserta(lmcache:how_registered_pred(PredMt:reexport(CallerMt:File),CallerMt,F,A)),
+       reexport(CallerMt:File),!.
+
+retry_undefined(CallerMt:F/A):-
+      autoload_library_index(F,A,PredMt,File),
+      ((current_module(PredMt),current_predicate(PredMt:F/A))
+       -> add_import_module(CallerMt,PredMt,start) ;
+       (PredMt:ensure_loaded(PredMt:File),add_import_module(CallerMt,PredMt,start))),!.
+
+
+%retry_undefined(PredMt:must/1) :- add_import_module(PredMt,logicmoo_util_catch,start),!.
+%retry_undefined(PredMt:debugm/2) :- add_import_module(PredMt,logicmoo_util_dmsg,start),!.
+
+
+
+
+
 
 %% multi_transparent( :TermX) is semidet.
 %
@@ -613,7 +818,7 @@ dynamic_transparent(X):-functor_catch(X,F,A),dynamic_transparent(F/A),!.
 multi_transparent([]):-!.
 multi_transparent([X]):-multi_transparent(X),!.
 multi_transparent([X|Xs]):-!,multi_transparent(X),multi_transparent(Xs),!.
-multi_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A),multifile(M:F/A).
+multi_transparent(PredMt:F/A):-!, module_transparent(PredMt:F/A),dynamic(PredMt:F/A),multifile(PredMt:F/A).
 multi_transparent(F/A):-!,multi_transparent(lmconf:F/A).
 multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 
@@ -626,7 +831,7 @@ multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 %
 % Dynamic If Missing.
 %
-dynamic_if_missing(F/A):-functor_safe(X,F,A),predicate_property(X,_),!.
+dynamic_if_missing(F/A):-functor_safe(X,F,A),predicate_property_nt(X,_),!.
 dynamic_if_missing(F/A):-dynamic([F/A]).
 
 
@@ -654,29 +859,29 @@ get_pi(Mask,PI):-get_functor(Mask,F,A),functor(PI,F,A),!.
 % Get Module Of Helper Number 4..
 %
 get_module_of_4(_P,F,A,ModuleName):- current_module(ModuleName),module_property(ModuleName, exports(List)),member(F/A,List),!.
-get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
-get_module_of_4(P,F,A,M):- trace_or_throw((get_module_of_4(P,F,A,M))).
+get_module_of_4(_P,F,A,PredMt):- current_predicate(M0:F0/A0),F0=F,A0=A,!,PredMt=M0.
+get_module_of_4(P,F,A,PredMt):- trace_or_throw((get_module_of_4(P,F,A,PredMt))).
 
 /*
-get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,defaultAssertMt(M).
+get_module_of_4(_P,F,A,PredMt):- current_predicate(F0/A0),F0=F,A0=A,!,defaultAssertMt(PredMt).
 get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
-get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
+get_module_of_4(P,F,A,PredMt):- trace, debugCall(get_module_of_4(P,F,A,PredMt)).
 */
 
 :- meta_predicate get_module_of(0,-).
 
 %= 	 	 
 
-%% get_module_of( :GoalV, -M) is semidet.
+%% get_module_of( :GoalV, -PredMt) is semidet.
 %
 % Get Module Of.
 %
-get_module_of(V,M):-var(V),!,current_module(M).
-get_module_of(F/A,M):-!,functor_catch(P,F,A),!,get_module_of(P,M).
-get_module_of(P,M):-predicate_property(P,imported_from(M)),!.
-get_module_of(P,M):-predicate_property(_:P,imported_from(M)),!.
-get_module_of(MM:_,M):-!,MM=M.
-get_module_of(P,M):-functor_catch(P,F,A),get_module_of_4(P,F,A,M).
+get_module_of(V,PredMt):-var(V),!,current_module(PredMt).
+get_module_of(F/A,PredMt):-!,functor_catch(P,F,A),!,get_module_of(P,PredMt).
+get_module_of(P,PredMt):-predicate_property_nt(P,imported_from(PredMt)),!.
+get_module_of(P,PredMt):-predicate_property_nt(_:P,imported_from(PredMt)),!.
+get_module_of(MM:_,PredMt):-!,MM=PredMt.
+get_module_of(P,PredMt):-functor_catch(P,F,A),get_module_of_4(P,F,A,PredMt).
 
 
 
@@ -686,11 +891,11 @@ get_module_of(P,M):-functor_catch(P,F,A),get_module_of_4(P,F,A,M).
 
 %= 	 	 
 
-%% static_predicate( +M, +F, +A) is semidet.
+%% static_predicate( +PredMt, +F, +A) is semidet.
 %
 % Static Predicate.
 %
-static_predicate(M,F,A):- functor_safe(FA,F,A),  once(M:predicate_property(FA,_)),not(M:predicate_property(FA,dynamic)),not((M:predicate_property(FA,imported_from(Where)),Where \== M)).
+static_predicate(PredMt,F,A):- functor_safe(FA,F,A),  once(PredMt:predicate_property_nt(FA,_)),not(PredMt:predicate_property_nt(FA,dynamic)),not((PredMt:predicate_property_nt(FA,imported_from(Where)),Where \== PredMt)).
 
 
 %= 	 	 
@@ -701,9 +906,9 @@ static_predicate(M,F,A):- functor_safe(FA,F,A),  once(M:predicate_property(FA,_)
 %
 static_predicate(A):-atom(F),!,current_predicate(F/A),!,functor(FA,F,A),static_predicate(FA).
 static_predicate(F/A):-!,atom(F),current_predicate(F/A),!,functor(FA,F,A),static_predicate(FA).
-% static_predicate(FA):-predicate_property(FA,built_in),!.
-static_predicate(FA):-predicate_property(FA,static),!.
-static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,dynamic)).
+% static_predicate(FA):-predicate_property_nt(FA,built_in),!.
+static_predicate(FA):-predicate_property_nt(FA,static),!.
+static_predicate(FA):-once(predicate_property_nt(FA,_)),not(predicate_property_nt(FA,dynamic)).
 
 
 
@@ -730,19 +935,19 @@ dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 %
 % Convert Converted To Dynamic.
 %
-convert_to_dynamic(M:FA):- !, get_functor(FA,F,A),convert_to_dynamic(M,F,A).
-convert_to_dynamic(FA):- strip_module(FA,M,FA0), get_functor(FA0,F,A), convert_to_dynamic(M,F,A).
+convert_to_dynamic(PredMt:FA):- !, get_functor(FA,F,A),convert_to_dynamic(PredMt,F,A).
+convert_to_dynamic(FA):- strip_module(FA,PredMt,FA0), get_functor(FA0,F,A), convert_to_dynamic(PredMt,F,A).
 
 
 %= 	 	 
 
-%% convert_to_dynamic( ?M, ?F, ?A) is semidet.
+%% convert_to_dynamic( ?PredMt, ?F, ?A) is semidet.
 %
 % Convert Converted To Dynamic.
 %
-convert_to_dynamic(M,F,A):-  functor(C,F,A), predicate_property(M:C,dynamic),!.
-convert_to_dynamic(M,F,A):-  functor(C,F,A),\+ predicate_property(M:C,_),if_defined(kb_dynamic(M:C),(M:((dynamic(M:F/A),multifile(M:F/A),export(M:F/A))))),!.
-convert_to_dynamic(M,F,A):-  functor(C,F,A),findall((C:-B),clause(C,B),List),rebuild_as_dyn(M,C,F,A),maplist(assertz,List),!.
+convert_to_dynamic(PredMt,F,A):-  functor(C,F,A), predicate_property_nt(PredMt:C,dynamic),!.
+convert_to_dynamic(PredMt,F,A):-  functor(C,F,A),\+ predicate_property_nt(PredMt:C,_),if_defined(kb_dynamic(PredMt:C),(PredMt:((dynamic(PredMt:F/A),multifile(PredMt:F/A),export(PredMt:F/A))))),!.
+convert_to_dynamic(PredMt,F,A):-  functor(C,F,A),findall((C:-B),clause(C,B),List),rebuild_as_dyn(PredMt,C,F,A),maplist(assertz,List),!.
 
 % kb_dynamic = 
 
@@ -750,22 +955,22 @@ convert_to_dynamic(M,F,A):-  functor(C,F,A),findall((C:-B),clause(C,B),List),reb
 
 %= 	 	 
 
-%% rebuild_as_dyn( ?M, ?C, ?VALUE3, ?VALUE4) is semidet.
+%% rebuild_as_dyn( ?PredMt, ?C, ?VALUE3, ?VALUE4) is semidet.
 %
 % Rebuild Converted To Dyn.
 %
-rebuild_as_dyn(M,C,_,_):- predicate_property(M:C,dynamic),!.
-rebuild_as_dyn(M,C,F,A):- redefine_system_predicate(M:C),M:abolish(F,A),dynamic(M:F/A),multifile(M:F/A),export(F/A),!.
+rebuild_as_dyn(PredMt,C,_,_):- predicate_property_nt(PredMt:C,dynamic),!.
+rebuild_as_dyn(PredMt,C,F,A):- redefine_system_predicate(PredMt:C),PredMt:abolish(F,A),dynamic(PredMt:F/A),multifile(PredMt:F/A),export(F/A),!.
 
 
 %= 	 	 
 
-%% dynamic_safe( +M, +F, +A) is semidet.
+%% dynamic_safe( +PredMt, +F, +A) is semidet.
 %
 % Dynamic Safely Paying Attention To Corner Cases.
 %
-dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,dmsg(warn(predicate_property(M:C,imported_from(system)))).
-dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> show_call(why,convert_to_dynamic(M,F,A)) ; on_x_log_cont((dynamic(M:F/A),multifile(M:F/A)))). % , warn_module_dupes(M,F,A).
+dynamic_safe(PredMt,F,A):- functor(C,F,A),predicate_property_nt(C,imported_from(system)),!,dmsg(warn(predicate_property_nt(PredMt:C,imported_from(system)))).
+dynamic_safe(PredMt,F,A):- (static_predicate(PredMt,F,A) -> show_call(why,convert_to_dynamic(PredMt,F,A)) ; on_x_log_cont((dynamic(PredMt:F/A),multifile(PredMt:F/A)))). % , warn_module_dupes(PredMt,F,A).
 :- op(1150,fx,lmconf:dynamic_safe).
 
 
@@ -777,20 +982,20 @@ dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> show_call(why,convert_to_dynam
 %
 % Predicate Prop.
 %
-pred_prop((M:F/A),DO,TEST,true):-pred_prop(M:F/A,DO,TEST).
-pred_prop(M:F/A,(lock_predicate(M:F/A)),(built_in),unlock_predicate(M:F/A)).
-pred_prop(M:F/A, (dynamic(M:F/A)) ,(dynamic), show_call(why,compile_predicates([F/A]))).
+pred_prop((PredMt:F/A),DO,TEST,true):-pred_prop(PredMt:F/A,DO,TEST).
+pred_prop(PredMt:F/A,(lock_predicate(PredMt:F/A)),(built_in),unlock_predicate(PredMt:F/A)).
+pred_prop(PredMt:F/A, (dynamic(PredMt:F/A)) ,(dynamic), show_call(why,compile_predicates([F/A]))).
 
 
-%% is_static_why( ?M, ?P, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% is_static_why( ?PredMt, ?P, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
 %
-% If Static Pred, Generate a Proof.
+% If Static F, Generate a Proof.
 %
 :- module_transparent(is_static_why/5).
-is_static_why(M,P,_,_,_):- predicate_property(M:P,dynamic),!,fail.
-is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=static(M:F/A).
+is_static_why(PredMt,P,_,_,_):- predicate_property_nt(PredMt:P,dynamic),!,fail.
+is_static_why(PredMt,P,F,A,WHY):- show_success(predicate_property_nt(PredMt:P,static)),!,WHY=static(PredMt:F/A).
 
-defined_predicate(M:P):- (current_predicate(_,M:P),( \+ predicate_property(M:P,imported_from(_)))).
+defined_predicate(PredMt:P):- (current_predicate(_,PredMt:P),( \+ predicate_property_nt(PredMt:P,imported_from(_)))).
 
 %= 	 	 
 
@@ -799,14 +1004,14 @@ defined_predicate(M:P):- (current_predicate(_,M:P),( \+ predicate_property(M:P,i
 % Predicate Prop.
 %
 pred_prop(_,(meta_predicate Spec),(meta_predicate Spec)).
-pred_prop(M:F/A,multifile(M:F/A)	       ,(multifile)).
-pred_prop(M:F/A,module_transparent(M:F/A) ,(transparent)).
-pred_prop(M:F/A,discontiguous(M:F/A) ,(discontiguous)).
-pred_prop(M:F/A,volatile(M:F/A)	  ,(volatile)).
-pred_prop(M:F/A,public(M:F/A)     ,(public)).
-pred_prop(M:F/A,thread_local(M:F/A),(thread_local)).
-pred_prop(M:F/A,noprofile(M:F/A)	    , (noprofile)).
-pred_prop(M:F/A,'$iso'(M:F/A) ,(iso)).
+pred_prop(PredMt:F/A,multifile(PredMt:F/A)	       ,(multifile)).
+pred_prop(PredMt:F/A,module_transparent(PredMt:F/A) ,(transparent)).
+pred_prop(PredMt:F/A,discontiguous(PredMt:F/A) ,(discontiguous)).
+pred_prop(PredMt:F/A,volatile(PredMt:F/A)	  ,(volatile)).
+pred_prop(PredMt:F/A,public(PredMt:F/A)     ,(public)).
+pred_prop(PredMt:F/A,thread_local(PredMt:F/A),(thread_local)).
+pred_prop(PredMt:F/A,noprofile(PredMt:F/A)	    , (noprofile)).
+pred_prop(PredMt:F/A,'$iso'(PredMt:F/A) ,(iso)).
 
 
 :- thread_local(tlbugger:rbuild_pred_impl_cache_pp/2).
@@ -836,15 +1041,15 @@ rebuild_pred_into(_,NMC,AssertZ,_):-tlbugger:rbuild_pred_impl_cache(NMC,AssertZ)
 rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
   listing(OMC),
   asserta(tlbugger:rbuild_pred_impl_cache(NMC,AssertZ)),
-  show_call(rebuild_pred_into,(predicate_property(OMC,number_of_clauses(_)))),
+  show_call(rebuild_pred_into,(predicate_property_nt(OMC,number_of_clauses(_)))),
   strip_module(OMC, OM, OC),
   strip_module(NMC, NM, NC),
    must_det_l((
       '$set_source_module'(Before, OM),
       functor(NC,NF,A), functor(OC,OF,A),
-      (show_call(why,predicate_property(OMC,number_of_clauses(_)))),
-      must_pi(show_failure(why,predicate_property(OMC,number_of_clauses(_)))),
-      forall(predicate_property(OC,PP),asserta(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
+      (show_call(why,predicate_property_nt(OMC,number_of_clauses(_)))),
+      must_pi(show_failure(why,predicate_property_nt(OMC,number_of_clauses(_)))),
+      forall(predicate_property_nt(OC,PP),asserta(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
       findall((OC:-B),((clause(OC,B),assertz(pp_clauses((OC:-B))))),List),
       '$set_source_module'( NM),
       forall(member(-PP,OtherTraits),retractall(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
@@ -855,7 +1060,7 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       garbage_collect_clauses,
       ignore(convert_to_dynamic(NM,NF,A)),
       garbage_collect_clauses,
-      %must_pi( \+ predicate_property(NMC,_)),
+      %must_pi( \+ predicate_property_nt(NMC,_)),
       %once(memberchk(CC,List)->true;(CC=((NC:-fail,1234)))),
       %convert_to_dynamic(NM,NF,A),
       %ignore(on_x_log_throw(tlbugger:rbuild_pred_impl_cache_pp(NC,(dynamic))->dynamic(NF/A);true)),
@@ -875,6 +1080,11 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       retractall(tlbugger:rbuild_pred_impl_cache_pp(NC,_))
       )).
 
-
+:- module_transparent(user:exception/3).
+:- multifile user:exception/3.
+:- dynamic user:exception/3.
+:- multifile system:exception/3.
+:- module_transparent system:exception/3.
+:- dynamic system:exception/3.
 
 

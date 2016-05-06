@@ -15,7 +15,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_prolog_file,[
           guess_file_type_loader/2,
           process_this_script/0,
@@ -27,14 +27,15 @@
           prolog_load_file_nlc_0/2,
           load_file_dir/2,
           load_file_some_type/2,
-          user:prolog_load_file/2,
+          use_file_type_loader/2,
+          %user:prolog_load_file/2,
           mpred_process_input/2,
           mpred_process_input_1/1
           
            
  ]).
 :- include('mpred_header.pi').
-:- endif.
+%:- endif.
 
 :- multifile(user:prolog_load_file/2).
 :- dynamic(user:prolog_load_file/2).

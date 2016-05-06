@@ -12,7 +12,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_kb_ops.pl
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_kb_ops,
           [ deducedSimply/1,
 
@@ -242,7 +242,7 @@ attvar_op/2,
 mpred_facts_and_universe/1
             
           ]).
-:- endif.
+%:- endif.
 
 :- meta_predicate 
       pred_head(1,*),

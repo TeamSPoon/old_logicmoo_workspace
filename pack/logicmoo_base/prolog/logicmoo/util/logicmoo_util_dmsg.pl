@@ -392,8 +392,8 @@ dmsg_text_to_string_safe(Expr,Forms):-on_x_fail(text_to_string(Expr,Forms)).
 %
 % Format Primary Helper.
 %
-fmt0(user_error,F,A):-!,current_main_error_stream(Err),!,format(Err,F,A).
-fmt0(current_error,F,A):-!,thread_current_error_stream(Err),!,format(Err,F,A).
+fmt0(user_error,F,A):-!,lmcache:current_main_error_stream(Err),!,format(Err,F,A).
+fmt0(current_error,F,A):-!,lmcache:thread_current_error_stream(Err),!,format(Err,F,A).
 fmt0(X,Y,Z):-catchvvnt((format(X,Y,Z),flush_output_safe(X)),E,dfmt(E:format(X,Y))).
 
 %= 	 	 
@@ -515,7 +515,7 @@ fmt_or_pp(X):-format('~q~N',[X]).
 %
 % Using Output Converted To Console.
 %
-with_output_to_console(X):- current_main_error_stream(Err),with_output_to_stream(Err,X).
+with_output_to_console(X):- lmcache:current_main_error_stream(Err),with_output_to_stream(Err,X).
 
 %= 	 	 
 
@@ -523,7 +523,7 @@ with_output_to_console(X):- current_main_error_stream(Err),with_output_to_stream
 %
 % Using Output Converted To Main.
 %
-with_output_to_main(X):- current_main_error_stream(Err),with_output_to_stream(Err,X).
+with_output_to_main(X):- lmcache:current_main_error_stream(Err),with_output_to_stream(Err,X).
 
 
 %= 	 	 
@@ -532,7 +532,7 @@ with_output_to_main(X):- current_main_error_stream(Err),with_output_to_stream(Er
 %
 % Dfmt.
 %
-dfmt(X):- thread_current_error_stream(Err),with_output_to_stream(Err,fmt(X)).
+dfmt(X):- lmcache:thread_current_error_stream(Err),with_output_to_stream(Err,fmt(X)).
 
 %= 	 	 
 
@@ -540,7 +540,7 @@ dfmt(X):- thread_current_error_stream(Err),with_output_to_stream(Err,fmt(X)).
 %
 % Dfmt.
 %
-dfmt(X,Y):- thread_current_error_stream(Err), with_output_to_stream(Err,fmt(X,Y)).
+dfmt(X,Y):- lmcache:thread_current_error_stream(Err), with_output_to_stream(Err,fmt(X,Y)).
 
 
 %= 	 	 
@@ -562,7 +562,7 @@ with_output_to_stream(Stream,Goal):-
 %
 % Converted To Stderror.
 %
-to_stderror(Call):- thread_current_error_stream(Err), with_output_to_stream(Err,Call).
+to_stderror(Call):- lmcache:thread_current_error_stream(Err), with_output_to_stream(Err,Call).
 
 
 
@@ -1476,7 +1476,7 @@ flush_output_safe(X):-ignore(catchv(flush_output(X),_,true)).
 % Write Failure Log.
 %
 writeFailureLog(E,X):-
-  thread_current_error_stream(ERR),
+  lmcache:thread_current_error_stream(ERR),
 		(fmt(ERR,'\n% error: ~q ~q\n',[E,X]),flush_output_safe(ERR),!,
 		%,true.
 		fmt('\n% error: ~q ~q\n',[E,X]),!,flush_output).

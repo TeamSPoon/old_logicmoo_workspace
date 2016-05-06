@@ -11,7 +11,7 @@
 % ===================================================================
 */
 
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_pfc, [
   ensure_abox/1,
   mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,
@@ -44,7 +44,7 @@
   mpred_notrace_exec/0,
   remove_negative_version/1,
   listing_u/1,
-  fix_mp_new/2,
+  
 
   '=@@='/2,
   op(700,xfx,'=@@='),
@@ -55,7 +55,7 @@
   is_source_ref1/1,
   get_source_ref_stack/1,
   set_fc_mode/1,
-  fix_mp_old/2,
+  
   with_no_mpred_breaks/1,
   mpred_remove1/2,
   check_never_assert/1,check_never_retract/1,
@@ -126,9 +126,9 @@
   mpred_unfwc_check_triggers0/1,mpred_unfwc1/1,mpred_why1/1,mpred_blast/1
   % trigger_trigger1/2  , trigger_trigger/3,
   ]).
-:- endif.
+%:- endif.
 
-:- '$set_source_module'(logicmoo_utils).
+% :- '$set_source_module'(logicmoo_utils).
 
 :- meta_predicate 
       each_E(:,+,+),
@@ -385,7 +385,7 @@ clause_u(MH,B,R):- nonvar(R),!,must(clause_i(M:H,B,R)),(MH=(M:H);MH=(H)),!.
 clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u((H:-B),BB,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u(MH,B,R):-  (mnotrace(fix_mp(MH,M:H)),clause_i(M:H,B,R))*->true;
-   (fix_mp_abox(MH,M:CALL),clause_i(M:CALL,B,R)).
+   (fix_mp_abox(MH,M,CALL),clause_i(M:CALL,B,R)).
 % clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
 %clause_u(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
@@ -431,10 +431,11 @@ with_umt(G):-
   with_umt(U,G).
 
 with_umt(U,G):-  
+  fix_mp(G,_M:P),
   gripe_time(30.0,
    call_from_module(U,
     w_tl(t_l:current_defaultAssertMt(U),
-      (baseKB:set_defaultAssertMt(U),G)))).
+      (baseKB:set_defaultAssertMt(U),P)))).
 
 
 
@@ -604,10 +605,11 @@ remove_negative_version(P):-
 fresh_mode :- fail.
 plus_fwc:-true.
 
+plus_fwc(_):-!.
 plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
 plus_fwc(support_hilog(_,_)):-!.
 plus_fwc('==>'(_,_)):-!.
-plus_fwc(P):- gripe_time(0.6,(plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true)).
+plus_fwc(P):- gripe_time(0.6,(plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true)),!.
 
 %% mpred_post(+Ps,+S) 
 %
@@ -1945,7 +1947,6 @@ mpred_mark_fa_as(_Sup,_P,'[|]',N,_):- dtrace,must(N=2).
 mpred_mark_fa_as(_Sup,_P,_:mpred_isa,N,_):- must(N=2).
 mpred_mark_fa_as(Sup, _P,F,A,Type):- really_mpred_mark(Sup,Type,F,A),!.
 
-really_mpred_mark(Sup,Type,F,A):- \+ current_predicate(_:make_declared_now/1),!,dmsg(really_mpred_mark(Sup,Type,F,A)),!.
 really_mpred_mark(_  ,Type,F,A):- mpred_call_no_bc(mpred_mark(Type,F,A)),!.
 really_mpred_mark(Sup,Type,F,A):- 
   MARK = mpred_mark(Type,F,A),
@@ -2330,7 +2331,8 @@ mpred_trace(Form):-
 %
 % PFC If Is A Tracing.
 %
-get_mpred_is_tracing(Form):- mnotrace(t_l:hide_mpred_trace_exec),!,
+get_mpred_is_tracing(_):-!,fail.
+get_mpred_is_tracing(Form):- t_l:hide_mpred_trace_exec,!,
   \+ \+ ((mnotrace(lookup_u(mpred_is_tracing_pred(Form))))).
 get_mpred_is_tracing(Form):- 
   once(t_l:mpred_debug_local ; tracing ; clause_asserted_u(mpred_is_tracing_exec) ; lookup_u(mpred_is_tracing_pred(Form))).
@@ -3227,7 +3229,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(filter_buffer_get_n/3).
 :- module_transparent(filter_buffer_trim/2).
 
-% :- '$current_source_module'(M),forall(mpred_database_term(F,A,_),(abolish(mpred_pfc:F/A),make_declared_now(M:F/A))).
+% :- '$current_source_module'(M),forall(mpred_database_term(F,A,_),(abolish(mpred_pfc:F/A),kb_dynamic(M:F/A))).
 % :- '$current_source_module'(M),add_import_module(M,baseKB,end).
 % :- initialization(ensure_abox(baseKB)).
 

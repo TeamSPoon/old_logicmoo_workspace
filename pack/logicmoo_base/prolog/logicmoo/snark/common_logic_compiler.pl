@@ -44,7 +44,7 @@
 %=    atmost(X,N,A)
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_compiler.pl
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(common_logic_compiler,         
           [ 
            nnf/3, 
@@ -143,7 +143,7 @@
             until_op/1,
             variants_are_equal/3
           ]).
-:- endif.
+%:- endif.
 
 % % :- '$set_source_module'(common_logic_compiler).
 

@@ -1,5 +1,5 @@
 
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(common_logic_kb_hooks,
  [kbp_t/1,with_el_holds_disabled/1,noGenlPreds/1,cyckb_t/3,link_to_holds2/2,
            assert_next_queue/1,
@@ -57,7 +57,7 @@ noGenlPreds/1,
             with_kb_assertions_matching/3,
             write_assertions/0
           ]).
-:- endif.
+%:- endif.
 
 % :- shared_multifile kbp_t_list_prehook/2.
 % % :- '$set_source_module'(common_logic_kb_hooks).
@@ -119,8 +119,8 @@ noGenlPreds/1,
 
 :- shared_multifile el_assertions:el_holds_pred_impl/1.
 :- shared_multifile el_assertions:is_cyckb_t_pred/2.
-:- was_dynamic el_assertions:el_holds_pred_impl/1.
-:- was_dynamic el_assertions:is_cyckb_t_pred/2.
+:- shared_multifile el_assertions:el_holds_pred_impl/1.
+:- shared_multifile el_assertions:is_cyckb_t_pred/2.
 :- dynamic cyckb_t/3.
 
 :- was_export(kbp_t/1). 
@@ -465,7 +465,7 @@ cyckb_t_implies(ANTE,CONSEQ):- nop(cyckb_t_implies(ANTE,CONSEQ)),!,fail.
 %
 % Knowledge Base P- True Structure List Prehook.
 %
-%:- decl_mpred_hybrid(kbp_t_list_prehook/2).
+%:- kb_dynamic(kbp_t_list_prehook/2).
 kbp_t_list_prehook(PLIST,PLIST).
 
 :- was_export(kbp_t_list/1). 

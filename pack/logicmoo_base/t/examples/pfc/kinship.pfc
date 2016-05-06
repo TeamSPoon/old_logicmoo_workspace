@@ -5,7 +5,7 @@
 
 :- use_module(library(logicmoo_user)).
 
-:- shared_multifile otherGender/2.
+:- kb_dynamic otherGender/2.
 
 % kinship domain example.
 

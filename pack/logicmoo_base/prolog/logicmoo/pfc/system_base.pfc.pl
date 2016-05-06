@@ -217,10 +217,15 @@ bt(P,_)==> (P:- mpred_bc_only(P)).
 ((prologHybrid(F),arity(F,A)/is_ftNameArity(F,A))==>hybrid_support(F,A)).
 (hybrid_support(F,A)/is_ftNameArity(F,A))==>prologHybrid(F),arity(F,A).
 
-((mpred_mark(_,F,A)/(A==0)) ==> {kb_dynamic(F/A)}).
+((mpred_mark(_,F,A)/(A\=0)) ==> {kb_dynamic(F/A)}).
+((mpred_mark(_,F,A)/(A\=0)) ==> {shared_multifile(F/A)}).
+
 
 pfcControlled(X)/get_pifunctor(X,C)==>({kb_dynamic(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
 prologHybrid(X)/get_pifunctor(X,C)==>({\+ static_predicate(C), kb_dynamic(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
+pfcControlled(X)/get_pifunctor(X,C)==>({shared_multifile(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
+prologHybrid(X)/get_pifunctor(X,C)==>({\+ static_predicate(C), shared_multifile(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
+
 
 prologBuiltin(X)/get_pifunctor(X,C)==>({decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologBuiltin(F)).
 prologDynamic(X)/get_pifunctor(X,C)==>({kb_dynamic(C),decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologDynamic(F)).

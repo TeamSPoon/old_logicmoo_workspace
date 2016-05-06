@@ -129,7 +129,8 @@ conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 
 
 {type_prefix(_Prefix,Type)}==>tCol(Type).
-{type_prefix(_Suffix,Type)}==>tCol(Type).
+{type_suffix(_Suffix,Type)}==>tCol(Type).
+tCol(completelyAssertedCollection).
 ~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
 (tCol(P),~ttExpressionType(P)) ==> tSet(P).
 
@@ -170,7 +171,6 @@ tPred(is_never_type/1,prologDynamic).
 tPred(term_expansion/2,prologDynamic).
 tPred(var/1,prologBuiltin).
 
-tCol(completelyAssertedCollection).
 completelyAssertedCollection(completelyAssertedCollection).
 completelyAssertedCollection(C)==>tCol(C).
 

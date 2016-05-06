@@ -16,15 +16,15 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_hooks.pl
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo_hooks,true))).
 :- module(mpred_hooks,[
 /*
-thglobal:agent_session/2,
-thglobal:session_agent/2,
-thglobal:session_io/4,
-thglobal:agent_session/2,
-thglobal:session_agent/2,
-thglobal:session_io/4,
+lmcache:agent_session/2,
+lmcache:session_agent/2,
+lmcache:session_io/4,
+lmcache:agent_session/2,
+lmcache:session_agent/2,
+lmcache:session_io/4,
 */
 
 relax_term/6,
@@ -500,7 +500,7 @@ never_mpred_tcall(isa).
 never_mpred_tcall(arity).
 
 
-:- setup_mpred_ops.
+% :- setup_mpred_ops.
 
 
 :- meta_predicate(tf_result(0,+)).

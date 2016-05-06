@@ -207,25 +207,25 @@ interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region))
 
 decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
-get_agent_input_stream(P,In):-no_repeats(P-In,(get_agent_session(P,O),thglobal:session_io(O,In,_,_))).
+get_agent_input_stream(P,In):-no_repeats(P-In,(get_agent_session(P,O),lmcache:session_io(O,In,_,_))).
 
-get_agent_input_thread(P,Id):-no_repeats(P-Id,(get_agent_input_stream(P,In),thglobal:session_io(_,In,_,Id))).
+get_agent_input_thread(P,Id):-no_repeats(P-Id,(get_agent_input_stream(P,In),lmcache:session_io(_,In,_,Id))).
 
 with_agent(P,CALL):-with_agent0(P,CALL).
 with_agent0(P,CALL):-
  get_session_id(TS),must(nonvar(TS)),
  thread_self(Self),
- ((get_agent_session(P,O),thglobal:session_io(O,_In,_Out,Id),Id\=Self)->Wrap=thread_signal_blocked(Id);Wrap=call),!,
+ ((get_agent_session(P,O),lmcache:session_io(O,_In,_Out,Id),Id\=Self)->Wrap=thread_signal_blocked(Id);Wrap=call),!,
   call(Wrap, 
-    w_tl([put_server_no_max,thglobal:session_agent(TS,P),thglobal:agent_session(P,TS)],
+    w_tl([put_server_no_max,lmcache:session_agent(TS,P),lmcache:agent_session(P,TS)],
       with_output_to_pred(deliver_event(P),CALL))).
 
-has_tty(O):-no_repeats(O,thglobal:session_io(O,_,_,_)).
+has_tty(O):-no_repeats(O,lmcache:session_io(O,_,_,_)).
 
 get_agent_session(P,O):-get_session_id(O),get_agent_sessions(P,O),!.
 get_agent_session(P,O):-get_agent_sessions(P,O),has_tty(O).
 :-export(get_agent_sessions/2).
-get_agent_sessions(P,O):- no_repeats(P-O,(thglobal:session_agent(O,P);thglobal:agent_session(P,O);(irc_user_plays(P,O,C),ground(irc_user_plays(P,O,C))))).
+get_agent_sessions(P,O):- no_repeats(P-O,(lmcache:session_agent(O,P);lmcache:agent_session(P,O);(irc_user_plays(P,O,C),ground(irc_user_plays(P,O,C))))).
 
 :-export(foc_current_agent/1).
 foc_current_agent(P):- current_agent(P),nonvar(P),!.
@@ -247,7 +247,7 @@ guess_session_ids(ID):-t_l:session_id(ID).
 % irc session
 guess_session_ids(ID):-if_defined_else(chat_config:chat_isWith(_,ID),true).
 % telnet session
-guess_session_ids(ID):-thread_self(TID),thglobal:session_io(ID,_,_,TID).
+guess_session_ids(ID):-thread_self(TID),lmcache:session_io(ID,_,_,TID).
 % returns http sessions as well
 guess_session_ids(ID):-if_defined(http_in_session:http_in_session(ID)).
 % tcp session
@@ -289,14 +289,14 @@ generate_new_player(P):- ensure_new_player(P),!.
 
 ensure_new_player(P):- must_det_l([nonvar(P),assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgent)]),!.
 
-detach_player(P):- thglobal:agent_session(P,_),!,trace_or_throw(detach_player(P)).
+detach_player(P):- lmcache:agent_session(P,_),!,trace_or_throw(detach_player(P)).
 detach_player(_).
 
 :-export(become_player/1).
 become_player(P):- once(current_agent(Was)),Was=P,!.
-become_player(P):- get_session_id(O),retractall(thglobal:agent_session(_,O)),
+become_player(P):- get_session_id(O),retractall(lmcache:agent_session(_,O)),
   assert_isa(P,tHumanPlayer),must(create_agent(P))->
-  detach_player(P),asserta_new(thglobal:agent_session(P,O)),!.
+  detach_player(P),asserta_new(lmcache:agent_session(P,O)),!.
 
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).

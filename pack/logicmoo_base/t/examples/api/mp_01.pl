@@ -4,7 +4,7 @@
 
 :- meta_predicate(like_bag(^,-)).
 
-:- ensure_loaded(library(logicmoo_user)).
+:- user:ensure_loaded(library(logicmoo_base)).
 
 like_bag(I,O):-copy_term(I,O).
 

@@ -192,8 +192,8 @@ ttSpatialType(tAgent).
 genls(tActor,tAgent).
 genls(tExplorer,tAgent).
 
-:-decl_mpred_hybrid(predTypeMax/3).
-:-decl_mpred_hybrid(predInstMax/3).
+:-kb_dynamic(predTypeMax/3).
+:-kb_dynamic(predInstMax/3).
 
 %NEXT TODO predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),isa(I,AgentType).
 %predInstMax(I,mudHealth,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(I,AgentType).

@@ -35,11 +35,11 @@ irc_mud_event_hook(Channel,User,ctcp("ACTION", ACT)):-!,irc_mud_event_hook(Chann
 irc_mud_event_hook(Channel,User,call('?-'(foc_current_agent(Agent)),_Vs)):- 
  foc_current_agent(Agent),
  get_session_id(ID),
- retractall(thglobal:agent_session(_,ID)),
- retractall(thglobal:session_agent(ID,_)),
+ retractall(lmcache:agent_session(_,ID)),
+ retractall(lmcache:session_agent(ID,_)),
  ain(irc_user_plays(Agent,User,Channel)),
-   asserta_if_new(thglobal:agent_session(Agent,ID)),
-   asserta_if_new(thglobal:session_agent(ID,Agent)),!.
+   asserta_if_new(lmcache:agent_session(Agent,ID)),
+   asserta_if_new(lmcache:session_agent(ID,Agent)),!.
 
 irc_mud_event_hook(Channel,User,actDo(TODO)):- irc_user_plays(Agent,User,Channel),ground(irc_user_plays(Agent,User,Channel)),irc_action_queue(Agent,TODO,Channel).
 irc_mud_event_hook(Channel,User,say(TODO)):- irc_user_plays(Agent,User,Channel),ground(irc_user_plays(Agent,User,Channel)),irc_action_queue(Agent,TODO,Channel).
@@ -57,7 +57,7 @@ irc_action_queue(Agent,TODO,Channel):-  get_session_id(ID), enqueue_session_acti
    ==> \+ irc_user_plays(OAgent,User,Other))).
 
 
-:-ain(( ~irc_user_plays(Agent,User,_) ==> {retractall(thglobal:agent_session(Agent,User)),retractall(thglobal:session_agent(User,Agent))} )).
+:-ain(( ~irc_user_plays(Agent,User,_) ==> {retractall(lmcache:agent_session(Agent,User)),retractall(lmcache:session_agent(User,Agent))} )).
 
 end_of_file.
 

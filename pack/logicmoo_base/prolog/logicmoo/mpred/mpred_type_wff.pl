@@ -7,7 +7,7 @@
 %
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_wff.pl
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_type_wff,
           [ 
             head_singletons/2, head_singles0/2,head_singles01/2,
@@ -94,7 +94,7 @@
 
             mpred_type_wff_file/0
           ]).
-:- endif.
+%:- endif.
 
 :- meta_predicate 
         call_last_is_var(0).

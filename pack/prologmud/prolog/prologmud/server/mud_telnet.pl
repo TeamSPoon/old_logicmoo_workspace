@@ -146,8 +146,8 @@ run_session(In,Out):-
          once(session_loop(In,Out)),
       retract(t_l:wants_logout(O)),!,
       thread_self(Id),
-      retractall(thglobal:session_io(_,_,_,Id)),      
-      retractall(thglobal:session_io(O,_,_,_)),!.
+      retractall(lmcache:session_io(_,_,_,Id)),      
+      retractall(lmcache:session_io(O,_,_,_)),!.
 
 session_loop(In,Out):-
   get_session_id(O),
@@ -164,11 +164,11 @@ session_loop(In,Out):-
 register_player_stream_local(P,In,Out):-
    set_player_telnet_options(P),
    get_session_id(O),thread_self(Id),
-   retractall(thglobal:session_io(_,_,_,Id)),
-   retractall(thglobal:session_io(O,_,_,_)),
-   asserta_new(thglobal:session_io(O,In,Out,Id)),
-   asserta_new(thglobal:session_agent(O,P)),
-   asserta_new(thglobal:agent_session(P,O)), 
+   retractall(lmcache:session_io(_,_,_,Id)),
+   retractall(lmcache:session_io(O,_,_,_)),
+   asserta_new(lmcache:session_io(O,In,Out,Id)),
+   asserta_new(lmcache:session_agent(O,P)),
+   asserta_new(lmcache:agent_session(P,O)), 
     (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),
      (thread_util:has_console(Id,In, Out,Err)->true;
        ((retractall(thread_util:has_console(Id,_,_,_)),
@@ -193,7 +193,7 @@ set_tty_control(TF):-
 
 :-ain(( deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
       foreach(no_repeats(get_agent_sessions(A,O)),
-         foreach(no_repeats(thglobal:session_io(O,_In,Out,_Id)),
+         foreach(no_repeats(lmcache:session_io(O,_In,Out,_Id)),
           fmtevent(Out,NewEvent))))).
 
 fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).

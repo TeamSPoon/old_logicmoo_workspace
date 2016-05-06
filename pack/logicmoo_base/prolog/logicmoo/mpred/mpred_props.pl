@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_props.pl
-:- if((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_props,
           [ add_mpred_prop_gleaned/2,
             add_mpred_prop_gleaned_4/4,
@@ -30,10 +30,10 @@
             decl_mpred_2/2,
             decl_mpred_4/3,
             decl_mpred_4/4,
-            (decl_mpred_hybrid)/1,
-            (decl_mpred_hybrid)/2,
-            (decl_mpred_hybrid)/3,
-            (decl_mpred_hybrid)/4,
+            (kb_dynamic)/1,
+            (kb_dynamic)/2,
+            (kb_dynamic)/3,
+            (kb_dynamic)/4,
             decl_mpred_hybrid_ilc/4,
             decl_mpred_hybrid_ilc_0/4,
             decl_mpred_mfa/3,
@@ -58,7 +58,7 @@
             pred_type_test2/2,
             mpred_props_file/0
           ]).
-:- endif.
+%:- endif.
 
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
@@ -67,13 +67,13 @@
 
 /*
  :- meta_predicate mpred_props:decl_mpred_prolog(?,1).
- :- meta_predicate mpred_props:decl_mpred_hybrid(?,1).
+ :- meta_predicate mpred_props:kb_dynamic(?,1).
  :- meta_predicate mpred_props:decl_mpred(?,1).
  :- meta_predicate mpred_props:decl_mpred_0(?,1).
  :- meta_predicate mpred_props:decl_mpred(+,+,+).
 */
 :- meta_predicate decl_mpred_0(?,1).
-:- meta_predicate decl_mpred_hybrid(?,1).
+:- meta_predicate kb_dynamic(?,1).
 %: mpred_props:meta_argtypes/2, which is referenced by
 % Warning: mpred_type_constraints:completeExtentEnumerable/1, which is referenced by
 % Warning: mpred_type_constraints:gather_goals/2, which is referenced by
@@ -230,58 +230,58 @@ decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
 
 
 % ========================================
-% (decl_mpred_hybrid)/1/2/3
+% (kb_dynamic)/1/2/3
 % ========================================
-:- op(0,fx,(decl_mpred_hybrid)).
+:- op(0,fx,(kb_dynamic)).
 
-:- was_export((decl_mpred_hybrid)/1).
+:- was_export((kb_dynamic)/1).
 
-:- meta_predicate(decl_mpred_hybrid(?)).
-
-%= 	 	 
-
-%% decl_mpred_hybrid( ?A) is semidet.
-%
-% Declare Managed Predicate Hybrid.
-%
-decl_mpred_hybrid(A):-not(compound(A)),!,ain00(prologHybrid(A)).
-decl_mpred_hybrid(M):-M=..[isEach|List],!,maplist(decl_mpred_hybrid,List).
-% decl_mpred_hybrid(A):-!, must((with_pfa(m_fa_to_m_p_fa(decl_mpred_hybrid),A))),!.
-decl_mpred_hybrid(P):- with_umt(with_pi(P,decl_mpred_hybrid)).
-
-:- was_export((decl_mpred_hybrid)/3).
+:- meta_predicate(kb_dynamic(?)).
 
 %= 	 	 
 
-%% decl_mpred_hybrid( ?M, ?F, ?A) is semidet.
+%% kb_dynamic( ?A) is semidet.
 %
 % Declare Managed Predicate Hybrid.
 %
-decl_mpred_hybrid(M,F,A):-integer(A),!,must(functor(PI,F,A)),decl_mpred_hybrid(M,PI,F/A).
-decl_mpred_hybrid(M,PI,FA):- must(decl_mpred_hybrid(_,M,PI,FA)).
+kb_dynamic(A):-not(compound(A)),!,ain00(prologHybrid(A)).
+kb_dynamic(M):-M=..[isEach|List],!,maplist(kb_dynamic,List).
+% kb_dynamic(A):-!, must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),A))),!.
+kb_dynamic(P):- with_umt(with_pi(P,kb_dynamic)).
+
+:- was_export((kb_dynamic)/3).
+
+%= 	 	 
+
+%% kb_dynamic( ?M, ?F, ?A) is semidet.
+%
+% Declare Managed Predicate Hybrid.
+%
+kb_dynamic(M,F,A):-integer(A),!,must(functor(PI,F,A)),kb_dynamic(M,PI,F/A).
+kb_dynamic(M,PI,FA):- must(kb_dynamic(_,M,PI,FA)).
 
 
 %= 	 	 
 
-%% decl_mpred_hybrid( ?F, ?A) is semidet.
+%% kb_dynamic( ?F, ?A) is semidet.
 %
 % Declare Managed Predicate Hybrid.
 %
-decl_mpred_hybrid(F,A):- integer(A),!,decl_mpred_hybrid(F/A).
-decl_mpred_hybrid(F,Other):- decl_mpred(F,Other),
+kb_dynamic(F,A):- integer(A),!,kb_dynamic(F/A).
+kb_dynamic(F,Other):- decl_mpred(F,Other),
      get_functor(F,F0),
      must(arity(F0,A)),
-     decl_mpred_hybrid(F0/A).
+     kb_dynamic(F0/A).
 
-:- was_export((decl_mpred_hybrid)/4).
+:- was_export((kb_dynamic)/4).
 
 %= 	 	 
 
-%% decl_mpred_hybrid( ?CM, ?M, ?PIN, ?FA) is semidet.
+%% kb_dynamic( ?CM, ?M, ?PIN, ?FA) is semidet.
 %
 % Declare Managed Predicate Hybrid.
 %
-decl_mpred_hybrid(CM,M,PIN,FA):- unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true).
+kb_dynamic(CM,M,PIN,FA):- unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true),kb_dynamic_good(M:FA).
 
 
 %= 	 	 
@@ -305,16 +305,18 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
       ain(mpred_module(F,M)),
       ain(prologHybrid(F)),
+      ain(hybrid_support(F,A)),
       get_cc(PI,NC),
       sanity(ignore(show_failure(why,M==baseKB))),
       decl_mpred_mfa(M,F,A),
+      
       decl_mpred_pi(PI),
       must(lmconf:mpred_provide_setup(call(conjecture),F/A,prologHybrid,_OUT)),
       must((get_cc(PI,NCN),NCN>=NC)).
 
 
 
-:- op(1120,fx,(decl_mpred_hybrid)).
+:- op(1120,fx,(kb_dynamic)).
 
 %prologHybrid(X,Y):-dtrace(prologHybrid(X,Y)).
 %:- was_dynamic(prologHybrid(_,_)).
@@ -517,7 +519,7 @@ decl_mpred_0(F,T):-doall(( decl_mpred_2(F,T) )).
 decl_mpred_2(F,meta_argtypes(FARGS)):- functor(FARGS,_,A),decl_mpred(F,A),fail.
 decl_mpred_2(_,meta_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(Arg),!.
 
-% decl_mpred_2(F,prologHybrid):- decl_mpred_hybrid(F).
+% decl_mpred_2(F,prologHybrid):- kb_dynamic(F).
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_mt_why(F,A).
 
 decl_mpred_2(F,A):-once(lmconf:mpred_provide_write_attributes(F,A)).

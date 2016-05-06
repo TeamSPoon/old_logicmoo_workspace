@@ -15,6 +15,20 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
+:- if((
+   user:use_module(user:library('logicmoo/util/logicmoo_util_filesystem.pl')),
+   push_modules,
+   UTILS = logicmoo_utils,
+   TBOX = baseKB,
+   current_smt(SM,M),
+   ignore((
+   SM\==user,
+   
+   maybe_add_import_module(SM,TBOX),
+   maybe_add_import_module(SM,UTILS),
+   system:asserta(lmconf:source_typein_boxes(SM,M,SM:TBOX)))))).
+:- endif.
+
 :- module(logicmoo_utils_file,[]).
 
 :- '$set_source_module'('logicmoo_utils').
@@ -28,7 +42,7 @@
 user:term_expansion(EOF,POS,O,POS2):- 
  is_file_based_expansion(term,EOF,POS,O,POS2),
  nonvar(EOF),
- EOF==end_of_file,
+ (EOF=end_of_file;EOF=(:-(module(_,_)))),
  prolog_load_context(module,M),
  M\==logicmoo_utils, 
  ignore((
@@ -57,14 +71,14 @@ user:term_expansion(EOF,POS,O,POS2):-
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_help.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_loop_check.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_no_repeats.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_scce.pl')).
+:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_terms.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_preddefs.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_prolog_frames.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_prolog_streams.pl')).
-:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_scce.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_strings.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_term_listing.pl')).
-:- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_terms.pl')).
 :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_bb_gvar.pl')).
 % the next are loaded idomaticalyl later (if needed)
 % :- user:ensure_loaded(user:library('logicmoo/util/logicmoo_util_bb_env.pl')).
@@ -220,7 +234,7 @@ lmconf:logicmoo_scan_autoloads:-false.
 :- thread_local logicmoo_utils_test_tl/0.
 :- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
 
-:- autoload([verbose(true)]).
+%:- autoload([verbose(true)]).
 %:- autoload([verbose(false)]).
 % ?- logicmoo_util_term_listing:xlisting(get_gtime).
 
@@ -232,4 +246,11 @@ lmconf:logicmoo_scan_autoloads:-false.
 :- 'mpred_trace_none'(tlbugger:skip_bugger/0).
 :- 'mpred_trace_none'(tlbugger:rtracing/0).
 */
+
+:- set_prolog_flag(autoload_logicmoo,true).
+:- dmsg("Adding logicmoo/[snark|mpred_online] to autoload path",[]).
+:- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
+:- add_library_search_path('./logicmoo/mpred/',[ 'mpred_*.pl']).
+:- pop_modules.
+:- use_module(library(logicmoo/mpred/mpred_loader)).
 

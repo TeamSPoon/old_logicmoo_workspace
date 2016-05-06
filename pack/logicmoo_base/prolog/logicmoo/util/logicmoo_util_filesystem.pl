@@ -34,6 +34,7 @@
             enumerate_files/2,
             enumerate_files0/2,
             enumerate_files00/2,
+            enumerate_files01/2,
             enumerate_files1/2,
             enumerate_files2/2,
             enumerate_m_files/3,
@@ -72,7 +73,11 @@
             with_filematch/1,
             with_filematches/1,
 
+            push_modules/0,
+            current_smt/2,
+            pop_modules/0,
             maybe_add_import_module/3,
+            maybe_add_import_module/2,
             add_prolog_predicate/6,
             glean_prolog_impl_file/4,
             add_genlMt/2
@@ -108,6 +113,7 @@
         current_filesource/1,
         enumerate_files0/2,
         enumerate_files00/2,
+        enumerate_files01/2,
         enumerate_files1/2,
         enumerate_files2/2,
         enumerate_m_files/3,
@@ -161,7 +167,40 @@
 :- '@'( ensure_loaded(library(filesex)), 'user').
 
 :-endif.
-      
+
+:- system:multifile(lmconf:source_typein_modules/3),
+   system:dynamic(lmconf:source_typein_modules/3).
+:- system:multifile(lmconf:source_typein_boxes/3),
+   system:dynamic(lmconf:source_typein_boxes/3).
+
+current_smt(SM,M):-
+ '$current_source_module'(SM),'$current_typein_module'(M).
+
+push_modules:- current_smt(SM,M),
+  system:asserta(lmconf:source_typein_modules(SM,M,push_state)).
+
+pop_modules:- 
+  system:retract(lmconf:source_typein_modules(SM,M,push_state)),
+  '$set_source_module'(SM),'$set_typein_module'(M),!.
+
+
+maybe_add_import_module(A,B):-maybe_add_import_module(A,B,start).
+maybe_add_import_module(A,baseKB,C):-!,maybe_add_import_module(baseKB,A,C).
+maybe_add_import_module(From,To,_):- default_module(From,To),!.
+maybe_add_import_module(user,_,start):-!.
+maybe_add_import_module(From,To,Start):-  
+   maybe_delete_import_module(To,From),
+   catch(add_import_module(From,To,Start),E,writeln(E=add_import_module(From,To,Start))).
+
+
+maybe_delete_import_module(_From,To):- To = user,!.
+maybe_delete_import_module(_From,To):- To = system,!.
+maybe_delete_import_module(From,To):- To = user,!,
+    catch(add_import_module(From,system,end),E,writeln(E=add_import_module(From,system,end))),
+   ignore(catch(system:delete_import_module(From,user),E,writeln(E=delete_import_module(To,From)))).
+   
+maybe_delete_import_module(To,From):-  ignore(catch(system:delete_import_module(To,From),E,writeln(E=delete_import_module(To,From)))).
+
 
 %% resolve_dir( ?Dir, ?Dir) is semidet.
 %
@@ -172,7 +211,7 @@ resolve_dir(Path,Dir):-
   (prolog_load_context(directory,SDir);
    (prolog_load_context(file,File),file_directory_name(File,SDir));
    (prolog_load_context(source,File),file_directory_name(File,SDir));
-   (catch((call(call,current_source_file(F)),to_filename(F,File),atom(File)),_,fail),file_directory_name(File,SDir));
+   (catch((current_source_file(F),to_filename(F,File),atom(File)),_,fail),file_directory_name(File,SDir));
     working_directory(SDir,SDir)),exists_directory(SDir),
     catch(absolute_file_name(Path,Dir,[relative_to(SDir),access(read),file_errors(fail),file_type(directory)]),_,fail),
     exists_directory(Dir).
@@ -326,11 +365,13 @@ enumerate_m_files_mscoped(M, Mask,File1):-
 %
 % Enumerate Files Primary Helper.
 %
-enumerate_files0(Mask,File1):- absolute_file_name(Mask,X,[expand(true),file_errors(fail),solutions(all)]),expand_file_name(X,Y),member(File1,Y).
+enumerate_files0(Mask,File1):- absolute_file_name(Mask,X,[expand(true),file_errors(fail),solutions(all)]),expand_file_name(X,Y),Y\==[],member(File1,Y).
 enumerate_files0(Mask,File1):- one_must(filematch3('./',Mask,File1),(current_filedir(D),filematch3(D,Mask,File1))).
 enumerate_files0(Spec,Result):- enumerate_files00(Spec,Result).
 enumerate_files0(Spec,Result):- to_filename(Spec,Result).
 enumerate_files0(Mask,File1):-  (current_dirs(D),filematch3(D,Mask,File1)).
+
+enumerate_files01(_Mask,_File1):-fail.
 
 
 %= 	 	 
@@ -900,13 +941,6 @@ add_genlMt(From,imports(To)):-
    catch(add_import_module(From,To,start),E,writeln(E=add_import_module(From,To))).
 
 
-maybe_add_import_module(A,baseKB,C):-!,maybe_add_import_module(baseKB,A,C).
-maybe_add_import_module(From,To,Start):-  
-   catch(add_import_module(From,To,Start),E,writeln(E=add_import_module(From,To))).
-
-
-system:maybe_delete_import_module(A,B):-  ignore(delete_import_module(A,B)).
-
 :- meta_predicate
         glean_prolog_impl_file(+,+,+,+).
 
@@ -931,7 +965,9 @@ is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
    PosAt>0,
    arg(1,PosI,At),!,At>=PosAt.
 
+:- dynamic(lmconf:known_complete_prolog_impl_file/3).
 glean_prolog_impl_file(_,_,_,_):-current_prolog_flag(xref,true),!.
+glean_prolog_impl_file(end_of_file,File,SM,TypeIn):-lmconf:known_complete_prolog_impl_file(SM,File,TypeIn),!.
 glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_concat([_,_|_],'.pfc',File),!,
    assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),
   % add_genlMt(logicmoo_user,imports(baseKB)),
@@ -949,6 +985,7 @@ glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_c
 glean_prolog_impl_file((:- module(Want,_PubList)),File,SM,TypeIn):-!,
     add_genlMt(TypeIn, uses(SM)),
     add_genlMt(logicmoo_utils, uses(SM)),
+    add_genlMt(baseKB, imports(SM)),
     add_genlMt(logicmoo_utils, uses(Want)),
     add_genlMt(SM, uses(Want)),
     add_genlMt(Want, file(File)).
