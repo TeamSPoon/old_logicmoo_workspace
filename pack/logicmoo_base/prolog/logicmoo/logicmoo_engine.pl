@@ -41,7 +41,7 @@
 %=    exists(X,A)
 %=    atleast(X,N,A)
 %=    atmost(X,N,A)
-
+end_of_file.
 :- module(logicmoo_engine, [ tsn/0 ] ). 
 
 :- use_module(library(logicmoo_user)).

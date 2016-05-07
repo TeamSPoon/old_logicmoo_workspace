@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_hooks.pl
-:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo_hooks,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo_hooks,true))).
 :- module(mpred_hooks,[
 /*
 lmcache:agent_session/2,
@@ -151,7 +151,7 @@ update_value/3
 %use_kif/2
 ]).
 
-:- endif.
+%:- endif.
 /*
 add_arg_parts_of_speech/4,
 agent_action_queue/3,
@@ -172,8 +172,8 @@ verb_after_arg/3
         holds_t(6, ?, ?, ?, ?, ?, ?),
         if_result(0, 0),
         loop_check_mpred(?),
-        mpred_fa_call(?, ?, 0),
-        tf_result(0, +).
+        mpred_fa_call(?, ?, 0).
+        
 
 
 
@@ -507,11 +507,6 @@ never_mpred_tcall(arity).
 
 %= 	 	 
 
-%% tf_result( :GoalCall, +TF) is semidet.
-%
-% True/false Result.
-%
-tf_result(Call,TF):-(Call->TF=true;TF=fail).
 :- meta_predicate(if_result(0,0)).
 
 %= 	 	 

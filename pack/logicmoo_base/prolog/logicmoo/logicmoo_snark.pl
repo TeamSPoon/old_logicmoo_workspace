@@ -6,6 +6,7 @@
 % Dec 13, 2035
 %
 */
+end_of_file.
 :- module(logicmoo_snark,[
   load_snark/0,mpred_load_restore_file/1,mpred_load_restore_file/1,mpred_save_restore_file/1,ensure_autoexec/0,
   with_ukb_snark/2]).

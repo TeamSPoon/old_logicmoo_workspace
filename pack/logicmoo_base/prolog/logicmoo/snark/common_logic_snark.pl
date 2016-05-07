@@ -25,7 +25,7 @@
             any_to_pfc/2,
             any_to_pfc0/2,
             as_dlog/2,
-            as_prolog/2,
+            lmconf:as_prolog_hook/2,
             as_symlog/2,
             check_is_kb/1,
             kif_to_pfc/2,
@@ -173,7 +173,7 @@
 
 /*
 :- was_dynamic
-        as_prolog/2,
+        lmconf:as_prolog_hook/2,
         elInverse/2,
         kif_test_string/1,
         mudEquals/2,
@@ -595,12 +595,12 @@ as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(FmlM,OPS,F
 
 %= 	 	 
 
-%% as_prolog( ?Fml, ?Fml) is semidet.
+%% lmconf:as_prolog_hook( ?Fml, ?Fml) is semidet.
 %
 % Converted To Prolog.
 %
-as_prolog(Fml,Fml):- is_ftVar(Fml),!.
-as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
+lmconf:as_prolog_hook(Fml,Fml):- is_ftVar(Fml),!.
+lmconf:as_prolog_hook(Fml,FmlO):- as_symlog(Fml,FmlM),
   to_prolog_ops(OPS),subsT_each(FmlM,OPS,FmlO).
 
 
@@ -770,7 +770,7 @@ flatten_or_list(_KB,X,[X]).
 %
 % Fmtl.
 %
-fmtl(X):- as_prolog(X,XX), fmt(XX).
+fmtl(X):- lmconf:as_prolog_hook(X,XX), fmt(XX).
 
 
 %= 	 	 
@@ -1575,7 +1575,7 @@ simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),l
 %
 % Save Well-founded Semantics Version.
 %
-save_wfs(Why,PrologI):- must_det_l((as_prolog(PrologI,Prolog),
+save_wfs(Why,PrologI):- must_det_l((lmconf:as_prolog_hook(PrologI,Prolog),
    w_tl(t_l:current_local_why(Why,Prolog),
    ain_h(save_in_code_buffer,Why,Prolog)))).
 

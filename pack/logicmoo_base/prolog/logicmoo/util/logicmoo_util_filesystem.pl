@@ -986,6 +986,7 @@ glean_prolog_impl_file((:- module(Want,_PubList)),File,SM,TypeIn):-!,
     add_genlMt(TypeIn, uses(SM)),
     add_genlMt(logicmoo_utils, uses(SM)),
     add_genlMt(baseKB, imports(SM)),
+    add_genlMt(SM,imports(logicmoo_base)),    
     add_genlMt(logicmoo_utils, uses(Want)),
     add_genlMt(SM, uses(Want)),
     add_genlMt(Want, file(File)).

@@ -27,18 +27,13 @@
 
 mpred_userkb_file.
 
-% % :- '$set_source_module'(mpred_userkb).
-
-:- dynamic(base_kb_pred_list/1).
-
-%= 	 	 
 
 %% base_kb_pred_list( ?VALUE1) is semidet.
 %
 % Base Knowledge Base Predicate List.
 %
+:- dynamic(mpred_userkb:base_kb_pred_list/1).
 mpred_userkb:base_kb_pred_list([
-% prolog_load_file_loop_checked/2,
  (::::)/2,
  (<-)/2,
  (<==)/2,
@@ -120,8 +115,6 @@ mpred_isa/2,
 %mpred_manages_unknowns/0,
 mpred_mark/3,
 mpred_module/2,
-mpred_univ/1,
-mpred_univ/3,
 mudKeyword/2,
 mudDescription/2,
 never_assert_u/2,
@@ -181,9 +174,14 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
  prologSingleValued/1,prologMacroHead/1,notAssertable/1,prologBuiltin/1,prologDynamic/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,prologEquality/1,prologPTTP/1,
  prologSideEffects/1,prologHybrid/1,prologListValued/1]).
 
+:- set_defaultAssertMt(baseKB).
+:- set_fileAssertMt(baseKB).
 
-% % :- '$set_source_module'(tbox).
+:- '$set_source_module'(baseKB).
+:- '$set_typein_module'(baseKB).
 
+:- set_defaultAssertMt(baseKB).
+:- set_fileAssertMt(baseKB).
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -191,66 +189,38 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 
 :- meta_predicate
-
-        t(?, ?, ?),
-        t(?, ?, ?, ?),
-        t(?, ?, ?, ?, ?),
+        t(2,?,?),
+        t(3,?,?,?),
+        t(4,?,?,?,?),
         t(5,?,?,?,?,?),
         t(6,?,?,?,?,?,?),
         t(7,?,?,?,?,?,?,?).   
 
-:- meta_predicate((
-      baseKB:resolveConflict((*)),
-      resolveConflict0((*)),
+:- meta_predicate
+      resolveConflict(+),
+      resolveConflict0(+),
       mpred_isa(?,1),
-      resolverConflict_robot((*)))).
-
-
-:- thread_local(t_l:user_abox/2).
-
-t_l:user_abox(tbox,tbox).
-
-:- show_call(source_context_module(_CM)).
-
+      resolverConflict_robot(+).
 
 
 :- kb_dynamic(arity/2).
 :- between(1,9,A),kb_dynamic(t/A).
 :- kb_dynamic(meta_argtypes/1).
 
-
-
-% % :- '$set_source_module'(tbox).
-
-:- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),
-  E\='$pldoc'/4),must((discontiguous(baseKB:E),dynamic(baseKB:E),
-  multifile(baseKB:E),module_transparent(baseKB:E)))).
-:- mpred_userkb:base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),must(kb_dynamic(E))).
-:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),kb_dynamic(E)).
-
+:- mpred_userkb:base_kb_pred_list(List),must_maplist(kb_dynamic,List).
 
 %:- import_module_to_user(logicmoo_user).
 
 %:- initialization(import_module_to_user(logicmoo_user)).
 
-
-% :- module_property(tbox, exports(List)),forall(member(E,List),kb_dynamic(E)).
-
-% :- use_module(mpred_pfc).
-
 :- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
-
-% % :- '$set_source_module'(tbox).
-
-%= 	 	 
 
 %% prologNegByFailure( ?VALUE1) is semidet.
 %
 % Prolog Negated By Failure.
 %
 prologNegByFailure(prologNegByFailure).
-
-%= 	 	 
+   	 
 
 %% completelyAssertedCollection( ?VALUE1) is semidet.
 %
@@ -266,7 +236,7 @@ completelyAssertedCollection(prologNegByFailure).
 %t(naf(CALL)):-!,not(t(CALL)).
 %t(not(CALL)):-!,mpred_f(CALL).
 
-%= 	 	 
+
 
 %% t( ?VALUE1, ?VALUE2) is semidet.
 %
@@ -274,23 +244,15 @@ completelyAssertedCollection(prologNegByFailure).
 %
 t(X,Y):- cwc, isa(Y,X).
 
-%= 	 	 
-
 %% t( ?CALL) is semidet.
 %
 % True Structure.
 %
 t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST).
-:- meta_predicate(t(?,?,?,?,?)).
-:- meta_predicate(t(?,?,?,?)).
-:- meta_predicate(t(?,?,?)).
-:- meta_predicate t(5,?,?,?,?,?).
-:- meta_predicate t(7,?,?,?,?,?,?,?).
-:- meta_predicate t(6,?,?,?,?,?,?).
 
 :-asserta_if_new((~(G):- (cwc, neg_in_code(G)))).
 
-%= 	 	 
+
 
 %% ~( ?VALUE1) is semidet.
 %
@@ -298,11 +260,10 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 %
 :-asserta('~'(tCol('$VAR'))).
 
-% import(I):-system:import(I).
 
 
 
-%= 	 	 
+
 
 %% skolem( ?X, ?SK) is semidet.
 %
@@ -311,7 +272,7 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 skolem(X,SK):-skolem_in_code(X,SK).
 
 
-%= 	 	 
+
 
 %% skolem( ?X, ?Vs, ?SK) is semidet.
 %
@@ -321,7 +282,7 @@ skolem(X,Vs,SK):-skolem_in_code(X,Vs,SK).
 
 
 
-%= 	 	 
+
 
 %% t( ?P, ?A1, ?A2) is semidet.
 %
@@ -330,7 +291,7 @@ skolem(X,Vs,SK):-skolem_in_code(X,Vs,SK).
 t(P,A1,A2):- mpred_fa_call(P,2,call(P,A1,A2)).
 t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
 
-%= 	 	 
+
 
 %% t( ?P, ?A1, ?A2, ?A3) is semidet.
 %
@@ -339,7 +300,7 @@ t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
 t(P,A1,A2,A3):- mpred_fa_call(P,3,call(P,A1,A2,A3)).
 t(P,A1,A2,A3):- loop_check_mpred(t(P,A1,A2,A3)).
 
-%= 	 	 
+
 
 %% t( ?P, ?A1, ?A2, ?A3, ?A4) is semidet.
 %
@@ -348,7 +309,7 @@ t(P,A1,A2,A3):- loop_check_mpred(t(P,A1,A2,A3)).
 t(P,A1,A2,A3,A4):- mpred_fa_call(P,4,call(P,A1,A2,A3,A4)).
 t(P,A1,A2,A3,A4):- loop_check_mpred(t(P,A1,A2,A3,A4)).
 
-%= 	 	 
+
 
 %% t( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
 %
@@ -357,7 +318,7 @@ t(P,A1,A2,A3,A4):- loop_check_mpred(t(P,A1,A2,A3,A4)).
 t(P,A1,A2,A3,A4,A5):- mpred_fa_call(P,5,call(P,A1,A2,A3,A4,A5)).
 t(P,A1,A2,A3,A4,A5):- loop_check_mpred(t(P,A1,A2,A3,A4,A5)).
 
-%= 	 	 
+
 
 %% t( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
 %
@@ -366,7 +327,7 @@ t(P,A1,A2,A3,A4,A5):- loop_check_mpred(t(P,A1,A2,A3,A4,A5)).
 t(P,A1,A2,A3,A4,A5,A6):- mpred_fa_call(P,6,call(P,A1,A2,A3,A4,A5,A6)).
 t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6)).
 
-%= 	 	 
+
 
 %% t( :PRED7P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
 %
@@ -377,7 +338,7 @@ t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
 
 
 
-%= 	 	 
+
 
 %% current_world( ?VALUE1) is semidet.
 %
@@ -385,15 +346,6 @@ t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
 %
 current_world(current).
 
-
-
-%= 	 	 
-
-%% mpred_univ( ?C, ?I, ?Head) is semidet.
-%
-% Managed Predicate Univ.
-%
-mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
 
 
 /*
@@ -408,7 +360,7 @@ resolveConflict(C) :- cwc,
 */
 
 
-%= 	 	 
+
 
 %% resolveConflict0( ?C) is semidet.
 %
@@ -420,7 +372,7 @@ resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_f
     is_resolved(C),!.
 
 
-%= 	 	 
+
 
 %% resolverConflict_robot( ?N) is semidet.
 %
@@ -445,7 +397,7 @@ never_declare(_:declared(_:FA),Why):-nonvar(FA),never_declare(declared(FA),Why).
 never_declare(_:declared(FA),Why):-nonvar(FA),never_declare(declared(FA),Why).
 
 
-%= 	 	 
+
 
 %% never_assert_u( :TermRule, ?Rule) is semidet.
 %
@@ -472,7 +424,7 @@ never_assert_u(pt(_,
 
 
 
-%= 	 	 
+
 
 %% never_assert_u0( :TermARG1, ?Why) is semidet.
 %

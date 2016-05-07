@@ -24,6 +24,7 @@
             (dynamic_safe)/1,
             (dynamic_safe)/3,
             op_safe/3,
+            % system:predicate_property_nt/2,
             dynamic_transparent/1,
             fill_args/2,
             get_module_of/2,
@@ -115,7 +116,11 @@
 
 :- use_module(logicmoo_util_shared_dynamic).
 
-predicate_property_nt(A,B):- quietly(w_tl(set_prolog_flag(retry_undefined,false),predicate_property(A,B))).
+:- meta_predicate(system:predicate_property_nt(:,?)).
+
+system:predicate_property_nt(A,B):- 
+  quietly(w_tl(set_prolog_flag(retry_undefined,false),
+   predicate_property(A,B))).
 
 dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
 
@@ -350,9 +355,10 @@ save_was(_,_,_,_).
 save_was(_,_, PredMt, F/A):- was_was:skip_def(F/A,PredMt),!.
 save_was(export,_, PredMt, F/A):- !,retractall(was_was:was_was_once(F/A,PredMt,_,_)),!,assert_if_new(was_was:skip_def(F/A,PredMt)),!.
 save_was(module_transparent,_, _, _):- !.
-save_was(_,CallerMt, PredMt, F/A):-  on_x_cont(PredMt:dynamic(F/A)), on_x_cont(CallerMt:dynamic(F/A)), on_x_cont(PredMt:multifile(F/A)), on_x_cont(CallerMt:multifile(F/A)),fail.
+save_was(_,CallerMt, PredMt, F/A):-  
+  on_x_cont(PredMt:dynamic(F/A)), on_x_cont(CallerMt:dynamic(F/A)), on_x_cont(PredMt:multifile(F/A)), on_x_cont(CallerMt:multifile(F/A)),fail.
 save_was(Was,CallerMt, PredMt, F/A):- !, once(source_location(File,_);File=CallerMt),assert_if_new(was_was:was_was_once(F/A,PredMt,File,Was)),!.
-save_was(Was,CallerMt, PredMt, P):-functor(P,F,A), save_was(Was,CallerMt, PredMt, F/A).
+save_was(Was,CallerMt, PredMt, P):- functor(P,F,A), save_was(Was,CallerMt, PredMt, F/A).
 
 :-module_transparent(make_shared_multifile/3).
 :- export((make_shared_multifile)/3).
@@ -366,9 +372,23 @@ save_was(Was,CallerMt, PredMt, P):-functor(P,F,A), save_was(Was,CallerMt, PredMt
 % Make Shared Multifile.
 %
 % make_shared_multifile(_, baseKB, F/A):- decl_shared(F/A),!.
-make_shared_multifile(CallerMt, t_l, F/A):-!,CallerMt:thread_local(t_l:F/A),!,CallerMt:multifile(t_l:F/A).
+
+make_shared_multifile(CallerMt,M,F/A):- 
+  correct_module(M,F,A,HomeM),
+  HomeM\==M,!,
+  make_shared_multifile(CallerMt,HomeM,F/A).
+
+make_shared_multifile(_,M,F/A):- mtSharedPrologCodeOnly(M),!,
+     wdmsg(mtSharedPrologCodeOnly_make_shared_multifile(M:F/A)),!.
+
+make_shared_multifile(CallerMt, t_l, F/A):-!,
+  CallerMt:thread_local(t_l:F/A),!,
+  CallerMt:multifile(t_l:F/A).
 % make_shared_multifile(_, basePFC, _):-!.
-make_shared_multifile(CallerMt, PredMt, F/A):-!,PredMt:dynamic(PredMt:F/A),!,PredMt:multifile(PredMt:F/A),!,CallerMt:multifile(PredMt:F/A).
+make_shared_multifile(CallerMt, PredMt, F/A):-!,  
+   icatch(PredMt:dynamic(PredMt:F/A)),!,
+   PredMt:multifile(PredMt:F/A),!,
+   CallerMt:multifile(PredMt:F/A).
 
 make_shared_multifile(CallerMt, PredMt, F/A):- 
  dmsg(make_shared_multifile(CallerMt, PredMt, F/A)),
@@ -378,7 +398,8 @@ make_shared_multifile(CallerMt, PredMt, F/A):-
    '@'(PredMt:multifile(PredMt:F/A),PredMt),
    '@'(PredMt:multifile(PredMt:F/A),CallerMt),   
     (CallerMt\==PredMt->CallerMt:import(PredMt:F/A);true))).
-make_shared_multifile(CallerMt, PredMt, PI):- functor(PI,F,A),make_shared_multifile(CallerMt, PredMt, F/A).
+make_shared_multifile(CallerMt, PredMt, PI):- 
+    functor(PI,F,A),make_shared_multifile(CallerMt, PredMt, F/A).
 
 :-module_transparent(with_pfa/2).
 :-export(with_pfa/2).
@@ -728,16 +749,25 @@ autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_ind
 :- multifile(baseKB:hybrid_support/2).
 :- dynamic(baseKB:hybrid_support/2).
 baseKB_hybrid_support(F,A):-baseKB:hybrid_support(F,A).
-baseKB_hybrid_support(arity,2).
-baseKB_hybrid_support(mpred_module,2).
-baseKB_hybrid_support(functorDeclares,1).
+baseKB:hybrid_support(arity,2).
+baseKB:hybrid_support(mpred_module,2).
+baseKB:hybrid_support(functorDeclares,1).
+baseKB:hybrid_support(spft,3).
+baseKB:hybrid_support(mtLocal,1).
+baseKB:hybrid_support(genlMt,2).
 
 istAbove(Mt,Query):- Mt \== baseKB, Mt \== logicmoo_utils, genlMt(Mt,MtAbove),MtAbove:Query.
 
-check_undefined_predicate(baseKB,F,A,fail):- baseKB_hybrid_support(F,A),!.
+check_undefined_predicate(baseKB,F,A,fail):- 
+  baseKB_hybrid_support(F,A),!,
+  multifile(baseKB:F/A),
+  module_transparent(baseKB:F/A),
+  icatch(dynamic(baseKB:F/A)),
+  icatch(discontiguous(baseKB:F/A)).
+
 check_undefined_predicate(M,F,A,error):- lmcache:tried_to_retry_undefined(M,F,A),!.
 check_undefined_predicate(CallerMt,F,A,_):-
-   wdmsg(check_undefined_predicate(CallerMt,F,A)),
+   wdmsg(uses_predicate(CallerMt,F,A)),
    assert(lmcache:tried_to_retry_undefined(CallerMt,F,A)),fail.
 check_undefined_predicate(CallerMt,F,A,retry):- baseKB_hybrid_support(F,A),!,
    functor(Goal,F,A),
@@ -752,26 +782,23 @@ check_undefined_predicate(CallerMt,F,A,retry):-
        autoload_library_index(F,A,PredMt,File),
        asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
        reexport(logicmoo_base:File),!,
-       add_module_import(CallerMt,logicmoo_base,start).
+       system:add_import_module(CallerMt,logicmoo_base,start).
 
 check_undefined_predicate(Module, Name, Arity, Action) :-
 	current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
+
 check_undefined_predicate(CallerMt,F,A,retry):- 
     loop_check(retry_undefined(CallerMt:F/A),true).  % dump_break
 
-:- dynamic(lmcache:tried_to_retry_undefined/3).
 
-user:exception(undefined_predicate,M:F/A,R):-
-   current_prolog_flag(retry_undefined,true),
-     w_tl(set_prolog_flag(retry_undefined,false),
-      check_undefined_predicate(M,F,A,R)),!.
+:- dynamic(lmcache:tried_to_retry_undefined/3).
 
 
 % Module defines the type
-retry_undefined(M:F/A):- lmcache:tried_to_retry_undefined(M,F,A),!.
-retry_undefined(M:F/A):- assert(lmcache:tried_to_retry_undefined(M,F,A)),fail.
+% retry_undefined(M:F/A):- lmcache:tried_to_retry_undefined(M,F,A),!.
+% retry_undefined(M:F/A):- assert(lmcache:tried_to_retry_undefined(M,F,A)),fail.
 
 retry_undefined(lmconf:F/A):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
 retry_undefined(lmcache:F/A):-multifile(lmcache:F/A),volatile(lmcache:F/A),dynamic(lmcache:F/A),!.
@@ -897,7 +924,12 @@ get_module_of(P,PredMt):-functor_catch(P,F,A),get_module_of_4(P,F,A,PredMt).
 %
 % Static Predicate.
 %
-static_predicate(PredMt,F,A):- functor_safe(FA,F,A),  once(PredMt:predicate_property_nt(FA,_)),not(PredMt:predicate_property_nt(FA,dynamic)),not((PredMt:predicate_property_nt(FA,imported_from(Where)),Where \== PredMt)).
+static_predicate(PredMt,F,A):- 
+  functor_safe(FA,F,A),  
+  PredMt:once(predicate_property_nt(FA,_)),
+  \+ predicate_property_nt(FA,dynamic),
+    \+ ((predicate_property_nt(PredMt:FA,imported_from(Where)),
+    Where \== PredMt)).
 
 
 %= 	 	 

@@ -6,6 +6,7 @@
 % Dec 13, 2035
 %
 */
+end_of_file.
 :- module(logicmoo_run_old_pttp,[]).
 
 :- ensure_loaded(logicmoo_engine).

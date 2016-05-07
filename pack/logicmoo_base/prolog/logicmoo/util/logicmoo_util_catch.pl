@@ -1459,7 +1459,7 @@ quietly(G):- on_x_f(hide_trace(G),
 sanity(_):- notrace((is_release;bad_idea)),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(why,Goal)).
 sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
-sanity(Goal):- quietly(Goal)*->true;setup_call_cleanup(wdmsg(begin_FAIL_in(G)),rtrace(G),wdmsg(end_FAIL_in(G))).
+sanity(Goal):- quietly(Goal)*->true;setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))).
 
 compare_results(N+NVs,O+OVs):-
    NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).

@@ -281,7 +281,8 @@ kb_dynamic(F,Other):- decl_mpred(F,Other),
 %
 % Declare Managed Predicate Hybrid.
 %
-kb_dynamic(CM,M,PIN,FA):- unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true),kb_dynamic_good(M:FA).
+kb_dynamic(CM,M,PIN,FA):- 
+  unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true),kb_dynamic_good(M:FA).
 
 
 %= 	 	 
@@ -293,7 +294,8 @@ kb_dynamic(CM,M,PIN,FA):- unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid
 decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,get_arity(PI,F,A),not(current_predicate(F/A)),!,
    forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_hybrid_ilc(CM,M,PIA,F/AA))).
 
-decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
+decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),
+  decl_mpred_hybrid_ilc(CM,M,F),true).
 
 %= 	 	 
 
@@ -311,8 +313,8 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       decl_mpred_mfa(M,F,A),
       
       decl_mpred_pi(PI),
-      must(lmconf:mpred_provide_setup(call(conjecture),F/A,prologHybrid,_OUT)),
-      must((get_cc(PI,NCN),NCN>=NC)).
+      nop(must(lmconf:mpred_provide_setup(call(conjecture),M:F/A,prologHybrid,_OUT))),
+      must((get_cc(M:PI,NCN),NCN>=NC)).
 
 
 

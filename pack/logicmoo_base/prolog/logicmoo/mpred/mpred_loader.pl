@@ -359,19 +359,23 @@ make_declared(F/A,T):- !,correct_module(abox,F,A,T),!,make_declared_now(T:F/A).
 %
 % Make Declared Now.
 %
+make_declared_now(M:F/A):- correct_module(M,F,A,HomeM),HomeM\==M,!,make_declared_now(HomeM:F/A).
+
+make_declared_now(M:F/A):- mtSharedPrologCodeOnly(M),!.
+
 make_declared_now(M:F/A):-!,
  debug(make_declared,'~p',make_declared_now(M:F/A)),
  w_tl(set_prolog_flag(access_level,system),
   M:(
    sanity( \+ ((M:F/A) = (qrTBox:p/1))),
    M:check_never_assert(declared(M:F/A)),
-   M:discontiguous(M:F/A),
+   icatch(M:discontiguous(M:F/A)),
    functor(P,F,A),
-   (predicate_property(P,dynamic)->true;
-    (predicate_property(P,static)->debug(make_declared,'~p',make_declared_now(M:F/A));
-       M:dynamic(M:F/A))),!,
+   (predicate_property(M:P,dynamic)->true;
+    (predicate_property(M:P,static)->debug(make_declared,'~p',make_declared_now(M:F/A));
+       icatch(M:dynamic(M:F/A)))),!,
    M:multifile(M:F/A),
-   M:dynamic(M:F/A),
+   icatch(M:dynamic(M:F/A)),
    M:module_transparent(M:F/A),
    M:import_to_user(M:F/A))), !.
 make_declared_now(M:P):-functor(P,F,A),!,make_declared_now(M:F/A). 
@@ -410,7 +414,8 @@ make_reachable(F/A):- dumpST,trace, source_context_module(CM),make_declared(CM:F
 %
 import_predicate(CM,M:_):- CM==M,!.
 import_predicate(CM,M:_):- default_module(CM,M),!.
-import_predicate(CM,M:F/A):- show_call(nop(CM:z333import(M:F/A))),CM:multifile(M:F/A),CM:discontiguous(M:F/A).
+import_predicate(CM,M:F/A):- show_call(nop(CM:z333import(M:F/A))),CM:multifile(M:F/A),
+  icatch(CM:discontiguous(M:F/A)).
 
 
 

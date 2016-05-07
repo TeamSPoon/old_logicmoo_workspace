@@ -1446,7 +1446,7 @@ make_1_cl(Extras,One,Conj,cl([One],NewBodyListO)):-
   delete_eq(Conj,One,Rest0),delete_eq(Rest0,NHead,Rest),
   must_maplist(negate_one_maybe(Extras),Rest,NewBodyList),!,
   flattenConjs(Extras,NewBodyList,NewBodyListM),
-  must_maplist(lmconf:as_prolog,NewBodyListM,NewBodyListO).
+  must_maplist(lmconf:as_prolog_hook,NewBodyListM,NewBodyListO).
 
 
 %= 	 	 
@@ -1943,7 +1943,7 @@ cf_to_flattened_clauses_0(KB,Why,NCFsI,FlattenedO):-
    % wdmsgl(cf(NCFs)),
    must_maplist(clauses_to_boxlog(KB,Why),NCFs,ListOfLists),
    flatten([ListOfLists],Flattened),
-   as_prolog(Flattened,FlattenedL),
+   lmconf:as_prolog_hook(Flattened,FlattenedL),
    list_to_set(FlattenedL,FlattenedS),
    must_maplist(demodal_sents(KB),FlattenedS,FlattenedO))),!.
   

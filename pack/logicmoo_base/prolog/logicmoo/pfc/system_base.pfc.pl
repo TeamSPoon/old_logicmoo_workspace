@@ -142,7 +142,7 @@ mtExact(lmconf).
 mtExact(lmcache).
 mtExact(t_l).
 mtExact(system).
-mtExact(Mt)==>mtGloal(Mt).
+mtExact(Mt)==> mtGlobal(Mt).
 mtExact(Mt)==> ~genlMt(Mt,_).
 
 tSet(mtCore,comment("mtCore(?Mt) states Mt specified is builtin")).

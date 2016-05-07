@@ -32,11 +32,12 @@
 
 :- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
 :- user:use_module(library(logicmoo_utils)).
-
-:- dynamic(logicmoo_utils:'$exported_op'/3).
+:- use_module(library('logicmoo/mpred/mpred_stubs.pl')).
 
 :- multifile(logicmoo_utils:'$exported_op'/3).
+:- dynamic(logicmoo_utils:'$exported_op'/3).
 :- discontiguous(logicmoo_utils:'$exported_op'/3).
+
 % ========================================
 % defaultTBoxMt/1
 % ========================================
@@ -130,7 +131,8 @@ fix_ops_for(CM):-
 
 % ================================================
 % DBASE_T System
-% ================================================
+% ================================================    
+      
 
 :- multifile(lmconf:mpred_is_impl_file/2).
 :- dynamic(lmconf:mpred_is_impl_file/2).
@@ -151,7 +153,7 @@ lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_pfc.pl')).
 lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_prolog_file.pl')).
 lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_props.pl')).
 lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_storage.pl')).
-lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_stubs.pl')).
+% lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_stubs.pl')).
 lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_type_constraints.pl')).
 lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_type_isa.pl')).
 lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_type_naming.pl')).
@@ -163,8 +165,8 @@ lmconf:mpred_is_impl_file(lmbase,library('logicmoo/snark/common_logic_skolem.pl'
 lmconf:mpred_is_impl_file(lmbase,library('logicmoo/snark/common_logic_kb_hooks.pl')).
 lmconf:mpred_is_impl_file(lmbase,library('logicmoo/snark/common_logic_compiler.pl')).
 lmconf:mpred_is_impl_file(lmbase,library('logicmoo/snark/common_logic_snark.pl')).
+lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_hooks.pl')).
 % lmconf:mpred_is_impl_file(lmbase,library('logicmoo/mpred/mpred_*.pl')).
-lmconf:mpred_is_impl_file(atbox,library('logicmoo/mpred/mpred_hooks.pl')).
 lmconf:mpred_is_impl_file(atbox,library('logicmoo/mpred/mpred_userkb.pl')).
 
 
@@ -223,6 +225,7 @@ enable_mpred_system(Usr,Sys):- with_mutex(mpred_system_mutex,enable_mpred_system
 %
 :- export(disable_mpred_system/2).
 disable_mpred_system(Usr,_Sys):- with_mutex(mpred_system_mutex,lmconf:disable_mpred_system0(Usr)).
+
 
 
 
@@ -343,12 +346,24 @@ import_2:- lmconf:source_typein_boxes(SM,M,Usr:Sys),
 % Enable System
 :- must(enable_mpred_system).
 
+lmconf:sanity_check:- findall(U,(current_module(U),default_module(U,baseKB)),L),must(L==[baseKB]).
+lmconf:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(U,M),U\==M),L),wdmsg(imports_eache :- (L,[sees(M)])))).
+lmconf:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(M,U),U\==M),L),wdmsg(imports(M):-L))).
+lmconf:sanity_check:- doall((mtSharedPrologCodeOnly(M),
+    setof(U,(current_module(U),default_module(M,U),U\==M),L),wdmsg(imports(M):-L))).
+
+user:exception(undefined_predicate,M:F/A,R):-
+   current_prolog_flag(retry_undefined,true),
+     w_tl(set_prolog_flag(retry_undefined,false),
+      check_undefined_predicate(M,F,A,R)),!.
 
 :- set_prolog_flag(system:unknown,error).
 :- set_prolog_flag(user:unknown,error).
 :- set_prolog_flag(baseKB:unknown,error).
 :- set_prolog_flag(tbox:unknown,warning).
 :- set_prolog_flag(abox:unknown,warning).
+
+:- forall(lmconf:sanity_check,true).
 
 :- set_prolog_flag(retry_undefined,true).
 
@@ -358,7 +373,6 @@ import_2:- lmconf:source_typein_boxes(SM,M,Usr:Sys),
         forall(filematch(Match,File),
           call((w_tl(t_l:disable_px,
                ensure_loaded(baseKB:File))))))))).
-
 
 % Load boot base file
 :- time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))).

@@ -13,7 +13,7 @@
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl
 %:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
-:- module(mpred_stubs,
+:- module(mpred_stubs_file_module,
           [ 
 agenda_rescan_mpred_props/0,
 assert_mpred_t/1,
@@ -79,6 +79,7 @@ rescan_missing_stubs/0,
 rescan_missing_stubs_ilc/0,
 rescan_mpred_props_ilc/0,
 scan_missing_stubs/1,
+tf_result/2,
 test_call_cut/0,
 wff_check_failed/3,
 wff_check_mpred_t_throw/1,
@@ -104,6 +105,7 @@ cwdl(0,+),
 % mpred_stubs
 must_op(*,0),
 % mpred_stubs
+tf_result(0, -),
 registerCycPredMtWhy(0),
 call_provided_mpred_storage_op(*,0,*).
 
@@ -753,11 +755,15 @@ lmconf:mpred_provide_setup(Op,HeadIn,StubType,OUT):- StubType \== prologDynamic,
  must((StubType = prologHybrid)),
  OUT=defined(lmconf:mpred_provide_setup(Op,HeadIn,StubType)).
 
+%% tf_result( :GoalCall, +TF) is semidet.
+%
+% True/false Result.
+%
+tf_result(Call,TF):-(Call->TF=true;TF=fail).
+
 % ==============================
 % SETUP HYBRID STUB 1-5
-% ==============================
-
-%= 	 	 
+% ============================== 	 
 
 %% ensure_universal_stub( ?HeadIn) is semidet.
 %

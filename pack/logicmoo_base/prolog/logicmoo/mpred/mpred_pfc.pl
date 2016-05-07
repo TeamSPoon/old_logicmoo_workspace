@@ -602,10 +602,9 @@ remove_negative_version(P):-
   must(mpred_ain(\+ (~(P)), S)))))),!.
 
      
-fresh_mode :- fail.
+fresh_mode:-fail.
 plus_fwc:-true.
 
-plus_fwc(_):-!.
 plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
 plus_fwc(support_hilog(_,_)):-!.
 plus_fwc('==>'(_,_)):-!.
@@ -654,7 +653,7 @@ mpred_post1(P,S):-
      !,
      mpred_enqueue(P,S),
      !)),
-  (plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true).
+  plus_fwc(P),!.
   
 /*
 % this would be the very inital by Tim Finnin...
@@ -1959,7 +1958,8 @@ really_mpred_mark(Sup,Type,F,A):-
 %
 % Functor-arity Converted To Pred.
 %
-fa_to_p(F,A,P):-is_ftNameArity(F,A),functor(P,F,A),( P \= mpred_call_no_bc(_) ),( P \= '$VAR'(_)).
+fa_to_p(F,A,P):-is_ftNameArity(F,A),functor(P,F,A),
+  ( P \= mpred_call_no_bc(_) ),( P \= '$VAR'(_)).
   
 
 %% build_code_test(+WS, ?Test, ?TestO) is semidet.

@@ -299,8 +299,8 @@ restore_trace(Per,Goal):-
 %
 rtrace(Goal):- notrace(tlbugger:rtracing),!, Goal.
 
-rtrace(Goal):-
-   ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
+rtrace(Goal):- wdmsg(rtrace(Goal)), 
+  ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
    '$leash'(OldL, OldL),'$visible'(OldV, OldV),
    (Undo =   notrace(((notrace,ignore(retract(tlbugger:rtracing)),'$leash'(_, OldL),'$visible'(_, OldV), Tracing)))),
    (RTRACE = notrace((notrace,asserta(tlbugger:rtracing),visible(+all),thread_leash(-all),thread_leash(+exception)))),!,

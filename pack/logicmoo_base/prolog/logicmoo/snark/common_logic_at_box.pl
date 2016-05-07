@@ -18,14 +18,15 @@
 % :- if((\+ current_prolog_flag(common_logic_at_box_true,true),set_prolog_flag(common_logic_at_box_true,true))).
 %:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(common_logic_at_box,[
-
+         mtSharedPrologCodeOnly/1,
          assert_setting01/1,
          make_module_name_local/2,
          make_module_name_local0/2,
          
          defaultAssertMt/1,
          set_defaultAssertMt/1,
-         
+         mtCanAssertMt/1,
+
          which_file/1,
          fileAssertMt/1,
          set_fileAssertMt/1,
@@ -93,7 +94,7 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
 in_mpred_kb_module:- source_context_module(MT),defaultAssertMt(MT2),!,MT==MT2.
 
 
-map_inheritence(Child):-forall(import_module(Child,Parent),inherit_into_module(Child,Parent)).
+map_inheritance(Child):-forall(import_module(Child,Parent),inherit_into_module(Child,Parent)).
 
 
 %% box_type( ?F, ?A, ?VALUE3) is semidet.
@@ -125,7 +126,8 @@ defaultAssertMt(ABox):-
     (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);
     '$current_typein_module'(ABox);
-     defaultTBoxMt(ABox))),ABox\==user,ABox\==logicmoo_utils)),!.
+     defaultTBoxMt(ABox))), 
+           mtCanAssertMt(ABox))),!.
 
 defaultAssertMt(ABox):- fileAssertMt(ABox).
 
@@ -135,7 +137,7 @@ defaultAssertMt(ABox):- fileAssertMt(ABox).
 % within a knowledge base.
 %
 % not just user modules
-fileAssertMt(ABox):- nonvar(ABox),fileAssertMt(ABoxVar),!,ABox=@=ABoxVar.
+fileAssertMt(ABox):- nonvar(ABox), fileAssertMt(ABoxVar),!,ABox=@=ABoxVar.
 fileAssertMt(ABox):- which_file(File)->current_module(ABox),module_property(ABox,file(File)),File\==ABox,!.
 fileAssertMt(ABox):-
  (t_l:current_defaultAssertMt(ABox);
@@ -143,8 +145,74 @@ fileAssertMt(ABox):-
 fileAssertMt(ABox):- which_file(File)->make_module_name_local(File,ABox),File\==ABox,!.
 fileAssertMt(ABox):-
  (((('$current_typein_module'(ABox);
-     defaultTBoxMt(ABox))),ABox\==user)),!.
+     defaultTBoxMt(ABox))),mtCanAssertMt(ABox))),!.
 fileAssertMt(baseKB).
+
+mtCanAssertMt(ABox):- \+ mtSharedPrologCodeOnly(ABox).
+
+mtSharedPrologCodeOnly(Mt):-
+      arg(_,v( 
+         common_logic_at_box,
+         common_logic_boxlog,
+         common_logic_compiler,
+         common_logic_kb_hooks,
+         common_logic_sexpr,
+         common_logic_skolem,
+         common_logic_snark,
+         lmconf,
+         lmcache,
+         t_l,
+         logicmoo_base,
+         logicmoo_base_file,
+         logicmoo_util_attvar_reader,
+         logicmoo_util_bugger,
+         logicmoo_util_catch,
+         logicmoo_util_ctx_frame,
+         logicmoo_util_database,
+         logicmoo_util_dmsg,
+         logicmoo_util_dra,
+         logicmoo_util_dumpst,
+         logicmoo_util_engines,
+         logicmoo_util_filestreams,
+         logicmoo_util_first,
+         logicmoo_util_help,
+         logicmoo_util_loop_check,
+         logicmoo_util_no_repeats,
+         logicmoo_util_preddefs,
+         logicmoo_util_prolog_frames,
+         logicmoo_util_prolog_streams,
+         logicmoo_util_rtrace,
+         logicmoo_util_shared_dynamic,
+         logicmoo_util_strings,
+         logicmoo_util_term_listing,
+         logicmoo_util_terms,
+         logicmoo_util_varnames,
+         logicmoo_util_with_assertions,
+         logicmoo_utils_file,
+         logicmoo_utils,
+         mpred_agenda,
+         mpred_expansion,
+         mpred_hooks,
+         mpred_kb_ops,
+         mpred_listing,
+         mpred_loader,
+         mpred_pfc,
+         mpred_props,
+         mpred_storage,
+         mpred_stubs,
+         mpred_stubs_file_module,
+         mpred_type_args,
+         mpred_type_constraints,
+         mpred_type_isa,
+         mpred_type_naming,
+         mpred_type_wff,
+         prolog_statistics,
+         system,
+         user
+       ),Mt).
+
+mtNoPrologCode(mpred_userkb).
+
 
 
 %% set_defaultAssertMt( ?ABox) is semidet.
@@ -152,6 +220,7 @@ fileAssertMt(baseKB).
 % Sets Current Module.
 %
 set_defaultAssertMt(ABox):- 
+    must(mtCanAssertMt(ABox)),
     defaultTBoxMt(TBox),
     (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
     '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
@@ -164,6 +233,7 @@ set_defaultAssertMt(ABox):-
 %
 set_fileAssertMt(ABox):- 
  must_det_l((
+   must(mtCanAssertMt(ABox)),
    defaultTBoxMt(TBox),
    TBox:ensure_abox(ABox),
    '$current_typein_module'(CM),
@@ -349,7 +419,9 @@ correct_module(M,X,T):-functor(X,F,A),quietly_must(correct_module(M,F,A,T)),!.
 correct_module(abox,F,A,T):- !,defaultAssertMt(M),correct_module(M,F,A,T).
 correct_module(tbox,F,A,T):- !,defaultTBoxMt(M),correct_module(M,F,A,T).
 correct_module(user,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,F,A,T).
+correct_module(M,F,A,T):- functor(G,F,A),guessMtFromGoal(M,G,T),!.
 correct_module(MT,_,_,MT):-!.
+
 
 % :- inherit_into_module(logicmoo_user,logicmoo_base).
 
@@ -371,218 +443,4 @@ fixup_modules:-
 
 
 % :- endif.
-
-
-end_of_file.
-
-
-
-[]=system
-[baseKB]=logicmoo_util_attvar_reader
-[baseKB]=logicmoo_util_bugger
-[baseKB,user]=logicmoo_util_catch
-[baseKB,user]=logicmoo_util_ctx_frame
-[baseKB,user]=logicmoo_util_database
-[baseKB,user]=logicmoo_util_dmsg
-[baseKB,user]=logicmoo_util_dra
-[baseKB,user]=logicmoo_util_dumpst
-[baseKB,user]=logicmoo_util_engines
-[baseKB,user]=logicmoo_util_filestreams
-[baseKB,user]=logicmoo_util_first
-[baseKB,user]=logicmoo_util_rtrace
-[baseKB,user]=logicmoo_util_varnames
-[baseKB,user]=logicmoo_util_with_assertions
-[logicmoo_util_filestreams,logicmoo_util_engines,logicmoo_util_dumpst,logicmoo_util_dra,
- logicmoo_util_database,logicmoo_util_ctx_frame,logicmoo_util_with_assertions,
- logicmoo_util_attvar_reader,logicmoo_util_bugger,logicmoo_util_rtrace,logicmoo_util_dmsg,logicmoo_util_varnames,logicmoo_util_catch,
- logicmoo_util_first,user]=logicmoo_utils
-[system]= $apply
-[system]= $attvar
-[system]= $autoload
-[system]= $bags
-[system]= $dcg
-[system]= $dicts
-[system]= $dwim
-[system]= $expand
-[system]= $history
-[system]= $messages
-[system]= $pack
-[system]= $parms
-[system]= $predopts
-[system]= $qlf
-[system]= $rc
-[system]= $syspreds
-[system]= $toplevel
-[system]= $var_info
-[system]=aggregate
-[system]=ansi_term
-[system]=apply
-[system]=archive
-[system]=arithmetic
-[system]=assoc
-[system]=backward_compatibility
-[system]=base32
-[system]=base64
-[system]=broadcast
-[system]=charsio
-[system]=check
-[system]=codesio
-[system]=crypto_hash
-[system]=date
-[system]=dcg_basics
-[system]=dif
-[system]=doc_access
-[system]=doc_util
-[system]=edinburgh
-[system]=editor_buttons
-[system]=error
-[system]=files_ex
-[system]=gensym
-[system]=git
-[system]=gui_tracer
-[system]=help_index
-[system]=html_head
-[system]=html_quasi_quotations
-[system]=html_write
-[system]=http_client
-[system]=http_dispatch
-[system]=http_exception
-[system]=http_header
-[system]=http_hook
-[system]=http_host
-[system]=http_multipart_plugin
-[system]=http_open
-[system]=http_parameters
-[system]=http_path
-[system]=http_server_files
-[system]=http_stream
-[system]=httpd_wrapper
-[system]=iostream
-[system]=jquery
-[system]=license
-[system]=link_xpce
-[system]=lists
-[system]=make
-[system]=memory_file
-[system]=mime_pack
-[system]=mimetype
-[system]=occurs
-[system]=ordsets
-[system]=oset
-[system]=pairs
-[system]=pce
-[system]=pce_autoload
-[system]=pce_compatibility_layer
-[system]=pce_dispatch
-[system]=pce_error
-[system]=pce_expand
-[system]=pce_expansion
-[system]=pce_global
-[system]=pce_goal_expansion
-[system]=pce_host
-[system]=pce_keybinding
-[system]=pce_messages
-[system]=pce_meta
-[system]=pce_nedit
-[system]=pce_portray
-[system]=pce_principal
-[system]=pce_realise
-[system]=pce_swi_hooks
-[system]=pce_util
-[system]=pldoc
-[system]=pldoc_colours
-[system]=pldoc_files
-[system]=pldoc_html
-[system]=pldoc_htmlsrc
-[system]=pldoc_http
-[system]=pldoc_index
-[system]=pldoc_man
-[system]=pldoc_modes
-[system]=pldoc_pack
-[system]=pldoc_process
-[system]=pldoc_register
-[system]=pldoc_search
-[system]=pldoc_wiki
-[system]=predicate_options
-[system]=process
-[system]=prolog_autoload
-[system]=prolog_breakpoints
-[system]=prolog_clause
-[system]=prolog_codewalk
-[system]=prolog_colour
-[system]=prolog_debug
-[system]=prolog_dialect
-[system]=prolog_edit
-[system]=prolog_history
-[system]=prolog_listing
-[system]=prolog_metainference
-[system]=prolog_operator
-[system]=prolog_pack
-[system]=prolog_source
-[system]=prolog_stack
-[system]=prolog_statistics
-[system]=prolog_system_predicate_options
-[system]=prolog_xref
-[system]=pure_input
-[system]=quasi_quotations
-[system]=quintus
-[system]=random
-[system]=rbtrees
-[system]=read_util
-[system]=record
-[system]=settings
-[system]=sgml
-[system]=sgml_write
-[system]=shell
-[system]=shlib
-[system]=socket
-[system]=ssl
-[system]=start_emacs
-[system]=swi_option
-[system]=swi_system_utilities
-[system]=terms
-[system]=thread_httpd
-[system]=thread_pool
-[system]=thread_util
-[system]=time
-[system]=toplevel_variables
-[system]=ugraphs
-[system]=uri
-[system]=url
-[system]=user
-[system]=utf8
-[system]=when
-[system]=www_browser
-[system]=xpath
-
-[user]=baseKB
-[user]=emacs_prolog_colours
-[user]=happy1
-[user]=http
-[user]=listing
-[user]=lmcache
-[user]=lmconf
-[user]=logicmoo_util_filesystem
-[user]=logicmoo_util_help
-[user]=logicmoo_util_term_listing
-[user]=mfree
-[user]=mime
-[user]=predopts_analysis
-[user]=prolog
-[user]=rdf_db
-[user]=sandbox
-[user]=star
-[user]=t_l
-[user]=t_l_global
-[user]=tlbugger
-[user]=varname_cache
-[user]=vn
-happy1:  ?-
-true.
-
- = class(user) ;
-MP = exports([]) ;
-MP = program_size(0) ;
-
-
 
