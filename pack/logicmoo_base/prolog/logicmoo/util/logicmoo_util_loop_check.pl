@@ -241,7 +241,7 @@ make_key(CC,KeyO):- ((ground(CC)->Key=CC ; cc_key(CC,Key))),!,KeyO=Key.
 %
 is_loop_checked(Call):-  make_key(Call,Key),!,(lmcache:ilc(Key);lmcache:ilc(Key+_)).
 
-:- meta_predicate logicmoo_utils:loop_check_early(0,0).
+:- meta_predicate lmcode:loop_check_early(0,0).
 :- export(loop_check_early/2).
 
 %= 	 	 

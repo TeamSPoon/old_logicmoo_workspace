@@ -36,7 +36,7 @@ lmconf:mpred_provide_read_attributes(F,_,_):-lmconf:mpred_isa(F,prologHybrid),!,
 lmconf:mpred_provide_read_attributes(F,A,prologDynamic(F,A)):-lmconf:mpred_isa(F,prologDynamic).
 lmconf:mpred_provide_read_attributes(F,A,Why):-functor_safe(P,F,A),lmconf:mpred_provide_read_attributes(P,F,A,Why).
 
-lmconf:mpred_provide_read_attributes(P,F,A,static_predicate(P)):-static_predicate(user,F,A).
+lmconf:mpred_provide_read_attributes(P,F,A,is_static_predicate(P)):-is_static_predicate(user,F,A).
 lmconf:mpred_provide_read_attributes(P,_,_,predicate_property(P,foreign)):-predicate_property(P,foreign),!.
 lmconf:mpred_provide_read_attributes(P,_,_,predicate_property(P,built_in)):-real_builtin_predicate(P),!.
 lmconf:mpred_provide_read_attributes(P,_,_,predicate_property(P,imported_from(system))):-predicate_property(P,imported_from(system)).

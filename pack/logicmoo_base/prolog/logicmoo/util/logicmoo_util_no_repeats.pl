@@ -55,7 +55,7 @@
 loop_check_nr(CL):- loop_check(no_repeats(CL)).
 
 
-:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
+:- if(current_predicate(lmcode:combine_logicmoo_utils/0)).
 :- module(logicmoo_util_no_repeats,
 [  % when the predciates are not being moved from file to file the exports will be moved here
        ]).

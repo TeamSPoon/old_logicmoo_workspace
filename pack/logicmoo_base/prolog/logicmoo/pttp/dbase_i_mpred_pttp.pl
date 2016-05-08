@@ -109,12 +109,12 @@ pttp_assert_real_wid(ID,X):-
 
 
 % -- CODEBLOCK
-:- was_export(static_predicate/2).
-:- meta_predicate(static_predicate(0,?)).
-static_predicate(M:(Y:-_),Why):-!,static_predicate(M:Y,Why).
-static_predicate((Y:-_),Why):-!,static_predicate(Y,Why).
-static_predicate(_:Y,file(F)):-!,predicate_property(_:Y,file(F)),not(predicate_property(_:Y,dynamic)).
-static_predicate(Y,file(F)):-predicate_property(_:Y,file(F)),not(predicate_property(_:Y,dynamic)).
+:- was_export(is_static_predicate_pttp/2).
+:- meta_predicate(is_static_predicate_pttp(0,?)).
+is_static_predicate_pttp(M:(Y:-_),Why):-!,is_static_predicate_pttp(M:Y,Why).
+is_static_predicate_pttp((Y:-_),Why):-!,is_static_predicate_pttp(Y,Why).
+is_static_predicate_pttp(_:Y,file(F)):-!,predicate_property(_:Y,file(F)),not(predicate_property(_:Y,dynamic)).
+is_static_predicate_pttp(Y,file(F)):-predicate_property(_:Y,file(F)),not(predicate_property(_:Y,dynamic)).
 
 
 % -- CODEBLOCK
@@ -364,7 +364,7 @@ pttp_assert_int_wid(ID,YB):- must((get_functor(YB,F,A),renumbervars_a(YB,Y),pttp
 
 
 
-pttp_assert_int_wid04(_,Y,_,_):- static_predicate(Y,Why),must( dmsg(error(warn(static_predicate(Y,Why))))),!.
+pttp_assert_int_wid04(_,Y,_,_):- is_static_predicate_pttp(Y,Why),must( dmsg(error(warn(is_static_predicate_pttp(Y,Why))))),!.
 pttp_assert_int_wid04(_,_,F,A):- was_pttp_functor(external,F,A),!.
 pttp_assert_int_wid04(_,Y,F,A):- not(internal_functor(F)),add_functor(external,F/A),assertz_unumbered(Y),!.
 pttp_assert_int_wid04(ID,Y,F,A):- show_success(why,wid(ID,F/A,Y)),!.
@@ -373,7 +373,7 @@ pttp_assert_int_wid04(ID,Y,F,A):- wid(_,_,Y),!,ainz_pttp(wid(ID,F/A,Y)),!.
 pttp_assert_int_wid04(ID,Y,F,A):- ainz_pttp(wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
 /*
 pttp_assert_int_wid04(ID,Y,F,A):- 
-   static_predicate(Y,Why)-> (trace,wdmsg(warn(error(static_predicate(Y,Why))))); 
+   is_static_predicate_pttp(Y,Why)-> (trace,wdmsg(warn(error(is_static_predicate_pttp(Y,Why))))); 
     must(show_failure(why,assertz_unumbered(Y)),
     must((not(internal_functor(F))-> add_functor(external,F/A); (ainz_pttp(wid(ID,F/A,Y)),add_functor(internal,F/A)))))
 */

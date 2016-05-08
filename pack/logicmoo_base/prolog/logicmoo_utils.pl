@@ -44,7 +44,7 @@ user:term_expansion(EOF,POS,O,POS2):-
  nonvar(EOF),
  (EOF=end_of_file;EOF=(:-(module(_,_)))),
  prolog_load_context(module,M),
- M\==logicmoo_utils, 
+ M\==lmcode, 
  ignore((
     source_location(S,_),
     '$current_typein_module'(TM),

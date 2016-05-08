@@ -7,15 +7,13 @@
 :- if((
    user:use_module(user:library('logicmoo/util/logicmoo_util_filesystem.pl')),
    push_modules,
-   UTILS = logicmoo_utils,
+   UTILS = lmcode,
    TBOX = baseKB,
    current_smt(SM,M),
    call(ignore((
-   % SM\==user,
-   
    maybe_add_import_module(SM,TBOX),
-   maybe_add_import_module(SM,UTILS),
-   system:asserta(lmconf:source_typein_boxes(SM,M,SM:TBOX))))))).
+   maybe_add_import_module(SM,UTILS)))),
+   system:asserta(lmconf:source_typein_boxes(SM,M,SM:TBOX)))).
 :- endif.
 
 :- module(logicmoo_base_file,
@@ -33,9 +31,9 @@
 :- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
 :- user:use_module(library(logicmoo_utils)).
 
-:- multifile(logicmoo_utils:'$exported_op'/3).
-:- dynamic(logicmoo_utils:'$exported_op'/3).
-:- discontiguous(logicmoo_utils:'$exported_op'/3).
+:- multifile(lmcode:'$exported_op'/3).
+:- dynamic(lmcode:'$exported_op'/3).
+:- discontiguous(lmcode:'$exported_op'/3).
 
 % ========================================
 % abox:defaultTBoxMt/1
@@ -142,38 +140,38 @@ fix_ops_for(CM):-
 % Managed Predicate If Is A Implimentation File.
 %
 
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_at_box.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_expansion.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_kb_ops.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_listing.pl')).
-:-reexport(logicmoo_base:library('logicmoo/snark/common_logic_sexpr.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_loader.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_pfc.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_prolog_file.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_props.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_storage.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_stubs.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_type_constraints.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_type_isa.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_type_naming.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_type_wff.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_type_args.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_agenda.pl')).
-:-reexport(logicmoo_base:library('logicmoo/snark/common_logic_boxlog.pl')).
-%:-reexport(logicmoo_base:library('logicmoo/snark/common_logic_skolem.pl')).
-%:-reexport(logicmoo_base:library('logicmoo/snark/common_logic_compiler.pl')).
-%:-reexport(logicmoo_base:library('logicmoo/snark/common_logic_snark.pl')).
-%:-reexport(logicmoo_base:library('logicmoo/snark/common_logic_kb_hooks.pl')).
-% :-reexport(logicmoo_base:library('logicmoo/mpred/mpred_*.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_at_box.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_expansion.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_kb_ops.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_listing.pl')).
+:-reexport(lmcode:library('logicmoo/snark/common_logic_sexpr.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_loader.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_pfc.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_prolog_file.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_props.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_storage.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_stubs.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_type_constraints.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_type_isa.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_type_naming.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_type_wff.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_type_args.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_agenda.pl')).
+:-reexport(lmcode:library('logicmoo/snark/common_logic_boxlog.pl')).
+%:-reexport(lmcode:library('logicmoo/snark/common_logic_skolem.pl')).
+%:-reexport(lmcode:library('logicmoo/snark/common_logic_compiler.pl')).
+%:-reexport(lmcode:library('logicmoo/snark/common_logic_snark.pl')).
+%:-reexport(lmcode:library('logicmoo/snark/common_logic_kb_hooks.pl')).
+% :-reexport(lmcode:library('logicmoo/mpred/mpred_*.pl')).
 lmconf:mpred_is_impl_file(atbox,library('logicmoo/mpred/mpred_userkb.pl')).
-:-reexport(logicmoo_base:library('logicmoo/mpred/mpred_hooks.pl')).
+:-reexport(lmcode:library('logicmoo/mpred/mpred_hooks.pl')).
 
 
 % :- reexport(library('logicmoo/snark/common_logic_sexpr.pl')).
 
 
-%prolog:get_source_ref(R):-logicmoo_utils:get_source_ref(R).
-%prolog:mpred_ain(U,R):- logicmoo_utils:mpred_ain(U,R).
+%prolog:get_source_ref(R):-lmcode:get_source_ref(R).
+%prolog:mpred_ain(U,R):- lmcode:mpred_ain(U,R).
 
 %% assert_setting00( ?X) is semidet.
 assert_setting00(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),system:retractall(M:DP),system:asserta(M:P).
@@ -189,15 +187,15 @@ load_mpred_system(_,Sys):-asserta(abox:defaultTBoxMt(Sys)),current_prolog_flag(a
 load_mpred_system(SM,Sys):-
  must((current_smt(SM,M),
  lmconf:source_typein_boxes(SM,M,_Usr:Sys))),
- ignore(catch(system:delete_import_module(logicmoo_utils,Sys),_,true)),
- ignore(catch(system:add_import_module(Sys,logicmoo_utils,start),_,true)),
+ ignore(catch(system:delete_import_module(lmcode,Sys),_,true)),
+ ignore(catch(system:add_import_module(Sys,lmcode,start),_,true)),
  with_mutex(mpred_system_mutex,
             (forall(
-               :-reexport(logicmoo_base:Match),     
+               :-reexport(lmcode:Match),     
               (( 
                  forall(filematch(Sys:Match,File),
                    call((w_tl(t_l:disable_px,
-                        logicmoo_utils:ensure_loaded(logicmoo_utils:File)))))))))).
+                        lmcode:ensure_loaded(lmcode:File)))))))))).
 
 */
 
@@ -208,7 +206,7 @@ load_mpred_system(SM,Sys):-
 %
 enable_mpred_system:-
    must((current_smt(SM,M),
-   lmconf:source_typein_boxes(SM,M,Usr:Sys))),
+    (lmconf:source_typein_boxes(SM,M,Usr:Sys);lmconf:source_typein_boxes(SM,_,Usr:Sys)))),
    enable_mpred_system(Usr,Sys).
 
 %% enable_mpred_system(+Usr,+Sys) is det.
@@ -276,8 +274,8 @@ lmconf:disable_mpred_system0(Usr):-
 import_2:- lmconf:source_typein_boxes(SM,M,Usr:Sys),
    maybe_add_import_module(SM,Usr,start),
    maybe_add_import_module(M,Sys,start),
-   maybe_add_import_module(M,logicmoo_utils,start),
-   maybe_add_import_module(M,logicmoo_utils,start).
+   maybe_add_import_module(M,lmcode,start),
+   maybe_add_import_module(M,lmcode,start).
 
 
 :- must(add_library_search_path('./logicmoo/mpred_online/',[ '*.pl'])).
@@ -285,35 +283,35 @@ import_2:- lmconf:source_typein_boxes(SM,M,Usr:Sys),
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
 
-%:- maybe_add_import_module(logicmoo_utils,logicmoo_utils,start).
+%:- maybe_add_import_module(lmcode,lmcode,start).
 %:- autoload([verbose(false)]).
 
 :- forall(current_op(X,Y,user:Z),assert(was_op(user,X,Y,Z))).
 :- forall(current_op(X,Y,system:Z),assert(was_op(system,X,Y,Z))).
 
-:- forall(was_op(system,X,Y,Z),op_safe(X,Y,logicmoo_utils:Z)).
-:- forall(was_op(user,X,Y,Z),op_safe(X,Y,logicmoo_utils:Z)).
+:- forall(was_op(system,X,Y,Z),op_safe(X,Y,lmcode:Z)).
+:- forall(was_op(user,X,Y,Z),op_safe(X,Y,lmcode:Z)).
 
 :- set_prolog_flag(access_level,system).
 
 :- forall(was_op(system,X,Y,Z),system:op(X,Y,user:Z)).
 :- forall(was_op(user,X,Y,Z),system:op(X,Y,user:Z)).
-:- forall(was_op(_,X,Y,Z),system:op(X,Y,logicmoo_utils:Z)).
+:- forall(was_op(_,X,Y,Z),system:op(X,Y,lmcode:Z)).
 :- forall(was_op(_,X,Y,Z),system:op(X,Y,baseKB:Z)).
 
 :- set_prolog_flag(access_level,user).
 
 
-:- asserta_new((logicmoo_util_database:ainz(G):- !, call(logicmoo_utils:mpred_ainz,G))).
-:- asserta_new((logicmoo_util_database:ain(G):- !, call(logicmoo_utils:mpred_ain,G))).
-:- asserta_new((logicmoo_util_database:aina(G):- !, call(logicmoo_utils:mpred_aina,G))).
+:- asserta_new((logicmoo_util_database:ainz(G):- !, call(lmcode:mpred_ainz,G))).
+:- asserta_new((logicmoo_util_database:ain(G):- !, call(lmcode:mpred_ain,G))).
+:- asserta_new((logicmoo_util_database:aina(G):- !, call(lmcode:mpred_aina,G))).
 
 :- do_gc.
 
 
 :- set_prolog_flag(access_level,user).
 
-%:- add_import_module(logicmoo_utils,prolog_statistics,start).
+%:- add_import_module(lmcode,prolog_statistics,start).
 
 :- statistics.
 
@@ -325,7 +323,7 @@ import_2:- lmconf:source_typein_boxes(SM,M,Usr:Sys),
     retract(( wsh_w:wrap_shared(F,A,ereq):- Body )), 
       between(0,9,A),ain((arity(F,A),pfcControlled(F),prologHybrid(F))),fail)).
 
-% :- doall((current_module(W),import_module(W,system),\+ import_module(W, user), W\==baseKB, add_import_module(logicmoo_utils,W,end))).
+% :- doall((current_module(W),import_module(W,system),\+ import_module(W, user), W\==baseKB, add_import_module(lmcode,W,end))).
 
 */
 :- dmsg("Adding logicmoo/[snark|mpred_online] to autoload path",[]).
@@ -410,12 +408,11 @@ user:exception(undefined_predicate,M:F/A,R):-
                ensure_loaded(baseKB:File))))))))).
 
 % Load boot base file
-lbf:- 
- must(enable_mpred_system),
- time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))).
-
-% :- lbf.
+:- must(enable_mpred_system).
+:- time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))).
 
 % restore entry state
 :- pop_modules.
 % :- w_tl(t_l:side_effect_ok,doall(call_no_cuts(lmconf:module_local_init(Usr,Sys)))).
+
+

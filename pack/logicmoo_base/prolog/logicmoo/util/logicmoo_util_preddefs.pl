@@ -44,8 +44,8 @@
             rebuild_pred_into/3,
             rebuild_pred_into/4,
             remove_pred/3,
-            static_predicate/1,
-            static_predicate/3,
+            is_static_predicate/1,
+            is_static_predicate_3/3,
             save_was/4,
              (was_dynamic)/1,
              (was_multifile)/1,
@@ -80,7 +80,8 @@
         must_pi(0),
         rebuild_pred_into(0, 1, ?),
         rebuild_pred_into(0, 0, 1, ?),
-        static_predicate(+, +, +),
+        is_static_predicate_3(+, +, +),
+        is_static_predicate(:),
         with_mfa(0, 3),
         with_mfa_of(3, +, +, +, +),
         with_pi(0, 4),
@@ -111,7 +112,7 @@
         pred_prop/4,
         rebuild_as_dyn/4,
         remove_pred/3,
-        static_predicate/1.
+        is_static_predicate/1.
 
 
 :- include('logicmoo_util_header.pi').
@@ -603,6 +604,10 @@ dynamic_multifile(F/N):-
    dynamic(F/N),
    multifile(F/N),
    module_transparent(F/N).
+dynamic_multifile(M:F/N):-
+   dynamic(M:F/N),
+   multifile(M:F/N),
+   module_transparent(M:F/N).
 
 
 %= 	 	 
@@ -697,16 +702,16 @@ get_module_of(P,PredMt):-functor_catch(P,F,A),get_module_of_4(P,F,A,PredMt).
 
 
 % ----------
-:- export(static_predicate/3).
-% = :- meta_predicate(static_predicate(+,+,+)).
+:- export(is_static_predicate_3/3).
+% = :- meta_predicate(is_static_predicate_3(+,+,+)).
 
 %= 	 	 
 
-%% static_predicate( +PredMt, +F, +A) is semidet.
+%% is_static_predicate( +PredMt, +F, +A) is semidet.
 %
 % Static Predicate.
 %
-static_predicate(PredMt,F,A):- 
+is_static_predicate_3(PredMt,F,A):- 
   functor_safe(FA,F,A),  
   PredMt:once(predicate_property_nt(FA,_)),
   \+ predicate_property_nt(FA,dynamic),
@@ -716,15 +721,15 @@ static_predicate(PredMt,F,A):-
 
 %= 	 	 
 
-%% static_predicate( :TermA) is semidet.
+%% is_static_predicate( :TermA) is semidet.
 %
 % Static Predicate.
 %
-static_predicate(A):-atom(F),!,current_predicate(F/A),!,functor(FA,F,A),static_predicate(FA).
-static_predicate(F/A):-!,atom(F),current_predicate(F/A),!,functor(FA,F,A),static_predicate(FA).
-% static_predicate(FA):-predicate_property_nt(FA,built_in),!.
-static_predicate(FA):-predicate_property_nt(FA,static),!.
-static_predicate(FA):-once(predicate_property_nt(FA,_)),not(predicate_property_nt(FA,dynamic)).
+is_static_predicate(M:A):-atom(F),!,current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
+is_static_predicate(M:F/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
+is_static_predicate(M:F//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
+is_static_predicate(FA):-predicate_property_nt(FA,static),!,predicate_property_nt(FA,number_of_clauses(_)).
+is_static_predicate(FA):-once(predicate_property_nt(FA,_)),\+ predicate_property_nt(FA,dynamic).
 
 
 
@@ -786,7 +791,8 @@ rebuild_as_dyn(PredMt,C,F,A):- redefine_system_predicate(PredMt:C),PredMt:abolis
 % Dynamic Safely Paying Attention To Corner Cases.
 %
 dynamic_safe(PredMt,F,A):- functor(C,F,A),predicate_property_nt(C,imported_from(system)),!,dmsg(warn(predicate_property_nt(PredMt:C,imported_from(system)))).
-dynamic_safe(PredMt,F,A):- (static_predicate(PredMt,F,A) -> show_call(why,convert_to_dynamic(PredMt,F,A)) ; on_x_log_cont((dynamic(PredMt:F/A),multifile(PredMt:F/A)))). % , warn_module_dupes(PredMt,F,A).
+dynamic_safe(PredMt,F,A):- (is_static_predicate(PredMt:F/A) 
+  -> show_call(why,convert_to_dynamic(PredMt,F,A)) ; on_x_log_cont((dynamic(PredMt:F/A),multifile(PredMt:F/A)))). % , warn_module_dupes(PredMt,F,A).
 :- op(1150,fx,lmconf:dynamic_safe).
 
 

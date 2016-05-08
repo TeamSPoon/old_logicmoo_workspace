@@ -14,6 +14,9 @@
 :- module(logicmoo_util_filesystem,
           [ 
           swi_module/2,
+          write_module_imports/0,
+          show_module_imports/1,
+          show_module_imports/2,
             is_file_based_expansion/5,
             add_library_search_path/2,
             add_file_search_path/2,
@@ -152,7 +155,7 @@
 
 :- use_module(library(dialect)).
 
-:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
+:- if(current_predicate(lmcode:combine_lmsystem/0)).
 :- module(logicmoo_util_filesystem,
 [  % when the predciates are not being moved from file to file the exports will be moved here
        ]).
@@ -937,8 +940,8 @@ add_genlMt(From,imports(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),
 add_genlMt(From,maybe(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
 add_genlMt(baseKB,imports(logicmoo_user)):-!. % this means never will happen
 
-add_genlMt(logicmoo_utils,imports(baseKB)):- !, add_genlMt(baseKB,imports(logicmoo_utils)).
-add_genlMt(logicmoo_utils,imports(baseKB)):-!.
+add_genlMt(lmcode,imports(baseKB)):- !, add_genlMt(baseKB,imports(lmcode)).
+add_genlMt(lmcode,imports(baseKB)):-!.
 
 % add_genlMt(_From,imports(To)):-arg(_,v(baseKB,logicmoo_user),To),!.
 add_genlMt(From,Prop):-lmconf:known_prolog_file_prop(From,Prop),!.
@@ -982,7 +985,7 @@ glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_c
    assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),
   % add_genlMt(logicmoo_user,imports(baseKB)),
   % add_genlMt(SM,maybe(TypeIn)),
-  add_genlMt(logicmoo_utils,imports(SM)),
+  add_genlMt(lmcode,imports(SM)),
   % add_genlMt(SM,imports(logicmoo_user)),
   % add_genlMt(SM,imports(baseKB)),
    forall(source_file(M:H,File),
@@ -994,10 +997,11 @@ glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_c
 
 glean_prolog_impl_file((:- module(Want,_PubList)),File,SM,TypeIn):-!,
     add_genlMt(TypeIn, uses(SM)),
-    add_genlMt(logicmoo_utils, uses(SM)),
-    add_genlMt(baseKB, imports(SM)),
-    add_genlMt(SM,imports(logicmoo_base)),    
-    add_genlMt(logicmoo_utils, uses(Want)),
+    add_genlMt(lmcode, uses(SM)),
+    % add_genlMt(baseKB, imports(SM)),
+    add_genlMt(baseKB, imports(lmcode)),
+    add_genlMt(SM,imports(lmcode)),    
+    add_genlMt(lmcode, uses(Want)),
     add_genlMt(SM, uses(Want)),
     add_genlMt(Want, file(File)).
     
@@ -1020,3 +1024,16 @@ add_prolog_predicate(_ImportTo,M,H,F,A,_S):-
        M:module_transparent(M:F/A))).
       
 
+show_module_imports(M):- show_module_imports(M,_),show_module_imports(_,M).
+
+show_module_imports(M,I):-var(M),!,forall(current_module(M),show_module_imports(M,I)).
+show_module_imports(M,I):-
+   forall(import_module(M,I),
+      portray_clause(':-'(system:add_import_module(M,I)))),
+   ((import_module(M,user);M=user)->true;portray_clause(':-'(ignore(system:delete_import_module(M,user))))),
+   forall((default_module(M,I),M\==I,\+import_module(M,I)),nop(wdmsg(default_module(M,I)))).
+
+write_module_imports:-
+  forall(current_module(M),show_module_imports(M,_)).
+  
+   

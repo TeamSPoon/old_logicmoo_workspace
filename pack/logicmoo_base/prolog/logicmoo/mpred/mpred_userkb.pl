@@ -41,7 +41,7 @@ mpred_userkb:base_kb_pred_list([
  (==>)/1,
  (nesc)/1,
  (~)/1,
-% mpred_f/1,
+%mpred_f/1, 
 mpred_f/2,mpred_f/3,mpred_f/4,mpred_f/5,mpred_f/6,mpred_f/7,
 %add_args/15,
 %naf_in_code/1,
@@ -128,7 +128,7 @@ pfcControlled/1,
 pfcRHS/1,
 predCanHaveSingletons/1,
 prologBuiltin/1,
-prologDynamic/1,prologDynamic/2,prologHybrid/1,prologHybrid/2,prologKIF/1,prologListValued/1,prologMacroHead/1,prologMultiValued/1,prologNegByFailure/1,prologOrdered/1,
+prologDynamic/1,prologHybrid/1,prologKIF/1,prologListValued/1,prologMacroHead/1,prologMultiValued/1,prologNegByFailure/1,prologOrdered/1,
 prologPTTP/1,
 prologSideEffects/1,
 prologSingleValued/1,
@@ -178,7 +178,6 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- discontiguous baseKB:'$exported_op'/3.
 :- thread_local t_l:disable_px.
 
-
 :- dynamic(baseKB:use_kif/2).
 
 % :- shared_multifile(baseKB:use_kif/2).
@@ -188,6 +187,8 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 
 :- '$set_source_module'(baseKB).
 :- '$set_typein_module'(baseKB).
+
+:- mpred_userkb:base_kb_pred_list(List),must_maplist(kb_dynamic,List).
 
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
@@ -215,8 +216,6 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- kb_dynamic(arity/2).
 :- between(1,9,A),kb_dynamic(t/A).
 :- kb_dynamic(meta_argtypes/1).
-
-:- mpred_userkb:base_kb_pred_list(List),must_maplist(kb_dynamic,List).
 
 %:- import_module_to_user(logicmoo_user).
 
@@ -450,7 +449,7 @@ never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
 %:- rtrace.
 %:- trace.
 %:- ignore(delete_import_module(baseKB,user)).
-%:- add_import_module(baseKB,logicmoo_utils,start).
+%:- add_import_module(baseKB,lmcode,start).
 %:- nortrace.
 %:- notrace.
 

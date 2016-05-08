@@ -596,7 +596,7 @@ lmconf:module_local_init:-set_prolog_stack_gb(16).
 %
 is_mpred_action('$VAR'(_)):-!,fail.
 is_mpred_action(remove_if_unsupported(_,_)).
-is_mpred_action(P):-predicate_property(P,static).
+is_mpred_action(P):-is_static_predicate(P).
 
 %% mpred_is_builtin( +P) is semidet.
 %

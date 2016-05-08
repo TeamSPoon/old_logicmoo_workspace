@@ -90,20 +90,6 @@ lmconf:sanity_test/0,
 lmconf:type_action_info/3,
 mpred_online:semweb_startup/0,
 
-/*
-baseKB:argIsa/3,
-bt/2, %basePFC
-hs/1, %basePFC
-hs/1, %basePFC
-nt/3, %basePFC
-pk/3, %basePFC
-pt/2, %basePFC
-que/1, %basePFC
-pm/1, %basePFC
-spft/3, %basePFC
-tms/1, %basePFC
-*/
-
 user:portray/1,
 user:prolog_load_file/2, 
 %user:prolog_clause_name/2,
@@ -188,6 +174,23 @@ user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_
           op(1150,fx,(was_export)),
           op(1150,fx,(shared_multifile)).
 
+:- decl_shared(mtExact/1).
+:- decl_shared(mpred_f/3).
+:- decl_shared(mpred_f/2).
+
+:- decl_shared((
+   argIsa/3,
+   bt/2, %basePFC
+   hs/1, %basePFC
+   hs/1, %basePFC
+   nt/3, %basePFC
+   pk/3, %basePFC
+   pt/2, %basePFC
+   que/1, %basePFC
+   pm/1, %basePFC
+   spft/3, %basePFC
+   tms/1, %basePFC
+   prologSingleValued/1)).
 
 
 

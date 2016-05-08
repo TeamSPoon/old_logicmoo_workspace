@@ -306,6 +306,7 @@ unassertable((_:V)):-!,unassertable(V).
 unassertable((_;_)).
 unassertable((_,_)).
 
+
 fix_mp_abox(G0,U,G):-fix_mp(G0,U:G).
 
 fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
@@ -2071,7 +2072,7 @@ mpred_assertz_w_support(P,Support):-
 %
 
 
-clause_asserted_u(MH):- sanity((nonvar(MH), \+  predicate_property(MH, static))),fail.
+clause_asserted_u(MH):- sanity((nonvar(MH), \+ is_static_predicate(MH))),fail.
 %clause_asserted_u(MH):- \+ ground(MH),must(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
 clause_asserted_u((MH:-B)):- must(mnotrace(fix_mp(MH,M:H))),!,clause_asserted_i((M:H :-B )).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(MH,M:H))),clause_asserted_i(M:H).

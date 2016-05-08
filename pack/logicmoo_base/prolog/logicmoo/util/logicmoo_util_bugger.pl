@@ -742,13 +742,6 @@ new_a2s0(List, Separator, String):-
 %
 bad_idea:- current_prolog_flag(bad_idea,true).
 
-/*
-:- export(static_predicate/1).
-% = %= :- meta_predicate (static_predicate(:)).
-:- module_transparent(static_predicate/1).
-static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,dynamic)).
-*/
-
 
 % ===================================================================
 % Bugger Term Expansions

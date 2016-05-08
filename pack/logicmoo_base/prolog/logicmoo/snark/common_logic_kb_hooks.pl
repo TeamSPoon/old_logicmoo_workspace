@@ -2,125 +2,90 @@
 %:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(common_logic_kb_hooks,
  [kbp_t/1,with_el_holds_disabled/1,noGenlPreds/1,cyckb_t/3,link_to_holds2/2,
-           assert_next_queue/1,
-            assert_to_db_list/2,
-            big_kb_ASSERTION/2,
-            convert_easy_strings/0,
-            convert_easy_strings2/0,
-            cyckb_t/1,
-            cyckb_t/3,
-            cyckb_t_call/1,
-            cyckb_t_implies/2,
-            cyckb_t_via_genlPreds/1,
-            cyckb_t_via_implies/1,
-            drain_assert_next_buffer/0,
-            el_holds_DISABLED_KB/0,
-          get_assertions/2,
-          get_b_dnf/2,
-          get_dnf_props/6,
-          get_props/4,
-          cycAssert/1,cycAssert/2,
-          get_varsp/2,
-          hide_empty_strings/0,
-          hide_term_rewrites/0,
+   assert_next_queue/1,
+  assert_to_db_list/2,
+  big_kb_ASSERTION/2,
+  convert_easy_strings/0,
+  convert_easy_strings2/0,
+  cyckb_t/1,
+  cyckb_t/3,
+  cyckb_t_call/1,
+  cyckb_t_implies/2,
+  cyckb_t_via_genlPreds/1,
+  cyckb_t_via_implies/1,
+  drain_assert_next_buffer/0,
+  el_holds_DISABLED_KB/0,
+  get_assertions/2,
+  get_b_dnf/2,
+  get_dnf_props/6,
+  get_props/4,
+  cycAssert/1,cycAssert/2,
+  get_varsp/2,
+  hide_empty_strings/0,
+  hide_term_rewrites/0,
 
-      kb_f/1,
-      kb_mt/2,
-      kb_t/1,
-      kb_t/3,
-      kbp_t/1,
-      kbp_t_list/1,
-      kbp_t_list/2,
-      kbp_t_list/3,
-      kbp_t_list_0/3,
-      kbp_t_list_1/3,
-      kbp_t_list_prehook/2,
-      kbp_to_mpred_0/0,
-      kbp_to_mpred_nomore/0,
-      kbp_to_mpred_t/0,
-            link_to_holds/2,
-            link_to_holds/3,
-            link_to_holds2/2,
-            link_to_holds2/3,
-            link_to_holds_DYNAMIC/2,
-            link_to_holds_list/2,
-            
-            move_implied/0,
-            move_kb_assertions_matching/4,
+  kb_f/1,
+  kb_mt/2,
+  kb_t/1,
+  kb_t/3,
+  kbp_t/1,
+  kbp_t_list/1,
+  kbp_t_list/2,
+  kbp_t_list/3,
+  kbp_t_list_0/3,
+  kbp_t_list_1/3,
+  kbp_t_list_prehook/2,
+  kbp_to_mpred_0/0,
+  kbp_to_mpred_nomore/0,
+  kbp_to_mpred_t/0,
+  link_to_holds/2,
+  link_to_holds/3,
+  link_to_holds2/2,
+  link_to_holds2/3,
+  link_to_holds_DYNAMIC/2,
+  link_to_holds_list/2,
+  
+  move_implied/0,
+  move_kb_assertions_matching/4,
 noGenlPreds/1,
-            nv1000/1,
-            proof_from_clause/3,
-            prove_calllist/3,
-            tiny_kb_ASSERTION/2,
-            with_el_holds_disabled/1,
-            with_el_holds_enabled/1,
-            with_kb_assertions_matching/3,
-            write_assertions/0
-          ]).
+  nv1000/1,
+  proof_from_clause/3,
+  prove_calllist/3,
+  tiny_kb_ASSERTION/2,
+  with_el_holds_disabled/1,
+  with_el_holds_enabled/1,
+  with_kb_assertions_matching/3,
+  write_assertions/0
+  ]).
 %:- endif.
 
-% :- shared_multifile kbp_t_list_prehook/2.
+% :- dynamic_multifile kbp_t_list_prehook/2.
 % % :- '$set_source_module'(common_logic_kb_hooks).
 :- include('../mpred/mpred_header.pi').
 :-
-            op(1150,fx,(was_dynamic)),
-            op(1150,fx,(was_multifile)),
-            op(1150,fy,(was_module_transparent)),
-            op(1150,fx,(was_export)),
-            op(1150,fx,(shared_multifile)).
-
-/*
-:- shared_multifile el_assertions:el_holds/4.
-:- shared_multifile el_assertions:el_holds/5.
-:- shared_multifile el_assertions:el_holds/6.
-:- shared_multifile el_assertions:el_holds/7.
-:- shared_multifile el_assertions:el_holds/8.
-:- shared_multifile el_assertions:el_holds/9.
-:- shared_multifile el_assertions:el_holds/10.
-:- shared_multifile el_assertions:el_holds/11.
-:- shared_multifile el_assertions:el_holds/12.
-:- shared_multifile el_assertions:el_holds/13.
-:- shared_multifile el_assertions:el_holds/14.
+  op(1150,fx,(was_export)),
+  op(1150,fx,(dynamic_multifile)).
 
 
 
-:- was_module_transparent   el_assertions:el_holds/4.
-:- was_module_transparent   el_assertions:el_holds/5.
-:- was_module_transparent   el_assertions:el_holds/6.
-:- was_module_transparent   el_assertions:el_holds/7.
-:- was_module_transparent   el_assertions:el_holds/8.
-:- was_module_transparent   el_assertions:el_holds/9.
-:- was_module_transparent   el_assertions:el_holds/10.
-:- was_module_transparent   el_assertions:el_holds/11.
-:- was_module_transparent   el_assertions:el_holds/12.
-:- was_module_transparent   el_assertions:el_holds/13.
-:- was_module_transparent   el_assertions:el_holds/14.
-
-
-
-
-*/
-
-
-
-:- was_dynamic el_assertions:el_holds/4.
-:- was_dynamic el_assertions:el_holds/5.
-:- was_dynamic el_assertions:el_holds/6.
-:- was_dynamic el_assertions:el_holds/7.
-:- was_dynamic el_assertions:el_holds/8.
-:- was_dynamic el_assertions:el_holds/9.
-:- was_dynamic el_assertions:el_holds/10.
-:- was_dynamic el_assertions:el_holds/11.
-:- was_dynamic el_assertions:el_holds/12.
-:- was_dynamic el_assertions:el_holds/13.
-:- was_dynamic el_assertions:el_holds/14.
+:- dynamic_multifile el_assertions:el_holds/4.
+:- dynamic_multifile el_assertions:el_holds/5.
+:- dynamic_multifile el_assertions:el_holds/6.
+:- dynamic_multifile el_assertions:el_holds/7.
+:- dynamic_multifile el_assertions:el_holds/8.
+:- dynamic_multifile el_assertions:el_holds/9.
+:- dynamic_multifile el_assertions:el_holds/10.
+:- dynamic_multifile el_assertions:el_holds/11.
+:- dynamic_multifile el_assertions:el_holds/12.
+:- dynamic_multifile el_assertions:el_holds/13.
+:- dynamic_multifile el_assertions:el_holds/14.
 
 :- meta_predicate with_kb_assertions_matching(?,?,0).
 
-:- shared_multifile el_assertions:el_holds_pred_impl/1.
-:- shared_multifile el_assertions:is_cyckb_t_pred/2.
-:- shared_multifile el_assertions:el_holds_pred_impl/1.
-:- shared_multifile el_assertions:is_cyckb_t_pred/2.
+:- dynamic_multifile(el_assertions:el_holds_pred_impl/1).
+:- dynamic_multifile el_assertions:is_cyckb_t_pred/2.
+:- dynamic_multifile el_assertions:el_holds_pred_impl/1.
+:- dynamic_multifile el_assertions:is_cyckb_t_pred/2.
 :- dynamic cyckb_t/3.
 
 :- was_export(kbp_t/1). 
@@ -142,7 +107,7 @@ kbp_t(_):- not(loaded_external_kbs),!,fail.
 % kbp_t(PLIST):- kbp_t_list(PLIST). % append(PLIST,[_MT,_PROOF],PLISTO), apply(el_assertions:el_holds,PLISTO).  % el_assertions:el_holds has 2 extra args our callers shouldnt be forced to use.. but this is a big slowdown
 
 
-:- was_dynamic(assertion_f/1).
+:- dynamic_multifile(assertion_f/1).
 :- was_export(kb_f/1).
 
 %= 	 	 
@@ -291,12 +256,12 @@ link_to_holds2(Pred,TargetPred):- !,link_to_holds2(Pred,user,TargetPred).
 % Link Converted To Holds Extended Helper.
 %
 link_to_holds2(Pred,M,TargetPred):- 
-  forall(between(2,12,X),((length(PLIST,X),append(PLIST,[_MT],PLISTMT),append(PLISTMT,[_PROOF],PLISTMTPROOF),         
-         export(Pred/X),        
-         % X2 is X + 2, nop(export(TargetPred/X2)),        
-          A=..[Pred|PLIST],
-          B=..[TargetPred|PLISTMTPROOF],              
-         assertz_if_new((A :- (M:B) ))))).
+  forall(between(2,12,X),((length(PLIST,X),append(PLIST,[_MT],PLISTMT),append(PLISTMT,[_PROOF],PLISTMTPROOF), 
+   export(Pred/X),  
+ % X2 is X + 2, nop(export(TargetPred/X2)),  
+  A=..[Pred|PLIST],
+  B=..[TargetPred|PLISTMTPROOF],  
+   assertz_if_new((A :- (M:B) ))))).
 
 :- was_export(link_to_holds/2).
 
@@ -317,11 +282,11 @@ link_to_holds(Pred,TargetPred):- !,link_to_holds(Pred,user,TargetPred).
 %
 link_to_holds(Pred,M,TargetPred):- 
   doall((between(2,12,X),length(PLIST,X),
-         export(Pred/X),          
-         nop(export(TargetPred/X)),          
-          A=..[Pred|PLIST],
-          B=..[TargetPred|PLIST],              
-         assertz_if_new((A:- M:B)))).
+   export(Pred/X),  
+   nop(export(TargetPred/X)),  
+  A=..[Pred|PLIST],
+  B=..[TargetPred|PLIST],  
+   assertz_if_new((A:- M:B)))).
 
 :- was_export(link_to_holds_DYNAMIC/2).
 
@@ -333,11 +298,11 @@ link_to_holds(Pred,M,TargetPred):-
 %
 link_to_holds_DYNAMIC(Pred,TargetPred):- 
   doall((between(2,12,X),length(PLIST,X),
-         export(Pred/X),          
-         export(TargetPred/X),          
-          A=..[Pred|PLIST],
-          B=..[TargetPred|PLIST],              
-         assertz_if_new((A:-B)))).
+   export(Pred/X),  
+   export(TargetPred/X),  
+  A=..[Pred|PLIST],
+  B=..[TargetPred|PLIST],  
+   assertz_if_new((A:-B)))).
 :- was_export(link_to_holds_list/2).
 
 %= 	 	 
@@ -348,11 +313,11 @@ link_to_holds_DYNAMIC(Pred,TargetPred):-
 %
 link_to_holds_list(Pred,TargetPred):- 
   doall((between(2,12,X),length(PLIST,X),
-         export(Pred/X),          
-         export(TargetPred/1),          
-          A=..[Pred|PLIST],
-          B=..[TargetPred,PLIST],              
-         assertz_if_new((A:-B)))).
+   export(Pred/X),  
+   export(TargetPred/1),  
+  A=..[Pred|PLIST],
+  B=..[TargetPred,PLIST],  
+   assertz_if_new((A:-B)))).
 
 
 /*
@@ -365,7 +330,7 @@ cyckb_t(P,A1,A2):- t([P,A1,A2]).
 cyckb_t(P,A1):- t([P,A1]).
 */
 
-:- was_dynamic(el_holds_DISABLED_KB/0).
+:- dynamic_multifile(el_holds_DISABLED_KB/0).
 :- was_export(el_holds_DISABLED_KB/0).
 :- asserta(el_holds_DISABLED_KB).
 
@@ -573,11 +538,11 @@ proof_from_clause(Head, Body, ((Head:- Body))).
 % Move Knowledge Base Assertions Matching.
 %
 move_kb_assertions_matching(PLIST,Match,Replace,Where):- 
-%   dmsg(move_kb_assertions_matching(PLIST,Match,Replace,to(Where))),
-        doall((kbp_t_list(PLIST,Call),
-           forall(retract(Call),
-           (subst(PLIST:Call,Match,Replace,NewPLIST:NewCall),
-           assert_to_db_list(Where,[rewrite,NewPLIST,NewCall]))))).
+% dmsg(move_kb_assertions_matching(PLIST,Match,Replace,to(Where))),
+  doall((kbp_t_list(PLIST,Call),
+   forall(retract(Call),
+   (subst(PLIST:Call,Match,Replace,NewPLIST:NewCall),
+   assert_to_db_list(Where,[rewrite,NewPLIST,NewCall]))))).
 
 
 
@@ -598,7 +563,7 @@ assert_to_db_list(HOLDS,PLIST):- safe_univ(Call,[HOLDS|PLIST]), assert(assert_ne
 % Using Knowledge Base Assertions Matching.
 %
 with_kb_assertions_matching(PLIST,Proof,Call):- doall((kbp_t_list(PLIST, Proof),Call)).
-   
+ 
 :- was_export(kbp_to_mpred_t/0).
 
 %= 	 	 
@@ -632,7 +597,7 @@ kbp_to_mpred_0:- time_call(drain_assert_next_buffer),!.
 % Knowledge Base P- Converted To Managed Predicate No More.
 %
 kbp_to_mpred_nomore:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(_F,PLIST)),
-   retractall(lmconf:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_mpred_t).
+ retractall(lmconf:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_mpred_t).
 
 
 :- was_export(move_implied/0).
@@ -644,11 +609,11 @@ kbp_to_mpred_nomore:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db
 % Move Implied.
 %
 move_implied:-doall((between(2,6,Len),length(PLIST,Len), 
-                     Call=..[assertion_holds,implied|PLIST],
-                     retract(hl_holds:Call),
-                     append(ALIST,[Last],PLIST),NewCall=..[assertion_holds,impliedBy,ALIST,Last],
-                     assert(assert_next_queue(hl_holds:NewCall)))),
-                     drain_assert_next_buffer.
+   Call=..[assertion_holds,implied|PLIST],
+   retract(hl_holds:Call),
+   append(ALIST,[Last],PLIST),NewCall=..[assertion_holds,impliedBy,ALIST,Last],
+   assert(assert_next_queue(hl_holds:NewCall)))),
+   drain_assert_next_buffer.
 
 :- was_export(hide_term_rewrites/0).
 
@@ -660,13 +625,13 @@ move_implied:-doall((between(2,6,Len),length(PLIST,Len),
 %
 hide_term_rewrites :- w_tl(t_l:useOnlyExternalDBs,
  % remove badjuju from the KB (that is unbould slots in the middle of GAFs)
-   % hl_holds:retractall(assertion_holds(isa, badjuju, 'Thing')),
-   % hl_holds:retractall(el_assertions:el_holds(genls, badjuju, 'AerosolStuff',_,_)), 
-   % hl_holds:retractall(assertion_holds(genls, badjuju, 'BiologicalAgentStuff')), 
+ % hl_holds:retractall(assertion_holds(isa, badjuju, 'Thing')),
+ % hl_holds:retractall(el_assertions:el_holds(genls, badjuju, 'AerosolStuff',_,_)), 
+ % hl_holds:retractall(assertion_holds(genls, badjuju, 'BiologicalAgentStuff')), 
  % the next few lines will cover the top
-   doall((between(2,6,Len),length(PLIST,Len),
-     forall(member(vvvar,PLIST),move_kb_assertions_matching(PLIST,vvvar,_,term_rewrites_kb))))),
-   drain_assert_next_buffer.
+ doall((between(2,6,Len),length(PLIST,Len),
+ forall(member(vvvar,PLIST),move_kb_assertions_matching(PLIST,vvvar,_,term_rewrites_kb))))),
+ drain_assert_next_buffer.
 
 :- was_export(hide_empty_strings/0).
 
@@ -679,9 +644,9 @@ hide_term_rewrites :- w_tl(t_l:useOnlyExternalDBs,
 hide_empty_strings :- w_tl(t_l:useOnlyExternalDBs,
  % remove more badjuju from the KB (that is unbould slots in the middle of GAFs)
  % the next few lines will cover the top
-   doall((between(2,6,Len),length(PLIST,Len),
-     forall(member('',PLIST),move_kb_assertions_matching(PLIST,'','',term_rewrites_kb))))),
-   drain_assert_next_buffer.
+ doall((between(2,6,Len),length(PLIST,Len),
+ forall(member('',PLIST),move_kb_assertions_matching(PLIST,'','',term_rewrites_kb))))),
+ drain_assert_next_buffer.
 
 
 :- was_export(convert_easy_strings/0).
@@ -693,9 +658,9 @@ hide_empty_strings :- w_tl(t_l:useOnlyExternalDBs,
 % Convert Easy Strings.
 %
 convert_easy_strings:-
-   doall((between(2,6,Len),length(PLIST,Len),
-     forall(member(string(_),PLIST),
-      time_call(with_kb_assertions_matching(PLIST,Proof,must_det(print_sentence(Proof))))))),drain_assert_next_buffer.
+ doall((between(2,6,Len),length(PLIST,Len),
+ forall(member(string(_),PLIST),
+  time_call(with_kb_assertions_matching(PLIST,Proof,must_det(print_sentence(Proof))))))),drain_assert_next_buffer.
 
 
 %= 	 	 
@@ -705,9 +670,9 @@ convert_easy_strings:-
 % Convert Easy Strings Extended Helper.
 %
 convert_easy_strings2:-
-   doall((between(2,6,Len),length(PLIST,Len),
-     forall(member([_|_],PLIST),
-      time_call(with_kb_assertions_matching(PLIST,Proof,must_det(print_sentence(Proof))))))),drain_assert_next_buffer.
+ doall((between(2,6,Len),length(PLIST,Len),
+ forall(member([_|_],PLIST),
+  time_call(with_kb_assertions_matching(PLIST,Proof,must_det(print_sentence(Proof))))))),drain_assert_next_buffer.
 
 
 %= 	 	 
@@ -717,7 +682,7 @@ convert_easy_strings2:-
 % Drain Assert Next Buffer.
 %
 drain_assert_next_buffer:- predicate_property(assert_next_queue(_),number_of_clauses(CL)),dmsg(drain_assert_next_buffer(CL)),
-   time_call(doall((retract(assert_next_queue(Call)),asserta_if_new(Call)))).
+ time_call(doall((retract(assert_next_queue(Call)),asserta_if_new(Call)))).
 
 
 %= 	 	 
@@ -727,11 +692,11 @@ drain_assert_next_buffer:- predicate_property(assert_next_queue(_),number_of_cla
 % Write Assertions.
 %
 write_assertions:-
-   tell(holds_all),
-   listing(assertion_holds_mworld0),
-   listing(assertion_holds),
-   listing(term_rewrites_kb),
-   told.
+ tell(holds_all),
+ listing(assertion_holds_mworld0),
+ listing(assertion_holds),
+ listing(term_rewrites_kb),
+ told.
 
 
 % % :- '$set_source_module'(common_logic_kb_hooks).

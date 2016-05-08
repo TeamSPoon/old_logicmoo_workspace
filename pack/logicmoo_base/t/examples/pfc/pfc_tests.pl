@@ -1,6 +1,6 @@
 %% some simple tests to see if Pfc is working properly
 % :-use_module(library(pfc)).
-% :- 'lmbase':ensure_loaded(logicmoo(mpred/logicmoo_props)).
+% :- 'lmcode':ensure_loaded(logicmoo(mpred/logicmoo_props)).
 
 :- dynamic(b/1).
 

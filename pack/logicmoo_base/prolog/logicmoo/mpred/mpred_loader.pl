@@ -1567,7 +1567,7 @@ mpred_term_expansion(Fact,Output):- load_file_term_to_command_1b(_Dir,Fact,C),!,
   
 mpred_term_expansion_by_storage_type(_M,'$si$':'$was_imported_kb_content$'(_,_),pl):-!.
 mpred_term_expansion_by_storage_type(M,( \+ C ),HOW):- nonvar(C), !,mpred_term_expansion_by_storage_type(M,C,HOW).
-mpred_term_expansion_by_storage_type(_M,C,compile_clause(static)):- predicate_property(C,static).
+mpred_term_expansion_by_storage_type(_M,C,compile_clause(static)):- is_static_predicate(C).
 mpred_term_expansion_by_storage_type(_M,C,requires_storage(WHY)):- requires_storage(C,WHY),!.
 mpred_term_expansion_by_storage_type(_M,C,must_compile_special):- must_compile_special_clause(C),t_l:mpred_already_inside_file_expansion(C).
 

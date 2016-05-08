@@ -76,7 +76,7 @@ baseKB:mtSharedPrologCodeOnly(Mt):-
          lmconf,
          lmcache,
          t_l,
-         logicmoo_base,
+         lmcode,
          logicmoo_base_file,
          logicmoo_util_attvar_reader,
          logicmoo_util_bugger,
@@ -103,7 +103,7 @@ baseKB:mtSharedPrologCodeOnly(Mt):-
          logicmoo_util_varnames,
          logicmoo_util_with_assertions,
          logicmoo_utils_file,
-         logicmoo_utils,
+         lmcode,
          mpred_agenda,
          mpred_at_box,
          mpred_expansion,
@@ -365,11 +365,11 @@ ensure_imports_tbox(M,TBox):-
 
 
 
-% :- inherit_into_module(logicmoo_user,logicmoo_base).
+% :- inherit_into_module(logicmoo_user,lmcode).
 
 fixup_module(system,_).
 fixup_module(M,_L):-mtGlobal(M),skip_user(M).
-fixup_module(logicmoo_utils,_L):-skip_user(logicmoo_utils).
+fixup_module(lmcode,_L):-skip_user(lmcode).
 fixup_module(_,[user]).
 fixup_module(M,_L):- skip_user(M).
 
@@ -502,12 +502,12 @@ baseKB:hybrid_support(spft,3).
 baseKB:hybrid_support(mtLocal,1).
 baseKB:hybrid_support(genlMt,2).
 
-istAbove(Mt,Query):- Mt \== baseKB, Mt \== logicmoo_utils, genlMt(Mt,MtAbove),MtAbove:Query.
+istAbove(Mt,Query):- Mt \== baseKB, Mt \== lmcode, genlMt(Mt,MtAbove),MtAbove:Query.
 
 check_undefined_predicate(M,F,A,error):- lmcache:tried_to_retry_undefined(M,F,A),!.
 
 check_undefined_predicate(CallerMt,F,A,_):-
-   wdmsg(uses_predicate(CallerMt,F,A)),
+   '$current_source_module'(SM),wdmsg(uses_predicate(SM,CallerMt,F,A)),
    assert(lmcache:tried_to_retry_undefined(CallerMt,F,A)),fail.
 
 check_undefined_predicate(CallerMt,F,A,retry):- baseKB_hybrid_support(F,A),!,
@@ -540,8 +540,8 @@ check_undefined_predicate(baseKB,F,A,fail):-
 check_undefined_predicate(CallerMt,F,A,retry):-
        autoload_library_index(F,A,PredMt,File),
        asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
-       reexport(logicmoo_base:File),!.
-       % system:add_import_module(CallerMt,logicmoo_base,start).
+       reexport(lmcode:File),!.
+       % system:add_import_module(CallerMt,lmcode,start).
 
 check_undefined_predicate(Module, Name, Arity, Action) :-
 	current_prolog_flag(autoload, true),
@@ -611,18 +611,17 @@ retry_undefined(CallerMt:F/A):-
 %
 % Shared Multifile.
 %
-shared_multifile(MPI):- 
-   context_module_of_file(CallerMt),
+shared_multifile(PredMt:MPI):-
+   context_module_of_file(CallerMt),!,
    with_pfa_group(make_shared_multifile,CallerMt,PredMt, MPI),!.
 
+shared_multifile(PI):- kb_dynamic(PI).
 
 
 %% make_shared_multifile( ?CallerMt, ?PredMt, :TermPI) is semidet.
 %
 % Make Shared Multifile.
 %
-
-%TODO  make_shared_multifile(_, baseKB, F/A):- decl_shared(F/A),!.
 
 make_shared_multifile(CallerMt,    t_l,F/A):-!,CallerMt:thread_local(t_l:F/A),CallerMt:multifile(t_l:F/A).
 make_shared_multifile(CallerMt,lmconf ,F/A):-!,CallerMt:multifile(lmconf:F/A),CallerMt:dynamic(lmconf:F/A),!.
@@ -634,10 +633,10 @@ make_shared_multifile(CallerMt,PredMt,F/A):-
   HomeM\==PredMt,!,
   make_shared_multifile(CallerMt,HomeM,F/A).
 
-  
-
 make_shared_multifile(CallerMt,Home,F/A):- baseKB:mtSharedPrologCodeOnly(Home),!,
      wdmsg(mtSharedPrologCodeOnly_make_shared_multifile(CallerMt,Home:F/A)),!.
+
+make_shared_multifile(CallerMt, baseKB, F/A):- kb_dynamic(F/A).
 
 make_shared_multifile(CallerMt,PredMt,F/A):-!,
  debug(make_shared_multifile,'~p',make_shared_multifile(PredMt:F/A)),
@@ -645,16 +644,10 @@ make_shared_multifile(CallerMt,PredMt,F/A):-!,
   PredMt:( 
    sanity( \+ ((PredMt:F/A) = (qrTBox:p/1))),
    PredMt:check_never_assert(declared(PredMt:F/A)),
-   icatch(PredMt:discontiguous(PredMt:F/A)),
-   functor(P,F,A),
-   (predicate_property(PredMt:P,dynamic)->true;
-    (predicate_property(PredMt:P,static)->debug(make_shared_multifile,'~p',make_shared_multifile(PredMt:F/A));
-       icatch(PredMt:dynamic(PredMt:F/A)))),!,
-   PredMt:multifile(PredMt:F/A),
-   PredMt:module_transparent(PredMt:F/A))), !.
+   decl_shared(PredMt:F/A))).
 
 make_shared_multifile(CallerMt, PredMt, PI):- 
-   functor(PI,F,A),make_shared_multifile(CallerMt, PredMt, F/A).
+   functor(PI,F,A),!,make_shared_multifile(CallerMt, PredMt, F/A).
 
 
 
@@ -665,7 +658,8 @@ make_shared_multifile(CallerMt, PredMt, PI):-
 %
 make_reachable(_,Test):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
 make_reachable(CM,M:F/A):-  atom(CM),ignore(CM=M),quietly_must(atom(CM)),quietly_must(atom(M)), 
-   make_shared_multifile(M:F/A,TT), !,import_predicate(CM,TT:F/A).
+   functor(G,F,A),
+   correct_module(M,G,F,A,TT), !,import_predicate(CM,TT:F/A).
 
 
 

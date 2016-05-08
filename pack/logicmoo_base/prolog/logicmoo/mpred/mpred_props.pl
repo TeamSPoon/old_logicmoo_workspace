@@ -35,8 +35,8 @@
             (kb_dynamic)/2,
             (kb_dynamic)/3,
             (kb_dynamic)/4,
-            decl_mpred_hybrid_ilc/4,
-            decl_mpred_hybrid_ilc_0/4,
+            kb_dynamic_ilc/4,
+            kb_dynamic_ilc_0/4,
             decl_mpred_mfa/3,
             decl_mpred_pi/1,
             decl_mpred_prolog/1,
@@ -143,7 +143,7 @@ decl_mpred_mfa(M,FF,A):-
      assert_arity(F,A),  
      must_det(nonvar(M)),
     '@'((
-     nop((static_predicate(M,F,A)->true; (M:dynamic(F/A),M:discontiguous(F/A)))), 
+     nop((is_static_predicate(M,F,A)->true; (M:dynamic(F/A),M:discontiguous(F/A)))), 
      nop(M:export(F/A)),
      nop(M:multifile(M:F/A))),M) ]).
 
@@ -226,7 +226,7 @@ decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
       ain(mpred_module(PI,M)),
       ain(~prologHybrid(F)),
-      (\+ static_predicate(M,F,A)->ain(prologDynamic(F));true),
+      (\+ is_static_predicate(M,F,A)->ain(prologDynamic(F));true),
       ain(mpred_isa(PI,predCanHaveSingletons)),!.
 
 
@@ -269,7 +269,8 @@ kb_dynamic(M,PI,FA):- must(kb_dynamic(_,M,PI,FA)).
 % Declare Managed Predicate Hybrid.
 %
 kb_dynamic(F,A):- integer(A),!,kb_dynamic(F/A).
-kb_dynamic(F,Other):- decl_mpred(F,Other),
+kb_dynamic(F,Other):- 
+     decl_mpred(F,Other),     
      get_functor(F,F0),
      must(arity_no_bc(F0,A)),
      kb_dynamic(F0/A).
@@ -283,32 +284,40 @@ kb_dynamic(F,Other):- decl_mpred(F,Other),
 % Declare Managed Predicate Hybrid.
 %
 kb_dynamic(CM,M,PIN,FA):- 
-  unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true).    
+  unnumbervars(PIN,PI),loop_check(must(kb_dynamic_ilc(CM,M,PI,FA)),true).    
 
 
 %= 	 	 
 
-%% decl_mpred_hybrid_ilc( ?CM, ?M, ?PIN, :TermF) is semidet.
+%% kb_dynamic_ilc( ?CM, ?M, ?PIN, :TermF) is semidet.
 %
 % Declare Managed Predicate Hybrid Inside Of Loop Checking.
 %
-decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,get_arity(PI,F,A),not(current_predicate(F/A)),!,
-   forall((arity_no_bc(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_hybrid_ilc(CM,M,PIA,F/AA))).
+kb_dynamic_ilc(CM,M,PI,F/A):-atom(PI),A==0,get_arity(PI,F,A),not(current_predicate(F/A)),!,
+   forall((arity_no_bc(F,AA),AA\=0),(functor(PIA,F,AA),kb_dynamic_ilc(CM,M,PIA,F/AA))).
 
-decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),
-  loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),
-  decl_mpred_hybrid_ilc(CM,M,F),true).
+kb_dynamic_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),
+  loop_check_term(kb_dynamic_ilc_0(CM,M,PI,F/A),
+  kb_dynamic_ilc(CM,M,F),true).
 
 %= 	 	 
 
-%% decl_mpred_hybrid_ilc_0( ?CM, ?M, ?PI, :TermF) is semidet.
+%% kb_dynamic_ilc_0( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Declare Managed Predicate hybrid Inside Of Loop Checking  Primary Helper.
 %
-decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
+kb_dynamic_ilc_0(CM,M,PI,F/A):-
       assert_arity(F,A),
       %icatch(discontiguous(baseKB:F/A)),
       ain(mpred_module(F,M)),
+      decl_shared(M:F/A),!,
+      sanity(\+is_static_predicate(M:PI)),
+      (is_static_predicate(M:PI) -> true ;
+       (predicate_property(M:PI,dynamic) -> true ; icatch(CM:dynamic(M:F/A)))),!.
+
+      
+
+      /*
       ain(prologHybrid(F)),
       ain(hybrid_support(F,A)),
       get_cc(PI,NC),
@@ -318,7 +327,7 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       decl_mpred_pi(PI),
       nop(must(lmconf:mpred_provide_setup(call(conjecture),M:F/A,prologHybrid,_OUT))),
       must((get_cc(M:PI,NCN),NCN>=NC)).
-
+      */
 
 
 :- op(1120,fx,(kb_dynamic)).
@@ -405,9 +414,10 @@ assert_arity(F,A):-not(atom(F)),trace_or_throw(assert_arity(F,A)).
 assert_arity(F,A):-not(integer(A)),trace_or_throw(assert_arity(F,A)).
 assert_arity(typeProps,0):- trace_or_throw(assert_arity(typeProps,0)).
 assert_arity(argsIsa,2):- trace_or_throw(assert_arity_argsIsa(error,2)).
+assert_arity(prologDynamic,2):- trace_or_throw(assert_arity_argsIsa(prologDynamic,2)).
 assert_arity(F,A):- must_det(good_pred_relation_name(F,A)),fail.
 assert_arity(F,A):- arity_no_bc(F,A),!.
-assert_arity(F,A):- arity_no_bc(F,AA), A\=AA,dmsg(trace_or_throw(assert_arity_switched(F,AA->A))),!,ain_fast(arity_no_bc(F,A)).
+assert_arity(F,A):- arity_no_bc(F,AA), A\=AA,dmsg(trace_or_throw(assert_arity_switched(F,AA->A))),!,ain_fast(arity(F,A)).
 assert_arity(F,A):- ain_fast(arity(F,A)),!.
 
 

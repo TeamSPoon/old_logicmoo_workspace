@@ -502,6 +502,7 @@ fully_expand_now(Op,Sent,SentO):-
     (Sent \=@= lmconf:SentO), dmsg(fully_expand_now(Op,(Sent --> SentO)))))))))),!.
 
      
+:- decl_shared(mtExact/1).
 
 %% is_stripped_module( +Op) is semidet.
 %

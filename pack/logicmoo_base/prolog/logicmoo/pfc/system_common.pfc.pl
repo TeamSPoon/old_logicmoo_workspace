@@ -280,9 +280,9 @@ tSet(C)==>completelyAssertedCollection(C).
 
 tCol(C)/(atom(C),TCI=..[C,I]) ==> ({decl_type(C)},arity(C,1),mpred_univ(C,I,TCI)).
 
-(tCol(C)/(atom(C), \+ static_predicate(C/1) )) ==> {kb_dynamic(C/1)}.
+(tCol(C)/(atom(C), \+ is_static_predicate(C/1) )) ==> {kb_dynamic(C/1)}.
 
-(tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(C/1), \+ completelyAssertedCollection(C))) 
+(tCol(C)/(atom(C),TCI=..[C,I],\+ is_static_predicate(C/1), \+ completelyAssertedCollection(C))) 
   ==> ((TCI:- 
     ((cwc,
     lazy(( \+ ~(TCI))),
@@ -300,7 +300,7 @@ prologSideEffects(resolveConflict/1).
 
 
 /*
-((hybrid_support(F,A)/(is_ftNameArity(F,A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
+((hybrid_support(F,A)/(is_ftNameArity(F,A), \+ prologDynamic(F),\+ is_static_predicate(F/A))) ==>
   ({    
     functor(G,F,A),
      (var(M)->must(defaultAssertMt(M));true),
@@ -309,7 +309,7 @@ prologSideEffects(resolveConflict/1).
      % must(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         
      % (predicate_property(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
      kb_dynamic(M:F/A),
-     show_failure(hybrid_support, \+ static_predicate(F/A))}),
+     show_failure(hybrid_support, \+ is_static_predicate(F/A))}),
      prologHybrid(F),
     arity(F,A)).
 */

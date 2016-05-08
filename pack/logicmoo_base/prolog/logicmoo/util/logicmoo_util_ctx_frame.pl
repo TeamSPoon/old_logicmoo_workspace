@@ -118,7 +118,7 @@
 
 
 
-:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
+:- if(current_predicate(lmcode:combine_logicmoo_utils/0)).
 :- module(ctx_frame,[
          lastMemberCtx/2,
          lastMemberCtx/3,

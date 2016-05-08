@@ -18,8 +18,16 @@
           system_goal_expansion_safe_wrap/2,
           ereq/1,
           dbreq/1,
+          warn_if_static/2,
           is_user_module/0]).
 
+
+:- module_transparent((decl_shared/1,
+          system_goal_expansion_safe_wrap/2,
+          ereq/1,
+          dbreq/1,
+          warn_if_static/2,
+          is_user_module/0)).
 
 :- dynamic(wsh_w:wrap_shared/3).
 
@@ -88,28 +96,51 @@ safe_wrap(I,How,call(How,I)).
 
 
 
+warn_if_static(F,A):- 
+ ignore((F\={},
+  functor(P,F,A),
+  is_static_predicate(F/A),
+  listing(P),
+  trace_or_throw(warn(pfcPosTrigger,P,static)))).
+
+
 %% decl_shared( :TermM) is semidet.
 %
 % Declare Shared.
 %
 decl_shared(Var):-var(Var),!,trace_or_throw(var_decl_shared(Var)).
 decl_shared((A,B)):-!,decl_shared(A),!,decl_shared(B),!.
-decl_shared([A|B]):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared([A]):-!,decl_shared(A),!.
-/*
+decl_shared([A|B]):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared(M:(A,B)):-!,decl_shared(M:A),!,decl_shared(M:B),!.
-decl_shared(M:[A|B]):-!,decl_shared(M:A),!,decl_shared(M:B),!.
 decl_shared(M:[A]):-!,decl_shared(M:A),!.
+decl_shared(M:[A|B]):-!,decl_shared(M:A),!,decl_shared(M:B),!.
 decl_shared(_:M:A):-!,decl_shared(M:A),!.
-*/
+decl_shared(F):-atom(F),!,decl_shared(F/_).
+decl_shared(M:F):-atom(F),!,decl_shared(M:F/_).
+decl_shared(baseKB:F/A):-atom(F),decl_shared(F/A),!.
 
-% decl_shared(F/A):-atom(F),decl_shared(baseKB:F/A),!.
-decl_shared(F/A):-atom(F),!,asserta_if_new(wsh_w:wrap_shared(F,A,ereq)),(integer(A)->ain(baseKB:arity(F,A));true),ain((baseKB:prologHybrid(F))).
+decl_shared(F/A):-atom(F),!,
+ asserta_if_new(wsh_w:wrap_shared(F,A,ereq)),
+ ain(baseKB:prologHybrid(F)),
+ ignore((integer(A),
+   ain(baseKB:arity(F,A)),
+   baseKB:multifile(F/A),
+   baseKB:discontiguous(F/A))).
+
+
 decl_shared(M:F/A):-atom(F),!,
-  asserta_if_new(wsh_w:wrap_shared(F,A,M:ereq)),ain(M:prologHybrid(F)),(integer(A)->ain(baseKB:arity(F,A));true).
-decl_shared(M:P):-compound(P),!,functor(P,F,A),!,decl_shared(M:F/A).
-decl_shared(F:P):-atom(P),!,decl_shared(F:P/_).
-decl_shared(F):-atom(F),!,asserta_if_new(wsh_w:wrap_shared(F,_,ereq)),ain(prologHybrid(F)).
+ asserta_if_new(wsh_w:wrap_shared(F,A,M:ereq)),
+ ain(baseKB:prologHybrid(F)),
+ ignore((integer(A),
+   ain(baseKB:arity(F,A)),
+   baseKB:multifile(F/A),
+   baseKB:discontiguous(F/A))).
+
+
+decl_shared(M:P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared(M:F/A).
+decl_shared(P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared(F/A).
+
 
 % loading_module 
 %:- decl_shared(arity/2).

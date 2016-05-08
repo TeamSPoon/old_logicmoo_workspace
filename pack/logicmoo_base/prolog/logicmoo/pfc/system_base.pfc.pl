@@ -39,24 +39,14 @@
 
 % catching of misinterpreations
 
-((mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static), predicate_property(P,defined))) ==> 
-  {listing(P),trace_or_throw(warn(pfcPosTrigger,P,static))}).
+:- dynamic(mpred_mark/3).
 
-((mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static), predicate_property(P,defined))) ==> 
-  {listing(P),trace_or_throw(warn(pfcPosTrigger,P,static))}).
+mpred_mark(pfcPosTrigger,F,A)==>{warn_if_static(F,A)}.
+mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
+mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
 
-(mpred_mark(pfcNegTrigger,F,A)/(fa_to_p(F,A,P),  P\={_}, predicate_property(P,static), predicate_property(P,defined))) ==> {
-  listing(P),dmsg(warn(pfcNegTrigger,P,static))}.
-
-(mpred_mark(pfcBcTrigger,F,A)/(fa_to_p(F,A,P),
-   predicate_property(P,static), predicate_property(P,defined))) ==> {listing(P),dmsg(warn(pfcNegTrigger,P,static))}.
-
-
-%(mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb_dynamic(tbox:F/A)}.
-%(mpred_mark(pfcNegTrigger,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb_dynamic(tbox:F/A)}.
 
 :- dynamic(marker_supported/2).
-% :- dynamic(mpred_mark/3).
 
 :- dynamic(mpred_mark_C/1).
 
@@ -134,7 +124,7 @@ predicateConventionMt(regression_test,lmconf).
 
 tSet(mtGlobal,comment("mtGlobal(?Mt) states the Mt is always findable during inheritance")).
 mtGlobal(baseKB).
-mtGlobal(logicmoo_utils).
+mtGlobal(lmcode).
 mtGlobal(system).
 
 tCol(tSet).  % = isa(tSet,tCol).
@@ -205,7 +195,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 
 :- kb_dynamic(support_hilog/2).
 
-(((support_hilog(F,A)/(F\='$VAR',is_ftNameArity(F,A),\+ static_predicate(F/A), \+ prologDynamic(F)))) ==>
+(((support_hilog(F,A)/(F\='$VAR',is_ftNameArity(F,A),\+ is_static_predicate(F/A), \+ prologDynamic(F)))) ==>
    (hybrid_support(F,A), 
     {% functor(Head,F,A) ,Head=..[F|TTs], TT=..[t,F|TTs],
     %  (CL = (Head :- cwc, call(second_order(TT,CuttedCall)), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall)))
@@ -230,8 +220,8 @@ bt(P,_)==> (P:- mpred_bc_only(P)).
 pfcControlled(X)/get_pifunctor(X,C)==>({kb_dynamic(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
 %pfcControlled(X)/get_pifunctor(X,C)==>({shared_multifile(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
 
-prologHybrid(X)/get_pifunctor(X,C)==>({\+ static_predicate(C), shared_multifile(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
-%prologHybrid(X)/get_pifunctor(X,C)==>({\+ static_predicate(C), kb_dynamic(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
+prologHybrid(X)/get_pifunctor(X,C)==>({\+ is_static_predicate(C), shared_multifile(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
+%prologHybrid(X)/get_pifunctor(X,C)==>({\+ is_static_predicate(C), kb_dynamic(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
 
 
 prologBuiltin(X)/get_pifunctor(X,C)==>({decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologBuiltin(F)).
@@ -275,7 +265,7 @@ mpred_mark_C(G) ==> {map_mpred_mark_C(G)}.
 map_mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),ain([isa(F,pfcControlled),arity(F,A)]))),G).
 mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfcControlled(F).
 
-% (hybrid_support(F,A) ==>{\+ static_predicate(F/A), must(kb_dynamic(F/A))}).
+% (hybrid_support(F,A) ==>{\+ is_static_predicate(F/A), must(kb_dynamic(F/A))}).
 
 
 %:- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).

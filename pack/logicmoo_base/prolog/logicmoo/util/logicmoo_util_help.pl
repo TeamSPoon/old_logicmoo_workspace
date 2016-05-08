@@ -1288,7 +1288,7 @@ longer_sumry(S,W):-atom(S),atom_concat(S0,'s',S),longer_sumry(S0,W0),atom_concat
 % else use a structured comment 
 % our smarter matching system (based off listing)
 % prolog:help_hook(help(What)):- match_predicates(What, Preds), Preds\==[], Preds\==[What],forall(member(M:F/A,Preds),help(M:F/A)),fail.
-% prolog:help_hook(help(A)):-  logicmoo_utils:mpred_show_doc(A),fail.
+% prolog:help_hook(help(A)):-  lmcode:mpred_show_doc(A),fail.
 
 
 %	mpred_show_doc(+Object) is det.

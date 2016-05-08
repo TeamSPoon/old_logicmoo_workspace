@@ -28,7 +28,7 @@
 % Creates a warning if we are in the incorrect context
 % ===================================================================
 /*
-:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
+:- if(current_predicate(lmcode:combine_logicmoo_utils/0)).
 :- multifile(lmconf:logicmoo_utils_separate/0).
 lmconf:logicmoo_utils_separate.
 :- set_prolog_flag(generate_debug_info, true).
