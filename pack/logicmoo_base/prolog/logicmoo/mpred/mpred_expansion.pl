@@ -78,7 +78,7 @@
             db_quf_l/5,
             db_quf_l_0/5,
             default_te/3,
-            remodualize/3,
+            remodulize/3,
             replaced_module/3,
             do_expand_args/3,
             do_expand_args/3,
@@ -366,7 +366,7 @@ instTypePropsToType(instTypeProps,ttSpatialType).
 %
 % Reduce Clause.
 %
-reduce_clause(Op,C,HB):-must(nonvar(C)),remodualize(Op,C,CB),CB\=@=C,!,reduce_clause(Op,CB,HB).
+reduce_clause(Op,C,HB):-must(nonvar(C)),remodulize(Op,C,CB),CB\=@=C,!,reduce_clause(Op,CB,HB).
 reduce_clause(Op,clause(C, B),HB):-!,reduce_clause(Op,(C :- B),HB).
 reduce_clause(Op,(C:- B),HB):- is_true(B),!,reduce_clause(Op,C,HB).
 reduce_clause(_,C,C).
@@ -521,7 +521,7 @@ is_stripped_module(Mt):-mtExact(Mt),!,fail.
 %
 % Expand isEach/Ns.
 
-expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),remodualize(clause(_,_),
+expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),remodulize(clause(_,_),
    Sent,SentM),Sent\=@=SentM,!,bagof(O,do_expand_args(isEach,SentM,O),SentO).
 expand_isEach_or_fail(Sent,SentO):-
     bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L.
@@ -1055,23 +1055,23 @@ replaced_module(_,umt,ABox):-defaultAssertMt(ABox).
 replaced_module(_,abox,ABox):-defaultAssertMt(ABox).
 replaced_module(_,tbox,TBox):-defaultTBoxMt(TBox).
 
-%% remodualize( ?Op, ?H, ?HH) is semidet.
+%% remodulize( ?Op, ?H, ?HH) is semidet.
 %
 % Re-Modulize.
 %
-remodualize(_, H,H):- \+ compound(H),!.
-remodualize(_, H,H):- is_ftVar(H),!.
-remodualize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
-remodualize(Op,M:H,M:HHH):-is_ftVar(M),!,remodualize(mvar(Op),H,HHH).
-remodualize(Op,M:H,R:HHH):-replaced_module(Op,M,R),remodualize(Op,H,HHH).
-remodualize(Op,M:H,HHH):- is_stripped_module(M),!,remodualize(Op,H,HHH).
-remodualize(Op,H,HH):-is_list(H),!,must_maplist(remodualize(Op),H,HH),!.
-remodualize(Op,':-'(G),':-'(GG)):-!,remodualize(call(Op),G,GG).
-remodualize(Op,(H:-G),(HH:-GG)):-!,remodualize(Op,H,HH),remodualize(call(Op),G,GG).
-remodualize(Op,(H,G),(HH,GG)):-!,remodualize(call(Op),H,HH),remodualize(call(Op),G,GG).
-remodualize(Op,(H;G),(HH;GG)):-!,remodualize(call(Op),H,HH),remodualize(call(Op),G,GG).
-remodualize(Op,H,HHH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodualize(Op),HL,HHL),HH=..[F|HHL],!,fix_mp(HH,HHH).
-remodualize(Op,HB,HB):-sanity(trace_or_throw(unknown_remodualize(Op,HB,HB))).
+remodulize(_, H,H):- \+ compound(H),!.
+remodulize(_, H,H):- is_ftVar(H),!.
+remodulize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
+remodulize(Op,M:H,M:HHH):-is_ftVar(M),!,remodulize(mvar(Op),H,HHH).
+remodulize(Op,M:H,R:HHH):-replaced_module(Op,M,R),remodulize(Op,H,HHH).
+remodulize(Op,M:H,HHH):- is_stripped_module(M),!,remodulize(Op,H,HHH).
+remodulize(Op,H,HH):-is_list(H),!,must_maplist(remodulize(Op),H,HH),!.
+remodulize(Op,':-'(G),':-'(GG)):-!,remodulize(call(Op),G,GG).
+remodulize(Op,(H:-G),(HH:-GG)):-!,remodulize(Op,H,HH),remodulize(call(Op),G,GG).
+remodulize(Op,(H,G),(HH,GG)):-!,remodulize(call(Op),H,HH),remodulize(call(Op),G,GG).
+remodulize(Op,(H;G),(HH;GG)):-!,remodulize(call(Op),H,HH),remodulize(call(Op),G,GG).
+remodulize(Op,H,HHH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodulize(Op),HL,HHL),HH=..[F|HHL],!,fix_mp(HH,HHH).
+remodulize(Op,HB,HB):-sanity(trace_or_throw(unknown_remodualize(Op,HB,HB))).
 
 
 %= 	 	 

@@ -169,10 +169,20 @@ use_ideep_swi/0,
 vtUnreifiableFunction/1,
 was_chain_rule/1,
 wid/3,
+use_kif/2,
 never_assert_u/2,
 prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/1,pfcWatched/1,pfcMustFC/1,predIsFlag/1,tPred/1,prologMultiValued/1,
  prologSingleValued/1,prologMacroHead/1,notAssertable/1,prologBuiltin/1,prologDynamic/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,prologEquality/1,prologPTTP/1,
  prologSideEffects/1,prologHybrid/1,prologListValued/1]).
+
+:- multifile(baseKB:'$exported_op'/3).
+:- discontiguous baseKB:'$exported_op'/3.
+:- thread_local t_l:disable_px.
+
+
+:- dynamic(baseKB:use_kif/2).
+
+% :- shared_multifile(baseKB:use_kif/2).
 
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
@@ -440,10 +450,10 @@ never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
 
 %:- rtrace.
 %:- trace.
-:- ignore(delete_import_module(baseKB,user)).
-:- add_import_module(baseKB,logicmoo_utils,start).
-:- nortrace.
-:- notrace.
+%:- ignore(delete_import_module(baseKB,user)).
+%:- add_import_module(baseKB,logicmoo_utils,start).
+%:- nortrace.
+%:- notrace.
 
 
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).

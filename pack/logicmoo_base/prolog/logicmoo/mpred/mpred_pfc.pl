@@ -24,6 +24,8 @@
   mpred_post1_rem1/2,
   mpred_mark_as_ml/3,
   mpred_mark_fa_as/5,
+  mpred_te/0,
+  mpred_te/2,
   '__aux_maplist/2_call+0'/1,
   log_failure/1,
   code_sentence_op/1,
@@ -212,7 +214,7 @@ ensure_abox(logicmoo_user):-!,throw(logicmoo_user(  ensure_abox(baseKB))).
 ensure_abox(user):- !, ensure_abox(logicmoo_user),!.
 ensure_abox(M):- 
    asserta(lmcache:has_pfc_database_preds(M)),
-   mpred_ops(M), 
+   setup_module_ops(M), 
    ensure_imports(M),
    maybe_add_import_module(M,baseKB,end),
    forall(mpred_database_term(F,A,_),
@@ -312,7 +314,7 @@ fix_mp(Unassertable,_):- unassertable(Unassertable),!,trace_or_throw(unassertabl
 fix_mp((G :- B),( M:GO :- B)):- fix_mp(G,M:GO),!.
 fix_mp((G :- B),M:( GO :- B)):- !, fix_mp(G,M:GO).
 fix_mp(Mt:P,Mt:P):- mtExact(Mt).
-fix_mp(abox:P,ABOX:P):- defaultAssertionMt(ABOX), !.
+fix_mp(abox:P,ABOX:P):- defaultAssertMt(ABOX), !.
 fix_mp(tbox:P,TBOX:P):- defaultTBoxMt(TBOX), !.
 fix_mp(G,M:GO):- strip_module(G,_,GO), !,functor(GO,F,A),convention_or_default(F,A,M).
 %fix_mp(baseKB:P,baseKB:P):-!.
@@ -1006,7 +1008,7 @@ mpred_ain_trigger_reprop(BT,Support):-
   % if_defined_else(attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),true),!,
   assert_if_new((Trigger:-mpred_bc_only(Trigger))),
   mpred_mark_as(Support,Trigger,pfcBcTrigger),
-  % if_defined_else(import_to_user(Trigger),true), 
+  % if_defined_else(kb_dynamic(Trigger),true), 
   mpred_trace_msg('~N~n\tAdding backwards~n\t\ttrigger: ~p~n\t\tbody: ~p~n\t Support: ~p~n',[Trigger,Body,Support]),
   mpred_assert_w_support(BT,Support),
   mpred_bt_pt_combine(Trigger,Body,Support).
@@ -3093,6 +3095,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((all_closed)/1).
 :- module_transparent((code_sentence_op)/1).
 :- module_transparent((build_code_test)/3).
+:- discontiguous((fa_to_p)/3).
 :- module_transparent((fa_to_p)/3).
 :- module_transparent((really_mpred_mark)/4).
 :- module_transparent((mpred_mark_fa_as)/5).

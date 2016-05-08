@@ -15,9 +15,6 @@
           with_umt_l/1,
           assert_until_eof/2,
           assert_until_eof/1,
-          make_declared/1,
-          make_declared/2,
-          make_declared_now/1,
           mpred_ops/0,setup_module_ops/1,
           set_file_lang/1,
           pfc_dcg/0,
@@ -26,7 +23,7 @@
            simplify_language_name/2,
            %is_undefaulted/1,
           
-            split_into_mts/1,
+            
             add_term/2,
             assert_kif/1,
             % system:import_module_to_user/1,
@@ -43,8 +40,6 @@
 
             begin_pfc/0,
             call_file_command/4,
-            call_from_module/2,
-            with_source_module/2,
             can_be_dynamic/1,
             cl_assert/2,
             clear_predicates/1,
@@ -177,9 +172,7 @@
             lmconf:never_reload_file/1,
             always_expand_on_thread/1,
             t_l:current_lang/1,
-            kb_dynamic_good/1,
-            make_reachable/2,
-            import_predicate/2,
+
             lmconf:mpred_skipped_module/1,
             %prolog_load_file_loop_checked/2,
 %            registered_module_type/2,
@@ -205,7 +198,6 @@
     transform_opers_0/2, transform_opers_1/2)).
 
  :- meta_predicate
-        kb_dynamic_good(?),       
         make_reachable(?,?),
         call_file_command(?, ?, ?, ?),
         call_from_module(+, 0),
@@ -317,106 +309,8 @@
 	    term_subsumer/3,		% +Special1, +Special2, -General
 	    term_factorized/3]).
 
-:- lmconf:dynamic((lmconf:registered_mpred_file/1,lmconf:ignore_file_mpreds/1,lmconf:registered_module_type/2)).
+:-   dynamic((lmconf:registered_mpred_file/1,lmconf:ignore_file_mpreds/1,lmconf:registered_module_type/2)).
 :- multifile((lmconf:registered_mpred_file/1,lmconf:ignore_file_mpreds/1,lmconf:registered_module_type/2)).
-
-%% kb_dynamic_good( ?P) is semidet.
-%
-% Knowledge Base Dynamic.
-%
-kb_dynamic_good(FA):- loop_check(kb_dynamic0(FA)).
-kb_dynamic0(FA):- is_ftVar(FA),!,fail.
-kb_dynamic0(P):-atom(P),must(get_arity(P,F,A)),!,kb_dynamic_good(F/A).
-kb_dynamic0(_:FA):- is_ftVar(FA),!,fail.
-kb_dynamic0(_:F/_):- is_ftVar(F),!,fail.
-kb_dynamic0(F/A):- !, defaultAssertMt(KB),!,kb_dynamic_good(KB:F/A).
-kb_dynamic0([FA1|FA2]):-!,kb_dynamic_good(FA1),kb_dynamic_good(FA2).
-kb_dynamic0((FA1,FA2)):-!,kb_dynamic_good(FA1),kb_dynamic_good(FA2).
-% kb_dynamic_good(CM:M:FA):- atom(CM),atom(M),!,(CM==M -> kb_dynamic_good(M:FA);(CM:kb_dynamic_good(M:FA))).
-% kb_dynamic_good(CM:M:F/A):- atom(CM),atom(M),!,(CM==M -> kb_dynamic_good(M:FA);(CM:kb_dynamic_good(M:F/A))).
-kb_dynamic0(M:(FA1,FA2)):-!,kb_dynamic_good(M:FA1),kb_dynamic_good(M:FA2).
-kb_dynamic0(M:[FA1|FA2]):-!,kb_dynamic_good(M:FA1),kb_dynamic_good(M:FA2).
-kb_dynamic0(M:F/A):-!,quietly_must((make_declared(M:F/A,T),must(defaultAssertMt(CM)),make_reachable(CM,T:F/A))).
-kb_dynamic0(M:P):-functor(P,F,A),!,kb_dynamic_good(M:F/A).
-kb_dynamic0(P):-compound(P),functor(P,F,A),!,kb_dynamic_good(F/A).
-
-
-
-
-%% make_declared( ?Test, -IN2) is semidet.
-%
-% Make Declared.
-%
-make_declared(MFA):-make_declared_now(MFA,_).
-
-make_declared(Test,_):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
-make_declared(F/_,_):- is_ftVar(F),!.
-make_declared(M:F/A,T):- !,correct_module(M,F,A,T),!,make_declared_now(T:F/A).
-make_declared(F/A,T):- !,correct_module(abox,F,A,T),!,make_declared_now(T:F/A).
-
-
-%% make_declared_now( :TermM) is semidet.
-%
-% Make Declared Now.
-%
-make_declared_now(M:F/A):- correct_module(M,F,A,HomeM),HomeM\==M,!,make_declared_now(HomeM:F/A).
-
-make_declared_now(M:F/A):- mtSharedPrologCodeOnly(M),!.
-
-make_declared_now(M:F/A):-!,
- debug(make_declared,'~p',make_declared_now(M:F/A)),
- w_tl(set_prolog_flag(access_level,system),
-  M:(
-   sanity( \+ ((M:F/A) = (qrTBox:p/1))),
-   M:check_never_assert(declared(M:F/A)),
-   icatch(M:discontiguous(M:F/A)),
-   functor(P,F,A),
-   (predicate_property(M:P,dynamic)->true;
-    (predicate_property(M:P,static)->debug(make_declared,'~p',make_declared_now(M:F/A));
-       icatch(M:dynamic(M:F/A)))),!,
-   M:multifile(M:F/A),
-   icatch(M:dynamic(M:F/A)),
-   M:module_transparent(M:F/A),
-   M:import_to_user(M:F/A))), !.
-make_declared_now(M:P):-functor(P,F,A),!,make_declared_now(M:F/A). 
-
-split_into_mts(F/A):- M=baseKB,
-      functor(P,F,A),numbervars(P,778,_),
-      asserta(M:P,Ref),erase(Ref).
-/*
-   make_declared_now(baseKB:F/A),
-   
-*/
-
-
-%% make_reachable( ?UPARAM1, ?Test) is semidet.
-%
-% Make Reachable.
-%
-make_reachable(_,Test):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
-make_reachable(CM,M:F/A):-  atom(CM),ignore(CM=M),quietly_must(atom(CM)),quietly_must(atom(M)), 
-   make_declared(M:F/A,TT), !,import_predicate(CM,TT:F/A).
-
-
-
-%% make_reachable( :TermF) is semidet.
-%
-% Make Reachable.
-%
-make_reachable(F/A):- dumpST,trace, source_context_module(CM),make_declared(CM:F/A,_).
-
-
-
-
-%% import_predicate( ?CM, :TermM) is semidet.
-%
-% Import Predicate.
-%
-import_predicate(CM,M:_):- CM==M,!.
-import_predicate(CM,M:_):- default_module(CM,M),!.
-import_predicate(CM,M:F/A):- show_call(nop(CM:z333import(M:F/A))),CM:multifile(M:F/A),
-  icatch(CM:discontiguous(M:F/A)).
-
 
 
 :- include('mpred_header.pi').
@@ -875,7 +769,7 @@ check_term_expansions:- not(do_term_expansions).
 %:-listing(lmconf:mpred_skipped_module/1).
 
 
-:- shared_multifile(t_l:into_form_code).
+:- thread_local(t_l:into_form_code).
 :- thread_local(t_l:into_form_code).
 :- thread_local(t_l:disable_px /0).
 % :- dynamic(lmconf:disable_mpred_term_expansions_globally/0).
@@ -956,7 +850,6 @@ must_compile_special_clause(CL):- \+ t_l:disable_px,
     \+((get_functor(CL,F),expanded_already_functor(F))),
    mpred_db_type(CL,_),!.
 
-:- shared_multifile(t_l:mpred_module_expansion/1).
 :- thread_local(t_l:mpred_module_expansion/1).
 
 
@@ -1201,7 +1094,6 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 mpred_ops:-  prolog_load_context(module,M),setup_module_ops(M).
 
 :- export(mpred_op_unless/4).
-:- export(op_safe/3).
 
 setup_module_ops(M):- mpred_op_each(baseKB:mpred_op_unless(M)).
 
@@ -1321,7 +1213,7 @@ disable_mpred_expansion:- (( t_l:disable_px) -> true ;
 
 predicate_is_undefined_fa(F,A):-
   \+ current_predicate(_:F/A),
-  mk_functor(P,F,A),
+  functor(P,F,A),
   \+ predicate_property(_:P,exported),
   \+ predicate_property(_:P,static).
 
@@ -1499,7 +1391,6 @@ transform_opers(LANG,PFCM,PFCO):- hotrace((w_tl(t_l:current_lang(LANG),((transit
 :- op(600,yfx,'v').
 :- op(1075,xfx,'<-').
 :- op(350,xfx,'xor').
-:- op(1100,fx,(shared_multifile)).
 
 
 
@@ -1790,8 +1681,9 @@ make_dynamic((H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(H)).
 make_dynamic(M:(H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(M:H)).
 make_dynamic(C):- compound(C),strip_module(C,M,_),get_functor(C,F,A),quietly_must(F\=='$VAR'),
   functor(P,F,A),
-  ( \+predicate_property(M:P,_) -> kb_dynamic_good(M:F/A) ; (predicate_property(M:P,dynamic)->true;dynamic_safe(M:P))),!,
-  import_to_user(M:F/A),
+  ( \+predicate_property(M:P,_) -> kb_dynamic(M:F/A) ; 
+    (predicate_property(M:P,dynamic)->true;dynamic_safe(M:P))),!,
+  kb_dynamic(M:F/A),
   quietly_must((predicate_property(M:P,dynamic))).
 
 % once(lmconf:mpred_is_impl_file(F);asserta(lmconf:mpred_is_impl_file(F))).
@@ -1922,6 +1814,7 @@ current_context_module(Ctx):-hotrace((source_context_module(Ctx))).
 % register_module_type/end_module_type
 % ========================================
 :- was_module_transparent(lmconf:register_module_type/1).
+% :- op(1100,fx,(shared_multifile)).
 :- shared_multifile(lmconf:registered_module_type/2).
 
 
@@ -2094,31 +1987,7 @@ must_locate_file(FileIn,File):-
 :- meta_predicate call_from_module(+,0).
 
 
-%% with_source_module( +NewModule, :GoalGoal) is semidet.
-%
-% Call Using Source Module.
-%
-:- meta_predicate with_source_module(+,0).
-with_source_module(NewModule,Goal):-  
-   '$current_source_module'(OldModule),
-    NewModule:setup_call_cleanup_each(
-      '$set_source_module'(NewModule),
-          Goal, 
-      '$set_source_module'(OldModule)).
 
-%% call_from_module( +NewModule, :GoalGoal) is semidet.
-%
-% Call Using Module.
-%
-:- meta_predicate call_from_module(+,0).
-call_from_module(NewModule,Goal):-
-   '$current_typein_module'(OldModule),
-   '$current_source_module'(OldSModule),
-   strip_module(Goal,_,Call),
-    setup_call_cleanup_each(
-      ('$set_typein_module'(NewModule),'$set_source_module'(NewModule)), 
-      (NewModule:(Call, true)),
-      ('$set_source_module'(OldSModule),'$set_typein_module'(OldModule))).
 
 
 

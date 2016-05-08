@@ -33,16 +33,9 @@ constrain_args/2,
 create_stub_body/2,
 create_stub_body/3,
 cwdl/2,
-ensure_universal_stub/1,
-ensure_universal_stub_1/4,
-ensure_universal_stub_2/5,
-ensure_universal_stub_plus_mt_why/2,
-ensure_universal_stub_plus/2,
-ensure_universal_stub_plus_HIDE/2,
 erase_mpred_storage_op/1,
 first_mpred_props/1,
 get_cc/2,
-has_storage_stub/1,
 hybrid_tPredStubImpl/1,
 is_call_op/1,
 is_mpred_change_op/1,
@@ -55,16 +48,12 @@ is_tCol/1,
 last_arg_ground/1,
 last_arg_ground/3,
 make_builtin/1,
-maybe_storage_stub/2,
-missing_stub/1,
-mpred_missing_stubs/2,
 mpred_prop_ordered/2,
 mpred_t_call_op/2,
 mpred_t_mpred_storage_clauses_facts/3,
 mpred_t_storage_op/2,
 mud_call_store_op/2,
 mustIsa/2,
-must_have_storage_stub/1,
 must_op/2,
 must_same_clauses/2,
 no_rescans/0,
@@ -75,10 +64,6 @@ registerCycPredMtWhy/1,
 registerCycPredMtWhy_3/3,
 registerCycPredMtWhy_3/4,
 renumbervarZ/2,
-rescan_missing_stubs/0,
-rescan_missing_stubs_ilc/0,
-rescan_mpred_props_ilc/0,
-scan_missing_stubs/1,
 tf_result/2,
 test_call_cut/0,
 wff_check_failed/3,
@@ -128,16 +113,9 @@ constrain_args/2,
 create_stub_body/2,
 create_stub_body/3,
 cwdl/2,
-ensure_universal_stub/1,
-ensure_universal_stub_1/4,
-ensure_universal_stub_2/5,
-ensure_universal_stub_plus_mt_why/2,
-ensure_universal_stub_plus/2,
-ensure_universal_stub_plus_HIDE/2,
 erase_mpred_storage_op/1,
 first_mpred_props/1,
 get_cc/2,
-has_storage_stub/1,
 hybrid_tPredStubImpl/1,
 is_call_op/1,
 is_mpred_change_op/1,
@@ -150,9 +128,6 @@ is_tCol/1,
 last_arg_ground/1,
 last_arg_ground/3,
 make_builtin/1,
-maybe_storage_stub/2,
-missing_stub/1,
-mpred_missing_stubs/2,
 mpred_prop_ordered/2,
 mpred_t_call_op/2,
 lmconf:mpred_provide_storage_op/2,
@@ -160,7 +135,6 @@ mpred_t_mpred_storage_clauses_facts/3,
 mpred_t_storage_op/2,
 mud_call_store_op/2,
 mustIsa/2,
-must_have_storage_stub/1,
 must_op/2,
 must_same_clauses/2,
 no_rescans/0,
@@ -171,10 +145,6 @@ registerCycPredMtWhy/1,
 registerCycPredMtWhy_3/3,
 registerCycPredMtWhy_3/4,
 renumbervarZ/2,
-rescan_missing_stubs/0,
-rescan_missing_stubs_ilc/0,
-rescan_mpred_props_ilc/0,
-scan_missing_stubs/1,
 test_call_cut/0,
 wff_check_failed/3,
 wff_check_mpred_t_throw/1.
@@ -276,68 +246,13 @@ db_redir_op_if_needed(Op,_C0,Prop,ARGS):- database_modify_units(Op,Unit).
 % ================================================================================
 
 
-%= 	 	 
-
-%% maybe_storage_stub( ?VALUE1, ?VALUE2) is semidet.
-%
-% Maybe Storage Stub.
-%
-maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==prologDynamic)),arity(F,A),must(ensure_universal_stub(F/A)).
-
 % :- meta_predicate lmconf:decl_database_hook(?,0).
-%OLD lmconf:decl_database_hook(change(assert,_),mpred_isa(F,StubType)):- maybe_storage_stub(F,StubType).
+%OLD lmconf:decl_database_hook(change(assert,_),local_q_mpred_isa(F,StubType)):- maybe_storage_stub(F,StubType).
 
 %OLD lmconf:decl_database_hook(change(assert,_),isa(F,StubType)):- maybe_storage_stub(F,StubType).
 
-%OLD lmconf:decl_database_hook(change(assert,_),arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),mpred_isa(F,StubType),must(ensure_universal_stub(F/A)).
+%OLD lmconf:decl_database_hook(change(assert,_),arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),local_q_mpred_isa(F,StubType),must(ensure_universal_stub(F/A)).
 
-
-% has_storage_stub(Head):- !.
-
-%= 	 	 
-
-%% has_storage_stub( ?Head) is semidet.
-%
-% Has Storage Stub.
-%
-has_storage_stub(Head):-  lmconf:pfcManageHybrids,!,   
-      get_pifunctor(Head,PHead,_F),
-      create_stub_body(PHead,Body),
-      (predicate_property(PHead,dynamic);lmconf:clause_safe(PHead,Body)),!.
-      
-      
-
-has_storage_stub(Head):-       
-      get_pifunctor(Head,PHead,F),
-      create_stub_body(PHead,Body),
-      lmconf:clause(PHead,Body),
-      (((show_failure(has_storage_stub,predicate_property(PHead,number_of_clauses(1)))),(show_failure(has_storage_stub,predicate_property(PHead,number_of_rules(1)))))
-        -> true; (listing(PHead),trace)),
-      !,
-      must((mpred_isa(F,predStub(StubType)),
-      must(hybrid_tPredStubImpl(StubType)))).
-      
-
-% must_have_storage_stub(Head):-!.
-
-%= 	 	 
-
-%% must_have_storage_stub( ?Head) is semidet.
-%
-% Must Be Successfull Have Storage Stub.
-%
-must_have_storage_stub(Head):-
- (has_storage_stub(Head)->true;(get_functor(Head,F),listing(F),xlisting(F),ensure_universal_stub(Head))).
-
-
-%= 	 	 
-
-%% missing_stub( ?Head) is semidet.
-%
-% Missing Stub.
-%
-missing_stub(Head):-has_storage_stub(Head),!,fail.
-missing_stub(Head):-not(predicate_property(Head,public)),listing(Head).
 
 
 %= 	 	 
@@ -445,7 +360,7 @@ change( retract,one)  using =
 change( retract,all)  using =
 
 same_functors(Head1,Head2):-must_det(get_functor(Head1,F1,A1)),must_det(get_functor(Head2,F2,A2)),!,F1=F2,A1=A2.
-good_for_hybrid(H,F):- not(mpred_isa(F,_ANY_)),predicate_property(H,number_of_clauses(0)),predicate_property(H,dynamic).
+good_for_hybrid(H,F):- not(local_q_mpred_isa(F,_ANY_)),predicate_property(H,number_of_clauses(0)),predicate_property(H,dynamic).
 ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicate_property(PHead,dynamic)->true;(predicate_property(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
 
 */
@@ -461,9 +376,10 @@ ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicat
 %
 is_tCol(V):-is_ftVar(V),!,fail.
 is_tCol(tCol).
-is_tCol(F):- mpred_isa(F,tCol);t(tCol,F);t(F,_).
+is_tCol(F):- local_q_mpred_isa(F,tCol);t(tCol,F);t(F,_).
 
 
+local_q_mpred_isa(F,C):- call_u(isa(F,C)).
 %= 	 	 
 
 %% is_proc( ?V) is semidet.
@@ -471,7 +387,7 @@ is_tCol(F):- mpred_isa(F,tCol);t(tCol,F);t(F,_).
 % If Is A Proc.
 %
 is_proc(V):-is_ftVar(V),!,fail.
-is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(mpred_isa(F,tCol))).
+is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(local_q_mpred_isa(F,tCol))).
 
 % -- CODEBLOCK
 
@@ -600,10 +516,10 @@ call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 % Call Wdmsg.
 %
 call_wdmsg(P,DB,t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),call_u(CALL).
-call_wdmsg(P,MP,F,A):- mpred_isa(F,prologHybrid),must(A>1),into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
-call_wdmsg(P,MP,F,A):-  (\+ mpred_isa(F,prologDynamic)), (\+ mpred_isa(F,prologBuiltin)), kb_dynamic(F/A), into_functor_form(t,MP,DB),!, 
+call_wdmsg(P,MP,F,A):- local_q_mpred_isa(F,prologHybrid),must(A>1),into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
+call_wdmsg(P,MP,F,A):-  (\+ local_q_mpred_isa(F,prologDynamic)), (\+ local_q_mpred_isa(F,prologBuiltin)), kb_dynamic(F/A), into_functor_form(t,MP,DB),!, 
   append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
-call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_isa(F,prologDynamic);mpred_isa(F,prologBuiltin)),!,call_u(CALL).
+call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(local_q_mpred_isa(F,prologDynamic);local_q_mpred_isa(F,prologBuiltin)),!,call_u(CALL).
 %call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),call_u(CALL))).
 
 
@@ -614,50 +530,6 @@ call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_isa(F,
 %:-agenda_rescan_mpred_props.
 
 % pass 2
-
-%= 	 	 
-
-%% scan_missing_stubs( ?VALUE1) is semidet.
-%
-% Scan Missing Stubs.
-%
-scan_missing_stubs(F):-
-   ignore((forall(mpred_missing_stubs(F,A),
-      (arity(F,A),show_call(why,ensure_universal_stub(F/A)))))).
-
-
-%= 	 	 
-
-%% mpred_missing_stubs( ?VALUE1, ?VALUE2) is semidet.
-%
-% Managed Predicate Missing Stubs.
-%
-mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),arity(F,A),mpred_isa(F,StubType),must(arity(F,A)),not(has_storage_stub(F/A)).
-
-
-:- assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
-
-:- was_export(rescan_missing_stubs/0).
-% rescan_missing_stubs:-no_rescans,!.
-
-%= 	 	 
-
-%% rescan_missing_stubs is semidet.
-%
-% Rescan Missing Stubs.
-%
-rescan_missing_stubs:-loop_check(time_call(rescan_missing_stubs_ilc),true).
-
-%= 	 	 
-
-%% rescan_missing_stubs_ilc is semidet.
-%
-% Rescan Missing Stubs Inside Of Loop Checking.
-%
-rescan_missing_stubs_ilc:- once(lmconf:use_cyc_database), once(w_tl(t_l:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,
-   good_pred_relation_name(F,A),not(arity(F,A))),with_no_dmsg(decl_mpred_mfa,kb_dynamic(F/A))))),fail.
-rescan_missing_stubs_ilc:- hotrace((doall((mpred_missing_stubs(F,A),arity(F,A),ensure_universal_stub(F/A))))).
-
 
 %= 	 	 
 
@@ -685,9 +557,8 @@ agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
 % Rescan Managed Predicate Props Inside Of Loop Checking.
 %
 rescan_mpred_props_ilc:-no_rescans,!.
-rescan_mpred_props_ilc:-rescan_duplicated_facts(user,mpred_isa(_,_)),fail.
-rescan_mpred_props_ilc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(mpred_isa(Pred,Prop)))),fail.
-rescan_mpred_props_ilc:-rescan_missing_stubs.
+rescan_mpred_props_ilc:-rescan_duplicated_facts(user,local_q_mpred_isa(_,_)),fail.
+rescan_mpred_props_ilc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(local_q_mpred_isa(Pred,Prop)))),fail.
 rescan_mpred_props_ilc.
 
 
@@ -706,8 +577,8 @@ first_mpred_props(meta_argtypes(_)).
 %
 % Managed Predicate Prop Ordered.
 %
-mpred_prop_ordered(Pred,Prop):-first_mpred_props(Prop),mpred_isa(Pred,Prop),\+ (mpred_isa(Pred,prologDynamic)).
-mpred_prop_ordered(Pred,Prop):-mpred_isa(Pred,Prop),not(first_mpred_props(Prop)),not(mpred_isa(Pred,prologDynamic)).
+mpred_prop_ordered(Pred,Prop):-first_mpred_props(Prop),local_q_mpred_isa(Pred,Prop),\+ (local_q_mpred_isa(Pred,prologDynamic)).
+mpred_prop_ordered(Pred,Prop):-local_q_mpred_isa(Pred,Prop),not(first_mpred_props(Prop)),not(local_q_mpred_isa(Pred,prologDynamic)).
 
 
 % ================================================================================
@@ -751,7 +622,6 @@ get_cc(PI,NC):-provide_clauses_list(PI,HBLISTO),length(HBLISTO,NC).
 %
 lmconf:mpred_provide_setup(Op,HeadIn,StubType,OUT):- StubType \== prologDynamic,
  sanity(var(OUT)),
- must(ensure_universal_stub(HeadIn)),
  must((StubType = prologHybrid)),
  OUT=defined(lmconf:mpred_provide_setup(Op,HeadIn,StubType)).
 
@@ -760,127 +630,6 @@ lmconf:mpred_provide_setup(Op,HeadIn,StubType,OUT):- StubType \== prologDynamic,
 % True/false Result.
 %
 tf_result(Call,TF):-(Call->TF=true;TF=fail).
-
-% ==============================
-% SETUP HYBRID STUB 1-5
-% ============================== 	 
-
-%% ensure_universal_stub( ?HeadIn) is semidet.
-%
-% Ensure Universal Stub.
-%
-ensure_universal_stub(HeadIn):- compound(HeadIn),(HeadIn=(F/A)),!,
-   functor(NewHead,F,A),ensure_universal_stub(NewHead).
-
-ensure_universal_stub(HeadIn):- has_storage_stub(HeadIn),!.
-ensure_universal_stub(HeadIn):-
-  must_det_l(( get_pifunctor(HeadIn,Head,F,A),  
-   sanity(not(A==0)),
-  ensure_universal_stub_1(HeadIn,Head,F,A))).
-
-
-
-%= 	 	 
-
-%% ensure_universal_stub_1( ?HeadIn, ?Head, ?F, ?A) is semidet.
-%
-% ensure universal stub  Secondary Helper.
-%
-ensure_universal_stub_1(HeadIn,Head,F,A):- lmconf:pfcManageHybrids,!,
-   must(ensure_universal_stub_2(HeadIn,Head,F,A,[])).
-
-ensure_universal_stub_1(HeadIn,Head,F,A):-
-   must(provide_clauses_list(Head,HBLIST)),
-   must(ensure_universal_stub_2(HeadIn,Head,F,A,HBLIST)).
-
-
-
-%= 	 	 
-
-%% ensure_universal_stub_2( ?HeadIn, ?Head, ?F, ?A, ?HBLIST) is semidet.
-%
-% ensure universal stub  Extended Helper.
-%
-ensure_universal_stub_2(HeadIn,Head,F,A,_HBLIST):- (true;lmconf:pfcManageHybrids),!,
-    must((StubType = prologHybrid)),
-   tf_result(predicate_property(Head,dynamic),WasDynamic),
-   tf_result(predicate_property(Head,multifile),WasMulifile),      
-   asserta_if_new(mpred_isa(F,StubType)),
-   ain(isa(F,StubType)),
-   dynamic_safe(F/A),
-   % abolish(F,A),
-   % really_add_mpred_storage_op(Head),
-   (predicate_property(Head,dynamic)->true;show_pred_info(Head)),
-   must((predicate_property(Head,dynamic))),
-   (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; dynamic_safe(F/A)),   
-   % public(F/A),
-   % lock_predicate(Head),
-   discontiguous(Head),
-   retractall(mpred_isa(F,prologDynamic)),   
-   ain(isa(Head,pfcControlled)),
-   dmsg(pfcManageHybrids(HeadIn)),!.
-
-
-ensure_universal_stub_2(HeadIn,Head,F,A,[]):-!,
- must((StubType = prologHybrid)),
-   tf_result(predicate_property(Head,dynamic),WasDynamic),
-   tf_result(predicate_property(Head,multifile),WasMulifile),      
-   asserta_if_new(mpred_isa(F,StubType)),
-   dynamic_safe(F/A),
-   call((asserta_if_new(mpred_isa(F,predStub(StubType))))),
-   abolish(F,A),really_add_mpred_storage_op(Head),
-   (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; compile_predicates([F/A])),   
-   % public(F/A),
-   lock_predicate(Head),
-   retractall(mpred_isa(F,prologDynamic)),
-   dmsg(compiled_new_predicate(HeadIn)),!.
-
-ensure_universal_stub_2(HeadIn,Head,F,A,HBLIST):- mpred_isa(F,prologDynamic), must((StubType = prologHybrid)), !,
-   forall(member(HB,HBLIST),must(show_call(why,assert_mpred_t(HB)))),!,
-   expire_dont_add,ex,
-  (is_same_clauses(Head,HBLIST)
-    ->
-   (unlock_predicate(Head),
-      dmsg(converted_prolog_predicate(HeadIn)),
-            tf_result(predicate_property(Head,dynamic),WasDynamic),
-            tf_result(predicate_property(Head,multifile),WasMulifile),      
-            asserta_if_new(mpred_isa(F,StubType)),
-            call((asserta_if_new(mpred_isa(F,predStub(StubType))))),
-            abolish(F,A),really_add_mpred_storage_op(Head),
-            (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; compile_predicates([F/A])),
-            public(F/A),
-            lock_predicate(Head),
-            retractall(mpred_isa(F,prologDynamic)),
-           % Stop turning GC on/off
-           % set_prolog_flag(gc,true), garbage_collect_atoms,
-            dmsg(compiled_new_predicate(HeadIn)));
-       ((wdmsg(error(cannot_absorb_all_clauses((Head))))),!,fail)).
-
-
-
-ensure_universal_stub_2(HeadIn,Head,F,A,HBLIST):-  must((StubType = prologHybrid)),
-   forall(member(HB,HBLIST),must(show_call(why,assert_mpred_t(HB)))),!,
-   expire_dont_add,ex,
-  (is_same_clauses(Head,HBLIST)
-    ->
-   (unlock_predicate(Head),
-    dmsg(merging_prolog_predicate(HeadIn)),
-          tf_result(predicate_property(Head,dynamic),WasDynamic),
-          tf_result(predicate_property(Head,multifile),WasMulifile),      
-          asserta_if_new(mpred_isa(F,StubType)),
-          call((asserta_if_new(mpred_isa(F,predStub(StubType))))),
-          abolish(F,A),really_add_mpred_storage_op(Head),
-          (WasDynamic-> dynamic_safe(F/A) ; compile_predicates([F/A])),
-          if_result(WasMulifile,multifile(F/A)), 
-          compile_predicates([F/A]),
-          public(F/A),
-          lock_predicate(Head),
-          retractall(mpred_isa(F,prologDynamic)),
-          dmsg(merging_prolog_predicate(HeadIn)));
-     ((wdmsg(error(cannot_absorb_all_clauses((Head))))),!,fail)).
-
-
-
 
 %= 	 	 
 
@@ -1088,7 +837,7 @@ call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
 % Call For Literal Database.
 %
 call_for_literal_db(F,A,HEAD):- P=F, HEAD=..[P|ARGS],
-   ((lmconf:after_mpred_load,missing_stub(HEAD))->kb_dynamic(F,A);true),
+   ((lmconf:after_mpred_load)->kb_dynamic(F,A);true),
    constrain_args(P,ARGS),call_for_literal_db0(F,A,HEAD),constrain_args(P,ARGS).
 
 
@@ -1232,8 +981,8 @@ body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [t|PLIST], lmconf:use_
 body_req(HEAD,HEAD_T):- (hook_body_req(HEAD,HEAD_T)).
 
 :- was_export(body_req_normal/4).
-%hook_body_req(HEAD,HEAD_T):- mpred_isa(F,prologPTTP),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
-%hook_body_req(HEAD,HEAD_T):- mpred_isa(F,prologDynamic),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
+%hook_body_req(HEAD,HEAD_T):- local_q_mpred_isa(F,prologPTTP),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
+%hook_body_req(HEAD,HEAD_T):- local_q_mpred_isa(F,prologDynamic),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,t(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,t(C,I)):- !, body_req_isa(I,C).
@@ -1247,10 +996,10 @@ body_req_normal(HEAD,HEAD_T):- not(ground(HEAD)),!,no_repeats(HEAD_T,body_req_1(
 body_req_normal(HEAD,HEAD_T):- body_req_1(HEAD,HEAD_T),!. 
 
 :- was_export(body_req_1/4).
-body_req_1(HEAD,HEAD_T):- get_functor(HEAD,F), mpred_isa(F,call_tabled),!, call_tabled(body_req_2(HEAD,HEAD_T)).
+body_req_1(HEAD,HEAD_T):- get_functor(HEAD,F), local_q_mpred_isa(F,call_tabled),!, call_tabled(body_req_2(HEAD,HEAD_T)).
 body_req_1(HEAD,HEAD_T):- body_req_2(HEAD,HEAD_T).
 
-body_req_2(HEAD,  _):-   get_functor(HEAD,F), mpred_isa(F,external(Module)),!,call(Module:HEAD).
+body_req_2(HEAD,  _):-   get_functor(HEAD,F), local_q_mpred_isa(F,external(Module)),!,call(Module:HEAD).
 body_req_2(HEAD,HEAD_T):- body_req_with_rules(HEAD,HEAD_T).
 
 body_req_with_rules(HEAD,HEAD_T):-body_req_no_rules(HEAD,HEAD_T).
@@ -1263,7 +1012,7 @@ body_req_no_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
 body_req_only_rules(HEAD, _):-  ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 body_req_only_rules(_,_,_,t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
-body_req_plus_cyc(F,_,_,HEAD_T):-  mpred_isa(F,cycPlus2(_)),t_l:useOnlyExternalDBs,!,w_tl(lmconf:use_cyc_database,body_call_cyckb(HEAD_T)).
+body_req_plus_cyc(F,_,_,HEAD_T):-  local_q_mpred_isa(F,cycPlus2(_)),t_l:useOnlyExternalDBs,!,w_tl(lmconf:use_cyc_database,body_call_cyckb(HEAD_T)).
 
 */
 

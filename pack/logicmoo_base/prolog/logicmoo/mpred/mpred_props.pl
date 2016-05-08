@@ -25,6 +25,7 @@
             bad_pred_relation_name1/2,
             (decl_mpred)/1,
             (decl_mpred)/2,
+            arity_no_bc/2,
             (decl_mpred)/3,
             decl_mpred_0/2,
             decl_mpred_2/2,
@@ -101,8 +102,8 @@ pred_type_test(H,P):-functor(P,F,A),!,THFA=..[H,F/A],HF=..[H,F],(clause(THFA,tru
 %
 % Predicate Type Test Extended Helper.
 %
-pred_type_test2(T,F):- \+ compound(F),!,arity(F,A),!,pred_type_test(T,F,A).
-pred_type_test2(T,F/A):-!,atom(F),arity(F,A),!,pred_type_test(T,F,A).
+pred_type_test2(T,F):- \+ compound(F),!,arity_no_bc(F,A),!,pred_type_test(T,F,A).
+pred_type_test2(T,F/A):-!,atom(F),arity_no_bc(F,A),!,pred_type_test(T,F,A).
 pred_type_test2(T,P):-functor(P,F,A),!,pred_type_test(T,F,A).
 
 
@@ -130,7 +131,7 @@ decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
 
 %% decl_mpred_mfa( ?M, ?FF, ?A) is semidet.
 %
-% Declare Managed Predicate Module-functor-arity.
+% Declare Managed Predicate Module-functor-arity_no_bc.
 %
 decl_mpred_mfa(_,M:F,A):-atom(M),!,decl_mpred_mfa(M,F,A).
 decl_mpred_mfa(M,FF,A):-var(M),!,source_context_module(M),!,decl_mpred_mfa(M,FF,A).
@@ -186,7 +187,7 @@ decl_mpred_prolog(M,PI,FA):- must(decl_mpred_prolog(_,M,PI,FA)).
 decl_mpred_prolog(F,A):- integer(A),!,decl_mpred_prolog(F/A).
 decl_mpred_prolog(F,Other):- decl_mpred(F,Other),
      get_functor(F,F0),
-     must(arity(F0,A)),
+     must(arity_no_bc(F0,A)),
      decl_mpred_prolog(F0/A).
 :- was_export(decl_mpred_prolog/4).
 
@@ -206,7 +207,7 @@ decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA
 % Declare Managed Predicate Prolog Inside Of Loop Checking.
 %
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-atom(PI),A==0,not(current_predicate(F/A)),!,
-  must(arity(F,_)),forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_prolog_ilc(CM,M,PIA,F/AA))).
+  must(arity_no_bc(F,_)),forall((arity_no_bc(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_prolog_ilc(CM,M,PIA,F/AA))).
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-loop_check_term(decl_mpred_prolog_ilc_0(CM,M,PI,F/A),decl_mpred_prolog_ilc(CM,M,F),true).
 
 %= 	 	 
@@ -270,7 +271,7 @@ kb_dynamic(M,PI,FA):- must(kb_dynamic(_,M,PI,FA)).
 kb_dynamic(F,A):- integer(A),!,kb_dynamic(F/A).
 kb_dynamic(F,Other):- decl_mpred(F,Other),
      get_functor(F,F0),
-     must(arity(F0,A)),
+     must(arity_no_bc(F0,A)),
      kb_dynamic(F0/A).
 
 :- was_export((kb_dynamic)/4).
@@ -282,7 +283,7 @@ kb_dynamic(F,Other):- decl_mpred(F,Other),
 % Declare Managed Predicate Hybrid.
 %
 kb_dynamic(CM,M,PIN,FA):- 
-  unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true),kb_dynamic_good(M:FA).
+  unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true).    
 
 
 %= 	 	 
@@ -292,9 +293,10 @@ kb_dynamic(CM,M,PIN,FA):-
 % Declare Managed Predicate Hybrid Inside Of Loop Checking.
 %
 decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,get_arity(PI,F,A),not(current_predicate(F/A)),!,
-   forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_hybrid_ilc(CM,M,PIA,F/AA))).
+   forall((arity_no_bc(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_hybrid_ilc(CM,M,PIA,F/AA))).
 
-decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),
+decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),
+  loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),
   decl_mpred_hybrid_ilc(CM,M,F),true).
 
 %= 	 	 
@@ -305,6 +307,7 @@ decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_
 %
 decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
+      %icatch(discontiguous(baseKB:F/A)),
       ain(mpred_module(F,M)),
       ain(prologHybrid(F)),
       ain(hybrid_support(F,A)),
@@ -381,13 +384,15 @@ get_arity(M:FA,F,A):-atom(M),!,get_arity(FA,F,A).
 get_arity(FA,F,A):- get_functor(FA,F,A),must(A>0).
 
 
+arity_no_bc(F,A):- call_u(arity(F,A)).
 %= 	 	 
 
 %% ensure_arity( ?VALUE1, ?VALUE2) is semidet.
 %
 % Ensure Arity.
 %
-ensure_arity(F,A):- one_must(arity(F,A),one_must((current_predicate(F/A),(A>0),assert_arity(F,A)),(ground(F:A),(A>0),assert_arity(F,A)))),!.
+ensure_arity(F,A):- one_must(arity_no_bc(F,A),one_must((current_predicate(F/A),
+    (A>0),assert_arity(F,A)),(ground(F:A),(A>0),assert_arity(F,A)))),!.
 
 
 %= 	 	 
@@ -401,8 +406,8 @@ assert_arity(F,A):-not(integer(A)),trace_or_throw(assert_arity(F,A)).
 assert_arity(typeProps,0):- trace_or_throw(assert_arity(typeProps,0)).
 assert_arity(argsIsa,2):- trace_or_throw(assert_arity_argsIsa(error,2)).
 assert_arity(F,A):- must_det(good_pred_relation_name(F,A)),fail.
-assert_arity(F,A):- arity(F,A),!.
-assert_arity(F,A):- arity(F,AA), A\=AA,dmsg(trace_or_throw(assert_arity_switched(F,AA->A))),!,ain_fast(arity(F,A)).
+assert_arity(F,A):- arity_no_bc(F,A),!.
+assert_arity(F,A):- arity_no_bc(F,AA), A\=AA,dmsg(trace_or_throw(assert_arity_switched(F,AA->A))),!,ain_fast(arity_no_bc(F,A)).
 assert_arity(F,A):- ain_fast(arity(F,A)),!.
 
 
@@ -438,7 +443,7 @@ bad_pred_relation_name0('[|]',_).
 %
 bad_pred_relation_name1(X,Y):-bad_pred_relation_name0(X,Y).
 bad_pred_relation_name1(F,A):-must_det((atom_codes(F,[C|_]),to_upper(C,U))),!, U == C, A>1.
-bad_pred_relation_name1(F,A):-arity(F,AO), A \= AO.
+bad_pred_relation_name1(F,A):-arity_no_bc(F,AO), A \= AO.
 
 % :-at_start(writeq("Seen Mpred_props at start!\n")),!.
 

@@ -77,7 +77,7 @@
           create_agent/2)).
 
 :- dynamic  agent_list/1.
-:- import_to_user(mudDescription/2).
+:- kb_dynamic(mudDescription/2).
 
 :- include(prologmud(mud_header)).
 % :- register_module_type (utility).

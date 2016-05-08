@@ -17,10 +17,12 @@
             convert_to_dynamic/3,
             current_predicate_module/2,
             context_module_of_file/1,
+          call_from_module/2,
+          with_source_module/2,
             def_meta_predicate/3,
             dynamic_if_missing/1,
             dynamic_multifile/1,
-            (shared_multifile)/1,            
+            dump_break/0,
             (dynamic_safe)/1,
             (dynamic_safe)/3,
             op_safe/3,
@@ -49,13 +51,14 @@
              (was_multifile)/1,
              (was_module_transparent)/1,
              (was_export)/1,
-             (shared_multifile)/1,
             with_mfa/2,            
-            (make_shared_multifile)/3,
-            check_undefined_predicate/4,
-            retry_undefined/1,
             with_pfa/2,
+            add_mi/3,
             with_pfa/4,
+            make_module_name00/2,
+
+            is_static_why/5,
+            defined_predicate/1,
             m_m_fa_to_m_p_fa/4,
             m_fa_to_m_p_fa/2,
             with_pfa_single/4,
@@ -86,17 +89,16 @@
         context_module_of_file(-),
          with_pfa(1,*,+,+),
          with_pfa(1,+),
-         only_3rd(1,*,*,*),
-         transitive_path(2,*,*).
+         only_3rd(1,*,*,*).
 
 
 :- module_transparent
         convert_to_dynamic/1,
         convert_to_dynamic/3,
         current_predicate_module/2,
+   call_from_module/2,
+   with_source_module/2,
         dynamic_if_missing/1,
-        check_undefined_predicate/4,
-        retry_undefined/1,
         dynamic_multifile/1,
         dynamic_transparent/1,
         only_3rd/4,
@@ -116,6 +118,33 @@
 
 :- use_module(logicmoo_util_shared_dynamic).
 
+%% with_source_module( +NewModule, :GoalGoal) is semidet.
+%
+% Call Using Source Module.
+%
+:- meta_predicate with_source_module(+,0).
+with_source_module(NewModule,Goal):-  
+   '$current_source_module'(OldModule),
+    NewModule:setup_call_cleanup_each(
+      '$set_source_module'(NewModule),
+          Goal, 
+      '$set_source_module'(OldModule)).
+
+%% call_from_module( +NewModule, :GoalGoal) is semidet.
+%
+% Call Using Module.
+%
+:- meta_predicate call_from_module(+,0).
+call_from_module(NewModule,Goal):-
+   '$current_typein_module'(OldModule),
+   '$current_source_module'(OldSModule),
+   strip_module(Goal,_,Call),
+    setup_call_cleanup_each(
+      ('$set_typein_module'(NewModule),'$set_source_module'(NewModule)), 
+      (NewModule:(Call, true)),
+      ('$set_source_module'(OldSModule),'$set_typein_module'(OldModule))).
+
+
 :- meta_predicate(system:predicate_property_nt(:,?)).
 
 system:predicate_property_nt(A,B):- 
@@ -134,9 +163,12 @@ dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
 :- meta_predicate with_pfa(1,+).
 :- meta_predicate with_pfa(1,+,+,+).
 
-
+:- export(op_safe/3).
 op_safe(A,B,C):-!, (current_op(_,B,C)->true;op(A,B,C)).
 
+
+:- reexport(logicmoo_util_with_assertions).
+:- reexport(logicmoo_util_dmsg).
 
 % ----------
 :- export(with_pi/2).
@@ -289,22 +321,6 @@ make_module_name00(P,PredMt):-must(filematch(P,F)),F\=P,!,make_module_name00(F,P
 
 :- op(1150,fx,lmconf:dynamic_safe).
 
-:- export((shared_multifile)/1).
-:- module_transparent((shared_multifile)/1).
-:- meta_predicate((shared_multifile(+))).
-
-
-
-%= 	 	 
-
-%% shared_multifile( +PI) is semidet.
-%
-% Shared Multifile.
-%
-shared_multifile(user:PI):-!, context_module_of_file(CallerMt),with_pfa_group(make_shared_multifile,CallerMt, baseKB, PI).
-shared_multifile(logicmoo_user:PI):- !, context_module_of_file(CallerMt),with_pfa_group(make_shared_multifile,CallerMt, baseKB, PI).
-shared_multifile(PI):- context_module_of_file(CallerMt),with_pfa_group(make_shared_multifile,CallerMt, baseKB, PI).
-
 %= 	 	 
 
 %% was_dynamic( ?PI) is semidet.
@@ -360,46 +376,6 @@ save_was(_,CallerMt, PredMt, F/A):-
 save_was(Was,CallerMt, PredMt, F/A):- !, once(source_location(File,_);File=CallerMt),assert_if_new(was_was:was_was_once(F/A,PredMt,File,Was)),!.
 save_was(Was,CallerMt, PredMt, P):- functor(P,F,A), save_was(Was,CallerMt, PredMt, F/A).
 
-:-module_transparent(make_shared_multifile/3).
-:- export((make_shared_multifile)/3).
-
-
-
-%= 	 	 
-
-%% make_shared_multifile( ?CallerMt, ?PredMt, :TermPI) is semidet.
-%
-% Make Shared Multifile.
-%
-% make_shared_multifile(_, baseKB, F/A):- decl_shared(F/A),!.
-
-make_shared_multifile(CallerMt,M,F/A):- 
-  correct_module(M,F,A,HomeM),
-  HomeM\==M,!,
-  make_shared_multifile(CallerMt,HomeM,F/A).
-
-make_shared_multifile(_,M,F/A):- mtSharedPrologCodeOnly(M),!,
-     wdmsg(mtSharedPrologCodeOnly_make_shared_multifile(M:F/A)),!.
-
-make_shared_multifile(CallerMt, t_l, F/A):-!,
-  CallerMt:thread_local(t_l:F/A),!,
-  CallerMt:multifile(t_l:F/A).
-% make_shared_multifile(_, basePFC, _):-!.
-make_shared_multifile(CallerMt, PredMt, F/A):-!,  
-   icatch(PredMt:dynamic(PredMt:F/A)),!,
-   PredMt:multifile(PredMt:F/A),!,
-   CallerMt:multifile(PredMt:F/A).
-
-make_shared_multifile(CallerMt, PredMt, F/A):- 
- dmsg(make_shared_multifile(CallerMt, PredMt, F/A)),
- must_det_l((    
-    dynamic_safe(PredMt,F,A), 
-   '@'(PredMt:export(PredMt:F/A),PredMt),
-   '@'(PredMt:multifile(PredMt:F/A),PredMt),
-   '@'(PredMt:multifile(PredMt:F/A),CallerMt),   
-    (CallerMt\==PredMt->CallerMt:import(PredMt:F/A);true))).
-make_shared_multifile(CallerMt, PredMt, PI):- 
-    functor(PI,F,A),make_shared_multifile(CallerMt, PredMt, F/A).
 
 :-module_transparent(with_pfa/2).
 :-export(with_pfa/2).
@@ -641,200 +617,6 @@ dynamic_transparent([X|Xs]):-!,dynamic_transparent(X),dynamic_transparent(Xs),!.
 dynamic_transparent(PredMt:F/A):-!, module_transparent(PredMt:F/A),dynamic(PredMt:F/A).
 dynamic_transparent(F/A):-!,multi_transparent(lmconf:F/A).
 dynamic_transparent(X):-functor_catch(X,F,A),dynamic_transparent(F/A),!.
-
-
-% mtGlobal
-% mtCore
-
-
-
-makeConstant(_Mt).
-
-
-%:- (system:trace, rtrace, trace,cls ).
-%:- (break,notrace,nortrace).
-
-
-% ============================================
-:- dynamic(lmcache:how_registered_pred/4).
-:- module_transparent(lmcache:how_registered_pred/4).
-
-
-guessMtFromGoal(HintMt,_,HintMt):- mtExact(HintMt).
-guessMtFromGoal(HintMt,Goal,HintMt):-
-  predicate_property_nt(HintMt:Goal,exported).
-guessMtFromGoal(HintMt,Goal,OtherMt):-
-  predicate_property_nt(HintMt:Goal,imported_from(OtherMt)).
-guessMtFromGoal(_,Goal,OtherMt):-
-  predicate_property_nt(Goal,imported_from(OtherMt)).
-
-guessMtFromGoal(_,Goal,OtherMt):- var(OtherMt),!,
-  predicate_property_nt(OtherMt:Goal,file(_)).
-
-guessMtFromGoal(_,Goal,OtherMt):-
-  mtGlobal(OtherMt),
-  predicate_property_nt(OtherMt:Goal,file(_)).
-
-
-add_import_predicate(Mt,Goal,OtherMt):- fail,
-   mtGlobal(Mt),
-   mtGlobal(OtherMt),
-   \+ import_module(OtherMt,Mt),
-   catch(add_import_module(Mt,OtherMt,end),
-       error(permission_error(add_import,module,baseKB),
-       context(system:add_import_module/3,'would create a cycle')),fail),
-   must(predicate_property_nt(Mt:Goal,imported_from(OtherMt))),!.
-add_import_predicate(Mt,Goal,OtherMt):- catch(Mt:import(OtherMt:Goal),_,fail),!.
-add_import_predicate(Mt,Goal,OtherMt):- 
-   functor(Goal,F,A),
-   make_as_dynamic(imported_from(OtherMt),Mt,F,A),
-   assert_if_new(( Mt:Goal :- OtherMt:Goal)).
-  
-
-
-make_as_dynamic(Reason,Mt,F,A):- dynamic( Mt:F/A),
-   functor(Goal,F,A),
-   assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))).
-
-
-
-registerCycPred(Mt,_,F,A):-
-   lmcache:how_registered_pred(_,Mt,F,A),!.
-
-registerCycPred(Mt,Goal,F,A):-
-   guessMtFromGoal(Mt,Goal,OtherMt), 
-   sanity(Mt \== OtherMt),
-   must(Mt \== OtherMt),
-   ain(tMicrotheory(Mt)),
-   registerCycPred(Mt,Goal,F,A,OtherMt),!.
-
-registerCycPred(Mt,Goal,F,A):-
-   dynamic(Mt:F/A), % (1 is random(180)->dump_break;true),
-   assert_if_new(( Mt:Goal :- istAbove(Mt,Goal))).
-
-
-transitive_path(F,[Arg1,Arg2],Arg2):-
-  dif(Arg1,Arg2),call(F,Arg1,Arg2),!.
-transitive_path(F,[Arg1,SecondNodeMt|REST],Arg2):-
-  dif(Arg1,Arg2),dif(Arg1,SecondNodeMt),
-  call(F,Arg1,SecondNodeMt),stack_check,
-  transitive_path(F,[SecondNodeMt|REST],Arg2).
-
-registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
-  mtGlobal(OtherMt),
-  add_import_predicate(Mt,Goal,OtherMt),!.
-  
-
-registerCycPred(Mt,Goal,F,A,OtherMt):- 
-   transitive_path(genlMt,[Mt,SecondNodeMt|_],OtherMt),
-   make_as_dynamic(genlMt(Mt,OtherMt),Mt,F,A),
-   assert_if_new(( Mt:Goal :- SecondNodeMt:call(Goal))),!.
-
-registerCycPred(Mt,_Goal,F,A,OtherMt):-
-  dump_break,
-  make_as_dynamic(need_genlMt(Mt,OtherMt),Mt,F,A),!.
-   
-:- reexport(logicmoo_util_with_assertions).
-:- reexport(logicmoo_util_dmsg).
-
-clearKb(KB):- mtCore(KB),!.
-clearKb(KB):- forall(import_module(KB,O),
-                  ignore(delete_import_module(KB,O))),
-     forall(( current_module(X),import_module(X,KB)),
-                  ignore(delete_import_module(X,KB))).
-
-autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_index(P,PredMt,File).
-
-
-:- multifile(baseKB:hybrid_support/2).
-:- dynamic(baseKB:hybrid_support/2).
-baseKB_hybrid_support(F,A):-baseKB:hybrid_support(F,A).
-baseKB:hybrid_support(arity,2).
-baseKB:hybrid_support(mpred_module,2).
-baseKB:hybrid_support(functorDeclares,1).
-baseKB:hybrid_support(spft,3).
-baseKB:hybrid_support(mtLocal,1).
-baseKB:hybrid_support(genlMt,2).
-
-istAbove(Mt,Query):- Mt \== baseKB, Mt \== logicmoo_utils, genlMt(Mt,MtAbove),MtAbove:Query.
-
-check_undefined_predicate(baseKB,F,A,fail):- 
-  baseKB_hybrid_support(F,A),!,
-  multifile(baseKB:F/A),
-  module_transparent(baseKB:F/A),
-  icatch(dynamic(baseKB:F/A)),
-  icatch(discontiguous(baseKB:F/A)).
-
-check_undefined_predicate(M,F,A,error):- lmcache:tried_to_retry_undefined(M,F,A),!.
-check_undefined_predicate(CallerMt,F,A,_):-
-   wdmsg(uses_predicate(CallerMt,F,A)),
-   assert(lmcache:tried_to_retry_undefined(CallerMt,F,A)),fail.
-check_undefined_predicate(CallerMt,F,A,retry):- baseKB_hybrid_support(F,A),!,
-   functor(Goal,F,A),
-   assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
-
-check_undefined_predicate(_, (/), _, error) :- !. %dumpST.
-check_undefined_predicate(_, (:), _, error) :- !. %dumpST.
-check_undefined_predicate(_, '[|]', _, error) :- !. %dumpST.
-
-% Autoloads importing the entire other module
-check_undefined_predicate(CallerMt,F,A,retry):-
-       autoload_library_index(F,A,PredMt,File),
-       asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
-       reexport(logicmoo_base:File),!,
-       system:add_import_module(CallerMt,logicmoo_base,start).
-
-check_undefined_predicate(Module, Name, Arity, Action) :-
-	current_prolog_flag(autoload, true),
-	'$autoload'(Module, Name, Arity), !,
-	Action = retry.
-
-check_undefined_predicate(CallerMt,F,A,retry):- 
-    loop_check(retry_undefined(CallerMt:F/A),true).  % dump_break
-
-
-:- dynamic(lmcache:tried_to_retry_undefined/3).
-
-
-% Module defines the type
-% retry_undefined(M:F/A):- lmcache:tried_to_retry_undefined(M,F,A),!.
-% retry_undefined(M:F/A):- assert(lmcache:tried_to_retry_undefined(M,F,A)),fail.
-
-retry_undefined(lmconf:F/A):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
-retry_undefined(lmcache:F/A):-multifile(lmcache:F/A),volatile(lmcache:F/A),dynamic(lmcache:F/A),!.
-retry_undefined(t_l:F/A):-multifile(t_l:F/A),thread_local(t_l:F/A),!.
-
-% Every module has it''s own
-retry_undefined(CallerMt:'$pldoc'/4):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
-
-
-% System-like Autoloads
-retry_undefined(CallerMt:debug/1):- use_module(CallerMt:library(debug)),!.
-retry_undefined(CallerMt:debugging/1):- use_module(CallerMt:library(debug)),!.
-retry_undefined(CallerMt:member/2):- use_module(CallerMt:library(lists)),!.
-retry_undefined(CallerMt:directory_file_path/3):- use_module(CallerMt:library(filesex)),!.
-
-
-retry_undefined(CallerMt:F/A):- fail,
-       autoload_library_index(F,A,_,File),
-       load_files(CallerMt:File,[if(true),imports([F/A]),register(false),silent(false)]),!.
-
-% Autoloads importing the entire other module
-retry_undefined(CallerMt:F/A):-
-       autoload_library_index(F,A,PredMt,File),
-       asserta(lmcache:how_registered_pred(PredMt:reexport(CallerMt:File),CallerMt,F,A)),
-       reexport(CallerMt:File),!.
-
-retry_undefined(CallerMt:F/A):-
-      autoload_library_index(F,A,PredMt,File),
-      ((current_module(PredMt),current_predicate(PredMt:F/A))
-       -> add_import_module(CallerMt,PredMt,start) ;
-       (PredMt:ensure_loaded(PredMt:File),add_import_module(CallerMt,PredMt,start))),!.
-
-
-%retry_undefined(PredMt:must/1) :- add_import_module(PredMt,logicmoo_util_catch,start),!.
-%retry_undefined(PredMt:debugm/2) :- add_import_module(PredMt,logicmoo_util_dmsg,start),!.
-
 
 
 
@@ -1113,12 +895,4 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       listing(NMC),
       retractall(tlbugger:rbuild_pred_impl_cache_pp(NC,_))
       )).
-
-:- module_transparent(user:exception/3).
-:- multifile user:exception/3.
-:- dynamic user:exception/3.
-:- multifile system:exception/3.
-:- module_transparent system:exception/3.
-:- dynamic system:exception/3.
-
 

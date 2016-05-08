@@ -40,7 +40,9 @@
 
 :- op(1100,fx,(shared_multifile)).
 
- 
+
+:- prolog_load_context(module,M),assert_if_new(baseKB:mtSharedPrologCodeOnly(M)).
+
 %:- multifile(user_db:grant_openid_server/2).
 
 % HOOKS

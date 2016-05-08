@@ -6,10 +6,10 @@
 :- if(current_prolog_flag(dialect,yap)).
 :-  expects_dialect(swi).
 @(C,M) :- M:call(C).
-user:file_search_path(library, '../pack/logicmoo_base/prolog').
-user:file_search_path(library, '../pack/logicmoo_nlu/prolog').
-user:file_search_path(library, '../pack/logicmoo_packages/prolog').
-user:file_search_path(library, '../pack/logicmoo_planner/prolog').
+user:file_search_path(library, '../../../pack/logicmoo_base/prolog').
+user:file_search_path(library, '../../../pack/logicmoo_nlu/prolog').
+user:file_search_path(library, '../../../pack/logicmoo_packages/prolog').
+user:file_search_path(library, '../../../pack/logicmoo_planner/prolog').
 
 :- else.
 
@@ -25,7 +25,7 @@ in_logicmoo_repl_source_file.
 :- initialization(attach_packs).
 
 :- if((exists_source(library(logicmoo_utils)))).
-%:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(library(logicmoo_utils)).
 %:- ensure_loaded(logicmoo(mpred/mpred_pfc)).
 %USER :- ensure_loaded(library(logicmoo_user)).
 

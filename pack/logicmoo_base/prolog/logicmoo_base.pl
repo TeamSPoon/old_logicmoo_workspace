@@ -184,6 +184,8 @@ assert_setting00(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),system
 % Load Managed Predicate System.
 %
 load_mpred_system(_,Sys):-defaultTBoxMt(Sys),!.
+load_mpred_system(_,_Sys):-!.
+/*
 load_mpred_system(_,Sys):-asserta(defaultTBoxMt(Sys)),current_prolog_flag(autoload_logicmoo,true),!.
 load_mpred_system(SM,Sys):-
  must((current_smt(SM,M),
@@ -198,6 +200,7 @@ load_mpred_system(SM,Sys):-
                    call((w_tl(t_l:disable_px,
                         logicmoo_utils:ensure_loaded(logicmoo_utils:File)))))))))).
 
+*/
 
 
 %% enable_mpred_system is det.
@@ -311,7 +314,7 @@ import_2:- lmconf:source_typein_boxes(SM,M,Usr:Sys),
 
 :- set_prolog_flag(access_level,user).
 
-:- add_import_module(logicmoo_utils,prolog_statistics,start).
+%:- add_import_module(logicmoo_utils,prolog_statistics,start).
 
 :- statistics.
 
@@ -326,6 +329,10 @@ import_2:- lmconf:source_typein_boxes(SM,M,Usr:Sys),
 % :- doall((current_module(W),import_module(W,system),\+ import_module(W, user), W\==baseKB, add_import_module(logicmoo_utils,W,end))).
 
 */
+:- dmsg("Adding logicmoo/[snark|mpred_online] to autoload path",[]).
+:- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
+:- add_library_search_path('./logicmoo/mpred/',[ 'mpred_*.pl']).
+:- pop_modules.
 
 
 :- set_prolog_flag(gc,false).
@@ -338,24 +345,49 @@ import_2:- lmconf:source_typein_boxes(SM,M,Usr:Sys),
 :- discontiguous '$exported_op'/3.
 
 % Config System
-:- must(config_mpred_system).
-:- autoload.
+%:- must(config_mpred_system).
+%:- autoload.
 
 :- set_prolog_flag(gc,true).
 
-% Enable System
-:- must(enable_mpred_system).
+
 
 lmconf:sanity_check:- findall(U,(current_module(U),default_module(U,baseKB)),L),must(L==[baseKB]).
 lmconf:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(U,M),U\==M),L),wdmsg(imports_eache :- (L,[sees(M)])))).
 lmconf:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(M,U),U\==M),L),wdmsg(imports(M):-L))).
-lmconf:sanity_check:- doall((mtSharedPrologCodeOnly(M),
+lmconf:sanity_check:- doall((baseKB:mtSharedPrologCodeOnly(M),
     setof(U,(current_module(U),default_module(M,U),U\==M),L),wdmsg(imports(M):-L))).
+
+
+:- module_transparent(user:exception/3).
+:- multifile user:exception/3.
+:- dynamic user:exception/3.
+:- multifile system:exception/3.
+:- module_transparent system:exception/3.
+:- dynamic system:exception/3.
+
+user:exception(undefined_predicate,Module:Name/Arity, Action) :-
+	current_prolog_flag(autoload, true),
+	'$autoload'(Module, Name, Arity), !,
+	Action = retry.
+
+user:exception(undefined_predicate,baseKB: F/A, retry) :-
+  (F/A == functorDeclares/1),!,
+  multifile(baseKB:F/A),
+  module_transparent(baseKB:F/A),
+  icatch(dynamic(baseKB:F/A)),
+  icatch(discontiguous(baseKB:F/A)).
+
 
 user:exception(undefined_predicate,M:F/A,R):-
    current_prolog_flag(retry_undefined,true),
      w_tl(set_prolog_flag(retry_undefined,false),
       check_undefined_predicate(M,F,A,R)),!.
+
+% Enable System
+
+:- autoload.
+
 
 :- set_prolog_flag(system:unknown,error).
 :- set_prolog_flag(user:unknown,error).
@@ -363,9 +395,13 @@ user:exception(undefined_predicate,M:F/A,R):-
 :- set_prolog_flag(tbox:unknown,warning).
 :- set_prolog_flag(abox:unknown,warning).
 
-:- forall(lmconf:sanity_check,true).
 
 :- set_prolog_flag(retry_undefined,true).
+
+:- must(enable_mpred_system).
+
+:- forall(lmconf:sanity_check,true).
+
 
 :- (forall(
       lmconf:mpred_is_impl_file(atbox,Match),     
@@ -375,7 +411,9 @@ user:exception(undefined_predicate,M:F/A,R):-
                ensure_loaded(baseKB:File))))))))).
 
 % Load boot base file
-:- time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))).
+lbf:- time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))).
+
+:- lbf.
 
 % restore entry state
 :- pop_modules.

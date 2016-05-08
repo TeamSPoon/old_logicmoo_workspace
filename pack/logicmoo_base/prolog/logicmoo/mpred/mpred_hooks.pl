@@ -26,7 +26,6 @@ lmcache:agent_session/2,
 lmcache:session_agent/2,
 lmcache:session_io/4,
 */
-
 relax_term/6,
 fix_sentence/2,
 holds_f/1,
@@ -86,26 +85,27 @@ call_which_t/9,
 call_whichlist_t/3,
 callable_tf/2,
 
-   xcall_f/1,
-   xcall_f/2,
-   xcall_f/3,
-   xcall_f/4,
-   xcall_f/5,
-   xcall_f/6,
-   xcall_f/7,
-   xcall_f/8,
-   xcall_f/9,
-   xcall_f/10,
-   xcall_t/1,
-   xcall_t/2,
-   xcall_t/3,
-   xcall_t/4,
-   xcall_t/5,
-   xcall_t/6,
-   xcall_t/7,
-   xcall_t/8,
-   xcall_t/9,
-   xcall_t/10,
+xcall_f/1,
+xcall_f/2,
+xcall_f/3,
+xcall_f/4,
+xcall_f/5,
+xcall_f/6,
+xcall_f/7,
+xcall_f/8,
+xcall_f/9,
+xcall_f/10,
+xcall_t/1,
+xcall_t/2,
+xcall_t/3,
+xcall_t/4,
+xcall_t/5,
+xcall_t/6,
+xcall_t/7,
+xcall_t/8,
+xcall_t/9,
+xcall_t/10,
+
 mpred_f/1,
 which_f/1,
 (which_t)/1,
@@ -145,10 +145,9 @@ replace_arg/4,
 replace_nth_arglist/4,
 replace_nth_ref/5,
 same_vars/2,
-tf_result/2,
+%tf_result/2,
 %tms_reject_why/2,
 update_value/3
-%use_kif/2
 ]).
 
 %:- endif.
@@ -344,10 +343,8 @@ telnet_fmt_shown/3,
 term_anglify_last/2,
 term_anglify_np/3,
 term_anglify_np_last/3,
-tf_result/2,
 tms_reject_why/2,
 % use_cyc_database/0,
-use_kif/2,
 verb_after_arg/3
 */
 
@@ -393,15 +390,6 @@ update_value/3,
 */
 
 
-/*
-:- shared_multifile(agent_action_queue/3).
-:- shared_multifile session_io/4, session_agent/2, agent_session/2, telnet_fmt_shown/3, agent_action_queue/3.
-:- shared_multifile(agent_text_command/4).
-:- shared_multifile agent_session/2.
-:- shared_multifile(grid_key/1).
-*/
-
-
 :- shared_multifile(create_random_fact/1).
 
 :- op(1100,fx,(shared_multifile)).
@@ -436,11 +424,6 @@ update_value/3,
 
 :- shared_multifile tFarthestReachableItem/1.
 :- shared_multifile tNearestReachableItem/1.
-
-:- dynamic(baseKB:use_kif/2).
-
-:- shared_multifile baseKB:use_kif/2.
-
 
 
 :- multifile(lmconf:use_cyc_database/0).
@@ -500,11 +483,13 @@ never_mpred_tcall(isa).
 never_mpred_tcall(arity).
 
 
+local_qh_mpred_isa(F,C):- call_u(isa(F,C)).
+
+
 % :- setup_mpred_ops.
 
 
-:- meta_predicate(tf_result(0,+)).
-
+                   
 %= 	 	 
 
 :- meta_predicate(if_result(0,0)).
@@ -533,7 +518,7 @@ if_result(TF,Call):-(TF->Call;true).
 mpred_plist_t(P,[]):-!,t(P).
 mpred_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[t,P|LIST],on_x_rtrace((CALL)).
 mpred_plist_t(t,[P|LIST]):-!, mpred_plist_t(P,LIST).
-mpred_plist_t(mpred_isa,[C,_A,I]):-!,ground(I:C),mpred_isa(C,I).
+mpred_plist_t(mpred_isa,[C,_A,I]):-!,ground(I:C),local_qh_mpred_isa(C,I).
 mpred_plist_t(isa,[I,C]):-!,t(C,I).
 mpred_plist_t(P,_):-never_mpred_tcall(P),!,fail.
 mpred_plist_t(P,[L|IST]):-is_holds_true(P),!,mpred_plist_t(L,IST).
@@ -572,7 +557,7 @@ mpred_fa_call(F,_,Call):-current_predicate(F,M:_OtherCall),M:Call.
 %
 % Managed Predicate Fact Arity.
 %
-mpred_fact_arity(F,A):-arity(F,A),once(mpred_isa(F,prologHybrid);mpred_isa(F,pfcControlled);mpred_isa(F,prologPTTP);mpred_isa(F,prologKIF)).
+mpred_fact_arity(F,A):-arity(F,A),once(local_qh_mpred_isa(F,prologHybrid);local_qh_mpred_isa(F,pfcControlled);local_qh_mpred_isa(F,prologPTTP);local_qh_mpred_isa(F,prologKIF)).
 
 
 %= 	 	 
@@ -590,7 +575,7 @@ prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into
 %
 % If Is A Cyc Predicate Arity Ignoreable.
 %
-isCycPredArity_ignoreable(F,A):- ignore(mpred_isa(F,cycPred(A))),ignore(arity(F,A)).
+isCycPredArity_ignoreable(F,A):- ignore(local_qh_mpred_isa(F,cycPred(A))),ignore(arity(F,A)).
 
 
 %= 	 	 

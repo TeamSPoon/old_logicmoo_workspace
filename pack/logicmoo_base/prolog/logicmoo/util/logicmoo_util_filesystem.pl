@@ -78,6 +78,7 @@
             pop_modules/0,
             maybe_add_import_module/3,
             maybe_add_import_module/2,
+            maybe_delete_import_module/2,
             add_prolog_predicate/6,
             glean_prolog_impl_file/4,
             add_genlMt/2
@@ -185,6 +186,10 @@ pop_modules:-
 
 
 maybe_add_import_module(A,B):-maybe_add_import_module(A,B,start).
+
+%TODO
+maybe_add_import_module(_From,_To,_):- !.
+
 maybe_add_import_module(A,baseKB,C):-!,maybe_add_import_module(baseKB,A,C).
 maybe_add_import_module(From,To,_):- default_module(From,To),!.
 maybe_add_import_module(user,_,start):-!.
@@ -193,8 +198,13 @@ maybe_add_import_module(From,To,Start):-
    catch(add_import_module(From,To,Start),E,writeln(E=add_import_module(From,To,Start))).
 
 
+
 maybe_delete_import_module(_From,To):- To = user,!.
 maybe_delete_import_module(_From,To):- To = system,!.
+
+%TODO
+maybe_delete_import_module(_From,_To):- !.
+
 maybe_delete_import_module(From,To):- To = user,!,
     catch(add_import_module(From,system,end),E,writeln(E=add_import_module(From,system,end))),
    ignore(catch(system:delete_import_module(From,user),E,writeln(E=delete_import_module(To,From)))).

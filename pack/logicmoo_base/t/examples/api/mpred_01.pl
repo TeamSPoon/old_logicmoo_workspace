@@ -15,7 +15,7 @@ end_of_file.
 
 :- set_defaultAssertMt(myMicrotheory).
 
-:- import_to_user(genlMt/2).
+:- kb_dynamic(genlMt/2).
 
 t(genlMt,myMicrotheory,baseKB).
 

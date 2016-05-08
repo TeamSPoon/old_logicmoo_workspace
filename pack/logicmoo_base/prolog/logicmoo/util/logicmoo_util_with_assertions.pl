@@ -153,8 +153,11 @@ wno_tl(UHead,Call):-
 %
 % Converted To Thread Head 1m.
 %
+to_thread_head_1m(_: (TL:Head :- BODY),TL,TL:(TL:Head :- BODY),(TL:Head :- BODY)):- nonvar(TL),
+   check_thread_local_1m(TL:Head).
 to_thread_head_1m((H:-B),TL,HO,(HH:-B)):-to_thread_head_1m(H,TL,HO,HH).
 to_thread_head_1m(lmconf:Head,lmconf,lmconf:Head,Head).
+
 to_thread_head_1m(TL:Head,TL,TL:Head,Head):- check_thread_local_1m(TL:Head).
 % to_thread_head_1m(Head,Module,Module:Head,Head):-Head \= (_:_), predicate_module(Head,Module).
 to_thread_head_1m(lmconf:Head,user,lmconf:Head,Head).

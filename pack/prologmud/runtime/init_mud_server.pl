@@ -8,7 +8,7 @@
 :-multifile(lmconf:sanity_test/0).
 :-multifile(lmconf:regression_test/0).
 :-multifile(lmconf:feature_test/0).
-:- shared_multifile((        
+:- dynamic((        
         lmconf:agent_call_command/2,
         lmconf:feature_test/0,
         lmconf:mud_test/2,

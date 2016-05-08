@@ -583,9 +583,9 @@ set_prolog_stack_gb(Six):-set_prolog_stack(global, limit(Six*10**9)),set_prolog_
 % Hook To [lmconf:module_local_init/0] For Module Mpred_pfc.
 % Module Local Init.
 %
+:- multifile(lmconf:mpred_hook_rescan_files/0).
+:- dynamic(lmconf:mpred_hook_rescan_files/0).
 lmconf:module_local_init:-set_prolog_stack_gb(16).
-:- shared_multifile(lmconf:mpred_hook_rescan_files/0).
-:- was_dynamic(lmconf:mpred_hook_rescan_files/0).
 %:- was_dynamic(use_presently/0).
 % used to annotate a predciate to indicate PFC support
 
@@ -1625,7 +1625,7 @@ mpred_call_1(M,G,F):- sanity(\+  is_side_effect_disabled),
                  fail,
                  %TODO remove this failure
                  must(show_call(kb_dynamic(M:G))),
-                 import_to_user(M:G),!,fail.
+                 kb_dynamic(M:G),!,fail.
 mpred_call_1(_,G,_):- mpred_call_with_no_triggers(G).
 
 

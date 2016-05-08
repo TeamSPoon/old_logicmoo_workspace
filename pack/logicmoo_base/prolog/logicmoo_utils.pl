@@ -248,9 +248,4 @@ lmconf:logicmoo_scan_autoloads:-false.
 */
 
 :- set_prolog_flag(autoload_logicmoo,true).
-:- dmsg("Adding logicmoo/[snark|mpred_online] to autoload path",[]).
-:- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
-:- add_library_search_path('./logicmoo/mpred/',[ 'mpred_*.pl']).
-:- pop_modules.
-:- use_module(library(logicmoo/mpred/mpred_loader)).
 
