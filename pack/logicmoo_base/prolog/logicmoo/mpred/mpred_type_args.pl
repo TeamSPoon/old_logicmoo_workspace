@@ -87,7 +87,8 @@
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
 % % :- '$set_source_module'(mpred_type_args).
 
-:- shared_multifile(coerce/3).
+:- multifile(coerce/3).
+:- dynamic(coerce/3).
 
 
 /*

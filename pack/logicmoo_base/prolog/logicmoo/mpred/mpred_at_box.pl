@@ -476,9 +476,9 @@ transitive_path(F,[Arg1,SecondNodeMt|REST],Arg2):-
 registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
   mtGlobal(OtherMt),
   add_import_predicate(Mt,Goal,OtherMt),!.
-  
 
-registerCycPred(Mt,Goal,F,A,OtherMt):- 
+  /*
+registerCycPred(Mt,Goal,F,A,OtherMt):- fail,
    transitive_path(genlMt,[Mt,SecondNodeMt|_],OtherMt),
    make_as_dynamic(genlMt(Mt,OtherMt),Mt,F,A),
    assert_if_new(( Mt:Goal :- SecondNodeMt:call(Goal))),!.
@@ -486,7 +486,7 @@ registerCycPred(Mt,Goal,F,A,OtherMt):-
 registerCycPred(Mt,_Goal,F,A,OtherMt):-
   dump_break,
   make_as_dynamic(need_genlMt(Mt,OtherMt),Mt,F,A),!.
-   
+   */
 
 
 autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_index(P,PredMt,File).

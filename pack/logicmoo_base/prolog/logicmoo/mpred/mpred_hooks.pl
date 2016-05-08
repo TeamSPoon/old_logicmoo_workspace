@@ -390,55 +390,55 @@ update_value/3,
 */
 
 
-:- shared_multifile(create_random_fact/1).
+% %%% :- shared_multifile(create_random_fact/1).
 
 :- op(1100,fx,(shared_multifile)).
 
-% :- shared_multifile lmconf:decl_database_hook/2.
-:- shared_multifile deduce_facts/2.
-:- shared_multifile default_type_props/3.
-:- shared_multifile fact_always_true/1.
-:- shared_multifile fact_maybe_deduced/1.
-:- shared_multifile tms_reject_why/2.
-:- shared_multifile fskel/7.
-:- shared_multifile hooked_random_instance/3.
+% % %%% :- shared_multifile lmconf:decl_database_hook/2.
+% %%% :- shared_multifile deduce_facts/2.
+% %%% :- shared_multifile default_type_props/3.
+% %%% :- shared_multifile fact_always_true/1.
+% %%% :- shared_multifile fact_maybe_deduced/1.
+% %%% :- shared_multifile tms_reject_why/2.
+% %%% :- shared_multifile fskel/7.
+% %%% :- shared_multifile hooked_random_instance/3.
 
-:- shared_multifile now_unused/1.
-
-
-:- shared_multifile(lmconf:startup_option/2).
-:- shared_multifile(is_edited_clause/3).
-
-:- shared_multifile(loaded_external_kbs/0).
+% %%% :- shared_multifile now_unused/1.
 
 
-:- shared_multifile fact_is_false/2.
+% %%% :- shared_multifile(lmconf:startup_option/2).
+% %%% :- shared_multifile(is_edited_clause/3).
+
+% %%% :- shared_multifile(loaded_external_kbs/0).
+
+
+% %%% :- shared_multifile fact_is_false/2.
 
 
 
 
-:- shared_multifile mudKeyword/2.
-:- shared_multifile only_if_pttp/0.
-:- shared_multifile relationMostInstance/3.
+% %%% :- shared_multifile mudKeyword/2.
+% %%% :- shared_multifile only_if_pttp/0.
+% %%% :- shared_multifile relationMostInstance/3.
 
 
-:- shared_multifile tFarthestReachableItem/1.
-:- shared_multifile tNearestReachableItem/1.
+% %%% :- shared_multifile tFarthestReachableItem/1.
+% %%% :- shared_multifile tNearestReachableItem/1.
 
 
 :- multifile(lmconf:use_cyc_database/0).
-% :- shared_multifile decl_database_hook/2.
+% % %%% :- shared_multifile decl_database_hook/2.
 
 
-:- shared_multifile(mpred_module_ready).
+% %%% :- shared_multifile(mpred_module_ready).
 
-% :- shared_multifile loading_module/1.
-:- shared_multifile local_term_anglify/2.
+% % %%% :- shared_multifile loading_module/1.
+% %%% :- shared_multifile local_term_anglify/2.
 
 
-:- shared_multifile term_anglify_last/2.
-:- shared_multifile term_anglify_np/3.
-:- shared_multifile term_anglify_np_last/3.
+% %%% :- shared_multifile term_anglify_last/2.
+% %%% :- shared_multifile term_anglify_np/3.
+% %%% :- shared_multifile term_anglify_np_last/3.
 
 
 % ========================================

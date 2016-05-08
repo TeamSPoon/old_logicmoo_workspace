@@ -198,7 +198,7 @@
     transform_opers_0/2, transform_opers_1/2)).
 
  :- meta_predicate
-        make_reachable(?,?),
+        % make_reachable(?,?),
         call_file_command(?, ?, ?, ?),
         call_from_module(+, 0),
         with_source_module(+, 0),
@@ -1813,9 +1813,8 @@ current_context_module(Ctx):-hotrace((source_context_module(Ctx))).
 % ========================================
 % register_module_type/end_module_type
 % ========================================
-:- was_module_transparent(lmconf:register_module_type/1).
+%:- was_module_transparent(lmconf:register_module_type/1).
 % :- op(1100,fx,(shared_multifile)).
-:- shared_multifile(lmconf:registered_module_type/2).
 
 
 
@@ -1832,6 +1831,7 @@ register_module_type(Type):-current_context_module(CM),register_module_type(CM,T
 %
 % Register Module Type.
 %
+:- multifile(lmconf:registered_module_type/2).
 register_module_type(CM,Types):-is_list(Types),!,forall(member(T,Types),register_module_type(CM,T)).
 register_module_type(CM,Type):-asserta_new(lmconf:registered_module_type(CM,Type)).
 
