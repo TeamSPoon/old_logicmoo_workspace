@@ -432,12 +432,12 @@ with_umt(G):-
   baseKB:defaultAssertMt(U),
   with_umt(U,G).
 
-with_umt(U,G):-  
-  fix_mp(G,_M:P),
+with_umt(U,G):- defaultAssertMt(W),W=U,!,call_from_module(U,G).
+with_umt(U,G):-
+ fix_mp(G,_M:P),
   gripe_time(30.0,
-   call_from_module(U,
-    w_tl(t_l:current_defaultAssertMt(U),
-      (baseKB:set_defaultAssertMt(U),P)))).
+   w_tl(t_l:current_defaultAssertMt(U),
+     call_from_module(U,P))).
 
 
 

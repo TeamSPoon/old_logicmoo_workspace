@@ -131,7 +131,11 @@ conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 {type_prefix(_Prefix,Type)}==>tCol(Type).
 {type_suffix(_Suffix,Type)}==>tCol(Type).
 tCol(completelyAssertedCollection).
-~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
+
+%WEIRD ~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
+% EASIER
+~tCol(C) ==> ~completelyAssertedCollection(C).
+
 (tCol(P),~ttExpressionType(P)) ==> tSet(P).
 
 %= 	 	 
@@ -140,8 +144,8 @@ tCol(completelyAssertedCollection).
 %
 % Prolog Builtin.
 %
-prologBuiltin(resolveConflict/1,mpred_module(tbox)).
-prologBuiltin(mpred_select/2,mpred_module(lmconf)).
+%WRONG prologBuiltin(resolveConflict/1,mpred_module(baseKB)).
+%WRONG prologBuiltin(mpred_select/2,mpred_module(lmconf)).
 %:-rtrace.
 prologBuiltin(agent_text_command/4,prologDynamic).
 %tPred(t,prologDynamic).

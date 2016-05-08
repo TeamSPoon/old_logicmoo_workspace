@@ -415,7 +415,7 @@ correct_module(M,G,T):-functor(X,G,A),quietly_must(correct_module(M,G,F,A,T)),!.
 % Correct Module.
 %
 correct_module(abox,G,F,A,T):- !, defaultAssertMt(M),correct_module(M,G,F,A,T).
-correct_module(tbox,G,F,A,T):- !,abox:defaultTBoxMt(M),correct_module(M,G,F,A,T).
+correct_module(tbox,G,F,A,T):- !, abox:defaultTBoxMt(M),correct_module(M,G,F,A,T).
 correct_module(user,G,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,G,F,A,T).
 correct_module(HintMt,_,F,A,HintMt):- mtExact(HintMt).
 correct_module(HintMt,Goal,F,A,HintMt):- predicate_property_nt(HintMt:Goal,exported).

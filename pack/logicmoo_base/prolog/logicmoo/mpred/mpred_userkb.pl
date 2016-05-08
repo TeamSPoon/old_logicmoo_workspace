@@ -94,7 +94,6 @@ transitiveViaArgInverse/3,
 genls/2,
 grid_key/1,
 hybrid_support/2,
-transitiveViaArgInverse/2,
 if_missing/2, % pfc
 is_edited_clause/3,
 is_wrapper_pred/1,
