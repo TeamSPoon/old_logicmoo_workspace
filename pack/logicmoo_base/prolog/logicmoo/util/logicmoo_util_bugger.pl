@@ -2020,7 +2020,7 @@ real_builtin_predicate(G):-
    predicate_property(G,built_in),
    \+ predicate_property(G,dynamic),
    functor(G,F,_),!,
-   (if_defined(defaultTBoxMt(M),fail),
+   (if_defined(abox:defaultTBoxMt(M),fail),
    (if_defined(M:mpred_isa(F,prologHybrid),fail);
      if_defined(baseKB:mpred_isa(F,prologHybrid),fail))),
    !.

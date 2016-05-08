@@ -15,6 +15,9 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+
+end_of_file.
+
 % :- if((\+ current_prolog_flag(common_logic_at_box_true,true),set_prolog_flag(common_logic_at_box_true,true))).
 %:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(common_logic_at_box,[
@@ -30,7 +33,7 @@
          which_file/1,
          fileAssertMt/1,
          set_fileAssertMt/1,
-         defaultTBoxMt/1,
+         abox:defaultTBoxMt/1,
          
          correct_module/3,
          correct_module/4,
@@ -110,9 +113,9 @@ box_type(_,_,abox).
 :- thread_local(t_l:current_defaultAssertMt/1).
 :- dynamic(lmconf:file_to_module/2).
 
-:- multifile(defaultTBoxMt/1).
-:- dynamic(defaultTBoxMt/1).
-defaultTBoxMt(baseKB).
+:- multifile(abox:defaultTBoxMt/1).
+:- dynamic(abox:defaultTBoxMt/1).
+abox:defaultTBoxMt(baseKB).
 
 
 %% defaultAssertMt(-Ctx) is det.
@@ -126,7 +129,7 @@ defaultAssertMt(ABox):-
     (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);
     '$current_typein_module'(ABox);
-     defaultTBoxMt(ABox))), 
+     abox:defaultTBoxMt(ABox))), 
            mtCanAssertMt(ABox))),!.
 
 defaultAssertMt(ABox):- fileAssertMt(ABox).
@@ -145,7 +148,7 @@ fileAssertMt(ABox):-
 fileAssertMt(ABox):- which_file(File)->make_module_name_local(File,ABox),File\==ABox,!.
 fileAssertMt(ABox):-
  (((('$current_typein_module'(ABox);
-     defaultTBoxMt(ABox))),mtCanAssertMt(ABox))),!.
+     abox:defaultTBoxMt(ABox))),mtCanAssertMt(ABox))),!.
 fileAssertMt(baseKB).
 
 mtCanAssertMt(ABox):- \+ mtSharedPrologCodeOnly(ABox).
@@ -221,7 +224,7 @@ mtNoPrologCode(mpred_userkb).
 %
 set_defaultAssertMt(ABox):- 
     must(mtCanAssertMt(ABox)),
-    defaultTBoxMt(TBox),
+    abox:defaultTBoxMt(TBox),
     (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
     '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
     setup_module_ops(ABox), 
@@ -234,7 +237,7 @@ set_defaultAssertMt(ABox):-
 set_fileAssertMt(ABox):- 
  must_det_l((
    must(mtCanAssertMt(ABox)),
-   defaultTBoxMt(TBox),
+   abox:defaultTBoxMt(TBox),
    TBox:ensure_abox(ABox),
    '$current_typein_module'(CM),
    '$current_source_module'(SM),
@@ -417,7 +420,7 @@ correct_module(M,X,T):-functor(X,F,A),quietly_must(correct_module(M,F,A,T)),!.
 % Correct Module.
 %
 correct_module(abox,F,A,T):- !,defaultAssertMt(M),correct_module(M,F,A,T).
-correct_module(tbox,F,A,T):- !,defaultTBoxMt(M),correct_module(M,F,A,T).
+correct_module(tbox,F,A,T):- !,abox:defaultTBoxMt(M),correct_module(M,F,A,T).
 correct_module(user,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,F,A,T).
 correct_module(M,F,A,T):- functor(G,F,A),guessMtFromGoal(M,G,T),!.
 correct_module(MT,_,_,MT):-!.

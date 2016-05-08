@@ -30,7 +30,7 @@
          correct_module/3,
          correct_module/5,
          defaultAssertMt/1,
-         defaultTBoxMt/1,
+         abox:defaultTBoxMt/1,
          ensure_imports/1,
          fileAssertMt/1,
          in_mpred_kb_module/0,
@@ -184,9 +184,9 @@ box_type(_,_,abox).
 :- thread_local(t_l:current_defaultAssertMt/1).
 :- dynamic(lmconf:file_to_module/2).
 
-:- multifile(defaultTBoxMt/1).
-:- dynamic(defaultTBoxMt/1).
-defaultTBoxMt(baseKB).
+:- multifile(abox:defaultTBoxMt/1).
+:- dynamic(abox:defaultTBoxMt/1).
+abox:defaultTBoxMt(baseKB).
 
 
 %% defaultAssertMt(-Ctx) is det.
@@ -200,7 +200,7 @@ defaultAssertMt(ABox):-
     (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);
     '$current_typein_module'(ABox);
-     defaultTBoxMt(ABox))), 
+     abox:defaultTBoxMt(ABox))), 
            mtCanAssertMt(ABox))),!.
 
 defaultAssertMt(ABox):- fileAssertMt(ABox).
@@ -219,7 +219,7 @@ fileAssertMt(ABox):-
 fileAssertMt(ABox):- which_file(File)->make_module_name_local(File,ABox),File\==ABox,!.
 fileAssertMt(ABox):-
  (((('$current_typein_module'(ABox);
-     defaultTBoxMt(ABox))),mtCanAssertMt(ABox))),!.
+     abox:defaultTBoxMt(ABox))),mtCanAssertMt(ABox))),!.
 fileAssertMt(baseKB).
 
 mtCanAssertMt(ABox):- \+ baseKB:mtSharedPrologCodeOnly(ABox).
@@ -245,7 +245,7 @@ makeConstant(_Mt).
 %
 set_defaultAssertMt(ABox):- 
     must(mtCanAssertMt(ABox)),
-    defaultTBoxMt(TBox),
+    abox:defaultTBoxMt(TBox),
     (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
     '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
     setup_module_ops(ABox), 
@@ -258,7 +258,7 @@ set_defaultAssertMt(ABox):-
 set_fileAssertMt(ABox):- 
  must_det_l((
    must(mtCanAssertMt(ABox)),
-   defaultTBoxMt(TBox),
+   abox:defaultTBoxMt(TBox),
    TBox:ensure_abox(ABox),
    '$current_typein_module'(CM),
    '$current_source_module'(SM),
@@ -415,7 +415,7 @@ correct_module(M,G,T):-functor(X,G,A),quietly_must(correct_module(M,G,F,A,T)),!.
 % Correct Module.
 %
 correct_module(abox,G,F,A,T):- !, defaultAssertMt(M),correct_module(M,G,F,A,T).
-correct_module(tbox,G,F,A,T):- !,defaultTBoxMt(M),correct_module(M,G,F,A,T).
+correct_module(tbox,G,F,A,T):- !,abox:defaultTBoxMt(M),correct_module(M,G,F,A,T).
 correct_module(user,G,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,G,F,A,T).
 correct_module(HintMt,_,F,A,HintMt):- mtExact(HintMt).
 correct_module(HintMt,Goal,F,A,HintMt):- predicate_property_nt(HintMt:Goal,exported).
@@ -611,13 +611,9 @@ retry_undefined(CallerMt:F/A):-
 %
 % Shared Multifile.
 %
-shared_multifile(MPI):- strip_module(MPI,_,PI),
-   MPI \== PI,!, kb_dynamic(MPI).
-
-shared_multifile(MPI):- strip_module(MPI,PredMt,PI),
-   must(MPI \== PI),
+shared_multifile(MPI):- 
    context_module_of_file(CallerMt),
-   with_pfa_group(make_shared_multifile,CallerMt,PredMt, PI),!.
+   with_pfa_group(make_shared_multifile,CallerMt,PredMt, MPI),!.
 
 
 

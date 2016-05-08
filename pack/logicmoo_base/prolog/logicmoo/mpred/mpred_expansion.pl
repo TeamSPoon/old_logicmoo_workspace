@@ -1053,7 +1053,7 @@ db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_e
 replaced_module(_,V,_):- \+ atom(V),!,fail.
 replaced_module(_,umt,ABox):-defaultAssertMt(ABox).
 replaced_module(_,abox,ABox):-defaultAssertMt(ABox).
-replaced_module(_,tbox,TBox):-defaultTBoxMt(TBox).
+replaced_module(_,tbox,TBox):-abox:defaultTBoxMt(TBox).
 
 %% remodulize( ?Op, ?H, ?HH) is semidet.
 %

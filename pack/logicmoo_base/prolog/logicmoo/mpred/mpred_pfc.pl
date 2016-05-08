@@ -315,7 +315,7 @@ fix_mp((G :- B),( M:GO :- B)):- fix_mp(G,M:GO),!.
 fix_mp((G :- B),M:( GO :- B)):- !, fix_mp(G,M:GO).
 fix_mp(Mt:P,Mt:P):- mtExact(Mt).
 fix_mp(abox:P,ABOX:P):- defaultAssertMt(ABOX), !.
-fix_mp(tbox:P,TBOX:P):- defaultTBoxMt(TBOX), !.
+fix_mp(tbox:P,TBOX:P):- abox:defaultTBoxMt(TBOX), !.
 fix_mp(G,M:GO):- strip_module(G,_,GO), !,functor(GO,F,A),convention_or_default(F,A,M).
 %fix_mp(baseKB:P,baseKB:P):-!.
 fix_mp(M:P,M:P):-baseKB:mtLocal(M),!.

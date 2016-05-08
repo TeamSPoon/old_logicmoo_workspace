@@ -38,11 +38,11 @@
 :- discontiguous(logicmoo_utils:'$exported_op'/3).
 
 % ========================================
-% defaultTBoxMt/1
+% abox:defaultTBoxMt/1
 % ========================================
 %% mpred_system_kb( ?VALUE1) is semidet.
 %
-% Hook To [defaultTBoxMt/1] For Usr Logicmoo_base.
+% Hook To [abox:defaultTBoxMt/1] For Usr Logicmoo_base.
 % Managed Predicate System Knowledge Base.
 %
 
@@ -54,7 +54,7 @@ config_mpred_system:-
 config_mpred_system(Usr,Sys):-
   ignore(lmconf:source_typein_boxes(SM,M,Usr:Sys)),
   must(load_mpred_system(SM,Sys)),
-  must(defaultTBoxMt(Sys)),
+  must(abox:defaultTBoxMt(Sys)),
   fix_ops_for(SM),
   fix_ops_for(Sys),
   fix_ops_for(Usr),!,
@@ -99,8 +99,8 @@ show_kb_structure:-
 :- multifile(t_l:disable_px/0).
 :- thread_local(t_l:disable_px/0).
 
-:- multifile(defaultTBoxMt/1).
-:- dynamic(defaultTBoxMt/1).
+:- multifile(abox:defaultTBoxMt/1).
+:- dynamic(abox:defaultTBoxMt/1).
 
 % :- autoload([verbose(false)]).
 lmconf:mpred_skipped_module(eggdrop).
@@ -182,10 +182,10 @@ assert_setting00(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),system
 %
 % Load Managed Predicate System.
 %
-load_mpred_system(_,Sys):-defaultTBoxMt(Sys),!.
+load_mpred_system(_,Sys):-abox:defaultTBoxMt(Sys),!.
 load_mpred_system(_,_Sys):-!.
 /*
-load_mpred_system(_,Sys):-asserta(defaultTBoxMt(Sys)),current_prolog_flag(autoload_logicmoo,true),!.
+load_mpred_system(_,Sys):-asserta(abox:defaultTBoxMt(Sys)),current_prolog_flag(autoload_logicmoo,true),!.
 load_mpred_system(SM,Sys):-
  must((current_smt(SM,M),
  lmconf:source_typein_boxes(SM,M,_Usr:Sys))),

@@ -56,7 +56,7 @@
 %(mpred_mark(pfcNegTrigger,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb_dynamic(tbox:F/A)}.
 
 :- dynamic(marker_supported/2).
-:- dynamic(mpred_mark/3).
+% :- dynamic(mpred_mark/3).
 
 :- dynamic(mpred_mark_C/1).
 
