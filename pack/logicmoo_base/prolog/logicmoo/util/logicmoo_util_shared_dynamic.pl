@@ -73,6 +73,56 @@ wsh_w:wrap_shared(clause,3,dbreq):- is_user_module.
 wsh_w:wrap_shared(retract,1,dbreq):- is_user_module.
 wsh_w:wrap_shared(retractall,1,dbreq):- is_user_module.
 
+wsh_w:wrap_shared(argQuotedIsa,3,ereq).
+wsh_w:wrap_shared(arity,2,ereq).
+wsh_w:wrap_shared(call_OnEachLoad,1,ereq).
+wsh_w:wrap_shared(completeExtentEnumerable,1,ereq).
+wsh_w:wrap_shared(completelyAssertedCollection,1,ereq).
+wsh_w:wrap_shared(constrain_args_pttp,2,ereq).
+wsh_w:wrap_shared(cycPlus2,2,ereq).
+wsh_w:wrap_shared(cycPred,2,ereq).
+wsh_w:wrap_shared(decided_not_was_isa,2,ereq).
+wsh_w:wrap_shared(definingMt,2,ereq).
+wsh_w:wrap_shared(functorDeclares,1,ereq).
+wsh_w:wrap_shared(genls,2,ereq).
+wsh_w:wrap_shared(import_shared_pred,3,ereq).
+wsh_w:wrap_shared(is_static_predicate,3,ereq).
+wsh_w:wrap_shared(isa,2,ereq).
+wsh_w:wrap_shared(lambda,5,ereq).
+wsh_w:wrap_shared(loaded_external_kbs,0,ereq).
+wsh_w:wrap_shared(meta_argtypes,1,ereq).
+wsh_w:wrap_shared(mpred_f,4,ereq).
+wsh_w:wrap_shared(mpred_f,5,ereq).
+wsh_w:wrap_shared(mpred_f,6,ereq).
+wsh_w:wrap_shared(mpred_f,7,ereq).
+wsh_w:wrap_shared(mpred_mark,3,ereq).
+wsh_w:wrap_shared(mpred_module,2,ereq).
+wsh_w:wrap_shared(mudKeyword,2,ereq).
+wsh_w:wrap_shared(pfcControlled,1,ereq).
+wsh_w:wrap_shared(pfcRHS,1,ereq).
+wsh_w:wrap_shared(prologBuiltin,1,ereq).
+wsh_w:wrap_shared(prologDynamic,1,ereq).
+wsh_w:wrap_shared(prologHybrid,1,ereq).
+wsh_w:wrap_shared(prologKIF,1,ereq).
+wsh_w:wrap_shared(prologMacroHead,1,ereq).
+wsh_w:wrap_shared(prologPTTP,1,ereq).
+wsh_w:wrap_shared(prologSideEffects,1,ereq).
+wsh_w:wrap_shared(props,2,ereq).
+wsh_w:wrap_shared(resultIsa,2,ereq).
+wsh_w:wrap_shared(singleValuedInArg,2,ereq).
+wsh_w:wrap_shared(spft,3,ereq).
+wsh_w:wrap_shared(support_hilog,2,ereq).
+wsh_w:wrap_shared(t,3,ereq).
+wsh_w:wrap_shared(tCol,1,ereq).
+wsh_w:wrap_shared(tNotForUnboundPredicates,1,ereq).
+wsh_w:wrap_shared(tPred,1,ereq).
+wsh_w:wrap_shared(tRelation,1,ereq).
+wsh_w:wrap_shared(tSet,1,ereq).
+wsh_w:wrap_shared(ttExpressionType,1,ereq).
+wsh_w:wrap_shared(ttPredType,1,ereq).
+wsh_w:wrap_shared(ttTemporalType,1,ereq).
+wsh_w:wrap_shared(use_ideep_swi,0,ereq).
+
 is_user_module :- prolog_load_context(source,F), lmconf:mpred_is_impl_file(_,F),!,fail.
 is_user_module :- prolog_load_context(module,M), module_property(M,class(L)),L=library,!,fail.
 is_user_module :- prolog_load_context(module,user). 

@@ -26,6 +26,7 @@
          add_import_predicate/3,
          autoload_library_index/4,
          baseKB_hybrid_support/2,
+         check_undefined_predicate/2,
          check_undefined_predicate/4,
          correct_module/3,
          correct_module/5,
@@ -40,12 +41,28 @@
          mtCanAssertMt/1,
          registerCycPred/4,
          registerCycPred/5,
-         retry_undefined/1,
+         retry_undefined/3,
          set_defaultAssertMt/1,
          set_fileAssertMt/1,
          transitive_path/3,
          which_file/1,
          user_m_check/1,
+
+         ensure_tbox/1,
+
+
+         fixup_modules/0,
+         import_predicate/2,
+         skip_user/1,
+         inherit_into_module/2,
+         box_type/3,
+         make_reachable/2,
+         fixup_module/2,
+         is_undefaulted/1,
+         ensure_imports_tbox/2,
+         map_inheritance/1,
+
+
          which_file/1
     ]).
 %:- endif.
@@ -226,7 +243,7 @@ mtCanAssertMt(ABox):- \+ baseKB:mtSharedPrologCodeOnly(ABox).
 
 
 
-% mtGlobal
+% baseKB:mtGlobal
 % mtCore
 
 
@@ -276,7 +293,7 @@ set_fileAssertMt(ABox):-
 
 make_module_name_local(A,B):- make_module_name_local0(A,B), \+ exists_file(B).
 
-make_module_name_local0(Source,KB):- mtGlobal(Source),defaultAssertMt(KB).
+make_module_name_local0(Source,KB):- baseKB:mtGlobal(Source),defaultAssertMt(KB).
 make_module_name_local0(Source,SetName):- lmconf:file_to_module(Source,SetName),!.
 make_module_name_local0(Source,Source):- lmcache:has_pfc_database_preds(Source).
 make_module_name_local0(Source,GetName):- make_module_name(Source,GetName).
@@ -293,21 +310,21 @@ ensure_tbox(_ABox).
 baseKB:mtCore(baseKB).
 
 
-%% mtGlobal(M,Box).
+%% baseKB:mtGlobal(M,Box).
 %
 % Boot Modules.
 %
-%mtGlobal(mpred_loader).
+%baseKB:mtGlobal(mpred_loader).
 
-:- dynamic(mtGlobal/1).
-mtGlobal(baseKB).
-mtGlobal(boot_system).
-mtGlobal(system_markers).
-mtGlobal(system_singleValued).
-mtGlobal(system_genls).
-mtGlobal(system_if_missing).
-mtGlobal(common_logic_clif).
-mtGlobal(system_mdefault).
+:- dynamic(baseKB:mtGlobal/1).
+baseKB:mtGlobal(baseKB).
+baseKB:mtGlobal(boot_system).
+baseKB:mtGlobal(system_markers).
+baseKB:mtGlobal(system_singleValued).
+baseKB:mtGlobal(system_genls).
+baseKB:mtGlobal(system_if_missing).
+baseKB:mtGlobal(common_logic_clif).
+baseKB:mtGlobal(system_mdefault).
 
 
 is_undefaulted(user).
@@ -368,7 +385,7 @@ ensure_imports_tbox(M,TBox):-
 % :- inherit_into_module(logicmoo_user,lmcode).
 
 fixup_module(system,_).
-fixup_module(M,_L):-mtGlobal(M),skip_user(M).
+fixup_module(M,_L):-baseKB:mtGlobal(M),skip_user(M).
 fixup_module(lmcode,_L):-skip_user(lmcode).
 fixup_module(_,[user]).
 fixup_module(M,_L):- skip_user(M).
@@ -408,7 +425,7 @@ fixup_modules:-
 %
 % Correct Module.
 %
-correct_module(M,G,T):-functor(X,G,A),quietly_must(correct_module(M,G,F,A,T)),!.
+correct_module(M,G,T):-functor(G,F,A),quietly_must(correct_module(M,G,F,A,T)),!.
 
 %% correct_module( ?M, ?Goal, ?F, ?A, ?T) is semidet.
 %
@@ -417,12 +434,12 @@ correct_module(M,G,T):-functor(X,G,A),quietly_must(correct_module(M,G,F,A,T)),!.
 correct_module(abox,G,F,A,T):- !, defaultAssertMt(M),correct_module(M,G,F,A,T).
 correct_module(tbox,G,F,A,T):- !, abox:defaultTBoxMt(M),correct_module(M,G,F,A,T).
 correct_module(user,G,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,G,F,A,T).
-correct_module(HintMt,_,F,A,HintMt):- mtExact(HintMt).
-correct_module(HintMt,Goal,F,A,HintMt):- predicate_property_nt(HintMt:Goal,exported).
-correct_module(HintMt,Goal,F,A,OtherMt):- predicate_property_nt(HintMt:Goal,imported_from(OtherMt)).
-correct_module(_,Goal,F,A,OtherMt):- predicate_property_nt(Goal,imported_from(OtherMt)).
-correct_module(_,Goal,F,A,OtherMt):- var(OtherMt),!, predicate_property_nt(OtherMt:Goal,file(_)).
-correct_module(_,Goal,F,A,OtherMt):- mtGlobal(OtherMt), predicate_property_nt(OtherMt:Goal,file(_)).
+correct_module(HintMt,Goal,_,_,OtherMt):- predicate_property_nt(HintMt:Goal,imported_from(OtherMt)).
+correct_module(_,Goal,_,_,OtherMt):- predicate_property_nt(Goal,imported_from(OtherMt)).
+correct_module(HintMt,_,_,_,HintMt):- mtExact(HintMt).
+correct_module(HintMt,Goal,_,_,HintMt):- predicate_property_nt(HintMt:Goal,exported).
+correct_module(_,Goal,_,_,OtherMt):- var(OtherMt),!, predicate_property_nt(OtherMt:Goal,file(_)).
+correct_module(_,Goal,_,_,OtherMt):- baseKB:mtGlobal(OtherMt), predicate_property_nt(OtherMt:Goal,file(_)).
 correct_module(MT,_,_,_,MT):-!.
 
 
@@ -431,8 +448,8 @@ correct_module(MT,_,_,_,MT):-!.
 :- module_transparent(lmcache:how_registered_pred/4).
 
 add_import_predicate(Mt,Goal,OtherMt):- fail,
-   mtGlobal(Mt),
-   mtGlobal(OtherMt),
+   baseKB:mtGlobal(Mt),
+   baseKB:mtGlobal(OtherMt),
    \+ import_module(OtherMt,Mt),
    catch(add_import_module(Mt,OtherMt,end),
        error(permission_error(add_import,module,baseKB),
@@ -474,7 +491,7 @@ transitive_path(F,[Arg1,SecondNodeMt|REST],Arg2):-
   transitive_path(F,[SecondNodeMt|REST],Arg2).
 
 registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
-  mtGlobal(OtherMt),
+  baseKB:mtGlobal(OtherMt),
   add_import_predicate(Mt,Goal,OtherMt),!.
 
   /*
@@ -494,6 +511,7 @@ autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_ind
 
 :- multifile(baseKB:hybrid_support/2).
 :- dynamic(baseKB:hybrid_support/2).
+baseKB_hybrid_support(F,A):-wsh_w:wrap_shared(F,A,_).
 baseKB_hybrid_support(F,A):-baseKB:hybrid_support(F,A).
 baseKB:hybrid_support(arity,2).
 baseKB:hybrid_support(mpred_module,2).
@@ -502,54 +520,34 @@ baseKB:hybrid_support(spft,3).
 baseKB:hybrid_support(mtLocal,1).
 baseKB:hybrid_support(genlMt,2).
 
+
 istAbove(Mt,Query):- Mt \== baseKB, Mt \== lmcode, genlMt(Mt,MtAbove),MtAbove:Query.
 
-check_undefined_predicate(M,F,A,error):- lmcache:tried_to_retry_undefined(M,F,A),!.
 
+
+check_undefined_predicate(M:F/A,R):- check_undefined_predicate(M,F,A,R).
+check_undefined_predicate(F/A,R):- check_undefined_predicate(user,F,A,R).
+
+
+check_undefined_predicate(Module,Name,Arity,Action) :- 
+      current_prolog_flag(autoload, true),
+	'$autoload'(Module, Name, Arity), !,
+	Action = retry.
+check_undefined_predicate(M,F,A,error):- lmcache:tried_to_retry_undefined(_SM:M,F,A),!.
 check_undefined_predicate(CallerMt,F,A,_):-
-   '$current_source_module'(SM),wdmsg(uses_predicate(SM,CallerMt,F,A)),
-   assert(lmcache:tried_to_retry_undefined(CallerMt,F,A)),fail.
-
-check_undefined_predicate(CallerMt,F,A,retry):- baseKB_hybrid_support(F,A),!,
-   functor(Goal,F,A),
-   assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
-
+   '$current_source_module'(SM),
+   wdmsg(uses_predicate(SM,CallerMt,F,A)),
+   assert(lmcache:tried_to_retry_undefined(SM:CallerMt,F,A)),fail.
 check_undefined_predicate(_, (/), _, error) :- !. %dumpST.
 check_undefined_predicate(_, (:), _, error) :- !. %dumpST.
 check_undefined_predicate(_, '[|]', _, error) :- !. %dumpST.
-
-check_undefined_predicate(mpred_props,with_umt,1,retry):- 
-    reexport(mpred_props:mpred_pfc),!.
-check_undefined_predicate(mpred_pfc,fixed_negations,2,retry):- 
-    reexport(mpred_pfc:mpred_expansion),!.
-check_undefined_predicate(CallerMt,F,A,retry):- 
-    autoload_library_index(F,A,_PredMt,File),
-    reexport(CallerMt:File),!.
-   
-
-
-check_undefined_predicate(baseKB,F,A,fail):- 
-  baseKB_hybrid_support(F,A),!,
-  multifile(baseKB:F/A),
-  module_transparent(baseKB:F/A),
-  icatch(dynamic(baseKB:F/A)),
-  icatch(discontiguous(baseKB:F/A)).
-
-
-% Autoloads importing the entire other module
-check_undefined_predicate(CallerMt,F,A,retry):-
-       autoload_library_index(F,A,PredMt,File),
-       asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
-       reexport(lmcode:File),!.
-       % system:add_import_module(CallerMt,lmcode,start).
-
-check_undefined_predicate(Module, Name, Arity, Action) :-
+check_undefined_predicate(Module, Name, Arity, Action) :- fail,
 	current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
 
 check_undefined_predicate(CallerMt,F,A,retry):- 
-    loop_check(retry_undefined(CallerMt:F/A),true).  % dump_break
+    loop_check(retry_undefined(CallerMt,F,A),dump_break).
 
 
 :- dynamic(lmcache:tried_to_retry_undefined/3).
@@ -559,33 +557,59 @@ check_undefined_predicate(CallerMt,F,A,retry):-
 % retry_undefined(M:F/A):- lmcache:tried_to_retry_undefined(M,F,A),!.
 % retry_undefined(M:F/A):- assert(lmcache:tried_to_retry_undefined(M,F,A)),fail.
 
-retry_undefined(lmconf:F/A):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
-retry_undefined(lmcache:F/A):-multifile(lmcache:F/A),volatile(lmcache:F/A),dynamic(lmcache:F/A),!.
-retry_undefined(t_l:F/A):-multifile(t_l:F/A),thread_local(t_l:F/A),!.
 
 % Every module has it''s own
-retry_undefined(CallerMt:'$pldoc'/4):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
+retry_undefined(CallerMt,'$pldoc',4):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
+
+retry_undefined(lmconf,F,A):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
+retry_undefined(lmcache,F,A):-multifile(lmcache:F/A),volatile(lmcache:F/A),dynamic(lmcache:F/A),!.
+retry_undefined(t_l,F,A):-multifile(t_l:F/A),thread_local(t_l:F/A),!.
+
+retry_undefined(baseKB, F, A):-  baseKB_hybrid_support(F,A),
+   dynamic(baseKB:F/A),
+   multifile(baseKB:F/A),
+   dynamic(baseKB:F/A),
+   discontiguous(baseKB:F/A),!.
+
+retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A),find_and_call(mtLocalized(CallerMt)),!,
+   functor(Goal,F,A),assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
+
+retry_undefined(CallerMt,F,A):- current_predicate(lmcode:F/A), current_module(M),M\=lmcode,
+  current_predicate(M:F/A),functor(P,F,A),predicate_property(M:P,defined),\+predicate_property(M:P,imported_from(_)),
+  CallerMt:import(M:F/A).
+
+retry_undefined(CallerMt,F,A):- 
+    autoload_library_index(F,A,_PredMt,File),
+    use_module(CallerMt:File),!.
+   
+% Autoloads importing the entire other module
+retry_undefined(CallerMt,F,A):-
+       autoload_library_index(F,A,PredMt,File),
+       asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
+       use_module(lmcode:File),!.
+       % system:add_import_module(CallerMt,lmcode,start).
+
 
 
 % System-like Autoloads
-retry_undefined(CallerMt:debug/1):- use_module(CallerMt:library(debug)),!.
-retry_undefined(CallerMt:debugging/1):- use_module(CallerMt:library(debug)),!.
-retry_undefined(CallerMt:member/2):- use_module(CallerMt:library(lists)),!.
-retry_undefined(CallerMt:directory_file_path/3):- use_module(CallerMt:library(filesex)),!.
+retry_undefined(CallerMt,debug,1):- use_module(CallerMt:library(debug)),!.
+retry_undefined(CallerMt,debugging,1):- use_module(CallerMt:library(debug)),!.
+retry_undefined(CallerMt,member,2):- use_module(CallerMt:library(lists)),!.
+retry_undefined(CallerMt,directory_file_path,3):- use_module(CallerMt:library(filesex)),!.
 
 
-retry_undefined(CallerMt:F/A):- fail,
+retry_undefined(CallerMt,F,A):- fail,
        autoload_library_index(F,A,_,File),
        load_files(CallerMt:File,[if(true),imports([F/A]),register(false),silent(false)]),!.
 
 % Autoloads importing the entire other module
-retry_undefined(CallerMt:F/A):-
+retry_undefined(CallerMt,F,A):-
        autoload_library_index(F,A,PredMt,File),
-       asserta(lmcache:how_registered_pred(PredMt:reexport(CallerMt:File),CallerMt,F,A)),
-       reexport(CallerMt:File),!.
+       asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
+       use_module(CallerMt:File),!.
 
 /*
-retry_undefined(CallerMt:F/A):-
+retry_undefined(CallerMt,F,A):-
       autoload_library_index(F,A,PredMt,File),
       ((current_module(PredMt),current_predicate(PredMt:F/A))
        -> add_import_module(CallerMt,PredMt,start) ;
@@ -636,9 +660,9 @@ make_shared_multifile(CallerMt,PredMt,F/A):-
 make_shared_multifile(CallerMt,Home,F/A):- baseKB:mtSharedPrologCodeOnly(Home),!,
      wdmsg(mtSharedPrologCodeOnly_make_shared_multifile(CallerMt,Home:F/A)),!.
 
-make_shared_multifile(CallerMt, baseKB, F/A):- kb_dynamic(F/A).
+make_shared_multifile(_CallerMt, baseKB, F/A):- kb_dynamic(F/A).
 
-make_shared_multifile(CallerMt,PredMt,F/A):-!,
+make_shared_multifile(_CallerMt,PredMt,F/A):-!,
  debug(make_shared_multifile,'~p',make_shared_multifile(PredMt:F/A)),
  w_tl(set_prolog_flag(access_level,system),
   PredMt:( 

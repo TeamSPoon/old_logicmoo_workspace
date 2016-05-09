@@ -62,6 +62,7 @@
             as_is_term/1,as_is_term/1,
             as_list/2,
             cheaply_u/1,
+            cheaply_u_ilc/1,
             compare_op/4,
             comparitiveOp/1,
             compound_all_open/1,
@@ -151,7 +152,8 @@
 
 :- meta_predicate 
    % mpred_expansion
-   cheaply_u(0),
+   cheaply_u(+),
+   cheaply_u_ilc(+),
    db_expand_maplist(2,*,*,*,*),
    % mpred_expansion
    transitive_lc_nr(2,*,*),
@@ -275,13 +277,14 @@ alt_calls(ireq).
 %
 show_doall(Call):- doall(show_call(why,Call)).
 
-cheaply_u(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
-cheaply_u(M:argsQuoted(G)):- !,lookup_u(M:argsQuoted(G)).
-cheaply_u(M:call(ereq,G)):- !,cheaply_u(M:G).
-cheaply_u(G):- unsafe_safe(lookup_u(G),cheaply_u_old(G)).
-% cheaply_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
-cheaply_u_old(G):- ground(G),!,(lookup_u(G)*->true;(call_with_depth_limit(call_u(G),30,N),number(N))),!.
-cheaply_u_old(G):- (lookup_u(G)*->true;(call_with_depth_limit(call_u(G),30,N),number(N))).
+cheaply_u(P):- strip_module(P,_,C),P\==C,!,cheaply_u(C).
+cheaply_u(G):- loop_check(cheaply_u_ilc(G),loop_check_term(cheaply_u_ilc(G),ilc2(G),dump_break)).
+
+cheaply_u_ilc(P):- strip_module(P,_,C),P\==C,!,cheaply_u_ilc(C).
+cheaply_u_ilc(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
+cheaply_u_ilc(call(ereq,G)):- !,cheaply_u(G).
+cheaply_u_ilc(P):- predicate_property_nt(P,number_of_rules(N)),N=0,!,lookup_u(P).
+cheaply_u_ilc(G):- call_u(G).
 
 %= 	 	 
 

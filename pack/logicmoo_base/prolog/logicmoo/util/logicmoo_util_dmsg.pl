@@ -102,6 +102,15 @@
             with_output_to_main/1,
             with_output_to_stream/2,
             with_show_dmsg/2,
+
+
+source_variables_lwv/1,
+term_color0/2,
+term_to_message_string/2,
+ansi_prop/2,
+dmsg_log/3,
+dmsg000/1,
+
             writeFailureLog/2
           ]).
 :- multifile
@@ -1494,6 +1503,7 @@ cls:- shell(cls).
 
 :- use_module(library(random)).
 :- use_module(logicmoo_util_varnames).
+:- use_module(logicmoo_util_catch).
 % :- autoload([verbose(false)]).
 
 /*

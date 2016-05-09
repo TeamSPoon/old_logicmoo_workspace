@@ -190,7 +190,7 @@ is_never_type(V):-never_type_why(V,_),!.
 %
 % A.
 %
-:- meta_predicate a(1,?).
+:- meta_predicate a(+,?).
 a(C,I):- atom(C),G=..[C,I], no_repeats_old(clause_true(G)). % ;clause_true(isa(I,C))).
 
 

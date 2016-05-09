@@ -24,8 +24,8 @@
   mpred_post1_rem1/2,
   mpred_mark_as_ml/3,
   mpred_mark_fa_as/5,
-  mpred_te/0,
-  mpred_te/2,
+  %mpred_te/0,
+  %mpred_te/2,
   '__aux_maplist/2_call+0'/1,
   log_failure/1,
   code_sentence_op/1,
@@ -131,6 +131,8 @@
 %:- endif.
 
 % :- '$set_source_module'(logicmoo_utils).
+
+:- include('mpred_header.pi').
 
 :- meta_predicate 
       each_E(:,+,+),
@@ -504,18 +506,19 @@ each_E(P,H,S) :- apply(P,[H|S]).
 
 
 
-:- dynamic(mpred_te/0).
+%:- dynamic(mpred_te/0).
 :- multifile(user:term_expansion/2).
 :- dynamic(user:term_expansion/2).
-user:term_expansion(I,O):-mpred_te->mpred_te(I,O).
+% user:term_expansion(I,O):-mpred_te->mpred_te(I,O).
 
+/*
 mpred_te((P==>Q),(:- mpred_ain((P==>Q)))).
 %mpred_te((P==>Q),(:- mpred_ain(('<-'(Q,P))))).  % speed-up attempt
 mpred_te(('<-'(P,Q)),(:- mpred_ain(('<-'(P,Q))))). 
 mpred_te((P<==>Q),(:- mpred_ain((P<==>Q)))).
 mpred_te((RuleName :::: Rule),(:- mpred_ain((RuleName :::: Rule)))).
 mpred_te((==>P),(:- mpred_ain(P))).
-
+*/
 
 %  predicates to examine the state of mpred_
 
@@ -593,8 +596,8 @@ mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
 
 ain_fast(P):- get_source_ref(UU), ain_fast(P,UU).
 ain_fast(P,S):- 
-  filter_buffer_trim('$last_mpred_fwc1s',1),
-  filter_buffer_trim('$last_mpred_post1s',2),
+  filter_buffer_trim('$last_mpred_fwc1s',11),
+  filter_buffer_trim('$last_mpred_post1s',12),
   each_E(mpred_post1,P,[S]),
   mpred_run.
 
@@ -638,7 +641,7 @@ mpred_post1( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 mpred_post1(  ~ P,   S):- 
    with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
 
-% mpred_post1(Fact, _):- filter_buffer_n_test('$last_mpred_post1s',3,Fact),!.
+mpred_post1(Fact, _):- filter_buffer_n_test('$last_mpred_post1s',3,Fact),!.
 
 % Two version exists of this function one expects for a clean database (fresh_mode) and adds new information.
 % tries to assert a fact or set of fact to the database.
@@ -2979,8 +2982,8 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 
 :- module_transparent((clause_asserted_u)/1).
 :- module_transparent((mpred_remove1)/2).
-:- module_transparent((mpred_te)/2).
-:- module_transparent((mpred_te)/0).
+%:- module_transparent((mpred_te)/2).
+%:- module_transparent((mpred_te)/0).
 %:- module_transparent((mpred_current_db)/1).
 :- module_transparent((listing_u)/1).
 :- module_transparent((mpred_test_fok)/1).

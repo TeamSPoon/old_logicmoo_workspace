@@ -281,9 +281,9 @@ boxlog_to_pfc_pass_2(rev(=>),H,OUTPUT):-!, boxlog_to_pfc_pass_2(fwc,H,OUTPUT).
 boxlog_to_pfc_pass_2(~(WHAT),(~(H):-B),OUTPUT):-!, boxlog_to_pfc_pass_2(WHAT,(~(H):-B),OUTPUT).
 boxlog_to_pfc_pass_2(~(WHAT),~(H),OUTPUT):-!, boxlog_to_pfc_pass_2(WHAT,~(H),OUTPUT).
 
-boxlog_to_pfc_pass_2((:-),(~(H):-B),unused_true((~(H):-B))):- nonvar(H),prologBuiltin(H),!.
+boxlog_to_pfc_pass_2((:-),(~(H):-B),unused_true((~(H):-B))):- nonvar(H),a(prologBuiltin,H),!.
 boxlog_to_pfc_pass_2((:-),(~(H):-B),(HH:-(cwc,BBB))):-body_for_pfc((:-),~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_pfc_pass_2((:-),(H:-B),OUT):-pfcControlled(H),boxlog_to_pfc_pass_2((bwc),(H:-B),OUT),!.
+boxlog_to_pfc_pass_2((:-),(H:-B),OUT):- a(pfcControlled,H),boxlog_to_pfc_pass_2((bwc),(H:-B),OUT),!.
 boxlog_to_pfc_pass_2((:-),(H:-B),(HH:-(cwc,BBB))):- body_for_pfc((:-),H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_pfc_pass_2((:-),~(H),~(H)):-  !.
 boxlog_to_pfc_pass_2((:-),H,H):-  !.
@@ -491,7 +491,7 @@ body_for_mpred_2(_Mode,Head,Head,poss(X),{loop_check(\+ ~(X),true)}).
 body_for_mpred_2(Mode,Head,NewHead,B,BBB):- once(reduce_literal(B,BB)),B\=@=BB,!,body_for_mpred_1(Mode,Head,NewHead,BB,BBB).
 body_for_mpred_2(_Mode,Head,Head,~(A),~(A)):-!.
 body_for_mpred_2(_Mode,Head,Head,different(A,B),{dif:dif(A,B)}).
-body_for_mpred_2(_Mode,Head,Head,A,{A}):-prologBuiltin(A),!.
+body_for_mpred_2(_Mode,Head,Head,A,{A}):-a(prologBuiltin,A),!.
 body_for_mpred_2(_Mode,Head,Head,A,A).
 
 

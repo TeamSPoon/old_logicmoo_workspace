@@ -14,7 +14,7 @@
 :- module(logicmoo_util_filesystem,
           [ 
           swi_module/2,
-          write_module_imports/0,
+          show_module_imports/0,
           show_module_imports/1,
           show_module_imports/2,
             is_file_based_expansion/5,
@@ -1000,7 +1000,7 @@ glean_prolog_impl_file((:- module(Want,_PubList)),File,SM,TypeIn):-!,
     add_genlMt(lmcode, uses(SM)),
     % add_genlMt(baseKB, imports(SM)),
     add_genlMt(baseKB, imports(lmcode)),
-    add_genlMt(SM,imports(lmcode)),    
+    % add_genlMt(SM,imports(lmcode)),    
     add_genlMt(lmcode, uses(Want)),
     add_genlMt(SM, uses(Want)),
     add_genlMt(Want, file(File)).
@@ -1024,16 +1024,18 @@ add_prolog_predicate(_ImportTo,M,H,F,A,_S):-
        M:module_transparent(M:F/A))).
       
 
-show_module_imports(M):- show_module_imports(M,_),show_module_imports(_,M).
+show_module_imports(M):- show_module_imports(M,_),
+  ((import_module(M,user);M=user)->true;portray_clause(':-'(ignore(system:delete_import_module(M,user))))),
+  show_module_imports(_,M).
 
 show_module_imports(M,I):-var(M),!,forall(current_module(M),show_module_imports(M,I)).
 show_module_imports(M,I):-
    forall(import_module(M,I),
       portray_clause(':-'(system:add_import_module(M,I)))),
-   ((import_module(M,user);M=user)->true;portray_clause(':-'(ignore(system:delete_import_module(M,user))))),
+   
    forall((default_module(M,I),M\==I,\+import_module(M,I)),nop(wdmsg(default_module(M,I)))).
 
-write_module_imports:-
-  forall(current_module(M),show_module_imports(M,_)).
+show_module_imports:-
+  forall(current_module(M),show_module_imports(M)).
   
    

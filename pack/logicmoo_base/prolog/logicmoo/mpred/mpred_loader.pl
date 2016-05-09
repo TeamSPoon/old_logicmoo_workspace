@@ -22,7 +22,8 @@
            
            simplify_language_name/2,
            %is_undefaulted/1,
-          
+
+          current_op_alias/2,
             
             add_term/2,
             assert_kif/1,
@@ -36,7 +37,12 @@
 
             predicate_is_undefined_fa/2,
             
-            
+            same_language/2,
+            call_file_command0/4,
+            is_compiling_clause/0,
+            to_prolog_xform/2,
+            mpred_ain_loaded/0,
+
 
             begin_pfc/0,
             call_file_command/4,
@@ -109,6 +115,7 @@
             loading_source_file/1,
             make_db_listing/0,
             make_dynamic/1,
+           (make_dynamic_ilc)/1,
             with_ukb/2,
             module_typed_term_expand/2,
             module_typed_term_expand/5,
@@ -164,7 +171,6 @@
             was_exported_content/3,
             with_mpred_expansions/1,
             with_no_mpred_expansions/1,
-            with_source_module/2,
             lmcache:mpred_directive_value/3,
 
             lmconf:loaded_file_world_time/3,
@@ -200,8 +206,6 @@
  :- meta_predicate
         % make_reachable(?,?),
         call_file_command(?, ?, ?, ?),
-        call_from_module(+, 0),
-        with_source_module(+, 0),
         with_ukb(+, 0),
         cl_assert(?, ?),
         show_bool(0),
@@ -400,7 +404,7 @@ mpred_file_term_expansion(_,_,I,_):- is_ftVar(I),!,fail.
 mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !, Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
 mpred_file_term_expansion(_,_,_,_):- get_lang(pl),!,fail.
 mpred_file_term_expansion(Type,LoaderMod,(I:-B),OO):-B==true,!,mpred_file_term_expansion(Type,LoaderMod,I,OO).
-mpred_file_term_expansion(Type,LoaderMod,I,( :- must(ain(I)))):-!.
+mpred_file_term_expansion(_Type,_LoaderMod,I,( :- must(ain(I)))):-!.
 mpred_file_term_expansion(Type,LoaderMod,I,OO):-
  ((
   sanity((ground(Type:LoaderMod),nonvar(I),var(OO))),
@@ -789,7 +793,7 @@ check_term_expansions:- not(do_term_expansions).
 is_code_body(P):- cnotrace(cwc==P ; (compound(P),arg(1,P,E),is_code_body(E))),!.
 
 
-:- meta_predicate(with_source_module(:,(*))).
+% :- meta_predicate(with_source_module(:,(*))).
 
 
 
@@ -1136,7 +1140,6 @@ pfc_dcg:- file_begin(pfc), op(400,yfx,('\\\\')),op(1200,xfx,('-->>')),op(1200,xf
 % ========================================
 % begin/end_transform_mpreds
 % ========================================
-:- dynamic(current_op_alias/2).
 :- dynamic(t_l:current_lang/1).
 
 
@@ -1325,6 +1328,7 @@ get_op_alias(OP,ALIAS):-get_lang(LANG),lang_op_alias(LANG,OP,ALIAS).
 %
 % Current Oper. Alias.
 %
+:- dynamic(current_op_alias/2).
 current_op_alias( not(:-),~(:-)).
 current_op_alias( (:-),(:-)).
 
@@ -1679,8 +1683,11 @@ compile_clause(CL):- quietly_must((make_dynamic(CL),assertz_if_new(CL),!,clause_
 %
 make_dynamic((H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(H)).
 make_dynamic(M:(H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(M:H)).
-make_dynamic(C):- compound(C),strip_module(C,M,_),get_functor(C,F,A),quietly_must(F\=='$VAR'),
+make_dynamic(C):- loop_check(make_dynamic_ilc(C),true).
+
+make_dynamic_ilc(C):- compound(C),strip_module(C,M,_),get_functor(C,F,A),quietly_must(F\=='$VAR'),
   functor(P,F,A),
+
   ( \+predicate_property(M:P,_) -> kb_dynamic(M:F/A) ; 
     (predicate_property(M:P,dynamic)->true;dynamic_safe(M:P))),!,
   kb_dynamic(M:F/A),
@@ -1947,7 +1954,6 @@ load_init_world(World,File):-
 
 
 
-
 %% ensure_mpred_file_loaded( ?MFileIn) is semidet.
 %
 % Ensure Managed Predicate File Loaded.
@@ -1982,9 +1988,6 @@ ensure_mpred_file_loaded(World,FileIn):-
 %
 must_locate_file(FileIn,File):-
   quietly_must(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File)).
-
-
-:- meta_predicate call_from_module(+,0).
 
 
 

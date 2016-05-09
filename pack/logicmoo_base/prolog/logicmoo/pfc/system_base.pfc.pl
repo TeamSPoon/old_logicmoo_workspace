@@ -48,6 +48,10 @@ mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
 
 :- dynamic(marker_supported/2).
 
+:- dynamic(pass2/0).
+
+
+
 :- dynamic(mpred_mark_C/1).
 
 :- kb_dynamic(tCol/1).
@@ -65,13 +69,14 @@ mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
 
 arity(apathFn,2).
 arity(isKappaFn,2).
+arity('$VAR',1).
 arity(isInstFn,1).
 arity(ftListFn,1).
 arity(xyzFn,4).
 arity(arity,2).
 arity(is_never_type,1).
 arity(argIsa, 3).
-arity(Prop,1):-ttPredType(Prop).
+arity(Prop,1):- cwc, ttPredType(Prop).
 arity(meta_argtypes,1).
 arity(arity,2).
 arity(is_never_type,1).
@@ -95,7 +100,6 @@ argsQuoted('loop_check_term').
 argsQuoted('loop_check_term_key').
 argsQuoted('QuoteFn').
 argsQuoted('$VAR').
-baseKB:arity('$VAR',1).
 
 argsQuoted(ain).
 argsQuoted(meta_argtypes).
@@ -149,9 +153,9 @@ mtCore(Mt)==>tMicrotheory(Mt).
    (atom_concat('common_logic_',_,Mt);atom_concat('logicmoo_util_',_,Mt);atom_concat('mpred_',_,Mt))} 
     ==>  mtGlobal(Mt).
 
-{module_property(Mt,class(library))} ==> mtGlobal(Mt).
-
 */
+
+{module_property(Mt,class(library))} ==> mtGlobal(Mt).
 
 mtGlobal(Mt)==>(mtCore(Mt),~mtLocal(Mt)).
 
@@ -187,7 +191,9 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 
 :- unload_file(library(yall)).
 
+
 ((prologBuiltin(P)/get_arity(P,F,A),arity(F,A))==>{make_builtin(F/A)}).
+
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
@@ -204,6 +210,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
    (CL))).
 
 
+
 %:- kb_dynamic(hybrid_support/2).
 %prologBuiltin(resolveConflict/1).
 
@@ -217,14 +224,14 @@ bt(P,_)==> (P:- mpred_bc_only(P)).
 % ((mpred_mark(_,F,A)/(A\=0)) ==> {shared_multifile(F/A)}).
 
 
-pfcControlled(X)/get_pifunctor(X,C)==>({kb_dynamic(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
+(pass2,pfcControlled(X)/get_pifunctor(X,C))==>({kb_dynamic(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
 %pfcControlled(X)/get_pifunctor(X,C)==>({shared_multifile(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
 
-prologHybrid(X)/get_pifunctor(X,C)==>({\+ is_static_predicate(C), shared_multifile(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
+(pass2,prologHybrid(X)/get_pifunctor(X,C))==>({\+ is_static_predicate(C), shared_multifile(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
 %prologHybrid(X)/get_pifunctor(X,C)==>({\+ is_static_predicate(C), kb_dynamic(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
 
 
-prologBuiltin(X)/get_pifunctor(X,C)==>({decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologBuiltin(F)).
+(pass2,prologBuiltin(X)/get_pifunctor(X,C))==>({decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologBuiltin(F)).
 
 % prologDynamic(X)/get_pifunctor(X,C)==>({kb_dynamic(C),decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologDynamic(F)).
 
