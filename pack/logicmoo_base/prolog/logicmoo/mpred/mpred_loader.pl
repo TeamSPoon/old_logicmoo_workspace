@@ -1099,7 +1099,7 @@ mpred_ops:-  prolog_load_context(module,M),setup_module_ops(M).
 
 :- export(mpred_op_unless/4).
 
-setup_module_ops(M):- mpred_op_each(baseKB:mpred_op_unless(M)).
+setup_module_ops(M):- mpred_op_each(mpred_op_unless(M)).
 
 mpred_op_unless(M,A,B,C):- op_safe(A,B,M:C).
 

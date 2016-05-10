@@ -75,7 +75,7 @@ pfclog(PROLOG) ==> PROLOG.
 
 
 % we create code syntax listeners for [if,iff,clif_forall,all,exists]/2s
-({is_clif(CLIF)} ==>
+({is_clif(CLIF),dynamic(CLIF)} ==>
   (CLIF/is_clif(CLIF) ==> clif(CLIF))).
 
 (CLIF/is_kif_clause(CLIF) ==> clif(CLIF)).

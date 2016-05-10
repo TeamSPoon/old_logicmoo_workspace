@@ -50,7 +50,7 @@
             isQualifiedAndVarAs/3,
             isQualifiedAs/3,
             isQualifiedAs/4,
-            isSlot/1,
+            % isSlot/1,
             isSlot/2,
             isVarObject/1,
             isVarObject/2,

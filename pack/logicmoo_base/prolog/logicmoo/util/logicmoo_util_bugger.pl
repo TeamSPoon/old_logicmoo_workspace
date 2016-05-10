@@ -431,6 +431,11 @@
 :- dynamic
         logLevel/2.
 
+:- use_module(library(gui_tracer)).
+:- use_module(library(check)).
+
+
+
 % :- use_module('logicmoo_util_rtrace').
 :- include('logicmoo_util_header.pi').
 

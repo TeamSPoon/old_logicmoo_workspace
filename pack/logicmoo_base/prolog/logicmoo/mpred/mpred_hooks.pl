@@ -110,6 +110,10 @@ mpred_f/1,
 which_f/1,
 (which_t)/1,
 
+add_arg_parts_of_speech/4,
+verb_after_arg/3,
+local_qh_mpred_isa/2,
+fact_always_true/1,
 
 /*
 create_random_fact/1,

@@ -608,8 +608,8 @@ remove_negative_version(P):-
   must(mpred_ain(\+ (~(P)), S)))))),!.
 
      
-fresh_mode:-fail.
-plus_fwc:-true.
+fresh_mode :- \+ current_prolog_flag(pfc_booted,true).
+plus_fwc :- \+ fresh_mode.
 
 plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
 plus_fwc(support_hilog(_,_)):-!.
@@ -641,7 +641,7 @@ mpred_post1( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 mpred_post1(  ~ P,   S):- 
    with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
 
-mpred_post1(Fact, _):- filter_buffer_n_test('$last_mpred_post1s',3,Fact),!.
+mpred_post1(Fact, _):- filter_buffer_n_test('$last_mpred_post1s',13,Fact),!.
 
 % Two version exists of this function one expects for a clean database (fresh_mode) and adds new information.
 % tries to assert a fact or set of fact to the database.
@@ -1289,7 +1289,7 @@ mpred_fwc(Ps):- each_E(mpred_fwc0,Ps,[]).
 %  Avoid loop while calling mpred_fwc1(P)
 % 
 % this line filters sequential (and secondary) dupes
-mpred_fwc0(Fact):- filter_buffer_n_test('$last_mpred_fwc1s',6,Fact),!.
+mpred_fwc0(Fact):- filter_buffer_n_test('$last_mpred_fwc1s',16,Fact),!.
 mpred_fwc0(Fact):- copy_term_vn(Fact,FactC),
       mpred_fwc1(FactC).
 
@@ -1323,7 +1323,7 @@ mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc\==cwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 % mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
-  % dmsg(mpred_fwc1(Fact)),
+  dmsg(mpred_fwc1(Fact)),
   mpred_do_rule(Fact),
   copy_term_vn(Fact,F),
   % check positive triggers

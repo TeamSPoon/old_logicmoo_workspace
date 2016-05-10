@@ -932,8 +932,7 @@ os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \== OSP,!,os_to_prol
 :- multifile(lmconf:known_prolog_file_prop/2).
 :- dynamic(lmconf:known_prolog_file_prop/2).
 
-% add_genlMt(_,_):-!.
-
+add_genlMt(_,_):- \+ current_prolog_flag(logicmoo_glean,true),!.
 add_genlMt(From,Prop):-atom(Prop),!,add_genlMt(From,imports(Prop)).
 add_genlMt(From,CTo):-arg(1,CTo,To),From==To,!.
 add_genlMt(From,imports(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
@@ -979,7 +978,9 @@ is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
    arg(1,PosI,At),!,At>=PosAt.
 
 :- dynamic(lmconf:known_complete_prolog_impl_file/3).
-glean_prolog_impl_file(_,_,_,_):-current_prolog_flag(xref,true),!.
+glean_prolog_impl_file(_,_,_,_):- current_prolog_flag(xref,true),!.
+glean_prolog_impl_file(_,_,_,_):- \+ source_location(_,_),!.
+
 glean_prolog_impl_file(end_of_file,File,SM,TypeIn):-lmconf:known_complete_prolog_impl_file(SM,File,TypeIn),!.
 glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_concat([_,_|_],'.pfc',File),!,
    assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),

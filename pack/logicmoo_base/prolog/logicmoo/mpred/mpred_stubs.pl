@@ -517,7 +517,10 @@ call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 %
 call_wdmsg(P,DB,t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),call_u(CALL).
 call_wdmsg(P,MP,F,A):- local_q_mpred_isa(F,prologHybrid),must(A>1),into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
-call_wdmsg(P,MP,F,A):-  (\+ local_q_mpred_isa(F,prologDynamic)), (\+ local_q_mpred_isa(F,prologBuiltin)), kb_dynamic(F/A), into_functor_form(t,MP,DB),!, 
+call_wdmsg(P,MP,F,A):-  
+  (\+ local_q_mpred_isa(F,prologDynamic)), 
+  (\+ local_q_mpred_isa(F,prologBuiltin)), 
+  functor(FA,F,A),kb_dynamic(FA), into_functor_form(t,MP,DB),!, 
   append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
 call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(local_q_mpred_isa(F,prologDynamic);local_q_mpred_isa(F,prologBuiltin)),!,call_u(CALL).
 %call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),call_u(CALL))).
@@ -551,14 +554,14 @@ no_rescans.
 agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
 
 %= 	 	 
-
+:- reconsult(library(statistics)).
 %% rescan_mpred_props_ilc is semidet.
 %
 % Rescan Managed Predicate Props Inside Of Loop Checking.
 %
 rescan_mpred_props_ilc:-no_rescans,!.
 rescan_mpred_props_ilc:-rescan_duplicated_facts(user,local_q_mpred_isa(_,_)),fail.
-rescan_mpred_props_ilc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(local_q_mpred_isa(Pred,Prop)))),fail.
+rescan_mpred_props_ilc:- prolog_statistics:time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(local_q_mpred_isa(Pred,Prop)))),fail.
 rescan_mpred_props_ilc.
 
 
@@ -1098,7 +1101,7 @@ registerCycPredMtWhy(P):-!,lmconf:with_pi(P,baseKB:registerCycPredMtWhy_3).
 % Ensure Universal Stub Plus Presently Unused.
 %
 ensure_universal_stub_plus_HIDE(F,AMinus2):-
-   kb_dynamic(F/AMinus2).
+  functor(FAMinus2,F,AMinus2), kb_dynamic(FAMinus2).
 
 
 %= 	 	 

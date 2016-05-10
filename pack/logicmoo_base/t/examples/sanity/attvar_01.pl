@@ -1,6 +1,6 @@
 #!/usr/bin/env swipl
 
-:- module(sanity_ks_two,[]).
+:- module(attvar_01,[]).
 
 :- use_module(library(logicmoo_utils)).
 
@@ -37,7 +37,7 @@ sk_in(avar([vn='Ex',sk='SKF-666'])).
 
 
 q :- q(X), writeln(X).
-q(X) :- depth_of_var(X, D), format('Depth = ~w~n', [D]), D < 5, q(X),notail.
+q(X) :- '$depth_of_var'(X, D), format('Depth = ~w~n', [D]), D < 5, q(X),notail.
 
 notail.
 

@@ -270,6 +270,7 @@
 :- use_module(library(check)).
 % :- use_module(library(check),[check:string_predicate/1]).
 :- multifile(check:string_predicate/1).
+:- dynamic(check:string_predicate/1).
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- multifile(double_quotes_was_strings/1).
@@ -1384,7 +1385,7 @@ string_dedupe(StringI,StringO):- to_word_list(StringI,Words),remove_predupes(Wor
 % Hook To [check:string_predicate/1] For Module Logicmoo_util_strings.
 % String Predicate.
 %
-check:string_predicate(remove_predupes/2).
+:- asserta(check:string_predicate(remove_predupes/2)).
 
 
 %= 	 	 
@@ -1686,7 +1687,7 @@ read_stream_to_arglist(Input,[H|T]):-show_call(why,if_defined(lisp_read_from_inp
 is_ending(List):-nonvar(List),(is_list(List)->last(List,whitepace("\n"));List==whitepace("\n")).
 
 
-check:string_predicate(is_simple_split/1).
+:- asserta(check:string_predicate(is_simple_split/1)).
 
 %= 	 	 
 

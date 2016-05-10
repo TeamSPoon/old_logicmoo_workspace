@@ -22,6 +22,15 @@
 :- dynamic(lmconf:module_local_init/2).
 :- discontiguous(lmconf:module_local_init/2).
 
+:- use_module(library(error)).
+:- use_module(library(backcomp)).
+:- use_module(library(occurs)).
+:- use_module(library(gensym)).
+:- use_module(library(apply)).
+:- use_module(library(memfile)).
+:- use_module(library(terms)).
+:- use_module(library(listing)).
+:- use_module(library(codesio)).
 % :- use_module(library(logicmoo_utils)).
 :-
  op(1199,fx,('==>')), 

@@ -29,7 +29,7 @@
             (decl_mpred)/3,
             decl_mpred_0/2,
             decl_mpred_2/2,
-            decl_mpred_4/3,
+            decl_mpred_3/3,
             decl_mpred_4/4,
             (kb_dynamic)/1,
             (kb_dynamic)/2,
@@ -184,11 +184,11 @@ decl_mpred_prolog(M,PI,FA):- must(decl_mpred_prolog(_,M,PI,FA)).
 %
 % Declare Managed Predicate Prolog.
 %
-decl_mpred_prolog(F,A):- integer(A),!,decl_mpred_prolog(F/A).
+decl_mpred_prolog(F,A):- integer(A),!,functor(FA,F,A),decl_mpred_prolog(FA).
 decl_mpred_prolog(F,Other):- decl_mpred(F,Other),
      get_functor(F,F0),
      must(arity_no_bc(F0,A)),
-     decl_mpred_prolog(F0/A).
+     functor(F0A,F0,A),decl_mpred_prolog(F0A).
 :- was_export(decl_mpred_prolog/4).
 
 %= 	 	 
@@ -268,12 +268,13 @@ kb_dynamic(M,PI,FA):- must(kb_dynamic(_,M,PI,FA)).
 %
 % Declare Managed Predicate Hybrid.
 %
-kb_dynamic(F,A):- integer(A),!,kb_dynamic(F/A).
+kb_dynamic(F,A):- integer(A),!,functor(FA,F,A),kb_dynamic(FA).
 kb_dynamic(F,Other):- 
      decl_mpred(F,Other),     
      get_functor(F,F0),
      must(arity_no_bc(F0,A)),
-     kb_dynamic(F0/A).
+     functor(F0A,F0,A),
+     kb_dynamic(F0A).
 
 :- was_export((kb_dynamic)/4).
 
@@ -479,16 +480,17 @@ decl_mpred(M):-loop_check(with_pi(M,decl_mpred_4),true).
 
 %= 	 	 
 
-%% decl_mpred_4( ?VALUE1, ?ARGS, :TermARG3) is semidet.
+%% decl_mpred_3( ?VALUE1, ?ARGS, :TermARG3) is semidet.
 %
 % Declare Managed Predicate Helper Number 4..
 %
-decl_mpred_4(user,prologSingleValued(ARGS),prologSingleValued/1):- compound(ARGS),get_functor(ARGS,F,A),!, decl_mpred(F,[prologArity(A),prologSingleValued,meta_argtypes(ARGS)]),!.
-decl_mpred_4(_,F,F/0):-!,assert_hasInstance(tPred,F).
-decl_mpred_4(M,PI,F/A):-
+decl_mpred_3(user,prologSingleValued(ARGS),prologSingleValued/1):- compound(ARGS),get_functor(ARGS,F,A),!, 
+   ain(arity(F,A)),ain(prologSingleValued(F)),ain(meta_argtypes(ARGS)),!.
+decl_mpred_3(_,F,F/0):-!,assert_hasInstance(tPred,F).
+decl_mpred_3(M,PI,F/A):-
    decl_mpred(F,A),
    ignore((ground(PI),compound(PI),call(call,GG=meta_argtypes(PI)),decl_mpred(F,GG))),
-   decl_mpred(F,[mpred_module(M)]).
+   ain(mpred_module(F,M)).
 
 :- was_export((decl_mpred)/2).
 
@@ -498,7 +500,7 @@ decl_mpred_4(M,PI,F/A):-
 %
 % Declare Managed Predicate.
 %
-decl_mpred(C,A):- integer(A),!,decl_mpred(C/A).
+decl_mpred(C,A):- integer(A),!,functor(FA,C,A),decl_mpred(FA).
 decl_mpred(C,More):- ignore(loop_check(decl_mpred_0(C,More),true)).
 
 
@@ -557,8 +559,7 @@ decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,definingMt(M
 %
 % Declare Managed Predicate Helper Number 4..
 %
-decl_mpred_4(_CM,M,PI,F/A):-
-   decl_mpred_4(M,PI,F/A).
+decl_mpred_4(_CM,M,PI,FA):- decl_mpred_3(M,PI,FA).
 
 
 
@@ -608,7 +609,7 @@ add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_
 %
 % Add Managed Predicate Prop Gleaned Helper Number 4..
 %
-add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,decl_mpred(Arg1,[meta_argtypes(Arg1)|FRGS]).
+add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,ain(meta_argtypes(Arg1,Arg1)),decl_mpred(Arg1,FRGS).
 add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 

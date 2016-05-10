@@ -335,7 +335,7 @@ xtreme_debug(_).
 
 :- meta_predicate sanity(0).
 sanity(P):- \+ is_recompile, (true; is_release),!,nop(P).
-sanity(P):- on_x_rtrace(hotrace(P)),!.
+sanity(P):- on_x_rtrace(no_trace(P)),!.
 sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 :- meta_predicate(when_debugging(+,0)).
 when_debugging(What,Call):- debugging(What),!,Call.

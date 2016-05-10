@@ -1446,7 +1446,7 @@ make_1_cl(Extras,One,Conj,cl([One],NewBodyListO)):-
   delete_eq(Conj,One,Rest0),delete_eq(Rest0,NHead,Rest),
   must_maplist(negate_one_maybe(Extras),Rest,NewBodyList),!,
   flattenConjs(Extras,NewBodyList,NewBodyListM),
-  must_maplist(lmconf:as_prolog_hook,NewBodyListM,NewBodyListO).
+  Pred= lmconf:as_prolog_hook, must_maplist(Pred,NewBodyListM,NewBodyListO).
 
 
 %= 	 	 

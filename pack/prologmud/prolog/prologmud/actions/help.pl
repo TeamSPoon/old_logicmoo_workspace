@@ -46,7 +46,7 @@ first_pl(PL,PL).
 
 action_info_db(TEMPL,INFO,WAS):- (PRED=agent_call_command(_,WAS);PRED=agent_text_command(_,_,_,WAS)) ,
    clause(PRED,BODY,REF),clause_property(REF,file(S)),
-   (ground(WAS)->true;once(( ignore((nop(S=S),first_pl(BODY,PL),ignore(catch(((true;hotrace(PL)),!),_,true)))),ground(WAS)))),
+   (ground(WAS)->true;once(( ignore((nop(S=S),first_pl(BODY,PL),ignore(catch(((true;no_trace(PL)),!),_,true)))),ground(WAS)))),
    
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
 

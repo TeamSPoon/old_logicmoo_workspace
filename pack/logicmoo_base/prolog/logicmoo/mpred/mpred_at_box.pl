@@ -22,12 +22,13 @@
          make_module_name_local/2,
          make_module_name_local0/2,
          (make_shared_multifile)/3,
+         (make_shared_multifile)/4,
          (shared_multifile)/1,
          add_import_predicate/3,
          autoload_library_index/4,
          baseKB_hybrid_support/2,
-         check_undefined_predicate/2,
-         check_undefined_predicate/4,
+         uses_predicate/2,
+         uses_predicate/4,
          correct_module/3,
          correct_module/5,
          defaultAssertMt/1,
@@ -66,10 +67,14 @@
          which_file/1
     ]).
 %:- endif.
+:- set_prolog_flag(retry_undefined,false).
 
 :- include('mpred_header.pi').
 
 user_m_check(_Out).
+
+:- meta_predicate make_shared_multifile(+,+,+).
+:- meta_predicate make_shared_multifile(*,*,*,*).
 
 
 :- meta_predicate shared_multifile(:).
@@ -394,7 +399,6 @@ fixup_module(M,_L):- skip_user(M).
 fixup_modules:- 
    doall((current_module(M),once((findall(I,import_module(M,I),L))),once(fixup_module(M,L)))).
 
-:- set_prolog_flag(retry_undefined,false).
 % :- autoload([verbose(false)]).
 :- set_prolog_flag(retry_undefined,true).
 
@@ -525,28 +529,31 @@ istAbove(Mt,Query):- Mt \== baseKB, Mt \== lmcode, genlMt(Mt,MtAbove),MtAbove:Qu
 
 
 
-check_undefined_predicate(M:F/A,R):- check_undefined_predicate(M,F,A,R).
-check_undefined_predicate(F/A,R):- check_undefined_predicate(user,F,A,R).
+uses_predicate(M:F/A,R):- uses_predicate(M,F,A,R).
+uses_predicate(F/A,R):- uses_predicate(user,F,A,R).
 
 
-check_undefined_predicate(Module,Name,Arity,Action) :- 
+uses_predicate(Module,Name,Arity,Action) :- 
       current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
-check_undefined_predicate(M,F,A,error):- lmcache:tried_to_retry_undefined(_SM:M,F,A),!.
-check_undefined_predicate(CallerMt,F,A,_):-
+uses_predicate(CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
+uses_predicate(M,F,A,error):- lmcache:tried_to_retry_undefined(_SM:M,F,A),!.
+uses_predicate(CallerMt,F,A,_):-
    '$current_source_module'(SM),
    wdmsg(uses_predicate(SM,CallerMt,F,A)),
    assert(lmcache:tried_to_retry_undefined(SM:CallerMt,F,A)),fail.
-check_undefined_predicate(_, (/), _, error) :- !. %dumpST.
-check_undefined_predicate(_, (:), _, error) :- !. %dumpST.
-check_undefined_predicate(_, '[|]', _, error) :- !. %dumpST.
-check_undefined_predicate(Module, Name, Arity, Action) :- fail,
+uses_predicate(_, (/), _, error) :- !,dumpST,break.
+uses_predicate(_, (//), _, error) :- !,dumpST,break.
+uses_predicate(_, (:), _, error) :- !,dumpST,break.
+% uses_predicate(_, '>>',  4, error) :- !,dumpST,break.
+uses_predicate(_, '[|]', _, error) :- !,dumpST,break.
+uses_predicate(Module, Name, Arity, Action) :- fail,
 	current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
 
-check_undefined_predicate(CallerMt,F,A,retry):- 
+uses_predicate(CallerMt,F,A,retry):- 
     loop_check(retry_undefined(CallerMt,F,A),dump_break).
 
 
@@ -646,32 +653,30 @@ shared_multifile(PI):- kb_dynamic(PI).
 %
 % Make Shared Multifile.
 %
+make_shared_multifile(CallerMt,   M,FA):- get_fa(FA,F,A), make_shared_multifile(CallerMt, PredMt,F,A),!.
 
-make_shared_multifile(CallerMt,    t_l,F/A):-!,CallerMt:thread_local(t_l:F/A),CallerMt:multifile(t_l:F/A).
-make_shared_multifile(CallerMt,lmconf ,F/A):-!,CallerMt:multifile(lmconf:F/A),CallerMt:dynamic(lmconf:F/A),!.
-make_shared_multifile(CallerMt,lmcache,F/A):-!,CallerMt:multifile(lmcache:F/A),CallerMt:volatile(lmcache:F/A),CallerMt:dynamic(lmcache:F/A),!.
+make_shared_multifile(CallerMt,    t_l,F,A):-!,CallerMt:thread_local(t_l:F/A),CallerMt:multifile(t_l:F/A).
+make_shared_multifile(CallerMt,lmconf ,F,A):-!,CallerMt:multifile(lmconf:F/A),CallerMt:dynamic(lmconf:F/A),!.
+make_shared_multifile(CallerMt,lmcache,F,A):-!,CallerMt:multifile(lmcache:F/A),CallerMt:volatile(lmcache:F/A),CallerMt:dynamic(lmcache:F/A),!.
 
-make_shared_multifile(CallerMt,PredMt,F/A):- 
+make_shared_multifile(CallerMt,PredMt,F,A):- 
   functor(Goal,F,A),
   correct_module(PredMt,Goal,F,A,HomeM),
   HomeM\==PredMt,!,
-  make_shared_multifile(CallerMt,HomeM,F/A).
+  make_shared_multifile(CallerMt,HomeM,F,A).
 
-make_shared_multifile(CallerMt,Home,F/A):- baseKB:mtSharedPrologCodeOnly(Home),!,
+make_shared_multifile(CallerMt,Home,F,A):- baseKB:mtSharedPrologCodeOnly(Home),!,
      wdmsg(mtSharedPrologCodeOnly_make_shared_multifile(CallerMt,Home:F/A)),!.
 
-make_shared_multifile(_CallerMt, baseKB, F/A):- kb_dynamic(F/A).
+make_shared_multifile(_CallerMt, baseKB,F,A):-  kb_dynamic(F,A),!.
 
-make_shared_multifile(_CallerMt,PredMt,F/A):-!,
+make_shared_multifile(_CallerMt,PredMt,F,A):-!,
  debug(make_shared_multifile,'~p',make_shared_multifile(PredMt:F/A)),
  w_tl(set_prolog_flag(access_level,system),
   PredMt:( 
    sanity( \+ ((PredMt:F/A) = (qrTBox:p/1))),
    PredMt:check_never_assert(declared(PredMt:F/A)),
    decl_shared(PredMt:F/A))).
-
-make_shared_multifile(CallerMt, PredMt, PI):- 
-   functor(PI,F,A),!,make_shared_multifile(CallerMt, PredMt, F/A).
 
 
 

@@ -27,6 +27,29 @@ second_order/2,
 whenAnd/2,
 if_missing/1,
 
+ain_minfo/2,
+cnstrn0/2,
+physical_side_effect/1,
+mpred_update_literal/4,
+cnstrn/1,
+predicate_to_goal/2,
+
+map_unless/4,
+mpred_update_literal/4,
+cnstrn/1,
+mpred_facts_only/1,
+pred_head/2,
+ain_minfo/2,
+cnstrn/2,
+ain_minfo_2/2,
+cnstrn0/2,
+physical_side_effect/1,
+predicate_to_goal/2,
+mpred_kb_ops_file/0,
+mpred_wfflist/2,
+mpred_wff/3,
+
+
 attvar_op/2,
 no_side_effects/1,
 mpred_non_neg_literal/1,
@@ -62,7 +85,6 @@ no_side_effects/1,
 should_call_for_facts/3,
 should_call_for_facts/1,
 clause_or_call/2,
-get_fa/3,
 is_relative/1,
 mpred_non_neg_literal/1,
 is_reprop_0/1,
@@ -1957,16 +1979,6 @@ mpred_trigger_key(X,X).
 lmconf:module_local_init:- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
 
 
-%% get_fa( +PI, ?F, ?A) is semidet.
-%
-% Get Functor-arity.
-%
-get_fa(PI,_F,_A):-is_ftVar(PI),!.
-get_fa(F/A,F,A):- !.
-get_fa(PI,PI,_A):- atomic(PI),!.
-get_fa(PI,F,A):- is_ftCompound(PI),!,functor(PI,F,A).
-get_fa(Mask,F,A):-get_functor(Mask,F,A).
-
 
 
 %% clause_or_call( +H, ?B) is semidet.
@@ -2440,7 +2452,6 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent( (should_call_for_facts)/3).
 :- module_transparent( (should_call_for_facts)/1).
 :- module_transparent( (clause_or_call)/2).
-:- module_transparent( (get_fa)/3).
 :- module_transparent( (is_relative)/1).
 :- module_transparent( (mpred_non_neg_literal)/1).
 :- module_transparent( (is_reprop_0)/1).
@@ -2590,6 +2601,14 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent(physical_side_effect/1).
 :- module_transparent(pred_head/2).
 :- module_transparent(if_missing/1).
+
+
+ :- meta_predicate update_single_valued_arg(0,*).
+ :- meta_predicate assert_mu(*,0,*,*).
+ :- meta_predicate mpred_facts_and_universe(0).
+ :- meta_predicate {0}.
+ :- meta_predicate repropagate_2(0).
+ :- meta_predicate mpred_get_support_via_sentence(0,*).
 
 % :- shared_multifile(infoF/1).
 :- dynamic(system:infoF/1).

@@ -146,7 +146,15 @@
             translateListOps/8,
             translateOneArg/8,
             was_isa_syntax/3,
-          mpred_expansion_file/0
+          mpred_expansion_file/0,
+         temp_comp/4,
+         with_umt_l2/1,
+         get_ruleRewrite/2,
+         expand_kif_string_or_fail/3,
+         to_predicate_isas/2,
+         append_as_first_arg/3,
+         try_expand_head/3,
+         is_elist_functor/1
           ]).
 %:- endif.
 
@@ -841,9 +849,13 @@ fully_expand_head(A,B,C):-
    subst(B,mpred_isa,isa,B1),
    into_mpred_form(B1,B2),
    B2=B3,
-   must(loop_check_term(transitive_lc(try_expand_head_dif(A),B3,C),fully_expand_head(A,B,C),B3=C)),!.
+   must(
+    loop_check_term(
+        transitive_lc(try_expand_head_dif(A),B3,C),
+        fully_expand_head(A,B,C),
+        B3=C)),!.
 
-try_expand_head_dif(A,B,C):-try_expand_head(A,B,C), B\=@=C.
+try_expand_head_dif(A,B,C):-try_expand_head(A,B,C),!, B\=@=C.
 
 %db_expand_0(Op,Sent,SentO):- is_meta_functor(Sent,F,List),F\=t,!,must_maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
 %db_expand_0(_ ,NC,OUT):-mpred_expand(NC,OUT),NC\=@=OUT,!.
@@ -851,7 +863,7 @@ try_expand_head(_,A,B):- t_l:infSkipFullExpand,!,A=B.
 %==SKIPPED==% try_expand_head(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> SentO = Template ; SentO = (Pretest,Template)),!.
 %==SKIPPED==% try_expand_head(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
 %==COVERED==% try_expand_head(_Op,Sent,SentO):-to_predicate_isas(Sent,SentO).
-try_expand_head(Op,Sent,SentO):- transitive_lc(db_expand_0(Op),Sent,SentO).
+try_expand_head(Op,Sent,SentO):- transitive_lc(db_expand_0(Op),Sent,OO),!,SentO=OO.
 %==SKIPPED==% try_expand_head(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)).
 
 

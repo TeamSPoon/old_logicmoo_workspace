@@ -1151,7 +1151,7 @@ real_list_undefined(A):-
         ;   print_message(warning, check(undefined_predicates)),
             keysort(E, F),
             group_pairs_by_key(F, G),
-            maplist(check:report_undefined, G)
+            check:maplist(report_undefined, G)
         ).
 
 
@@ -1200,7 +1200,7 @@ update_changed_files1 :-
 	;   true
 	),
 	print_message(silent, make(reload(Reload))),
-	maplist(make:reload_file, Reload),
+	make:maplist(reload_file, Reload),
 	print_message(silent, make(done(Reload))),
 	(   prolog:make_hook(after, Reload)
 	->  true
@@ -1472,7 +1472,7 @@ prolog_listing_list_clauses(Pred, Source) :-
 
 :- if(true).
 
-:- ensure_loaded(library(listing)).
+:- reconsult(library(listing)).
 
 :- redefine_system_predicate(prolog_listing:portray_clause/3).
 :- abolish(prolog_listing:portray_clause/3).

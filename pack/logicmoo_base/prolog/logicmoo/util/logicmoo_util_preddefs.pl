@@ -38,6 +38,7 @@
             must_pi/1,
             p_predicate_property/2,
             to_canonical_mpi/2,
+            get_fa/3,
             pred_prop/3,
             pred_prop/4,
             rebuild_as_dyn/4,
@@ -458,6 +459,20 @@ to_canonical_mpi((PredMt:F)//A2,MPI):-integer(A),!,A is A2 + 2, functor(PI,F,A),
 to_canonical_mpi(F/A,MPI):- functor(P,F,A), functor(P,F,A),strip_module(P,PredMt,PI),add_mi(PredMt,PI,MPI).
 to_canonical_mpi(F//A2,MPI):- A is A2 + 2, functor(P,F,A),strip_module(P,PredMt,PI),add_mi(PredMt,PI,MPI).
 to_canonical_mpi(P,MPI):- strip_module(P,PredMt,PI),add_mi(PredMt,PI,MPI).
+
+
+
+%% get_fa( +PI, ?F, ?A) is semidet.
+%
+% Get Functor-arity.
+%
+get_fa(FA,F,A):- var(FA),!,trace_or_throw(var_get_fa(FA,F,A)).
+get_fa(_:FA,F,A):-!,get_fa(FA,F,A).
+get_fa(F/A,F,A):-!.
+get_fa(F//A2,F,A):-A is A2+2.
+get_fa(PI,PI,0):- atomic(PI),!.
+%get_fa(FA,F,A):- functor(FA,F,A),!.
+get_fa(Mask,F,A):-get_functor(Mask,F,A).
 
 
 %= 	 	 

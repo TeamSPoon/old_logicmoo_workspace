@@ -107,7 +107,6 @@ kbp_t(_):- not(loaded_external_kbs),!,fail.
 % kbp_t(PLIST):- kbp_t_list(PLIST). % append(PLIST,[_MT,_PROOF],PLISTO), apply(el_assertions:el_holds,PLISTO).  % el_assertions:el_holds has 2 extra args our callers shouldnt be forced to use.. but this is a big slowdown
 
 
-:- dynamic_multifile(assertion_f/1).
 :- was_export(kb_f/1).
 
 %= 	 	 

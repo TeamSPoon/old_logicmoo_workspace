@@ -1,4 +1,8 @@
 
+:- dynamic(lmconf:mpred_is_impl_file/2).
+:- multifile(lmconf:mpred_is_impl_file/2).
+:- system_module.
+
 /*
 :- multifile((user:term_expansion/2,system:term_expansion/2)).
 :- dynamic((user:term_expansion/2,system:term_expansion/2)).

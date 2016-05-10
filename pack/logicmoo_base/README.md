@@ -51,7 +51,7 @@ X = 3.
 ````
 
 
-# 3) hotrace/1 fixes the system:notrace/1 determinancy
+# 3) no_trace/1 fixes the system:notrace/1 determinancy
 
 
 ````
@@ -64,7 +64,7 @@ Oops it had an implicit once/1
 Dont worry..
 
 ````
-?- trace,hotrace(member(X,[1,2,3])).
+?- trace,no_trace(member(X,[1,2,3])).
 X = 1 ;
 X = 2 ;
 X = 3.
@@ -108,7 +108,7 @@ in_dumptrace(logicmoo_util_bugger_catch:on_x_debug(user:fail))
 (24)[system] scc(rtions:asserta(bugger:dmsg_match(show,_G38813),<clause>(0x1768a80)),dumpst:dtrace('_catch':on_x_debug(user:fail),103),rtions:erase(<clause>(0x1768a80))).   %  init.pl:314:
 (25)$[system] sccc(rtions:asserta(bugger:dmsg_match(show,_G38875),<clause>(0x1768a80)),dumpst:dtrace('_catch':on_x_debug(user:fail),103),_G38862,rtions:erase(<clause>(0x1768a80))).   %  init.pl:310:
 (26)*[dumpst] dtrace('_catch':on_x_debug(user:fail),103).   %  logicmoo_util_dumpst.pl:253:
-(27)$[_catch] '_catch':hotrace(dumpst:dumpST(500000000)).   %  logicmoo_util_bugger_catch.pl:706:
+(27)$[_catch] '_catch':no_trace(dumpst:dumpST(500000000)).   %  logicmoo_util_bugger_catch.pl:706:
 (28)[dumpst] dumpST(500000000).   %  logicmoo_util_dumpst.pl:71:
 (29)[_check] '_check':loop_check_early(dumpst:dumpST9(500000000),dumpst:dumpST0(500000000)).   %  logicmoo_util_loop_check.pl:181:
 (30)[_check] '_check':loop_check_term_key(dumpst:dumpST9(500000000),dumpst:dumpST9(500000000),dumpst:dumpST0(500000000)).   %  logicmoo_util_loop_check.pl:189:
