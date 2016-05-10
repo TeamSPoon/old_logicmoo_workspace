@@ -20,8 +20,11 @@
   show_if_debug/1,
   maybe_mpred_break/1,
   each_E/3,
+  call_m_g/3,
+  lookup_m_g/3,
   mpred_post1_rem/2,
   mpred_post1_rem1/2,
+  fwc1s_post1s/2,
   mpred_mark_as_ml/3,
   mpred_mark_fa_as/5,
   %mpred_te/0,
@@ -93,7 +96,7 @@
   mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
   mpred_descendants/2,mpred_enqueue/2,mpred_error/1,mpred_error/2,mpred_eval_lhs/2,mpred_eval_lhs_0/2,mpred_eval_rhs/2,mpred_fact/1,
   mpred_fact/2,mpred_facts/1,mpred_facts/2,mpred_facts/3,mpred_fwc/1,mpred_get_support/2,lookup_u/1,lookup_u/2,
-  mpred_literal/1,mpred_load/1,mpred_make_supports/1,mpred_ain_object/1,mpred_aina/2,mpred_ainz/2,
+  mpred_literal/1,mpred_load/1,mpred_make_supports/1,mpred_ain_object/1,mpred_aina/2,mpred_ainz/2,mpred_aina/1,mpred_ainz/1,
   mpred_negated_literal/1,mpred_negation/2,mpred_nf/2,mpred_nf1_negation/2,mpred_nf_negation/2,mpred_nf_negations/2,mpred_notrace/0,mpred_nowatch/0,
   mpred_nospy/0,mpred_nospy/1,mpred_nospy/3,mpred_positive_literal/1,mpred_post/2,pp_qu/0,mpred_undo_action/1,
   mpred_rem_support/2,mpred_remove_old_version/1,mpred_remove_supports/1,mpred_remove_supports_quietly/1,mpred_reset/0,mpred_retract/1,mpred_retract_i_or_warn/1,mpred_retract_supported_relations/1,
@@ -585,20 +588,22 @@ mpred_ain(P):- get_source_ref(UU),mpred_ain(P,UU).
 %
 ain(P,S):- mpred_ain(P,S).
 
-
+mpred_ain(MTP,S):- is_ftVar(MTP),!,trace_or_throw(var_mpred_ain(MTP,S)).
+mpred_ain(user:MTP,S):- !, must(mpred_ain(MTP,S)).
 mpred_ain(MTP,S):- stack_check, strip_module(MTP,MT,P),P\==MTP,!,
-  with_umt(MT,mpred_ain(P,S)).
+  (\+(baseKB:mtExact(MT)) -> mpred_ain(P,S) ; with_umt(MT,mpred_ain(P,S))),!.
 mpred_ain(P,S):- 
-  gripe_time(0.6,
-   with_umt((if_defined_else(fully_expand(clause(assert,ain),P,P0),P0=P) -> ain_fast(P0,S)))),!.
-mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
+  must(gripe_time(0.6,
+   with_umt((if_defined_else(fully_expand(clause(assert,ain),P,P0),P0=P) -> ain_fast(P0,S))))),!.
+mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
 
 
 
 ain_fast(P):- get_source_ref(UU), ain_fast(P,UU).
 ain_fast(P,S):- 
-  filter_buffer_trim('$last_mpred_fwc1s',11),
-  filter_buffer_trim('$last_mpred_post1s',12),
+  fwc1s_post1s(One,Two),
+  filter_buffer_trim('$last_mpred_fwc1s',One),
+  filter_buffer_trim('$last_mpred_post1s',Two),
   each_E(mpred_post1,P,[S]),
   mpred_run.
 
@@ -609,13 +614,19 @@ remove_negative_version(P):-
   must(mpred_ain(\+ (~(P)), S)))))),!.
 
      
+fwc1s_post1s(10,20):- fresh_mode,!.
+fwc1s_post1s(1,2).
+
 fresh_mode :- \+ current_prolog_flag(pfc_booted,true).
 plus_fwc :- \+ fresh_mode.
 
 plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
 plus_fwc(support_hilog(_,_)):-!.
 plus_fwc('==>'(_,_)):-!.
-plus_fwc(P):- gripe_time(0.6,(plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true)),!.
+plus_fwc(P):- gripe_time(0.6,
+  (plus_fwc
+    ->
+      loop_check_term(must(mpred_fwc(P)),plus_fwc(P),true);true)),!.
 
 %% mpred_post(+Ps,+S) 
 %
@@ -642,7 +653,7 @@ mpred_post1( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 mpred_post1(  ~ P,   S):- 
    with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
 
-mpred_post1(Fact, _):- filter_buffer_n_test('$last_mpred_post1s',13,Fact),!.
+mpred_post1(Fact, _):- fwc1s_post1s(One,_Two),Three is One * 3, filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
 
 % Two version exists of this function one expects for a clean database (fresh_mode) and adds new information.
 % tries to assert a fact or set of fact to the database.
@@ -1290,7 +1301,7 @@ mpred_fwc(Ps):- each_E(mpred_fwc0,Ps,[]).
 %  Avoid loop while calling mpred_fwc1(P)
 % 
 % this line filters sequential (and secondary) dupes
-mpred_fwc0(Fact):- filter_buffer_n_test('$last_mpred_fwc1s',16,Fact),!.
+mpred_fwc0(Fact):- fwc1s_post1s(_One,Two),Six is Two * 3,filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
 mpred_fwc0(Fact):- copy_term_vn(Fact,FactC),
       mpred_fwc1(FactC).
 
@@ -1533,6 +1544,9 @@ trigger_trigger1(Trigger,Body):-
   fail.
 */
 
+
+call_m_g(To,_M,G):- To:call(G).
+lookup_m_g(To,_M,G):- clause(To:G,true).
 
 %%  call_u(F) is det.
 % 
