@@ -773,7 +773,7 @@ db_expand_final(_, MArg1User, NewMArg1User):- is_ftCompound(MArg1User), fail,
    MArg1User=..[M,Arg1,Arg2|User],
    compound_all_open(Arg1),
    get_functor(Arg1,F,A),F\==(t),F\==(/),
-   member(F,[arity,mpred_module]),
+   member(F,[arity,predicateConventionMt]),
    NewMArg1User=..[M,F/A,Arg2|User],!.
 */
 

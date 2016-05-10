@@ -142,7 +142,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-:-decl_mpred(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
+:-decl_mpred(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[predicateConventionMt(user)]).
 mudGetPrecepts(Agent,Percepts) :- mudGetPrecepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 mudGetPrecepts0(Agent,Percepts) :-
   call((
@@ -154,7 +154,7 @@ mudGetPrecepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% :-decl_mpred(mudNearReach(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
+% :-decl_mpred(mudNearReach(tAgent,ftListFn(tSpatialThing)),[predicateConventionMt(user)]).
 mudNearReach(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -164,7 +164,7 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location tAgent is currently in.
-% :-decl_mpred(mudNearFeet(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
+% :-decl_mpred(mudNearFeet(tAgent,ftListFn(tSpatialThing)),[predicateConventionMt(user)]).
 mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-

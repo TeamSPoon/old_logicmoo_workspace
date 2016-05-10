@@ -490,8 +490,8 @@ argIsa_call_0(instTypeProps,N,ftVoprop):-between(3,31,N).
 
 argIsa_call_0(must,1,ftAskable).
 
-argIsa_call_0(mpred_module,1,tPred).
-argIsa_call_0(mpred_module,2,ftAtom).
+argIsa_call_0(predicateConventionMt,1,tPred).
+argIsa_call_0(predicateConventionMt,2,ftAtom).
 % argIsa_call_0(lmconf:agent_text_command,_,ftTerm).
 argIsa_call_0('<=>',_,ftTerm).
 argIsa_call_0(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftListFn(ftVoprop)).

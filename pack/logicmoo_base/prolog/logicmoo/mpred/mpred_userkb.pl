@@ -73,7 +73,7 @@ contract_output_proof/2,
 transitiveViaArg/3,
 current_world/1,
 cyc_to_plarkc/2,
-definingMt/2, 
+predicateConventionMt/2, 
 %is_never_type/1,
 %cyckb_t/3,
 cycPrepending/2,
@@ -110,7 +110,7 @@ mpred_do_and_undo_method/2,
 mpred_isa/2,
 %mpred_manages_unknowns/0,
 mpred_mark/3,
-mpred_module/2,
+predicateConventionMt/2,
 mudKeyword/2,
 mudDescription/2,
 never_assert_u/2,
@@ -428,10 +428,14 @@ never_assert_u(pt(_,
 */
 
 
-:- forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox),add_import_module(M,abox,start)).
-:- forall((current_module(M),M\=user,M\=system,M\=baseKB),add_import_module(M,baseKB,start)).
+on_modules_changed :-
+  forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox,\+ baseKB:mtLocal(M)),
+      (default_module(abox,M)->true;catch(add_import_module(M,abox,start),_E,dmsg(add_import_module(M,abox,start))))),
+  forall((current_module(M),M\=user,M\=system,M\=baseKB),
+     (default_module(baseKB,M)->true;catch(add_import_module(M,baseKB,end),_E,dmsg(add_import_module(M,baseKB,end))))).
 
-
+:- on_modules_changed.
+:- initialization(on_modules_changed).
 
 %% never_assert_u0( :TermARG1, ?Why) is semidet.
 %

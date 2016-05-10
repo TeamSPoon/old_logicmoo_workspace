@@ -128,7 +128,7 @@ lmconf:sanity_check:- doall((baseKB:mtSharedPrologCodeOnly(M),
 :- dynamic system:exception/3.
 
 :-ignore((lmconf:source_typein_modules(O, _O, _), O\=user,O\=baseKB,O\=system,
-   setup_module_ops(O), insert_at_abox(O), set_defaultAssertMt(O))).
+   setup_module_ops(O), add_abox_module(O), set_defaultAssertMt(O))).
   
 
 :- set_prolog_flag(retry_undefined,false).
@@ -155,12 +155,13 @@ user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_unde
 user:lmbf:- 
   set_prolog_flag(mpred_te,true),
   set_prolog_flag(pfc_booted,false),
-  time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))),
+  with_umt(baseKB,
+  time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc'))))),
   set_prolog_flag(pfc_booted,true).
 
 :- user:lmbf.
 :- reset_modules.
 
-:- forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox),add_import_module(M,abox,start)).
-:- forall((current_module(M),M\=user,M\=system,M\=baseKB),add_import_module(M,baseKB,start)).
+:- forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox),maybe_add_import_module(M,abox,start)).
+:- forall((current_module(M),M\=user,M\=system,M\=baseKB),maybe_add_import_module(M,baseKB,start)).
 

@@ -12,7 +12,7 @@
 
 :- ensure_loaded(  library(pfc/mpred_runtime)).
 
-:- mpred_module.
+:- predicateConventionMt.
 :- mpred_begin.
 :- pfc:mpred_trace.
 :- mpred_watch.

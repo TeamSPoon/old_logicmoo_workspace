@@ -76,7 +76,7 @@ prologHybrid(genls/2).
            prologHybrid/1,predCanHaveSingletons/1,prologDynamic/1,prologBuiltin/1,prologMacroHead/1,prologListValued/1,prologSingleValued/1,
           (hs/1),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,prologMacroHead/1,pfcControlled/1,
            resolveConflict/1,resolverConflict_robot/1)))),
- with_pfa(With,((mpred_isa/2,arity/2,mpred_module/2))),
+ with_pfa(With,((mpred_isa/2,arity/2,predicateConventionMt/2))),
  with_pfa(With,((vtColor/1))).
  */
 
@@ -144,8 +144,8 @@ tCol(completelyAssertedCollection).
 %
 % Prolog Builtin.
 %
-%WRONG prologBuiltin(resolveConflict/1,mpred_module(baseKB)).
-%WRONG prologBuiltin(mpred_select/2,mpred_module(lmconf)).
+%WRONG prologBuiltin(resolveConflict/1,predicateConventionMt(baseKB)).
+%WRONG prologBuiltin(mpred_select/2,predicateConventionMt(lmconf)).
 %:-rtrace.
 prologBuiltin(agent_text_command/4,prologDynamic).
 %tPred(t,prologDynamic).
@@ -632,14 +632,14 @@ prologHybrid(argIsa/3).
 :- meta_predicate(~(0)).
 :- kb_dynamic(~(0)).
 
-:- kb_dynamic(mpred_module/2).
-:- decl_mpred(mpred_module/2).
+:- kb_dynamic(predicateConventionMt/2).
+:- decl_mpred(predicateConventionMt/2).
 
-meta_argtypes(mpred_module(tPred,tPrologModule)).
+meta_argtypes(predicateConventionMt(tPred,tPrologModule)).
 
 
-prologHybrid(mpred_module, 2).
-prologMultiValued(mpred_module(tRelation,ftAtom)).
+prologHybrid(predicateConventionMt, 2).
+prologMultiValued(predicateConventionMt(tRelation,ftAtom)).
 
 
 % pddlObjects(Type,EList)==>  isa(isEach(EList),Type).

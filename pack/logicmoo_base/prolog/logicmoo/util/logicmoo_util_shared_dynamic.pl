@@ -86,7 +86,7 @@ wsh_w:wrap_shared(constrain_args_pttp,2,ereq).
 wsh_w:wrap_shared(cycPlus2,2,ereq).
 wsh_w:wrap_shared(cycPred,2,ereq).
 wsh_w:wrap_shared(decided_not_was_isa,2,ereq).
-wsh_w:wrap_shared(definingMt,2,ereq).
+wsh_w:wrap_shared(predicateConventionMt,2,ereq).
 wsh_w:wrap_shared(functorDeclares,1,ereq).
 wsh_w:wrap_shared(genls,2,ereq).
 wsh_w:wrap_shared(import_shared_pred,3,ereq).
@@ -100,7 +100,7 @@ wsh_w:wrap_shared(mpred_f,5,ereq).
 wsh_w:wrap_shared(mpred_f,6,ereq).
 wsh_w:wrap_shared(mpred_f,7,ereq).
 wsh_w:wrap_shared(mpred_mark,3,ereq).
-wsh_w:wrap_shared(mpred_module,2,ereq).
+wsh_w:wrap_shared(predicateConventionMt,2,ereq).
 wsh_w:wrap_shared(mudKeyword,2,ereq).
 wsh_w:wrap_shared(pfcControlled,1,ereq).
 wsh_w:wrap_shared(pfcRHS,1,ereq).

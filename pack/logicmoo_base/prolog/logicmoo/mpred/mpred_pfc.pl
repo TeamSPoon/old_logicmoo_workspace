@@ -1333,6 +1333,7 @@ filter_buffer_n_test(Name,N,Fact):- filter_buffer_get_n(Name,FactS,N),
 %
 mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc\==cwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
+mpred_fwc1((Fact:- BODY)):- 
 % mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
   dmsg(mpred_fwc1(Fact)),

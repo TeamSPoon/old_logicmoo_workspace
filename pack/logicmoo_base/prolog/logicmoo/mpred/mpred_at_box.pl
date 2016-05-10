@@ -49,6 +49,8 @@
          which_file/1,
          user_m_check/1,
 
+         add_abox_module/1,
+
          ensure_tbox/1,
 
 
@@ -83,12 +85,15 @@ user_m_check(_Out).
 
 :- use_module(mpred_pfc).
 
-insert_like_abox(O):- baseKB:mtLocal(O),!.
-insert_like_abox(O):-
-  asserta(baseKB:mtLocal(O)),
+add_abox_module(ABox):- baseKB:mtLocal(ABox),!.
+add_abox_module(baseKB):-!.
+add_abox_module(ABox):- 
+  must(mtCanAssertMt(ABox)),
+  asserta(baseKB:mtLocal(ABox)),
   forall(current_module(M),
-    ((import_module(M,abox)->add_import_module(M,O,start);true),
-     (import_module(abox,M)->add_import_module(O,M,start);true))).
+    (((import_module(M,abox),(M\==ABox))->add_import_module(M,ABox,start);true),
+     ((import_module(abox,M),(M\==ABox)->add_import_module(ABox,M,start);true)))),  
+    ((M==abox)->true;(ignore(system:delete_import_module(ABox,abox)),add_import_module(abox,ABox,start))).
 
 :- dynamic(baseKB:mtSharedPrologCodeOnly/1).
 :- dynamic(baseKB:mtNoPrologCode/1).
@@ -225,7 +230,7 @@ abox:defaultTBoxMt(baseKB).
 % within a knowledge base.
 %
 % not just user modules
-defaultAssertMt(ABox):- nonvar(ABox),defaultAssertMt(ABoxVar),!,show_failure(ABox=@=ABoxVar).
+defaultAssertMt(ABox):- nonvar(ABox),defaultAssertMt(ABoxVar),!,ABox=@=ABoxVar.
 defaultAssertMt(ABox):- 
     (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);
@@ -274,16 +279,17 @@ makeConstant(_Mt).
 % Sets Current Module.
 %
 set_defaultAssertMt(abox):-!.
-set_defaultAssertMt(M):- baseKB:mtSharedPrologCodeOnly(M),!.
+set_defaultAssertMt(M):- baseKB:mtSharedPrologCodeOnly(M),!,setup_module_ops(M).
+set_defaultAssertMt(ABox):- defaultAssertMt(QABox)->QABox==ABox,!.
 set_defaultAssertMt(ABox):- 
+  must_det_l((
     must(mtCanAssertMt(ABox)),
-    add_import_module(abox,ABox,start),
     must(abox:defaultTBoxMt(TBox)),
     asserta_if_new(ABox:defaultTBoxMt(TBox)),
     (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
     '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
     setup_module_ops(ABox), 
-    inherit_into_module(ABox,TBox).
+    inherit_into_module(ABox,TBox))).
 
 %% set_fileAssertMt( ABox) is semidet.
 %
@@ -530,7 +536,7 @@ autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_ind
 baseKB_hybrid_support(F,A):-wsh_w:wrap_shared(F,A,_).
 baseKB_hybrid_support(F,A):-baseKB:hybrid_support(F,A).
 baseKB:hybrid_support(arity,2).
-baseKB:hybrid_support(mpred_module,2).
+baseKB:hybrid_support(predicateConventionMt,2).
 baseKB:hybrid_support(functorDeclares,1).
 baseKB:hybrid_support(spft,3).
 baseKB:hybrid_support(mtLocal,1).

@@ -129,7 +129,7 @@ rez_loc_object(XY,Type):-
 
 %prologDynamic(mudNearbyObjs(tObj,tObj)).
 %prologDynamic(mudNearbyObjs(tObj,tObj)).
-%mpred_module(mudNearbyObjs(tObj,tObj),user).
+%predicateConventionMt(mudNearbyObjs(tObj,tObj),user).
 mudNearbyObjs(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),mudNearbyLocs(L1,L2).
 
 is_location(Obj):-var(Obj),!,fail.

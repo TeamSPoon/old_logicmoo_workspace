@@ -400,7 +400,7 @@ prologHybrid(pathDirLeadsTo/3).
 prologDynamic(mudMoveDist/2).
 :- dynamic(mudMoveDist/2).
 meta_argtypes(mudMoveDist(tAgent,ftInt)).
-prologSingleValued(mudMoveDist,[mpred_module(user),query(call),argSingleValueDefault(2,1)]).
+prologSingleValued(mudMoveDist,[predicateConventionMt(user),query(call),argSingleValueDefault(2,1)]).
 prologDynamic(stat_total/2).
 tCol(tContainer).
 tCol(tRegion).
@@ -433,9 +433,9 @@ prologHybrid(mudTextSame(ftText,ftText)).
 prologHybrid(mudTexture(tSpatialThing,vtTexture)).
 prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
 meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
-prologListValued(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
+prologListValued(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[predicateConventionMt(user)]).
 prologListValued(mudNearFeet(tAgent,ftListFn(tSpatialThing)),[]).
-prologListValued(mudNearReach(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
+prologListValued(mudNearReach(tAgent,ftListFn(tSpatialThing)),[predicateConventionMt(user)]).
 prologMultiValued(action_rules(tAgent,vtVerb,ftListFn(ftVar),ftVoprop)).
 prologMultiValued(mudLastCmdSuccess(tAgent,ftAction)).
 prologMultiValued(descriptionHere(ftTerm,ftString)).

@@ -470,7 +470,7 @@ mpred_list_triggers_1(What):-
    print_db_items('Arity',current_predicate(_),What),
    print_db_items('MetaFacts Predicate',predicate_property(_,_),What),
    print_db_items('Sources',module_property(_,_),What),
-   print_db_items('Sources',mpred_module(_,_),What),
+   print_db_items('Sources',predicateConventionMt(_,_),What),
    print_db_items('Sources',source_file(_,_),What),
    print_db_items('Sources',_:man_index(_,_,_,_,_),What),
    print_db_items('Sources',_:'$pldoc'(_,_,_,_),What),

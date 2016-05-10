@@ -168,6 +168,8 @@ mtCore(Mt)==>tMicrotheory(Mt).
 
 */
 
+:- mpred_ops.
+
 {module_property(Mt,class(library))} ==> mtPrologLibrary(Mt).
 
 mtPrologLibrary(Mt)==>mtGlobal(Mt).
@@ -178,7 +180,7 @@ mtGlobal(Mt)==>(mtCore(Mt),~mtLocal(Mt)).
 
 (genlMt(Mt,baseKB)/(Mt \==baseKB ), \+ mtCore(Mt)) ==> mtLocal(Mt).
 
-mtLocal(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
+% mtLocal(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
 mtGlobal(Mt)==>genlMt(baseKB,Mt).
 
 baseKB:isRegisteredCycPred(apply,maplist,3).
@@ -302,3 +304,4 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 
 % :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
 
+:-ain(pass2).
