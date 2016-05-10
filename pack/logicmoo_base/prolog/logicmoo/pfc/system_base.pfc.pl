@@ -305,3 +305,6 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 % :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
 
 :-ain(pass2).
+
+:- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
+:- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).

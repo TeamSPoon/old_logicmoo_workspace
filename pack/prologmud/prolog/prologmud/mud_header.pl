@@ -104,7 +104,7 @@
 :- kb_dynamic   defnSufficient/2.
 :- thread_local   t_l:repl_to_string/2.
 :- thread_local   t_l:repl_writer/2.
-:- kb_dynamic   loaded_external_kbs/0.
+:- kb_dynamic   lmcache:loaded_external_kbs/0.
 :- kb_dynamic   loading_module_h/1.
 :- kb_dynamic   registered_module_type/2.
 :- kb_dynamic   must_compile_special_clause_file/1.

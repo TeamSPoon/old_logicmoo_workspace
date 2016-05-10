@@ -201,7 +201,7 @@ term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subf
 % Term If Is A Format Type How.
 %
 term_is_ft_how(Term,Type):- clause_umt(quotedDefnIff(Type,Info)),nonvar(Info),
-   (show_success(why,(Info='SubLQuoteFn'(LISPSYMBOL),nop(Term+Type+LISPSYMBOL)))-> 
+   (show_success(why,(Info='SubLQuoteFn'(LISPSYMBOL),nop(dmsg(Term+Type+LISPSYMBOL))))-> 
                  fail;
                  (append_term(Info,Term,CALL),call_u(CALL))),!.
 
@@ -792,7 +792,7 @@ correctAnyType(_, A,Type,AA):-  evaluatableArg(A,Type),dmsg(evaluatableArg(A,Typ
 correctAnyType(Op,A,Type,AA):- var(Type),trace_or_throw(correctAnyType(Op,A,Type,AA)).
 % TODO snags on new tpyes correctAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctAnyType(Op,A,Type,AA):- one_must(correctType(Op,A,Type,AA),A=AA).
-correctAnyType(Op,A,Type,A):- dtrace(nop(warn(not(correctAnyType(Op,A,Type))))).
+correctAnyType(Op,A,Type,A):- dtrace(nop(dmsg(warn(not(correctAnyType(Op,A,Type)))))).
 
 
 

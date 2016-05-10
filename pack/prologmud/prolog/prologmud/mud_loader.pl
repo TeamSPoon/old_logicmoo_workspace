@@ -490,7 +490,7 @@ download_and_install_el:-
 
 %:- xperimental_big_data->catch(user:ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
 
-% :- asserta(loaded_external_kbs),show_call(kbp_to_mpred_t).
+% :- asserta(lmcache:loaded_external_kbs),show_call(kbp_to_mpred_t).
 
 :- user:ensure_loaded(prologmud(vworld/world_agent)).
 :- user:ensure_loaded(prologmud(parsing/parser_imperative)).

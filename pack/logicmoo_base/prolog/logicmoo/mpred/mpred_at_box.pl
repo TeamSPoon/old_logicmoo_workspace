@@ -395,7 +395,7 @@ ensure_imports_tbox(M,TBox):-
    ignore(maybe_delete_import_module(TBox,M)),
    forall((user:current_predicate(_,TBox:P),
       \+ predicate_property(TBox:P,imported_from(_))),
-      import_shared_pred(M,TBox,P)),
+      add_import_predicate(M,P,TBox)),
    inherit_into_module(M,user),
    skip_user(M),
    ignore(maybe_delete_import_module(M,user)),

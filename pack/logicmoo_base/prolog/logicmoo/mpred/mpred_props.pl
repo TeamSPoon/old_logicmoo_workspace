@@ -143,10 +143,10 @@ decl_mpred_mfa(M,FF,A):-
      ignore((nonvar(M),asserta_if_new(mpred_isa(F,predicateConventionMt(M))))),
      assert_arity(F,A),  
      must_det(nonvar(M)),
-    '@'((
+    nop(dmsg(('@'((
      nop((is_static_predicate(M,F,A)->true; (M:dynamic(F/A),M:discontiguous(F/A)))), 
      nop(M:export(F/A)),
-     nop(M:multifile(M:F/A))),M) ]).
+     nop(M:multifile(M:F/A))),M)))) ]).
 
 
 
@@ -225,9 +225,9 @@ decl_mpred_prolog_ilc_0(CM,M,PI,F/A):-
 
 decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
-      ain(predicateConventionMt(PI,M)),
+      ain(predicateConventionMt(F,M)),
       ain(~prologHybrid(F)),
-      (\+ is_static_predicate(M,F,A)->ain(prologDynamic(F));true),
+      (\+ is_static_predicate(M:PI)->ain(prologDynamic(F));true),
       ain(mpred_isa(PI,predCanHaveSingletons)),!.
 
 

@@ -89,11 +89,9 @@ wsh_w:wrap_shared(decided_not_was_isa,2,ereq).
 wsh_w:wrap_shared(predicateConventionMt,2,ereq).
 wsh_w:wrap_shared(functorDeclares,1,ereq).
 wsh_w:wrap_shared(genls,2,ereq).
-wsh_w:wrap_shared(import_shared_pred,3,ereq).
-wsh_w:wrap_shared(is_static_predicate,3,ereq).
 wsh_w:wrap_shared(isa,2,ereq).
 wsh_w:wrap_shared(lambda,5,ereq).
-wsh_w:wrap_shared(loaded_external_kbs,0,ereq).
+%wsh_w:wrap_shared(lmcache:loaded_external_kbs,0,ereq).
 wsh_w:wrap_shared(meta_argtypes,1,ereq).
 wsh_w:wrap_shared(mpred_f,4,ereq).
 wsh_w:wrap_shared(mpred_f,5,ereq).

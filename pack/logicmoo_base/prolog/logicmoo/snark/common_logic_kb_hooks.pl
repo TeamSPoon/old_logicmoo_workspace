@@ -100,7 +100,7 @@ cycAssert(O,Mt):-assert_kif(Mt:O).
 %
 % Knowledge Base P- True Stucture.
 %
-kbp_t(_):- not(loaded_external_kbs),!,fail.
+kbp_t(_):- not(lmcache:loaded_external_kbs),!,fail.
 % kbp_t(PLIST):- ground(PLIST),!,no_repeats(call_no_cuts(kbp_t_list_prehook(PLIST,PLISTO))),kbp_t_list(PLISTO).
 % kbp_t(PLIST):- kbp_t_list_prehook(PLIST,PLISTO),kbp_t_list(PLISTO).
 % TODO RE-ENABLE 

@@ -202,6 +202,14 @@ with_pi(P,Pred3):-source_context_module(CallerMt),with_pi_selected(CallerMt,Call
 %
 % Using Predicate Indicator Selected.
 %
+
+with_pi_selected(CallerMt,PredMt, F/A ,Pred3):- var(A),!,
+  forall(between(1,10,A),must(with_pi_selected(CallerMt,PredMt, F/A ,Pred3))).
+
+with_pi_selected(CallerMt,PredMt, F//A ,Pred3):- var(A),!,
+  forall(between(1,10,A),must(with_pi_selected(CallerMt,PredMt, F//A ,Pred3))).
+
+
 with_pi_selected(CallerMt, PredMt,[P|L],Pred3):-!,with_pi_selected(CallerMt,PredMt,P,  Pred3),with_pi_selected(CallerMt,PredMt,L,Pred3).
 with_pi_selected(CallerMt,PredMt,(P,L),Pred3):-!,with_pi_selected(CallerMt,PredMt,P,  Pred3),with_pi_selected(CallerMt,PredMt,L,Pred3).
 with_pi_selected(_CallerMt,_M,[]  ,_Pred3):-!.

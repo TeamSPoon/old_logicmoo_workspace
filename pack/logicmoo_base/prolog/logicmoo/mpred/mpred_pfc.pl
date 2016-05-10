@@ -22,6 +22,7 @@
   each_E/3,
   call_m_g/3,
   lookup_m_g/3,
+  head_to_functor_name/2,
   mpred_post1_rem/2,
   mpred_post1_rem1/2,
   fwc1s_post1s/2,
@@ -1332,8 +1333,7 @@ filter_buffer_n_test(Name,N,Fact):- filter_buffer_get_n(Name,FactS,N),
 % forward chains for a single fact.
 %
 mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
-mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc\==cwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
-mpred_fwc1((Fact:- BODY)):- 
+mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc==fwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 % mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
   dmsg(mpred_fwc1(Fact)),
@@ -2044,6 +2044,9 @@ code_sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_pr
 %
 all_closed(C):- \+is_ftCompound(C)->true;(functor(C,_,A),A>1,\+((arg(_,C,Arg),is_ftVar(Arg)))),!.
 
+
+%head_to_functor_name(I,F):- is_ftCompound(I),get_head(I,H),is_ftCompound(I),get_functor_name(I,F).
+head_to_functor_name(I,F):- is_ftCompound(I),get_functor(I,F).
 
 
 %% mpred_db_type(+VALUE1, ?Type) is semidet.

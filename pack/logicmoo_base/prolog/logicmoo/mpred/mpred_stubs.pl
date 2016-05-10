@@ -922,7 +922,7 @@ call_rule_db(F,A,HEAD):- ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 call_mpred_body(_,true):-!.
 call_mpred_body(HEAD,and(A,B)):- !,call_mpred_body(HEAD,A),!,call_mpred_body(HEAD,B).
 call_mpred_body(HEAD,(A,B)):- !,call_mpred_body(HEAD,A),call_mpred_body(HEAD,B).
-call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_ilc(HEAD,BODY),body_of(HEAD),(nop(failure(call_mpred_body_ilc(HEAD,BODY))),!,fail))).
+call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_ilc(HEAD,BODY),body_of(HEAD),(nop(dmsg(failure(call_mpred_body_ilc(HEAD,BODY)))),!,fail))).
 
 
 %= 	 	 

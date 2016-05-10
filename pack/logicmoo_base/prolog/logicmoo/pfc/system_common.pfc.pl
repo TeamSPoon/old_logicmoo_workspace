@@ -397,9 +397,9 @@ functorDeclares(X)==>tCol(X).
 % prologMacroHead(pddlSomethingIsa/2).
 tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 
-prologBuiltin(A) :- cwc,is_ftCompound(A),get_functor(A, B),prologBuiltin(B).
+prologBuiltin(A) :- cwc,head_to_functor_name(A, B),prologBuiltin(B).
 prologBuiltin(P) :- cwc,is_ftCompound(P),!,get_functor(P,F,A),functor(C,F,A),(predicate_property(C,built_in)). % predicate_property(P,static)).
-ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,is_ftCompound(I),get_functor(I,F),call(PT,F)).
+ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,head_to_functor_name(I,F),call(PT,F)).
 
 
 
