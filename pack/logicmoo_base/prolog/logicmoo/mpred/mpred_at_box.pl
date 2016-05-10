@@ -82,11 +82,19 @@ user_m_check(_Out).
 :- meta_predicate transitive_path(2,*,*).
 
 :- use_module(mpred_pfc).
-       
+
+insert_like_abox(O):- baseKB:mtLocal(O),!.
+insert_like_abox(O):-
+  asserta(baseKB:mtLocal(O)),
+  forall(current_module(M),
+    ((import_module(M,abox)->add_import_module(M,O,start);true),
+     (import_module(abox,M)->add_import_module(O,M,start);true))).
+
 :- dynamic(baseKB:mtSharedPrologCodeOnly/1).
 :- dynamic(baseKB:mtNoPrologCode/1).
 baseKB:mtNoPrologCode(mpred_userkb).
 
+baseKB:mtSharedPrologCodeOnly(Mt):- module_property(Mt,class(library)).
 baseKB:mtSharedPrologCodeOnly(Mt):-
       arg(_,v( 
          common_logic_boxlog,
@@ -265,9 +273,13 @@ makeConstant(_Mt).
 %
 % Sets Current Module.
 %
+set_defaultAssertMt(abox):-!.
+set_defaultAssertMt(M):- baseKB:mtSharedPrologCodeOnly(M),!.
 set_defaultAssertMt(ABox):- 
     must(mtCanAssertMt(ABox)),
-    abox:defaultTBoxMt(TBox),
+    add_import_module(abox,ABox,start),
+    must(abox:defaultTBoxMt(TBox)),
+    asserta_if_new(ABox:defaultTBoxMt(TBox)),
     (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
     '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
     setup_module_ops(ABox), 
@@ -402,7 +414,7 @@ fixup_modules:-
 % :- autoload([verbose(false)]).
 :- set_prolog_flag(retry_undefined,true).
 
-:- fixup_modules.
+% :- fixup_modules.
 
 
 % :- endif.

@@ -176,7 +176,7 @@ assert_predArgTypes_from_left(F,A,[Type|ArgsList]):-assert_argIsa(F,A,Type),!,Ap
 % Clause User Microtheory.
 %
 clause_umt(M:C):-!,clause(M:C,true).
-clause_umt(C):-with_umt(clause(C,true)).
+clause_umt(C):- call_u(clause(C,true)).
 clause_umt(C):-!,clause(_:C,true).
 
 
@@ -909,11 +909,11 @@ correctType0(_ ,A,ftVoprop,AA):- !, must(A=AA).
 correctType0(Op,A,ftVoprop,AA):- is_list(A),!,maplist(correctTypeArg(Op,ftAskable),A,AA).
 correctType0(Op,A,ftVoprop,AA):- !,w_tl(t_l:inVoprop,correctType0(Op,A,ftAskable,AA)).
 
-correctType0(_ ,Obj,argIsaFn(Prop,N),AA):-must_equals(Obj,AA),
+correctType0(_ ,Obj,argIsaFn(_Prop,N),AA):-must_equals(Obj,AA),
    ignore((t_l:deduceArgTypes(_),
      sanity(N\=0),
-      findall(OT,isa_asserted(Obj,OT),OType),
-         must(nop(deduce_argN(Prop,N,Obj,OType,argIsaFn(Prop,N)))))),!.
+      findall(OT,isa_asserted(Obj,OT),_OType),
+         ! /* must(nop(deduce_argN(Prop,N,Obj,OType,argIsaFn(Prop,N)))) */ )),!.
 
 
 correctType0(_ ,A,ftTerm,AA):- must_equals(A,AA).

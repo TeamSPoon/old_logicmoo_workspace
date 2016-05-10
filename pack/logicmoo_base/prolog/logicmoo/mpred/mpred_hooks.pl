@@ -138,7 +138,7 @@ inverse_args/2,
 isCycPredArity_ignoreable/2,
 list_update_op/3,
 %local_term_anglify/2,
-loop_check_mpred/1,
+
 mpred_fact_arity/2,
 %mpred_module_ready/0,
 mpred_fa_call/3,
@@ -174,7 +174,6 @@ verb_after_arg/3
         holds_t(5, ?, ?, ?, ?, ?),
         holds_t(6, ?, ?, ?, ?, ?, ?),
         if_result(0, 0),
-        loop_check_mpred(?),
         mpred_fa_call(?, ?, 0).
         
 
@@ -364,7 +363,6 @@ inverse_args/2,
 mpred_fa_call/3,
 mpred_plist_t/2,
 list_update_op/3,
-loop_check_mpred/1,
 compute_value/2,
 compute_value_no_dice/2,
 */
@@ -529,17 +527,6 @@ mpred_plist_t(P,[L|IST]):-is_holds_true(P),!,mpred_plist_t(L,IST).
 mpred_plist_t(P,LIST):-is_holds_false(P),!,mpred_f(LIST).
 mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],on_x_rtrace(CALL).
 
-:- meta_predicate(loop_check_mpred(?)).
-% loop_check_mpred(Call):- current_predicate(ireq/1), loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
-
-%= 	 	 
-
-%% loop_check_mpred( ?Call) is semidet.
-%
-% Loop Check Managed Predicate.
-%
-loop_check_mpred(Call):- !, fail,not(t_l:infInstanceOnly(_)),loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
-% loop_check_mpred(Call):-loop_check(call_u(t,Call),fail).
 
 :- meta_predicate(mpred_fa_call(?,?,0)).
 
@@ -1537,7 +1524,7 @@ xcall_f(P):- \+ xcall_t(P).
 assertion_f([AH,P|LIST]):- is_holds_true(AH),!,assertion_f([P|LIST]).
 assertion_f([AH,P|LIST]):- is_holds_false(AH),!,assertion_f([P|LIST]).
 % todo hook into loaded files!
-assertion_f(_):- not(loaded_external_kbs),!,fail.
+assertion_f(_):- \+(loaded_external_kbs),!,fail.
 %MAYBE LATER assertion_f([P|LIST]):- 'TINYKB-ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 %MAYBE LATER assertion_f([P|LIST]):- 'TINYKB-ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 

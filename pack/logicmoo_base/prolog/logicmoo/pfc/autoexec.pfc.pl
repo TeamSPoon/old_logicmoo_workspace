@@ -104,17 +104,17 @@
 :- set_fileAssertMt(baseKB).
 
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_common.pfc')).
+:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_common.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_if_missing.pfc')).
+:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_if_missing.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_mdefault.pfc')).
+:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_mdefault.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_singleValued.pfc')).
+:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_singleValued.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/snark/common_logic_clif.pfc')).
+:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/snark/common_logic_clif.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('user_relationAllExists.pfc')).
+:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('user_relationAllExists.pfc')).
 
 
 :-multifile(lmconf:locked_baseKB/0).

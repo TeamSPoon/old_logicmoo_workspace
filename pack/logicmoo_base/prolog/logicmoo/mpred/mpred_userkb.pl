@@ -294,7 +294,7 @@ skolem(X,Vs,SK):-skolem_in_code(X,Vs,SK).
 % True Structure.
 %
 t(P,A1,A2):- mpred_fa_call(P,2,call(P,A1,A2)).
-t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
+t(P,A1,A2):- call_u(t(P,A1,A2)).
 
 
 
@@ -303,7 +303,7 @@ t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
 % True Structure.
 %
 t(P,A1,A2,A3):- mpred_fa_call(P,3,call(P,A1,A2,A3)).
-t(P,A1,A2,A3):- loop_check_mpred(t(P,A1,A2,A3)).
+t(P,A1,A2,A3):- call_u(t(P,A1,A2,A3)).
 
 
 
@@ -312,7 +312,7 @@ t(P,A1,A2,A3):- loop_check_mpred(t(P,A1,A2,A3)).
 % True Structure.
 %
 t(P,A1,A2,A3,A4):- mpred_fa_call(P,4,call(P,A1,A2,A3,A4)).
-t(P,A1,A2,A3,A4):- loop_check_mpred(t(P,A1,A2,A3,A4)).
+t(P,A1,A2,A3,A4):- call_u(t(P,A1,A2,A3,A4)).
 
 
 
@@ -321,7 +321,7 @@ t(P,A1,A2,A3,A4):- loop_check_mpred(t(P,A1,A2,A3,A4)).
 % True Structure.
 %
 t(P,A1,A2,A3,A4,A5):- mpred_fa_call(P,5,call(P,A1,A2,A3,A4,A5)).
-t(P,A1,A2,A3,A4,A5):- loop_check_mpred(t(P,A1,A2,A3,A4,A5)).
+t(P,A1,A2,A3,A4,A5):- call_u(t(P,A1,A2,A3,A4,A5)).
 
 
 
@@ -330,7 +330,7 @@ t(P,A1,A2,A3,A4,A5):- loop_check_mpred(t(P,A1,A2,A3,A4,A5)).
 % True Structure.
 %
 t(P,A1,A2,A3,A4,A5,A6):- mpred_fa_call(P,6,call(P,A1,A2,A3,A4,A5,A6)).
-t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6)).
+t(P,A1,A2,A3,A4,A5,A6):- call_u(t(P,A1,A2,A3,A4,A5,A6)).
 
 
 
@@ -339,7 +339,7 @@ t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6)).
 % True Structure.
 %
 t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_fa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
-t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
+t(P,A1,A2,A3,A4,A5,A6,A7):- call_u(t(P,A1,A2,A3,A4,A5,A6,A7)).
 
 
 

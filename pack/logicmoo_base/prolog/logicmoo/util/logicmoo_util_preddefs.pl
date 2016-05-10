@@ -155,10 +155,13 @@ system:predicate_property_nt(A,B):-
 
 dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
 
-:- decl_shared(genlMt/2).
-:- decl_shared(mtCore/1).
-:- decl_shared(mtExact/1).
-:- decl_shared(mtGlobal/1).
+:- decl_shared(baseKB:dynamic,genlMt/2).
+:- decl_shared(baseKB:dynamic,mtCore/1).
+:- decl_shared(baseKB:dynamic,mtPrologLibrary/1).
+:- decl_shared(baseKB:dynamic,mtSharedPrologCodeOnly/1).
+:- decl_shared(baseKB:dynamic,mtLocal/1).
+:- decl_shared(baseKB:dynamic,mtExact/1).
+:- decl_shared(baseKB:dynamic,mtGlobal/1).
 
 
 :- meta_predicate only_3rd(1,*,*,*).

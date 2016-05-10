@@ -77,6 +77,7 @@
             with_filematches/1,
 
             push_modules/0,
+            reset_modules/0,
             current_smt/2,
             pop_modules/0,
             maybe_add_import_module/3,
@@ -174,17 +175,26 @@
 
 :- system:multifile(lmconf:source_typein_modules/3),
    system:dynamic(lmconf:source_typein_modules/3).
-:- system:multifile(lmconf:source_typein_boxes/3),
-   system:dynamic(lmconf:source_typein_boxes/3).
+
+:- multifile(lmconf:mpred_is_impl_file/2).
+:- dynamic(lmconf:mpred_is_impl_file/2).
+
 
 current_smt(SM,M):-
  '$current_source_module'(SM),'$current_typein_module'(M).
 
 push_modules:- current_smt(SM,M),
-  system:asserta(lmconf:source_typein_modules(SM,M,push_state)).
+  prolog_load_context(source,F),
+  system:asserta(lmconf:source_typein_modules(SM,M,F)).
+
+reset_modules:- 
+  prolog_load_context(source,F),
+  lmconf:source_typein_modules(SM,M,F),
+  '$set_source_module'(SM),'$set_typein_module'(M),!.
 
 pop_modules:- 
-  system:retract(lmconf:source_typein_modules(SM,M,push_state)),
+  prolog_load_context(source,F),
+  system:retract(lmconf:source_typein_modules(SM,M,F)),  
   '$set_source_module'(SM),'$set_typein_module'(M),!.
 
 
@@ -1039,4 +1049,4 @@ show_module_imports(M,I):-
 show_module_imports:-
   forall(current_module(M),show_module_imports(M)).
   
-   
+

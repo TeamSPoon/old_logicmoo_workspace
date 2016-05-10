@@ -3,11 +3,9 @@
 %
 % Dec 13, 2035
 % Douglas Miles
+
 */
-:- if(('$set_source_module'(CM,CM),'$current_typein_module'(M),
-   multifile(logicmoo_user_file:user_module_uses/2),
-   dynamic(logicmoo_user_file:user_module_uses/2),
-   system:asserta(logicmoo_user_file:user_module_uses(CM,M)))).
+:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_filesystem.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_user_file,
  [
@@ -24,26 +22,19 @@
  op(350,xfx,'xor'),
  op(300,fx,'~'),
  op(300,fx,'-')]).
+% restore entry state
+:- reset_modules.
 
-:- logicmoo_user_file:user_module_uses(CM,M),!,
-   '$set_typein_module'(M),'$set_source_module'(CM).
+:- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
+:- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
+:- endif.
 
-:- logicmoo_user_file:user_module_uses(CM,M),!, 
-   M:ensure_loaded(CM:library(logicmoo_base)).
-
-% in case something changed
-:- logicmoo_user_file:user_module_uses(CM,M),!,
-   dmsg(user_module_uses(CM,M)),
-   fix_ops_for(M),fix_ops_for(CM).
+:- use_module(library(logicmoo_utils)).
+:- use_module(library(logicmoo_base)).
 
 :-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
 
-% :- time(load_snark).
-
-%:- forall(retract(wsh_w:wrap_shared(F,A,ereq)),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
-
-:- logicmoo_user_file:user_module_uses(CM,M),!,
-   '$set_typein_module'(M),'$set_source_module'(CM).
+:- forall(wsh_w:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
 
 /*
 :- set_prolog_flag(report_error,true).
@@ -58,4 +49,4 @@
 :- debug.
 :- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 */
-:- pop_modules.
+:- reset_modules.

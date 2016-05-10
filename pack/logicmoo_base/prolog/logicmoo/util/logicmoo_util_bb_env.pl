@@ -86,8 +86,6 @@ term_expansion_add_context/5
 
 :- include('logicmoo_util_header.pi').
 
-:- thread_local(t_l:user_abox/2).
-
 :- multifile(abox:defaultTBoxMt/1).
 :- dynamic(abox:defaultTBoxMt/1).
 

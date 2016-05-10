@@ -46,6 +46,8 @@ mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
 mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
 
 
+
+:- dynamic(ttModule/1).
 :- dynamic(marker_supported/2).
 
 :- dynamic(pass2/0).
@@ -85,6 +87,7 @@ arity('<=>',2).
 arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
 arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
+arity(ttModule,1).
 arity(tSet,1).
 arity(argsQuoted,1).
 arity(quasiQuote,1).
@@ -124,16 +127,26 @@ predicateConventionMt(regression_test,lmconf).
 
 % mtExact(Mt)==>{kb_dynamic(Mt)}.
 
+tCol(ttModule).
+tCol(tSet).  % = isa(tSet,tCol).
+
+ttModule(M)==>tSet(M).
 
 
-tSet(mtGlobal,comment("mtGlobal(?Mt) states the Mt is always findable during inheritance")).
+ttModule(mtPrologLibrary,comment("Builtin Prolog code modules such as 'lists' or 'apply'")).
+
+ttModule(mtLibrary,comment("PFC System modules such as 'mpred_loader' or 'mpred_type_wff'")).
+
+
+ttModule(mtLocal,comment("mtLocal(?Mt) is always scoped underneath baseKB")).
+
+
+ttModule(mtGlobal,comment("mtGlobal(?Mt) states the Mt is always findable during inheritance")).
 mtGlobal(baseKB).
 mtGlobal(lmcode).
 mtGlobal(system).
 
-tCol(tSet).  % = isa(tSet,tCol).
-
-tSet(mtExact,
+ttModule(mtExact,
   comment("mtExact(?Mt) states that all predicates the Mt specified should not inherit past ?Mt.  Thus:  mtExact(Mt)==> ~genlMt(Mt,_)")).
 mtExact(lmconf).
 mtExact(lmcache).
@@ -142,7 +155,7 @@ mtExact(system).
 mtExact(Mt)==> mtGlobal(Mt).
 mtExact(Mt)==> ~genlMt(Mt,_).
 
-tSet(mtCore,comment("mtCore(?Mt) states Mt specified is builtin")).
+ttModule(mtCore,comment("mtCore(?Mt) states Mt specified is builtin")).
 mtCore(user).
 mtCore(everythingPCS).
 mtCore(inferencePCS).
@@ -155,7 +168,9 @@ mtCore(Mt)==>tMicrotheory(Mt).
 
 */
 
-{module_property(Mt,class(library))} ==> mtGlobal(Mt).
+{module_property(Mt,class(library))} ==> mtPrologLibrary(Mt).
+
+mtPrologLibrary(Mt)==>mtGlobal(Mt).
 
 mtGlobal(Mt)==>(mtCore(Mt),~mtLocal(Mt)).
 
@@ -168,12 +183,12 @@ mtGlobal(Mt)==>genlMt(baseKB,Mt).
 
 baseKB:isRegisteredCycPred(apply,maplist,3).
 
-
+/*
 (genlMt(Child,Parent), \+ mtCore(Child)) ==>
    {ignore((system:delete_import_module(Parent,user))),
     ignore((system:delete_import_module(Parent,Child))),
     system:add_import_module(Child,Parent,start)}.
-
+*/
 
 :- dynamic(baseKB:isRegisteredCycPred/3).
 
@@ -285,5 +300,5 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 (hybrid_support(F,A) ==>{ must(kb_dynamic(F/A))}).
 
 
-% :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
+% :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
 

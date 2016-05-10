@@ -5,9 +5,6 @@
 
 :- begin_pfc.
 
-?- listing(lmconf:abox_for/2).
-?- listing(t_l:user_abox/2).
-
 :- show_call(defaultAssertMt(_)).
 
 

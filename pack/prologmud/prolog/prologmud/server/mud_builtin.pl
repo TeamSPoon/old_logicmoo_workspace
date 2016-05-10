@@ -35,7 +35,7 @@
 
 :- retractall(t_l:disable_px).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/pfc/autoexec.pfc')).
+:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/pfc/autoexec.pfc')).
 
 % baseKB:isa(iPerson99,tPerson).
 

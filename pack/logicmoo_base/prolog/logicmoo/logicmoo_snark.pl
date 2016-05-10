@@ -15,15 +15,13 @@ end_of_file.
   load_snark/0,mpred_load_restore_file/1,mpred_load_restore_file/1,mpred_save_restore_file/1,ensure_autoexec/0,
   with_ukb_snark/2)).
 
-:- thread_local(t_l:user_abox/2).
-
 % 	 	 
 %% with_ukb_snark( ?VALUE1, ?VALUE2) is semidet.
 %
 % Hook To [with_ukb_snark/2] For Module Logicmoo_snark.
 % Using Ukb Snark.
 %
-with_ukb_snark(KB,G):- source_module(SM), w_tl(t_l:user_abox(SM,KB),baseKB:G).
+with_ukb_snark(KB,G):- with_umt(KB,G).
 
 %:- use_module(logicmoo_utils).
 %:- system:initialization(use_listing_vars).

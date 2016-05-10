@@ -36,6 +36,7 @@
   filter_buffer_get_n/3,
   filter_buffer_trim/2,
   plus_fwc/0,
+  plus_fwc/1,
   cut_c/0,
   to_u/2,
   fresh_mode/0,

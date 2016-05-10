@@ -87,6 +87,7 @@
             do_expand_args_pa/4,
             ex_argIsa/3,
             exact_args/1,
+            exact_args0/1,
             expand_isEach_or_fail/2,
             expand_goal_correct_argIsa/2,
             expand_props/3,
@@ -148,7 +149,6 @@
             was_isa_syntax/3,
           mpred_expansion_file/0,
          temp_comp/4,
-         with_umt_l2/1,
          get_ruleRewrite/2,
          expand_kif_string_or_fail/3,
          to_predicate_isas/2,
@@ -290,7 +290,7 @@ cheaply_u(G):- loop_check(cheaply_u_ilc(G),loop_check_term(cheaply_u_ilc(G),ilc2
 
 cheaply_u_ilc(P):- strip_module(P,_,C),P\==C,!,cheaply_u_ilc(C).
 cheaply_u_ilc(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
-cheaply_u_ilc(call(ereq,G)):- !,cheaply_u(G).
+cheaply_u_ilc(call(ereq,G)):- !,cheaply_u_ilc(G).
 cheaply_u_ilc(P):- predicate_property_nt(P,number_of_rules(N)),N=0,!,lookup_u(P).
 cheaply_u_ilc(G):- call_u(G).
 
@@ -1733,22 +1733,30 @@ to_predicate_isas(C,CO):-C=..[F|CL],must_maplist(to_predicate_isas,CL,CLO),!,CO=
 exact_args(Q):-is_ftVar(Q),!,fail.
 exact_args(isEach):-!,fail.
 exact_args(Q):- \+ compound(Q), !.
-%exact_args(cwc).
-%exact_args(true).
-exact_args(argsQuoted(_)):-!,fail.
-exact_args(==>(_,_)):-!,fail.
-exact_args(Q):- cheaply_u(argsQuoted(Q)).
-exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),lookup_u(argsQuoted(F)).
-exact_args(second_order(_,_)).
-exact_args(call(_)).
-exact_args(asserted(_)).
-exact_args(retract_eq_quitely(_)).
-exact_args(asserts_eq_quitely(_)).
-exact_args(assertz_if_new(_)).
-exact_args(mpred_ain(_)).
-exact_args(dynamic(_)).
-exact_args((A/B)):- (is_ftVar(A);is_ftVar(B)).
-exact_args((_ =.. _)).
+exact_args(Q):- Q=..[_,A],atomic(A),!.
+exact_args(_:Q):- !,loop_check(exact_args0(Q),fail).
+exact_args(Q):- exact_args0(Q),!.
+
+
+%exact_args0(cwc).
+%exact_args0(true).
+exact_args0(Q):- \+ compound(Q), !.
+exact_args0(Q):- Q=..[_,A],atomic(A),!.
+exact_args0(argsQuoted(_)):-!,fail.
+exact_args0(==>(_,_)):-!,fail.
+exact_args0(mtExact(_)).
+exact_args0(second_order(_,_)).
+exact_args0(call(_)).
+exact_args0(asserted(_)).
+exact_args0(retract_eq_quitely(_)).
+exact_args0(asserts_eq_quitely(_)).
+exact_args0(assertz_if_new(_)).
+exact_args0(mpred_ain(_)).
+exact_args0(dynamic(_)).
+exact_args0((A/B)):- (is_ftVar(A);is_ftVar(B)),!.
+exact_args0((_ =.. _)).
+exact_args0(Q):- is_ftCompound(Q),functor(Q,F,_),!,lookup_u(argsQuoted(F)),!.
+exact_args0(Q):- clause(argsQuoted(Q),Body),compound(Body),call(Body),!.
 
 % exact_args((_:-_)).
 % exact_args((:-( _))).
@@ -1762,16 +1770,4 @@ exact_args((_ =.. _)).
 :- export(mpred_expansion_file/0).
 mpred_expansion_file.
 
-
-
-
-with_umt_l2(G):-
-  notrace(current_prolog_flag(mpred_pfc_file,true)),
-   defaultAssertMt(U),
-   nonvar(U),
-   '$set_source_module'(Was,U),
-   nonvar(Was),
-   call_cleanup(
-     catch(G,E,(wdmsg(E),throw(E))),
-      '$set_source_module'(Was)).
 

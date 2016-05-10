@@ -15,42 +15,36 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-:- if((
-   user:use_module(user:library('logicmoo/util/logicmoo_util_filesystem.pl')),
-   push_modules,
-   UTILS = logicmoo_utils,
-   TBOX = baseKB,
-   current_smt(SM,M),
-   ignore((
-   SM\==user,
-   
-   maybe_add_import_module(SM,TBOX),
-   maybe_add_import_module(SM,UTILS),
-   system:asserta(lmconf:source_typein_boxes(SM,M,SM:TBOX)))))).
+:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_filesystem.pl')), push_modules)). 
+:- endif.
+:- module(logicmoo_utils_file,[]).
+% restore entry state
+:- reset_modules.
+
+:- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
+:- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
 :- endif.
 
-:- module(logicmoo_utils_file,[]).
-
-:- '$set_source_module'('logicmoo_utils').
-
-:- user:use_module(user:library('logicmoo/util/logicmoo_util_filesystem.pl')).
-% :- use_module('./logicmoo/util/logicmoo_util_filesystem').
-% :- autoload([verbose(false)]).
-% :- set_prolog_flag(autoload, false).
-
+% ======================================================
+% Included separated logicmoo util files
+% ======================================================
+/*
 :- module_transparent(user:term_expansion/1).
 user:term_expansion(EOF,POS,O,POS2):- 
  is_file_based_expansion(term,EOF,POS,O,POS2),
  nonvar(EOF),
  (EOF=end_of_file;EOF=(:-(module(_,_)))),
  prolog_load_context(module,M),
- M\==lmcode, 
+ M\==user, 
  ignore((
     source_location(S,_),
     '$current_typein_module'(TM),
     glean_prolog_impl_file(EOF,S,M,TM))),fail.
 
-:- set_prolog_flag(access_level,system).
+*/
+:- set_prolog_flag(system:generate_debug_info, true).
+:- set_prolog_flag(generate_debug_info, true).
+
 :- use_module(system:library('logicmoo/util/logicmoo_util_database.pl')).
 :- use_module(system:library('logicmoo/util/logicmoo_util_first.pl')).
 :- use_module(system:library('logicmoo/util/logicmoo_util_catch.pl')).
@@ -75,6 +69,12 @@ user:term_expansion(EOF,POS,O,POS2):-
 :- use_module(system:library('logicmoo/util/logicmoo_util_engines.pl')).
 :- use_module(system:library('logicmoo/util/logicmoo_util_help.pl')).
 
+
+
+% ======================================================
+% Preload library so that autoloading is not used
+% ======================================================
+
 % HTTP related autoloads
 :- use_module(http_exception:library(settings)).
 
@@ -84,6 +84,9 @@ user:term_expansion(EOF,POS,O,POS2):-
 :- use_module(system:library(pce_emacs)).
 :- use_module(system:library(pce),except([op(_,_,_)])).
 
+% ======================================================
+% Rest of the standard library
+% ======================================================
 :- use_module(system:library(backcomp), [ '$arch'/2,
 	    '$version'/1,
 	    '$home'/1,
@@ -152,36 +155,12 @@ user:term_expansion(EOF,POS,O,POS2):-
 	    term_factorized/3]).
 
 :- use_module(system:library(quintus),except([mode/1])).
-use_file_module_maybe(M):- member(C,['/terms.pl','/backcomp.pl',rdf,pengi,win_men,swicli,'swicli.pl',swicffi,quintus,solution_sequences,metaterm,coind,drac,'INDEX',jpl,nb_set,yall,settings]),atom_contains(M,C),!.
-use_file_module_maybe(M):- member(C,[persistency,chr,rewrite,check,xpath,record]),atom_contains(M,C),!. % ,user:use_module(user:M).
-use_file_module_maybe(M):- use_module(system:M).
 
-:- forall(filematch(swi(('library/*.pl')),M),use_file_module_maybe(M)).
-
-
-/*
-
-
-:- use_module(system:library('logicmoo/util/logicmoo_util_ctx_frame.pl')).
-:- use_module(system:library('logicmoo/util/logicmoo_util_dra.pl')).
-% the next are loaded idomaticalyl later (if needed)
-% :- use_module(system:library('logicmoo/util/logicmoo_util_bb_gvar.pl')).
-% :- use_module(system:library('logicmoo/util/logicmoo_util_bb_env.pl')).
-% :- use_module(system:library('logicmoo/util/logicmoo_util_dcg.pl')).
-% :- use_module(system:library('logicmoo/util/logicmoo_util_varfunctors.pl')).
-% :- use_module(system:library('logicmoo/util/logicmoo_util_structs.pl')).
-% :- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
-*/
-
-:- if( \+ current_predicate(baseKB:setup_call_cleanup_each/3)).
-:- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
-:- endif.
-
-:- set_prolog_flag(access_level,user).
-
-:- dynamic(lmconf:logicmoo_utils_separate/0).
-:- retractall(lmconf:logicmoo_utils_separate).
-:- set_prolog_flag(generate_debug_info, true).
+:- forall(filematch(swi(('library/*.pl')),M),
+ ignore((
+   \+ (member(C,['/terms.pl','/backcomp.pl',rdf,pengi,win_men,swicli,'swicli.pl',swicffi,quintus,solution_sequences,metaterm,coind,drac,'INDEX',jpl,nb_set,yall,settings]), atom_contains(M,C)),
+   \+ (member(C,[persistency,chr,rewrite,bdb,check,xpath,record]),atom_contains(M,C)),
+   use_module(system:M)))).
 
 
 % ======================================================
@@ -189,7 +168,6 @@ use_file_module_maybe(M):- use_module(system:M).
 % ======================================================
 :- dynamic(user:file_search_path/2).
 :- multifile(user:file_search_path/2).
-
 
 % ======================================================
 % Add Extra pack-ages directory
@@ -245,8 +223,6 @@ lmconf:logicmoo_pre_release.
 :- endif.
 
 
-%= 	 	 
-
 %% logicmoo_scan_autoloads is semidet.
 %
 % Hook To [lmconf:logicmoo_scan_autoloads/0] For Module Logicmoo_utils.
@@ -274,64 +250,21 @@ lmconf:logicmoo_scan_autoloads:-false.
 %user:term_expansion((:-use_module(Name)), :-true):- atom(Name),atom_concat(logicmoo_util_,_,Name).
 %user:term_expansion((:-use_module(Name)), :-true):- atom(Name),atom_concat(logicmoo_util_,_,Name).
 
-% ======================================================
-% Included separated logicmoo util files
-% ======================================================
-%:- export(use_libraries/1). 
-%use_libraries(M):- F= (util/_),foreach(lmconf:mpred_is_impl_file(logicmoo_utils,F),(writeln(M:use_module(F)),M:use_module(F))).
-
-%:- export(use_libraries/0). 
-%use_libraries:- source_context_module(M),use_libraries(M).
-
-:- multifile(lmconf:mpred_is_impl_file/2).
-:- dynamic(lmconf:mpred_is_impl_file/2).
-
-%= 	 	 
-
-%% mpred_is_impl_file(?Type, ?A) is semidet.
-%
-% Hook To [lmconf:mpred_is_impl_file/2] For Module Logicmoo_utils.
-% Managed Predicate If Is A Implimentation File.
-%
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_first).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_database).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_catch).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_with_assertions).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_loop_check).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_dmsg).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_ctx_frame).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_filestreams).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_bugger).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_filesystem).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_multivar).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_no_repeats).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_preddefs).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_prolog_frames).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_prolog_streams).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_term_listing).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_terms).
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_varnames). 
- lmconf:mpred_is_impl_file(logicmoo_utils,logicmoo/util/logicmoo_util_strings). 
-
-%:- use_module(system:library(logicmoo/util/logicmoo_util_bugger)).
-%:- use_module(system:library(logicmoo/util/logicmoo_util_first)).
-%:- use_module(system:library(logicmoo/util/logicmoo_util_catch)).
 
 :- thread_local logicmoo_utils_test_tl/0.
 :- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
 
-%:- autoload([verbose(true)]).
-%:- autoload([verbose(false)]).
-% ?- logicmoo_util_term_listing:xlisting(get_gtime).
-
-% ?- list_undefined.
-
-% :- predicate_property(M:maplist(_,_,_),exported),maybe_add_import_module(baseKB,M,end).
 /*
-:- 'mpred_trace_none'(tlbugger:dont_skip_bugger/0).
-:- 'mpred_trace_none'(tlbugger:skip_bugger/0).
-:- 'mpred_trace_none'(tlbugger:rtracing/0).
+% the next are loaded idomaticalyl later (if needed)
+% :- use_module(system:library('logicmoo/util/logicmoo_util_ctx_frame.pl')).
+% :- use_module(system:library('logicmoo/util/logicmoo_util_dra.pl')).
+% :- use_module(system:library('logicmoo/util/logicmoo_util_bb_gvar.pl')).
+% :- use_module(system:library('logicmoo/util/logicmoo_util_bb_env.pl')).
+% :- use_module(system:library('logicmoo/util/logicmoo_util_dcg.pl')).
+% :- use_module(system:library('logicmoo/util/logicmoo_util_varfunctors.pl')).
+% :- use_module(system:library('logicmoo/util/logicmoo_util_structs.pl')).
+% :- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
 */
 
-:- set_prolog_flag(autoload_logicmoo,true).
+
 

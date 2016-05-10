@@ -4,8 +4,6 @@
 
 :- use_module(library(logicmoo_user)).
 
-:- mpred_pfc_file.
-
 :- debug(_).
 :- nodebug(http(_)).
 :- begin_pfc.

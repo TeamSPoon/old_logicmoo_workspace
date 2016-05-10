@@ -294,12 +294,12 @@ kb_dynamic(CM,M,PIN,FA):-
 %
 % Declare Managed Predicate Hybrid Inside Of Loop Checking.
 %
-kb_dynamic_ilc(CM,M,PI,F/A):-atom(PI),A==0,get_arity(PI,F,A),not(current_predicate(F/A)),!,
-   forall((arity_no_bc(F,AA),AA\=0),(functor(PIA,F,AA),kb_dynamic_ilc(CM,M,PIA,F/AA))).
+kb_dynamic_ilc(baseKB,M,PI,F/A):- defaultAssertMt(Mt),M\==Mt,!,must(kb_dynamic_ilc(baseKB,Mt,PI,F/A)).
+kb_dynamic_ilc(CM,M,PI,F/A):-atom(PI),A==0,get_arity(PI,F,A),\+(current_predicate(F/A)),!,
+   must((forall((arity_no_bc(F,AA),AA\=0),(functor(PIA,F,AA),kb_dynamic_ilc(CM,M,PIA,F/AA))))).
 
 kb_dynamic_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),
-  loop_check_term(kb_dynamic_ilc_0(CM,M,PI,F/A),
-  kb_dynamic_ilc(CM,M,F),true).
+  loop_check_term(kb_dynamic_ilc_0(CM,M,PI,F/A),kb_dynamic_ilc(CM,M,F),true).
 
 %= 	 	 
 
@@ -308,13 +308,13 @@ kb_dynamic_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),
 % Declare Managed Predicate hybrid Inside Of Loop Checking  Primary Helper.
 %
 kb_dynamic_ilc_0(CM,M,PI,F/A):-
-      assert_arity(F,A),
+   must_det_l((   assert_arity(F,A),
       %icatch(discontiguous(baseKB:F/A)),
-      ain(mpred_module(F,M)),
+      ain(baseKB:mpred_module(F,M)),!,
       decl_shared(M:F/A),!,
       sanity(\+is_static_predicate(M:PI)),
       (is_static_predicate(M:PI) -> true ;
-       (predicate_property(M:PI,dynamic) -> true ; icatch(CM:dynamic(M:F/A)))),!.
+       (predicate_property(M:PI,dynamic) -> true ; icatch(CM:dynamic(M:F/A)))))),!.
 
       
 

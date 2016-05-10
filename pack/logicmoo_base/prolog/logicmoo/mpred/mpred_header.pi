@@ -71,7 +71,6 @@ el_assertions:el_holds/9, %el_assertions
 el_assertions:el_holds_pred_impl/1, %el_assertions
 el_assertions:is_cyckb_t_pred/2, %el_assertions
 lmcache:has_pfc_database_preds/1,
-lmconf:abox_for/2,
 lmconf:after_mpred_load/0,
 lmconf:agent_call_command/2,
 lmconf:decl_coerce/3,
@@ -169,7 +168,6 @@ user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_
 :- thread_local(t_l:into_form_code/0).
 :- thread_local(t_l:infSupertypeName/0).
 :- thread_local(t_l:loading_mpred_file/2).
-:- thread_local(t_l:user_abox/2).
 :- thread_local(t_l:mpred_run_paused/0).
 :- thread_local(t_l:no_kif_var_coroutines/0).
 

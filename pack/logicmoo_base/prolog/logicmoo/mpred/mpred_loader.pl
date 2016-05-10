@@ -12,7 +12,6 @@
 :- module(mpred_loader,
           [ add_from_file/1,
           % unused_assertion/1,
-          with_umt_l/1,
           assert_until_eof/2,
           assert_until_eof/1,
           mpred_ops/0,setup_module_ops/1,
@@ -116,7 +115,6 @@
             make_db_listing/0,
             make_dynamic/1,
            (make_dynamic_ilc)/1,
-            with_ukb/2,
             module_typed_term_expand/2,
             module_typed_term_expand/5,
             mpred_begin/0,
@@ -198,7 +196,7 @@
           ]).
 %:- endif.
 
- :- module_transparent((with_umt_l/1,load_file_term_to_command_1b/3,pfc_dcg/0, mpred_term_expansion_by_pred_class/3,
+ :- module_transparent((load_file_term_to_command_1b/3,pfc_dcg/0, mpred_term_expansion_by_pred_class/3,
    must_expand_term_to_command/2, pl_to_mpred_syntax0/2, 
     
     transform_opers_0/2, transform_opers_1/2)).
@@ -206,7 +204,6 @@
  :- meta_predicate
         % make_reachable(?,?),
         call_file_command(?, ?, ?, ?),
-        with_ukb(+, 0),
         cl_assert(?, ?),
         show_bool(0),
         convert_side_effect(?, +, -),
@@ -226,8 +223,7 @@
         myDebugOnError(0),        
         with_mpred_expansions(0),
         with_no_mpred_expansions(0),
-        mpred_loader_module_transparent(?),
-         with_umt_l(0),
+        mpred_loader_module_transparent(?),       
         lmconf:loaded_file_world_time(+, +, +).
 :- multifile((t_l:into_form_code/0, t_l:mpred_module_expansion/1, user:term_expansion/2)).
 :- (dynamic   user:term_expansion/2).
@@ -320,13 +316,6 @@
 :- include('mpred_header.pi').
 
 
-
-%% with_ukb( +KB, :GoalG) is semidet.
-%
-% Using Ukb.
-%
-with_ukb(KB,G):- quietly_must(KB\==user),w_tl(t_l:user_abox(_SM,KB),G).
-
 % TODO uncomment the next line without breaking it all!
 % lmconf:use_cyc_database.
 
@@ -376,7 +365,7 @@ mpred_prolog_only_file(File):- file_name_extension(File,_,pfc),!,fail.
 :- prolog_load_context(directory,Dir),asserta(lmconf:mpred_loader_dir(Dir)).
 
 mpred_expander(Type,_,I,_,_,_):- notrace(dont_term_expansion(Type,I)),!,fail.
-mpred_expander(_Type,_Module,I,PosI,O,PosI):- get_lang(pl), expand_isEach_or_fail(I,O).
+mpred_expander(_Type,_Module,I,PosI,O,PosI):- get_lang(pl),!, expand_isEach_or_fail(I,O).
 mpred_expander(Type,Module,I,PosI,O,PosO):-
    is_file_based_expansion(Type,I,PosI,O,PosO),
    mpred_file_term_expansion(Type,Module,I,O).
@@ -2303,18 +2292,6 @@ push_predicates(M:F/A,STATE):- functor(H,F,A),findall((H:-B), (M:clause(H,B,Ref)
 %
 pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:assert((H:-B))).
 
-
-
-
-with_umt_l(G):- 
-  notrace(current_prolog_flag(mpred_pfc_file,true)),
-   defaultAssertMt(U),
-   nonvar(U),
-   '$set_source_module'(Was,U),
-   nonvar(Was),
-   call_cleanup(
-     catch(G,E,(wdmsg(E),throw(E))),
-      '$set_source_module'(Was)).
 
 
 mpred_loader_file.

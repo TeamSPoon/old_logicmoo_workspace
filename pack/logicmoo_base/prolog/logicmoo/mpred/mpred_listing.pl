@@ -26,6 +26,7 @@
             mpred_list_triggers_nlc/1,
             mpred_list_triggers_1/1,
             mpred_list_triggers_0/1,
+            mpred_list_triggers/1,
             mpred_contains_term/2,
             mpred_classify_facts/4,
             lqu/0,
@@ -208,7 +209,7 @@ print_db_items(F/A):-number(A),!,functor(P,F,A),!,print_db_items(P).
 print_db_items(I):- bagof(I,with_umt(clause_u(I,true)),R1),pp_items((:),R1),R1\==[],!.
 print_db_items(I):- bagof(I,with_umt(clause_i(I,true)),R1),pp_items((:),R1),R1\==[],!.
 print_db_items(I):- \+ current_predicate(_,I),!. 
-print_db_items(I):- catch( ('$find_predicate'(I,_),with_umt(listing(I))),_,true),!,nl,nl.
+print_db_items(I):- catch( ('$find_predicate'(I,_),call_u(listing(I))),_,true),!,nl,nl.
 
 
 %= 	 	 

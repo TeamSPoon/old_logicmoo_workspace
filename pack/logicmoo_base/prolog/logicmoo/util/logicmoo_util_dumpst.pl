@@ -490,7 +490,7 @@ dtrace:- wdmsg("DUMP_TRACE_BREAK/0"), dtrace(system:break).
 %
 
 dtrace(G):- tlbugger:has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
-dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dtrace(G))),trace).
+dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dumptrace(G))),trace).
 
 dtrace(G):- notrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
@@ -545,7 +545,7 @@ dumptrace(G):-
    w_tl(set_prolog_flag(gui, false),
      dumptrace0(G))).
 
-dumptrace0(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dumptrace0(G))),trace).
+dumptrace0(G):- notrace((tracing,notrace,wdmsg(tracing_dumptrace(G)))),break.
 dumptrace0(G):- 
   ignore((debug,
     catch(attach_console,_,true),
