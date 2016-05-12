@@ -181,6 +181,9 @@ mpred_mark(pfcNegTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
 mpred_mark(pfcBcTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
 mpred_mark(pfcRHS,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
 mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>{functor(P,F,A),make_dynamic(P)}.
+:- ain((mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>{functor(P,F,A),kb_dynamic(P)})).
+:- ain((mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>{create_predicate_istAbove(abox,F,A)})).
+
 mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
 mpred_mark(pfcCallCode,F, A)/((is_ftNameArity(F,A)), 
   predicate_is_undefined_fa(F,A))==> marker_supported(F,A).

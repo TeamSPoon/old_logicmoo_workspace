@@ -1117,7 +1117,8 @@ get_kv(KV,X,Y):- arg(1,KV,X),arg(2,KV,Y),!.
 % If Is A Function.
 %
 is_function(F):- is_ftVar(F),!,fail.
-is_function(Function):- compound(Function),get_functor(Function,F,A),is_function(Function,F,A).
+is_function(Function):- compound(Function),!,get_functor(Function,F,A),is_function(Function,F,A).
+is_function(Function):- is_function(Function,Function,0).
 
 
 
@@ -1134,7 +1135,7 @@ is_function(_,'aNARTFn',_):- !,fail.
 is_function(_,'CollectionSubsetFn',_).
 is_function(_,'aCollectionSubsetFn',_).
 is_function(_,F,_):- atom_concat('sk',_Was,F),!,fail.
-is_function(P,_,_):- loop_check(leave_as_is(P)),!,fail.
+% is_function(P,_,_):- loop_check(leave_as_is(P)),!,fail.
 is_function(_,F,_):- loop_check(is_log_op(F)),!,fail.
 is_function(_,F,_):- atom_concat(_Was,'Fn',F).
 is_function(_,F,_):- cheaply_u(tFunction(F)).

@@ -19,6 +19,7 @@
 %:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_at_box,[
          assert_setting01/1,
+         create_predicate_istAbove/3,
          make_module_name_local/2,
          make_module_name_local0/2,
          (make_shared_multifile)/3,
@@ -40,8 +41,8 @@
          make_as_dynamic/4,
          makeConstant/1,
          mtCanAssertMt/1,
-         registerCycPred/4,
-         registerCycPred/5,
+         %registerCycPred/4,
+         %registerCycPred/5,
          retry_undefined/3,
          set_defaultAssertMt/1,
          set_fileAssertMt/1,
@@ -484,7 +485,15 @@ make_as_dynamic(Reason,Mt,F,A):- dynamic( Mt:F/A),
    assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))).
 
 
+transitive_path(F,[Arg1,Arg2],Arg2):-
+  dif(Arg1,Arg2),call(F,Arg1,Arg2),!.
+transitive_path(F,[Arg1,SecondNodeMt|REST],Arg2):-
+  dif(Arg1,Arg2),dif(Arg1,SecondNodeMt),
+  call(F,Arg1,SecondNodeMt),stack_check,
+  transitive_path(F,[SecondNodeMt|REST],Arg2).
 
+
+/*
 registerCycPred(Mt,_,F,A):-
    lmcache:how_registered_pred(_,Mt,F,A),!.
 
@@ -495,22 +504,12 @@ registerCycPred(Mt,Goal,F,A):-
    ain(tMicrotheory(Mt)),
    registerCycPred(Mt,Goal,F,A,OtherMt),!.
 
-registerCycPred(Mt,Goal,F,A):-
-   dynamic(Mt:F/A), % (1 is random(180)->dump_break;true),
-   assert_if_new(( Mt:Goal :- istAbove(Mt,Goal))).
 
-
-transitive_path(F,[Arg1,Arg2],Arg2):-
-  dif(Arg1,Arg2),call(F,Arg1,Arg2),!.
-transitive_path(F,[Arg1,SecondNodeMt|REST],Arg2):-
-  dif(Arg1,Arg2),dif(Arg1,SecondNodeMt),
-  call(F,Arg1,SecondNodeMt),stack_check,
-  transitive_path(F,[SecondNodeMt|REST],Arg2).
 
 registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
   baseKB:mtGlobal(OtherMt),
   add_import_predicate(Mt,Goal,OtherMt),!.
-
+*/
   /*
 registerCycPred(Mt,Goal,F,A,OtherMt):- fail,
    transitive_path(genlMt,[Mt,SecondNodeMt|_],OtherMt),
@@ -534,8 +533,18 @@ baseKB:hybrid_support(arity,2).
 baseKB:hybrid_support(predicateConventionMt,2).
 baseKB:hybrid_support(functorDeclares,1).
 baseKB:hybrid_support(spft,3).
+
 baseKB:hybrid_support(mtCycL,1).
 baseKB:hybrid_support(genlMt,2).
+
+%predicateConventionMt(genlMt,baseKB).
+
+% baseKBOnly mark_mark/3 must be findable from every module (dispite the fact that baseKB is not imported)
+:- dynamic baseKB:mpred_mark/3.
+
+% hybrid_support (like spft/3) must be defined directly in every module and then aggregated thru genlMts (thus to baseKB)
+:- dynamic abox:spft/3.
+
 
 
 istAbove(Mt,Query):- Mt \== baseKB, Mt \== lmcode, genlMt(Mt,MtAbove),MtAbove:Query.
@@ -569,6 +578,16 @@ uses_predicate(Module, Name, Arity, Action) :- fail,
 uses_predicate(CallerMt,F,A,retry):- 
     loop_check(retry_undefined(CallerMt,F,A),dump_break).
 
+%% create_predicate_istAbove(+ChildDefMt,+F,+A) is semidet.
+%
+% Ensure istAbove/2 stub is present in ChildDefMt.
+%
+create_predicate_istAbove(abox,F,A):-
+   defaultAssertMt(CallerMt),!,create_predicate_istAbove(CallerMt,F,A).
+create_predicate_istAbove(CallerMt,F,A):-
+   sanity(\+ find_and_call(mtGlobal(CallerMt))),!,
+   functor(Goal,F,A),assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
+
 
 :- dynamic(lmcache:tried_to_retry_undefined/3).
 
@@ -591,8 +610,8 @@ retry_undefined(baseKB, F, A):-  baseKB_hybrid_support(F,A),
    dynamic(baseKB:F/A),
    discontiguous(baseKB:F/A),!.
 
-retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A),find_and_call(mtLocalized(CallerMt)),!,
-   functor(Goal,F,A),assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
+retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(mtGlobal(CallerMt)),
+   create_predicate_istAbove(CallerMt,F,A).
 
 retry_undefined(CallerMt,F,A):- current_predicate(lmcode:F/A), current_module(M),M\=lmcode,
   current_predicate(M:F/A),functor(P,F,A),predicate_property(M:P,defined),\+predicate_property(M:P,imported_from(_)),

@@ -62,7 +62,9 @@
             logicmoo_util_varnames_file/0,
             make_subterm_path/3,
             maybe_record_scanned_file/0,
-            
+
+            without_varname_scan/1,
+
             no_varnaming/1,
             no_vars_needed/1,
             not_member_eq/2,            
@@ -113,6 +115,7 @@
         get_clause_vars(:),
         get_clause_vars(:, ?),        
         no_varnaming(0),
+        without_varname_scan(0),
         dcall_when(2, ?, ?),
         snumbervars4(*, ?, ?, ?),
         snumbervars5(*, ?, ?, ?),
@@ -153,6 +156,7 @@
             make_subterm_path/3,
             maybe_record_scanned_file/0,            
             no_varnaming/1,
+            without_varname_scan/1,
             no_vars_needed/1,
             not_member_eq/2,            
    print_numbervars_maybe/1,
@@ -350,7 +354,7 @@ dcall_when(P,In,Out):- must(call(P,In,Out)),ignore((In\=@=Out,dmsg((dcall_when(P
 %
 % No Varnaming.
 %
-no_varnaming(G):-!, G.
+
 no_varnaming(G):-w_tl(t_l:dont_varname,G).
 
 
@@ -1187,6 +1191,7 @@ scan_for_varnames:-
  doall((source_file(F),que_read_source_file_vars(F))),!,
  ignore((
    ( \+ \+ varname_cache:queued_read_source_file_vars(_)),
+   dmsg("Begining grovel for vars..."),
    gripe_time(1.0,doall((retract(varname_cache:queued_read_source_file_vars(F)),
      read_source_file_vars(F)))))).
 
@@ -1374,6 +1379,10 @@ term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:don
    current_predicate(logicmoo_util_varnames_file/0), current_prolog_flag(mpred_vars,true),  
    source_context_module(M),init_varname_stores(M),logicmoo_util_with_assertions:w_tl([t_l:dont_varname_te,t_l:disable_px],try_save_vars(M:HB)),!,fail.
 
+
+without_varname_scan(Goal):-
+  w_tl(current_prolog_flag(mpred_vars,false),  
+   w_tl([-t_l:dont_varname_te,- t_l:dont_varname],Goal)).
 
 %= 	 	 
 

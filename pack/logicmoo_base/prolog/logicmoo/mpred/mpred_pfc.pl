@@ -1336,7 +1336,7 @@ mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc==fwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 % mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
-  %dmsg(mpred_fwc1(Fact)),
+  dmsg(mpred_fwc1(Fact)),
   mpred_do_rule(Fact),
   copy_term_vn(Fact,F),
   % check positive triggers
