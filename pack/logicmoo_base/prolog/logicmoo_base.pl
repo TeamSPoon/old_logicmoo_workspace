@@ -116,7 +116,7 @@ bad_thing_to_do:- doall((clause(wsh_w:wrap_shared(F,A,ereq),Body),
 lmconf:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(U,M),U\==M),L),
      wdmsg(imports_eache :- (L,[sees(M)])))).
 lmconf:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(M,U),U\==M),L),wdmsg(imports(M):-L))).
-lmconf:sanity_check:- doall((baseKB:mtSharedPrologCodeOnly(M),
+lmconf:sanity_check:- doall((baseKB:mtProlog(M),
     setof(U,(current_module(U),default_module(M,U),U\==M),L),wdmsg(imports(M):-L))).
 
 
@@ -127,9 +127,10 @@ lmconf:sanity_check:- doall((baseKB:mtSharedPrologCodeOnly(M),
 :- module_transparent system:exception/3.
 :- dynamic system:exception/3.
 
+/*
 :-ignore((lmconf:source_typein_modules(O, _O, _), O\=user,O\=baseKB,O\=system,
    setup_module_ops(O), add_abox_module(O), set_defaultAssertMt(O))).
-  
+*/  
 
 :- set_prolog_flag(retry_undefined,false).
 
@@ -164,4 +165,6 @@ user:lmbf:-
 
 :- forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox),maybe_add_import_module(M,abox,start)).
 :- forall((current_module(M),M\=user,M\=system,M\=baseKB),maybe_add_import_module(M,baseKB,start)).
+
+
 

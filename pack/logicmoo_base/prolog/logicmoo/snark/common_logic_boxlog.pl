@@ -541,7 +541,7 @@ did_use_hack(X):-wdmsg(did_use_hack(X)).
 %
 % Datalog Converted To Prolog.
 %
-boxlog_to_pfc_pass_4(IN,OUT):-notrace(leave_as_is(IN)),!,IN=OUT.
+boxlog_to_pfc_pass_4(IN,OUT):-cnotrace(leave_as_is(IN)),!,IN=OUT.
 boxlog_to_pfc_pass_4(H, HH):-is_list(H),!,must_maplist(boxlog_to_pfc_pass_4,H,HH).
 boxlog_to_pfc_pass_4(IN,OUT):-once(demodal_sents('$VAR'('KB'),IN,MID)),IN\=@=MID,!,boxlog_to_pfc_pass_4(MID,OUT).
 boxlog_to_pfc_pass_4(IN,OUT):-once(subst_except(IN,not,~,MID)),IN\=@=MID,!,boxlog_to_pfc_pass_4(MID,OUT).

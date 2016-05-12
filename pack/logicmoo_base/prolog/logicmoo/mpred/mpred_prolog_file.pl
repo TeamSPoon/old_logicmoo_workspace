@@ -28,6 +28,7 @@
           load_file_dir/2,
           load_file_some_type/2,
           use_file_type_loader/2,
+          never_load_special/2,
           %user:prolog_load_file/2,
           mpred_process_input/2,
           mpred_process_input_1/1
@@ -57,7 +58,7 @@ mpred_process_input_1(T):- must(try_save_vars(T)),with_umt(ain(T)),!.
 %
 % Managed Predicate Process Input.
 %
-mpred_process_input(T,Vs):- must(notrace(expand_term(T,TT)))->put_variable_names( Vs)->mpred_process_input_1(TT)->!.
+mpred_process_input(T,Vs):- must(cnotrace(expand_term(T,TT)))->put_variable_names( Vs)->mpred_process_input_1(TT)->!.
 
 
 
@@ -297,11 +298,10 @@ load_file_some_type(M:File,Options):-call_from_module(M,must(load_files(M:File,O
 % Prolog Load File.
 %
 
-
-user:prolog_load_file(Module:Spec, Options):- fail,
+user:prolog_load_file(Module:Spec, Options):-
   Spec \== 'MKINDEX.pl',
-  system:predicate_property(prolog_load_file_loop_checked(_,_),dynamic),
   \+ never_load_special(Module:Spec, Options),  
-  catch(prolog_load_file_loop_checked(Module:Spec, Options),E,
+  catch(prolog_load_file_loop_checked(Module:Spec, Options),
+   E,
     ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))).
 

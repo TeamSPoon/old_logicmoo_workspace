@@ -19,7 +19,7 @@ end_of_file.
 :- was_dynamic(cwtdl_failed/1).
 
 cwtdl(Goal,DL,TL):- cwc,
-  notrace((ignore((nortrace,
+  cnotrace((ignore((nortrace,
    (show_failure(why,catch(call_with_time_limit(TL,(((call_with_depth_limit(Goal,DL,DLE),DLE\==depth_limit_exceeded)))),E,(dmsg(E:cwtdl(Goal,DL,TL)),fail)))
      ->true;
     assert(cwtdl_failed(Goal))))))).
@@ -90,7 +90,7 @@ tHominid(iExplorer2).
 
 :- set_clause_compile(fwc).
 
-load_later:- notrace((transfer_predicate(tinyK8(Form),writeq(Form),ignore(on_x_log_throw(cwtdl(ain(clif(Form)),500,10)))))).
+load_later:- cnotrace((transfer_predicate(tinyK8(Form),writeq(Form),ignore(on_x_log_throw(cwtdl(ain(clif(Form)),500,10)))))).
 
 :- mpred_notrace.
 

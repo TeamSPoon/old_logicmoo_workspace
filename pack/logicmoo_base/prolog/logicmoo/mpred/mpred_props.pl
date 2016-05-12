@@ -248,11 +248,11 @@ decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
 %
 kb_dynamic(A):-not(compound(A)),!,ain00(prologHybrid(A)).
 kb_dynamic(M):-M=..[isEach|List],!,must_maplist(kb_dynamic,List).
-kb_dynamic(M):-is_list(List),!,must_maplist(kb_dynamic,List).
+kb_dynamic(List):-is_list(List),!,must_maplist(kb_dynamic,List).
 % kb_dynamic(A):-!, must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),A))),!.
 kb_dynamic(F/A):- var(A),atom(F),
  with_umt((must(current_smt(SM,CM)),!,
-   forall(between(1,10,A),must(kb_dynamic_ilc_0(CM,SM,PI,F,A))))).
+   forall(between(1,10,A),must((functor(PI,F,A),kb_dynamic_ilc_0(CM,SM,PI,F,A)))))).
 kb_dynamic(P):- with_umt(with_pi(P,kb_dynamic)).
 
 :- was_export((kb_dynamic)/3).

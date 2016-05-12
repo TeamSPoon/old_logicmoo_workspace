@@ -33,19 +33,15 @@
 
 :- '$set_source_module'(baseKB).
 
+
 :- file_begin(pfc).
 
 :- set_fileAssertMt(baseKB).
+:- mpred_ops.
 
 % catching of misinterpreations
 
 :- dynamic(mpred_mark/3).
-
-mpred_mark(pfcPosTrigger,F,A)==>{warn_if_static(F,A)}.
-mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
-mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
-
-
 
 :- dynamic(ttModule/1).
 :- dynamic(marker_supported/2).
@@ -67,6 +63,8 @@ mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
 :- kb_dynamic(arity/2).
 
 :- dynamic(arity/2).
+:- dynamic(disjointWith/2).
+
 % prologHybrid(arity/2).
 
 arity(apathFn,2).
@@ -122,92 +120,6 @@ argsQuoted(second_order).
 
 nondet.
 
-predicateConventionMt(genlMt,baseKB).
-predicateConventionMt(regression_test,lmconf).
-
-% mtExact(Mt)==>{kb_dynamic(Mt)}.
-
-tCol(ttModule).
-tCol(tSet).  % = isa(tSet,tCol).
-
-ttModule(M)==>tSet(M).
-
-
-ttModule(mtPrologLibrary,comment("Builtin Prolog code modules such as 'lists' or 'apply'")).
-
-ttModule(mtLibrary,comment("PFC System modules such as 'mpred_loader' or 'mpred_type_wff'")).
-
-
-ttModule(mtLocal,comment("mtLocal(?Mt) is always scoped underneath baseKB")).
-
-
-ttModule(mtGlobal,comment("mtGlobal(?Mt) states the Mt is always findable during inheritance")).
-mtGlobal(baseKB).
-mtGlobal(lmcode).
-mtGlobal(system).
-
-ttModule(mtExact,
-  comment("mtExact(?Mt) states that all predicates the Mt specified should not inherit past ?Mt.  Thus:  mtExact(Mt)==> ~genlMt(Mt,_)")).
-mtExact(lmconf).
-mtExact(lmcache).
-mtExact(t_l).
-mtExact(system).
-mtExact(Mt)==> mtGlobal(Mt).
-mtExact(Mt)==> ~genlMt(Mt,_).
-
-ttModule(mtCore,comment("mtCore(?Mt) states Mt specified is builtin")).
-mtCore(user).
-mtCore(everythingPCS).
-mtCore(inferencePCS).
-mtCore(Mt)==>tMicrotheory(Mt).
-
-/*
-{module_property(Mt,class(user)),
-   (atom_concat('common_logic_',_,Mt);atom_concat('logicmoo_util_',_,Mt);atom_concat('mpred_',_,Mt))} 
-    ==>  mtGlobal(Mt).
-
-*/
-
-:- mpred_ops.
-
-{module_property(Mt,class(library))} ==> mtPrologLibrary(Mt).
-
-mtPrologLibrary(Mt)==>mtGlobal(Mt).
-
-mtGlobal(Mt)==>(mtCore(Mt),~mtLocal(Mt)).
-
-(tMicrotheory(Mt), ~ mtCore(Mt)) <==> mtLocal(Mt).
-
-(genlMt(Mt,baseKB)/(Mt \==baseKB ), \+ mtCore(Mt)) ==> mtLocal(Mt).
-
-% mtLocal(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
-mtGlobal(Mt)==>genlMt(baseKB,Mt).
-
-baseKB:isRegisteredCycPred(apply,maplist,3).
-
-/*
-(genlMt(Child,Parent), \+ mtCore(Child)) ==>
-   {ignore((system:delete_import_module(Parent,user))),
-    ignore((system:delete_import_module(Parent,Child))),
-    system:add_import_module(Child,Parent,start)}.
-*/
-
-:- dynamic(baseKB:isRegisteredCycPred/3).
-
-({fail,current_module(Mt),
-   predicate_property(Mt:P,defined), 
- \+ predicate_property(Mt:P,imported_from(_)),
- functor(P,F,A)})
-  ==>baseKB:isRegisteredCycPred(Mt,F,A).
-
-
-/* prolog_listing:listing */
-% :- printAll(baseKB:isRegisteredCycPred/3).
-
-% ~(tCol({})).
-
-:- unload_file(library(yall)).
-
 
 ((prologBuiltin(P)/get_arity(P,F,A),arity(F,A))==>{make_builtin(F/A)}).
 
@@ -225,7 +137,6 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
     CL = arity(F,A)
     },
    (CL))).
-
 
 
 %:- kb_dynamic(hybrid_support/2).
@@ -253,6 +164,10 @@ bt(P,_)==> (P:- mpred_bc_only(P)).
 % prologDynamic(X)/get_pifunctor(X,C)==>({kb_dynamic(C),decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologDynamic(F)).
 
 isa(F,pfcMustFC) ==> pfcControlled(F).
+
+mpred_mark(pfcPosTrigger,F,A)==>{warn_if_static(F,A)}.
+mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
+mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
 
 
 
@@ -298,8 +213,142 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 % becomes         mp_test_agr(+,+,-,?,^,:,0,1,0,0)
 
 
-((marker_supported(F,A)/is_ftNameArity(F,A),prologHybrid(F))==>hybrid_support(F,A)).
-(hybrid_support(F,A) ==>{ must(kb_dynamic(F/A))}).
+((marker_supported(F,A)/is_ftNameArity(F,A),prologHybrid(F)))==>hybrid_support(F,A).
+
+hybrid_support(F,A) ==>{ must(kb_dynamic(F/A))}.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+genlMt(Mt1,Mt2),mtCycL(Mt1),mtProlog(Mt2) ==> 
+  {maybe_add_module_import(Mt1,Mt2)}.
+
+/*
+genlMt(Mt1,Mt2),mtProlog(Mt1),mtCycL(Mt2) ==> 
+  {trace_or_throw(oddly_genlMt(Mt1,Mt2))}.
+*/
+
+predicateConventionMt(genlMt,baseKB).
+predicateConventionMt(regression_test,lmconf).
+
+% mtExact(Mt)==>{kb_dynamic(Mt)}.
+
+tCol(ttModule).
+tCol(tSet).  % = isa(tSet,tCol).
+
+mtProlog(Mt),predicateConventionMt(F,Mt)==>prologBuiltin(F).
+
+genlsFwd(Sub,Super)==>(isa(I,Sub)==>isa(I,Super)).
+
+ttModule(M)==>tSet(M).
+ttModule(MtType)==>genlsFwd(MtType,tMicrotheory).
+ttModule(mtProlog).
+
+disjointWith(mtLibrary,mtPrologLibrary).
+
+% partition(mtProlog, mtLibrary, mtPrologLibrary, mtUserCodeLibrary).
+
+
+
+
+ttModule(mtCycL,comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),
+  genlsFwd(tMicrotheory)).
+ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
+  genlsFwd(tMicrotheory)).
+
+ttModule(mtPrologLibrary,comment("Builtin Prolog code modules such as 'lists' or 'apply'"),
+  genlsFwd(mtProlog),genlsFwd(mtCore)).
+
+ttModule(mtLibrary,comment("PFC System modules such as 'mpred_loader' or 'mpred_type_wff'"),
+   genlsFwd(mtProlog)).
+
+% ttModule(mtLocal,comment("mtLocal(?Mt) is always scoped underneath baseKB")).
+
+
+mtExact(Mt)==> mtGlobal(Mt).
+
+ttModule(mtGlobal,comment("mtGlobal(?Mt) states the Mt is always findable during inheritance")).
+mtGlobal(baseKB).
+mtGlobal(lmcode).
+mtGlobal(system).
+
+ttModule(mtExact,
+  comment("mtExact(?Mt) states that all predicates the Mt specified should be called from ?Mt.")).
+mtExact(lmconf).
+mtExact(lmcache).
+mtExact(t_l).
+mtExact(system).
+mtExact(Mt)==> mtGlobal(Mt).
+mtExact(Mt)==> ~genlMt(Mt,_).
+
+ttModule(mtCore,comment("mtCore(?Mt) states Mt specified is builtin")).
+mtCore(user).
+mtCore(everythingPCS).
+mtCore(inferencePCS).
+mtCore(Mt)==>tMicrotheory(Mt).
+
+
+
+
+
+
+/*
+{module_property(Mt,class(user)),
+   (atom_concat('common_logic_',_,Mt);atom_concat('logicmoo_util_',_,Mt);atom_concat('mpred_',_,Mt))} 
+    ==>  mtGlobal(Mt).
+
+*/
+
+mtCycL(O)==>{setup_module_ops(O)}.
+
+{module_property(Mt,class(library))} ==> mtPrologLibrary(Mt).
+
+mtPrologLibrary(Mt)==>mtGlobal(Mt).
+
+mtGlobal(Mt)==>(mtCore(Mt),~mtLocal(Mt)).
+
+(tMicrotheory(Mt), ~ mtCycL(Mt)) <==> mtProlog(Mt).
+
+(genlMt(Mt,baseKB)/(Mt \==baseKB ), \+ mtCore(Mt)) ==> mtLocal(Mt).
+
+% mtCycL(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
+mtGlobal(Mt)==>genlMt(baseKB,Mt).
+
+baseKB:isRegisteredCycPred(apply,maplist,3).
+
+/*
+(genlMt(Child,Parent), \+ mtCore(Child)) ==>
+   {ignore((system:delete_import_module(Parent,user))),
+    ignore((system:delete_import_module(Parent,Child))),
+    system:add_import_module(Child,Parent,start)}.
+*/
+
+:- dynamic(baseKB:isRegisteredCycPred/3).
+
+({fail,current_module(Mt),
+   predicate_property(Mt:P,defined), 
+ \+ predicate_property(Mt:P,imported_from(_)),
+ functor(P,F,A)})
+  ==>baseKB:isRegisteredCycPred(Mt,F,A).
+
+
+/* prolog_listing:listing */
+% :- printAll(baseKB:isRegisteredCycPred/3).
+
+% ~(tCol({})).
+
+:- unload_file(library(yall)).
+
 
 
 % :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
@@ -307,4 +356,4 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 :-ain(pass2).
 
 :- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
-:- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
+:- ain(mpred_database_term(F,_,_)==> predicateConventionMt(F,abox)).

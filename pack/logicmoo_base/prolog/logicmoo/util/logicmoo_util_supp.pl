@@ -51,7 +51,7 @@ must_or_die(Goal):- (Goal *-> true ; throw(failed_must_or_die(Goal))).
 
 :- module_transparent(must_atomic/1).
 :- '$hide'(must_atomic/1).
-must_atomic(Goal):- must_or_die(notrace(('$sig_atomic'(Goal)))).
+must_atomic(Goal):- must_or_die(cnotrace(('$sig_atomic'(Goal)))).
 
 :- module_transparent(must_notrace/1).
 :- '$hide'(must_notrace/1).
@@ -59,8 +59,8 @@ must_notrace(Goal):- no_trace(must_or_die(Goal)).
 
 :- module_transparent(no_trace/1).
 :- '$hide'(no_trace/1).
-no_trace(G):- notrace((tracing,notrace))->
-   setup_call_cleanup_each(notrace(notrace),G,notrace(trace)); G.
+no_trace(G):- cnotrace((tracing,cnotrace))->
+   setup_call_cleanup_each(cnotrace(cnotrace),G,cnotrace(trace)); G.
 
 :- module_transparent(call_cleanup_each/2).
 :- '$hide'(call_cleanup_each/2).

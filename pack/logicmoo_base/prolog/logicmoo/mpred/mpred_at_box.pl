@@ -85,22 +85,18 @@ user_m_check(_Out).
 
 :- use_module(mpred_pfc).
 
-add_abox_module(ABox):- baseKB:mtLocal(ABox),!.
 add_abox_module(baseKB):-!.
 add_abox_module(ABox):- 
+  
   must(mtCanAssertMt(ABox)),
-  asserta(baseKB:mtLocal(ABox)),
-  forall(current_module(M),
-    (((import_module(M,abox),(M\==ABox))->add_import_module(M,ABox,start);true),
-     ((import_module(abox,M),(M\==ABox)->add_import_module(ABox,M,start);true)))),  
-    ((M==abox)->true;(ignore(system:delete_import_module(ABox,abox)),add_import_module(abox,ABox,start))).
+  ain(baseKB:mtCycL(ABox)).
 
-:- dynamic(baseKB:mtSharedPrologCodeOnly/1).
+:- dynamic(baseKB:mtProlog/1).
 :- dynamic(baseKB:mtNoPrologCode/1).
 baseKB:mtNoPrologCode(mpred_userkb).
 
-baseKB:mtSharedPrologCodeOnly(Mt):- module_property(Mt,class(library)).
-baseKB:mtSharedPrologCodeOnly(Mt):-
+baseKB:mtProlog(Mt):- module_property(Mt,class(library)).
+baseKB:mtProlog(Mt):-
       arg(_,v( 
          common_logic_boxlog,
          common_logic_compiler,
@@ -257,7 +253,7 @@ fileAssertMt(ABox):-
      abox:defaultTBoxMt(ABox))),mtCanAssertMt(ABox))),!.
 fileAssertMt(baseKB).
 
-mtCanAssertMt(ABox):- \+ baseKB:mtSharedPrologCodeOnly(ABox).
+mtCanAssertMt(ABox):- \+ baseKB:mtProlog(ABox).
 
 
 
@@ -270,7 +266,7 @@ makeConstant(_Mt).
 
 
 %:- (system:trace, rtrace, trace,cls ).
-%:- (break,notrace,nortrace).
+%:- (break,cnotrace,nortrace).
 
 
 
@@ -279,12 +275,13 @@ makeConstant(_Mt).
 % Sets Current Module.
 %
 set_defaultAssertMt(abox):-!.
-set_defaultAssertMt(M):- baseKB:mtSharedPrologCodeOnly(M),!,setup_module_ops(M).
+set_defaultAssertMt(M):- baseKB:mtProlog(M),!,setup_module_ops(M).
 set_defaultAssertMt(ABox):- defaultAssertMt(QABox)->QABox==ABox,!.
 set_defaultAssertMt(ABox):- 
   must_det_l((
     must(mtCanAssertMt(ABox)),
     must(abox:defaultTBoxMt(TBox)),
+    ain(baseKB:mtCycL(ABox)),
     asserta_if_new(ABox:defaultTBoxMt(TBox)),
     (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
     '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
@@ -388,8 +385,6 @@ ensure_imports_tbox(M,TBox):-
   asserta(lmcache:is_ensured_imports_tbox(M,TBox)),
   
   must_det((
-   %forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(M,IM)),
-   %forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),inherit_into_module(TBox,IM)),
    skip_user(TBox),
    ignore(maybe_delete_import_module(M,TBox)),
    ignore(maybe_delete_import_module(TBox,M)),
@@ -539,7 +534,7 @@ baseKB:hybrid_support(arity,2).
 baseKB:hybrid_support(predicateConventionMt,2).
 baseKB:hybrid_support(functorDeclares,1).
 baseKB:hybrid_support(spft,3).
-baseKB:hybrid_support(mtLocal,1).
+baseKB:hybrid_support(mtCycL,1).
 baseKB:hybrid_support(genlMt,2).
 
 
@@ -671,7 +666,7 @@ shared_multifile(PI):- kb_dynamic(PI).
 %
 % Make Shared Multifile.
 %
-make_shared_multifile(CallerMt,   M,FA):- get_fa(FA,F,A), make_shared_multifile(CallerMt, PredMt,F,A),!.
+make_shared_multifile(CallerMt, PredMt,FA):- get_fa(FA,F,A), make_shared_multifile(CallerMt, PredMt,F,A),!.
 
 make_shared_multifile(CallerMt,    t_l,F,A):-!,CallerMt:thread_local(t_l:F/A),CallerMt:multifile(t_l:F/A).
 make_shared_multifile(CallerMt,lmconf ,F,A):-!,CallerMt:multifile(lmconf:F/A),CallerMt:dynamic(lmconf:F/A),!.
@@ -683,7 +678,7 @@ make_shared_multifile(CallerMt,PredMt,F,A):-
   HomeM\==PredMt,!,
   make_shared_multifile(CallerMt,HomeM,F,A).
 
-make_shared_multifile(CallerMt,Home,F,A):- baseKB:mtSharedPrologCodeOnly(Home),!,
+make_shared_multifile(CallerMt,Home,F,A):- baseKB:mtProlog(Home),!,
      wdmsg(mtSharedPrologCodeOnly_make_shared_multifile(CallerMt,Home:F/A)),!.
 
 make_shared_multifile(_CallerMt, baseKB,F,A):-  kb_dynamic(F,A),!.

@@ -430,7 +430,7 @@ never_assert_u(pt(_,
 
 
 on_modules_changed :-
-  forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox,\+ baseKB:mtLocal(M)),
+  forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox,\+ baseKB:mtCycL(M)),
       (default_module(abox,M)->true;catch(add_import_module(M,abox,start),_E,dmsg(add_import_module(M,abox,start))))),
   forall((current_module(M),M\=user,M\=system,M\=baseKB),
      (default_module(baseKB,M)->true;catch(add_import_module(M,baseKB,end),_E,dmsg(add_import_module(M,baseKB,end))))).
@@ -456,7 +456,7 @@ never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
 %:- ignore(delete_import_module(baseKB,user)).
 %:- add_import_module(baseKB,lmcode,start).
 %:- nortrace.
-%:- notrace.
+%:- cnotrace.
 
 
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).

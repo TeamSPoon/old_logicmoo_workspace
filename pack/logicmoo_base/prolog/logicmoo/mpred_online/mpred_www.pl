@@ -176,10 +176,9 @@
 :- export((current_form_var0/1, get_http_session0/1, handler_logicmoo_cyclone_1/1, is_context0/1, make_quotable_0/2, pp_i2tml_0/1, pp_i2tml_1/1, put_string0/1, put_string0/2, sanity_test_000/0, show_edit_term0/3, show_edit_term1/3, show_select1/2, show_select2/3)).
 :- multifile((last_item_offered/1, http:location/3, http_dispatch:handler/4, http_session:session_data/2, http_session:urandom_handle/1, mpred_www:foobar/1, mpred_www:http_last_request/1, mpred_www:last_item_offered/1, system:'$init_goal'/3, user:file_search_path/2)).
 
-
-:- user:use_module(library(http/http_server_files)).
-:- user:use_module(library(logicmoo_base)).
 :- include(logicmoo(mpred/'mpred_header.pi')).
+:- system:use_module(library(logicmoo_utils)).
+:- system:use_module(library(logicmoo_swilib)).
 
 
 :-
@@ -196,7 +195,9 @@
  op(350,xfx,'xor'),
  op(300,fx,'~'),
  op(300,fx,'-').
-:- user:((
+
+:- 
+ user:((
  op(1199,fx,('==>')), 
  op(1190,xfx,('::::')),
  op(1180,xfx,('==>')),
@@ -212,10 +213,7 @@
  op(300,fx,'-'))).
 
 
-:- user:use_module(library(pldoc)).
-:- user:use_module(library(pldoc/doc_access)).
-:- user:use_module(library(pldoc/doc_pack)).
-
+:- nb_setval(pldoc_options,[ prefer(manual) ]).
 
 :- meta_predicate hmust(0).
 :- meta_predicate hmust_l(0).
@@ -228,18 +226,16 @@
 
 
 
-%= 	 	 
-
-%% ensure_webserver( ?ARG1) is semidet.
+%% ensure_webserver( ?ARG1) is det.
 %
 % Ensure Webserver.
 %
 ensure_webserver(Port) :- format(atom(A),'httpd@~w_1',[Port]),thread_property(_,alias(A)),!.
 ensure_webserver(Port) :- on_x_rtrace(http_server(http_dispatch,[ port(Port), workers(16) ])).
 
-%= 	 	 
 
-%% ensure_webserver is semidet.
+
+%% ensure_webserver is det.
 %
 % Ensure Webserver.
 %
@@ -256,21 +252,24 @@ ensure_webserver:- ensure_webserver(3020).
 :- volatile(http_session:urandom_handle/1).
 
 
-%= 	 	 
 
-%% hmust( :GoalARG1) is semidet.
+
+%% hmust( :GoalARG1) is det.
 %
 % Hmust.
 %
-hmust(G):-G.
+hmust(G):-G *-> true ; throw(failed_hmust(G)).
 
-%= 	 	 
 
-%% hmust_l( :GoalARG1) is semidet.
+
+%% hmust_l( :GoalARG1) is det.
 %
 % Hmust (list Version).
 %
-hmust_l(G):-G.
+hmust_l(G):-is_list(G),!,maplist(hmust,G).
+hmust_l((G1,G2)):- !,hmust_l(G1),hmust_l(G2).
+hmust_l(G):-hmust(G).
+
 
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
@@ -282,90 +281,22 @@ hmust_l(G):-G.
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-% :- user:use_module(logicmoo(logicmoo_utils)).
+
  
 
-% :- module(mpred_www,[ html_print_term/2  ]).  % +Term, +Options
-
-% :- if(if_defined(load_mud_www)).
 
 
 
-:- dynamic http:location/3.
-:- multifile http:location/3.
-
-:- user:use_module(library(debug), [debug/3]).
-:- user:use_module(library(lists), [append/3, member/2, select/3]).
-:- user:use_module(library(operators), [push_op/3]).
-:- user:use_module(library(shlib), [current_foreign_library/2]).
-:- user:use_module(library(prolog_source)).
-:- user:use_module(library(option)).
-:- user:use_module(library(error)).
-:- user:use_module(library(apply)).
-:- user:use_module(library(debug)).
-
-:- if(exists_source(library(unix))).
-:- user:use_module(library(unix)).
-:- endif.
-
-:- user:use_module(library(rdf_ntriples),[rdf_ntriple_part/4]).
-:- user:use_module(library(tty),[menu/3]).
-:- user:use_module(library(solution_sequences),[distinct/1]).
-
-:- if(exists_source(library(pldoc))).
-:- user:use_module(library(pldoc), []).
-	% Must be loaded before doc_process
-:- user:use_module(library(pldoc/doc_process)).
-:- endif.
-:- user:use_module(library(prolog_xref)).
 
 
 % WANT 
 :- initialization(doc_collect(true)).
 
-%:- user:use_module(library(pldoc/doc_library)).
-%:- doc_load_library.
 
-:- user:use_module(library(option)).
-%:- style_check(-discontiguous). 
-%:- style_check(-singleton).
+:- portray_text(false).  % or Enable portray of strings
 
 
 :- thread_local(t_l:omit_full_stop).
-
-:- user:use_module(library(http/thread_httpd)).
-:- user:use_module(library(http/http_error)).
-:- user:use_module(library(http/http_client)).
-
-:- include(library(pldoc/hooks)).
-% http_reply_from_files is here
-:- user:use_module(library(http/http_files)).
-% http_404 is in here
-:- user:use_module(library(http/http_dispatch)).
-:- user:use_module(library(pldoc/doc_process)).
-:- reexport(library(pldoc/doc_html)).
-:- user:use_module(library(pldoc/doc_wiki)).
-:- user:use_module(library(pldoc/doc_search)).
-:- user:use_module(library(pldoc/doc_util)).
-:- user:use_module(library(http/http_dispatch)).
-:- user:use_module(library(http/html_write)).
-
-:- user:use_module(library(http/html_head)).
-:- user:use_module(library(readutil)).
-:- user:use_module(library(url)).
-:- user:use_module(library(option)).
-:- user:use_module(library(lists)).
-:- user:use_module(library(doc_http)).
-
-:- user:use_module(library(http/http_session)).
-
-:- M=pldoc_process,ignore((module_property(M,file(S)),source_file(PI,S),
-   \+ ((predicate_property(M:PI,imported_from(U)),U\==M)),
-   functor(PI,F,A),zzzimport(F/A),fail)).
-
-
-:- portray_text(false).  % Enable portray of strings
-:- user:use_module(library(http/http_parameters)).
 
 %:- thread_property(_,alias('http@3020'))->true; http_server(http_dispatch, [port(3020)]).
 
@@ -373,18 +304,17 @@ hmust_l(G):-G.
 :- http_handler('/logicmoo_nc/', handler_logicmoo_cyclone, [prefix]). %  % 
 
 
-%= 	 	 
 
-%% location( ?ARG1, ?ARG2, ?ARG3) is semidet.
+%% location( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Hook To [http:location/3] For Module Mpred_www.
 % Location.
 %
 http:location(pixmaps, root(pixmaps), []).
 
-%= 	 	 
 
-%% user:file_search_path( ?ARG1, ?ARG2) is semidet.
+
+%% user:file_search_path( ?ARG1, ?ARG2) is det.
 %
 % Hook To [user:file_search_path/2] For Module Mpred_www.
 % File Search Path.
@@ -396,9 +326,9 @@ user:file_search_path(pixmaps, logicmoo('mpred_online/pixmaps')).
 	handler_logicmoo_cyclone(+).
 
 
-%= 	 	 
 
-%% print_request( :TermARG1) is semidet.
+
+%% print_request( :TermARG1) is det.
 %
 % Print Request.
 %
@@ -409,20 +339,19 @@ print_request([H|T]) :-
         print_request(T).
 
 
-:- nb_setval(pldoc_options,[ prefer(manual) ]).
 
 
-%= 	 	 
 
-%% make_quotable_0( ?ARG1, ?ARG2) is semidet.
+
+%% make_quotable_0( ?ARG1, ?ARG2) is det.
 %
 % make quotable  Primary Helper.
 %
 make_quotable_0(SUnq,SObj):-atom_subst(SUnq,'\\','\\\\',SObj0),atom_subst(SObj0,'\n','\\n',SObj1),atom_subst(SObj1,'"','\\\"',SObj).
 
-%= 	 	 
 
-%% make_quotable( ?ARG1, ?ARG2) is semidet.
+
+%% make_quotable( ?ARG1, ?ARG2) is det.
 %
 % Make Quotable.
 %
@@ -437,9 +366,9 @@ make_quotable(String,SObj):-format(string(SUnq),'~q',[String]),make_quotable_0(S
 
 :- export(save_in_session/1).
 
-%= 	 	 
 
-%% save_in_session( :TermARG1) is semidet.
+
+%% save_in_session( :TermARG1) is det.
 %
 % Save In Session.
 %
@@ -452,9 +381,9 @@ save_in_session(NV):- dmsg(not_save_in_session(NV)),!.
 
 :- export(save_in_session/2).
 
-%= 	 	 
 
-%% save_in_session( ?ARG1, ?ARG2) is semidet.
+
+%% save_in_session( ?ARG1, ?ARG2) is det.
 %
 % Save In Session.
 %
@@ -464,9 +393,9 @@ save_in_session(N,V):- get_http_session(S), save_in_session(S, N,V),!.
 
 % save_in_session(S,N,V):- \+ param_default_value(N,_),!.
 
-%= 	 	 
 
-%% save_in_session( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% save_in_session( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Save In Session.
 %
@@ -477,9 +406,9 @@ save_in_session(S,N,V):- dmsg(not_save_in_session(S,N,V)),!.
 
 
 
-%= 	 	 
 
-%% show_http_session is semidet.
+
+%% show_http_session is det.
 %
 % Show Http Session.
 %
@@ -487,9 +416,9 @@ show_http_session:-hmust(get_http_session(S)),listing(http_session:session_data(
   
 
 
-%= 	 	 
 
-%% make_session( ?ARG1) is semidet.
+
+%% make_session( ?ARG1) is det.
 %
 % Make Session.
 %
@@ -497,9 +426,9 @@ make_session(S):- ignore((is_cgi_stream,http_session:http_open_session(S,[renew(
 
 :- export(get_http_session/1).
 
-%= 	 	 
 
-%% get_http_session( ?ARG1) is semidet.
+
+%% get_http_session( ?ARG1) is det.
 %
 % Get Http Session.
 %
@@ -510,9 +439,9 @@ get_http_session(main).
 
 :- export(get_http_session0/1).
 
-%= 	 	 
 
-%% get_http_session0( ?ARG1) is semidet.
+
+%% get_http_session0( ?ARG1) is det.
 %
 % Get Http Session Primary Helper.
 %
@@ -522,18 +451,18 @@ get_http_session0(S):- on_x_log_fail((get_http_current_request(R),member(session
 get_http_session0(S):- on_x_log_fail((get_http_current_request(R),member(cookie([swipl_session=S]),R))),!.
 
 
-%= 	 	 
 
-%% is_cgi_stream is semidet.
+
+%% is_cgi_stream is det.
 %
 % If Is A Cgi Stream.
 %
 is_cgi_stream:-current_output(X),http_stream:is_cgi_stream(X).
 
 
-%= 	 	 
 
-%% reset_assertion_display is semidet.
+
+%% reset_assertion_display is det.
 %
 % Reset Assertion Display.
 %
@@ -544,20 +473,19 @@ reset_assertion_display:-
    retractall(shown_clause(_)).
 
 
-%= 	 	 
 
-%% get_param_sess( ?ARG1, ?ARG2) is semidet.
+
+%% get_param_sess( ?ARG1, ?ARG2) is det.
 %
 % Get Param Sess.
 %
 get_param_sess(N,V):- must(param_default_value(N,D)),!,get_param_sess(N,V,D),!.
 
-:- user:use_module(library(http/http_wrapper)).
 :- dynamic(http_last_request/1).
 
-%= 	 	 
 
-%% get_http_current_request( ?ARG1) is semidet.
+
+%% get_http_current_request( ?ARG1) is det.
 %
 % Get Http Current Request.
 %
@@ -566,9 +494,9 @@ get_http_current_request(B):- http_last_request(B),!.
 get_http_current_request([]).
 
 
-%= 	 	 
 
-%% get_param_sess( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% get_param_sess( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Get Param Sess.
 %
@@ -576,9 +504,9 @@ get_param_sess(N,V,D):- nonvar(V),!,get_param_sess(N,VV,D),!,param_matches(V,VV)
 get_param_sess(L,V,D):-get_nv_session(L,V,D).
 
 
-%= 	 	 
 
-%% get_param_req( ?ARG1, ?ARG2) is semidet.
+
+%% get_param_req( ?ARG1, ?ARG2) is det.
 %
 % Get Param Req.
 %
@@ -591,9 +519,9 @@ get_param_req(L,V):- (is_list(L)-> member(N,L) ; N=L),
 % get_param_sess(L,V,V):- (is_list(L)-> member(N,L) ; N=L), save_in_session(N=V),!.
 
 
-%= 	 	 
 
-%% get_nv_session( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% get_nv_session( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Get Nv Session.
 %
@@ -603,9 +531,9 @@ get_nv_session(_,V,V):-!.
 
 
 
-%= 	 	 
 
-%% save_request_in_session( ?ARG1) is semidet.
+
+%% save_request_in_session( ?ARG1) is det.
 %
 % Save Request In Session.
 %
@@ -617,23 +545,23 @@ save_request_in_session(Request):-
 
 
 
-%= 	 	 
 
-%% handler_logicmoo_cyclone( +ARG1) is semidet.
+
+%% handler_logicmoo_cyclone( +Request) is det.
 %
 % Handler Logicmoo Cyclone.
 %
-handler_logicmoo_cyclone(Request):- notrace(((is_goog_bot,!,
+handler_logicmoo_cyclone(Request):- cnotrace(((is_goog_bot,!,
   format('Content-type: text/html~n~n',[]),
   format('<!DOCTYPE html><html><head></head><body><pre>~q</pre></body></html>~n~n',[Request]),flush_output))),!.
 
 handler_logicmoo_cyclone(Request):-    
-  notrace(call(handler_logicmoo_cyclone_1,Request)),!.
+  cnotrace(call(handler_logicmoo_cyclone_1,Request)),!.
 
 
-%= 	 	 
 
-%% handler_logicmoo_cyclone_1( ?ARG1) is semidet.
+
+%% handler_logicmoo_cyclone_1( ?ARG1) is det.
 %
 % handler logicmoo cyclone  Secondary Helper.
 %
@@ -648,13 +576,13 @@ handler_logicmoo_cyclone_1(Request):-
       member(path(PATH),Request),
     directory_file_path(_,FCALL,PATH),
    once(get_param_req(call,Call);(current_predicate(FCALL/0),Call=FCALL);get_param_sess(call,Call,edit1term)),
-   notrace(Call),!,flush_output)))).
+   cnotrace(Call),!,flush_output)))).
    
 
 
-%= 	 	 
 
-%% write_begin_html( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% write_begin_html( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Write Begin Html.
 %
@@ -690,9 +618,9 @@ body {
    
 
 
-%= 	 	 
 
-%% write_end_html is semidet.
+
+%% write_end_html is det.
 %
 % Write End Html.
 %
@@ -701,9 +629,9 @@ write_end_html:- flush_output,format('</body></html>~n~n',[]),flush_output,!.
 % logicmoo_html_needs_debug.
 
 
-%= 	 	 
 
-%% add_form_script is semidet.
+
+%% add_form_script is det.
 %
 % Add Form Script.
 %
@@ -760,36 +688,36 @@ else
 
 
 
-%= 	 	 
 
-%% show_pcall_footer is semidet.
+
+%% show_pcall_footer is det.
 %
 % Show Pcall Footer.
 %
 show_pcall_footer:- format('<hr><a href="http://prologmoo.com">LogicMOO/PrologMUD</a>',[]),!.
 
 
-%= 	 	 
 
-%% sensical_nonvar( ?ARG1) is semidet.
+
+%% sensical_nonvar( ?ARG1) is det.
 %
 % Sensical Nonvar.
 %
 sensical_nonvar(O):-nonvar(O), O \= (_ - _).
 
 
-%= 	 	 
 
-%% cvt_param_to_term( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% cvt_param_to_term( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Cvt Param Converted To Term.
 %
 cvt_param_to_term(In,Obj,Vs):-atom(In),on_x_fail(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
 cvt_param_to_term(In,Obj,Vs):-string(In),on_x_fail(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
 
-%= 	 	 
 
-%% cvt_param_to_term( ?ARG1, ?ARG2) is semidet.
+
+%% cvt_param_to_term( ?ARG1, ?ARG2) is det.
 %
 % Cvt Param Converted To Term.
 %
@@ -801,17 +729,17 @@ cvt_param_to_term(Obj,Obj).
 :- discontiguous param_default_value/2. 
 
 
-%= 	 	 
 
-%% param_default_value( ?ARG1, ?ARG2) is semidet.
+
+%% param_default_value( ?ARG1, ?ARG2) is det.
 %
 % Param Default Value.
 %
 param_default_value(human_language,'EnglishLanguage').
 
-%= 	 	 
 
-%% human_language( ?ARG1) is semidet.
+
+%% human_language( ?ARG1) is det.
 %
 % Human Language.
 %
@@ -850,9 +778,9 @@ param_default_value(logic_lang_name,'CLIF').
 param_default_value(olang,'CLIF').
 param_default_value(find,'tHumanHead').
 
-%= 	 	 
 
-%% logic_lang_name( ?ARG1, ?ARG2) is semidet.
+
+%% logic_lang_name( ?ARG1, ?ARG2) is det.
 %
 % Logic Language Name.
 %
@@ -866,9 +794,9 @@ logic_lang_name('OWL',"OWL").
 
 param_default_value(prover_name,'proverPTTP').
 
-%= 	 	 
 
-%% prover_name( ?ARG1, ?ARG2) is semidet.
+
+%% prover_name( ?ARG1, ?ARG2) is det.
 %
 % Prover Name.
 %
@@ -879,9 +807,9 @@ prover_name("proverDOLCE","DOLCE (LogicMOO)").
 
 param_default_value(partOfSpeech,'N').
 
-%= 	 	 
 
-%% partOfSpeech( ?ARG1, ?ARG2) is semidet.
+
+%% partOfSpeech( ?ARG1, ?ARG2) is det.
 %
 % Part Of Speech.
 %
@@ -891,9 +819,9 @@ partOfSpeech("J","Adjective").
 partOfSpeech("Z","Adverb").
 
 
-%= 	 	 
 
-%% param_matches( ?ARG1, ?ARG2) is semidet.
+
+%% param_matches( ?ARG1, ?ARG2) is det.
 %
 % Param Matches.
 %
@@ -902,9 +830,9 @@ param_matches(VV,V):-atomic(VV),atomic(V),string_to_atom(VV,VVA),string_to_atom(
 param_matches(A,B):-A=B,!.
 
 
-%= 	 	 
 
-%% show_select2( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% show_select2( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Show Select Extended Helper.
 %
@@ -922,9 +850,9 @@ show_select2(Name,Pred,Options):-
 
 
 
-%= 	 	 
 
-%% show_select1( ?ARG1, ?ARG2) is semidet.
+
+%% show_select1( ?ARG1, ?ARG2) is det.
 %
 % Show Select Secondary Helper.
 %
@@ -939,9 +867,9 @@ show_select1(Name,Pred):-
 
 
 
-%= 	 	 
 
-%% as_ftVars( :TermARG1) is semidet.
+
+%% as_ftVars( :TermARG1) is det.
 %
 % Converted To Format Type Variables.
 %
@@ -949,12 +877,13 @@ as_ftVars(N='$VAR'(N)):-atomic(N),!.
 as_ftVars(_N=_V).
 as_ftVars(_).
 
-:- user:use_module(library(logicmoo/util/logicmoo_util_varnames)).
-    
+:- system:use_module(library(logicmoo/util/logicmoo_util_varnames)).
 
-%= 	 	 
+% :- use_listing_vars.
 
-%% search4term is semidet.
+
+
+%% search4term is det.
 %
 % Search4term.
 %
@@ -966,9 +895,9 @@ search4term:- must_det_l((
   call_for_terms(make_page_pretext_obj(Obj)))),!.
 
 
-%= 	 	 
 
-%% edit1term is semidet.
+
+%% edit1term is det.
 %
 % Edit1term.
 %
@@ -1011,9 +940,9 @@ edit1term:-
  show_iframe(search4term,find,SWord).
 
 
-%= 	 	 
 
-%% edit1term( :GoalARG1) is semidet.
+
+%% edit1term( :GoalARG1) is det.
 %
 % Edit1term.
 %
@@ -1025,9 +954,9 @@ edit1term(Call):-
 
 
 
-%= 	 	 
 
-%% show_edit_term( :GoalARG1, ?ARG2, ?ARG3) is semidet.
+
+%% show_edit_term( :GoalARG1, ?ARG2, ?ARG3) is det.
 %
 % Show Edit Term.
 %
@@ -1035,9 +964,9 @@ show_edit_term(Call,String,_SWord):- cvt_param_to_term(String,T),compound(T),T=(
 show_edit_term(Call,String,SWord):- show_edit_term0(Call,String,SWord),!.
 
 
-%= 	 	 
 
-%% show_edit_term0( :GoalARG1, ?ARG2, ?ARG3) is semidet.
+
+%% show_edit_term0( :GoalARG1, ?ARG2, ?ARG3) is det.
 %
 % Show Edit Term Primary Helper.
 %
@@ -1045,18 +974,18 @@ show_edit_term0(Call,String,SWord):-atomic(SWord),cvt_param_to_term(SWord,T),non
 show_edit_term0(Call,String,SWord):-show_edit_term1(Call,String,SWord).
 
 
-%= 	 	 
 
-%% do_guitracer is semidet.
+
+%% do_guitracer is det.
 %
 % Do Guitracer.
 %
 do_guitracer:- guitracer,trace.
 
 
-%= 	 	 
 
-%% show_edit_term1( :GoalARG1, ?ARG2, ?ARG3) is semidet.
+
+%% show_edit_term1( :GoalARG1, ?ARG2, ?ARG3) is det.
 %
 % Show Edit Term Secondary Helper.
 %
@@ -1129,35 +1058,35 @@ format('
    write_end_html,!.
 
 
-%= 	 	 
 
-%% show_iframe( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% show_iframe( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Show Iframe.
 %
 show_iframe(URL,Name,Value):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="~w?~w= ~w"></iframe>',[URL,Name,Value]).
 
-%= 	 	 
 
-%% show_iframe( ?ARG1) is semidet.
+
+%% show_iframe( ?ARG1) is det.
 %
 % Show Iframe.
 %
 show_iframe(URL):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="search4term?find= ~w"></iframe>',[URL]).
   
 
-%= 	 	 
 
-%% show_search_filtersTop( ?ARG1) is semidet.
+
+%% show_search_filtersTop( ?ARG1) is det.
 %
 % Show Search Filters Top.
 %
 show_search_filtersTop(BR):- write(BR).
 
 
-%= 	 	 
 
-%% show_search_filters( ?ARG1) is semidet.
+
+%% show_search_filters( ?ARG1) is det.
 %
 % Show Search Filters.
 %
@@ -1165,9 +1094,9 @@ show_search_filters(BR):-
    forall(search_filter_name_comment(N,C,_),session_checkbox(N,C,BR)).
 
 
-%= 	 	 
 
-%% parameter_names( ?ARG1, ?ARG2) is semidet.
+
+%% parameter_names( ?ARG1, ?ARG2) is det.
 %
 % Parameter Names.
 %
@@ -1177,17 +1106,17 @@ parameter_names(N=_,N):-!,atom(N).
 parameter_names(C,N):-compound(C),functor(C,N,1).
 
 
-%= 	 	 
 
-%% current_form_var( ?ARG1) is semidet.
+
+%% current_form_var( ?ARG1) is det.
 %
 % Current Form Variable.
 %
 current_form_var(N):-no_repeats((current_form_var0(N))),atom(N),\+ arg(_,v(peer,idle,ip,session),N).
 
-%= 	 	 
 
-%% current_form_var0( ?ARG1) is semidet.
+
+%% current_form_var0( ?ARG1) is det.
 %
 % Current Form Variable Primary Helper.
 %
@@ -1196,9 +1125,9 @@ current_form_var0(N):- param_default_value(N,_).
 %current_form_var0(N):- http_current_session(_, Parameters),parameter_names(Parameters,N).
 
 
-%= 	 	 
 
-%% is_goog_bot is semidet.
+
+%% is_goog_bot is det.
 %
 % If Is A Goog Bot.
 %
@@ -1206,9 +1135,9 @@ is_goog_bot:- get_http_current_request(B),member(user_agent(UA),B),!,atom_contai
  
 param_default_value(N,D):-search_filter_name_comment(N,_,D).
 
-%= 	 	 
 
-%% search_filter_name_comment( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% search_filter_name_comment( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Search Filter Name Comment.
 %
@@ -1225,18 +1154,18 @@ search_filter_name_comment(showAll,'Show All','0').
   
 
 
-%= 	 	 
 
-%% session_checked( ?ARG1) is semidet.
+
+%% session_checked( ?ARG1) is det.
 %
 % Session Checked.
 %
 session_checked(Name):- get_param_sess(Name,V),V\=='0',V\==0,V\=="0".
 
 
-%= 	 	 
 
-%% session_checkbox( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% session_checkbox( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Session Checkbox.
 %
@@ -1246,9 +1175,9 @@ session_checkbox(Name,Caption,BR):-
  % format('<font size="-3"><label><input type="checkbox" name="~w" value="1" ~w/>~w</label></font>~w',[Name,CHECKED,Caption,BR]).
 
 
-%= 	 	 
 
-%% action_menu_applied( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% action_menu_applied( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Action Menu Applied.
 %
@@ -1259,17 +1188,17 @@ action_menu_applied(MenuName,ItemName,Where):-
 
 param_default_value(is_context,'BaseKB').
 
-%= 	 	 
 
-%% is_context( ?ARG1, ?ARG2) is semidet.
+
+%% is_context( ?ARG1, ?ARG2) is det.
 %
 % If Is A Context.
 %
 is_context(MT,MT):-no_repeats(is_context0(MT)).
 
-%= 	 	 
 
-%% is_context0( ?ARG1) is semidet.
+
+%% is_context0( ?ARG1) is det.
 %
 % If Is A Context Primary Helper.
 %
@@ -1278,9 +1207,9 @@ is_context0('BaseKB').
 
 param_default_value(action_menu_item,'query').
 
-%= 	 	 
 
-%% action_menu_item( ?ARG1, ?ARG2) is semidet.
+
+%% action_menu_item( ?ARG1, ?ARG2) is det.
 %
 % Action Menu Item.
 %
@@ -1302,9 +1231,9 @@ action_menu_item('NonMonotonic',"Treat $item NonMonotonic").
 
 
 
-%= 	 	 
 
-%% get_request_vars( ?ARG1) is semidet.
+
+%% get_request_vars( ?ARG1) is det.
 %
 % Get Request Variables.
 %
@@ -1314,9 +1243,9 @@ get_request_vars(Format):- ignore(Exclude=[term,find,session_data,call,user_agen
 
 
 
-%= 	 	 
 
-%% call_for_terms( ?ARG1) is semidet.
+
+%% call_for_terms( ?ARG1) is det.
 %
 % Call For Terms.
 %
@@ -1341,9 +1270,9 @@ call_for_terms(Call):-
 
 
 
-%= 	 	 
 
-%% with_search_filters( :GoalARG1) is semidet.
+
+%% with_search_filters( :GoalARG1) is det.
 %
 % Using Search Filters.
 %
@@ -1357,9 +1286,9 @@ with_search_filters(C):-C.
 % make_page_pretext_obj(Obj):- atom(Obj),atom_to_term(Obj,Term,Bindings),nonvar(Term),Term\=@=Obj,!,hmust(make_page_pretext_obj(Term)).
 
 
-%= 	 	 
 
-%% make_page_pretext_obj( ?ARG1) is semidet.
+
+%% make_page_pretext_obj( ?ARG1) is det.
 %
 % Make Page Pretext Obj.
 %
@@ -1379,16 +1308,16 @@ make_page_pretext_obj(Obj):- writeq(make_page_pretext_obj(Obj)),!.
 :- prolog_xref:assert_default_options(register_called(all)).
 
 
-%= 	 	 
 
-%% reply_object_sub_page( ?ARG1) is semidet.
+
+%% reply_object_sub_page( ?ARG1) is det.
 %
 % Reply Object Sub Page.
 %
 reply_object_sub_page(Obj) :- phrase(object_sub_page(Obj, []), HTML), print_html(HTML),!.
 
 
-%%  object_sub_page(+ Obj, + Options)// is semidet.
+%%  object_sub_page(+ Obj, + Options)// is det.
 %
 % -->.
 %
@@ -1417,17 +1346,17 @@ object_sub_page(Obj, Options) -->
 
 
 
-%= 	 	 
 
-%% return_to_pos( :GoalARG1) is semidet.
+
+%% return_to_pos( :GoalARG1) is det.
 %
 % Return Converted To Pos.
 %
 return_to_pos(Call):- current_line_position(LP),Call,!, must(set_line_pos(LP)).
 
-%= 	 	 
 
-%% nl_same_pos is semidet.
+
+%% nl_same_pos is det.
 %
 % Nl Same Pos.
 %
@@ -1436,17 +1365,17 @@ nl_same_pos:-return_to_pos(nl).
 
 
 
-%= 	 	 
 
-%% set_line_pos( ?ARG1) is semidet.
+
+%% set_line_pos( ?ARG1) is det.
 %
 % Set Line Pos.
 %
 set_line_pos(LP):-current_output(Out),set_line_pos(Out,LP).
 
-%= 	 	 
 
-%% set_line_pos( ?ARG1, ?ARG2) is semidet.
+
+%% set_line_pos( ?ARG1, ?ARG2) is det.
 %
 % Set Line Pos.
 %
@@ -1455,26 +1384,26 @@ set_line_pos(Out,LP):-
   (CLP==LP->! ;((CLP>LP->nl(Out);put_code(Out,32)),!,set_line_pos(Out,LP))).
 
 
-%= 	 	 
 
-%% current_line_position( ?ARG1) is semidet.
+
+%% current_line_position( ?ARG1) is det.
 %
 % Current Line Position.
 %
 current_line_position(LP):-current_output(Out),current_line_position(Out,LP).
 
-%= 	 	 
 
-%% current_line_position( ?ARG1, ?ARG2) is semidet.
+
+%% current_line_position( ?ARG1, ?ARG2) is det.
 %
 % Current Line Position.
 %
 current_line_position(Out,LP):-stream_property(Out,position( Y)),stream_position_data(line_position,Y,LP),!.
 
 
-%= 	 	 
 
-%% tmw is semidet.
+
+%% tmw is det.
 %
 % Tmw.
 %
@@ -1490,9 +1419,9 @@ tmw:- w_tl(t_l:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF
 % II = 56+TTT, ((show_call(why,(url_encode(II,EE),var_property(TTT,name(NNN)),url_decode(EE,OO))))),writeq(OO).
 
 
-%= 	 	 
 
-%% url_encode( ?ARG1, ?ARG2) is semidet.
+
+%% url_encode( ?ARG1, ?ARG2) is det.
 %
 % Url Encode.
 %
@@ -1505,9 +1434,9 @@ url_encode(B,A):- url_iri(A,B).
 
 
 
-%= 	 	 
 
-%% url_encode_term( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% url_encode_term( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Url Encode Term.
 %
@@ -1523,18 +1452,18 @@ url_encode_term(InTerm,VsIn,URL):-
   url_iri(URL,IRI),!.
 
 
-%= 	 	 
 
-%% member_open( ?ARG1, :TermARG2) is semidet.
+
+%% member_open( ?ARG1, :TermARG2) is det.
 %
 % Member Open.
 %
 member_open(C, [B|A]) :-  (nonvar(B),B=C) ; (nonvar(A),member_open(C, A)).
 
 
-%= 	 	 
 
-%% name_the_var( ?ARG1, ?ARG2, :TermARG3, :TermARG4, :TermARG5) is semidet.
+
+%% name_the_var( ?ARG1, ?ARG2, :TermARG3, :TermARG4, :TermARG5) is det.
 %
 % Name The Variable.
 %
@@ -1554,9 +1483,9 @@ name_the_var(Num,Vs,[VIn|More],[N=VIn|VsOut],[N=VIn|Added]):- Num2 is Num +1, NV
 
 % url_decode(B,A):- \+ atom(B),!,term_to_atom(B,BB),!,url_encode(BB,O),!,A=O.
 
-%= 	 	 
 
-%% url_decode( ?ARG1, ?ARG2) is semidet.
+
+%% url_decode( ?ARG1, ?ARG2) is det.
 %
 % Url Decode.
 %
@@ -1565,9 +1494,9 @@ url_decode(A,B):- atom_concat('#%24%28',_,A) , url_decode_term(A,T),!,T=B.
 url_decode(A,B):- url_iri(A,C),!,B=C.
 
 
-%= 	 	 
 
-%% url_decode_term( ?ARG1, ?ARG2) is semidet.
+
+%% url_decode_term( ?ARG1, ?ARG2) is det.
 %
 % Url Decode Term.
 %
@@ -1588,9 +1517,9 @@ url_decode_term(A,T):-
 
 
 
-%= 	 	 
 
-%% tovl( :TermARG1, :TermARG2, :TermARG3) is semidet.
+
+%% tovl( :TermARG1, :TermARG2, :TermARG3) is det.
 %
 % Tovl.
 %
@@ -1598,9 +1527,9 @@ tovl([],[],[]).
 tovl([K|KL],[V|VL],[K=V|KVL]) :- tovl(KL, VL, KVL).
 
 
-%= 	 	 
 
-%% merge_key_vals( :TermARG1, ?ARG2, ?ARG3) is semidet.
+
+%% merge_key_vals( :TermARG1, ?ARG2, ?ARG3) is det.
 %
 % Merge Key Vals.
 %
@@ -1624,9 +1553,9 @@ merge_key_vals([K1=V1|Prev],Pairs,NewSave):-
 %   b_setval(URL,InTerm).
 
 
-%= 	 	 
 
-%% write_as_url_encoded( ?ARG1, ?ARG2) is semidet.
+
+%% write_as_url_encoded( ?ARG1, ?ARG2) is det.
 %
 % Write Converted To Url Encoded.
 %
@@ -1634,9 +1563,9 @@ write_as_url_encoded(_Arg, D):- url_encode(D,U),!,writeq(U).
 :- format_predicate('u',write_as_url_encoded(_Arg,_Time)).
 
 
-%= 	 	 
 
-%% term_to_pretty_string( ?ARG1, ?ARG2) is semidet.
+
+%% term_to_pretty_string( ?ARG1, ?ARG2) is det.
 %
 % Term Converted To Pretty String.
 %
@@ -1647,9 +1576,9 @@ term_to_pretty_string(H,HS):-
   with_output_to(atom(HS),portray_clause(H)).
 
 
-%= 	 	 
 
-%% fmtimg( ?ARG1, ?ARG2) is semidet.
+
+%% fmtimg( ?ARG1, ?ARG2) is det.
 %
 % Fmtimg.
 %
@@ -1661,9 +1590,9 @@ fmtimg(_,_).
 
 
 
-%= 	 	 
 
-%% indent_nbsp( ?ARG1) is semidet.
+
+%% indent_nbsp( ?ARG1) is det.
 %
 % Indent Nbsp.
 %
@@ -1671,9 +1600,9 @@ indent_nbsp(X):-t_l:print_mode(html),forall(between(0,X,_),format('&nbsp;')),!.
 indent_nbsp(X):-forall(between(0,X,_),format('~t',[])),!.
 
 
-%= 	 	 
 
-%% indent_nl is semidet.
+
+%% indent_nl is det.
 %
 % Indent Nl.
 %
@@ -1681,9 +1610,9 @@ indent_nl:- fresh_line, flag(indent,X,X), indent_nbsp(X).
 
 
 
-%= 	 	 
 
-%% indent_nbsp( :PRED1ARG1, ?ARG2) is semidet.
+
+%% indent_nbsp( :PRED1ARG1, ?ARG2) is det.
 %
 % Indent Nbsp.
 %
@@ -1692,15 +1621,14 @@ indent_nbsp(1,'\n         '):-!.
 indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   ',[OutP]),!.
 
 
-:- user:use_module(library(pldoc/doc_library)).
 
 
 :- multifile lmconf:shared_hide_data/1.
 
 
-%= 	 	 
 
-%% shared_hide_data( :PRED4ARG1) is semidet.
+
+%% shared_hide_data( :PRED4ARG1) is det.
 %
 % Hook To [logicmoo_util_term_listing:shared_hide_data/1] For Module Mpred_www.
 % Shared Hide Data.
@@ -1724,18 +1652,18 @@ lmconf:shared_hide_data(mpred_mark/3):- !,listing_filter(hideMeta).
 
 
 
-%= 	 	 
 
-%% pp_now is semidet.
+
+%% pp_now is det.
 %
 % Pretty Print Now.
 %
 pp_now.
 
 
-%= 	 	 
 
-%% this_listing( :TermARG1) is semidet.
+
+%% this_listing( :TermARG1) is det.
 %
 % This Listing.
 %
@@ -1750,9 +1678,9 @@ this_listing(MFA):-listing(MFA).
 % i2tml_save(Obj,H):- \+ is_list(H),cyc:pterm_to_sterm(H,S),H\=@=S,!,i2tml_save(Obj,S).
 
 
-%= 	 	 
 
-%% pp_i2tml_saved_done( ?ARG1) is semidet.
+
+%% pp_i2tml_saved_done( ?ARG1) is det.
 %
 % Pretty Print I2tml Saved Done.
 %
@@ -1762,9 +1690,9 @@ pp_i2tml_saved_done(Obj):-
   forall(member(S,Set),pp_i2tml(S)),!.
 
 
-%= 	 	 
 
-%% find_cl_ref( :TermARG1, ?ARG2) is semidet.
+
+%% find_cl_ref( :TermARG1, ?ARG2) is det.
 %
 % Find Clause Ref.
 %
@@ -1775,9 +1703,9 @@ find_cl_ref((H:-B),Ref):-!, clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!.
 find_cl_ref(H,Ref):- clause(H,true,Ref),clause(HH,true,Ref),H=@=HH,!.
 
 
-%= 	 	 
 
-%% find_ref( :TermARG1, ?ARG2) is semidet.
+
+%% find_ref( :TermARG1, ?ARG2) is det.
 %
 % Find Ref.
 %
@@ -1787,9 +1715,9 @@ find_ref(This,Ref):- '$si$':'$was_imported_kb_content$'(A,CALL),arg(1,CALL,This)
 find_ref(M:This,Ref):- atom(M),!,find_ref(This,Ref).
 
 
-%= 	 	 
 
-%% head_functor_sort( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% head_functor_sort( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Head Functor Sort.
 %
@@ -1799,9 +1727,9 @@ head_functor_sort(Result,H1,H2):- once((get_functor(H1,F1,_),get_functor(H2,F2,_
 head_functor_sort(Result,H1,H2):-compare(Result,H1,H2),!.
 
 
-%= 	 	 
 
-%% i2tml_hbr( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% i2tml_hbr( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % I2tml Hbr.
 %
@@ -1810,9 +1738,9 @@ i2tml_hbr(H,B,_):- B==true,!, pp_i2tml_save_seen(H).
 i2tml_hbr(H,B,_):- !,pp_i2tml_save_seen((H:-B)).
 
 
-%= 	 	 
 
-%% pp_i2tml_save_seen( ?ARG1) is semidet.
+
+%% pp_i2tml_save_seen( ?ARG1) is det.
 %
 % Pretty Print I2tml Save Seen.
 %
@@ -1831,17 +1759,17 @@ pp_i2tml_save_seen(HB):- assertz_if_new(sortme_buffer(_Obj,HB)),!.
 
 
 
-%= 	 	 
 
-%% section_open( ?ARG1) is semidet.
+
+%% section_open( ?ARG1) is det.
 %
 % Section Open.
 %
 section_open(Type):-  once(shown_subtype(Type)->true;((t_l:print_mode(html)->format('~n</pre><hr>~w<hr><pre>~n<font face="verdana,arial,sans-serif">',[Type]);(draw_line,format('% ~w~n~n',[Type]))),asserta(shown_subtype(Type)))),!.
 
-%= 	 	 
 
-%% section_close( ?ARG1) is semidet.
+
+%% section_close( ?ARG1) is det.
 %
 % Section Close.
 %
@@ -1849,9 +1777,9 @@ section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(t_l
 
 
 
-%= 	 	 
 
-%% pp_item_html( ?ARG1, ?ARG2) is semidet.
+
+%% pp_item_html( ?ARG1, ?ARG2) is det.
 %
 % Pretty Print Item Html.
 %
@@ -1865,9 +1793,9 @@ pp_item_html(Type,H):- ignore((flag(matched_assertions,X,X),between(0,5000,X),pp
 
 :- dynamic(last_item_offered/1).
 
-%= 	 	 
 
-%% last_item_offered( ?ARG1) is semidet.
+
+%% last_item_offered( ?ARG1) is det.
 %
 % Last Item Offered.
 %
@@ -1875,9 +1803,9 @@ last_item_offered(unknonw).
 
 
 
-%= 	 	 
 
-%% pp_item_html_now( ?ARG1, ?ARG2) is semidet.
+
+%% pp_item_html_now( ?ARG1, ?ARG2) is det.
 %
 % Pretty Print Item Html Now.
 %
@@ -1888,9 +1816,9 @@ pp_item_html_now(Type,H):-
 
 
 
-%= 	 	 
 
-%% pp_item_html_if_in_range( ?ARG1, ?ARG2) is semidet.
+
+%% pp_item_html_if_in_range( ?ARG1, ?ARG2) is det.
 %
 % Pretty Print Item Html If In Range.
 %
@@ -1901,9 +1829,9 @@ pp_item_html_if_in_range(Type,H):- section_open(Type),!,pp_i2tml(H),!,nl.
 
 
 
-%= 	 	 
 
-%% show_clause_ref( ?ARG1) is semidet.
+
+%% show_clause_ref( ?ARG1) is det.
 %
 % Show Clause Ref.
 %
@@ -1912,9 +1840,9 @@ show_clause_ref(Ref):- t_l:last_show_clause_ref(Ref),!.
 show_clause_ref(Ref):- retractall(t_l:last_show_clause_ref(_)),asserta(t_l:last_show_clause_ref(Ref)),on_x_rtrace(show_clause_ref_now(Ref)),!.
 
 
-%= 	 	 
 
-%% show_clause_ref_now( :GoalARG1) is semidet.
+
+%% show_clause_ref_now( :GoalARG1) is det.
 %
 % Show Clause Ref Now.
 %
@@ -1932,9 +1860,9 @@ show_clause_ref_now(Ref):- clause_property(Ref,erased),
     format('erased(~w) (~w)~N',[Ref,Module]),!.
 
 
-%= 	 	 
 
-%% pp_i2tml( :TermARG1) is semidet.
+
+%% pp_i2tml( :TermARG1) is det.
 %
 % Pretty Print I2tml.
 %
@@ -1946,9 +1874,9 @@ pp_i2tml(HB):- find_ref(HB,Ref),!, must(w_tl(t_l:current_clause_ref(Ref),pp_i2tm
 pp_i2tml(HB):- w_tl(t_l:current_clause_ref(none),must(pp_i2tml_v((HB)))).
 
 
-%= 	 	 
 
-%% numberlist_at( ?ARG1, :TermARG2) is semidet.
+
+%% numberlist_at( ?ARG1, :TermARG2) is det.
 %
 % Numberlist When.
 %
@@ -1959,18 +1887,18 @@ numberlist_at(Was,[_|More]):- N2 is Was+2, numberlist_at(N2,More),!.
 
 
 
-%= 	 	 
 
-%% pp_i2tml_v( ?ARG1) is semidet.
+
+%% pp_i2tml_v( ?ARG1) is det.
 %
 % Pretty Print I2tml V.
 %
 pp_i2tml_v(HB):- ignore(catch(( \+ \+ ((get_clause_vars_for_print(HB,HB2),pp_i2tml_0(HB2)))),_,true)),!.
 
 
-%= 	 	 
 
-%% pp_i2tml_0( :TermARG1) is semidet.
+
+%% pp_i2tml_0( :TermARG1) is det.
 %
 % Pretty Print i2tml  Primary Helper.
 %
@@ -2010,9 +1938,9 @@ pp_i2tml_0((M:H:-B)):- M==user,!,pp_i2tml_1((H:-B)).
 pp_i2tml_0(HB):-pp_i2tml_1(HB).
 
 
-%= 	 	 
 
-%% if_html( ?ARG1, :GoalARG2) is semidet.
+
+%% if_html( ?ARG1, :GoalARG2) is det.
 %
 % If Html.
 %
@@ -2020,9 +1948,9 @@ if_html(F,A):-t_l:print_mode(html),!,format(F,[A]).
 if_html(_,A):-A.
 
 
-%= 	 	 
 
-%% pp_i2tml_1( ?ARG1) is semidet.
+
+%% pp_i2tml_1( ?ARG1) is det.
 %
 % Pretty Print i2tml  Secondary Helper.
 %
@@ -2042,9 +1970,9 @@ pp_i2tml_1(H):- t_l:print_mode(html),
 pp_i2tml_1(H):- \+ \+ pp_i2tml_now(H).
 
 
-%= 	 	 
 
-%% pp_i2tml_now( ?ARG1) is semidet.
+
+%% pp_i2tml_now( ?ARG1) is det.
 %
 % Pretty Print I2tml Now.
 %
@@ -2055,9 +1983,9 @@ pp_i2tml_now(C):- if_html('<font size="3">~@</font>~N',if_defined(rok_portray_cl
 
 
 
-%= 	 	 
 
-%% functor_to_color( ?ARG1, ?ARG2) is semidet.
+
+%% functor_to_color( ?ARG1, ?ARG2) is det.
 %
 % Functor Converted To Color.
 %
@@ -2067,9 +1995,9 @@ functor_to_color(_G,green):-!.
 
 
 
-%= 	 	 
 
-%% functor_to_color( ?ARG1, ?ARG2, ?ARG3, ?ARG4) is semidet.
+
+%% functor_to_color( ?ARG1, ?ARG2, ?ARG3, ?ARG4) is det.
 %
 % Functor Converted To Color.
 %
@@ -2113,18 +2041,18 @@ functor_to_color(_,(wid),_,green_yellow).
 % ===================================================
 :- export(write_atom_link/1).
 
-%= 	 	 
 
-%% write_atom_link( ?ARG1) is semidet.
+
+%% write_atom_link( ?ARG1) is det.
 %
 % Write Atom Link.
 %
 write_atom_link(A):-must(write_atom_link(A,A)).
 :- export(write_atom_link/2).
 
-%= 	 	 
 
-%% write_atom_link( ?ARG1, ?ARG2) is semidet.
+
+%% write_atom_link( ?ARG1, ?ARG2) is det.
 %
 % Write Atom Link.
 %
@@ -2132,9 +2060,9 @@ write_atom_link(L,N):-must_det_l((write_atom_link(atom(W),L,N),format('~w',[W]))
 
 % pred_href(Name/Arity, Module, HREF) :-
 
-%= 	 	 
 
-%% write_atom_link( ?ARG1, ?ARG2, ?ARG3) is semidet.
+
+%% write_atom_link( ?ARG1, ?ARG2, ?ARG3) is det.
 %
 % Write Atom Link.
 %
@@ -2147,9 +2075,9 @@ write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),
    format(W,'<a href="?f= ~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
 
 
-%= 	 	 
 
-%% write_term_to_atom_one( :TermARG1, ?ARG2) is semidet.
+
+%% write_term_to_atom_one( :TermARG1, ?ARG2) is det.
 %
 % Write Term Converted To Atom One.
 %
@@ -2229,9 +2157,9 @@ write_term_to_atom_one(atom(A),Term):-format(atom(A),'~q',[Term]).
 
 
 
-%= 	 	 
 
-%% portable_display( ?ARG1) is semidet.
+
+%% portable_display( ?ARG1) is det.
 %
 % Portable Display.
 %
@@ -2240,9 +2168,9 @@ portable_display(Term) :-
 
 
 
-%= 	 	 
 
-%% portable_print( ?ARG1) is semidet.
+
+%% portable_print( ?ARG1) is det.
 %
 % Portable Print.
 %
@@ -2251,9 +2179,9 @@ portable_print(Term) :-
 
 
 
-%= 	 	 
 
-%% portable_write( ?ARG1) is semidet.
+
+%% portable_write( ?ARG1) is det.
 %
 % Portable Write.
 %
@@ -2262,9 +2190,9 @@ portable_write(Term) :-
 
 
 
-%= 	 	 
 
-%% portable_writeq( ?ARG1) is semidet.
+
+%% portable_writeq( ?ARG1) is det.
 %
 % Portable Writeq.
 %
@@ -2277,9 +2205,9 @@ portable_writeq(Term) :-
 %   writes a parenthesis if the context demands it.
 
 
-%= 	 	 
 
-%% maybe_paren( ?ARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5) is semidet.
+
+%% maybe_paren( ?ARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5) is det.
 %
 % Maybe Paren.
 %
@@ -2296,9 +2224,9 @@ maybe_paren(_, _, _, C, C).
 %   tokens won't run into each other.
 
 
-%= 	 	 
 
-%% maybe_space( ?ARG1, ?ARG2) is semidet.
+
+%% maybe_space( ?ARG1, ?ARG2) is det.
 %
 % Maybe Space.
 %
@@ -2316,17 +2244,17 @@ maybe_space(_, _).
 
 
 
-%= 	 	 
 
-%% put_string( ?ARG1) is semidet.
+
+%% put_string( ?ARG1) is det.
 %
 % Put String.
 %
 put_string(B):-put_string0(B).
 
-%= 	 	 
 
-%% put_string0( :TermARG1) is semidet.
+
+%% put_string0( :TermARG1) is det.
 %
 % Put String Primary Helper.
 %
@@ -2341,9 +2269,9 @@ put_string0([H|T]) :-
 %   quote has already been written.  Instances of Q in S are doubled.
 
 
-%= 	 	 
 
-%% put_string( ?ARG1, ?ARG2) is semidet.
+
+%% put_string( ?ARG1, ?ARG2) is det.
 %
 % Put String.
 %
@@ -2355,9 +2283,9 @@ put_string(A,B):- put_string0(A,B).
 
 % :-rtrace.
 
-%= 	 	 
 
-%% put_string0( :TermARG1, ?ARG2) is semidet.
+
+%% put_string0( :TermARG1, ?ARG2) is det.
 %
 % Put String Primary Helper.
 %
@@ -2376,9 +2304,9 @@ put_string0([H|T], Q) :-
 %   is system dependent.  This just uses whatever Prolog supplies.
 
 
-%= 	 	 
 
-%% write_variable( ?ARG1) is semidet.
+
+%% write_variable( ?ARG1) is det.
 %
 % Write Variable.
 %
@@ -2395,9 +2323,9 @@ write_variable(V) :-
 %   was of type Co.
 
 
-%= 	 	 
 
-%% write_out( :TermARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5) is semidet.
+
+%% write_out( :TermARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5) is det.
 %
 % Write Out.
 %
@@ -2458,9 +2386,9 @@ write_out(Term, Style, Prio, Ci, Co) :-
 
 
 
-%= 	 	 
 
-%% write_out( ?ARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5, ?ARG6, ?ARG7) is semidet.
+
+%% write_out( ?ARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5, ?ARG6, ?ARG7) is det.
 %
 % Write Out.
 %
@@ -2500,9 +2428,9 @@ write_out(N, F, Term, Style, _Prio, Ci, punct) :-
 
 
 
-%= 	 	 
 
-%% write_oper( ?ARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5) is semidet.
+
+%% write_oper( ?ARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5) is det.
 %
 % Write Oper.
 %
@@ -2515,9 +2443,9 @@ write_oper(Op, _, Style, _Ci, punct) :-
 	put(32).
 
 
-%= 	 	 
 
-%% write_VAR( ?ARG1, ?ARG2, ?ARG3, ?ARG4) is semidet.
+
+%% write_VAR( ?ARG1, ?ARG2, ?ARG3, ?ARG4) is det.
 %
 % Write Var.
 %
@@ -2529,9 +2457,9 @@ write_VAR(X, Style, Ci, punct) :-
 
 
 
-%= 	 	 
 
-%% write_atom( ?ARG1, ?ARG2, ?ARG3, ?ARG4) is semidet.
+
+%% write_atom( ?ARG1, ?ARG2, ?ARG3, ?ARG4) is det.
 %
 % Write Atom.
 %
@@ -2568,9 +2496,9 @@ write_atom(Atom, Style, Ci, Co) :-
 %   be as fast as you can make it.
 
 
-%= 	 	 
 
-%% classify_name( :TermARG1, ?ARG2) is semidet.
+
+%% classify_name( :TermARG1, ?ARG2) is det.
 %
 % Classify Name.
 %
@@ -2583,9 +2511,9 @@ classify_name([H|T], other) :-
 	classify_other_tail(T).
 
 
-%= 	 	 
 
-%% classify_alpha_tail( :TermARG1) is semidet.
+
+%% classify_alpha_tail( :TermARG1) is det.
 %
 % Classify Alpha Tail.
 %
@@ -2599,9 +2527,9 @@ classify_alpha_tail([H|T]) :-
 	classify_alpha_tail(T).
 
 
-%= 	 	 
 
-%% classify_other_tail( :TermARG1) is semidet.
+
+%% classify_other_tail( :TermARG1) is det.
 %
 % Classify Other Tail.
 %
@@ -2618,9 +2546,9 @@ classify_other_tail([H|T]) :-
 %   Separator is 0'( initially and later 0', .
 
 
-%= 	 	 
 
-%% write_args( ?ARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5) is semidet.
+
+%% write_args( ?ARG1, ?ARG2, ?ARG3, ?ARG4, ?ARG5) is det.
 %
 % Write Arguments.
 %
@@ -2639,9 +2567,9 @@ write_args(I, N, Term, C, Style) :-
 %   writes the tail of a list of a given style.
 
 
-%= 	 	 
 
-%% write_tail( :TermARG1, ?ARG2) is semidet.
+
+%% write_tail( :TermARG1, ?ARG2) is det.
 %
 % Write Tail.
 %
@@ -2681,9 +2609,9 @@ write_tail(Other, Style) :-		%  |junk]
 */
 
 
-%= 	 	 
 
-%% portable_listing is semidet.
+
+%% portable_listing is det.
 %
 % Portable Listing.
 %
@@ -2704,9 +2632,9 @@ portable_listing.
 %   matching one of these specifications.
 
 
-%= 	 	 
 
-%% portable_listing( :TermARG1) is semidet.
+
+%% portable_listing( :TermARG1) is det.
 %
 % Portable Listing.
 %
@@ -2729,9 +2657,9 @@ portable_listing(_).
 
 
 
-%= 	 	 
 
-%% functor spec( ?ARG1, ?ARG2, :GoalARG3, :PRED255ARG4) is semidet.
+
+%% functor spec( ?ARG1, ?ARG2, :GoalARG3, :PRED255ARG4) is det.
 %
 % Functor Spec.
 %
@@ -2740,9 +2668,9 @@ portable_listing(_).
 'functor spec'(Name, Name, 0, 255).
 
 
-%= 	 	 
 
-%% rok_portray_clause( :TermARG1) is semidet.
+
+%% rok_portray_clause( :TermARG1) is det.
 %
 % Rok Portray Clause.
 %
@@ -2766,9 +2694,9 @@ rok_portray_clause((Pred)) :-
 
 
 
-%= 	 	 
 
-%% list clauses( :TermARG1, ?ARG2, ?ARG3, ?ARG4) is semidet.
+
+%% list clauses( :TermARG1, ?ARG2, ?ARG3, ?ARG4) is det.
 %
 % List Clauses.
 %
@@ -2797,9 +2725,9 @@ rok_portray_clause((Pred)) :-
 ).
 
 
-%= 	 	 
 
-%% list magic( ?ARG1, :PRED5ARG2, ?ARG3) is semidet.
+
+%% list magic( ?ARG1, :PRED5ARG2, ?ARG3) is det.
 %
 % List Magic.
 %
@@ -2828,9 +2756,9 @@ rok_portray_clause((Pred)) :-
 
 
 
-%= 	 	 
 
-%% list magic( ?ARG1, ?ARG2) is semidet.
+
+%% list magic( ?ARG1, ?ARG2) is det.
 %
 % List Magic.
 %
@@ -2839,9 +2767,9 @@ rok_portray_clause((Pred)) :-
 
 
 
-%= 	 	 
 
-%% list magic( ?ARG1, ?ARG2, ?ARG3, ?ARG4) is semidet.
+
+%% list magic( ?ARG1, ?ARG2, ?ARG3, ?ARG4) is det.
 %
 % List Magic.
 %
@@ -2917,9 +2845,9 @@ lmconf:my_portray(A) :- \+compound(A),fail.
 
 
 
-%= 	 	 
 
-%% sanity_test_000 is semidet.
+
+%% sanity_test_000 is det.
 %
 % Optional Sanity Checking test  Primary Helper Primary Helper Primary Helper.
 %

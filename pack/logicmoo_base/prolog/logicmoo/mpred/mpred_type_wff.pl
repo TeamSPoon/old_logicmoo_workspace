@@ -1091,7 +1091,7 @@ head_singles0(Pre,Post):-head_singles01(Pre,Post).
 % Head Singles Primary Helper Secondary Helper.
 %
 head_singles01(Pre,Post):-
-  notrace((
+  cnotrace((
     term_singletons(Post,_,CSingles),
     term_slots(Pre,PreVars),!,
     subtract_eq(CSingles,PreVars,Bad),!,Bad\==[])).

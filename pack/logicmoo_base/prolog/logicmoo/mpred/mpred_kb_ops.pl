@@ -407,7 +407,7 @@ whenAnd(A,B):-A,ground(B),once(B).
 %
 % Reduce Managed Predicate Oper..
 %
-reduce_mpred_op(Op,Op2):-must(notrace(transitive(how_to_op,Op,Op2))),!.
+reduce_mpred_op(Op,Op2):-must(cnotrace(transitive(how_to_op,Op,Op2))),!.
 reduce_mpred_op(A,A).
 
 
@@ -706,7 +706,7 @@ attvar_op(Op,Data):-
 */
 :- module_transparent(attvar_op/2).
 attvar_op(Op,Data):-
-   notrace((strip_module(Op,_,OpA), sanity((atom(OpA))),
+   cnotrace((strip_module(Op,_,OpA), sanity((atom(OpA))),
    defaultAssertMt(ABOX),add_side_effect(Op,Data),deserialize_attvars(Data,Data0))),
    (==(Data,Data0)->
      physical_side_effect(call(Op,Data0));
@@ -926,7 +926,7 @@ all_different_head_vals_2(_,_).
 %
 % PFC Rule Head+body.
 %
-mpred_rule_hb(Outcome,OutcomeO,AnteO):-notrace((mpred_rule_hb_0(Outcome,OutcomeO,Ante),mpred_rule_hb_0(Ante,AnteO,_))),!.
+mpred_rule_hb(Outcome,OutcomeO,AnteO):-cnotrace((mpred_rule_hb_0(Outcome,OutcomeO,Ante),mpred_rule_hb_0(Ante,AnteO,_))),!.
 % :-mpred_trace_nochilds(mpred_rule_hb/3).
 
 
@@ -1510,7 +1510,7 @@ trigger_supporters_list(Trigger,[Fact|MoreFacts]) :-
   mpred_get_support_precanonical_plus_more(Trigger,(Fact,AnotherTrigger)),
   must(trigger_supporters_list(AnotherTrigger,MoreFacts)).
 
-mpred_retry(G):- fail; notrace(G).
+mpred_retry(G):- fail; cnotrace(G).
 
 
 %% { ?G} is semidet.

@@ -378,8 +378,8 @@ all_different_vals(Term):-all_different_vals(dif_matrix,Term).
 % All Different Variables.
 %
 all_different_vars(_):- t_l:dont_varname,!.
-all_different_vars(A):-(notrace((all_disjoint_in_sets(dif_matrix,A,A)))),!.
-all_different_vars(A):-must(notrace((all_disjoint_in_sets(dif_matrix,A,A)))),!.
+all_different_vars(A):-(cnotrace((all_disjoint_in_sets(dif_matrix,A,A)))),!.
+all_different_vars(A):-must(cnotrace((all_disjoint_in_sets(dif_matrix,A,A)))),!.
 all_different_vars(A):-all_different_vals(v_dif_rest,A),!.
 
 
@@ -389,7 +389,7 @@ all_different_vars(A):-all_different_vals(v_dif_rest,A),!.
 % All Different Vals.
 %
 all_different_vals(Pred,Term):- 
- must(notrace(( (is_list(Term)-> Slots = Term ; term_slots(Term,Slots)),!,
+ must(cnotrace(( (is_list(Term)-> Slots = Term ; term_slots(Term,Slots)),!,
                                  all_disjoint_in_sets(Pred,Slots,Slots)))).
 
 %% all_different_vals(:PRED2, +SET1, +SET2) is semidet.
@@ -426,7 +426,7 @@ dif_matrix_hopfully(A,B):- dif:dif(A,B),!.
 %
 lock_vars(Var):-var(Var),!,when:when(nonvar(Var),Var='$VAR'(_)).
 lock_vars(Var):-var(Var),!,only_stars(Var). 
-lock_vars(Term):- must(notrace((term_variables(Term,Vs),maplist(lock_vars,Vs),all_different_vars(Vs)))).
+lock_vars(Term):- must(cnotrace((term_variables(Term,Vs),maplist(lock_vars,Vs),all_different_vars(Vs)))).
 
 
 %= 	 	 
@@ -437,7 +437,7 @@ lock_vars(Term):- must(notrace((term_variables(Term,Vs),maplist(lock_vars,Vs),al
 %
 
 unlock_vars( Var):-var(Var),!,del_attr(Var,when),del_attr(Var,eq),del_attr(Var,dif).
-unlock_vars(Term):- must(notrace((term_attvars(Term,Vs),maplist(unlock_vars,Vs)))).
+unlock_vars(Term):- must(cnotrace((term_attvars(Term,Vs),maplist(unlock_vars,Vs)))).
 
 
 
@@ -613,7 +613,7 @@ term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 % Hook To [mpred_type_wff:term_singletons/2] For Module Logicmoo_varnames.
 % Term Singletons.
 %
-term_singletons(A,Vs):- notrace(term_singletons(A,[],_,[],Vs)).
+term_singletons(A,Vs):- cnotrace(term_singletons(A,[],_,[],Vs)).
 %= %= :- was_export(term_singletons/3).
 
 %= 	 	 
@@ -623,7 +623,7 @@ term_singletons(A,Vs):- notrace(term_singletons(A,[],_,[],Vs)).
 % Hook To [mpred_type_wff:term_singletons/3] For Module Logicmoo_varnames.
 % Term Singletons.
 %
-term_singletons(Term,NonSingle,Singles):- notrace(term_singletons(Term,[],NonSingle,[],Singles)).
+term_singletons(Term,NonSingle,Singles):- cnotrace(term_singletons(Term,[],NonSingle,[],Singles)).
 %= %= :- was_export(term_singletons/5).
 
 %= 	 	 
@@ -937,9 +937,9 @@ ensure_vars_labled_r(I,O):- copy_term_and_varnames(I,O),I\=@=O.
 %
 % Copy Term And Varnames.
 %
-copy_term_and_varnames(Term,Named):- notrace((unnumbervars(Term,UNV),copy_term(UNV,Named))),!.
+copy_term_and_varnames(Term,Named):- cnotrace((unnumbervars(Term,UNV),copy_term(UNV,Named))),!.
 copy_term_and_varnames(Term,Named):-
-   notrace((ignore((source_variables_lv(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(set_varname([write_functor,b_setarg]),CAllS))).
+   cnotrace((ignore((source_variables_lv(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(set_varname([write_functor,b_setarg]),CAllS))).
 
 
 %= 	 	 
@@ -949,7 +949,7 @@ copy_term_and_varnames(Term,Named):-
 % Renumbervars.
 %
 renumbervars(How,Term,Named):- 
-   notrace((ignore((source_variables_lv(AllS))), 
+   cnotrace((ignore((source_variables_lv(AllS))), 
    copy_term(Term+AllS,Named+CAllS),
    maplist(set_varname(How),CAllS))).
 
@@ -966,7 +966,7 @@ renumbervars(How,Term,Named):-
 source_variables_lv(AllS):-
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
   (nb_current('$variable_names', Vs2);Vs2=[]),
-  % notrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
+  % cnotrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
   ignore(Vs3=[]),
   append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,list_to_set(All,AllS),
   nb_linkval('$variable_names', AllS).
@@ -1032,9 +1032,9 @@ call_not_not(Goal):- \+ \+ Goal.
 %
 % Contains Badvarnames.
 %
-contains_badvarnames(Term):-  notrace((sub_term(SubV,Term),compound(SubV),SubV='$VAR'(Sub),bad_varnamez(Sub))),!.
+contains_badvarnames(Term):-  cnotrace((sub_term(SubV,Term),compound(SubV),SubV='$VAR'(Sub),bad_varnamez(Sub))),!.
 
-contains_dvar(Term):-notrace((sub_term(SubV,Term),compound(SubV),SubV='$VAR'(_),!)).
+contains_dvar(Term):-cnotrace((sub_term(SubV,Term),compound(SubV),SubV='$VAR'(_),!)).
 
 %= 	 	 
 
@@ -1199,7 +1199,7 @@ que_read_source_file_vars(F):-ain00(varname_cache:queued_read_source_file_vars(F
 %
 % Dirrectly Call If While Being Descriptive.
 %
-dcall_if_verbose(G):-!, notrace(G).
+dcall_if_verbose(G):-!, cnotrace(G).
 dcall_if_verbose(G):-show_call(why,G).
 
 %  list_undefined([module_class([user,system,library,test,development])]).
@@ -1317,7 +1317,7 @@ ensure_vars_labled(I,I).
 % Portray.
 %
 user:portray(A) :-  \+ tracing, 
-  catch(notrace(((compound(A);var(A)), current_prolog_flag(mpred_vars, true), set_prolog_flag(mpred_vars, false),
+  catch(cnotrace(((compound(A);var(A)), current_prolog_flag(mpred_vars, true), set_prolog_flag(mpred_vars, false),
     call_cleanup((((user:portray(A) -> ! ; print_numbervars_maybe(A)))),set_prolog_flag(mpred_vars, true)))),E,(writeq(E),nl,fail)).
 
 

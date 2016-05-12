@@ -626,7 +626,7 @@ autodoc_stream(LineByLineStream,File,In):-
 	  catch((           
             stream_property(In,position(Pos)),
             read_once(In, Term, Expanded, Vs,TermPos)),
-		E,(call((nop(set_stream_position(In,Pos)),dmsg(E),notrace,trace,rtrace(read_once(In, Term, Expanded, Vs,TermPos)))),fail)),
+		E,(call((nop(set_stream_position(In,Pos)),dmsg(E),cnotrace,trace,rtrace(read_once(In, Term, Expanded, Vs,TermPos)))),fail)),
           stream_position_data(line_count, TermPos, Start),
           line_count(In,End),
 	(   Term == end_of_file

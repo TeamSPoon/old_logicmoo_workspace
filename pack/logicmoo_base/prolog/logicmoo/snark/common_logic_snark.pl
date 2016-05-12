@@ -790,7 +790,7 @@ write_list([]).
 % Numbervars Using Names.
 %
 
-unnumbervars_with_names(Term,CTerm):- !, must(notrace(unnumbervars(Term,CTerm))),!.
+unnumbervars_with_names(Term,CTerm):- !, must(cnotrace(unnumbervars(Term,CTerm))),!.
 unnumbervars_with_names(Term,CTerm):- ground(Term),!,duplicate_term(Term,CTerm).
 
 unnumbervars_with_names(Term,CTerm):-

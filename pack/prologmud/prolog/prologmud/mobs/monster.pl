@@ -59,13 +59,13 @@ prologHybrid(wearsClothing/2).
 %:-prolog.
 %:-visible(+all),leash(+all),trace.
 :-ain(meta_argtypes(wearsClothing(tObj,tClothing))).
-%:-notrace.
+%:-cnotrace.
 %:- prolog.
 
 % TODO fingure out why term_expansion is not working
 %:-visible(+all),leash(-all),trace.
 %instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
-%:-notrace.
+%:-cnotrace.
 %:- prolog.
 
 

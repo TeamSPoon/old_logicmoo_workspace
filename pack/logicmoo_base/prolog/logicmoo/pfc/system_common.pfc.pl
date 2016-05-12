@@ -108,14 +108,14 @@ prologHybrid(genls/2).
 % (P/mpred_non_neg_literal(P) ==> (\+ ~(P))).
 % ((P/(mpred_non_neg_literal(P),copy_term(P,PP))) ==> (~ ~ PP )).
 
-% :- nortrace,notrace.
+% :- nortrace,cnotrace.
 % a pretty basic conflict (disabled for now)
 %(~(P)/mpred_non_neg_literal(P), P) ==> conflict(~(P)).
 %(P/mpred_non_neg_literal(P), ~(P)) ==> conflict(P).
 
 %:- rtrace,trace.
 prologBuiltin(mpred_select/2).
-% :- nortrace,notrace.
+% :- nortrace,cnotrace.
 
 :- kb_dynamic(conflict/1).
 % a conflict triggers a Prolog action to resolve it.
@@ -780,7 +780,7 @@ isa(vtValue,ttValueType).
 
 typeGenls(ttValueType,vtValue).
 
-:- must((vtColor(vRed))).
+% :- must((vtColor(vRed))).
 
 
 :- assertz_if_new((argIsa(Prop,N,Type) :- cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type))))).

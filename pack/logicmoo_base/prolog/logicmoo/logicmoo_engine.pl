@@ -197,7 +197,7 @@ door(What).
 :- kif_add(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
 :- forall(kif_test_string(TODO),(kif_io(string(TODO),current_output)))
 :- set_no_debug.
-:- notrace.
+:- cnotrace.
 :- nodebug.
 
 :- wdmsg('we see this').

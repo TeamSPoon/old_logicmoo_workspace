@@ -23,7 +23,7 @@ can_move_into(_LOC,XXYY):-ground(XXYY).
 %:-start_rtrace.
 %:-trace.
 vtActionTemplate(actClimb(vtDirection)).
-%:- notrace.
+%:- cnotrace.
 %:-stop_rtrace.
 
 

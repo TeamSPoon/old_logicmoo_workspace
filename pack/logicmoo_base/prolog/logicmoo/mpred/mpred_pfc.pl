@@ -267,8 +267,8 @@ setup_mpred_ops:-
 % Get Source Ref (Current file or User)
 %
 :- module_transparent((get_source_ref)/1).
-get_source_ref(O):- notrace((current_why(U),(U=(_,_)->O=U;O=(U,ax)))),!.
-get_source_ref(O):- notrace((get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)))),!.
+get_source_ref(O):- cnotrace((current_why(U),(U=(_,_)->O=U;O=(U,ax)))),!.
+get_source_ref(O):- cnotrace((get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)))),!.
 
 get_source_ref_stack(O):- findall(U,current_why(U),Whys),Whys\==[],!, U=(_,_),(Whys=[U]->O=U;O=(Whys,ax)),!.
 get_source_ref_stack(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
@@ -326,7 +326,7 @@ fix_mp(abox:P,ABOX:P):- defaultAssertMt(ABOX), !.
 fix_mp(tbox:P,TBOX:P):- abox:defaultTBoxMt(TBOX), !.
 fix_mp(G,M:GO):- strip_module(G,_,GO), !,functor(GO,F,A),convention_or_default(F,A,M).
 %fix_mp(baseKB:P,baseKB:P):-!.
-fix_mp(M:P,M:P):-baseKB:mtLocal(M),!.
+fix_mp(M:P,M:P):-baseKB:mtCycL(M),!.
 fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
 fix_mp(M:P,M:P):-!.
 
@@ -1336,7 +1336,7 @@ mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc==fwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 % mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
-  dmsg(mpred_fwc1(Fact)),
+  %dmsg(mpred_fwc1(Fact)),
   mpred_do_rule(Fact),
   copy_term_vn(Fact,F),
   % check positive triggers
@@ -2404,8 +2404,8 @@ not_not_ignore_mnotrace(G):- ignore(mnotrace(\+ \+ G)).
 
 % needed:  mpred_trace_rule(Name)  ...
 
-log_failure(ALL):- notrace((log_failure_red,maybe_mpred_break(ALL),log_failure_red)).
-log_failure_red:- notrace(doall((between(1,3,_),wdmsg(color(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")),fail))).
+log_failure(ALL):- cnotrace((log_failure_red,maybe_mpred_break(ALL),log_failure_red)).
+log_failure_red:- cnotrace(doall((between(1,3,_),wdmsg(color(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")),fail))).
 
 maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(mpred)->dtrace(dmsg(Info));(dmsg(Info)))).
 

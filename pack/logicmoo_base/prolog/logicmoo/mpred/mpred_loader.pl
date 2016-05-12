@@ -364,7 +364,7 @@ mpred_prolog_only_file(File):- file_name_extension(File,_,pfc),!,fail.
 
 :- prolog_load_context(directory,Dir),asserta(lmconf:mpred_loader_dir(Dir)).
 
-mpred_expander(Type,_,I,_,_,_):- notrace(dont_term_expansion(Type,I)),!,fail.
+mpred_expander(Type,_,I,_,_,_):- cnotrace(dont_term_expansion(Type,I)),!,fail.
 mpred_expander(_Type,_Module,I,PosI,O,PosI):- get_lang(pl),!, expand_isEach_or_fail(I,O).
 mpred_expander(Type,Module,I,PosI,O,PosO):-
    is_file_based_expansion(Type,I,PosI,O,PosO),
@@ -418,7 +418,7 @@ mpred_file_term_expansion(Type,LoaderMod,I,OO):-
     (b_setval('$term',TermWas))),
   !,
   must(I\=@=O),O=OO,
-  notrace(wdmsg(I-->OO)))).
+  cnotrace(wdmsg(I-->OO)))).
   
 
            
@@ -1966,7 +1966,7 @@ ensure_mpred_file_loaded(MFileIn):- strip_module(MFileIn,M,_),
 % Ensure Managed Predicate File Loaded.
 %
 ensure_mpred_file_loaded(World,FileIn):- 
-  w_tl(defaultAssertMt(World),ensure_mpred_file_loaded(FileIn)).
+  with_umt(World,ensure_mpred_file_loaded(FileIn)).
 
 
 
@@ -1988,8 +1988,10 @@ must_locate_file(FileIn,File):-
 %
 % Force Reload Managed Predicate File.
 %
-force_reload_mpred_file(FileIn):- 
-  quietly_must((defaultAssertMt(World),force_reload_mpred_file(World,FileIn))).
+force_reload_mpred_file(MFileIn):- 
+ strip_module(MFileIn,M,FileIn),
+ (FileIn==MFileIn->defaultAssertMt(World);World=M),
+  quietly_must(force_reload_mpred_file(World,FileIn)).
 
 
 

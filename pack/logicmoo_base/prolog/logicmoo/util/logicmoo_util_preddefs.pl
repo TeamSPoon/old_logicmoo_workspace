@@ -158,8 +158,8 @@ dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
 :- decl_shared(baseKB:dynamic,genlMt/2).
 :- decl_shared(baseKB:dynamic,mtCore/1).
 :- decl_shared(baseKB:dynamic,mtPrologLibrary/1).
-:- decl_shared(baseKB:dynamic,mtSharedPrologCodeOnly/1).
-:- decl_shared(baseKB:dynamic,mtLocal/1).
+:- decl_shared(baseKB:dynamic,mtProlog/1).
+:- decl_shared(baseKB:dynamic,mtCycL/1).
 :- decl_shared(baseKB:dynamic,mtExact/1).
 :- decl_shared(baseKB:dynamic,mtGlobal/1).
 

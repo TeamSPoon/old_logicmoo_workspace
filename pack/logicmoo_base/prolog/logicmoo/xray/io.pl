@@ -186,7 +186,7 @@ read_clauses_to_pred(File,Pred) :-
 
 
 compile_ckb(File) :-	
-	notrace(concatenate(File,'.ckb',KBFile)),
+	cnotrace(concatenate(File,'.ckb',KBFile)),
 	compile_with_cyclic_term(KBFile).
 
 compile_query(File) :-	

@@ -1295,7 +1295,7 @@ portray_hb(H,B):- portray_one_line((H:-B)), format('~N').
 %
 % Portray One Line.
 %
-portray_one_line(H):- notrace((tlbugger:no_slow_io,!, writeq(H),write('.'),nl)),!.
+portray_one_line(H):- cnotrace((tlbugger:no_slow_io,!, writeq(H),write('.'),nl)),!.
 portray_one_line(H):- lmconf:portray_one_line_hook(H),!.
 portray_one_line(H):- maybe_separate(H,(format('~N'))),fail.
 portray_one_line(H):- \+ \+ ((logicmoo_varnames:get_clause_vars(H), portray_clause(H))),!.

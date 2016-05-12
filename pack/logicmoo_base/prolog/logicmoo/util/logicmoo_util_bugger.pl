@@ -762,8 +762,8 @@ bad_idea:- current_prolog_flag(bad_idea,true).
 %
 % Wdmsg.
 %
-wdmsg(X):- notrace(show_source_location),
-   notrace(ignore(hotrace(with_all_dmsg(dmsg(X))))).
+wdmsg(X):- cnotrace(show_source_location),
+   cnotrace(ignore(hotrace(with_all_dmsg(dmsg(X))))).
 
 %= 	 	 
 
@@ -771,7 +771,7 @@ wdmsg(X):- notrace(show_source_location),
 %
 % Wdmsg.
 %
-wdmsg(F,X):- notrace(ignore(with_all_dmsg(dmsg(F,X)))).
+wdmsg(F,X):- cnotrace(ignore(with_all_dmsg(dmsg(F,X)))).
 
 
 %= 	 	 
@@ -892,7 +892,7 @@ differnt_modules(User2,User1):- User1 \== User2.
 
 
 :- dynamic(unwrap_for_debug/1).
-% unwrap_for_debug(F):-member(F,[notrace,hotrace]).
+% unwrap_for_debug(F):-member(F,[cnotrace,hotrace]).
 % unwrap_for_debug(F):-member(F,[traceok,must,must_det,hotrace]).
 %unwrap_for_debug(F):-member(F,['on_x_debug',on_x_debug]),!,fail.
 %unwrap_for_debug(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must']),atom_concat(_,FF,F),!.
@@ -1187,7 +1187,7 @@ call_skipping_n_clauses(N,H):-
 %
 % Cli N Trace.
 %
-cli_ntrace(X):- tracing -> w_tl( tlbugger:wastracing,call_cleanup((notrace,call(X)),trace)) ; call(X).
+cli_ntrace(X):- tracing -> w_tl( tlbugger:wastracing,call_cleanup((cnotrace,call(X)),trace)) ; call(X).
 
 %= 	 	 
 
@@ -1195,7 +1195,7 @@ cli_ntrace(X):- tracing -> w_tl( tlbugger:wastracing,call_cleanup((notrace,call(
 %
 % Traceok.
 %
-traceok(X):-  tlbugger:wastracing -> call_cleanup((trace,call(X)),notrace) ; call(X).
+traceok(X):-  tlbugger:wastracing -> call_cleanup((trace,call(X)),cnotrace) ; call(X).
 
 % :- mpred_trace_none(tlbugger:skip_bugger).
 % :- mpred_trace_none(skipWrapper).
@@ -1291,7 +1291,7 @@ show_success(Goal):- show_success(mpred,Goal).
 %
 % Whenever Functor Log Fail.
 %
-on_f_log_fail(Goal):-one_must(Goal,notrace((dmsg(on_f_log_fail(Goal)),cleanup_strings,!,fail))).
+on_f_log_fail(Goal):-one_must(Goal,cnotrace((dmsg(on_f_log_fail(Goal)),cleanup_strings,!,fail))).
 
 
 
@@ -1358,7 +1358,7 @@ set_no_debug:-
    thread_leash(-all),
    thread_leash(+exception),
    visible(-cut_call),!,
-   notrace, nodebug)),!.
+   cnotrace, nodebug)),!.
 
 :- export(set_no_debug_thread/0).
 
@@ -1411,7 +1411,7 @@ set_yes_debug:-
    thread_leash(+all),
    thread_leash(+exception),
    visible(+cut_call),
-   notrace, debug]),!.
+   cnotrace, debug]),!.
 
 
 %= 	 	 
@@ -1646,7 +1646,7 @@ doHideTrace(M,F,A,ATTRIB):- tryHide(M:F/A),!,
 %
 % Class Trace.
 %
-ctrace:-willTrace->trace;notrace.
+ctrace:-willTrace->trace;cnotrace.
 
 
 %= 	 	 
@@ -1712,7 +1712,7 @@ do_gc0:- set_prolog_flag(gc,true), do_gc1, set_prolog_flag(gc,false).
 %
 % Do Gc Secondary Helper.
 %
-do_gc1:- notrace((garbage_collect, cleanup_strings /*garbage_collect_clauses*/ /*, statistics*/
+do_gc1:- cnotrace((garbage_collect, cleanup_strings /*garbage_collect_clauses*/ /*, statistics*/
                     )).
 
 :- multifile(lmconf:is_prolog_stream/1).
@@ -3005,7 +3005,7 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
     format(ERR, 'Error ST-End: ~p', [Term]), nl(ERR),
     nl(ERR), fail)).
 
-:-disabled_this.
+%:-disabled_this.
 
 :- dynamic(lmconf:no_buggery/0).
 % show the warnings origins
@@ -3053,7 +3053,7 @@ prolog_stack:stack_guard(none).
 %:-mpred_trace_less(thread_leash/1).
 % :- mpred_trace_less('$syspreds':visible/1).
 %:-mpred_trace_less(visible/1).
-% :- mpred_trace_less(notrace/0).
+% :- mpred_trace_less(cnotrace/0).
 % :- mpred_trace_less(hotrace/1).
 % :- mpred_trace_less(trace/0).
 % :-'$set_predicate_attribute'(!, trace, 1).
@@ -3072,7 +3072,7 @@ prolog_stack:stack_guard(none).
 % :- mpred_trace_less(tlbugger:A/0).
 
 % :- mpred_trace_less(dmsg/1).
-%:-mpred_trace_less(system:notrace/1). 
+%:-mpred_trace_less(system:cnotrace/1). 
 
 /*
 

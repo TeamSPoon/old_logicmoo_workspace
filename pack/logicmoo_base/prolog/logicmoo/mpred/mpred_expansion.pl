@@ -1669,7 +1669,7 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 
 % -  dmsg_hook(db_op(query(HLDS,call),holds_t(ft_info,tCol,'$VAR'(_)))):-trace_or_throw(dtrace).
 
-fixed_negations(I,O):-notrace((fix_negations(I,O),!,I\=@=O)),!.
+fixed_negations(I,O):-cnotrace((fix_negations(I,O),!,I\=@=O)),!.
 fix_negations(P0,P0):- not_ftCompound(P0),!.
 fix_negations(~(P0),~(P0)):- not_ftCompound(P0),!.
 fix_negations(\+(P0),\+(P0)):- not_ftCompound(P0),!.

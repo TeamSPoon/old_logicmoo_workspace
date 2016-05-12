@@ -172,7 +172,7 @@ chang_lee_example6 :-
 %%% SOURCE
 
 chang_lee_example7 :-
-	notrace((pttp((
+	cnotrace((pttp((
 		p(a),
 		m(a,s(c),s(b)),
 		m(X,X,s(X)),

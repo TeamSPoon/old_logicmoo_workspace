@@ -230,7 +230,7 @@ find_and_call(G):-current_predicate(_,R:G),!,find_and_call(R:G).
 %
 % Assert If New Primary Helper.
 %
-ain0(N):-notrace(clause_asserted(N))->true;mpred_op_prolog(assert,N).
+ain0(N):-cnotrace(clause_asserted(N))->true;mpred_op_prolog(assert,N).
 
 :- export(mpred_op_prolog/2).
 :- module_transparent(mpred_op_prolog/2).
@@ -242,10 +242,10 @@ ain0(N):-notrace(clause_asserted(N))->true;mpred_op_prolog(assert,N).
 %
 % Managed Predicate Oper. Prolog.
 %
-mpred_op_prolog(ain0,N):- !,(notrace(clause_asserted(N))->true;mpred_op_prolog0(assert,N)).
-mpred_op_prolog(paina,N):-!,(notrace(clause_asserted(N))->true;mpred_op_prolog0(system:asserta,N)).
-mpred_op_prolog(painz,N):-!,(notrace(clause_asserted(N))->true;mpred_op_prolog0(system:assertz,N)).
-mpred_op_prolog(pain,N):- !,(notrace(clause_asserted(N))->true;mpred_op_prolog0(assert,N)).
+mpred_op_prolog(ain0,N):- !,(cnotrace(clause_asserted(N))->true;mpred_op_prolog0(assert,N)).
+mpred_op_prolog(paina,N):-!,(cnotrace(clause_asserted(N))->true;mpred_op_prolog0(system:asserta,N)).
+mpred_op_prolog(painz,N):-!,(cnotrace(clause_asserted(N))->true;mpred_op_prolog0(system:assertz,N)).
+mpred_op_prolog(pain,N):- !,(cnotrace(clause_asserted(N))->true;mpred_op_prolog0(assert,N)).
 mpred_op_prolog(aina,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(system:asserta,N)).
 mpred_op_prolog(ainz,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(system:assertz,N)).
 mpred_op_prolog(ain,N):-  !,(clause_asserted(N)->true;mpred_op_prolog0(assert,N)).
@@ -586,7 +586,7 @@ modulize_head(MH,M:H):- strip_module(MH,Cm,H),!,
   modulize_head_fb(Cm,H,Cm,M:H).
 
 modulize_head_fb(From,H,Fallback,M:H):- 
- notrace((findall(M:H,
+ cnotrace((findall(M:H,
   ((no_repeats(M, ((current_modules_from(From,M),current_predicate(_,M:H),\+ predicate_property(M:H,imported_from(_))))))->true;
   M=Fallback),List))),
  member(M:H,List).
@@ -628,7 +628,7 @@ put_clause_ref(_Ref,_V):- !.
 put_clause_ref(Ref,V):- !, nop(dmsg(put_clause_ref(Ref,V))).
 put_clause_ref(Ref,V):-put_attr(V,cref,Ref).
 
-remove_term_attr_type(Term,Mod):- notrace((term_attvars(Term,AVs),maplist(del_attr_type(Mod),AVs))).
+remove_term_attr_type(Term,Mod):- cnotrace((term_attvars(Term,AVs),maplist(del_attr_type(Mod),AVs))).
 
 :- op(700,xfx,'=@=').
 
@@ -693,7 +693,7 @@ clause_i(MH,B,Ref):- !,
 clause_i(H0,BIn,Ref):- 
     copy_term_nat(H0:BIn,H:B0),
     system:clause(H,BC,Ref),
-  (must(notrace(split_attrs(BC,AV,B))) -> ( B=B0 -> AV -> H=H0 -> BIn=B)).
+  (must(cnotrace(split_attrs(BC,AV,B))) -> ( B=B0 -> AV -> H=H0 -> BIn=B)).
 */
 
 
@@ -718,7 +718,7 @@ retractall_i(H):-expand_to_hb(H,HH,_),forall(clause_i(HH,_,Ref),erase(Ref)).
 % Clause True.
 %
 clause_true(M:G):-!,system:clause(M:G,true)*->true;(current_module(M2),system:clause(M2:G,true)).
-clause_true(G):- !, notrace((current_module(M), \+ \+  system:clause(M:G,_,_))),!, system:clause(M:G,true).
+clause_true(G):- !, cnotrace((current_module(M), \+ \+  system:clause(M:G,_,_))),!, system:clause(M:G,true).
 clause_true(M:G):-predicate_property(M:G,number_of_clauses(_)),!,system:clause(M:G,true).
 clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).
 clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).

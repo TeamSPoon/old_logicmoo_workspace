@@ -99,7 +99,7 @@
       %   op(1000,xfy,(',')),
          op(700,xfx,('==')).
 
-:- ensure_abox(baseKB).
+%:- ensure_abox(baseKB).
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
 

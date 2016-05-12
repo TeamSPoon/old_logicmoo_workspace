@@ -140,13 +140,13 @@ install_attvar_expander(M):-
   asserta_if_new((
   M:term_expansion(I,CO):- 
    ((current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), 
-   notrace((system_expanded_attvars(I,O),
+   cnotrace((system_expanded_attvars(I,O),
    (is_term_expanding_in_file(I)->clausify_attributes(O,CO);=(O,CO)),wdmsg(xform(I --> CO)))))))),
 
    system:multifile(system:goal_expansion/2),
    system:dynamic(system:goal_expansion/2),
    asserta_if_new((system:goal_expansion(I,O):- 
-    notrace((current_prolog_flag(read_attvars,true), 
+    cnotrace((current_prolog_flag(read_attvars,true), 
      \+ current_prolog_flag(xref,true), system_expanded_attvars(I,O))))).
 
 

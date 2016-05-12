@@ -80,10 +80,10 @@ collecting_list(G,Vs,At,S):-
 
 :- nb_setval(query_result,sol(0,1,false,false)).
 
-shared_vars(Left,Right,SVG):-notrace(( term_variables(Left,Vs1),term_variables(Right,Vs2),intersect_eq0(Vs2,Vs1,SVG))).
+shared_vars(Left,Right,SVG):-cnotrace(( term_variables(Left,Vs1),term_variables(Right,Vs2),intersect_eq0(Vs2,Vs1,SVG))).
 
 % sol(number,G,successfull,done)
-next_solution:- notrace(next_solution(How)),call(How).
+next_solution:- cnotrace(next_solution(How)),call(How).
 
 next_solution(throw(no_query_result)) :- \+ nb_current(query_result,_),!.
 next_solution(request_next0) :- nb_getval(query_result,sol(_,_,true,false)),!.
@@ -92,7 +92,7 @@ next_solution(request_next0) :- nb_getval(query_result,sol(_,_,_,false)),!.
 next_solution(nop(unknown(QR))) :- nb_getval(query_result,QR),!.
 
 request_next0 :- 
-  notrace((thread_send_message(ask1,please(next_sol)), !, 
+  cnotrace((thread_send_message(ask1,please(next_sol)), !, 
   thread_get_message(answer1,M),wdmsg(rn(M)),nb_setval(query_result,M))),!.
 
 call_in_engine(G):- 
@@ -124,7 +124,7 @@ call_goal_in_thread_saved_nd:- next_solution.
 
 
 start_goal_saved1:- 
-  notrace((nb_getval(in,v(_,G,_,_)),
+  cnotrace((nb_getval(in,v(_,G,_,_)),
   thread_create(start_listening(G),_ID,[detached(true)]))),
   nb_setval(query_result,sol(0,G,unknown,false)),!.
 
@@ -136,7 +136,7 @@ thread_send_answer(Left,G,TF,Done):- wdmsg(next_________sol(Left,G,TF,Done)), th
 
 :- meta_predicate start_listening(0).
 start_listening(G):-
-  notrace((flag(sol,_,0),
+  cnotrace((flag(sol,_,0),
   ((thread_send_answer(0,G,unknown,false)),
   thread_get_message(ask1,please(next_sol),[]),  
   ignore(((
