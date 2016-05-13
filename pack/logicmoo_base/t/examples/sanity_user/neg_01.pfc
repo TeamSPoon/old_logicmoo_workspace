@@ -19,7 +19,9 @@
 
 :- mpred_test(~fooBar).
 
-fooBar.
+:- cls.
+% fooBar.
+:- rtrace(ain(fooBar)).
 
 :- mpred_test(\+ ~fooBar).
 
