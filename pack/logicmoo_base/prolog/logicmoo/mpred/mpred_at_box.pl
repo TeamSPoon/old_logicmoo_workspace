@@ -582,8 +582,11 @@ uses_predicate(CallerMt,F,A,retry):-
 %
 % Ensure istAbove/2 stub is present in ChildDefMt.
 %
-create_predicate_istAbove(abox,F,A):-
-   defaultAssertMt(CallerMt),!,create_predicate_istAbove(CallerMt,F,A).
+create_predicate_istAbove(abox,F,A):- 
+   defaultAssertMt(CallerMt),!,must(dynamic(CallerMt:F/A)),
+   show_call((*),create_predicate_istAbove(CallerMt,F,A)).
+create_predicate_istAbove(baseKB,F,A):- must(dynamic(baseKB:F/A)),!.
+% create_predicate_istAbove(CallerMt,F,A):- mtGlobal(CallerMt),!,trace_or_throw(global_create_predicate_istAbove(CallerMt,F,A)).   
 create_predicate_istAbove(CallerMt,F,A):-
    sanity(\+ find_and_call(mtGlobal(CallerMt))),!,
    functor(Goal,F,A),assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).

@@ -82,7 +82,7 @@ ensure_named(Vs,V,N):- atom(N),member(N=VV,Vs),put_attr(V,vn,N),!,maybe_must(VV=
 ensure_named(Vs,V,N):- atom(N),put_attr(V,vn,N),set_in_vd(Vs,N=V).
 ensure_named(Vs,V,N):- get_attr(V,vn,N),!,set_in_vd(Vs,N=V).
 ensure_named(Vs,V,N):- member(N=NV,Vs),V==NV,!,put_attr(V,vn,N).
-ensure_named(Vs,V,N):- nb_current('$variable_names', VsE), member(N=NV,VsE),V==NV,!,put_attr(V,vn,N),set_in_vd(Vs,N=V).
+ensure_named(Vs,V,N):- get_varname_list(VsE), member(N=NV,VsE),V==NV,!,put_attr(V,vn,N),set_in_vd(Vs,N=V).
 
 set_in_vd(Vs,N=V):-member(NN=VV,Vs),NN==N,V==VV,!.
 set_in_vd(Vs,N=V):-member(NN=VV,Vs),NN==N,!,maybe_must(V=VV).
@@ -93,7 +93,7 @@ maybe_must(V=VV):-V==VV,!.
 maybe_must(_).
 
 
-% deserialize_attvars(V,O):- nb_current('$variable_names', Vs),!,loop_check(deserialize_attvars(['$variable_names'|Vs], V,O)),!.
+% deserialize_attvars(V,O):- get_varname_list(Vs),!,loop_check(deserialize_attvars(['$variable_names'|Vs], V,O)),!.
 deserialize_attvars(V,O):- loop_check(deserialize_attvars([localvs], V,O),V=O),!.
 
 deserialize_attvars(_Vs, V,O):- cyclic_term(V),!,O=V.

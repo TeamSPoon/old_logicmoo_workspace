@@ -43,7 +43,7 @@ trap 'EXIT' 1 2 3 4 5 6 7 8 9
  
  ( 
   echo -e "\n\n%=%=% Test $1 %=%=%\n\n"
-  swipl -x lm_user -f $1 -g "halt(7)." 
+  /usr/bin/swipl -x lmb.prc -f $1 -g "halt(7)." 
   status=$?
   echostatus $status $1
   ) 2>&1 |
@@ -65,7 +65,9 @@ export -f run_test_file echostatus EXIT
 
 if [ "$1" != "" ]; then
 
-   find ./*/ -name "*.p*" -name "$1" -and \( -not -name "*htm*" \) -print -exec  bash -c 'run_test_file $0' '{}' \;
+   find ./sanity/ -name "*.p*" -name "$1" -and \( -not -name "*htm*" \) -print -exec  bash -c 'run_test_file $0' '{}' \;
+
+   #find ./ -name "*.p*" -and \( -not -name "*htm*" \) -print0  | grep "$1" | xargs -I % bash -c 'run_test_file '
 
 else
 

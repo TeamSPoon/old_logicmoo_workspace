@@ -5,9 +5,9 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(sanity_neg,[]).
+:- module(neg_01,[]).
 
-:- use_module(library(logicmoo_base)).
+:- use_module(library(logicmoo_user)).
 
 :- begin_pfc.
 
@@ -20,6 +20,8 @@
 :- mpred_test(~fooBar).
 
 fooBar.
+
+:- mpred_test(\+ ~fooBar).
 
 \+ fooBar.
 

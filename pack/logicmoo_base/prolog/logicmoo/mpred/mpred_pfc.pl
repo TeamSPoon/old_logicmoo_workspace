@@ -238,9 +238,11 @@ mnotrace(G):- no_trace(G),!.
 % ==============  UTILS BEGIN        ==============
 % =================================================
 copy_term_vn(B,A):- ground(B),!,A=B.
+copy_term_vn(B,A):- !,copy_term(B,A).
+
 % copy_term_vn(A,A):-!.
 copy_term_vn(B,A):- need_speed,!,copy_term(B,A).
-copy_term_vn(B,A):- nb_current('$variable_names',Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),b_setval('$variable_names',Vs3),!.
+copy_term_vn(B,A):- get_varname_list(Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),set_varname_list(Vs3),!.
 copy_term_vn(B,A):- nb_current('$old_variable_names',Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),b_setval('$old_variable_names',Vs3),!.
 copy_term_vn(B,A):- copy_term(B,A).
 
@@ -309,7 +311,7 @@ get_source_ref10(M):- fail,trace,
 is_source_ref1(_).
 
 unassertable(Var):-var(Var),!.
-unassertable((_:V)):-!,unassertable(V).
+unassertable((M:V)):-nonvar(M),!,unassertable(V).
 unassertable((_;_)).
 unassertable((_,_)).
 
@@ -710,7 +712,7 @@ mpred_post1(P,S):-  fail,!,
 %  (gets the status in Support and in Database)
 mpred_post1(P,S):- !,
 
-% b_setval('$variable_names',[]),!,
+% set_varname_list([]),!,
 
   copy_term_vn((P,S),(PP,SS)),
   
@@ -2488,7 +2490,7 @@ mpred_load(In):- is_stream(In),!,
    % double_quotes(_DQBool)
    Options = [variables(_Vars),variable_names(VarNames),singletons(_Singletons),comment(_Comment)],
    catchv((read_term(In,Term,[syntax_errors(error)|Options])),E,(dmsg(E),fail)),
-   b_setval('$variable_names',VarNames),expand_term(Term,TermO),mpred_load_term(TermO),
+   set_varname_list(VarNames),expand_term(Term,TermO),mpred_load_term(TermO),
    Term==end_of_file,
    close(In).
 

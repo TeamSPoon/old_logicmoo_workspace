@@ -120,8 +120,9 @@ argsQuoted(second_order).
 
 nondet.
 
-
-((prologBuiltin(P)/get_arity(P,F,A),arity(F,A))==>{make_builtin(F/A)}).
+%doing_slow_rules,
+((prologBuiltin(F),{atom(F)},arity(F,A))==>{make_builtin(F/A)}).
+((prologBuiltin(P),{compound(P),get_arity(P,F,A)},arity(F,A))==>{make_builtin(F/A)}).
 
 
 meta_argtypes(support_hilog(tRelation,ftInt)).

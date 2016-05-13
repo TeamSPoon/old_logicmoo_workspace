@@ -483,7 +483,7 @@ get_clause_vars(CV):- hotrace(get_clause_vars_nontraced(CV)).
 get_clause_vars_nontraced(_):- t_l:dont_varname,!.
 get_clause_vars_nontraced(V):- var(V),!.
 get_clause_vars_nontraced('$VAR'(_)):- !.
-get_clause_vars_nontraced(_:V):- var(V),!,ignore((nb_current('$variable_names',Vs),member(N=V0,Vs),V0==V,set_varname(write_functor,N,V))).
+get_clause_vars_nontraced(_:V):- var(V),!,ignore((get_varname_list(Vs),member(N=V0,Vs),V0==V,set_varname(write_functor,N,V))).
 get_clause_vars_nontraced(MHB):- term_variables(MHB,Vs),must(get_clause_vars(MHB,Vs)).
 
 :- '$set_predicate_attribute'(get_clause_vars(_), trace, 1).
@@ -793,7 +793,7 @@ set_varname(How,N,V):- atom(N),atom_concat('"?',LS,N),atom_concat(NN,'"',LS),fix
 set_varname(_M:write_functor,N,V):- !,ignore('$VAR'(N)=V),!.
 set_varname(_M:write_attribute,N,V):-!,put_attr(V,vn,N).
 set_varname(_M:put_attr,N,V):-!,put_attr(V,vn,N).
-set_varname(Nb_setval,N,V):- nb_current('$variable_names',Vs),!,register_var(N,Vs,V,NewVs),call(call,Nb_setval,'$variable_names',NewVs).
+set_varname(Nb_setval,N,V):- get_varname_list(Vs),!,register_var(N,Vs,V,NewVs),call(call,Nb_setval,'$variable_names',NewVs).
 set_varname(Nb_setval,N,V):- call(call,Nb_setval,'$variable_names',[N=V]).
 %set_varname(Nb_setval,N,V):- must(call(call,Nb_setval,N,V)).
 %set_varname(_How,_,_).
@@ -922,7 +922,7 @@ contains_ftVar(Term):- sub_term(Sub,Term),compound(Sub),Sub='$VAR'(_).
 %
 ensure_vars_labled_r(I,I):-!. 
 ensure_vars_labled_r(I,O):- 
-  once((((nb_current('$variable_names',Vs),Vs\==[])),
+  once((((get_varname_list(Vs),Vs\==[])),
    copy_term(I:Vs,O:OVs),
     must_maplist(write_functor,OVs))),
    (O \=@= I ;  ground(O)),!.
@@ -969,11 +969,11 @@ renumbervars(How,Term,Named):-
 %
 source_variables_lv(AllS):-
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
-  (nb_current('$variable_names', Vs2);Vs2=[]),
+  (get_varname_list(Vs2);Vs2=[]),
   % cnotrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
   ignore(Vs3=[]),
   append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,list_to_set(All,AllS),
-  nb_linkval('$variable_names', AllS).
+  set_varname_list( AllS).
 
 
 
@@ -1111,7 +1111,7 @@ imploded_copyvars(C,CT):-vmust((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_im
 % Source Variables.
 %
 source_variables(Vs):- (((prolog_load_context(variable_names,Vs),Vs\==[]);
-   (nb_current('$variable_names', Vs),Vs\==[]))),!.
+   (get_varname_list(Vs),Vs\==[]))),!.
 source_variables(Vars):-var(Vars),parent_goal('$toplevel':'$execute_goal2'(_, Vars),_),!.
 source_variables([]).
 
@@ -1163,7 +1163,7 @@ snumbervars5(Term,Start,End,List):-must_det_l((integer(Start),is_list(List), num
 % Try Save Variables.
 %
 try_save_vars(_):- t_l:dont_varname,!.
-try_save_vars(HB):-ignore((nb_current('$variable_names',Vs),Vs\==[],save_clause_vars(HB,Vs))),!.
+try_save_vars(HB):-ignore((get_varname_list(Vs),Vs\==[],save_clause_vars(HB,Vs))),!.
 
 :-export(maybe_scan_for_varnames/0).
 

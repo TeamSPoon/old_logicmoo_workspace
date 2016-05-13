@@ -693,11 +693,11 @@ source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property
 source_variables_l(AllS):-
  cnotrace((
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
-  (nb_current('$variable_names', Vs2);Vs2=[]),
+  (get_varname_list(Vs2);Vs2=[]),
   cnotrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
   ignore(Vs3=[]),
   append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,list_to_set(All,AllS),
-  nb_linkval('$variable_names', AllS))).
+  set_varname_list( AllS))).
 
 
 

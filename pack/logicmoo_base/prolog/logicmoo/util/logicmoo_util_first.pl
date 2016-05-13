@@ -7,6 +7,8 @@
           nput_variable_names/1,
           check_variable_names/2,
                   unnumbervars4/4,
+                  get_varname_list/1,
+                  set_varname_list/1,
                   icatch/1,
 user_ensure_loaded/1,
 user_use_module/1,
@@ -361,14 +363,17 @@ mustvv(G):-must(G).
 % unnumbervars(X,YY):- mustvv(unnumbervars0(X,Y)),!,mustvv(Y=YY).
 
 
+get_varname_list(VsOut):- nb_current('$variable_names',Vs),!,check_variable_names(Vs,VsOut).
+set_varname_list(VsIn):- check_variable_names(VsIn,Vs),
+  b_setval('$variable_names',[]),
+  duplicate_term(Vs,VsD),
+  nb_linkval('$variable_names',VsD).
 
-
-add_var_to_env(Name,Var):- nb_current('$variable_names',Vs),!,
-  check_variable_names(Vs,VsIn),
+add_var_to_env(Name,Var):- get_varname_list(VsIn),
    add_var_to_list(Name,Var,VsIn,NewName,NewVar,NewVs),
    (NewName\==Name -> put_attr(Var, vn, NewName) ; true),
    (NewVar \==Var  -> put_attr(NewVar, vn, Name) ; true),
-   (NewVs  \==Vs   -> put_variable_names(NewVs) ; true).
+   (NewVs  \==VsIn -> put_variable_names(NewVs) ; true).
    
 
 %% add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs) is det.
@@ -379,7 +384,8 @@ add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):- member(Name=_,Vs),
               length(Vs,Len),atom_concat(Name,Len,NameAgain0),( \+ member(NameAgain0=_,Vs)-> NameAgain0=NameAgain ; gensym(Name,NameAgain)),
               NewName=NameAgain,NewVar=Var, 
               NewVs=[NewName=NewVar|Vs],!.
-add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):-  NewName=Name,NewVar=Var,NewVs=[Name=Var|Vs],!.
+add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):-  
+  NewName=Name,NewVar=Var,NewVs=[Name=Var|Vs],!.
 
 
 %= 	 	 
@@ -394,7 +400,8 @@ unnumbervars(X,Y):- must(cnotrace(unnumbervars_and_save(X,Y))).
 put_variable_names(NewVs):-  check_variable_names(NewVs,Checked),call(b_setval,'$variable_names',Checked).
 nput_variable_names(NewVs):- check_variable_names(NewVs,Checked),call(nb_setval,'$variable_names',Checked).
 
-check_variable_names(I,O):- \+ member(free=_,I) -> O=I ; trace_or_throw(bad_check_variable_names(I)).
+check_variable_names(I,O):- (\+ member(free=_,I) -> O=I ; 
+   (set_prolog_flag(variable_names_bad,true),trace_or_throw(bad_check_variable_names))).
 
 %= 	 	 
 
@@ -407,7 +414,7 @@ unnumbervars_and_save(X,YO):- must(cnotrace(unnumbervars4(X,[],_,YO))),!.
 % unnumbervars_and_save(X,YO):- \+ ((sub_term(V,X),compound(V),'$VAR'(_)=V)),!,YO=X.
 
 /*
-unnumbervars_and_save(X,YO):- (nb_current('$variable_names', Vs)->true;Vs=[]),unnumbervars4(X,Vs,NewVs,YO),!,
+unnumbervars_and_save(X,YO):- (get_varname_list(Vs)->true;Vs=[]),unnumbervars4(X,Vs,NewVs,YO),!,
    (NewVs  \==Vs   -> put_variable_names(NewVs) ; true).
 unnumbervars_and_save(X,YO):-
  term_variables(X,TV),
@@ -515,9 +522,9 @@ add_newvar('A',_):-!.
 add_newvar('B',_):-!.
 add_newvar(N,_):- atom(N),atom_concat('_',_,N),!.
 add_newvar(N,V):- 
-  (nb_current('$variable_names', V0s)->true;V0s=[]),
+  (get_varname_list(V0s)->true;V0s=[]),
   remove_grounds(V0s,Vs),
- once((member(NN=Was,Vs),N==NN,var(Was),var(V),(Was=V))-> (V0s==Vs->true;nb_linkval('$variable_names',Vs)); nb_linkval('$variable_names',[N=V|Vs])).
+ once((member(NN=Was,Vs),N==NN,var(Was),var(V),(Was=V))-> (V0s==Vs->true;set_varname_list(Vs)); set_varname_list([N=V|Vs])).
 
 
 %= 	 	 
@@ -653,7 +660,7 @@ register_var_0(N,T,V,OUT):- atom(N),is_list(T),member(NI=VI,T),atom(NI),N=NI,V=V
 
 register_var_0(N,T,V,OUT):- mustvv(nonvar(N)),
    ((name_to_var(N,T,VOther)-> mustvv((OUT=T,samify(V,VOther)));
-     ((nb_current('$variable_names', Before)->true;Before=[]),
+     ((get_varname_list(Before)->true;Before=[]),
       (name_to_var(N,Before,VOther)  -> mustvv((samify(V,VOther),OUT= [N=V|T]));
          (var_to_name(V,T,_OtherName)                  -> OUT= [N=V|T];
            (var_to_name(V,Before,_OtherName)              -> OUT= [N=V|T];fail)))))),!.
@@ -661,7 +668,7 @@ register_var_0(N,T,V,OUT):- mustvv(nonvar(N)),
 
 register_var_0(N,T,V,OUT):- var(N),
    (var_to_name(V,T,N)                -> OUT=T;
-     ((nb_current('$variable_names', Before)->true;Before=[]),
+     ((get_varname_list(Before)->true;Before=[]),
           (var_to_name(V,Before,N)   -> OUT= [N=V|T];
                OUT= [N=V|T]))),!.
 

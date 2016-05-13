@@ -104,10 +104,10 @@ bad_thing_to_do:- doall((clause(wsh_w:wrap_shared(F,A,ereq),Body),
 % :- doall((current_module(W),import_module(W,system),\+ import_module(W, user), W\==baseKB, add_import_module(lmcode,W,end))).
 
 */
-:- dmsg("Adding logicmoo/[snark|mpred[online]] to autoload path",[]).
+%:- dmsg("Adding logicmoo/[snark|mpred[online]] to autoload path",[]).
 %:- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
 %:- add_library_search_path('./logicmoo/mpred/',[ 'mpred_*.pl']).
-:- must(add_library_search_path('./logicmoo/mpred_online/',[ '*.pl'])).
+%:- must(add_library_search_path('./logicmoo/mpred_online/',[ '*.pl'])).
 % :- add_library_search_path('./logicmoo/',[ '*.pl']).
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).

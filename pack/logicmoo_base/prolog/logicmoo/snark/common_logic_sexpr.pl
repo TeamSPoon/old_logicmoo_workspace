@@ -41,7 +41,7 @@ fixvars(P,N,[V|VARS],PO):-
      atom_string(Name,V),clip_qm(Name,NB),Var = '$VAR'(NB),
      subst(P,'$VAR'(N),Var,PM0),
      subst(PM0,'$VAR'(Name),Var,PM),
-   %  (nb_current('$variable_names', Vs)->true;Vs=[]),
+   %  (get_varname_list(Vs)->true;Vs=[]),
   %   append(Vs,[Name=Var],NVs),
   %   nput_variable_names( NVs),
      N2 is N + 1, fixvars(PM,N2,VARS,PO).
@@ -412,7 +412,7 @@ remove_incompletes([NV|Before],[NV|CBefore]):-
 % Extract Lvars.
 %
 extract_lvars(A,B,After):-
-     (nb_current('$variable_names',Before)->true;Before=[]),
+     (get_varname_list(Before)->true;Before=[]),
      remove_incompletes(Before,CBefore),!,
      copy_lvars(A,CBefore,B,After).
 

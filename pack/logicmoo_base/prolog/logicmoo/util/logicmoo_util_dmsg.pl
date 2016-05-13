@@ -639,11 +639,11 @@ portray_clause_w_vars(Msg,Options):- source_variables_lwv(Vs),portray_clause_w_v
 %
 source_variables_lwv(AllS):-
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
-  (nb_current('$variable_names', Vs2);Vs2=[]),
+  (get_varname_list(Vs2);Vs2=[]),
   %cnotrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
   ignore(Vs3=[]),
   append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,list_to_set(All,AllS),
-  nb_linkval('$variable_names', AllS).
+  set_varname_list( AllS).
 
 
 

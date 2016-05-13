@@ -362,12 +362,12 @@ is_not_entailed(CLIF):- cwc, mpred_nochaining((kif_to_pfc(CLIF,Prolog), \+ are_c
 
 %% is_clif( :TermCLIF) is semidet.
 %
-% If Is A Ieee Standard Common Logic Interchange Format Version.
+% True if an expression is in ISO Common Logic Interchange Format.
 %
 is_clif(all(_,X)):-cwc,compound(X),!,is_clif(X).
 is_clif(forall(_,X)):-cwc,compound(X),!.
 is_clif(CLIF):-cwc,
-  VVs = v(if,iff,clif_forall,all,exists), % implies,equiv,forall
+  VVs = v(if,iff,clif_forall,all,exists), % but not: implies,equiv,forall
    (var(CLIF)-> (arg(_,VVs,F),functor(CLIF,F,2));
      compound(CLIF),functor(CLIF,F,2),arg(_,VVs,F)).
 

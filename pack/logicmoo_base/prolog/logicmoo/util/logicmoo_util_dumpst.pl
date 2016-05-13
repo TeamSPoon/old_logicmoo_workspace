@@ -357,9 +357,9 @@ printable_variable_name(Var,Name):- v_name1(Var,Name),!.
 printable_variable_name(Var,Name):- v_name2(Var,Name),!. % ,atom_concat(Name1,'_TL',Name).
 
 v_name1(Var,Name):- var_property(Var,name(Name)),!.
-v_name1(Var,Name):- nb_current('$variable_names', Vs),member(Name=V,Vs),V==Var,!.
-v_name1(Var,Name):- nb_current('$old_variable_names', Vs),member(Name=V,Vs),V==Var,!.
-v_name2(Var,Name):- nb_current('$variable_names', Vs),format(atom(Name),'~W',[Var, [variable_names(Vs)]]).
+v_name1(Var,Name):- get_varname_list(Vs),member(Name=V,Vs),atomic(Name),V==Var,!.
+v_name1(Var,Name):- nb_current('$old_variable_names', Vs),member(Name=V,Vs),atomic(Name),V==Var,!.
+v_name2(Var,Name):- get_varname_list(Vs),format(atom(Name),'~W',[Var, [variable_names(Vs)]]).
  
 
 %attrs_to_list(att(sk,_,ATTRS),[sk|List]):-!,attrs_to_list(ATTRS,List).
@@ -382,7 +382,7 @@ simplify_var_printed(Var,'$VAR'(Name)):- is_ftVar(Var),!,printable_variable_name
 
 
 simplify_goal_printed(Var,Name):-cyclic_term(Var),!,Name=Var.
-simplify_goal_printed(Var,Name):-is_ftVar(Var),simplify_var_printed(Var,Name),!.
+simplify_goal_printed(Var,Name):-is_ftVar(Var),\+ current_prolog_flag(variable_names_bad,true),simplify_var_printed(Var,Name),!.
 simplify_goal_printed(setup_call_catcher_cleanup,sccc).
 simplify_goal_printed(existence_error(X,Y),_):-nl,writeq(existence_error(X,Y)),nl,fail.
 simplify_goal_printed(setup_call_cleanup,scc).
