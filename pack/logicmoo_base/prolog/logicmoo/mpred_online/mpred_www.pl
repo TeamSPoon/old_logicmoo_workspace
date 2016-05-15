@@ -1410,7 +1410,7 @@ current_line_position(Out,LP):-stream_property(Out,position( Y)),stream_position
 tmw:- w_tl(t_l:print_mode(html),
  (rok_portray_clause(a(LP)),
   rok_portray_clause((a(LP):-b([1,2,3,4]))),
-  nl,nl,with_umt(wid(_,_,KIF)),
+  nl,nl,call_u(wid(_,_,KIF)),
   KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
 tmw:- w_tl(t_l:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF),KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
 

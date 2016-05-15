@@ -36,6 +36,7 @@
             (kb_dynamic)/3,
             (kb_dynamic)/4,
             kb_dynamic_ilc/4,
+            kb_dynamic_ilc_z/4,
             kb_dynamic_ilc/5,
             kb_dynamic_ilc_0/5,
             decl_mpred_mfa/3,
@@ -246,14 +247,20 @@ decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
 %
 % Declare Managed Predicate Hybrid.
 %
+
 kb_dynamic(A):-not(compound(A)),!,ain00(prologHybrid(A)).
-kb_dynamic(M):-M=..[isEach|List],!,must_maplist(kb_dynamic,List).
+% ain(love(isEach(a/1,b/2,c/1,d),mother).
+% ain(loves(isElement(a/1,b/2,c/1,d),mother)).
+kb_dynamic(M):- M =.. [isEach|List],!,must_maplist(kb_dynamic,List).
 kb_dynamic(List):-is_list(List),!,must_maplist(kb_dynamic,List).
-% kb_dynamic(A):-!, must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),A))),!.
+kb_dynamic(MPI):- must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),MPI))),!.
+
+
 kb_dynamic(F/A):- var(A),atom(F),
- with_umt((must(current_smt(SM,CM)),!,
+ call_u((must(current_smt(SM,CM)),!,
    forall(between(1,10,A),must((functor(PI,F,A),kb_dynamic_ilc_0(CM,SM,PI,F,A)))))).
-kb_dynamic(P):- with_umt(with_pi(P,kb_dynamic)).
+kb_dynamic(P):- must(call_u(with_pi(P,kb_dynamic))).
+
 
 :- was_export((kb_dynamic)/3).
 
@@ -290,7 +297,7 @@ kb_dynamic(F,Other):-
 % Declare Managed Predicate Hybrid.
 %
 kb_dynamic(CM,M,PIN,FA):- 
-  unnumbervars(PIN,PI),loop_check(must(kb_dynamic_ilc(CM,M,PI,FA)),true).    
+  unnumbervars(PIN,PI),kb_dynamic_ilc(CM,M,PI,FA).
 
 
 %= 	 	 
@@ -299,18 +306,22 @@ kb_dynamic(CM,M,PIN,FA):-
 %
 % Declare Managed Predicate Hybrid Inside Of Loop Checking.
 %
-kb_dynamic_ilc(baseKB,M,PI,F/A):-kb_dynamic_ilc(baseKB,M,PI,F,A),!.
+kb_dynamic_ilc(Any,M,PI,FA):- must(kb_dynamic_ilc_z(Any,M,PI,FA)),!.
 
-kb_dynamic_ilc(baseKB,M,PI,F,A):- defaultAssertMt(Mt),M\==Mt,!,must(kb_dynamic_ilc(baseKB,Mt,PI,F/A)).
-kb_dynamic_ilc(CM,M,PI,F,A):-atom(PI),A==0,get_arity(PI,F,A),\+(current_predicate(F/A)),!,
+
+kb_dynamic_ilc_z(Any,M,PI,F/A):- kb_dynamic_ilc(Any,M,PI,F,A),!.
+kb_dynamic_ilc_z(Any,M,PI,FA):- trace_or_throw(failed_kb_dynamic_ilc(Any,M,PI,FA)).
+
+kb_dynamic_ilc(baseKB,M,PI,F,A):- defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic_ilc(baseKB,Mt,PI,F,A)).
+kb_dynamic_ilc(CM,    M,PI,F,A):- atom(PI),A==0,get_arity(PI,F,A),\+(current_predicate(F/A)),!,
    must((forall((arity_no_bc(F,AA),AA\=0),(functor(PIA,F,AA),kb_dynamic_ilc(CM,M,PIA,F,AA))))).
 
-kb_dynamic_ilc(CM,M,PIN,F,A):- unnumbervars(PIN,PI),
-  loop_check_term(kb_dynamic_ilc_0(CM,M,PI,F,A),kb_dynamic_ilc(CM,M,F),true).
+kb_dynamic_ilc(CM,   M,PIN,F,A):- unnumbervars(PIN,PI),
+  loop_check_term(must(kb_dynamic_ilc_0(CM,M,PI,F,A)),kb_dynamic_ilc(CM,M,F),true).
 
 %= 	 	 
 
-%% kb_dynamic_ilc_0( ?CM, ?M, ?PI, :TermF) is semidet.
+%% kb_dynamic_ilc_0( ?CM, ?M, ?PI, +F, +A) is det.
 %
 % Declare Managed Predicate hybrid Inside Of Loop Checking  Primary Helper.
 %

@@ -47,8 +47,8 @@
 :- multifile(t_l:disable_px/0).
 :- thread_local(t_l:disable_px/0).
 
-:- multifile(abox:defaultTBoxMt/1).
-:- dynamic(abox:defaultTBoxMt/1).
+%:- multifile(abox:defaultTBoxMt/1).
+%:- dynamic(abox:defaultTBoxMt/1).
 
 lmconf:mpred_skipped_module(eggdrop).
 :- forall(current_module(CM),system:assert(lmconf:mpred_skipped_module(CM))).
@@ -76,15 +76,18 @@ lmconf:mpred_skipped_module(eggdrop).
 :-use_module(system:library('logicmoo/mpred/mpred_type_wff.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_type_args.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_agenda.pl')).
-:-use_module(system:library('logicmoo/snark/common_logic_boxlog.pl')).
-:-use_module(system:library('logicmoo/snark/common_logic_skolem.pl')).
-:-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_)])).
-:-use_module(system:library('logicmoo/snark/common_logic_snark.pl'),except([op(_,_,_)])).
-:-use_module(system:library('logicmoo/snark/common_logic_kb_hooks.pl')).
+
 % :-use_module(system:library('logicmoo/mpred/mpred_*.pl')).
 
 :-use_module(system:library('logicmoo/mpred/mpred_hooks.pl')).
 :-use_module(baseKB:library('logicmoo/mpred/mpred_userkb.pl')).
+
+:-use_module(system:library('logicmoo/snark/common_logic_snark.pl'),except([op(_,_,_)])).
+:-use_module(system:library('logicmoo/snark/common_logic_boxlog.pl')).
+:-use_module(system:library('logicmoo/snark/common_logic_skolem.pl')).
+:-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_)])).
+:-use_module(system:library('logicmoo/snark/common_logic_kb_hooks.pl')).
+
 
 :- reset_modules.
 

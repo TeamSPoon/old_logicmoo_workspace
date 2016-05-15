@@ -223,6 +223,7 @@ dmsg000/1,
 :- include('logicmoo_util_header.pi').
 :- endif.
 
+:- use_module(system:library(memfile)).
 
 :- meta_predicate with_output_to_each(+,0).
 
@@ -449,10 +450,11 @@ fmt(X,Y,Z):- fmt_ansi(fmt0(X,Y,Z)),!.
 
 
 :- module_transparent((format_to_message)/3).
+
 format_to_message(Format,Args,Info):- 
-  (( sanity(is_list(Args))-> 
+  icatch(((( sanity(is_list(Args))-> 
      format(string(Info),Format,Args);
-     (trace,format(string(Info),'~N~n~p +++++++++++++++++ ~p~n',[Format,Args])))).
+     (format(string(Info),'~N~n~p +++++++++++++++++ ~p~n',[Format,Args])))))).
 
 %= 	 	 
 

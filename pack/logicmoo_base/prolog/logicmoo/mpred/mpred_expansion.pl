@@ -131,6 +131,7 @@
             map_f/2,
             mpred_expand_rule/2,
             must_expand/1,
+            must_remodulize/3,
             recommify/2,
             recommify/3,
             reduce_clause/3,
@@ -377,7 +378,7 @@ instTypePropsToType(instTypeProps,ttSpatialType).
 %
 % Reduce Clause.
 %
-reduce_clause(Op,C,HB):-must(nonvar(C)),remodulize(Op,C,CB),CB\=@=C,!,reduce_clause(Op,CB,HB).
+reduce_clause(Op,C,HB):-must(nonvar(C)),must_remodulize(Op,C,CB),CB\=@=C,!,reduce_clause(Op,CB,HB).
 reduce_clause(Op,clause(C, B),HB):-!,reduce_clause(Op,(C :- B),HB).
 reduce_clause(Op,(C:- B),HB):- is_true(B),!,reduce_clause(Op,C,HB).
 reduce_clause(_,C,C).
@@ -529,12 +530,12 @@ is_stripped_module(Mt):-mtExact(Mt),!,fail.
 
 
 
-%% expand_isEach_or_fail(^Sent, --SentO) is det.
+%% expand_isEach_or_fail(^Sent, --SentO) is semidet.
 %
 % Expand isEach/Ns.
 
-expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),remodulize(clause(_,_),
-   Sent,SentM),Sent\=@=SentM,!,bagof(O,do_expand_args(isEach,SentM,O),SentO).
+expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),must_remodulize(clause(_,_),
+   Sent,SentM),Sent\=@=SentM,!,bagof(O,do_expand_args(isEach,SentM,O),SentO),!.
 expand_isEach_or_fail(Sent,SentO):-
     bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L.
 
@@ -1071,25 +1072,25 @@ replaced_module(_,umt,ABox):-defaultAssertMt(ABox).
 replaced_module(_,abox,ABox):-defaultAssertMt(ABox).
 replaced_module(_,tbox,TBox):-abox:defaultTBoxMt(TBox).
 
-%% remodulize( ?Op, ?H, ?HH) is semidet.
+%% remodulize( ?Op, ?H, ?HH) is det.
 %
 % Re-Modulize.
 %
 remodulize(_, H,H):- \+ compound(H),!.
 remodulize(_, H,H):- is_ftVar(H),!.
 remodulize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
-remodulize(Op,M:H,M:HHH):-is_ftVar(M),!,remodulize(mvar(Op),H,HHH).
-remodulize(Op,M:H,R:HHH):-replaced_module(Op,M,R),remodulize(Op,H,HHH).
-remodulize(Op,M:H,HHH):- is_stripped_module(M),!,remodulize(Op,H,HHH).
+remodulize(Op,M:H,M:HHH):-is_ftVar(M),!,must_remodulize(mvar(Op),H,HHH).
+remodulize(Op,M:H,R:HHH):-replaced_module(Op,M,R),!,must_remodulize(Op,H,HHH).
+remodulize(Op,M:H,HHH):- is_stripped_module(M),!,must_remodulize(Op,H,HHH).
 remodulize(Op,H,HH):-is_list(H),!,must_maplist(remodulize(Op),H,HH),!.
-remodulize(Op,':-'(G),':-'(GG)):-!,remodulize(call(Op),G,GG).
-remodulize(Op,(H:-G),(HH:-GG)):-!,remodulize(Op,H,HH),remodulize(call(Op),G,GG).
-remodulize(Op,(H,G),(HH,GG)):-!,remodulize(call(Op),H,HH),remodulize(call(Op),G,GG).
-remodulize(Op,(H;G),(HH;GG)):-!,remodulize(call(Op),H,HH),remodulize(call(Op),G,GG).
+remodulize(Op,':-'(G),':-'(GG)):-!,must_remodulize(call(Op),G,GG).
+remodulize(Op,(H:-G),(HH:-GG)):-!,must_remodulize(Op,H,HH),must_remodulize(call(Op),G,GG).
+remodulize(Op,(H,G),(HH,GG)):-!,must_remodulize(call(Op),H,HH),must_remodulize(call(Op),G,GG).
+remodulize(Op,(H;G),(HH;GG)):-!,must_remodulize(call(Op),H,HH),must_remodulize(call(Op),G,GG).
 remodulize(Op,H,HHH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodulize(Op),HL,HHL),HH=..[F|HHL],!,fix_mp(HH,HHH).
 remodulize(Op,HB,HB):-sanity(trace_or_throw(unknown_remodualize(Op,HB,HB))).
 
-
+must_remodulize(Op,H,HHH):-must(remodulize(Op,H,HHH)),!.
 %= 	 	 
 
 %% is_meta_functor( ^ Sent, ?F, ?List) is semidet.

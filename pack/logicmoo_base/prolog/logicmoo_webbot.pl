@@ -52,4 +52,4 @@
 :- threads.
 %:- use_listing_vars.
 :- statistics.
-:- repeat,sleep(3.0),fail.
+% :- repeat,sleep(3.0),fail.

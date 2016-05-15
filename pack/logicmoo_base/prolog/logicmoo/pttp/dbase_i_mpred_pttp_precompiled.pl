@@ -201,6 +201,46 @@ pttp_logic(logicmoo_kb_refution,
 
        ))).
 
+pttp_logic(logicmoo_kb_refution_between_mts,
+          ((
+
+           % TODO define askable_t
+           (( ist(MT1,asserted_t(P,A,B)) & genlMt(MT1,MT2) => ist(MT2,true_t(P,A,B)) )),
+           (( true_t(P,A,B) => assumed_t(P,A,B) )),
+           (( assumed_t(P,A,B) => -not_true_t(P,A,B) & -fallacy_t(P,A,B)  )),
+           (( possible_t(P,A,B) => -not_true_t(P,A,B) & -fallacy_t(P,A,B)  )),            
+
+           (( true_t(P,A,B) & not_true_t(P,A,B) => fallacy_t(P,A,B) )),
+           
+           (( true_t(P,A,B) =>  -not_true_t(P,A,B) & possible_t(P,A,B) & -unknown_t(P,A,B) )),
+           (( not_true_t(P,A,B) <=> -true_t(P,A,B) & -possible_t(P,A,B) & -unknown_t(P,A,B) )),
+           (( ist(MT1,askable_t(P,A,B)) & genlMt(MT1,MT2)  =>  ist(MT1, (true_t(P,A,B) v unknown_t(P,A,B) v not_true_t(P,A,B)  )))),
+           (( answerable_t(P,A,B) <=> askable_t(P,A,B) & -unknown_t(P,A,B) )),
+           (( askable_t(P,A,B) <=> -fallacy_t(P,A,B) )),
+           (( answerable_t(P,A,B) => true_t(P,A,B) v not_true_t(P,A,B)  )),
+           (( true_t(P,A,B) v unknown_t(P,A,B) v not_true_t(P,A,B)  ))
+
+
+
+           % TODO define askable_t
+/*
+         (( fallacy_t(P,A,B) => not_true_t(P,A,B) & true_t(P,A,B) & -unknown_t(P,A,B) & -possible_t(P,A,B) )),   
+         
+           (( unknown_t(P,A,B) =>  -true_t(P,A,B) & possible_t(P,A,B) & -asserted_t(P,A,B) & -not_true_t(P,A,B) )),
+         
+            (( -unknown_t(P,A,B) => true_t(P,A,B) v not_true_t(P,A,B)  )),
+            (( -asserted_t(P,A,B) => possible_t(P,A,B) v not_true_t(P,A,B) v fallacy_t(P,A,B) )),
+            (( -true_t(P,A,B) =>  not_true_t(P,A,B) v fallacy_t(P,A,B) v possible_t(P,A,B) )),
+            (( -possible_t(P,A,B) => not_true_t(P,A,B) v fallacy_t(P,A,B) )),
+            (( -not_true_t(P,A,B) => fallacy_t(P,A,B) v unknown_t(P,A,B) v true_t(P,A,B) )),
+            (( -fallacy_t(P,A,B) =>  unknown_t(P,A,B) v not_true_t(P,A,B) v true_t(P,A,B) ))
+
+            */
+
+          %  (( askable_t(P,A,B) v fallacy_t(P,A,B) )),
+
+       ))).
+
 
 
 % -- CODEBLOCK

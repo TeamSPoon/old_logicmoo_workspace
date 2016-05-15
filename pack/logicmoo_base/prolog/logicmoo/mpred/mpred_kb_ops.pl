@@ -113,7 +113,6 @@ mpred_call_0/1,
 mpred_call_only_facts/2,
 mpred_call_only_facts/1,
 call_u_req/1,
-call_u/2,
 neg_in_code/1,
 neg_in_code0/1,
 {}/1,
@@ -266,6 +265,9 @@ mpred_facts_and_universe/1
             
           ]).
 %:- endif.
+
+:- dynamic(mpred_univ/3).
+
 
 :- meta_predicate 
       pred_head(1,*),
@@ -1547,15 +1549,6 @@ neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause_u(prologNegByF
 neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
 
 
-:- was_module_transparent(call_u/2).
-:- was_export(call_u/2).
-%% call_u( +ABOX, ?G) is semidet.
-%
-% Using User Microtheory.
-%
-call_u(ABOX,G):- w_tl(t_l:user_abox(ABOX),call_u(ABOX:G)).
-
-
 %=
 %= mpred_call_only_facts(+Why,:F) is true iff F is a fact available for forward chaining.
 %= Note that this has the side effect [maybe] of catching unsupported facts and
@@ -1671,7 +1664,8 @@ call_with_bc_triggers(MP) :- strip_module(MP,_,P), functor(P,F,A), \+ t_l:infBac
 %
 mpred_call_with_no_triggers(Clause) :-  strip_module(Clause,_,F),
   %= this (is_ftVar(F)) is probably not advisable due to extreme inefficiency.
-  (is_ftVar(F)    ->  mpred_facts_and_universe(F) ; mpred_call_with_no_triggers_bound(F)).
+  (is_ftVar(F)    ->  mpred_facts_and_universe(F) ;
+     mpred_call_with_no_triggers_bound(F)).
 
 
 %% mpred_call_with_no_triggers_bound( +F) is semidet.
@@ -1696,7 +1690,7 @@ mpred_call_with_no_triggers_uncaugth(Clause) :-  strip_module(Clause,_,F),
 %
 % PFC Backchaining Only.
 %
-mpred_bc_only(M:G):- !, call_u(M,mpred_bc_only0(G)).
+mpred_bc_only(M:G):- !, with_umt(M,mpred_bc_only0(G)).
 mpred_bc_only(G):- !, call_u(mpred_bc_only0(G)).
 
 % % :- '$set_source_module'(mpred_kb_ops).
@@ -2237,8 +2231,9 @@ repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 repropagate(P):-  \+ predicate_property(_:P,_),dmsg(undefined_repropagate(P)),dumpST,dtrace,!,fail.
 repropagate(P):-  repropagate_0(P).
 
+
 predicate_to_goal(P,Goal):-atom(P),get_arity(P,F,A),functor(Goal,F,A).
-predicate_to_goal(P/A,Goal):-atom(P),get_arity(P,F,A),functor(Goal,F,A).
+predicate_to_goal(PF/A,Goal):-atom(PF),get_arity(PF,F,A),functor(Goal,F,A).
 predicate_to_goal(G,G):-compound(G),!.
 
 %% repropagate_0( +P) is semidet.

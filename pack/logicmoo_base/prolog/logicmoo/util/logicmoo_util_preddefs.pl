@@ -203,11 +203,12 @@ with_pi(P,Pred3):-source_context_module(CallerMt),with_pi_selected(CallerMt,Call
 % Using Predicate Indicator Selected.
 %
 
+% 11 will be our signal of "any arity" (naughty)
 with_pi_selected(CallerMt,PredMt, F/A ,Pred3):- var(A),!,
-  forall(between(1,10,A),must(with_pi_selected(CallerMt,PredMt, F/A ,Pred3))).
+  forall(between(1,11,A),must(with_pi_selected(CallerMt,PredMt, F/A ,Pred3))).
 
 with_pi_selected(CallerMt,PredMt, F//A ,Pred3):- var(A),!,
-  forall(between(1,10,A),must(with_pi_selected(CallerMt,PredMt, F//A ,Pred3))).
+  forall(between(1,11,A),must(with_pi_selected(CallerMt,PredMt, F//A ,Pred3))).
 
 
 with_pi_selected(CallerMt, PredMt,[P|L],Pred3):-!,with_pi_selected(CallerMt,PredMt,P,  Pred3),with_pi_selected(CallerMt,PredMt,L,Pred3).
@@ -420,6 +421,8 @@ with_pfa(With,CallerMt, PredMt, PI):- context_module_of_file(CallerMt),with_pfa_
 %
 % Module Module Functor-arity Converted To Module F Functor-arity.
 %
+m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,F/A):- var(A),atom(F),!,
+   forall(between(1,11,A),(functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A))).
 m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,F/A):-!,atom(F),functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A).
 m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,PI):-functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A).
 

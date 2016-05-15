@@ -229,7 +229,7 @@ kif_hook(C):- C=..[F,A|_],is_sentence_functor(F),!,kif_hook(A).
 %
 % 
 are_clauses_entailed(E):-var(E),!,fail.
-are_clauses_entailed(B):- unnumbervars(B,A),with_umt(map_each_clause(is_prolog_entailed,A)).
+are_clauses_entailed(B):- unnumbervars(B,A),call_u(map_each_clause(is_prolog_entailed,A)).
 
 
 
@@ -1330,7 +1330,7 @@ kif_io(InS,Out):-
 % Generation Of Proof Converted To Id.
 %
 why_to_id(Term,Wff,IDWhy):-  ~(atom(Term)),term_to_atom(Term,Atom),!,why_to_id(Atom,Wff,IDWhy).
-why_to_id(Atom,Wff,IDWhy):- with_umt(wid(IDWhy,Atom,Wff)),!.
+why_to_id(Atom,Wff,IDWhy):- call_u(wid(IDWhy,Atom,Wff)),!.
 why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhyI,IDWhy),assertz_if_new(wid(IDWhy,Atom,Wff)).
 
 :- public(kif_process/1).

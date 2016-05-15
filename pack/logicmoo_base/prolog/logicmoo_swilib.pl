@@ -30,10 +30,23 @@
 :- use_module(http_exception:library(settings)).
 
 % XPCE related autoloads
+
+:- use_module(system:library(pce),except([op(_,_,_)])).
 :- use_module(system:library(swi_compatibility)).
 :- use_module(system:library(pce_util)).
 :- use_module(system:library(pce_emacs)).
-:- use_module(system:library(pce),except([op(_,_,_)])).
+:- use_module(system:library(swi_ide)).
+:- use_module(system:library(pce_edit)).
+:- use_module(system:library(edit_dialog)).
+:- use_module(system:library(swi_preferences)).
+:- use_module(system:library(pce_manual)).
+:- use_module(system:library(gui_tracer)).
+:- use_module(system:library(pce_meta)).
+:- use_module(system:library(portray_object)).
+:- use_module(system:library(keybinding)).
+:- use_module(system:library(emacs_tags)).
+:- use_module(system:library(pce_require)).
+:- use_module(system:library(pce_debug)).
 
 % ======================================================
 % Rest of the standard library

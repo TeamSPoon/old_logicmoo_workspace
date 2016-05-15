@@ -206,10 +206,9 @@ print_db_items(T, I):-
 % Print Database Items.
 %
 print_db_items(F/A):-number(A),!,functor(P,F,A),!,print_db_items(P).
-print_db_items(I):- bagof(I,with_umt(clause_u(I,true)),R1),pp_items((:),R1),R1\==[],!.
-print_db_items(I):- bagof(I,with_umt(clause_i(I,true)),R1),pp_items((:),R1),R1\==[],!.
-print_db_items(I):- \+ current_predicate(_,I),!. 
-print_db_items(I):- catch( ('$find_predicate'(I,_),call_u(listing(I))),_,true),!,nl,nl.
+print_db_items(H):- bagof(H,clause_u(H,true),R1),pp_items((:),R1),R1\==[],!.
+print_db_items(H):- \+ current_predicate(_,H),!. 
+print_db_items(H):- catch( ('$find_predicate'(H,_),call_u(listing(H))),_,true),!,nl,nl.
 
 
 %= 	 	 

@@ -66,6 +66,8 @@ sk_form(sk(Value),Value):-!.
 
 push_cond(X,Form):- annote(cond,X,Form,_Merged).
 
+cond:attr_unify_hook(_,_).
+
 
 push_skolem(Onto,SK_ADD):-push_skolem(Onto,SK_ADD,_).
 

@@ -264,7 +264,7 @@ get_pifunctor(Head,PHead,F):- get_pifunctor(Head,PHead,F,_).
 %
 get_pifunctor(M:Head,M:PHead,F,A):-atom(M),!,get_pifunctor(Head,PHead,F,A).
 get_pifunctor((F/A),PHead,F,A):- integer(A),!,must(atom(F)),functor(PHead,F,A).
-get_pifunctor(Head,PHead,F,A):-atom(Head),F=Head,!,with_umt(arity(F,A)),must(integer(A)),functor(PHead,F,A).
+get_pifunctor(Head,PHead,F,A):-atom(Head),F=Head,!,call_u(arity(F,A)),must(integer(A)),functor(PHead,F,A).
 %get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(Head/A,PHead,F,A).
 get_pifunctor(Head,PHead,F,A):-var(Head),!,sanity(atom(F)),must(ensure_arity(F,A)),functor(PHead,F,A),ignore(PHead=Head).
 get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(PHead=Head),!.

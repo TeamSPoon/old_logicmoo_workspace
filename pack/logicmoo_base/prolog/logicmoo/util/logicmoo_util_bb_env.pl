@@ -56,8 +56,8 @@ get_env_source_ctx/2,
 get_mp_arity/2,
 get_mpred_stubType/3,
 harvest_preds/2,
-hb_to_clause/3,
-hb_to_clause0/3,
+hb_to_clause_env/3,
+hb_to_clause_env0/3,
 in_dyn/2,
 in_dyn_pred/2,
 inside_file_bb/1,
@@ -79,7 +79,7 @@ term_expansion_add_context/5
 
 %:- (multifile bb:'$sourcefile_info_env'/1, abox:defaultTBoxMt/1, env_push_args/4).
 :- (module_transparent env_consult/1, env_mpred_op/2, env_mpred_op/3, env_mpred_op_1/3, env_shadow/2).
-%:- export((clause_to_hb0/3, env_mpred_op_1/3, hb_to_clause0/3, lg_op2/3)).
+%:- export((clause_to_hb0/3, env_mpred_op_1/3, hb_to_clause_env0/3, lg_op2/3)).
 %:- (dynamic bb:'$sourcefile_info_env'/1, abox:defaultTBoxMt/1, env_push_args/4, env_source_file/1, in_dyn/2).
 %:- shared_multifile((bb:'$sourcefile_info_env'/1, abox:defaultTBoxMt/1, env_push_args/4, env_source_file/1, in_dyn/2)).
 :- endif.
@@ -150,8 +150,8 @@ in_dyn_pred(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property
 
 
 get_mp_arity(F,A):- defaultAssertMt(M),if_defined(M:arity(F,A)).
-get_mp_arity(F,A):- abox:defaultTBoxMt(M),if_defined(M:arity(F,A)).
-get_mp_arity(F,A):- abox:defaultTBoxMt(M),M:mpred_arity(F,A).
+get_mp_arity(F,A):- call_u(defaultTBoxMt(M)),if_defined(M:arity(F,A)).
+get_mp_arity(F,A):- call_u(defaultTBoxMt(M)),M:mpred_arity(F,A).
 
 prop_mpred(Prop,F,A):- abox:defaultTBoxMt(M),M:isa(F,Prop),get_mp_arity(F,A).
 
@@ -357,10 +357,10 @@ term_expansion_add_context( NeedIt, Ctx,_,B,BB):- B=..[F|A], must_maplist(term_e
 
 :- dynamic(env_source_file/1).
 
-hb_to_clause(H,B,HB):- hb_to_clause0(H,B,HB0),!,HB=HB0.
-hb_to_clause0(H,T,H):- T==true.
-hb_to_clause0(T,B,(:-B)):- T==true.
-hb_to_clause0(H,B,(H:-B)).
+hb_to_clause_env(H,B,HB):- hb_to_clause_env0(H,B,HB0),!,HB=HB0.
+hb_to_clause_env0(H,T,H):- T==true.
+hb_to_clause_env0(T,B,(:-B)):- T==true.
+hb_to_clause_env0(H,B,(H:-B)).
 
 
 clause_to_hb(HB,H,B):-clause_to_hb0(HB,H0,B0),!,H=H0,B=B0.
@@ -382,12 +382,12 @@ env_term_expansion(HB,OUT):-
    (((nonvar(HNeedIt);nonvar(BNeedIt)),var(Ctx)) -> BBB = (get_env_ctx(Ctx),BB) ; BBB = BB))),
    (BBB\==B ; H\==HH),
    ((dmsg((old(H):-old,(B))),dmsg((HH:-BBB)))),
-   hb_to_clause(HH,BBB,OUT))),!.
+     hb_to_clause_env(HH,BBB,OUT))),!.
 
 env_term_expansion(HB,(H:-B)):-  HB\=(:-_), end_of_file\==HB, clause_to_hb(HB,H,B),
    _ALT = bb:'$sourcefile_info_env'(OUT),
    must(ain((H:-B))),
-   hb_to_clause(H,B,OUT),!.
+   hb_to_clause_env(H,B,OUT),!.
 
 
 get_env_expected_ctx(Current):- 

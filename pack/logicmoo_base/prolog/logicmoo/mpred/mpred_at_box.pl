@@ -33,14 +33,15 @@
          correct_module/3,
          correct_module/5,
          defaultAssertMt/1,
-         abox:defaultTBoxMt/1,
+         % abox:defaultTBoxMt/1,
          ensure_imports/1,
          fileAssertMt/1,
+         get_current_default_tbox/1,
          in_mpred_kb_module/0,
          istAbove/2,
          make_as_dynamic/4,
          makeConstant/1,
-         mtCanAssertMt/1,
+         mtCanAssert/1,
          %registerCycPred/4,
          %registerCycPred/5,
          retry_undefined/3,
@@ -87,16 +88,16 @@ user_m_check(_Out).
 :- use_module(mpred_pfc).
 
 add_abox_module(baseKB):-!.
-add_abox_module(ABox):- 
-  
-  must(mtCanAssertMt(ABox)),
+add_abox_module(ABox):- must(atom(ABox)),
+  must(mtCanAssert(ABox)),
   ain(baseKB:mtCycL(ABox)).
 
 :- dynamic(baseKB:mtProlog/1).
 :- dynamic(baseKB:mtNoPrologCode/1).
 baseKB:mtNoPrologCode(mpred_userkb).
 
-baseKB:mtProlog(Mt):- module_property(Mt,class(library)).
+baseKB:mtProlog(Mt):- baseKB:mtCycL(Mt),!,fail.
+baseKB:mtProlog(Mt):- atom(Mt),current_module(Mt),module_property(Mt,class(library)).
 baseKB:mtProlog(Mt):-
       arg(_,v( 
          common_logic_boxlog,
@@ -108,6 +109,7 @@ baseKB:mtProlog(Mt):-
          lmconf,
          lmcache,
          t_l,
+         
          lmcode,
          logicmoo_base_file,
          logicmoo_util_attvar_reader,
@@ -216,9 +218,10 @@ box_type(_,_,abox).
 :- thread_local(t_l:current_defaultAssertMt/1).
 :- dynamic(lmconf:file_to_module/2).
 
-:- multifile(abox:defaultTBoxMt/1).
-:- dynamic(abox:defaultTBoxMt/1).
-abox:defaultTBoxMt(baseKB).
+
+%:- multifile(abox:defaultTBoxMt/1).
+%:- dynamic(abox:defaultTBoxMt/1).
+%abox:defaultTBoxMt(baseKB).
 
 
 %% defaultAssertMt(-Ctx) is det.
@@ -232,10 +235,12 @@ defaultAssertMt(ABox):-
     (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);
     '$current_typein_module'(ABox);
-     abox:defaultTBoxMt(ABox))), 
-           mtCanAssertMt(ABox))),!.
+     clause_u(defaultTBoxMt(ABox)))),
+           mtCanAssert(ABox))),!.
 
 defaultAssertMt(ABox):- fileAssertMt(ABox).
+
+:- '$hide'(defaultAssertMt(_)).
 
 %% fileAssertMt(-ABox) is det.
 %
@@ -244,17 +249,21 @@ defaultAssertMt(ABox):- fileAssertMt(ABox).
 %
 % not just user modules
 fileAssertMt(ABox):- nonvar(ABox), fileAssertMt(ABoxVar),!,ABox=@=ABoxVar.
-fileAssertMt(ABox):- which_file(File)->current_module(ABox),module_property(ABox,file(File)),File\==ABox,!.
+fileAssertMt(ABox):- 
+   which_file(File)->current_module(ABox),module_property(ABox,file(File)),File\==ABox,!,
+   mtCanAssert(ABox).
 fileAssertMt(ABox):-
  (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox))),ABox\==user)),!.
-fileAssertMt(ABox):- which_file(File)->make_module_name_local(File,ABox),File\==ABox,!.
+fileAssertMt(ABox):- which_file(File)->make_module_name_local(File,ABox),File\==ABox,!,
+   mtCanAssert(ABox).
 fileAssertMt(ABox):-
  (((('$current_typein_module'(ABox);
-     abox:defaultTBoxMt(ABox))),mtCanAssertMt(ABox))),!.
+     abox:defaultTBoxMt(ABox))),mtCanAssert(ABox))),!.
 fileAssertMt(baseKB).
 
-mtCanAssertMt(ABox):- \+ baseKB:mtProlog(ABox).
+mtCanAssert(abox):- !,fail.
+mtCanAssert(ABox):- \+ baseKB:mtProlog(ABox).
 
 
 
@@ -270,6 +279,8 @@ makeConstant(_Mt).
 %:- (break,cnotrace,nortrace).
 
 
+get_current_default_tbox(TBox):- clause_u(defaultTBoxMt(TBox)),!.
+get_current_default_tbox(baseKB).
 
 %% set_defaultAssertMt( ?ABox) is semidet.
 %
@@ -280,8 +291,8 @@ set_defaultAssertMt(M):- baseKB:mtProlog(M),!,setup_module_ops(M).
 set_defaultAssertMt(ABox):- defaultAssertMt(QABox)->QABox==ABox,!.
 set_defaultAssertMt(ABox):- 
   must_det_l((
-    must(mtCanAssertMt(ABox)),
-    must(abox:defaultTBoxMt(TBox)),
+    must(mtCanAssert(ABox)),
+    get_current_default_tbox(TBox),
     ain(baseKB:mtCycL(ABox)),
     asserta_if_new(ABox:defaultTBoxMt(TBox)),
     (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
@@ -289,13 +300,15 @@ set_defaultAssertMt(ABox):-
     setup_module_ops(ABox), 
     inherit_into_module(ABox,TBox))).
 
+:- '$hide'(set_defaultAssertMt(_)).
+
 %% set_fileAssertMt( ABox) is semidet.
 %
 % Sets the File''s Module.
 %
 set_fileAssertMt(ABox):- 
  must_det_l((
-   must(mtCanAssertMt(ABox)),
+   must(mtCanAssert(ABox)),
    abox:defaultTBoxMt(TBox),
    TBox:ensure_abox(ABox),
    '$current_typein_module'(CM),
@@ -331,6 +344,8 @@ ensure_tbox(_ABox).
 baseKB:mtCore(baseKB).
 
 
+
+
 %% baseKB:mtGlobal(M,Box).
 %
 % Boot Modules.
@@ -347,6 +362,9 @@ baseKB:mtGlobal(system_if_missing).
 baseKB:mtGlobal(common_logic_clif).
 baseKB:mtGlobal(system_mdefault).
 
+:- dynamic(baseKB:mtCycLBroad/1).
+
+baseKB:mtCycLBroad(baseKB).
 
 is_undefaulted(user).
 
@@ -535,6 +553,7 @@ baseKB:hybrid_support(functorDeclares,1).
 baseKB:hybrid_support(spft,3).
 
 baseKB:hybrid_support(mtCycL,1).
+baseKB:hybrid_support(mtCycLBroad,1).
 baseKB:hybrid_support(genlMt,2).
 
 %predicateConventionMt(genlMt,baseKB).
@@ -585,8 +604,9 @@ uses_predicate(CallerMt,F,A,retry):-
 create_predicate_istAbove(abox,F,A):- 
    defaultAssertMt(CallerMt),!,must(dynamic(CallerMt:F/A)),
    show_call((*),create_predicate_istAbove(CallerMt,F,A)).
-create_predicate_istAbove(baseKB,F,A):- must(dynamic(baseKB:F/A)),!.
+create_predicate_istAbove(Mt,F,A):- baseKB:mtCycLBroad(Mt), must(dynamic(Mt:F/A)),!.
 % create_predicate_istAbove(CallerMt,F,A):- mtGlobal(CallerMt),!,trace_or_throw(global_create_predicate_istAbove(CallerMt,F,A)).   
+
 create_predicate_istAbove(CallerMt,F,A):-
    sanity(\+ find_and_call(mtGlobal(CallerMt))),!,
    functor(Goal,F,A),assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
@@ -607,11 +627,10 @@ retry_undefined(lmconf,F,A):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
 retry_undefined(lmcache,F,A):-multifile(lmcache:F/A),volatile(lmcache:F/A),dynamic(lmcache:F/A),!.
 retry_undefined(t_l,F,A):-multifile(t_l:F/A),thread_local(t_l:F/A),!.
 
-retry_undefined(baseKB, F, A):-  baseKB_hybrid_support(F,A),
-   dynamic(baseKB:F/A),
-   multifile(baseKB:F/A),
-   dynamic(baseKB:F/A),
-   discontiguous(baseKB:F/A),!.
+retry_undefined(Mt, F, A):-  baseKB:mtCycLBroad(Mt), baseKB_hybrid_support(F,A),
+   dynamic(Mt:F/A),
+   multifile(Mt:F/A),
+   discontiguous(Mt:F/A),!.
 
 retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(mtGlobal(CallerMt)),
    create_predicate_istAbove(CallerMt,F,A).

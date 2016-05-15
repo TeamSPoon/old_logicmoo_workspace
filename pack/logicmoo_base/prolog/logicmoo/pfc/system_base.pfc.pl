@@ -252,7 +252,7 @@ tCol(tSet).  % = isa(tSet,tCol).
 
 mtProlog(Mt),predicateConventionMt(F,Mt)==>prologBuiltin(F).
 
-genlsFwd(Sub,Super)==>(isa(I,Sub)==>isa(I,Super)).
+genlsFwd(Sub,Super)==> (isa(I,Super) :- isa(I,Sub)). 
 
 ttModule(M)==>tSet(M).
 ttModule(MtType)==>genlsFwd(MtType,tMicrotheory).

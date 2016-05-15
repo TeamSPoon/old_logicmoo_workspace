@@ -135,6 +135,8 @@
             skolem_f/5,
             skolem_fn/6,
             skolem_fn_shared/6,
+            % nnf_args/5,
+            nnf_args/8,
             third_order/1,
             to_poss/2,
             to_regular_cl/4,
@@ -144,6 +146,8 @@
             variants_are_equal/3
           ]).
 %:- endif.
+
+  
 
 % % :- '$set_source_module'(common_logic_compiler).
 
