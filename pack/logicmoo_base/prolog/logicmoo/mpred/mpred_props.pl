@@ -258,7 +258,7 @@ kb_dynamic(MPI):- must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),MPI))),!.
 
 kb_dynamic(F/A):- var(A),atom(F),
  call_u((must(current_smt(SM,CM)),!,
-   forall(between(1,10,A),must((functor(PI,F,A),kb_dynamic_ilc_0(CM,SM,PI,F,A)))))).
+   forall(between(1,11,A),must((functor(PI,F,A),kb_dynamic_ilc_0(CM,SM,PI,F,A)))))).
 kb_dynamic(P):- must(call_u(with_pi(P,kb_dynamic))).
 
 

@@ -33,7 +33,6 @@
          correct_module/3,
          correct_module/5,
          defaultAssertMt/1,
-         % abox:defaultTBoxMt/1,
          ensure_imports/1,
          fileAssertMt/1,
          get_current_default_tbox/1,
@@ -62,6 +61,7 @@
          inherit_into_module/2,
          box_type/3,
          make_reachable/2,
+         clause_b/1,
          fixup_module/2,
          is_undefaulted/1,
          ensure_imports_tbox/2,
@@ -76,6 +76,8 @@
 :- include('mpred_header.pi').
 
 user_m_check(_Out).
+
+clause_b(G):- clause(baseKB:G,Body),call(Body).
 
 :- meta_predicate make_shared_multifile(+,+,+).
 :- meta_predicate make_shared_multifile(*,*,*,*).
@@ -112,6 +114,7 @@ baseKB:mtProlog(Mt):-
          
          lmcode,
          logicmoo_base_file,
+         logicmoo_user_file,
          logicmoo_util_attvar_reader,
          logicmoo_util_bugger,
          logicmoo_util_catch,
@@ -219,9 +222,9 @@ box_type(_,_,abox).
 :- dynamic(lmconf:file_to_module/2).
 
 
-%:- multifile(abox:defaultTBoxMt/1).
-%:- dynamic(abox:defaultTBoxMt/1).
-%abox:defaultTBoxMt(baseKB).
+%:- multifile(get_current_default_tbox/1).
+%:- dynamic(get_current_default_tbox/1).
+%get_current_default_tbox(baseKB).
 
 
 %% defaultAssertMt(-Ctx) is det.
@@ -279,7 +282,7 @@ makeConstant(_Mt).
 %:- (break,cnotrace,nortrace).
 
 
-get_current_default_tbox(TBox):- clause_u(defaultTBoxMt(TBox)),!.
+get_current_default_tbox(TBox):- defaultAssertMt(ABox),clause(ABox:defaultTBoxMt(TBox),B),B,!.
 get_current_default_tbox(baseKB).
 
 %% set_defaultAssertMt( ?ABox) is semidet.
@@ -291,7 +294,7 @@ set_defaultAssertMt(M):- baseKB:mtProlog(M),!,setup_module_ops(M).
 set_defaultAssertMt(ABox):- defaultAssertMt(QABox)->QABox==ABox,!.
 set_defaultAssertMt(ABox):- 
   must_det_l((
-    must(mtCanAssert(ABox)),
+    sanity(mtCanAssert(ABox)),
     get_current_default_tbox(TBox),
     ain(baseKB:mtCycL(ABox)),
     asserta_if_new(ABox:defaultTBoxMt(TBox)),
@@ -484,8 +487,8 @@ correct_module(MT,_,_,_,MT):-!.
 :- module_transparent(lmcache:how_registered_pred/4).
 
 add_import_predicate(Mt,Goal,OtherMt):- fail,
-   baseKB:mtGlobal(Mt),
-   baseKB:mtGlobal(OtherMt),
+   clause_b(mtGlobal(Mt)),
+   clause_b(mtGlobal(OtherMt)),
    \+ import_module(OtherMt,Mt),
    catch(add_import_module(Mt,OtherMt,end),
        error(permission_error(add_import,module,baseKB),
@@ -525,7 +528,7 @@ registerCycPred(Mt,Goal,F,A):-
 
 
 registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
-  baseKB:mtGlobal(OtherMt),
+  clause_b(mtGlobal(OtherMt)),
   add_import_predicate(Mt,Goal,OtherMt),!.
 */
   /*
@@ -546,7 +549,7 @@ autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_ind
 :- multifile(baseKB:hybrid_support/2).
 :- dynamic(baseKB:hybrid_support/2).
 baseKB_hybrid_support(F,A):-wsh_w:wrap_shared(F,A,_).
-baseKB_hybrid_support(F,A):-baseKB:hybrid_support(F,A).
+baseKB_hybrid_support(F,A):-clause_b(hybrid_support(F,A)).
 baseKB:hybrid_support(arity,2).
 baseKB:hybrid_support(predicateConventionMt,2).
 baseKB:hybrid_support(functorDeclares,1).
@@ -604,7 +607,7 @@ uses_predicate(CallerMt,F,A,retry):-
 create_predicate_istAbove(abox,F,A):- 
    defaultAssertMt(CallerMt),!,must(dynamic(CallerMt:F/A)),
    show_call((*),create_predicate_istAbove(CallerMt,F,A)).
-create_predicate_istAbove(Mt,F,A):- baseKB:mtCycLBroad(Mt), must(dynamic(Mt:F/A)),!.
+create_predicate_istAbove(Mt,F,A):- clause_b(mtCycLBroad(Mt)), must(dynamic(Mt:F/A)),!.
 % create_predicate_istAbove(CallerMt,F,A):- mtGlobal(CallerMt),!,trace_or_throw(global_create_predicate_istAbove(CallerMt,F,A)).   
 
 create_predicate_istAbove(CallerMt,F,A):-
@@ -627,7 +630,7 @@ retry_undefined(lmconf,F,A):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
 retry_undefined(lmcache,F,A):-multifile(lmcache:F/A),volatile(lmcache:F/A),dynamic(lmcache:F/A),!.
 retry_undefined(t_l,F,A):-multifile(t_l:F/A),thread_local(t_l:F/A),!.
 
-retry_undefined(Mt, F, A):-  baseKB:mtCycLBroad(Mt), baseKB_hybrid_support(F,A),
+retry_undefined(Mt, F, A):-  clause_b(mtCycLBroad(Mt)), baseKB_hybrid_support(F,A),
    dynamic(Mt:F/A),
    multifile(Mt:F/A),
    discontiguous(Mt:F/A),!.
@@ -719,7 +722,7 @@ make_shared_multifile(CallerMt,PredMt,F,A):-
   HomeM\==PredMt,!,
   make_shared_multifile(CallerMt,HomeM,F,A).
 
-make_shared_multifile(CallerMt,Home,F,A):- baseKB:mtProlog(Home),!,
+make_shared_multifile(CallerMt,Home,F,A):- clause_b(mtProlog(Home)),!,
      wdmsg(mtSharedPrologCodeOnly_make_shared_multifile(CallerMt,Home:F/A)),!.
 
 make_shared_multifile(_CallerMt, baseKB,F,A):-  kb_dynamic(F,A),!.
