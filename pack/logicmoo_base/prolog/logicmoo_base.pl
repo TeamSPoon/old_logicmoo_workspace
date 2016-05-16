@@ -161,7 +161,8 @@ user:lmbf:-
   time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc'))))),
   set_prolog_flag(pfc_booted,true).
 
-% :- user:lmbf.
+:- user:lmbf.
+
 :- reset_modules.
 
 :- forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox),maybe_add_import_module(M,abox,start)).

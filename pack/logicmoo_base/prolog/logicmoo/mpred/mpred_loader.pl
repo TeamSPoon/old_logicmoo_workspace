@@ -1733,7 +1733,9 @@ loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(sou
 load_language_file(Name0):- 
  forall(filematch_ext('qlf',Name0,Name),
   ((
-   w_tl([(user:term_expansion(_,_):-!,fail),
+   w_tl([set_prolog_flag(lm_expanders,false),
+         set_prolog_flag(read_attvars,false),
+         (user:term_expansion(_,_):-!,fail),
          (user:term_expansion(_,_,_,_):-!,fail),
          (user:goal_expansion(_,_):-!,fail),
          (user:goal_expansion(_,_,_,_):-!,fail),

@@ -7,9 +7,9 @@
 
 % :- use_module(library(strings)), use_module(library(lists)).
 
-term_expansion((P -->> Q),(:- fcAdd(Rule))) :-
+term_expansion((P -->> Q),(:- ain(Rule))) :-
   mpred_translate_rule((P -->> Q), Rule).
-term_expansion((P --*>> Q),(:- fcAdd(Rule))) :-
+term_expansion((P --*>> Q),(:- ain(Rule))) :-
   mpred_translate_rule((P --*>> Q), Rule).
 
 mpred_translate_rule((LP-->>[]),H) :- !, mpred_t_lp(LP,Id,S,S,H).
@@ -68,7 +68,7 @@ mpred_tidy(A,A) :- !.
 compile_mpredg :-
   ((retract((L -->> R)), mpred_translate_rule((L -->> R), PfcRule));
     (retract((L --*>> R)), mpred_translate_rule((L --*>> R), PfcRule))),
-  fcAdd(PfcRule),
+  ain(PfcRule),
   fail.
 compile_mpredg.
 
@@ -81,11 +81,11 @@ parse(Words) :-
 parse(Words,Id) :- 
   gen_s_tag(Id),
   parse1(Words,Id),
-  fcAdd(sentence(Id,Words)).
+  ain(sentence(Id,Words)).
 
 parse1([],_) :- !.
 parse1([H|T],Id) :-
- do(fcAdd(ss(word(H),Id,([H|T]\T)))),
+ do(ain(ss(word(H),Id,([H|T]\T)))),
  parse1(T,Id).
 
 

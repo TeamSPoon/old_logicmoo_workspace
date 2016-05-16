@@ -12,7 +12,7 @@
 % ===================================================================
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_structs.pl
-:- module(logicmoo_util_clause_expansion,
+:- module(lmce,
           [
           nb_current_or_nil/2,
           get_named_value_goal/2,
@@ -40,50 +40,8 @@ appear in the source-code.
 
 */
 
-:- module_transparent((is_user_module/0,system_term_expansion/4,system_goal_expansion/4)).
-:- use_module(logicmoo_util_dmsg).
-:- use_module(logicmoo_util_rtrace).
-
-:- multifile(system:goal_expansion/4).
-:- dynamic(system:goal_expansion/4).
-:- multifile(system:term_expansion/4).
-:- dynamic(system:term_expansion/4).
-
-:- meta_predicate get_named_value_goal(0,*).
-
-:- multifile((clause_expansion/2,
-              directive_expansion/2,
-              body_expansion/2,
-              sub_body_expansion/2,
-              call_expansion/2,
-              sub_call_expansion/2)).
-:- dynamic((clause_expansion/2,
-              directive_expansion/2,
-              body_expansion/2,
-              sub_body_expansion/2,
-              call_expansion/2,
-              sub_call_expansion/2)).
-:- multifile((clause_expansion/4,
-              directive_expansion/4,
-              body_expansion/4,
-              sub_body_expansion/4,
-              call_expansion/4,
-              sub_call_expansion/4)).
-:- dynamic((clause_expansion/4,
-              directive_expansion/4,
-              body_expansion/4,
-              sub_body_expansion/4,
-              call_expansion/4,
-              sub_call_expansion/4)).
-
 
 :- multifile((system:clause_expansion/2,
-              system:directive_expansion/2,
-              system:body_expansion/2,
-              system:sub_body_expansion/2,
-              system:call_expansion/2,
-              system:sub_call_expansion/2)).
-:- dynamic((system:clause_expansion/2,
               system:directive_expansion/2,
               system:body_expansion/2,
               system:sub_body_expansion/2,
@@ -101,6 +59,37 @@ appear in the source-code.
               system:sub_body_expansion/4,
               system:call_expansion/4,
               system:sub_call_expansion/4)).
+:- dynamic((system:clause_expansion/2,
+              system:directive_expansion/2,
+              system:body_expansion/2,
+              system:sub_body_expansion/2,
+              system:call_expansion/2,
+              system:sub_call_expansion/2)).
+
+:- module_transparent((system:clause_expansion/4,
+              system:directive_expansion/4,
+              system:body_expansion/4,
+              system:sub_body_expansion/4,
+              system:call_expansion/4,
+              system:sub_call_expansion/4)).
+:- module_transparent((system:clause_expansion/2,
+              system:directive_expansion/2,
+              system:body_expansion/2,
+              system:sub_body_expansion/2,
+              system:call_expansion/2,
+              system:sub_call_expansion/2)).
+
+
+:- module_transparent((is_user_module/0,system_term_expansion/4,system_goal_expansion/4,functor_non_colon/3)).
+:- use_module(logicmoo_util_dmsg).
+:- use_module(logicmoo_util_rtrace).
+
+:- multifile(system:goal_expansion/4).
+:- dynamic(system:goal_expansion/4).
+:- multifile(system:term_expansion/4).
+:- dynamic(system:term_expansion/4).
+
+:- meta_predicate get_named_value_goal(0,*).
 
 
 
@@ -109,7 +98,7 @@ is_user_module :- prolog_load_context(module,user).
 is_user_module :- prolog_load_context(module,M), module_property(M,class(L)),L=library,!,fail.
 
 
-get_named_value_goal(G,N=V):- functor(G,N,_), ((\+ \+ G )-> V=true; V=false).
+get_named_value_goal(G,N=V):- functor_non_colon(G,N,_), ((\+ \+ G )-> V=true; V=false).
 
 get_pos_at_c(C,Num):-compound(C),arg(1,C,Num),number(Num).
 
@@ -130,7 +119,8 @@ is_fbe(goal,I,PosI):-!,
    get_pos_at_c(PosI,At),!,
    PosAt>0,!,At>=PosAt.
 
-
+functor_non_colon(G,F,A):- compound(G), functor(G,':',2),arg(2,G,GG),!,functor_non_colon(GG,F,A).
+functor_non_colon(G,F,A):- functor(G,F,A).
 
 system_term_expansion(I,_P,_O,_P2):- var(I),!,fail.
 system_term_expansion(I,P,_O,_P2):- \+ is_fbe(term,I,P),!,fail.

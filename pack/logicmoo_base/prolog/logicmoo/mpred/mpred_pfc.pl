@@ -14,7 +14,7 @@
 %:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_pfc, [
   ensure_abox/1,
-  mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,
+  mpred_call_no_bc/1,fix_mp/2,fix_mp/3,
   mpred_fwc/1,
   get_mpred_is_tracing/1,
   show_if_debug/1,
@@ -320,37 +320,45 @@ unassertable((_;_)).
 unassertable((_,_)).
 
 
-fix_mp_abox(G0,U,G):-fix_mp(G0,U:G).
+to_real_mt(abox,ABOX):- must(loop_check(defaultAssertMt(ABOX),fail)),!,sanity(mtCanAssert(ABOX)).
+to_real_mt(tbox,TBOX):- get_current_default_tbox(TBOX),!.
+to_real_mt(BOX,BOX).
+
+fix_mp(G0,U,G):-fix_mp(G0,U:G).
 
 fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
 fix_mp('?-'(G0), '?-'(M:CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
 fix_mp(Unassertable,_):- unassertable(Unassertable),!,trace_or_throw(unassertable_fix_mp(Unassertable)).
 fix_mp((G :- B),( M:GO :- B)):- fix_mp(G,M:GO),!.
 fix_mp((G :- B),M:( GO :- B)):- !, fix_mp(G,M:GO).
-fix_mp(Mt:P,Mt:P):- mtExact(Mt).
+fix_mp(Mt:P,Mt:P):- clause_b(mtExact(Mt)).
 fix_mp(abox:P,ABOX:P):- defaultAssertMt(ABOX), !.
-fix_mp(tbox:P,TBOX:P):- abox:defaultTBoxMt(TBOX), !.
+fix_mp(tbox:P,TBOX:P):- get_current_default_tbox(TBOX), !.
 fix_mp(G,M:GO):- strip_module(G,_,GO),functor(GO,F,A),loop_check(convention_or_default(F,A,M),fail),!.
 %fix_mp(baseKB:P,baseKB:P):-!.
-fix_mp(M:P,M:P):-baseKB:mtCycL(M),!.
+fix_mp(M:P,M:P):-clause_b(mtCycL(M)),!.
 fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
 fix_mp(M:P,M:P):-!.
 
 convention_or_default(genlMt,2,baseKB):-!.
 convention_or_default(F,A,M):- mpred_database_term(F,A,_),defaultAssertMt(M),!.
 convention_or_default(_,_,M):- atom(M),!.
+%:- cls.
+%:- rtrace.
 % the next line transforms to mpred_pfc:convention_or_default(A, _, B) :- call(ereq, predicateConventionMt(A, B)), !.
-convention_or_default(F,_,Mt):- predicateConventionMt(F,Mt),!.
+convention_or_default(F,_,Mt):- call_u(predicateConventionMt(F,Mt)),!.
+%:- notrace.
+%:- prolog.
 convention_or_default(_,_,M):- defaultAssertMt(M),!.
 /*
 % probably never makes it past the above
-fix_mp_abox(MG,M,GO):-  strip_module(MG,Cm,GO),
+fix_mp(MG,M,GO):-  strip_module(MG,Cm,GO),
   defaultAssertMt(Um),!,
    (((modulize_head_fb(Um,GO,Cm,M:GO),\+ predicate_property(M:GO,static)))*-> true;
       (GO==MG -> M=Um; M=Cm)
      ),!.
-fix_mp_abox(M:GO,M,GO):- current_predicate(_,M:GO), predicate_property(M:GO,dynamic),!.
-fix_mp_abox(G,M,GO):-
+fix_mp(M:GO,M,GO):- current_predicate(_,M:GO), predicate_property(M:GO,dynamic),!.
+fix_mp(G,M,GO):-
   strip_module(G,WM,GO),
   must((defaultAssertMt(Um),atom(Um))),!,
   member(M,[Um,WM,baseKB]),
@@ -403,7 +411,7 @@ clause_u(MH,B,R):- nonvar(R),!,must(clause_i(M:H,B,R)),(MH=(M:H);MH=(H)),!.
 clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u((H:-B),BB,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u(MH,B,R):-  (mnotrace(fix_mp(MH,M:H)),clause_i(M:H,B,R))*->true;
-   (fix_mp_abox(MH,M,CALL),clause_i(M:CALL,B,R)).
+   (fix_mp(MH,M,CALL),clause_i(M:CALL,B,R)).
 % clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
 %clause_u(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
@@ -1612,10 +1620,14 @@ mpred_BC_CACHE0(M,P):-
 % I''d like to remove this soon
 mpred_call_no_bc(P):- var(P),!,fail,trace,  mpred_fact(P).
 mpred_call_no_bc(baseKB:true):-!.
+mpred_call_no_bc(_):- stack_check,fail.
 mpred_call_no_bc(P):- nonvar(P),current_predicate(_,P),!, P.
 mpred_call_no_bc(P):- loop_check_term(mpred_METACALL(call_u, P),lc2(P),
    loop_check(mpred_METACALL(call_u, P),lookup_u(P))).
 
+pred_check(A):- var(A),!.
+% catch module prefix issues
+pred_check(A):- nonvar(A),must(atom(A)).
 
 mpred_METACALL(How,P):- mpred_METACALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);mpred_call_no_bc(Cut))).
 
@@ -3045,7 +3057,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((ain_fast)/2).
 :- module_transparent((ain_fast)/1).
 :- module_transparent((fix_mp)/2).
-:- module_transparent((fix_mp_abox)/3).
+:- module_transparent((fix_mp)/3).
 :- module_transparent((why_was_true)/1).
 :- module_transparent((mpred_is_silient)/0).
 :- module_transparent((get_mpred_is_tracing)/1).

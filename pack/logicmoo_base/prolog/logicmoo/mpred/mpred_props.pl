@@ -312,6 +312,8 @@ kb_dynamic_ilc(Any,M,PI,FA):- must(kb_dynamic_ilc_z(Any,M,PI,FA)),!.
 kb_dynamic_ilc_z(Any,M,PI,F/A):- kb_dynamic_ilc(Any,M,PI,F,A),!.
 kb_dynamic_ilc_z(Any,M,PI,FA):- trace_or_throw(failed_kb_dynamic_ilc(Any,M,PI,FA)).
 
+kb_dynamic_ilc(M,lmconf,PI,F,A):- M\==lmconf, must(kb_dynamic_ilc(lmconf,lmconf,PI,F,A)).
+
 kb_dynamic_ilc(baseKB,M,PI,F,A):- defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic_ilc(baseKB,Mt,PI,F,A)).
 kb_dynamic_ilc(CM,    M,PI,F,A):- atom(PI),A==0,get_arity(PI,F,A),\+(current_predicate(F/A)),!,
    must((forall((arity_no_bc(F,AA),AA\=0),(functor(PIA,F,AA),kb_dynamic_ilc(CM,M,PIA,F,AA))))).
@@ -326,16 +328,17 @@ kb_dynamic_ilc(CM,   M,PIN,F,A):- unnumbervars(PIN,PI),
 % Declare Managed Predicate hybrid Inside Of Loop Checking  Primary Helper.
 %
 kb_dynamic_ilc_0(CM,M,PI,F,A):-var(A),!,
-   forall(between(1,10,A),kb_dynamic_ilc_0(CM,M,PI,F,A)),!.
+   forall(between(1,11,A),kb_dynamic_ilc_0(CM,M,PI,F,A)),!.
 kb_dynamic_ilc_0(CM,M,PI,F,A):-
    must_det_l((    
+     %  ((var(CM),nonvar(M))->CM=M;true),
       ((var(PI),integer(A))->functor(PI,F,A);true),
       (integer(A)->assert_arity(F,A);true),
       ain(baseKB:predicateConventionMt(F,M)),!,
       decl_shared(M:F/A),!,
       sanity(\+is_static_predicate(M:PI)),
       (is_static_predicate(M:PI) -> true ;
-       (predicate_property(M:PI,dynamic) -> true ; icatch(CM:dynamic(M:F/A)))))),!.
+       (predicate_property(M:PI,dynamic) -> true ; icatch(M:dynamic(M:F/A)))))),!.
 
       
 
@@ -511,7 +514,7 @@ decl_mpred_3(_,F,F/0):-!,assert_hasInstance(tPred,F).
 decl_mpred_3(M,PI,F/A):-
    decl_mpred(F,A),
    ignore((ground(PI),compound(PI),call(call,GG=meta_argtypes(PI)),decl_mpred(F,GG))),
-   ain(predicateConventionMt(F,M)).
+   nop(ain(predicateConventionMt(F,M))).
 
 :- was_export((decl_mpred)/2).
 

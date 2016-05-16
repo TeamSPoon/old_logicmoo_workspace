@@ -189,12 +189,12 @@ push_modules:- current_smt(SM,M),
 
 reset_modules:- 
   prolog_load_context(source,F),
-  lmconf:source_typein_modules(SM,M,F),
+  once(lmconf:source_typein_modules(SM,M,F)),
   '$set_source_module'(SM),'$set_typein_module'(M),!.
 
 pop_modules:- 
   prolog_load_context(source,F),
-  system:retract(lmconf:source_typein_modules(SM,M,F)),  
+  once(system:retract(lmconf:source_typein_modules(SM,M,F))),
   '$set_source_module'(SM),'$set_typein_module'(M),!.
 
 
@@ -292,7 +292,7 @@ with_filematches(G):- forall(expand_wfm(G,GG),GG).
 %
 % Expand Wfm.
 %
-expand_wfm(G,GG):- must((sub_term(Sub, G),compound(Sub),Sub=wfm(F))),
+expand_wfm(G,GG):- once((sub_term(Sub, G),compound(Sub),Sub=wfm(F))),
    (filematch(F,M),subst(G,wfm(F),M,GG),y_must(with_filematch(G), (G\=@=GG))).
 
 
@@ -496,7 +496,7 @@ concat_paths(A,'',A).
 concat_paths(A,'/',A).
 concat_paths(ParentIn,'**',Result):-!, member(Child,['./','./*/','./*/*/','./*/*/*/','./*/*/*/*/','./*/*/*/*/*/']),concat_paths(ParentIn,Child,Result).
 concat_paths(ParentIn,Child,Result):- filematch(ParentIn,Parent),
-   once((is_directory(Parent) -> directory_file_path(Parent,Child,Joined) ; atom_concat(Parent,Child,Joined))),
+   once((is_directory(Parent) -> directory_file_path(Parent,Child,Joined) ; atom_concat(Parent,Child,Joined))),!,
    filematch(Joined,Result).
 
 :- export(concat_paths/2).

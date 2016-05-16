@@ -98,8 +98,11 @@ add_abox_module(ABox):- must(atom(ABox)),
 :- dynamic(baseKB:mtNoPrologCode/1).
 baseKB:mtNoPrologCode(mpred_userkb).
 
-baseKB:mtProlog(Mt):- baseKB:mtCycL(Mt),!,fail.
-baseKB:mtProlog(Mt):- atom(Mt),current_module(Mt),module_property(Mt,class(library)).
+baseKB:mtProlog(Mt):- compound(Mt),!,fail.
+baseKB:mtProlog(Mt):- var(Mt),!,current_module(Mt),clause_b(mtProlog(Mt)).
+baseKB:mtProlog(Mt):- \+ current_module(Mt),!,fail.
+baseKB:mtProlog(Mt):- clause_b(mtCycL(Mt)),!,fail.
+baseKB:mtProlog(Mt):- module_property(Mt,class(library)).
 baseKB:mtProlog(Mt):-
       arg(_,v( 
          common_logic_boxlog,
@@ -234,13 +237,7 @@ box_type(_,_,abox).
 %
 % not just user modules
 defaultAssertMt(ABox):- nonvar(ABox),defaultAssertMt(ABoxVar),!,ABox=@=ABoxVar.
-defaultAssertMt(ABox):- 
-    (t_l:current_defaultAssertMt(ABox);
-    ((('$current_source_module'(ABox);
-    '$current_typein_module'(ABox);
-     clause_u(defaultTBoxMt(ABox)))),
-           mtCanAssert(ABox))),!.
-
+defaultAssertMt(ABox):- t_l:current_defaultAssertMt(ABox),!.
 defaultAssertMt(ABox):- fileAssertMt(ABox).
 
 :- '$hide'(defaultAssertMt(_)).
@@ -253,21 +250,20 @@ defaultAssertMt(ABox):- fileAssertMt(ABox).
 % not just user modules
 fileAssertMt(ABox):- nonvar(ABox), fileAssertMt(ABoxVar),!,ABox=@=ABoxVar.
 fileAssertMt(ABox):- 
+  (t_l:current_defaultAssertMt(ABox);
+    ((('$current_source_module'(ABox);'$current_typein_module'(ABox)),mtCanAssert(ABox)))),!.
+fileAssertMt(ABox):- 
    which_file(File)->current_module(ABox),module_property(ABox,file(File)),File\==ABox,!,
    mtCanAssert(ABox).
 fileAssertMt(ABox):-
- (t_l:current_defaultAssertMt(ABox);
-    ((('$current_source_module'(ABox))),ABox\==user)),!.
-fileAssertMt(ABox):- which_file(File)->make_module_name_local(File,ABox),File\==ABox,!,
+  which_file(File)->make_module_name_local(File,ABox),current_module(ABox),File\==ABox,!,
    mtCanAssert(ABox).
-fileAssertMt(ABox):-
- (((('$current_typein_module'(ABox);
-     abox:defaultTBoxMt(ABox))),mtCanAssert(ABox))),!.
 fileAssertMt(baseKB).
 
-mtCanAssert(abox):- !,fail.
-mtCanAssert(ABox):- \+ baseKB:mtProlog(ABox).
-
+mtCanAssert(user):- !,fail.
+mtCanAssert(abox):- !,dumpST,fail.
+mtCanAssert(ABox):- clause_b(mtProlog(ABox)),!,fail.
+mtCanAssert(_).
 
 
 % baseKB:mtGlobal
@@ -289,8 +285,8 @@ get_current_default_tbox(baseKB).
 %
 % Sets Current Module.
 %
-set_defaultAssertMt(abox):-!.
-set_defaultAssertMt(M):- baseKB:mtProlog(M),!,setup_module_ops(M).
+set_defaultAssertMt(ABox):- must(mtCanAssert(ABox)),fail.
+%set_defaultAssertMt(M):- clause_b(mtProlog(M)),!,setup_module_ops(M).
 set_defaultAssertMt(ABox):- defaultAssertMt(QABox)->QABox==ABox,!.
 set_defaultAssertMt(ABox):- 
   must_det_l((
@@ -311,12 +307,12 @@ set_defaultAssertMt(ABox):-
 %
 set_fileAssertMt(ABox):- 
  must_det_l((
+   defaultAssertMt(Was),
    must(mtCanAssert(ABox)),
-   abox:defaultTBoxMt(TBox),
+   get_current_default_tbox(TBox),
    TBox:ensure_abox(ABox),
    '$current_typein_module'(CM),
    '$current_source_module'(SM),
-   defaultAssertMt(Was),
 
    set_defaultAssertMt(ABox),
    which_file(File),assert_setting(lmconf:file_to_module(File,ABox)),
@@ -330,7 +326,8 @@ set_fileAssertMt(ABox):-
 
 make_module_name_local(A,B):- make_module_name_local0(A,B), \+ exists_file(B).
 
-make_module_name_local0(Source,KB):- baseKB:mtGlobal(Source),defaultAssertMt(KB).
+make_module_name_local0(Source,KB):- clause_b(mtGlobal(Source)),!,defaultAssertMt(KB).
+make_module_name_local0(Source,KB):- clause_b(mtProlog(Source)),!,defaultAssertMt(KB).
 make_module_name_local0(Source,SetName):- lmconf:file_to_module(Source,SetName),!.
 make_module_name_local0(Source,Source):- lmcache:has_pfc_database_preds(Source).
 make_module_name_local0(Source,GetName):- make_module_name(Source,GetName).
@@ -424,8 +421,9 @@ ensure_imports_tbox(M,TBox):-
 
 % :- inherit_into_module(logicmoo_user,lmcode).
 
+fixup_module(_,_):-!.
 fixup_module(system,_).
-fixup_module(M,_L):-baseKB:mtGlobal(M),skip_user(M).
+fixup_module(M,_L):- clause_b(tGlobal(M)),skip_user(M).
 fixup_module(lmcode,_L):-skip_user(lmcode).
 fixup_module(_,[user]).
 fixup_module(M,_L):- skip_user(M).
@@ -471,14 +469,14 @@ correct_module(M,G,T):-functor(G,F,A),quietly_must(correct_module(M,G,F,A,T)),!.
 % Correct Module.
 %
 correct_module(abox,G,F,A,T):- !, defaultAssertMt(M),correct_module(M,G,F,A,T).
-correct_module(tbox,G,F,A,T):- !, abox:defaultTBoxMt(M),correct_module(M,G,F,A,T).
+correct_module(tbox,G,F,A,T):- !, get_current_default_tbox(M),correct_module(M,G,F,A,T).
 correct_module(user,G,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,G,F,A,T).
 correct_module(HintMt,Goal,_,_,OtherMt):- predicate_property_nt(HintMt:Goal,imported_from(OtherMt)).
 correct_module(_,Goal,_,_,OtherMt):- predicate_property_nt(Goal,imported_from(OtherMt)).
-correct_module(HintMt,_,_,_,HintMt):- mtExact(HintMt).
+correct_module(HintMt,_,_,_,HintMt):- call_u(mtExact(HintMt)).
 correct_module(HintMt,Goal,_,_,HintMt):- predicate_property_nt(HintMt:Goal,exported).
 correct_module(_,Goal,_,_,OtherMt):- var(OtherMt),!, predicate_property_nt(OtherMt:Goal,file(_)).
-correct_module(_,Goal,_,_,OtherMt):- baseKB:mtGlobal(OtherMt), predicate_property_nt(OtherMt:Goal,file(_)).
+correct_module(_,Goal,_,_,OtherMt):- clause_b(mtGlobal(OtherMt)), predicate_property_nt(OtherMt:Goal,file(_)).
 correct_module(MT,_,_,_,MT):-!.
 
 
@@ -565,7 +563,6 @@ baseKB:hybrid_support(genlMt,2).
 :- dynamic baseKB:mpred_mark/3.
 
 % hybrid_support (like spft/3) must be defined directly in every module and then aggregated thru genlMts (thus to baseKB)
-:- dynamic abox:spft/3.
 
 
 

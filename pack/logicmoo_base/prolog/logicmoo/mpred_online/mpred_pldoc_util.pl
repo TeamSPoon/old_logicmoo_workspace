@@ -748,7 +748,7 @@ read_n_codes(N, C, In, [C|T]) :-
 %	actual  clauses  are  created   from    the   1st   argument  of
 %	prolog_src_style/2.
 
-term_expansion(element(_,_,_), Clauses) :-
+term_expansion(element(_,_,_), Clauses) :- current_prolog_flag(mpred_pldoc_html,true),
 	findall(C, element_clause(C), Clauses).
 
 %element_tag(directive, div) :- !.

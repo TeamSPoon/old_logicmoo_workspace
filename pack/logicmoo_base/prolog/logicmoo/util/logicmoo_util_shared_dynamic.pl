@@ -22,16 +22,6 @@
           warn_if_static/2]).
 
 
-:- module_transparent((decl_shared/1,
-          system_goal_expansion_safe_wrap/2,
-          ereq/1,
-          dbreq/1,
-          warn_if_static/2)).
-
-:- meta_predicate decl_shared(1,+).
-:- meta_predicate decl_shared(+).
-
-:- dynamic(wsh_w:wrap_shared/3).
 
 :- multifile((system:clause_expansion/2,
               system:directive_expansion/2,
@@ -57,6 +47,18 @@
               system:sub_body_expansion/4,
               system:call_expansion/4,
               system:sub_call_expansion/4)).
+
+:- module_transparent((decl_shared/1,
+          system_goal_expansion_safe_wrap/2,
+          ereq/1,
+          dbreq/1,
+          warn_if_static/2)).
+
+:- meta_predicate decl_shared(1,+).
+:- meta_predicate decl_shared(+).
+
+:- dynamic(wsh_w:wrap_shared/3).
+
 
 :- use_module(logicmoo_util_clause_expansion).
 :- use_module(logicmoo_util_dmsg).
@@ -147,6 +149,9 @@ wsh_w:wrap_shared(use_ideep_swi,0,ereq).
 %
 % System Goal Expansion Sd.
 %
+
+system_goal_expansion_safe_wrap(Goal,_):- functor(Goal,F,_),arg(_,
+  v(call_u,call,(/)),F),!,fail.
 system_goal_expansion_safe_wrap(MT:Goal,call_u(Goal)):-MT==abox,!.
 system_goal_expansion_safe_wrap(MT:Goal,(call_u(genlMt(abox,GMt)),with_umt(GMt,Goal))):- MT==tbox.
 system_goal_expansion_safe_wrap(T,_):- \+ compound(T),!,fail.

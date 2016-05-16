@@ -21,6 +21,9 @@
 % restore entry state
 :- reset_modules.
 
+:- set_prolog_flag(lm_expanders,true).
+:- set_prolog_flag(mpred_te,true).
+
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
 :- system:use_module(library('logicmoo/util/logicmoo_util_supp.pl')).
 :- endif.
@@ -28,9 +31,10 @@
 % ======================================================
 % Included separated logicmoo util files
 % ======================================================
-/*
+
 :- module_transparent(user:term_expansion/1).
 user:term_expansion(EOF,POS,O,POS2):- 
+ current_prolog_flag(lm_expanders,true),
  is_file_based_expansion(term,EOF,POS,O,POS2),
  nonvar(EOF),
  (EOF=end_of_file;EOF=(:-(module(_,_)))),
@@ -41,11 +45,9 @@ user:term_expansion(EOF,POS,O,POS2):-
     '$current_typein_module'(TM),
     glean_prolog_impl_file(EOF,S,M,TM))),fail.
 
-*/
 :- set_prolog_flag(system:generate_debug_info, true).
 :- set_prolog_flag(generate_debug_info, true).
 
-:- system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_database.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_first.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_catch.pl')).
@@ -60,6 +62,7 @@ user:term_expansion(EOF,POS,O,POS2):-
 :- system:use_module(library('logicmoo/util/logicmoo_util_dumpst.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_with_assertions.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
+:- system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_preddefs.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_attvar_reader.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_term_listing.pl')).
