@@ -147,11 +147,10 @@
 %
 % Make Module Name.
 %
-make_module_name(P,Module):- module_property(Module,file(P)),!.
-
+make_module_name(P,Module):- P\==user,module_property(Module,file(P)),!.
+make_module_name(P,P):-current_module(P).
 make_module_name(P,O):-atom(P),!,file_base_name(P,F),file_name_extension(M,_Ext,F),(M\==F->make_module_name(M,O);O=M).
-make_module_name(mpred/P,M):-nonvar(P),!,make_module_name(P,M).
-make_module_name(util/P,M):-nonvar(P),!,make_module_name(P,M).
+make_module_name(_/P,M):-nonvar(P),!,make_module_name(P,M).
 make_module_name(P,M):-must(filematch(P,F)),F\=P,!,make_module_name(F,M).
 
 %= 	 	 

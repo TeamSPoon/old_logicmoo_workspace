@@ -19,35 +19,19 @@
           system_goal_expansion_safe_wrap/2,
           ereq/1,
           dbreq/1,
-          nb_current_or_nil/2,
-          get_named_value_goal/2,
-          is_fbe/3,
-          warn_if_static/2,
-          is_user_module/0]).
+          warn_if_static/2]).
 
 
 :- module_transparent((decl_shared/1,
           system_goal_expansion_safe_wrap/2,
           ereq/1,
           dbreq/1,
-          warn_if_static/2,
-          is_user_module/0)).
+          warn_if_static/2)).
 
 :- meta_predicate decl_shared(1,+).
 :- meta_predicate decl_shared(+).
 
 :- dynamic(wsh_w:wrap_shared/3).
-
-:- multifile(system:goal_expansion/4).
-:- dynamic(system:goal_expansion/4).
-:- multifile(system:term_expansion/4).
-:- dynamic(system:term_expansion/4).
-
-:- use_module(logicmoo_util_dmsg).
-:- use_module(logicmoo_util_rtrace).
-
-:- meta_predicate get_named_value_goal(0,*).
-
 
 :- multifile((system:clause_expansion/2,
               system:directive_expansion/2,
@@ -61,6 +45,22 @@
               system:sub_body_expansion/2,
               system:call_expansion/2,
               system:sub_call_expansion/2)).
+:- multifile((system:clause_expansion/4,
+              system:directive_expansion/4,
+              system:body_expansion/4,
+              system:sub_body_expansion/4,
+              system:call_expansion/4,
+              system:sub_call_expansion/4)).
+:- dynamic((system:clause_expansion/4,
+              system:directive_expansion/4,
+              system:body_expansion/4,
+              system:sub_body_expansion/4,
+              system:call_expansion/4,
+              system:sub_call_expansion/4)).
+
+:- use_module(logicmoo_util_clause_expansion).
+:- use_module(logicmoo_util_dmsg).
+:- use_module(logicmoo_util_rtrace).
 
 
 
@@ -142,10 +142,6 @@ wsh_w:wrap_shared(ttPredType,1,ereq).
 wsh_w:wrap_shared(ttTemporalType,1,ereq).
 wsh_w:wrap_shared(use_ideep_swi,0,ereq).
 
-is_user_module :- prolog_load_context(source,F), lmconf:mpred_is_impl_file(_,F),!,fail.
-is_user_module :- prolog_load_context(module,user). 
-is_user_module :- prolog_load_context(module,M), module_property(M,class(L)),L=library,!,fail.
-
 
 %% system_goal_expansion_safe_wrap( :TermT, :TermARG2) is semidet.
 %
@@ -159,10 +155,16 @@ system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),wsh_w:wrap_shared(F,A,How)
 
 
 system:sub_call_expansion(T,I):-nonvar(T),system_goal_expansion_safe_wrap(T,I).
-system:sub_call_expansion(T,(mpred_at_box:defaultAssertMt(NewVar),NewT)):- compound(T),subst(T,abox,NewVar,NewT),NewT\=@=T.
+
+system:call_expansion(T,(mpred_at_box:defaultAssertMt(NewVar),NewT)):- compound(T),
+   subst(T,abox,NewVar,NewT),NewT\=@=T.
+
+system:body_expansion(T,(mpred_at_box:defaultAssertMt(NewVar),NewT)):- compound(T),
+   subst(T,abox,NewVar,NewT),NewT\=@=T.
 
 system:sub_body_expansion(T,I):-nonvar(T),system_goal_expansion_safe_wrap(T,I).
 
+system:goal_expansion(I,P,O,P):- system_goal_expansion_safe_wrap(I,O)->I\=@=O.
 
 
 %% safe_wrap( Term, +How, -Wrapped) is semidet.
@@ -231,78 +233,5 @@ decl_shared(Plus,P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared
 %:- decl_shared(Plus,arity/2).
 %:- decl_shared(Plus,t).
 %:- decl_shared(Plus,meta_argtypes/1).
-
-
-
-% :- use_module(library(logicmoo_utils)).
-
-% wdmsg(P):- format(user_error,' ~p ~n',[P]).
-
-get_named_value_goal(G,N=V):- functor(G,N,_), ((\+ \+ G )-> V=true; V=false).
-
-
-is_fbe(term,I,PosI):-!,
-   compound(PosI),nonvar(I),
-   nb_current('$term',Was), Was==I,
-   nb_current('$term_position', Pos),
-   get_pos_at(Pos,PosAt),
-   get_pos_at(PosI,At),!,
-   PosAt>0,!,At>=PosAt.
-
-is_fbe(goal,I,PosI):-!,
-   compound(PosI),nonvar(I),
-   b_getval('$term',Was), Was==[],
-   nb_current('$term_position', Pos),
-   get_pos_at(Pos,PosAt),
-   get_pos_at(PosI,At),!,
-   PosAt>0,!,At>=PosAt.
-
-
-%get_pos_at('$stream_position'(PosAt,_,_,_),PosAt) :- !.
-get_pos_at(Pos,At) :- arg(1,Pos,At),!.
-
-
-system_term_expansion(I,_P,_O,_P2):- var(I),!,fail.
-system_term_expansion(I,P,_O,_P2):- \+ is_fbe(term,I,P),!,fail.
-system_term_expansion((:- B),P,O,P2):- system:directive_expansion((:- B),O),P=P2.
-system_term_expansion((:- B),P,O,P2):-!, system:call_expansion(( B),O),P=P2.
-system_term_expansion(I,_P,_O,_P2):- nb_setval('$term_e',I),fail.
-system_term_expansion((H ),P,O,P2):-  system:clause_expansion((H ),O),P=P2.
-system_term_expansion((H :- I),P,(H :- O),P2):- system:body_expansion(I,O),P=P2.
-
-% system_goal_expansion(I,P,O,P2):- var(I),!,fail.
-sub_positional(P):- compound(P),functor(P,F,A),arg(A,P,[L|_]),compound(L),functor(L,F,_).
-
-positional_range(_-_).
-positional_seg(term_position(G2787,_,G2787,_,[_-_])).
-
-nb_current_or_nil(N,V):-nb_current(N,V)->true;V=[].
-
-system_goal_expansion(I,P,O,P2):- b_getval('$term',Was),
-  get_named_value_goal(is_fbe(term,I,P),L1),
-  get_named_value_goal(Was=@=I,L2),
-  get_named_value_goal(sub_positional(P),L3),
-  get_named_value_goal(positional_seg(P),L4),
-  nb_current_or_nil('$term_e',TermWas), 
-  get_named_value_goal(\+ (TermWas =@= Was), L5),
-  do_ge([L1,L2,L3,L4,L5],I,O),ignore(I=O),!,P2=P.
-
- do_ge([is_fbe=false,(=@=)=false,sub_positional=false,positional_seg=true,(\+)=true], I,O):- ignore(system:sub_call_expansion(I,O)).
- do_ge(_,I,O):- ignore(system:sub_body_expansion(I,O)).
- do_ge(Why,I,O):- wdmsg(do_ge(Why,I,O)).
-
-
-system:clause_expansion(I,O):- current_prolog_flag(show_expanders,true), wdmsg(system:clause_expansion(I,O)),fail.
-system:directive_expansion(I,O):-  current_prolog_flag(show_expanders,true),wdmsg(system:directive_expansion(I,O)),fail.
-system:body_expansion(I,O):- current_prolog_flag(show_expanders,true),wdmsg(system:body_expansion(I,O)),fail.
-system:sub_body_expansion(I,O):- current_prolog_flag(show_expanders,true),wdmsg(system:sub_body_expansion(I,O)),fail.
-system:call_expansion(I,O):- current_prolog_flag(show_expanders,true),wdmsg(system:call_expansion(I,O)),fail.
-system:sub_call_expansion(I,O):- current_prolog_flag(show_expanders,true),wdmsg(system:sub_call_expansion(I,O)),fail.
-
-
-
-% system:term_expansion(I,P,O,P2):- fail, get_named_value_goal(is_fbe(term,I,P)),wdmsg(system:te4(I,P,O,P2)),fail.
-system:term_expansion(I,P,O,P2):- system_term_expansion(I,P,O,P2).
-system:goal_expansion(I,P,O,P2):- system_goal_expansion(I,P,O,P2).
 
 

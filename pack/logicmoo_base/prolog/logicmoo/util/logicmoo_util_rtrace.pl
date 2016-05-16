@@ -222,6 +222,7 @@ rtrace:- cnotrace((cnotrace,visible(+all),visible(+exception),thread_leash(-all)
 %
 % Nor Trace.
 %
+nortrace:-!.
 nortrace:- cnotrace, visible(+all),visible(+exception),thread_leash(+all),thread_leash(+exception). % restore_guitracer,ignore(retract(tlbugger:rtracing)))).
 
 
@@ -307,7 +308,7 @@ rtrace(Goal):- wdmsg(rtrace(Goal)),
    (Undo =   cnotrace(((cnotrace,ignore(retract(tlbugger:rtracing)),'$leash'(_, OldL),'$visible'(_, OldV), Tracing)))),
    (RTRACE = cnotrace((cnotrace,asserta(tlbugger:rtracing),visible(+all),thread_leash(-all),thread_leash(+exception)))),!,
    setup_call_cleanup_each(RTRACE,(trace,Goal),Undo).
-
+/*
 :- '$set_predicate_attribute'(system:call_cleanup(_,_), trace, 0).
 :- '$set_predicate_attribute'(system:call_cleanup(_,_), hide_childs, 1).
 :- '$set_predicate_attribute'(system:setup_call_cleanup(_,_,_), trace, 0).
@@ -326,11 +327,11 @@ rtrace(Goal):- wdmsg(rtrace(Goal)),
 :- '$set_predicate_attribute'(nortrace, hide_childs, 1).
 :- '$set_predicate_attribute'(pop_tracer, trace, 0).
 :- '$set_predicate_attribute'(pop_tracer, hide_childs, 1).
+*/
 :- '$set_predicate_attribute'(tlbugger:rtracing, trace, 0).
 :- '$set_predicate_attribute'(system:tracing, trace, 0).
 :- '$set_predicate_attribute'(system:cnotrace, trace, 0).
 :- '$set_predicate_attribute'(system:trace, trace, 0).
-
 %= :- meta_predicate  ftrace(0).
 
 %= 	 	 
@@ -368,7 +369,7 @@ traceafter_call(Goal):- call_cleanup(restore_trace((thread_leash(-all),visible(-
 % :- if_may_hide('$set_predicate_attribute'(system:cnotrace(_), trace, 0)).
 :- lock_predicate(system:cnotrace/1).
 
-:- mpred_trace_childs(hotrace/1).
+% :- mpred_trace_childs(hotrace/1).
 
 % :- mpred_trace_none(system:trace/0).
 % :- mpred_trace_none(system:cnotrace/0).

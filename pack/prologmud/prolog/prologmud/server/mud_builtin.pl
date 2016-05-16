@@ -550,7 +550,7 @@ vtBasicDirPlusUpDown(vUp).
 %localityOfObject(Above,HasSurface):- mudLocOnSurface(Above,HasSurface).
 %localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
 %localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
-%localityOfObject(Inner,Outer):- only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+%localityOfObject(Inner,Outer):- lmconf:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
 meta_argtypes(mudMaterial(tSpatialThing,vtMaterial)).
 meta_argtypes(mudSize(tSpatialThing,vtSize)).

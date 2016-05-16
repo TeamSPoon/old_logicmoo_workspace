@@ -446,6 +446,9 @@ m_fa_to_m_p_fa(Decl_mpred_hybrid,FA):-  m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredM
 %
 % Only 3rd.
 %
+only_3rd(With,CallerMt, PredMt, PI):- 
+   var(CallerMt),nonvar(PredMt),!,
+   must(\+ \+ only_3rd(With,PredMt, PredMt, PI)).
 only_3rd([],_CallerMt, _M, _PI):- !.
 only_3rd([With|List],CallerMt, PredMt, PI):- is_list(List),!,only_3rd(With,CallerMt, PredMt, PI),only_3rd(List,CallerMt, PredMt, PI).
 only_3rd(With,user, user, PI):-!, show_call(with_pi,call(With,PI)).
@@ -754,7 +757,8 @@ is_static_predicate_3(PredMt,F,A):-
 %
 % Static Predicate.
 %
-is_static_predicate(M:A):-atom(F),!,current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
+is_static_predicate(M:F):-atom(F),predicate_property_nt(M:F,static),!,predicate_property_nt(F,number_of_clauses(_)).
+is_static_predicate(M:F):-atom(F),!,between(1,11,A),current_predicate(M:F/A),functor(FA,F,A),is_static_predicate(M:FA),!.
 is_static_predicate(M:F/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(FA):-predicate_property_nt(FA,static),!,predicate_property_nt(FA,number_of_clauses(_)).

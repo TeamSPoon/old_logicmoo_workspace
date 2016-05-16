@@ -24,14 +24,6 @@
 :- set_prolog_flag(generate_debug_info, true).
 
 
-:- if( \+ current_predicate(lmconfig:defaultAssertMt/1)).
-:- multifile(lmconfig:defaultAssertMt/1).
-:- dynamic(lmconfig:defaultAssertMt/1).
-:- endif.
-:- if( \+ current_predicate(abox:defaultTBoxMt/1)).
-:- multifile(abox:defaultTBoxMt/1).
-:- dynamic(abox:defaultTBoxMt/1).
-:- endif.
 % :- abox:defaultTBoxMt(_)->true;('$current_typein_module'(M),asserta(abox:defaultTBoxMt(M))).
 
 

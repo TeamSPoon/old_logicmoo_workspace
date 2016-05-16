@@ -115,13 +115,8 @@ inside_queue(Q,E) :- %  trace_or_throw(inside_queue(Q,E)),!,fail.
 
 
 
-
-
-
-
-
 %:- export(pred_info/2).
-pred_info(H,Props):- get_functor(H,F,_),abox:defaultTBoxMt(M),findall(PP,M:mpred_isa(F,PP),Props).
+pred_info(H,Props):- get_functor(H,F,_),findall(PP,call_u(mpred_isa(F,PP)),Props).
 
 
 

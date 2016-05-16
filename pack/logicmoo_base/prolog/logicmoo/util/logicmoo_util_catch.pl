@@ -461,7 +461,7 @@ ddmsg_call(D):- ( (ddmsg(ddmsg_call(D)),call(D),ddmsg(ddmsg_exit(D))) *-> true ;
 %
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
-quietly_must(G):- no_trace(must(G)).
+quietly_must(G):- /*no_trace*/(must(G)).
 
 
 :- meta_predicate if_defined(:).
@@ -1441,6 +1441,9 @@ on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
 
 :- meta_predicate quietly(0).
 quietly(G):- is_release,!,call(G).
+quietly(G):- !, on_x_f((G),
+                     setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),
+                     fail).
 quietly(G):- on_x_f(hide_trace(G),
                      setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),
                      fail).

@@ -2018,7 +2018,7 @@ real_builtin_predicate(G):-
    predicate_property(G,built_in),
    \+ predicate_property(G,dynamic),
    functor(G,F,_),!,
-   (if_defined(abox:defaultTBoxMt(M),fail),
+   (if_defined(defaultTBoxMt(M),fail),
    (if_defined(M:mpred_isa(F,prologHybrid),fail);
      if_defined(baseKB:mpred_isa(F,prologHybrid),fail))),
    !.
@@ -2986,9 +2986,10 @@ prolog_exception_hook/4).
 % Disabled This.
 %
 disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame, _):- 
+ \+ current_prolog_flag(no_debug_ST,true),
+ set_prolog_flag(no_debug_ST,true),
  lmcache:thread_current_error_stream(ERR),
-    (   Exception = error(Term)
-    ;   Exception = error(Term, _)),
+    (   Exception = error(Term) ;   Exception = error(Term, _)),
     Term \= type_error(number,_), 
     Term \= type_error(character_code,_), 
     Term \= type_error(character,_), 
@@ -2999,13 +3000,14 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
     prolog_frame_attribute(PFrame,goal,Goal),
     format(ERR, 'Error ST-Begin: ~p', [Term]), nl(ERR),
     ignore((lmcache:thread_current_input(main,In),see(In))),
-    dumpST9(Frame,20),
+    dumpST,
 
     dtrace(Goal),
     format(ERR, 'Error ST-End: ~p', [Term]), nl(ERR),
-    nl(ERR), fail)).
+    nl(ERR), fail)),
+    set_prolog_flag(no_debug_ST,false).
 
-%:-disabled_this.
+:-disabled_this.
 
 :- dynamic(lmconf:no_buggery/0).
 % show the warnings origins

@@ -642,7 +642,7 @@ portray_clause_w_vars(Msg,Options):- source_variables_lwv(Vs),portray_clause_w_v
 source_variables_lwv(AllS):-
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
   (get_varname_list(Vs2);Vs2=[]),
-  %cnotrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
+  %notrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
   ignore(Vs3=[]),
   append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,list_to_set(All,AllS),
   set_varname_list( AllS).
@@ -776,9 +776,9 @@ if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.
 %
 % (debug)message.
 %
-dmsg(C):- cnotrace((tlbugger:no_slow_io,!,writeln(dmsg(C)))).
+dmsg(C):- notrace((tlbugger:no_slow_io,!,writeln(dmsg(C)))).
 dmsg(V):- if_defined_else(dmsg0(V),logicmoo_util_catch:ddmsg(V)).
-%dmsg(F,A):- cnotrace((tlbugger:no_slow_io,on_x_fail(format(atom(S),F,A))->writeln(dmsg(S));writeln(dmsg_fail(F,A)))),!.
+%dmsg(F,A):- notrace((tlbugger:no_slow_io,on_x_fail(format(atom(S),F,A))->writeln(dmsg(S));writeln(dmsg_fail(F,A)))),!.
 
 %= 	 	 
 
@@ -835,7 +835,7 @@ dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 %
 % (debug)message Primary Helper.
 %
-dmsg0(V):-cnotrace(ignore(dmsg00(V))).
+dmsg0(V):-notrace(ignore(dmsg00(V))).
 
 %= 	 	 
 
@@ -844,7 +844,8 @@ dmsg0(V):-cnotrace(ignore(dmsg00(V))).
 % (debug)message Primary Helper Primary Helper.
 %
 dmsg00(V):-cyclic_term(V),!,writeln(cyclic_term),flush_output,writeln(V),!.
-dmsg00(V):-simplify_goal_printed(V,VV),dmsg000(VV),!.
+dmsg00(V):- catch(logicmoo_util_dumpst:simplify_goal_printed(V,VV),_,fail),!,dmsg000(VV),!.
+dmsg00(V):- dmsg000(V),!.
 
 %= 	 	 
 
@@ -853,7 +854,7 @@ dmsg00(V):-simplify_goal_printed(V,VV),dmsg000(VV),!.
 % (debug)message Primary Helper Primary Helper Primary Helper.
 %
 dmsg000(V):-
-   cnotrace(make_key(V,K)),
+   notrace(make_key(V,K)),
    (tlbugger:in_dmsg(K)-> dmsg5(V);  % format_to_error('~N% ~q~n',[dmsg0(V)]) ;
       asserta(tlbugger:in_dmsg(K),Ref),call_cleanup(dmsg1(V),erase(Ref))).
 
@@ -886,7 +887,7 @@ dmsg2(skip_dmsg(_)):-!.
 %dmsg2(trace_or_throw(V)):- dumpST(350),dmsg(warning,V),fail.
 %dmsg2(error(V)):- dumpST(250),dmsg(warning,V),fail.
 %dmsg2(warn(V)):- dumpST(150),dmsg(warning,V),fail.
-dmsg2(Msg):-cnotrace((tlbugger:no_slow_io,!,dmsg3(Msg))),!.
+dmsg2(Msg):-notrace((tlbugger:no_slow_io,!,dmsg3(Msg))),!.
 dmsg2(ansi(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
 dmsg2(color(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
 dmsg2(Msg):- mesg_color(Msg,Ctrl),ansicall(Ctrl,dmsg3(Msg)).
@@ -912,7 +913,7 @@ dmsg3(C):-dmsg4(C),!.
 %
 % Dmsg4.
 %
-dmsg4(_):- cnotrace(show_source_location),fail.
+dmsg4(_):- notrace(show_source_location),fail.
 dmsg4(Msg):-dmsg5(Msg).
 
 
@@ -1008,8 +1009,8 @@ ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 %
 % Debugm.
 %
-debugm(X):-cnotrace((compound(X),functor(X,F,_),!,debugm(F,X))),!.
-debugm(X):-cnotrace((debugm(X,X))).
+debugm(X):-notrace((compound(X),functor(X,F,_),!,debugm(F,X))),!.
+debugm(X):-notrace((debugm(X,X))).
 
 %= 	 	 
 
@@ -1017,8 +1018,8 @@ debugm(X):-cnotrace((debugm(X,X))).
 %
 % Debugm.
 %
-debugm(Why,Msg):- cnotrace(( \+ debugging(mpred), \+ debugging(Why), \+ debugging(mpred(Why)),!, debug(Why,'~N~p~n',[Msg]))),!.
-debugm(Why,Msg):- cnotrace(( debug(Why,'~N~p~n',[Msg]))),!.
+debugm(Why,Msg):- notrace(( \+ debugging(mpred), \+ debugging(Why), \+ debugging(mpred(Why)),!, debug(Why,'~N~p~n',[Msg]))),!.
+debugm(Why,Msg):- notrace(( debug(Why,'~N~p~n',[Msg]))),!.
 
 
 % = :- export(colormsg/2).
@@ -1373,7 +1374,7 @@ contrasting_color(_,default).
 % Sgr Whenever Code.
 %
 sgr_on_code(Ctrl,OnCode):- sgr_on_code0(Ctrl,OnCode),!.
-sgr_on_code(_Foo,7):-!. %  cnotrace((format_to_error('~NMISSING: ~q~n',[bad_sgr_on_code(Foo)]))),!.
+sgr_on_code(_Foo,7):-!. %  notrace((format_to_error('~NMISSING: ~q~n',[bad_sgr_on_code(Foo)]))),!.
 
 
 %= 	 	 
@@ -1382,7 +1383,7 @@ sgr_on_code(_Foo,7):-!. %  cnotrace((format_to_error('~NMISSING: ~q~n',[bad_sgr_
 %
 % If Is A Sgr Whenever Code.
 %
-is_sgr_on_code(Ctrl):-cnotrace(sgr_on_code0(Ctrl,_)),!.
+is_sgr_on_code(Ctrl):-notrace(sgr_on_code0(Ctrl,_)),!.
 
 
 %= 	 	 

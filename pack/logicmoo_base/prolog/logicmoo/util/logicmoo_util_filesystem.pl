@@ -975,17 +975,19 @@ is_file_based_expansion(term,I,PosI,_O,_PosO):-!,
    compound(PosI),nonvar(I),
    nb_current('$term',Was), Was==I,
    nb_current('$term_position', Pos),
-   Pos = '$stream_position'(PosAt,_,_,_),
-   PosAt>0,
-   arg(1,PosI,At),!,At>=PosAt.
+   get_pos_at(Pos,PosAt),
+   get_pos_at(PosI,At),!,
+   PosAt>0,!,At>=PosAt.
 
 is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
    compound(PosI),nonvar(I),
-   % b_getval('$term',Was), Was==[],
+   %nb_current('$term',Was), Was\=[],Was=(:- _),
    nb_current('$term_position', Pos),
-   Pos = '$stream_position'(PosAt,_,_,_),
-   PosAt>0,
-   arg(1,PosI,At),!,At>=PosAt.
+   get_pos_at(Pos,PosAt),
+   get_pos_at(PosI,At),!,
+   PosAt>0,!,At>=PosAt.
+
+get_pos_at(C,Num):-compound(C),arg(1,C,Num),number(Num).
 
 :- dynamic(lmconf:known_complete_prolog_impl_file/3).
 glean_prolog_impl_file(_,_,_,_):- current_prolog_flag(xref,true),!.

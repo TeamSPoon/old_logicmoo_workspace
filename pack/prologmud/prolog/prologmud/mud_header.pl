@@ -147,7 +147,7 @@
 
 
 % DYN KB
-:- kb_dynamic   only_if_pttp/0.
+:- kb_dynamic   lmconf:only_if_pttp/0.
 :- kb_dynamic   use_kif/2.
 :- kb_dynamic   is_mpred_prop/2.
 %:- kb_dynamic   hasInstance_dyn/2.

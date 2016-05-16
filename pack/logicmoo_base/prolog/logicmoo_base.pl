@@ -47,8 +47,6 @@
 :- multifile(t_l:disable_px/0).
 :- thread_local(t_l:disable_px/0).
 
-%:- multifile(abox:defaultTBoxMt/1).
-%:- dynamic(abox:defaultTBoxMt/1).
 
 lmconf:mpred_skipped_module(eggdrop).
 :- forall(current_module(CM),system:assert(lmconf:mpred_skipped_module(CM))).
@@ -151,9 +149,9 @@ user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_unde
 :- w_tl(t_l:side_effect_ok,doall(call_no_cuts(lmconf:module_local_init(abox,baseKB)))).
 % :- forall(lmconf:sanity_check,true).
 
-:- asserta_new((logicmoo_util_database:ainz(G):- !, call(abox:mpred_ainz,G))).
-:- asserta_new((logicmoo_util_database:ain(G):- !, call(abox:mpred_ain,G))).
-:- asserta_new((logicmoo_util_database:aina(G):- !, call(abox:mpred_aina,G))).
+:- asserta_new((logicmoo_util_database:ainz(G):- !, call(mpred_ainz,G))).
+:- asserta_new((logicmoo_util_database:ain(G):- !, mpred_ain(G))).
+:- asserta_new((logicmoo_util_database:aina(G):- !, mpred_aina(G))).
 
 % Load boot base file
 user:lmbf:- 
@@ -163,7 +161,7 @@ user:lmbf:-
   time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc'))))),
   set_prolog_flag(pfc_booted,true).
 
-:- user:lmbf.
+% :- user:lmbf.
 :- reset_modules.
 
 :- forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox),maybe_add_import_module(M,abox,start)).

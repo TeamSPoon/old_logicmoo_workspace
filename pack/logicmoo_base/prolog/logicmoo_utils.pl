@@ -45,6 +45,7 @@ user:term_expansion(EOF,POS,O,POS2):-
 :- set_prolog_flag(system:generate_debug_info, true).
 :- set_prolog_flag(generate_debug_info, true).
 
+:- system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_database.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_first.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_catch.pl')).

@@ -100,7 +100,7 @@
          op(700,xfx,('==')).
 
 %:- ensure_abox(baseKB).
-:- set_defaultAssertMt(baseKB).
+
 :- set_fileAssertMt(baseKB).
 
 
