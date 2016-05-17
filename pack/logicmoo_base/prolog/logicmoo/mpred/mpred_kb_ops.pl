@@ -295,6 +295,13 @@ mpred_facts_and_universe/1
       ain_minfo(1,*),
         whenAnd(0,0).
 
+ :- meta_predicate mpred_get_support_one(0,*).
+ :- meta_predicate mpred_get_support_precanonical_plus_more(0,*).
+ :- meta_predicate '__aux_maplist/2_cnstrn0+1'(*,0).
+ :- meta_predicate repropagate_1(0).
+ :- meta_predicate trigger_supporters_list(0,*).
+ :- meta_predicate repropagate_meta_wrapper_rule(0).
+ :- meta_predicate repropagate_0(0).
 
 :- include('mpred_header.pi').
 
@@ -708,12 +715,14 @@ attvar_op(Op,Data):-
 */
 :- module_transparent(attvar_op/2).
 attvar_op(Op,Data):-
-   cnotrace((strip_module(Op,_,OpA), sanity((atom(OpA))),
-   defaultAssertMt(ABOX),add_side_effect(Op,Data),deserialize_attvars(Data,Data0))),
+   notrace((strip_module(Op,M,OpA), sanity((atom(OpA))),
+   defaultAssertMt(ABOX),
+   add_side_effect(OpA,M:Data),
+   deserialize_attvars(Data,Data0))),
    (==(Data,Data0)->
-     physical_side_effect(call(Op,Data0));
+     physical_side_effect(call(M:OpA,M:Data0));
 
-   ((atom_concat(asse,_,OpA) -> physical_side_effect(call(Op,Data0)));
+   ((atom_concat(assert,_,OpA) -> physical_side_effect(call(M:OpA,M:Data0)));
    ((
     % nop((expand_to_hb(Data0,H,B),split_attrs(B,BA,G))),
     trace, 
@@ -2475,7 +2484,6 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent( (mpred_call_only_facts)/2).
 :- module_transparent( (mpred_call_only_facts)/1).
 :- module_transparent( (call_u_req)/1).
-:- module_transparent( (call_u)/2).
 :- module_transparent( (neg_in_code)/1).
 :- module_transparent( ({})/1).
 :- module_transparent( (trigger_supporters_list)/2).

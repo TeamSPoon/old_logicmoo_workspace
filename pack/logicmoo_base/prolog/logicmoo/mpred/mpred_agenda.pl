@@ -132,10 +132,10 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 
 %% after_mpred_load is semidet.
 %
-% Hook To [lmconf:after_mpred_load/0] For Module Mpred_agenda.
+% Hook To [lmcache:after_mpred_load/0] For Module Mpred_agenda.
 % After Managed Predicate Load.
 %
-after_mpred_load:- \+(t_l:loading_mpred_file(_,_)),lmconf:loaded_mpred_file(_,_),!.
+lmcache:after_mpred_load:- \+(t_l:loading_mpred_file(_,_)),lmconf:loaded_mpred_file(_,_),!.
 
 % when all previous tasks have completed
 
@@ -145,9 +145,9 @@ after_mpred_load:- \+(t_l:loading_mpred_file(_,_)),lmconf:loaded_mpred_file(_,_)
 %
 % After Managed Predicate Load Pass Extended Helper.
 %
-after_mpred_load_pass2:- \+ (lmconf:will_call_after(lmconf:after_mpred_load,_)).
+after_mpred_load_pass2:- \+ (lmconf:will_call_after(lmcache:after_mpred_load,_)).
 :- meta_predicate(call_after_mpred_load(0)).
-% call_after_mpred_load(Code):- lmconf:after_mpred_load,!, call_after_next(after_mpred_load_pass2,Code).
+% call_after_mpred_load(Code):- lmcache:after_mpred_load,!, call_after_next(after_mpred_load_pass2,Code).
 
 %= 	 	 
 
@@ -155,7 +155,7 @@ after_mpred_load_pass2:- \+ (lmconf:will_call_after(lmconf:after_mpred_load,_)).
 %
 % Call After Managed Predicate Load.
 %
-call_after_mpred_load(Code):- call_after_next(lmconf:after_mpred_load,Code).
+call_after_mpred_load(Code):- call_after_next(lmcache:after_mpred_load,Code).
 
 :- was_export(rescan_mpred_loaded/0).
 
@@ -165,7 +165,7 @@ call_after_mpred_load(Code):- call_after_next(lmconf:after_mpred_load,Code).
 %
 % Rescan Managed Predicate Loaded.
 %
-rescan_mpred_loaded:- ignore((lmconf:after_mpred_load, loop_check(call_after(lmconf:after_mpred_load, true ),true))).
+rescan_mpred_loaded:- ignore((lmcache:after_mpred_load, loop_check(call_after(lmcache:after_mpred_load, true ),true))).
 
 :- was_export(rescan_mpred_loaded_pass2/0).
 
@@ -175,7 +175,7 @@ rescan_mpred_loaded:- ignore((lmconf:after_mpred_load, loop_check(call_after(lmc
 %
 % Rescan Managed Predicate Loaded Pass Extended Helper.
 %
-rescan_mpred_loaded_pass2:- ignore((lmconf:after_mpred_load, loop_check(call_after(after_mpred_load_pass2,  dmsg(rescan_mpred_loaded_pass2_comlpete)),true))).
+rescan_mpred_loaded_pass2:- ignore((lmcache:after_mpred_load, loop_check(call_after(after_mpred_load_pass2,  dmsg(rescan_mpred_loaded_pass2_comlpete)),true))).
 
 % ================================================
 % Agenda system - standard database
@@ -746,3 +746,4 @@ wfAssert(X):-ain(X). % add_later(X).
 
 
 mpred_agenda_file.
+

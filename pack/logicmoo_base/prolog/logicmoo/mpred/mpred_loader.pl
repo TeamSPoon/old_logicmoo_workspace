@@ -1257,7 +1257,7 @@ file_end(WIn):-
 % Get Language.
 % Inside File.
 %
-get_lang(LANG):-get_lang0(LANGVAR),same_language(LANG,LANGVAR).
+get_lang(LANG):- notrace((get_lang0(LANGVAR),same_language(LANG,LANGVAR))).
 
 same_language(LANG,LANGVAR):- 
     simplify_language_name(LANGVAR,LANGVARS),

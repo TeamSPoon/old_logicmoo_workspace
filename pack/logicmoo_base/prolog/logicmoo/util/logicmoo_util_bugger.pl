@@ -2390,7 +2390,7 @@ gripe_time(TooLong,Goal):- statistics(cputime,StartCPU),
         -> wdmsg(gripe_CPUTIME(warn(ElapseCPU>TooLong),Goal))
         ; (ElapseWALL is (EndWALL-StartWALL)/1000,
              (ElapseWALL>TooLong 
-                  -> wdmsg(gripe_WALLTIME(warn(ElapseWALL>TooLong),Goal))
+                  -> wdmsg(gripe_WALLTIME(warn(ElapseWALL>TooLong),cputime=ElapseCPU,Goal))
                   ; true))))), 
   Success.
 

@@ -34,7 +34,7 @@
             atom_to_value/2,
             checkAnyType/4,
             clause_umt/1,
-            coerce/4,
+            % coerce/4,
             correctAnyType/4,
             correctAnyTypeOrFail/4,
             correctArgsIsa/2,
@@ -86,9 +86,6 @@
 %:- endif.
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
 % % :- '$set_source_module'(mpred_type_args).
-
-:- multifile(coerce/3).
-:- dynamic(coerce/3).
 
 
 /*
@@ -407,9 +404,9 @@ asserted_argIsa_known(F,N,Type):- argIsa_call_6(F,N,Type),!.
 %
 % Converted To Format Type.
 %
-to_format_type(FT,FT):-t(ttExpressionType,FT),!.
+to_format_type(FT,FT):-a(ttExpressionType,FT),!.
 to_format_type(COL,FT):- clause_umt(formatted_resultIsa(FT,COL)),!.
-to_format_type(COL,FT):- clause_umt(resultIsa(FT,COL)),t(ttExpressionType,FT),!.
+to_format_type(COL,FT):- clause_umt(resultIsa(FT,COL)),a(ttExpressionType,FT),!.
 to_format_type(COL,ftTerm(COL)).
 
 
@@ -441,8 +438,8 @@ argIsa_call_0(comment,2,ftString).
 argIsa_call_0(isKappaFn,1,ftVar).
 argIsa_call_0(isKappaFn,2,ftAskable).
 %argIsa_call_0(isInstFn,1,tCol).
-argIsa_call_0(Col,1,Col):-t(tCol,Col).
-argIsa_call_0(Col,2,ftVoprop):-t(tCol,Col).
+argIsa_call_0(Col,1,Col):-a(tCol,Col).
+argIsa_call_0(Col,2,ftVoprop):-a(tCol,Col).
 argIsa_call_0(quotedDefnIff,1,ttExpressionType).
 argIsa_call_0(quotedDefnIff,2,ftCallable).
 argIsa_call_0(meta_argtypes,1,ttExpressionType).
@@ -499,7 +496,7 @@ argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),arity(Arity,A),number(A),numbe
 argIsa_call_0(F,2,ftString):-member(F,[descriptionHere,mudDescription,nameStrings,mudKeyword]),!.
 
 argIsa_call_0(F,N,Type):-t(functorDeclares,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
-argIsa_call_0(F,N,Type):-t(tCol,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
+argIsa_call_0(F,N,Type):-a(tCol,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
 argIsa_call_0(Compound,N,Type):-compound(Compound),!,arg(N,Compound,Type),tCol(Type).
 argIsa_call_0(F,N,Type):-between(1,2,N),argIsa_call_3(F,Type).
 argIsa_call_0(F,N,ftTerm):- N = 1, atom(F), current_predicate(F/N).
@@ -755,8 +752,8 @@ is_ephemeral(isOneOf(_)).
 % If Is A Valuespec.
 %
 is_valuespec(G):-is_ephemeral(G).
-is_valuespec(G):-t(tCol,G).
-is_valuespec(FT):-t(ttExpressionType,FT).
+is_valuespec(G):-a(tCol,G).
+is_valuespec(FT):-a(ttExpressionType,FT).
 is_valuespec(G):-evaluatableArg(G,_).
 
 
@@ -985,7 +982,7 @@ correctType0(Op,Arg,Props,NewArg):- compound(Props),
    correctArgsIsa(Op,C,CC),
    CC=..[F,NewArg|_].
 
-correctType0(_ ,A,Type,AA):- not(t(ttExpressionType,Type)),t(tCol,Type),isa_asserted(A,Type),!,must_equals(A,AA).
+correctType0(_ ,A,Type,AA):- \+ (a(ttExpressionType,Type)),a(tCol,Type),isa_asserted(A,Type),!,must_equals(A,AA).
 correctType0(_,A,_,_):- not(compound(A)),!,fail.
 correctType0(Op,A,T,AAA):- once(correctArgsIsa(Op,A,AA)),A\=AA,!,correctType0(Op,AA,T,AAA).
 correctType0(_ ,A,T,AA):- get_functor(A,F),clause_umt(resultIsa(F,T)),must_det(A=AA),!.
@@ -1028,7 +1025,7 @@ must_equals(A,AA):-must_det(A=AA).
 %
 % Deduced If Is A True Structure Col.
 %
-deduced_is_tCol(A):- (t_l:infSkipArgIsa->true; (t(tCol,A)->true;(fail,ain(isa(A,tCol))))),!.
+deduced_is_tCol(A):- (t_l:infSkipArgIsa->true; (a(tCol,A)->true;(fail,ain(isa(A,tCol))))),!.
 :- style_check(+singleton).
 
 :- was_export(any_to_value/2).

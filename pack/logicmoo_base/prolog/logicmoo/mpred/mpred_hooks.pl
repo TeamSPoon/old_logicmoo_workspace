@@ -337,7 +337,7 @@ fact_maybe_deduced/1,
 fskel/7,
 hooked_random_instance/3,
 isCycPredArity_ignoreable/2,
-% lmcache:loaded_external_kbs/0,
+% lmcache:loaded_external_kbs/1,
 local_term_anglify/2,
 mpred_fact_arity/2,
 %mpred_module_ready/0,
@@ -411,7 +411,7 @@ update_value/3,
 % %%% :- shared_multifile(lmconf:startup_option/2).
 % %%% :- shared_multifile(is_edited_clause/3).
 
-% %%% :- shared_multifile(lmcache:loaded_external_kbs/0).
+% %%% :- shared_multifile(lmcache:loaded_external_kbs/1).
 
 
 % %%% :- shared_multifile fact_is_false/2.
@@ -1524,7 +1524,7 @@ xcall_f(P):- \+ xcall_t(P).
 assertion_f([AH,P|LIST]):- is_holds_true(AH),!,assertion_f([P|LIST]).
 assertion_f([AH,P|LIST]):- is_holds_false(AH),!,assertion_f([P|LIST]).
 % todo hook into loaded files!
-assertion_f(_):- \+(lmcache:loaded_external_kbs),!,fail.
+assertion_f(_):- \+(lmcache:loaded_external_kbs(_)),!,fail.
 %MAYBE LATER assertion_f([P|LIST]):- 'TINYKB-ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 %MAYBE LATER assertion_f([P|LIST]):- 'TINYKB-ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 

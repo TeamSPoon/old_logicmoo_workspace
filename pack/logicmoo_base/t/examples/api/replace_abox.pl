@@ -7,6 +7,7 @@
 */
 :- module(feature_replace_abox,[]).
 
+:- lmb.
 
 :- 
   Before = foo(abox),

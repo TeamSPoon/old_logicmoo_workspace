@@ -1433,6 +1433,11 @@ quietly(G):- on_x_f(hide_trace(G),
                      setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),
                      fail).
 
+:- if(current_prolog_flag(optimise,true)).
+is_recompile.
+:- else.
+is_recompile:-fail.
+:- endif.
 
 % -- CODEBLOCK
 :- export(sanity/1).
@@ -1444,11 +1449,12 @@ quietly(G):- on_x_f(hide_trace(G),
 %
 % Optional Sanity Checking.
 %
-sanity(_):- notrace((is_release;bad_idea)),!.
-sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(why,Goal)).
+sanity(P):- notrace((\+ is_recompile,is_release,!,nop(P))).
+sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(sanity,Goal)).
 sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
 sanity(Goal):- quietly(Goal)*->true;
-  ((ignore(setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal)))),!,break)).
+  ((ignore(setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),
+    rtrace(Goal),wdmsg(end_FAIL_in(Goal)))),!,break)).
 
 compare_results(N+NVs,O+OVs):-
    NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).
@@ -1533,8 +1539,8 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
-must(Goal):-  is_release,!,call(Goal).
-must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal),!)),MGoal.
+must(Goal):-  notrace(is_release),!,call(Goal).
+must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),MGoal.
 
 
 %= 	 	 

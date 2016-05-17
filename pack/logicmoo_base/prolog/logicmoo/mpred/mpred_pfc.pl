@@ -18,9 +18,11 @@
   mpred_fwc/1,
   get_mpred_is_tracing/1,
   show_if_debug/1,
+  full_transform/3,
   maybe_mpred_break/1,
   each_E/3,
   call_m_g/3,
+  same_modules/2,
   must_notrace/1,
   lookup_m_g/3,
   head_to_functor_name/2,
@@ -146,7 +148,7 @@
       pfcl_do(+), % not all arg1s are callable
       lookup_u(:),
       mnotrace(0),
-      fix_mp(+,0),
+      fix_mp(+,-),
       must_notrace(0),
       clause_asserted_u(+),
       mpred_get_support(+,-),
@@ -175,6 +177,11 @@
       with_fc_mode(+,0),
       bagof_or_nil(?,^,-).
 
+:- meta_predicate mpred_retract_i_or_warn(0).
+:- meta_predicate mpred_retract_i_or_warn_0(0).
+:- meta_predicate mpred_retract_i_or_warn_1(0).
+:- meta_predicate not_not_ignore_mnotrace(0).
+
 :- module_transparent(clause_asserted_u/1).
 :- module_transparent(show_if_debug/1).
 :- module_transparent(fix_mp/2).
@@ -195,6 +202,50 @@
    IN=f2(N,A),OUT=f2(N,B),copy_term_vn(IN,OUT),
   asserta_u(IN),clause_asserted_u(OUT),!. % ,nl,writeq(A=@=B).
 */
+
+%% mpred_database_term(:PI, -TYPE) is nondet.
+%
+% is true iff F/A is something that Pfc adds to
+% the database and should not be present in an empty Pfc database
+%
+
+
+:- dynamic(mpred_database_term/3).
+% mined from program database      
+
+
+mpred_database_term(do_and_undo,2,rule).
+mpred_database_term(('::::'),2,rule).
+mpred_database_term((<-),2,rule).
+mpred_database_term((<==>),2,rule).
+mpred_database_term((==>),2,rule).
+
+mpred_database_term((==>),1,fact(_)).
+mpred_database_term((~),1,fact(_)).
+
+% forward,backward chaining database
+mpred_database_term(spft,3,support).
+mpred_database_term(nt,3,trigger).
+mpred_database_term(pt,2,trigger).
+mpred_database_term(bt,2,trigger).
+
+% transient state
+mpred_database_term(actn,1,state).
+mpred_database_term(que,1,state).
+mpred_database_term(hs,1,state).
+
+% forward,backward settings
+mpred_database_term(mpred_current_db,1,setting).
+mpred_database_term(mpred_select_hook,1,setting).
+mpred_database_term(tms,1,setting).
+mpred_database_term(pm,1,setting). 
+
+% debug settings
+mpred_database_term(mpred_is_tracing_pred,1,debug).
+mpred_database_term(mpred_is_tracing_exec,0,debug).
+mpred_database_term(mpred_is_spying_pred,2,debug).
+mpred_database_term(mpred_warnings,1,debug).
+mpred_database_term(why_buffer,2,debug).
 
 must_notrace(G):- notrace(must(G)).
 
@@ -236,7 +287,8 @@ ensure_abox(M):-
         M:discontiguous(M:F/A),
         M:multifile(M:F/A))),!.
 
-mnotrace(G):- notrace(no_trace(G)),!.
+
+mnotrace(G):- (no_trace(G)),!.
 
 % =================================================
 % ==============  UTILS BEGIN        ==============
@@ -321,35 +373,60 @@ unassertable((_,_)).
 
 
 to_real_mt(abox,ABOX):- must(loop_check(defaultAssertMt(ABOX),fail)),!,sanity(mtCanAssert(ABOX)).
-to_real_mt(tbox,TBOX):- get_current_default_tbox(TBOX),!.
+to_real_mt(tbox,TBOX):- must(get_current_default_tbox(TBOX)),!.
 to_real_mt(BOX,BOX).
 
 fix_mp(G0,U,G):-fix_mp(G0,U:G).
 
-fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
-fix_mp('?-'(G0), '?-'(M:CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
-fix_mp(Unassertable,_):- unassertable(Unassertable),!,trace_or_throw(unassertable_fix_mp(Unassertable)).
-fix_mp((G :- B),( M:GO :- B)):- fix_mp(G,M:GO),!.
-fix_mp((G :- B),M:( GO :- B)):- !, fix_mp(G,M:GO).
-fix_mp(Mt:P,Mt:P):- clause_b(mtExact(Mt)).
-fix_mp(abox:P,ABOX:P):- defaultAssertMt(ABOX), !.
-fix_mp(tbox:P,TBOX:P):- get_current_default_tbox(TBOX), !.
-fix_mp(G,M:GO):- strip_module(G,_,GO),functor(GO,F,A),loop_check(convention_or_default(F,A,M),fail),!.
-%fix_mp(baseKB:P,baseKB:P):-!.
-fix_mp(M:P,M:P):-clause_b(mtCycL(M)),!.
-fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
-fix_mp(M:P,M:P):-!.
+fix_mp(I,O):- must(fix_mp0(I,O)).
+
+fix_mp0('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
+fix_mp0('?-'(G0), '?-'(M:CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
+fix_mp0(Unassertable,_):- unassertable(Unassertable),!,trace_or_throw(unassertable_fix_mp(Unassertable)).
+fix_mp0((G :- B),( M:GO :- B)):- fix_mp(G,M:GO),!.
+fix_mp0((G :- B),M:( GO :- B)):- !, fix_mp(G,M:GO).
+fix_mp0(Mt:P,Mt:P):- clause_b(mtExact(Mt)).
+fix_mp0(abox:P,ABOX:P):- defaultAssertMt(ABOX), !.
+fix_mp0(tbox:P,TBOX:P):- get_current_default_tbox(TBOX), !.
+fix_mp0(G,M:GO):- strip_module(G,_,GO),functor(GO,F,A),loop_check(convention_or_default(F,A,M),fail),!.
+fix_mp0(M:P,M:P):-clause_b(mtCycL(M)),!.
+fix_mp0(M:P,M:P):- current_predicate(_,M:P),!.
+fix_mp0(M:P,M:P):-!.
+fix_mp0(P,M:P):- defaultAssertMt(M),!.
+
+convention_to_mt(F,A,RealMt):-convention_to_symbolic_mt_ec(F,A,Mt),to_real_mt(Mt,RealMt).
+
+bad_head_pred([]).
+bad_head_pred('[]').
+bad_head_pred('[|]').
+bad_head_pred(',').
+bad_head_pred(':').
+bad_head_pred(':-').
+bad_head_pred(';').
+bad_head_pred('==>').
+bad_head_pred('~').
 
 convention_or_default(genlMt,2,baseKB):-!.
 convention_or_default(F,A,M):- mpred_database_term(F,A,_),defaultAssertMt(M),!.
 convention_or_default(_,_,M):- atom(M),!.
 %:- cls.
 %:- rtrace.
-% the next line transforms to mpred_pfc:convention_or_default(A, _, B) :- call(ereq, predicateConventionMt(A, B)), !.
-convention_or_default(F,_,Mt):- call_u(predicateConventionMt(F,Mt)),!.
+% the next line transforms to mpred_pfc:convention_to_symbolic_mt(A, _, B) :- call(ereq, predicateConventionMt(A, B)), !.
+
+convention_to_symbolic_mt_ec(F,A,Error):- A\==0,bad_head_pred(F),!,trace_or_throw(error_convention_to_symbolic_mt(F,A,Error)).
+convention_to_symbolic_mt_ec(F,A,Mt):-convention_to_symbolic_mt(F,A,Mt).
+
+convention_to_symbolic_mt(predicateConventionMt,2,baseKB):-!.
+convention_to_symbolic_mt(genlMt,2,baseKB):-!.
+convention_to_symbolic_mt(mtCycL,1,baseKB):-!.
+convention_to_symbolic_mt(mtProlog,1,baseKB):-!.
+convention_to_symbolic_mt(F,A,abox):- mpred_database_term(F,A,_).
+convention_to_symbolic_mt(F,_,Mt):- clause_b(predicateConventionMt(F,Mt)),!.
+convention_to_symbolic_mt(F,A,abox):- wsh_w:wrap_shared(prologDynamic,F,A).
+convention_to_symbolic_mt(_,_,M):- atom(M),!.
 %:- notrace.
 %:- prolog.
-convention_or_default(_,_,M):- defaultAssertMt(M),!.
+% convention_to_symbolic_mt(_,_,M):- defaultAssertMt(M),!.
 /*
 % probably never makes it past the above
 fix_mp(MG,M,GO):-  strip_module(MG,Cm,GO),
@@ -368,6 +445,12 @@ fix_mp(G,M,GO):-
 
   
 
+full_transform(Why,MH,MHH):-
+   must(fully_expand(clause(Why,full_transform),MH,MHH)),
+   sanity(same_modules(MH,MHH)).
+
+same_modules(MH,MHH):- strip_module(MH,HM,_),strip_module(MHH,HHM,_),!,
+   HM==HHM.
 
 body_true(true):-!.
 body_true(avar(_,AVS)):-nonvar(AVS),attr_bind(AVS).
@@ -378,10 +461,11 @@ listing_u(P):-mpred_call_no_bc(listing(P)).
 
 attvar_op_fully(Why,MH):- !, attvar_op(Why,MH).
 attvar_op_fully(Why,M:H):- must_notrace(fully_expand(change(Why,attvar_op_fully),H,HH)),!,each_E(attvar_op(Why),M:HH,[]).
+attvar_op_fully(Why,MH):- full_transform(Why, MH,MHH),each_E(attvar_op(Why),MHH,[]).
 
-assert_u(MH):- must(mnotrace(fix_mp(MH,M:H))),attvar_op_fully(assert_i,M:H),expire_tabled_list(H).
-asserta_u(MH):- must(mnotrace(fix_mp(MH,M:H))),attvar_op_fully(asserta_i,M:H).
-assertz_u(MH):- must(mnotrace(fix_mp(MH,M:H))),attvar_op_fully(assertz_i,M:H).
+assert_u(MH):-  fix_mp(MH,M:H),attvar_op_fully(assert_i, M:H),expire_tabled_list(H).
+asserta_u(MH):- fix_mp(MH,M:H),attvar_op_fully(asserta_i,M:H).
+assertz_u(MH):- fix_mp(MH,M:H),attvar_op_fully(assertz_i,M:H).
 retract_u(H):- retract_u0(H) *-> true; attvar_op_fully(retract_u0,H).
 
 retract_u0(H0):- strip_module(H0,_,H),(H = ( \+ _ )),!,trace_or_throw(mpred_warn(retract_u(H0))),expire_tabled_list(H).
@@ -618,7 +702,7 @@ mpred_ain(user:MTP,S):- !, must(mpred_ain(MTP,S)).
 mpred_ain(MTP,S):- stack_check, strip_module(MTP,MT,P),P\==MTP,!,
   (\+(baseKB:mtExact(MT)) -> mpred_ain(P,S) ; with_umt(MT,mpred_ain(P,S))),!.
 mpred_ain(P,S):- 
- must(if_defined_else(fully_expand(clause(assert,ain),P,P0),P0=P)),!,
+  full_transform(ain,P,P0),!,
   gripe_time(0.6,must(ain_fast(P0,S))),!.
 
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
@@ -660,9 +744,7 @@ plus_fwc(P):- gripe_time(0.6,
 % tries to assert a fact or set of fact to the database.  For
 % each fact (or the singleton) mpred_post1 is called. It always succeeds.
 %
-mpred_post(P, S):- 
-   must_notrace(if_defined_else(fully_expand(clause(assert,post),P,P0),P0=P)), 
-   each_E(mpred_post1,P0,[S]).
+mpred_post(P, S):- full_transform(post,P,P0),each_E(mpred_post1,P0,[S]).
 
 
 %% mpred_post1(+P,+S) is det.
@@ -850,8 +932,8 @@ assert_u_confirmed_was_missing(P):-
  sanity((clause_asserted_u(PP),P=@=PP)),!.
 
 
-assert_u_confirm_if_missing(P):- copy_term_vn(P,PP),
- must_notrace(clause_asserted_u(PP)-> true ; assert_u_confirmed_was_missing(P)).
+assert_u_confirm_if_missing(P):-
+ must(clause_asserted_u(P)-> true ; assert_u_confirmed_was_missing(P)).
 
 %% get_mpred_current_db(-Db) is semidet.
 %
@@ -1814,7 +1896,7 @@ mpred_compile_rhs_term(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhs_term(Sup,P,P
    build_code_test(Sup,C,C0),!.
 
 mpred_compile_rhs_term(Sup,I,OO):- 
-  must_notrace(if_defined_else(fully_expand(change(assert,_),I,O),I=O)),
+  full_transform(compile_rhs,I,O),
   must(\+ \+ mpred_mark_as(Sup,O,pfcRHS)),!,build_consequent(Sup,O,OO).
 
 mpred_compile_rhs_term(Sup,I,O):- build_consequent(Sup,I,O).
@@ -1945,7 +2027,7 @@ check_never_assert(Pred):- fail,mnotrace(ignore(( copy_term_and_varnames(Pred,Pr
 % Check Never Retract.
 %
 check_never_retract(_Pred):-!.
-check_never_retract(Pred):- hotrace(ignore(( copy_term_and_varnames(Pred,Pred_2),mpred_call_no_bc(never_retract_u(Pred_2,Why)),Pred=@@=Pred_2,trace_or_throw(never_retract_u(Pred,Why))))).
+check_never_retract(Pred):- notrace(ignore(( copy_term_and_varnames(Pred,Pred_2),mpred_call_no_bc(never_retract_u(Pred_2,Why)),Pred=@@=Pred_2,trace_or_throw(never_retract_u(Pred,Why))))).
 
 
 :- export(mpred_mark_as_ml/3).
@@ -2138,7 +2220,7 @@ clause_asserted_u((MH:-B)):- must(mnotrace(fix_mp(MH,M:H))),!,clause_asserted_i(
 clause_asserted_u(MH):- must(mnotrace(fix_mp(MH,M:H))),clause_asserted_i(M:H).
 
 /*
-clause_asserted_u(MH):- must_notrace(fully_expand(change(assert,assert_u),MH,MA)),!,clause_asserted_i(MA).
+clause_asserted_u(MH):- full_transform(assert_u,MH,MA)),!,clause_asserted_i(MA).
 
 clause_asserted_u(MH):- must(mnotrace(fix_mp(MH,M:H))), clause_asserted_i(M:H).
 
@@ -2200,52 +2282,6 @@ mpred_conjoin(C1,C2,(C1,C2)).
 %   Updated: 10/11/87, ...
 %   Purpose: predicates to manipulate a Pfc database (e.ax. save,
 % 	restore, reset, etc.)
-
-%% mpred_database_term(:PI, -TYPE) is nondet.
-%
-% is true iff F/A is something that Pfc adds to
-% the database and should not be present in an empty Pfc database
-%
-
-
-:- dynamic(mpred_database_term/3).
-% mined from program database      
-
-% :- dynamic(spft/3).
-
-mpred_database_term(do_and_undo,2,rule).
-mpred_database_term(('::::'),2,rule).
-mpred_database_term((<-),2,rule).
-mpred_database_term((<==>),2,rule).
-mpred_database_term((==>),2,rule).
-
-mpred_database_term((==>),1,fact(_)).
-mpred_database_term((~),1,fact(_)).
-
-% forward,backward chaining database
-mpred_database_term(spft,3,support).
-mpred_database_term(nt,3,trigger).
-mpred_database_term(pt,2,trigger).
-mpred_database_term(bt,2,trigger).
-
-% transient state
-mpred_database_term(actn,1,state).
-mpred_database_term(que,1,state).
-mpred_database_term(hs,1,state).
-
-% forward,backward settings
-mpred_database_term(mpred_current_db,1,setting).
-mpred_database_term(mpred_select_hook,1,setting).
-mpred_database_term(tms,1,setting).
-mpred_database_term(pm,1,setting). 
-
-% debug settings
-mpred_database_term(mpred_is_tracing_pred,1,debug).
-mpred_database_term(mpred_is_tracing_exec,0,debug).
-mpred_database_term(mpred_is_spying_pred,2,debug).
-mpred_database_term(mpred_warnings,1,debug).
-mpred_database_term(why_buffer,2,debug).
-
 
 %% mpred_reset() is det.
 %

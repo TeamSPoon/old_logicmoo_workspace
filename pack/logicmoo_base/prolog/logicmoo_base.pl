@@ -167,6 +167,7 @@ user:lmbf:-
  :- meta_predicate mpred_expansion:temp_comp(*,*,2,?).
  :- meta_predicate mpred_storage:mdel(0).
  :- meta_predicate mpred_type_isa:assert_isa_hooked_after(?,1).
+ :- meta_predicate mpred_pfc:attvar_op_fully(1,?).
 
 
 :- list_undefined.

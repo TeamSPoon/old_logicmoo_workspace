@@ -240,6 +240,8 @@ defaultAssertMt(ABox):- nonvar(ABox),defaultAssertMt(ABoxVar),!,ABox=@=ABoxVar.
 defaultAssertMt(ABox):- t_l:current_defaultAssertMt(ABox),!.
 defaultAssertMt(ABox):- fileAssertMt(ABox).
 
+
+
 :- '$hide'(defaultAssertMt(_)).
 
 %% fileAssertMt(-ABox) is det.
@@ -260,11 +262,19 @@ fileAssertMt(ABox):-
    mtCanAssert(ABox).
 fileAssertMt(baseKB).
 
+mtCanAssert(baseKB).
 mtCanAssert(user):- !,fail.
 mtCanAssert(abox):- !,dumpST,fail.
 mtCanAssert(ABox):- clause_b(mtProlog(ABox)),!,fail.
 mtCanAssert(_).
 
+:- decl_shared(baseKB:dynamic,genlMt/2).
+:- decl_shared(baseKB:dynamic,mtCore/1).
+:- decl_shared(baseKB:dynamic,mtPrologLibrary/1).
+:- decl_shared(baseKB:dynamic,mtProlog/1).
+:- decl_shared(baseKB:dynamic,mtCycL/1).
+:- decl_shared(baseKB:dynamic,mtExact/1).
+:- decl_shared(baseKB:dynamic,mtGlobal/1).
 
 % baseKB:mtGlobal
 % mtCore
@@ -326,10 +336,12 @@ set_fileAssertMt(ABox):-
 
 make_module_name_local(A,B):- make_module_name_local0(A,B), \+ exists_file(B).
 
-make_module_name_local0(Source,KB):- clause_b(mtGlobal(Source)),!,defaultAssertMt(KB).
-make_module_name_local0(Source,KB):- clause_b(mtProlog(Source)),!,defaultAssertMt(KB).
+make_module_name_local0(Source,KB):- clause_b(mtProlog(Source)),t_l:current_defaultAssertMt(KB),!.
+make_module_name_local0(Source,KB):- clause_b(mtGlobal(Source)),t_l:current_defaultAssertMt(KB),!.
 make_module_name_local0(Source,SetName):- lmconf:file_to_module(Source,SetName),!.
 make_module_name_local0(Source,Source):- lmcache:has_pfc_database_preds(Source).
+make_module_name_local0(Source,Source):- clause_b(mtCycL(Source)),!.
+make_module_name_local0(user,KB):- t_l:current_defaultAssertMt(KB),!.
 make_module_name_local0(Source,GetName):- make_module_name(Source,GetName).
 
 
@@ -754,4 +766,12 @@ import_predicate(CM,M:_):- CM==M,!.
 import_predicate(CM,M:_):- default_module(CM,M),!.
 import_predicate(CM,M:F/A):- show_call(nop(CM:z333import(M:F/A))),CM:multifile(M:F/A),
   icatch(CM:discontiguous(M:F/A)).
+
+
+
+system:call_expansion(T,(mpred_at_box:defaultAssertMt(NewVar),NewT)):- current_predicate(_,get_lang(pfc)), compound(T),
+   subst(T,abox,NewVar,NewT),NewT\=@=T.
+
+system:body_expansion(T,(mpred_at_box:defaultAssertMt(NewVar),NewT)):- current_predicate(_,get_lang(pfc)), compound(T),
+   subst(T,abox,NewVar,NewT),NewT\=@=T.
 

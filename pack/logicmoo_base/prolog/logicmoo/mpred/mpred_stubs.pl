@@ -554,8 +554,9 @@ no_rescans.
 %
 agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
 
-%= 	 	 
-:- reconsult(library(statistics)).
+%= 
+:- use_module(system:library(statistics)).
+% :- reconsult(library(statistics)).
 %% rescan_mpred_props_ilc is semidet.
 %
 % Rescan Managed Predicate Props Inside Of Loop Checking.
@@ -823,7 +824,8 @@ mpred_t_call_op(_,FACT):- get_functor(FACT, F,A), !,
 % call_for_literal/3
 % ====================================================
 
-%= 	 	 
+:- meta_predicate call_for_literal(?,1,*).
+:- meta_predicate call_for_literal_db(?,1,*).
 
 %% call_for_literal( ?VALUE1, ?VALUE2, ?HEAD) is semidet.
 %
@@ -841,7 +843,7 @@ call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
 % Call For Literal Database.
 %
 call_for_literal_db(F,A,HEAD):- P=F, HEAD=..[P|ARGS],
-   ((lmconf:after_mpred_load)->kb_dynamic(F,A);true),
+   ((lmcache:after_mpred_load)->kb_dynamic(F,A);true),
    constrain_args(P,ARGS),call_for_literal_db0(F,A,HEAD),constrain_args(P,ARGS).
 
 

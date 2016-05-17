@@ -19,22 +19,25 @@
 % DWhitten> ... but is there a reason why "Absurdity" is the word used for something that doesn't exist?  
 % SOWA> It's stronger than that.  The absurd type is defined by axioms that are contradictory. 
 %  Therefore, by definition, nothing of that type can exist. 
-:- module(mpred_userkb, [mpred_userkb_file/0]).
+:- module(baseKB, [mpred_userkb_file/0]).
 :- include('mpred_header.pi').
 
 mpred_userkb_file.
 
+:- '$set_source_module'(baseKB).
+:- '$set_typein_module'(baseKB).
 
 %% base_kb_pred_list( ?VALUE1) is semidet.
 %
 % Base Knowledge Base Predicate List.
 %
-:- dynamic(mpred_userkb:base_kb_pred_list/1).
-mpred_userkb:base_kb_pred_list([
+:- dynamic(lmconf:base_kb_pred_list/1).
+lmconf:base_kb_pred_list([
  (::::)/2,
  (<-)/2,
  (<==)/2,
  (<==>)/2,
+ (==>)/2,
  (==>)/1,
  (nesc)/1,
  (~)/1,
@@ -44,12 +47,15 @@ mpred_f/2,mpred_f/3,mpred_f/4,mpred_f/5,mpred_f/6,mpred_f/7,
 %naf_in_code/1,
 %neg_may_naf/1,
 %tilda_in_code/1,
+mpred_undo_sys/3,
 addTiny_added/1,
 agent_call_command/2,
+mud_test/2,
+type_action_info/3,
 argGenl/3,
 argIsa/3,
 argQuotedIsa/3,
-lmcache:loaded_external_kbs/0,
+%lmcache:loaded_external_kbs/1,
 argsQuoted/1,
 arity/2,
 asserted_mpred_f/2,
@@ -83,7 +89,7 @@ default_type_props/3,
 defnSufficient/2,
 did_learn_from_name/1,
 elInverse/2,
-feature_test/0,
+% lmconf:feature_test/0,
 formatted_resultIsa/2,
 function_corisponding_predicate/2,
 functorDeclares/1,
@@ -97,7 +103,7 @@ is_wrapper_pred/1,
 isa/2,
 ruleRewrite/2,
 resultIsa/2,
-isCycAvailable_known/0,
+% lmcache:isCycAvailable_known/0,
 isCycUnavailable_known/1,
 lambda/5,
 mpred_select/2,
@@ -107,7 +113,7 @@ mpred_action/1,
 mdefault/1, % pfc
 most/1, % pfc
 mpred_do_and_undo_method/2,
-mpred_isa/2,
+%mpred_isa/2,
 %mpred_manages_unknowns/0,
 mpred_mark/3,
 predicateConventionMt/2,
@@ -119,7 +125,7 @@ never_retract_u/2,
 never_assert_u/1,
 never_retract_u/1,
 now_unused/1,
-only_if_pttp/0,
+%lmconf:only_if_pttp/0,
 pddlSomethingIsa/2,
 pfcControlled/1,
 pfcRHS/1,
@@ -138,7 +144,7 @@ retractall_wid/1,
 search/7,
 skolem/2,skolem/3,
 completeExtentEnumerable/1,
-use_ideep_swi/0,
+%use_ideep_swi/0,
 cycPred/2,
 isa/2,
 cycPlus2/2,
@@ -185,11 +191,13 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 
 :- '$set_source_module'(baseKB).
 :- '$set_typein_module'(baseKB).
-
-:- mpred_userkb:base_kb_pred_list(List),must_maplist(kb_dynamic,List).
-
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
+
+kb_dynamic_m(E):- with_source_module(baseKB,kb_dynamic(baseKB:E)).
+
+:- lmconf:base_kb_pred_list(List),call(must_maplist(kb_dynamic_m,List)).
+
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -207,12 +215,12 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- meta_predicate
       resolveConflict(+),
       resolveConflict0(+),
-      mpred_isa(?,1),
+      %mpred_isa(?,1),
       resolverConflict_robot(+).
 
 
 :- kb_dynamic(arity/2).
-:- between(1,9,A),kb_dynamic(t/A).
+:- forall(between(1,11,A),kb_dynamic(t/A)).
 :- kb_dynamic(meta_argtypes/1).
 
 %:- import_module_to_user(logicmoo_user).
@@ -466,4 +474,9 @@ never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
 %:- maybe_add_import_module(tbox,basePFC,end).
 %:- initialization(maybe_add_import_module(tbox,basePFC,end)).
 
-
+/*
+BAD IDEAS
+system:term_expansion(M1:(M2:G),(M1:G)):-atom(M1),M1==M2,!.
+system:goal_expansion(M1:(M2:G),(M1:G)):-atom(M1),M1==M2,!.
+system:sub_call_expansion(_:dynamic(_:((M:F)/A)),dynamic(M:F/A)):-atom(M),atom(F),integer(A).
+*/

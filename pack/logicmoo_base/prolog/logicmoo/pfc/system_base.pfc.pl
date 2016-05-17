@@ -31,6 +31,10 @@
 % Douglas Miles
 */
 
+:- set_prolog_flag(lm_expanders,true).
+% :- set_prolog_flag(read_attvars,false).
+:- set_prolog_flag(mpred_te,true).
+
 :- '$set_source_module'(baseKB).
 
 :- set_file_lang(pl).
@@ -45,7 +49,9 @@
 baseKB:mtCycL(baseKB).
 baseKB:mtExact(baseKB).
 
-% catching of misinterpreations
+
+:- sanity((get_lang(PL)->pl=PL)).
+
 
 %:- rtrace.
 :- dynamic(mpred_mark/3).
@@ -79,6 +85,8 @@ baseKB:mtExact(baseKB).
 :- ensure_abox(baseKB).
 
 :- begin_pfc.
+:- sanity(get_lang(pfc)).
+:- set_file_lang(pfc).
 % :- mpred_ops.
 
 
@@ -104,7 +112,8 @@ arity('<=>',2).
 arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
 arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
-arity(ttModule,1).
+tCol(ttModule).
+tSet(ttModule).
 arity(tSet,1).
 arity(argsQuoted,1).
 arity(quasiQuote,1).
@@ -139,9 +148,10 @@ argsQuoted(second_order).
 
 nondet.
 
+:- dynamic((==>)/2).
 %doing_slow_rules,
-((prologBuiltin(F),{atom(F)},arity(F,A))==>{make_builtin(F/A)}).
-((prologBuiltin(P),{compound(P),get_arity(P,F,A)},arity(F,A))==>{make_builtin(F/A)}).
+:-ain(((prologBuiltin(F),{atom(F)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)})).
+((prologBuiltin(P),{compound(P),get_arity(P,F,A)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)}).
 
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
@@ -185,10 +195,12 @@ bt(P,_)==> (P:- mpred_bc_only(P)).
 
 isa(F,pfcMustFC) ==> pfcControlled(F).
 
-mpred_mark(pfcPosTrigger,F,A)==>{warn_if_static(F,A)}.
-mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
-mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
-
+% catching of misinterpreations
+/*
+type_checking, mpred_mark(pfcPosTrigger,F,A)==>{warn_if_static(F,A)}.
+type_checking, mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
+type_checking, mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
+*/
 
 
 pfcControlled(C)==>prologHybrid(C).
@@ -266,7 +278,6 @@ predicateConventionMt(regression_test,lmconf).
 
 % mtExact(Mt)==>{kb_dynamic(Mt)}.
 
-tCol(ttModule).
 tCol(tSet).  % = isa(tSet,tCol).
 
 mtProlog(Mt),predicateConventionMt(F,Mt)==>prologBuiltin(F).
@@ -282,13 +293,40 @@ disjointWith(mtLibrary,mtPrologLibrary).
 
 % partition(mtProlog, mtLibrary, mtPrologLibrary, mtUserCodeLibrary).
 
+:- sanity(get_lang(pfc)).
 
 
+:- ain(ttModule(mtCycL,
+  comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),
+  genlsFwd(tMicrotheory))).
 
-ttModule(mtCycL,comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),
-  genlsFwd(tMicrotheory)).
+:- sanity(( fully_expand(((ttModule(mtCycL,
+  comment("yada....................."),
+  genlsFwd(tMicrotheory)))),
+  OO),dmsg(full_transform=OO),
+      OO=(_,_))).
+
+
+:- sanity(( full_transform(clause(cuz,one),((ttModule(mtCycL,
+  comment("yada....................."),
+  genlsFwd(tMicrotheory)))),
+  OO),dmsg(full_transform=OO),
+      OO=(_,_))).
+
+:- listing(ttModule).
+
+:- sanity(arity(ttModule,1)).
+:- sanity(\+ arity(ttModule,3)).
+:- sanity(\+ predicate_property(ttModule(_,_,_),_)).
+
 ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
   genlsFwd(tMicrotheory)).
+
+
+:- sanity(arity(ttModule,1)).
+:- sanity(\+ arity(ttModule,3)).
+:- sanity(\+ predicate_property(ttModule(_,_,_),_)).
+
 
 ttModule(mtPrologLibrary,comment("Builtin Prolog code modules such as 'lists' or 'apply'"),
   genlsFwd(mtProlog),genlsFwd(mtCore)).

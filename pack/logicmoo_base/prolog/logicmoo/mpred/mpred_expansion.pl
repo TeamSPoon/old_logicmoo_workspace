@@ -477,7 +477,7 @@ same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 %
 % Fully Expand.
 %
-fully_expand(X,Y):-fully_expand(clause(unknown,cuz),X,Y).
+fully_expand(X,Y):- must((fully_expand(clause(unknown,cuz),X,Y))).
 
 %:- mpred_trace_nochilds(fully_expand/3).
 
@@ -495,10 +495,10 @@ fully_expand(X,Y):-fully_expand(clause(unknown,cuz),X,Y).
 %
 
 fully_expand(Op,Sent,SentO):-
-  once((/*hotrace*/((cyclic_break((Sent)),
+  must(once((/*hotrace*/((cyclic_break((Sent)),
      must(hotrace((deserialize_attvars(Sent,SentI)))),
      w_tl_e(t_l:no_kif_var_coroutines(true),(((fully_expand_now(Op,SentI,SentO))))),
-     cyclic_break((SentO)))))).
+     cyclic_break((SentO))))))).
 
 %% fully_expand_now( ++Op, ^Sent, --SentO) is det.
 %
@@ -507,11 +507,11 @@ fully_expand(Op,Sent,SentO):-
 fully_expand_now(Op,Sent,SentO):- 
  copy_term(Sent,NoVary),
  cyclic_break((NoVary)),
- dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause(Op,Sent,BO))),!,
+ must((dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause(Op,Sent,BO))),!,
     SentO=BO,
     must(Sent=@=NoVary),
    ignore(((fail,cnotrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
-    (Sent \=@= lmconf:SentO), dmsg(fully_expand_now(Op,(Sent --> SentO)))))))))),!.
+    (Sent \=@= lmconf:SentO), dmsg(fully_expand_now(Op,(Sent --> SentO)))))))))))),!.
 
      
 :- decl_shared(mtExact/1).
@@ -520,12 +520,13 @@ fully_expand_now(Op,Sent,SentO):-
 %
 %  Is a stripped Module (Meaning it will be found via inheritance)
 %
-is_stripped_module(_):-!,fail.
 is_stripped_module(A):-var(A),!,fail.
 is_stripped_module(Mt):-mtExact(Mt),!,fail.
 %is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
 %is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
-% is_stripped_module(baseKB).
+is_stripped_module(abox).
+% is_stripped_module(_):-!,fail.
+is_stripped_module(baseKB).
 % is_stripped_module(A):- defaultAssertMt(AB),!,AB=A.
 
 
@@ -1072,23 +1073,41 @@ replaced_module(_,umt,ABox):-defaultAssertMt(ABox).
 replaced_module(_,abox,ABox):-defaultAssertMt(ABox).
 replaced_module(_,tbox,TBox):-get_current_default_tbox(TBox).
 
+
+maybe_prepend_mt(abox,_:HH,HH):-!.
+maybe_prepend_mt(abox,HH,HH):-!.
+maybe_prepend_mt(Mt,Mt:HH,Mt:HH):-!.
+maybe_prepend_mt(_,Mt:HH,Mt:HH):-!.
+maybe_prepend_mt(Mt,HH,Mt:HH):-!.
+
+
 %% remodulize( ?Op, ?H, ?HH) is det.
 %
 % Re-Modulize.
 %
-remodulize(_, H,H):- \+ compound(H),!.
 remodulize(_, H,H):- is_ftVar(H),!.
+remodulize(_, H,H):- \+ compound(H),!. % this disables the two next rules
+remodulize(_, H,HH):- atom(H),convention_to_symbolic_mt(H,0,M),maybe_prepend_mt(M,H,HH).
 remodulize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
 remodulize(Op,M:H,M:HHH):-is_ftVar(M),!,must_remodulize(mvar(Op),H,HHH).
-remodulize(Op,M:H,R:HHH):-replaced_module(Op,M,R),!,must_remodulize(Op,H,HHH).
-remodulize(Op,M:H,HHH):- is_stripped_module(M),!,must_remodulize(Op,H,HHH).
 remodulize(Op,H,HH):-is_list(H),!,must_maplist(remodulize(Op),H,HH),!.
 remodulize(Op,':-'(G),':-'(GG)):-!,must_remodulize(call(Op),G,GG).
-remodulize(Op,(H:-G),(HH:-GG)):-!,must_remodulize(Op,H,HH),must_remodulize(call(Op),G,GG).
+remodulize(Op,(H:-G),(HH:-GG)):-!,must_remodulize(clause(Op,(':-')),H,HH),must_remodulize(call(Op),G,GG).
 remodulize(Op,(H,G),(HH,GG)):-!,must_remodulize(call(Op),H,HH),must_remodulize(call(Op),G,GG).
 remodulize(Op,(H;G),(HH;GG)):-!,must_remodulize(call(Op),H,HH),must_remodulize(call(Op),G,GG).
-remodulize(Op,H,HHH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodulize(Op),HL,HHL),HH=..[F|HHL],!,fix_mp(HH,HHH).
-remodulize(Op,HB,HB):-sanity(trace_or_throw(unknown_remodualize(Op,HB,HB))).
+
+remodulize(Op,M:H,R:HHH):- replaced_module(Op,M,R),!,must_remodulize(Op,H,HHH).
+remodulize(Op,M:H,HHH):- is_stripped_module(M),!,must_remodulize(Op,H,HHH).
+
+remodulize(Op,Mt:H,HHHH):- is_ftCompound(H),H=..[F|HL],!,must_maplist(remodulize(Op),HL,HHL),HH=..[F|HHL],!,
+  must((remodulize_pass2(HH,HHH),maybe_prepend_mt(Mt,HHH,HHHH))).
+
+remodulize(Op,H,HHH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodulize(Op),HL,HHL),HH=..[F|HHL],!,
+  must(remodulize_pass2(HH,HHH)).
+
+remodulize_pass2(MHH,HHH):- strip_module(MHH,_,HH),functor(HH,F,A),convention_to_symbolic_mt(F,A,Mt),maybe_prepend_mt(Mt,HH,HHH).
+% remodulize_pass2(HH,HHH):- fix_mp(HH,HHH),!. % this is overzealous
+remodulize_pass2(HH,HH):- !.
 
 must_remodulize(Op,H,HHH):-must(remodulize(Op,H,HHH)),!.
 %= 	 	 
@@ -1517,7 +1536,7 @@ transform_holds_3(Op,[P|ARGS],[P|ARGS]):- not(atom(P)),!,dmsg(transform_holds_3)
 transform_holds_3(HFDS,[HOFDS,P,A|ARGS],OUT):- is_holds_true(HOFDS),!,transform_holds_3(HFDS,[P,A|ARGS],OUT).
 transform_holds_3(HFDS,[HOFDS,P,A|ARGS],OUT):- HFDS==HOFDS, !, transform_holds_3(HFDS,[P,A|ARGS],OUT).
 transform_holds_3(_,HOFDS,isa(I,C)) :- was_isa_syntax(HOFDS,I,C),!.
-transform_holds_3(_,[Type,Inst],isa(Inst,Type)):-is_ftNonvar(Type),isa(Type,tCol),!.
+transform_holds_3(_,[Type,Inst],isa(Inst,Type)):-is_ftNonvar(Type),a(tCol,Type),!.
 transform_holds_3(_,HOFDS,isa(I,C)):- holds_args(HOFDS,[ISA,I,C]),ISA==isa,!.
 
 transform_holds_3(Op,[Fogical|ARGS],OUT):-  
@@ -1670,7 +1689,7 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 
 % -  dmsg_hook(db_op(query(HLDS,call),holds_t(ft_info,tCol,'$VAR'(_)))):-trace_or_throw(dtrace).
 
-fixed_negations(I,O):-cnotrace((fix_negations(I,O),!,I\=@=O)),!.
+fixed_negations(I,O):-notrace((fix_negations(I,O),!,I\=@=O)),!.
 fix_negations(P0,P0):- not_ftCompound(P0),!.
 fix_negations(~(P0),~(P0)):- not_ftCompound(P0),!.
 fix_negations(\+(P0),\+(P0)):- not_ftCompound(P0),!.

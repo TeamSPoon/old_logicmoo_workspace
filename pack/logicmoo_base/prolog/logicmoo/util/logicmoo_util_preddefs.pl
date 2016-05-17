@@ -750,11 +750,13 @@ is_static_predicate_3(PredMt,F,A):-
 %
 % Static Predicate.
 %
-is_static_predicate(M:F):-atom(F),predicate_property_nt(M:F,static),!,predicate_property_nt(F,number_of_clauses(_)).
+is_static_predicate(M:F):-atom(F),predicate_property_nt(M:F,static),!,predicate_property_nt(F,number_of_clauses(_)),\+ predicate_property_nt(F,dynamic).
 is_static_predicate(M:F):-atom(F),!,between(1,11,A),current_predicate(M:F/A),functor(FA,F,A),is_static_predicate(M:FA),!.
+is_static_predicate((M:F)/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
+is_static_predicate((M:F)//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
-is_static_predicate(FA):-predicate_property_nt(FA,static),!,predicate_property_nt(FA,number_of_clauses(_)).
+is_static_predicate(FA):-predicate_property_nt(FA,static),!,predicate_property_nt(FA,number_of_clauses(_)), \+ predicate_property_nt(FA,dynamic).
 is_static_predicate(FA):-once(predicate_property_nt(FA,_)),\+ predicate_property_nt(FA,dynamic).
 
 
