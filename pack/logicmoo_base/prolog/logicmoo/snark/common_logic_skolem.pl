@@ -19,9 +19,13 @@
             annote/3,
             skolem_unify/2,
             push_cond/2,
+            skolem_test/1,
             with_no_kif_var_coroutines/1
 	  ]).
 %:- endif.
+
+:- meta_predicate skolem_test(0).
+:- meta_predicate skolem_unify(*,0).
 
 :- ensure_loaded(library(logicmoo/util/logicmoo_util_attvar_reader)).
 

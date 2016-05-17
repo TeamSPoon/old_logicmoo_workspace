@@ -120,7 +120,7 @@ go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(C
 
 
 :- include('logicmoo_util_header.pi').
-
+:- system:use_module(logicmoo_util_catch).
 
 %= 	 	 
 
@@ -280,7 +280,7 @@ loop_check(Call, TODO):- parent_goal(ParentCall,1)->(loop_check_term_key(Call,Ca
 %
 % Loop Check Term Key.
 %
-loop_check_term_key(Call,KeyIn,TODO):- cnotrace(make_key(KeyIn,Key)) -> loop_check_term(Call,Key,TODO).
+loop_check_term_key(Call,KeyIn,TODO):- notrace(make_key(KeyIn,Key)) -> loop_check_term(Call,Key,TODO).
 
 
 
@@ -318,8 +318,8 @@ no_loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> wno_tl(lmcache:
 %
 % Loop Check Term.
 %
-loop_check_term(Call,Key,TODO):- cnotrace(TT = lmcache:ilc(Key)),
- ( cnotrace( \+(TT)) -> (setup_call_cleanup(cnotrace(asserta(TT,REF)), Call, 
+loop_check_term(Call,Key,TODO):- notrace(TT = lmcache:ilc(Key)),
+ ( notrace( \+(TT)) -> (setup_call_cleanup(notrace(asserta(TT,REF)), Call, 
    erase(REF))) ; 
    ((can_fail(TODO)->retract_can_table;true),call(TODO)) ).
 
@@ -676,12 +676,12 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 % Goal Expansion.
 %
 
-system:goal_expansion(LC,PIn,LCOO,POut):- source_location(_,_),
-   compound(LC),
-   must(var(LCOO)),
-   cnotrace((is_file_based_expansion(goal,LC,PIn,LCOO,POut),
-   lco_goal_expansion(LC,LCOO),
-   LC\=@=LCOO)).
+system:body_expansion(LC,PIn,LCOO,PIn):- 
+   notrace((source_location(_,_),
+      compound(LC),
+      must(var(LCOO)),
+      lco_goal_expansion(LC,LCOO),
+      LC\=@=LCOO)).
 
 
 

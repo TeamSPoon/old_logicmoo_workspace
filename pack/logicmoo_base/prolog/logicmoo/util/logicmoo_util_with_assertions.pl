@@ -72,6 +72,7 @@ wtg(M:With,Call):- w_tl(M:With,Call).
 
 % = :- meta_predicate(w_tl(:,0)).
 
+:- use_module(system:logicmoo_util_scce).
 
 %= 	 	 
 
@@ -106,13 +107,13 @@ w_tl(M:before_after(Before,After),Call):-
      (M:Before -> setup_call_cleanup(true,Call,M:After);Call).
 
 w_tl(_:ensure(WM:THeadWM),CM:Call):- !,
- cnotrace(( 
+ notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> copy_term(HAssert,CHAssert) ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     ((CM:cnotrace((HAssert\=(_:-_),M:CHAssert,!,HAssert=@=CHAssert))) -> ( CM:Call );
+     ((CM:notrace((HAssert\=(_:-_),M:CHAssert,!,HAssert=@=CHAssert))) -> ( CM:Call );
             setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF))).
 
 w_tl(_:scc(WM:THeadWM),CM:Call):- !,
-   cnotrace(( 
+   notrace(( 
        to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
        setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF)).
 
@@ -121,7 +122,7 @@ w_tl(_:scce(WM:THeadWM),CM:Call):- !,w_tl_e(WM:THeadWM,CM:Call).
 w_tl(WM:THeadWM,CM:Call):-w_tl_e(WM:THeadWM,CM:Call).
 
 w_tl_e(WM:THeadWM,CM:Call):-
- cnotrace(( 
+ notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
      scce_orig2(key_asserta(M:HAssert),CM:Call,key_erase).
 
@@ -139,13 +140,6 @@ wno_tl(UHead,Call):- w_tl((UHead :- !,fail),Call).
 
 wno_tl_e(UHead,Call):- w_tl_e((UHead :- !,fail),Call).
 
-
-/*
-wno_tl(UHead,Call):- 
-  hotrace((THead = (UHead:- (!,fail)),
-   (to_thread_head_1m(THead,M,Head,HAssert) -> true; throw(to_thread_head_1m(THead,M,Head,HAssert))))),
-       setup_call_cleanup(hotrace(M:asserta(HAssert,REF)),Call,M:erase_safe(HAssert,REF)).
-*/
 
 
 %= 	 	 

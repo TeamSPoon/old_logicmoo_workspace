@@ -4,11 +4,12 @@
 % Douglas Miles
 
 */
-:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_filesystem.pl')), push_modules)). 
+:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_base_file,[]).
 % restore entry state
 :- reset_modules.
+
 
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
 :- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
@@ -77,20 +78,22 @@ lmconf:mpred_skipped_module(eggdrop).
 
 % :-use_module(system:library('logicmoo/mpred/mpred_*.pl')).
 
-:-use_module(system:library('logicmoo/mpred/mpred_hooks.pl')).
-:-use_module(baseKB:library('logicmoo/mpred/mpred_userkb.pl')).
-
 :-use_module(system:library('logicmoo/snark/common_logic_snark.pl'),except([op(_,_,_)])).
+:-use_module(system:library('logicmoo/mpred/mpred_hooks.pl')).
+
 :-use_module(system:library('logicmoo/snark/common_logic_boxlog.pl')).
 :-use_module(system:library('logicmoo/snark/common_logic_skolem.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_userkb.pl')).
 :-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_)])).
 :-use_module(system:library('logicmoo/snark/common_logic_kb_hooks.pl')).
 
 
-:- reset_modules.
+
 
 :- thread_local t_l:side_effect_ok/0.
-
+:- reset_modules.
+:- set_defaultAssertMt(baseKB).
+:- set_fileAssertMt(baseKB).
 system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_expander(goal,system,I,P1,O,P2).
 system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_expander(term,system,I,P1,O,P2).
 
@@ -143,9 +146,9 @@ user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_unde
 :- set_prolog_flag(user:unknown,error).
 :- set_prolog_flag(lmcode:unknown,error).
 :- set_prolog_flag(baseKB:unknown,warning).
-:- set_prolog_flag(tbox:unknown,warning).
-:- set_prolog_flag(abox:unknown,warning).
-
+%:- rtrace((mpred_at_box:defaultAssertMt(G40331),rtrace(set_prolog_flag(G40331:unknown,warning)))).
+%:- break.
+:- must(set_prolog_flag(abox:unknown,warning)).
 :- w_tl(t_l:side_effect_ok,doall(call_no_cuts(lmconf:module_local_init(abox,baseKB)))).
 % :- forall(lmconf:sanity_check,true).
 
@@ -161,12 +164,20 @@ user:lmbf:-
   time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc'))))),
   set_prolog_flag(pfc_booted,true).
 
-:- user:lmbf.
+ :- meta_predicate mpred_expansion:temp_comp(*,*,2,?).
+ :- meta_predicate mpred_storage:mdel(0).
+ :- meta_predicate mpred_type_isa:assert_isa_hooked_after(?,1).
 
-:- reset_modules.
+
+:- list_undefined.
+% :- user:lmbf.
+
+% 
+:- set_defaultAssertMt(baseKB).
+:- set_fileAssertMt(baseKB).
 
 :- forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox),maybe_add_import_module(M,abox,start)).
 :- forall((current_module(M),M\=user,M\=system,M\=baseKB),maybe_add_import_module(M,baseKB,start)).
 
-
-
+:- list_undefined.
+:- reset_modules.

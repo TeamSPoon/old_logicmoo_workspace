@@ -106,9 +106,6 @@
             logOnFailure0/1,
             logOnFailureEach/1,
             on_f_log_ignore/1,
-            loggerFmtReal/3,
-            loggerReFmt/2,
-            logger_property/3,
             logicmoo_bugger_loaded/0,
             meta_interp/2,
             meta_interp_signal/1,
@@ -152,7 +149,6 @@
             replace_elements/4,
             rmust_det/1,            
             saveUserInput/0,
-            setLogLevel/2,
             set_bugger_flag/2,
             set_gui_debug/1,
             set_no_debug/0,
@@ -370,11 +366,7 @@
         loading_module/1,
         loading_module/2,
         local_predicate/2,
-        logLevel/2,
         logOnFailureEach/1,
-        loggerFmtReal/3,
-        loggerReFmt/2,
-        logger_property/3,
         logicmoo_bugger_loaded/0,
         meta_interp_signal/1,
         module_hotrace/1,
@@ -395,7 +387,6 @@
         prolog_current_frames/1,
         replace_elements/4,
         saveUserInput/0,
-        setLogLevel/2,
         set_bugger_flag/2,
         set_no_debug/0,
         set_no_debug_thread/0,
@@ -2380,19 +2371,6 @@ time_call(Call):-
    Time is MSec/1000,
    ignore((Time > 0.5 , dmsg('Time'(Time)=Call))).
 
-:- dynamic logger_property/2.
-
-%= 	 	 
-
-%% logger_property( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
-%
-% Logger Property.
-%
-logger_property(todo,once,true).
-
-
-
-
 
 % = %= :- meta_predicate (gripe_time(+,0)).
 :- export(gripe_time/2).
@@ -2426,54 +2404,6 @@ gripe_time(TooLong,Goal):- statistics(cputime,StartCPU),
 %
 cleanup_strings:-!.
 cleanup_strings:-garbage_collect_atoms.
-
-:- dynamic(logLevel/2).
-:- module_transparent(logLevel/2).
-:- multifile(logLevel/2).
-
-
-%= 	 	 
-
-%% setLogLevel( ?M, ?L) is semidet.
-%
-% Set Log Level.
-%
-setLogLevel(M,L):-retractall(logLevel(M,_)),(nonvar(L)->asserta(logLevel(M,L));true).
-
-
-%= 	 	 
-
-%% logLevel( ?S, ?Z) is semidet.
-%
-% Log Level.
-%
-logLevel(debug,ERR):-lmcache:thread_current_error_stream(ERR).
-logLevel(error,ERR):-lmcache:thread_current_error_stream(ERR).
-logLevel(private,none).
-logLevel(S,Z):-current_stream(_X,write,Z),trace,stream_property(Z,alias(S)).
-
-
-%= 	 	 
-
-%% loggerReFmt( ?L, ?LRR) is semidet.
-%
-% Logger Re Format.
-%
-loggerReFmt(L,LRR):-logLevel(L,LR),L \==LR,!,loggerReFmt(LR,LRR),!.
-loggerReFmt(L,L).
-
-
-%= 	 	 
-
-%% loggerFmtReal( ?S, ?F, ?A) is semidet.
-%
-% Logger Format Real.
-%
-loggerFmtReal(none,_F,_A):-!.
-loggerFmtReal(S,F,A):-
-  current_stream(_,write,S),
-    fmt(S,F,A),
-    flush_output_safe(S),!.
 
 
 

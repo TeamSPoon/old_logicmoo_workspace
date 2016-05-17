@@ -4,7 +4,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_filesystem.pl')), push_modules)). 
+:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_webbot_file,[]).
 % restore entry state

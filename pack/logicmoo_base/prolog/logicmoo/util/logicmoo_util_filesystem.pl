@@ -13,11 +13,6 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_filesystem.pl
 :- module(logicmoo_util_filesystem,
           [ 
-          swi_module/2,
-          show_module_imports/0,
-          show_module_imports/1,
-          show_module_imports/2,
-            is_file_based_expansion/5,
             add_library_search_path/2,
             add_file_search_path/2,
             add_to_search_path/2,
@@ -74,18 +69,9 @@
             to_filename/2,
             upcase_atom_safe/2,
             with_filematch/1,
-            with_filematches/1,
+            with_filematches/1
 
-            push_modules/0,
-            reset_modules/0,
-            current_smt/2,
-            pop_modules/0,
-            maybe_add_import_module/3,
-            maybe_add_import_module/2,
-            maybe_delete_import_module/2,
-            add_prolog_predicate/6,
-            glean_prolog_impl_file/4,
-            add_genlMt/2
+
             
           ]).
 
@@ -172,57 +158,6 @@
 :- '@'( ensure_loaded(library(filesex)), 'user').
 
 :-endif.
-
-:- system:multifile(lmconf:source_typein_modules/3),
-   system:dynamic(lmconf:source_typein_modules/3).
-
-:- multifile(lmconf:mpred_is_impl_file/2).
-:- dynamic(lmconf:mpred_is_impl_file/2).
-
-
-current_smt(SM,M):-
- '$current_source_module'(SM),'$current_typein_module'(M).
-
-push_modules:- current_smt(SM,M),
-  prolog_load_context(source,F),
-  system:asserta(lmconf:source_typein_modules(SM,M,F)).
-
-reset_modules:- 
-  prolog_load_context(source,F),
-  once(lmconf:source_typein_modules(SM,M,F)),
-  '$set_source_module'(SM),'$set_typein_module'(M),!.
-
-pop_modules:- 
-  prolog_load_context(source,F),
-  once(system:retract(lmconf:source_typein_modules(SM,M,F))),
-  '$set_source_module'(SM),'$set_typein_module'(M),!.
-
-
-maybe_add_import_module(A,B):-maybe_add_import_module(A,B,start).
-
-%TODO
-maybe_add_import_module(_From,_To,_):- !.
-
-maybe_add_import_module(A,baseKB,C):-!,maybe_add_import_module(baseKB,A,C).
-maybe_add_import_module(From,To,_):- default_module(From,To),!.
-maybe_add_import_module(user,_,start):-!.
-maybe_add_import_module(From,To,Start):-  
-   maybe_delete_import_module(To,From),
-   catch(add_import_module(From,To,Start),E,writeln(E=add_import_module(From,To,Start))).
-
-
-
-maybe_delete_import_module(_From,To):- To = user,!.
-maybe_delete_import_module(_From,To):- To = system,!.
-
-%TODO
-maybe_delete_import_module(_From,_To):- !.
-
-maybe_delete_import_module(From,To):- To = user,!,
-    catch(add_import_module(From,system,end),E,writeln(E=add_import_module(From,system,end))),
-   ignore(catch(system:delete_import_module(From,user),E,writeln(E=delete_import_module(To,From)))).
-   
-maybe_delete_import_module(To,From):-  ignore(catch(system:delete_import_module(To,From),E,writeln(E=delete_import_module(To,From)))).
 
 
 %% resolve_dir( ?Dir, ?Dir) is semidet.
@@ -352,7 +287,7 @@ filematch_ext(Ext,FileIn,File):-
 %
 enumerate_files(_:Spec,Result):- call((atom(Spec),is_absolute_file_name(Spec),(exists_file(Spec);exists_directory(Spec)),prolog_to_os_filename(Result,Spec))),!.
 enumerate_files(M:Spec,Result):-
-   hotrace((no_repeats_old([Result],((enumerate_m_files(M,Spec,NResult),once((normalize_path(NResult,Result)->exists_file_or_dir(Result)))))))).
+   call((no_repeats_old([Result],((enumerate_m_files(M,Spec,NResult),once((normalize_path(NResult,Result)->exists_file_or_dir(Result)))))))).
 
 :- meta_predicate(enumerate_files(:,-)).
 :- export(enumerate_m_files/3).
@@ -800,7 +735,7 @@ atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !
 %
 % Exists File Safely Paying Attention To Corner Cases.
 %
-exists_file_safe(File):- hotrace((nonvar(File),(File=(_:F)->exists_file_safe(F);(atomic(File),exists_file(File))))).
+exists_file_safe(File):- ((nonvar(File),(File=(_:F)->exists_file_safe(F);(atomic(File),exists_file(File))))).
 
 %= 	 	 
 
@@ -935,120 +870,4 @@ os_to_prolog_filename(OS,PL):-atom(OS),atomic_list_concat([X,Y|Z],'\\',OS),atomi
 os_to_prolog_filename(OS,PL):-atom_concat_safe(BeforeSlash,'/',OS),os_to_prolog_filename(BeforeSlash,PL).
 os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \== OSP,!,os_to_prolog_filename(OSP,PL).
 
-% ===========================================================================
-% add_prolog_predicate/6,glean_prolog_impl_file/2,complete_prolog_impl_file/2
-% ===========================================================================
-
-:- multifile(lmconf:known_prolog_file_prop/2).
-:- dynamic(lmconf:known_prolog_file_prop/2).
-
-add_genlMt(_,_):- \+ current_prolog_flag(logicmoo_glean,true),!.
-add_genlMt(From,Prop):-atom(Prop),!,add_genlMt(From,imports(Prop)).
-add_genlMt(From,CTo):-arg(1,CTo,To),From==To,!.
-add_genlMt(From,imports(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
-add_genlMt(From,maybe(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
-add_genlMt(baseKB,imports(logicmoo_user)):-!. % this means never will happen
-
-add_genlMt(lmcode,imports(baseKB)):- !, add_genlMt(baseKB,imports(lmcode)).
-add_genlMt(lmcode,imports(baseKB)):-!.
-
-% add_genlMt(_From,imports(To)):-arg(_,v(baseKB,logicmoo_user),To),!.
-add_genlMt(From,Prop):-lmconf:known_prolog_file_prop(From,Prop),!.
-add_genlMt(From,Prop):-assertz(lmconf:known_prolog_file_prop(From,Prop)),fail.
-add_genlMt(_,file(_)):-!.
-add_genlMt(_,uses(_)):-!.
-add_genlMt(From,Prop):-write('% '), writeln(add_genlMt(From,Prop)),fail.
-
-add_genlMt(From,imports(To)):-
-   catch(add_import_module(From,To,start),E,writeln(E=add_import_module(From,To))).
-
-
-:- meta_predicate
-        glean_prolog_impl_file(+,+,+,+).
-
-:- export(glean_prolog_impl_file/4).
-:- module_transparent(glean_prolog_impl_file/4).
-
-swi_module(M,Preds):- forall(member(P,Preds),M:export(P)). % ,dmsg(swi_module(M)).
-
-is_file_based_expansion(term,I,PosI,_O,_PosO):-!,
-   compound(PosI),nonvar(I),
-   nb_current('$term',Was), Was==I,
-   nb_current('$term_position', Pos),
-   get_pos_at(Pos,PosAt),
-   get_pos_at(PosI,At),!,
-   PosAt>0,!,At>=PosAt.
-
-is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
-   compound(PosI),nonvar(I),
-   %nb_current('$term',Was), Was\=[],Was=(:- _),
-   nb_current('$term_position', Pos),
-   get_pos_at(Pos,PosAt),
-   get_pos_at(PosI,At),!,
-   PosAt>0,!,At>=PosAt.
-
-get_pos_at(C,Num):-compound(C),arg(1,C,Num),number(Num).
-
-:- dynamic(lmconf:known_complete_prolog_impl_file/3).
-glean_prolog_impl_file(_,_,_,_):- current_prolog_flag(xref,true),!.
-glean_prolog_impl_file(_,_,_,_):- \+ source_location(_,_),!.
-
-glean_prolog_impl_file(end_of_file,File,SM,TypeIn):-lmconf:known_complete_prolog_impl_file(SM,File,TypeIn),!.
-glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_concat([_,_|_],'.pfc',File),!,
-   assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),
-  % add_genlMt(logicmoo_user,imports(baseKB)),
-  % add_genlMt(SM,maybe(TypeIn)),
-  add_genlMt(lmcode,imports(SM)),
-  % add_genlMt(SM,imports(logicmoo_user)),
-  % add_genlMt(SM,imports(baseKB)),
-   forall(source_file(M:H,File),
-       ignore((functor(H,F,A),
-         (predicate_property(M:H,imported_from(Where))
-           -> add_prolog_predicate(SM,Where,H,F,A,File)
-          ; add_prolog_predicate(TypeIn,M,H,F,A,File))))),
-         fail.
-
-glean_prolog_impl_file((:- module(Want,_PubList)),File,SM,TypeIn):-!,
-    add_genlMt(TypeIn, uses(SM)),
-    add_genlMt(lmcode, uses(SM)),
-    % add_genlMt(baseKB, imports(SM)),
-    add_genlMt(baseKB, imports(lmcode)),
-    % add_genlMt(SM,imports(lmcode)),    
-    add_genlMt(lmcode, uses(Want)),
-    add_genlMt(SM, uses(Want)),
-    add_genlMt(Want, file(File)).
-    
-
-glean_prolog_impl_file(_,File,SM,_TypeIn):-
-   add_genlMt(SM,  file(File)),
-   add_genlMt(SM, imports(logicmoo_user)).
-
-
-:- export(add_prolog_predicate/6).
-:- module_transparent(add_prolog_predicate/6).
-add_prolog_predicate(skip,_M,_H,_F,_A,_S):-!.
-add_prolog_predicate(_ImportTo,M,H,F,A,_S):-
-  ignore((
-       F\=='$mode',
-       F\=='$pldoc',
-       F\=='$exported_op',
-       ignore(((\+ atom_concat('$',_,F),export(M:F/A)))),
-       \+ predicate_property(M:H,transparent),
-       M:module_transparent(M:F/A))).
-      
-
-show_module_imports(M):- show_module_imports(M,_),
-  ((import_module(M,user);M=user)->true;portray_clause(':-'(ignore(system:delete_import_module(M,user))))),
-  show_module_imports(_,M).
-
-show_module_imports(M,I):-var(M),!,forall(current_module(M),show_module_imports(M,I)).
-show_module_imports(M,I):-
-   forall(import_module(M,I),
-      portray_clause(':-'(system:add_import_module(M,I)))),
-   
-   forall((default_module(M,I),M\==I,\+import_module(M,I)),nop(wdmsg(default_module(M,I)))).
-
-show_module_imports:-
-  forall(current_module(M),show_module_imports(M)).
-  
 

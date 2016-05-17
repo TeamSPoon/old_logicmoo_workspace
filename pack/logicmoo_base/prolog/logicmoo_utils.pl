@@ -15,14 +15,13 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-:- if(( system:system:use_module(library('logicmoo/util/logicmoo_util_filesystem.pl')), push_modules)). 
+:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_utils_file,[]).
 % restore entry state
 :- reset_modules.
 
-:- set_prolog_flag(lm_expanders,true).
-:- set_prolog_flag(mpred_te,true).
+:- set_prolog_flag(lm_expanders,false).
 
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
 :- system:use_module(library('logicmoo/util/logicmoo_util_supp.pl')).
@@ -32,21 +31,9 @@
 % Included separated logicmoo util files
 % ======================================================
 
-:- module_transparent(user:term_expansion/1).
-user:term_expansion(EOF,POS,O,POS2):- 
- current_prolog_flag(lm_expanders,true),
- is_file_based_expansion(term,EOF,POS,O,POS2),
- nonvar(EOF),
- (EOF=end_of_file;EOF=(:-(module(_,_)))),
- prolog_load_context(module,M),
- M\==user, 
- ignore((
-    source_location(S,_),
-    '$current_typein_module'(TM),
-    glean_prolog_impl_file(EOF,S,M,TM))),fail.
-
 :- set_prolog_flag(system:generate_debug_info, true).
 :- set_prolog_flag(generate_debug_info, true).
+:- set_prolog_flag(lm_expanders,false).
 
 :- system:use_module(library('logicmoo/util/logicmoo_util_database.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_first.pl')).
@@ -61,17 +48,19 @@ user:term_expansion(EOF,POS,O,POS2):-
 :- system:use_module(library('logicmoo/util/logicmoo_util_terms.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_dumpst.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_with_assertions.pl')).
-:- system:use_module(library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_preddefs.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_attvar_reader.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_term_listing.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_strings.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_filestreams.pl')).
+:- system:use_module(library('logicmoo/util/logicmoo_util_filesystem.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_prolog_frames.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_prolog_streams.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_engines.pl')).
 :- system:use_module(library('logicmoo/util/logicmoo_util_help.pl')).
+
+:- system:use_module(library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
 
 :- system:use_module(library(logicmoo_swilib)).
 
@@ -178,5 +167,6 @@ lmconf:logicmoo_scan_autoloads:-false.
 % :- system:use_module(library('logicmoo/util/logicmoo_util_supp.pl')).
 */
 
+:- set_prolog_flag(lm_expanders,true).
 
 

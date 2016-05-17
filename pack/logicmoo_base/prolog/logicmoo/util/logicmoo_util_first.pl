@@ -39,7 +39,7 @@ quiet_all_module_predicates_are_transparent/1,
 
             add_newvar/2,
             add_newvars/1,
-            always_show_dmsg/0,
+
             %lbl_vars/6,
 
             mustvv/1,
@@ -118,7 +118,6 @@ quiet_all_module_predicates_are_transparent/1,
           mpred_trace_childs/1,
         add_newvar/2,
         add_newvars/1,
-        always_show_dmsg/0,
         %lbl_vars/6,
         name_to_var/3,
         register_var/3,
@@ -310,17 +309,6 @@ mpred_trace_all(W) :- forall(match_predicates(W,M,Pred,_,A),(
 :- include('logicmoo_util_header.pi').
 
 :- export(tlbugger:ifHideTrace/0).
-:- thread_local(tlbugger:ifHideTrace/0).
-:- thread_local(tlbugger:tl_always_show_dmsg).
-
-%= 	 	 
-
-%% always_show_dmsg is semidet.
-%
-% Always Show (debug)message.
-%
-always_show_dmsg:- thread_self(main).
-always_show_dmsg:- tlbugger:tl_always_show_dmsg.
 
 
 

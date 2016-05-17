@@ -13,6 +13,7 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_dmsg.pl
 :- module(logicmoo_util_dmsg,
           [ ansi_control_conv/2,
+            always_show_dmsg/0,
             with_output_to_each/2,
             ansicall/2,
             ansicall/3,
@@ -20,6 +21,7 @@
             ansicall1/3,
             ansifmt/2,
             ansifmt/3,
+          is_hiding_dmsgs/0,
             colormsg/2,
             contains_atom/2,
             contrasting_color/2,
@@ -29,7 +31,13 @@
             dfmt/1,dfmt/2,
             debugm/1,debugm/2,
             dmsg/1,dmsg/2,dmsg/3,
-          
+
+          setLogLevel/2,
+          logLevel/2,
+               loggerFmtReal/3,
+               loggerReFmt/2,
+               logger_property/3,
+
             cls/0,
             dmsg0/1,dmsg0/2,dmsg00/1,
             dmsg1/1,
@@ -224,6 +232,11 @@ dmsg000/1,
 :- endif.
 
 :- use_module(system:library(memfile)).
+:- system:use_module(logicmoo_util_first).
+:- system:use_module(logicmoo_util_with_assertions).
+:- system:use_module(logicmoo_util_loop_check).
+
+
 
 :- meta_predicate with_output_to_each(+,0).
 
@@ -580,6 +593,67 @@ to_stderror(Call):- lmcache:thread_current_error_stream(Err), with_output_to_str
 :- dynamic dmsg_log/3.
 
 
+:- dynamic(logLevel/2).
+:- module_transparent(logLevel/2).
+:- multifile(logLevel/2).
+
+
+:- dynamic logger_property/2.
+
+%= 	 	 
+
+%% logger_property( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%
+% Logger Property.
+%
+logger_property(todo,once,true).
+
+
+
+%= 	 	 
+
+%% setLogLevel( ?M, ?L) is semidet.
+%
+% Set Log Level.
+%
+setLogLevel(M,L):-retractall(logLevel(M,_)),(nonvar(L)->asserta(logLevel(M,L));true).
+
+
+%= 	 	 
+
+%% logLevel( ?S, ?Z) is semidet.
+%
+% Log Level.
+%
+logLevel(debug,ERR):-lmcache:thread_current_error_stream(ERR).
+logLevel(error,ERR):-lmcache:thread_current_error_stream(ERR).
+logLevel(private,none).
+logLevel(S,Z):-current_stream(_X,write,Z),trace,stream_property(Z,alias(S)).
+
+
+%= 	 	 
+
+%% loggerReFmt( ?L, ?LRR) is semidet.
+%
+% Logger Re Format.
+%
+loggerReFmt(L,LRR):-logLevel(L,LR),L \==LR,!,loggerReFmt(LR,LRR),!.
+loggerReFmt(L,L).
+
+
+%= 	 	 
+
+%% loggerFmtReal( ?S, ?F, ?A) is semidet.
+%
+% Logger Format Real.
+%
+loggerFmtReal(none,_F,_A):-!.
+loggerFmtReal(S,F,A):-
+  current_stream(_,write,S),
+    fmt(S,F,A),
+    flush_output_safe(S),!.
+
+
 
 :- thread_local tlbugger:is_with_dmsg/1.
 
@@ -847,14 +921,20 @@ dmsg00(V):-cyclic_term(V),!,writeln(cyclic_term),flush_output,writeln(V),!.
 dmsg00(V):- catch(logicmoo_util_dumpst:simplify_goal_printed(V,VV),_,fail),!,dmsg000(VV),!.
 dmsg00(V):- dmsg000(V),!.
 
-%= 	 	 
+%% always_show_dmsg is semidet.
+%
+% Always Show (debug)message.
+%
+always_show_dmsg:- thread_self(main).
+always_show_dmsg:- tlbugger:tl_always_show_dmsg.
+
 
 %% dmsg000( ?V) is semidet.
 %
 % (debug)message Primary Helper Primary Helper Primary Helper.
 %
 dmsg000(V):-
-   notrace(make_key(V,K)),
+   notrace(format(string(K),'~p',V)),
    (tlbugger:in_dmsg(K)-> dmsg5(V);  % format_to_error('~N% ~q~n',[dmsg0(V)]) ;
       asserta(tlbugger:in_dmsg(K),Ref),call_cleanup(dmsg1(V),erase(Ref))).
 
@@ -1024,7 +1104,16 @@ debugm(Why,Msg):- notrace(( debug(Why,'~N~p~n',[Msg]))),!.
 
 % = :- export(colormsg/2).
 
+:- dynamic(is_hiding_dmsgs).
+
 %= 	 	 
+
+%% is_hiding_dmsgs is semidet.
+%
+% If Is A Hiding (debug)messages.
+%
+is_hiding_dmsgs:- \+always_show_dmsg, current_prolog_flag(opt_debug,false),!.
+is_hiding_dmsgs:- \+always_show_dmsg, tlbugger:ifHideTrace,!.
 
 %% colormsg( ?Ctrl, ?Msg) is semidet.
 %
@@ -1041,7 +1130,7 @@ colormsg(Ctrl,Msg):- ansicall(Ctrl,fmt0(Msg)).
 %
 % Ansicall.
 %
-ansicall(Ctrl,Call):- hotrace((current_output(Out), ansicall(Out,Ctrl,Call))).
+ansicall(Ctrl,Call):- notrace((current_output(Out), ansicall(Out,Ctrl,Call))).
 
 
 %= 	 	 

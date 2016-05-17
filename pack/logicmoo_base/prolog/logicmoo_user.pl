@@ -5,7 +5,7 @@
 % Douglas Miles
 
 */
-:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_filesystem.pl')), push_modules)). 
+:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_user_file,
  [
@@ -25,15 +25,13 @@
 % restore entry state
 :- reset_modules.
 
-:- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
-:- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
-:- endif.
 
 :- use_module(library(logicmoo_utils)).
 :- use_module(library(logicmoo_base)).
 
+:- set_prolog_flag(pfc_booted,false).
 :-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
-
+:- set_prolog_flag(pfc_booted,true).
 :- forall(wsh_w:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
 
 /*

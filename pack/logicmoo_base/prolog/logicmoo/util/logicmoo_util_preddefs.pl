@@ -155,14 +155,6 @@ system:predicate_property_nt(A,B):-
 
 dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
 
-:- decl_shared(baseKB:dynamic,genlMt/2).
-:- decl_shared(baseKB:dynamic,mtCore/1).
-:- decl_shared(baseKB:dynamic,mtPrologLibrary/1).
-:- decl_shared(baseKB:dynamic,mtProlog/1).
-:- decl_shared(baseKB:dynamic,mtCycL/1).
-:- decl_shared(baseKB:dynamic,mtExact/1).
-:- decl_shared(baseKB:dynamic,mtGlobal/1).
-
 
 :- meta_predicate only_3rd(1,*,*,*).
 :- meta_predicate with_pfa(1,+).
@@ -507,8 +499,9 @@ add_mi(PredMt,P,PredMt:PI):-strip_module(P,_,PI).
 %
 % Using Pfa Group.
 %
-with_pfa_group(With,CallerMt, _, PredMt:F/A ):- must(atom(F)), !,with_pfa_group(With,CallerMt, PredMt,F/A ).
+with_pfa_group(With,CallerMt, _, _:(PredMt:F)/A ):- must(atom(F)), !,with_pfa_group(With,CallerMt, PredMt,F/A ).
 with_pfa_group(With,CallerMt, _, (PredMt:F)/A ):- must(atom(F)), !,with_pfa_group(With,CallerMt, PredMt,F/A ).
+with_pfa_group(With,CallerMt, _, PredMt:F/A ):- must(atom(F)), !,with_pfa_group(With,CallerMt, PredMt,F/A ).
 with_pfa_group(With,CallerMt, _, PredMt:PI ):- must(nonvar(PI)),!, with_pfa_group(With,CallerMt,PredMt,PI).
 with_pfa_group(With,CallerMt, PredMt, [A] ):-!,with_pfa_group(With,CallerMt,PredMt, A ).
 with_pfa_group(With,CallerMt, PredMt, [A|B] ):-!,with_pfa_group(With,CallerMt,PredMt, A ),with_pfa_group(With,CallerMt,PredMt, B ).

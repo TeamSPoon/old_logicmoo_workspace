@@ -15,7 +15,7 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_filesystem.pl')), push_modules)). 
+:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_swilib,[]).
 % restore entry state
@@ -47,6 +47,11 @@
 :- use_module(system:library(emacs_tags)).
 :- use_module(system:library(pce_require)).
 :- use_module(system:library(pce_debug)).
+
+
+:- use_module(system:library(statistics)).
+:- system:use_module(library(dialect/hprolog),[]).
+
 
 % ======================================================
 % Rest of the standard library
@@ -128,6 +133,11 @@
 :- dynamic http:location/3.
 :- multifile http:location/3.
 
+:- use_module(system:library(prolog_autoload)).
+:- use_module(system:library(prolog_clause)).
+:- use_module(system:library(occurs)).
+:- use_module(system:library(listing)).
+:- use_module(system:library(qsave)).
 :- system:use_module(library(apply)).
 :- system:use_module(library(debug)).
 :- system:use_module(library(error)).

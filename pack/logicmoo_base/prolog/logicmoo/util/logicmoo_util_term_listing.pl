@@ -450,9 +450,9 @@ searchable_terms(T):-search_refs_use_recorded,!,current_key(Key),unmake_search_k
 searchable_terms(T):-unify_in_thread(main,searchable_terms_tl(T)).
 
 % load statistics to keep ifprolog from overriding time/1.
-:- use_module(library(dialect/ifprolog),[current_global/1]).
+:- use_module(system:library(dialect/ifprolog),[current_global/1]).
 :- abolish(system:time/1).
-:- use_module(library(statistics),[time/1]).
+:- use_module(system:library(statistics),[time/1]).
 
 /*
 :- meta_predicate current_global_ifprolog(:).

@@ -101,6 +101,7 @@ Per-Litteral features
 :- include('../mpred/mpred_header.pi').
 %:- endif.
 
+:- system:use_module(library(dialect/hprolog),[]).
 :- common_logic_boxlog:use_module(library(dialect/hprolog),[]).
 
 :-

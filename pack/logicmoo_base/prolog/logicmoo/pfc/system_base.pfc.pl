@@ -33,15 +33,24 @@
 
 :- '$set_source_module'(baseKB).
 
+:- set_file_lang(pl).
 
-:- file_begin(pfc).
+:- sanity((get_lang(PL)->pl=PL)).
 
 :- set_fileAssertMt(baseKB).
-:- mpred_ops.
+
+:- dynamic(baseKB:mtCycL/1).
+:- dynamic(baseKB:mtExact/1).
+
+baseKB:mtCycL(baseKB).
+baseKB:mtExact(baseKB).
 
 % catching of misinterpreations
 
+%:- rtrace.
 :- dynamic(mpred_mark/3).
+%:- nortrace.
+%:- break.
 
 :- dynamic(ttModule/1).
 :- dynamic(marker_supported/2).
@@ -66,6 +75,16 @@
 :- dynamic(disjointWith/2).
 
 % prologHybrid(arity/2).
+
+:- ensure_abox(baseKB).
+
+:- begin_pfc.
+% :- mpred_ops.
+
+
+:- sanity((fix_mp(baseKB:arity(apathFn,2),O),O=baseKB:arity(apathFn,2))).
+
+:- sanity((fix_mp(arity(apathFn,2),O),O=baseKB:arity(apathFn,2))).
 
 arity(apathFn,2).
 arity(isKappaFn,2).

@@ -138,15 +138,15 @@ install_attvar_expander(M):-
   multifile(M:term_expansion/2),
   dynamic(M:term_expansion/2),
   asserta_if_new((
-  M:term_expansion(I,CO):- 
+   M:term_expansion(I,CO):- 
    ((current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), 
-   cnotrace((system_expanded_attvars(I,O),
+   notrace((system_expanded_attvars(I,O),
    (is_term_expanding_in_file(I)->clausify_attributes(O,CO);=(O,CO)),wdmsg(xform(I --> CO)))))))),
 
    system:multifile(system:goal_expansion/2),
    system:dynamic(system:goal_expansion/2),
    asserta_if_new((system:goal_expansion(I,O):- 
-    cnotrace((current_prolog_flag(read_attvars,true), 
+    notrace((current_prolog_flag(read_attvars,true), 
      \+ current_prolog_flag(xref,true), system_expanded_attvars(I,O))))).
 
 
@@ -185,7 +185,7 @@ verbatum_term('varname_info'(_,_,_,_)).
 %
 % System Goal Expansion Sd.
 %
-system_expanded_attvars(I,O):- (var(I);compound(I)),!,loop_check(deserialize_attvars(I,O)),O\=@=I,!.
+system_expanded_attvars(I,O):- (var(I);compound(I)),!,loop_check((deserialize_attvars(I,O))),O\=@=I,!.
 
 
 :- retract(restore_attvar_reader(Was)),set_prolog_flag(read_attvars,Was).

@@ -170,6 +170,8 @@
    map_each_clause(2,+,-),
    % common_logic_snark
    to_nonvars(2,?,?).
+:- meta_predicate '__aux_maplist/2_map_each_clause+1'(*,1).
+:- meta_predicate '__aux_maplist/3_map_each_clause+1'(*,*,2).
 
 /*
 :- was_dynamic

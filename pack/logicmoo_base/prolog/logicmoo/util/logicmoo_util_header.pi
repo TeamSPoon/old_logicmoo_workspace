@@ -2,6 +2,9 @@
 :- dynamic(lmconf:mpred_is_impl_file/2).
 :- multifile(lmconf:mpred_is_impl_file/2).
 :- system_module.
+:- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
+:- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
+:- endif.
 
 /*
 :- multifile((user:term_expansion/2,system:term_expansion/2)).
@@ -27,6 +30,8 @@
    initialization((
    lmconf:mpred_is_impl_file(F)->true;assertz(lmconf:mpred_is_impl_file(F)))))).
 */
+:- thread_local(tlbugger:ifHideTrace/0).
+:- thread_local(tlbugger:tl_always_show_dmsg).
 
 % ===================================================================
 % Creates a warning if we are in the incorrect context
@@ -67,9 +72,6 @@ add_pack_dir(UpUp):- prolog_load_context(directory,Dir),
  :- use_module(logicmoo_util_database).
  :- use_module(logicmoo_util_dumpst).
  :- use_module(logicmoo_util_rtrace).
- :- use_module(logicmoo_util_catch).
- :- use_module(logicmoo_util_with_assertions).
- :- use_module(logicmoo_util_loop_check).
  :- use_module(logicmoo_util_dmsg).
  :- use_module(logicmoo_util_bugger).
  :- use_module(logicmoo_util_ctx_frame).
