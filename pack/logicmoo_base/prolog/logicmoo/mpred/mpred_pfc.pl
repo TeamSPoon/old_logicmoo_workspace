@@ -1374,7 +1374,7 @@ mpred_unfwc(F):-
 mpred_unfwc1(F):-
   mpred_unfwc_check_triggers(F),
   % is this really the right place for mpred_run<?
-  notrace(mpred_run).
+  hotrace(mpred_run).
 
 
 mpred_unfwc_check_triggers(F):- loop_check(mpred_unfwc_check_triggers0(F),

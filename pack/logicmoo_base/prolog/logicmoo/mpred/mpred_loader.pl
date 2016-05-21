@@ -284,7 +284,8 @@ mpred_prolog_only_file(File):- var(File),!,fail.
 mpred_prolog_only_file(File):- lmconf:ignore_file_mpreds(File),!.
 mpred_prolog_only_file(File):- lmcache:mpred_directive_value(File,language,pl),!.
 mpred_prolog_only_file(File):- file_name_extension(File,_,pfc),!,fail.
-
+mpred_prolog_only_file(File):- lmcache:mpred_directive_value(File,language,pfc),!,fail.
+mpred_prolog_only_file(_).
 
 % :- use_module(library(logicmoo_utils)).
 %:- use_module(mpred_expansion).
@@ -339,39 +340,11 @@ mpred_file_term_expansion(_,_,_,_):- get_lang(pl),!,fail.
 mpred_file_term_expansion(Type,LoaderMod,I,OO):- !,
    no_loop_check(mpred_file_term_expansion0(Type,LoaderMod,I,OO)).
 
-
-
-mpred_file_term_expansion(Type,LoaderMod,I,OO):-
- ((
-  sanity((ground(Type:LoaderMod),nonvar(I),var(OO))),
-  quietly_must(get_source_ref1(mfl(_,F,L))),!,
-
-% \+ mpred_prolog_only_file(F),
-  '$current_source_module'(M),
-% \+ mpred_prolog_only_module(M),
-  '$module'(UM,M),
-  b_getval('$term',TermWas),
-  call_cleanup(((
-  
-     make_key(mpred_expander_key(F,L,M,UM,Type,LoaderMod,I),Key),  
-     ( \+ t_l:mpred_already_in_file_expansion(Key) ),
-      w_tl(t_l:mpred_already_in_file_expansion(Key),
-      w_tl(t_l:current_why_source(mfl(M,F,L)),
-        ((  
-           get_original_term_source(Orig), 
-           b_setval('$orig_term',Orig),
-           b_setval('$term',[]),
-           quietly_must(mpred_expand_file_module_clause(F,M,I,O)))))))),
-    (b_setval('$term',TermWas))),
-  !,
-  must(I\=@=O),O=OO,
-  wdmsg(I-->OO))).
-
-
 % Ensure rule macro predicates are being used checked just before assert/query time
 mpred_file_term_expansion0(Type,LoaderMod,I,O):- 
   sanity((ground(Type:LoaderMod),nonvar(I),var(O))),
   quietly_must(get_source_ref1(mfl(_,F,L))),!,
+  \+ mpred_prolog_only_file(F),
   b_getval('$term',TermWas), TermWas == I,
   call_cleanup(
         w_tl(t_l:current_why_source(mfl(LoaderMod,F,L)),
@@ -1668,6 +1641,7 @@ make_dynamic_ilc(C):- compound(C),strip_module(C,MIn,_),get_functor(C,F,A),quiet
 %:- system:use_module(library(operators)).
 
 :- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
+
 % filetypes 
 %
 %  pfc - all terms are sent to ain/1 (the the execeptions previously defined)

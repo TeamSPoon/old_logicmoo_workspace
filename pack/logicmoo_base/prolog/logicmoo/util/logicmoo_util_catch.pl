@@ -266,7 +266,7 @@
 %
 % Catchvvnt.
 %
-catchvvnt(T,E,F):-catchv(notrace(T),E,F).
+catchvvnt(T,E,F):-catchv(hotrace(T),E,F).
 
 :- thread_self(Goal),assert(lmcache:thread_main(user,Goal)).
 
@@ -347,7 +347,7 @@ format_to_error(F,A):-lmcache:current_main_error_stream(Err),!,format(Err,F,A).
 %
 % Fresh Line Converted To Err.
 %
-fresh_line_to_err:- notrace((flush_output_safe,lmcache:current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
+fresh_line_to_err:- hotrace((flush_output_safe,lmcache:current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
 
 :- dynamic(lmcache:thread_current_input/2).
 :- dynamic(lmcache:thread_current_error_stream/2).
@@ -676,10 +676,10 @@ source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property
 % Source Variables (list Version).
 %
 source_variables_l(AllS):-
- notrace((
+ hotrace((
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
   (get_varname_list(Vs2);Vs2=[]),
-  notrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
+  hotrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
   ignore(Vs3=[]),
   append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,list_to_set(All,AllS),
   set_varname_list( AllS))).
@@ -690,7 +690,7 @@ source_variables_l(AllS):-
 
 
 :-export( show_source_location/0).
-%show_source_location:- notrace((tlbugger:no_slow_io)),!.
+%show_source_location:- hotrace((tlbugger:no_slow_io)),!.
 %show_source_location:- is_hiding_dmsgs,!.
 
 %= 	 	 
@@ -1195,7 +1195,7 @@ for obvious reasons.
 %
 %  Trace or throw.
 %
-trace_or_throw(E):- non_user_console,notrace((thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),!,throw(abort),
+trace_or_throw(E):- non_user_console,hotrace((thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),!,throw(abort),
                     thread_exit(trace_or_throw(E)))).
 trace_or_throw(E):- wdmsg(E),dtrace((trace,throw(E))).
 
@@ -1413,7 +1413,7 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; must(Goal)),!.
 hide_trace(G):- is_release,!,call(G).
 hide_trace(G):- 
  restore_trace((
-   notrace(
+   hotrace(
       ignore((tracing,
       visible(-all),
       visible(-unify),
@@ -1449,7 +1449,7 @@ is_recompile:-fail.
 %
 % Optional Sanity Checking.
 %
-sanity(P):- notrace((\+ is_recompile,is_release,!,nop(P))).
+sanity(P):- hotrace((\+ is_recompile,is_release,!,nop(P))).
 sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(sanity,Goal)).
 sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
 sanity(Goal):- quietly(Goal)*->true;
@@ -1539,8 +1539,8 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
-must(Goal):-  notrace(is_release),!,call(Goal).
-must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),MGoal.
+must(Goal):-  hotrace(is_release),!,call(Goal).
+must(Goal):-  hotrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),MGoal.
 
 
 %= 	 	 
@@ -1549,19 +1549,19 @@ must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),MGoal.
 %
 % Get Must Be Successfull.
 %
-get_must(notrace(Goal),CGoal):-  fail, !,get_must(Goal,CGoal).
-get_must(M:notrace(Goal),CGoal):- !,get_must(M:Goal,CGoal).
-% get_must(notrace(Goal),CGoal):- !,get_must((notrace(Goal)*->true;Goal),CGoal).
+get_must(hotrace(Goal),CGoal):-  fail, !,get_must(Goal,CGoal).
+get_must(M:hotrace(Goal),CGoal):- !,get_must(M:Goal,CGoal).
+% get_must(hotrace(Goal),CGoal):- !,get_must((hotrace(Goal)*->true;Goal),CGoal).
 % get_must(Goal,CGoal):-  (is_release;tlbugger:skipMust),!,CGoal = Goal.
 get_must(Goal,CGoal):- fail, skipWrapper,!, CGoal = (Goal *-> true ;
    ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
 get_must(Goal,CGoal):-  fail, tlbugger:show_must_go_on,!,
  CGoal = ((catchv(Goal,E,
-     notrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
-            *-> true ; notrace((dumpST,wdmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
+     hotrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
+            *-> true ; hotrace((dumpST,wdmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
 
 %get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
-%get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
+%get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(hotrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
 get_must(Goal,CGoal):-    
    (CGoal = (catchv(Goal,E,
      (dumpST,ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),

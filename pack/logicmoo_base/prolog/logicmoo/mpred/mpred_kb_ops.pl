@@ -715,7 +715,7 @@ attvar_op(Op,Data):-
 */
 :- module_transparent(attvar_op/2).
 attvar_op(Op,Data):-
-   notrace((strip_module(Op,M,OpA), sanity((atom(OpA))),
+   cnotrace((strip_module(Op,M,OpA), sanity((atom(OpA))),
    defaultAssertMt(ABOX),
    add_side_effect(OpA,M:Data),
    deserialize_attvars(Data,Data0))),

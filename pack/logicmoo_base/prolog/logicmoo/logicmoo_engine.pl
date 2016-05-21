@@ -83,7 +83,7 @@ kif_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
 pttp_pred_head(P):- var(P),isa(F,prologPTTP),arity(F,A),functor(P,F,A).
 pttp_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
 
-:- shared_multifile(kify_comment/1).
+% :- shared_multifile(kify_comment/1).
 
 
 pttp_listens_to_head(_OP,P):- pttp_pred_head(P).

@@ -43,7 +43,7 @@
 %
 % Stack Depth.
 %
-stack_depth(Level):-notrace((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,Level))).
+stack_depth(Level):-hotrace((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,Level))).
 
 
 :-  module_transparent stack_check/0.
@@ -108,7 +108,7 @@ relative_frame(Attrib,Term,Nth):- find_parent_frame_attribute(Attrib,Term,Nth,_R
 %
 % Parent Goal.
 %
-parent_goal(Goal):-  notrace((prolog_current_frame(Frame),prolog_frame_attribute(Frame,parent,PFrame),prolog_frame_attribute(PFrame,parent_goal,Goal))).
+parent_goal(Goal):-  hotrace((prolog_current_frame(Frame),prolog_frame_attribute(Frame,parent,PFrame),prolog_frame_attribute(PFrame,parent_goal,Goal))).
 
 %= 	 	 
 
@@ -137,7 +137,7 @@ nth_parent_goal(Frame,Goal,_):- cnotrace((prolog_frame_attribute(Frame,goal,Goal
 %
 % Find Parent Frame Attribute.
 %
-find_parent_frame_attribute(Attrib,Term,Nth,RealNth,FrameNum):-notrace((ignore(Attrib=goal),prolog_current_frame(Frame),
+find_parent_frame_attribute(Attrib,Term,Nth,RealNth,FrameNum):-hotrace((ignore(Attrib=goal),prolog_current_frame(Frame),
                                                 current_frames(Frame,Attrib,5,NextList))),!,nth1(Nth,NextList,RealNth-FrameNum-Term).
 
 

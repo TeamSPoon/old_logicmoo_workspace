@@ -163,7 +163,7 @@ positional_seg(term_position(G2787,_,G2787,_,[_-_])).
 nb_current_or_nil(N,V):-nb_current(N,V)->true;V=[].
 
 system_goal_expansion(Mod,I,P,O,P2):- 
-  notrace((nb_current_or_nil('$term',Was),
+  hotrace((nb_current_or_nil('$term',Was),
   get_named_value_goal(is_fbe(term,I,P),L1),
   get_named_value_goal(Was=@=I,L2),
   get_named_value_goal(sub_positional(P),L3),

@@ -334,7 +334,7 @@ xtreme_debug(_).
 
 
 :- meta_predicate sanity(0).
-sanity(P):- notrace((\+ is_recompile,is_release,!,nop(P))).
+sanity(P):- hotrace((\+ is_recompile,is_release,!,nop(P))).
 sanity(P):- on_x_rtrace(no_trace(P)),!.
 sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!,ignore(ftrace(P)).
 :- meta_predicate(when_debugging(+,0)).
