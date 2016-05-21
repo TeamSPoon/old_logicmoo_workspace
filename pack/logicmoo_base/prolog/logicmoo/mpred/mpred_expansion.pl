@@ -79,6 +79,7 @@
             db_quf_l/5,
             db_quf_l_0/5,
             default_te/3,
+            demodulize/3,
             remodulize/3,
             replaced_module/3,
             do_expand_args/3,
@@ -348,6 +349,7 @@ functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,ftFunctional).
 functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,O)->O=tFunction.
 
 functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttExpressionType),P).
+functor_declares_instance_0(P,ttModule):- arg(_,s(tCol,tModule),P).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
@@ -378,12 +380,26 @@ instTypePropsToType(instTypeProps,ttSpatialType).
 %
 % Reduce Clause.
 %
-reduce_clause(Op,C,HB):-must(nonvar(C)),must_remodulize(Op,C,CB),CB\=@=C,!,reduce_clause(Op,CB,HB).
+reduce_clause(Op,C,HB):-must(nonvar(C)),quietly_must(demodulize(Op,C,CB)),CB\=@=C,!,reduce_clause(Op,CB,HB).
 reduce_clause(Op,clause(C, B),HB):-!,reduce_clause(Op,(C :- B),HB).
 reduce_clause(Op,(C:- B),HB):- is_true(B),!,reduce_clause(Op,C,HB).
 reduce_clause(_,C,C).
 
 
+%% demodulize( ?Op, ?H, ?HH) is semidet.
+%
+% Demodulize.
+%
+
+
+demodulize(_Op,H,HH):- as_is_term(H),!,HH=H.
+demodulize(Op,H,HHH):-once(strip_module(H,M,HH)),H\==HH,old_is_stripped_module(M),!,demodulize(Op,HH,HHH).
+demodulize(Op,H,HH):-is_list(H),!,must_maplist(demodulize(Op),H,HH),!.
+demodulize(Op,H,HH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(demodulize(Op),HL,HHL),HH=..[F|HHL],!.
+demodulize(_ ,HB,HB).
+
+old_is_stripped_module(user).
+old_is_stripped_module(baseKB).
 %= 	 	 
 
 %% to_reduced_hb( ?Op, ?HB, ?HH, ?BB) is semidet.
@@ -496,7 +512,7 @@ fully_expand(X,Y):- must((fully_expand(clause(unknown,cuz),X,Y))).
 
 fully_expand(Op,Sent,SentO):-
   must(once((/*hotrace*/((cyclic_break((Sent)),
-     must(hotrace((deserialize_attvars(Sent,SentI)))),
+     must(/*hotrace*/((deserialize_attvars(Sent,SentI)))),
      w_tl_e(t_l:no_kif_var_coroutines(true),(((fully_expand_now(Op,SentI,SentO))))),
      cyclic_break((SentO))))))).
 
@@ -521,7 +537,7 @@ fully_expand_now(Op,Sent,SentO):-
 %  Is a stripped Module (Meaning it will be found via inheritance)
 %
 is_stripped_module(A):-var(A),!,fail.
-is_stripped_module(Mt):-mtExact(Mt),!,fail.
+is_stripped_module(Mt):- call_u(mtExact(Mt)),!,fail.
 %is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
 %is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
 is_stripped_module(abox).
@@ -535,8 +551,8 @@ is_stripped_module(baseKB).
 %
 % Expand isEach/Ns.
 
-expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),must_remodulize(clause(_,_),
-   Sent,SentM),Sent\=@=SentM,!,bagof(O,do_expand_args(isEach,SentM,O),SentO),!.
+expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),quietly_must(demodulize(clause(_,_),
+   Sent,SentM)),Sent\=@=SentM,!,bagof(O,do_expand_args(isEach,SentM,O),SentO),!.
 expand_isEach_or_fail(Sent,SentO):-
     bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L.
 
@@ -575,13 +591,12 @@ fully_expand_clause(Op,M:Sent,SentO):- is_stripped_module(M),!,fully_expand_clau
 
 fully_expand_clause(Op,(B/H),Out):- !,fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB),!,must(Out=(BB/HH)).
 fully_expand_clause(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
-fully_expand_clause(Op, HB,HHBBO):- 
+fully_expand_clause(Op, HB,HHBB):- 
   to_reduced_hb(Op,HB,H,B)-> 
   \+ is_true(B) ->
   must((fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB))) ->
   reduce_clause(Op,(HH:-BB),HHBB) ->
-  HB \=@= HHBB ->
-  fully_expand_clause(Op,HHBB,HHBBO),!.
+  HB \=@= HHBB,!.
 fully_expand_clause(Op,Sent,SentO):- must(fully_expand_head(Op,Sent,SentO)).
 
 
@@ -854,10 +869,11 @@ fully_expand_head(A,B,C):-
    must(
     loop_check_term(
         transitive_lc(try_expand_head_dif(A),B3,C),
-        fully_expand_head(A,B,C),
-        B3=C)),!.
+        fully_expand_head(A,B,C), 
+        (wdmsg(loop_try_expand_head_dif(A)),B3=C))),!.
 
-try_expand_head_dif(A,B,C):-try_expand_head(A,B,C),!, B\=@=C.
+try_expand_head_dif(A,B,C):-try_expand_head(A,B,C), B\=@=C,!.
+try_expand_head_dif(_,B,B).
 
 %db_expand_0(Op,Sent,SentO):- is_meta_functor(Sent,F,List),F\=t,!,must_maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
 %db_expand_0(_ ,NC,OUT):-mpred_expand(NC,OUT),NC\=@=OUT,!.
@@ -1074,42 +1090,47 @@ replaced_module(_,abox,ABox):-defaultAssertMt(ABox).
 replaced_module(_,tbox,TBox):-get_current_default_tbox(TBox).
 
 
+maybe_prepend_mt(MT,I,O):- t_l:current_defaultAssertMt(ABOX)->ABOX==MT,!,maybe_prepend_mt(abox,I,O).
+maybe_prepend_mt(abox,H,HH):-nonvar(HH),trace,maybe_prepend_mt(abox,H,HHH),must(HHH=HH),!.
+maybe_prepend_mt(abox,H,HH):-var(H),must(HH=H),!.
+maybe_prepend_mt(_,H,HH):-predicateSystemCode(H,HH),!.
 maybe_prepend_mt(abox,_:HH,HH):-!.
 maybe_prepend_mt(abox,HH,HH):-!.
 maybe_prepend_mt(Mt,Mt:HH,Mt:HH):-!.
 maybe_prepend_mt(_,Mt:HH,Mt:HH):-!.
 maybe_prepend_mt(Mt,HH,Mt:HH):-!.
 
+predicateSystemCode(P,PP):-strip_module(P,_,PP),predicate_property(system:PP,defined),\+ predicate_property(system:PP,imported_from(baseKB)).
 
-%% remodulize( ?Op, ?H, ?HH) is det.
+%% remodulize( ?Why, ?H, ?HH) is det.
 %
 % Re-Modulize.
 %
 remodulize(_, H,H):- is_ftVar(H),!.
 remodulize(_, H,H):- \+ compound(H),!. % this disables the two next rules
-remodulize(_, H,HH):- atom(H),convention_to_symbolic_mt(H,0,M),maybe_prepend_mt(M,H,HH).
-remodulize(call(Op),M,R):-atom(M),replaced_module(Op,M,R),!.
-remodulize(Op,M:H,M:HHH):-is_ftVar(M),!,must_remodulize(mvar(Op),H,HHH).
-remodulize(Op,H,HH):-is_list(H),!,must_maplist(remodulize(Op),H,HH),!.
-remodulize(Op,':-'(G),':-'(GG)):-!,must_remodulize(call(Op),G,GG).
-remodulize(Op,(H:-G),(HH:-GG)):-!,must_remodulize(clause(Op,(':-')),H,HH),must_remodulize(call(Op),G,GG).
-remodulize(Op,(H,G),(HH,GG)):-!,must_remodulize(call(Op),H,HH),must_remodulize(call(Op),G,GG).
-remodulize(Op,(H;G),(HH;GG)):-!,must_remodulize(call(Op),H,HH),must_remodulize(call(Op),G,GG).
+remodulize(Why, H,HH):- atom(H),convention_to_symbolic_mt(Why,H,0,M),maybe_prepend_mt(M,H,HH).
+remodulize(call(Why),M,R):-atom(M),replaced_module(Why,M,R),!.
+remodulize(Why,M:H,M:HHH):-is_ftVar(M),!,must_remodulize(mvar(Why),H,HHH).
+remodulize(Why,H,HH):-is_list(H),!,must_maplist(remodulize(Why),H,HH),!.
+remodulize(Why,':-'(G),':-'(GG)):-!,must_remodulize(call(Why),G,GG).
+remodulize(Why,(H:-G),(HH:-GG)):-!,must_remodulize(clause(Why,(':-')),H,HH),must_remodulize(call(Why),G,GG).
+remodulize(Why,(H,G),(HH,GG)):-!,must_remodulize(call(Why),H,HH),must_remodulize(call(Why),G,GG).
+remodulize(Why,(H;G),(HH;GG)):-!,must_remodulize(call(Why),H,HH),must_remodulize(call(Why),G,GG).
 
-remodulize(Op,M:H,R:HHH):- replaced_module(Op,M,R),!,must_remodulize(Op,H,HHH).
-remodulize(Op,M:H,HHH):- is_stripped_module(M),!,must_remodulize(Op,H,HHH).
+remodulize(Why,M:H,R:HHH):- replaced_module(Why,M,R),!,must_remodulize(Why,H,HHH).
+remodulize(Why,M:H,HHH):- is_stripped_module(M),!,must_remodulize(Why,H,HHH).
 
-remodulize(Op,Mt:H,HHHH):- is_ftCompound(H),H=..[F|HL],!,must_maplist(remodulize(Op),HL,HHL),HH=..[F|HHL],!,
-  must((remodulize_pass2(HH,HHH),maybe_prepend_mt(Mt,HHH,HHHH))).
+remodulize(Why,Mt:H,HHHH):- is_ftCompound(H),H=..[F|HL],!,must_maplist(remodulize(Why),HL,HHL),HH=..[F|HHL],!,
+  must((remodulize_pass2(Why,HH,HHH),maybe_prepend_mt(Mt,HHH,HHHH))).
 
-remodulize(Op,H,HHH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodulize(Op),HL,HHL),HH=..[F|HHL],!,
-  must(remodulize_pass2(HH,HHH)).
+remodulize(Why,H,HHH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(remodulize(Why),HL,HHL),HH=..[F|HHL],!,
+  must(remodulize_pass2(Why,HH,HHH)).
 
-remodulize_pass2(MHH,HHH):- strip_module(MHH,_,HH),functor(HH,F,A),convention_to_symbolic_mt(F,A,Mt),maybe_prepend_mt(Mt,HH,HHH).
-% remodulize_pass2(HH,HHH):- fix_mp(HH,HHH),!. % this is overzealous
-remodulize_pass2(HH,HH):- !.
+remodulize_pass2(Why,MHH,HHH):- strip_module(MHH,_,HH),functor(HH,F,A),convention_to_symbolic_mt(Why,F,A,Mt),maybe_prepend_mt(Mt,HH,HHH).
+% remodulize_pass2(Why,HH,HHH):- fix_mp(Why,HH,HHH),!. % this is overzealous
+remodulize_pass2(_Why,HH,HH):- !.
 
-must_remodulize(Op,H,HHH):-must(remodulize(Op,H,HHH)),!.
+must_remodulize(Why,H,HHH):-must(demodulize(Why,H,HHH)),!.
 %= 	 	 
 
 %% is_meta_functor( ^ Sent, ?F, ?List) is semidet.
@@ -1413,8 +1434,15 @@ into_mpred_form(WAS,isa(I,C)):-was_isa_syntax(WAS,I,C),!.
 into_mpred_form(t(P,A),O):-atom(P),!,O=..[P,A].
 into_mpred_form(t(P,A,B),O):-atom(P),!,O=..[P,A,B].
 into_mpred_form(t(P,A,B,C),O):-atom(P),!,O=..[P,A,B,C].
+into_mpred_form(IN,OUT):- 
+   IN=..[F|Args],
+   must_maplist(into_mpred_form,Args,ArgsO),
+   map_f(F,FO),OUT=..[FO|ArgsO].
+
 into_mpred_form(Var,MPRED):- is_ftVar(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
-into_mpred_form(I,O):- hotrace(loop_check(into_mpred_form_ilc(I,O),O=I)). % trace_or_throw(into_mpred_form(I,O).
+
+
+into_mpred_form(I,O):- /*hotrace*/(loop_check(into_mpred_form_ilc(I,O),O=I)). % trace_or_throw(into_mpred_form(I,O).
 
 %:- mpred_trace_nochilds(into_mpred_form/2).
 

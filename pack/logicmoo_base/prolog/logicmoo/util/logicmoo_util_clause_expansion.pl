@@ -283,7 +283,7 @@ maybe_add_import_module(A,B):-maybe_add_import_module(A,B,start).
 %TODO
 maybe_add_import_module(_From,_To,_):- !.
 
-maybe_add_import_module(A,baseKB,C):-!,maybe_add_import_module(baseKB,A,C).
+maybe_add_import_module(From,To,_):- (call(ereq,mtCycL(From)); call(ereq,mtCycL(To))),!.
 maybe_add_import_module(From,To,_):- default_module(From,To),!.
 maybe_add_import_module(user,_,start):-!.
 maybe_add_import_module(From,To,Start):-  
@@ -329,8 +329,12 @@ add_genlMt(_,file(_)):-!.
 add_genlMt(_,uses(_)):-!.
 add_genlMt(From,Prop):-write('% '), writeln(add_genlMt(From,Prop)),fail.
 
+/*
 add_genlMt(From,imports(To)):-
    catch(add_import_module(From,To,start),E,writeln(E=add_import_module(From,To))).
+*/
+
+add_genlMt(_,_).
 
 
 :- meta_predicate
@@ -383,7 +387,7 @@ glean_prolog_impl_file((:- module(Want,_PubList)),File,SM,TypeIn):-!,
     add_genlMt(TypeIn, uses(SM)),
     add_genlMt(lmcode, uses(SM)),
     % add_genlMt(baseKB, imports(SM)),
-    add_genlMt(baseKB, imports(lmcode)),
+    % add_genlMt(baseKB, imports(lmcode)),
     % add_genlMt(SM,imports(lmcode)),    
     add_genlMt(lmcode, uses(Want)),
     add_genlMt(SM, uses(Want)),
@@ -444,11 +448,11 @@ without_lm_expanders(Goal):-
   setup_call_cleanup_each(set_prolog_flag(lm_expanders,false),Goal,set_prolog_flag(lm_expanders,true)).
 
 
-:- all_source_file_predicates_are_transparent.
-
 :- module_transparent(user:term_expansion/1).
 % system:term_expansion(I,P,O,P2):- fail, get_named_value_goal(is_fbe(term,I,P)),dmsg(te4(I,P,O,P2)),fail.
-system:goal_expansion(I,P,O,P2):- current_prolog_flag(lm_expanders,true),prolog_load_context(module,Mod),
+system:goal_expansion(I,P,O,P2):- 
+  current_prolog_flag(lm_expanders,true),
+   prolog_load_context(module,Mod),
    without_lm_expanders((system_goal_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
 
 system:term_expansion(EOF,POS,O,POS2):- 
@@ -463,6 +467,10 @@ system:term_expansion(EOF,POS,O,POS2):-
     '$current_typein_module'(TM),
      glean_prolog_impl_file(EOF,S,M,TM))),fail.
 
-system:term_expansion(I,P,O,P2):- current_prolog_flag(lm_expanders,true), prolog_load_context(module,Mod), 
+system:term_expansion(I,P,O,P2):- current_prolog_flag(lm_expanders,true), 
+  prolog_load_context(module,Mod), 
    without_lm_expanders((system_term_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
+
+
+:- all_source_file_predicates_are_transparent.
 

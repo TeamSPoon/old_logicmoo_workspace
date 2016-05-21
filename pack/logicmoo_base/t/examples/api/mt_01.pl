@@ -18,6 +18,8 @@
 
 :- set_defaultAssertMt(myMt).
 
+:- rtrace,trace.
+
 socialMt:loves(sally,joe).
 
 :- set_defaultAssertMt(myMt).

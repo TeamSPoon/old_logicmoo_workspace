@@ -277,8 +277,8 @@ isa_pred_l(Pred,[X|L],List,[X|O]):-isa_pred_l(Pred,L,List,O).
 % min  (isa/2).
 %
 min_isa(HintA,HintA,HintA):- !.
-min_isa(HintA,HintB,HintA):- genls(HintA,HintB),!.
-min_isa(HintB,HintA,HintA):- genls(HintA,HintB),!.
+min_isa(HintA,HintB,HintA):- call_u(genls(HintA,HintB)),!.
+min_isa(HintB,HintA,HintA):- call_u(genls(HintA,HintB)),!.
 min_isa((A,B),HintC,HintO):- min_isa(A,HintC,HintA),min_isa(B,HintC,HintB),conjoin(HintA,HintB,HintO).
 min_isa(HintA,HintB,HintO):- conjoin(HintA,HintB,HintO).
 
@@ -303,8 +303,11 @@ max_isa(HintA,HintB,HintO):- conjoin(HintA,HintB,HintO).
 %
 % Add Iza.
 %
-add_iza(Var,HintA):- var(Var),(get_attr(Var,argisa,HintB)->min_isa(HintA,HintB,Hint);Hint=HintA), put_attr(Var,argisa,Hint).
-add_iza(Var,Hint):- ignore(show_failure(why,isa(Var,Hint))).
+add_iza(Var,HintA):- var(Var),
+  (get_attr(Var,argisa,HintB)
+    ->min_isa(HintA,HintB,Hint);Hint=HintA), 
+     put_attr(Var,argisa,Hint).
+add_iza(Var,Hint):- ignore(show_failure(why,call_u(isa(Var,Hint)))).
 
 :- style_check(-singleton).
 
@@ -367,9 +370,9 @@ attempt_attribute_args(AndOr,Hint,F,N,[A|ARGS]):-attempt_attribute_one_arg(Hint,
 %
 % Attempt Attribute One Argument.
 %
-attempt_attribute_one_arg(Hint,F,N,A):-argIsa(F,N,Type),Type\=ftTerm,not(compound(Type)),!,attempt_attribute_args(AndOr,Type,A).
-attempt_attribute_one_arg(Hint,F,N,A):-argQuotedIsa(F,N,Type),Type\=ftTerm,not(compound(Type)),!,attempt_attribute_args(AndOr,Type,A).
-attempt_attribute_one_arg(Hint,F,N,A):-argIsa(F,N,Type),Type\=ftTerm,!,attempt_attribute_args(AndOr,Type,A).
+attempt_attribute_one_arg(Hint,F,N,A):-call_u(argIsa(F,N,Type)),Type\=ftTerm,not(compound(Type)),!,attempt_attribute_args(AndOr,Type,A).
+attempt_attribute_one_arg(Hint,F,N,A):-call_u(argQuotedIsa(F,N,Type)),Type\=ftTerm,not(compound(Type)),!,attempt_attribute_args(AndOr,Type,A).
+attempt_attribute_one_arg(Hint,F,N,A):-call_u(argIsa(F,N,Type)),Type\=ftTerm,!,attempt_attribute_args(AndOr,Type,A).
 attempt_attribute_one_arg(Hint,F,N,A):-attempt_attribute_args(AndOr,argi(F,N),A).
 
 
@@ -395,8 +398,6 @@ mdif(A,B):-A\==B.
 same(X,Y):- samef(X,Y),!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
-
-
 
 
 
@@ -597,11 +598,36 @@ isac(X, Domain) :-
 %
 % Type Size.
 %
-type_size(C,S):-a(completeExtentEnumerable,C),!,setof(E,isa(E,C),L),length(L,S).
-type_size(C,1000000):-isa(C,ttExpressionType),!.
+type_size(C,S):-a(completeExtentEnumerable,C),!,setof(E,t(C,E),L),length(L,S).
+type_size(C,1000000):-a(ttExpressionType,C),!.
 type_size(_,1000).
 
+/*
 
+?-  Z #=:= 2 + X, Z #< 2 .
+
+succ(succ(0)).
+
+S2I
+I2E
+
+2
+2
+2
+E2S
+
+S = succ/1.
+I = integer
+E = 2
+
+a:p(1).
+
+a:p(X):-b:p(X).
+b:p(X):-c:p(X).
+
+b:p(2).
+
+*/ 
 
 
 %% comp_type( ?Comp, ?Col1, ?Col2) is semidet.
@@ -651,7 +677,7 @@ isac_chk(E,Cs):-once(isac_gen(E,Cs)).
 % Isac Gen.
 %
 isac_gen(_, []).
-isac_gen(Y, [H|List]):-isa(Y,H),!,isac_gen(Y, List).
+isac_gen(Y, [H|List]):-call_u(isa(Y,H)),!,isac_gen(Y, List).
 
 
 

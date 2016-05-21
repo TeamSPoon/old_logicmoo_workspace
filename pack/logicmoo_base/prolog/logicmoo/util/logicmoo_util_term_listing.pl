@@ -17,6 +17,7 @@
           use_listing_vars/1,
           use_xlisting/0,
           use_xlisting/1,
+          pi_to_head_l/2,
             bad_pred/1,
             blob_info/3,
             bookeepingPredicateXRef/1,
@@ -1361,7 +1362,7 @@ pp_listing(Pred):- functor_safe(Pred,F,A),functor_safe(FA,F,A),findall(NV,predic
 
 %= 	 	 
 
-%% pi_to_head_l( ?Head, ?Head) is semidet.
+%% pi_to_head_l( ?Head, ?HeadPI) is semidet.
 %
 % Predicate Indicator Converted To Head (list Version).
 %

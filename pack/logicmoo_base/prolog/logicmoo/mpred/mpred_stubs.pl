@@ -377,7 +377,7 @@ ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicat
 %
 is_tCol(V):-is_ftVar(V),!,fail.
 is_tCol(tCol).
-is_tCol(F):- local_q_mpred_isa(F,tCol);t(tCol,F);t(F,_).
+is_tCol(F):- local_q_mpred_isa(F,tCol);a(tCol,F);a(F,_).
 
 
 local_q_mpred_isa(F,C):- call_u(isa(F,C)).
@@ -832,7 +832,7 @@ mpred_t_call_op(_,FACT):- get_functor(FACT, F,A), !,
 % Call For Literal.
 %
 call_for_literal(_,_,HEAD):- call_u(baseKB:use_kif(HEAD,true)),!,kif_ask(HEAD).
-call_for_literal(_,_,HEAD):- use_ideep_swi,!,  call_for_literal_ideep_ilc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
+call_for_literal(_,_,HEAD):- call_u(use_ideep_swi),!, call_for_literal_ideep_ilc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
 call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
 
 
@@ -884,7 +884,7 @@ call_for_literal_db0(F,A,HEAD):-no_repeats(HEAD,call_for_literal_db2(F,A,HEAD)).
 % Call For Literal Database Extended Helper.
 %
 call_for_literal_db2(_,_,HEAD):- clause_u(HEAD).
-call_for_literal_db2(F,_,   _):- (isa(F,completelyAssertedCollection);t(completeExtentAsserted,F)),!,fail.
+call_for_literal_db2(F,_,   _):- (a(completelyAssertedCollection,F);a(completeExtentAsserted,F)),!,fail.
 call_for_literal_db2(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
 call_for_literal_db2(F,A,HEAD):- \+ call_u(baseKB:use_kif(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(clause_u(genlPreds(P2,P1)),gp(P1),fail),
    call(t,P2,A1,A2).
@@ -907,9 +907,9 @@ out_of_mpred_t(HEAD):-clause_safe(HEAD,true)*->true;show_success(why,call_u(fact
 %
 % Call Rule Database.
 %
-call_rule_db(F,A,HEAD):- isa(F,completelyAssertedCollection),!,fail.
-call_rule_db(F,A,HEAD):- call_u(baseKB:use_kif(HEAD,_)),!,kif_ask(HEAD).
-call_rule_db(F,A,HEAD):- ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
+call_rule_db(F,_A,_HEAD):- a(completelyAssertedCollection,F),!,fail.
+call_rule_db(_F,_A,HEAD):- call_u(use_kif(HEAD,_)),!,kif_ask(HEAD).
+call_rule_db(_F,_A,HEAD):- ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 
 :- style_check(+singleton).
 :- style_check(-singleton).
@@ -943,8 +943,8 @@ call_mpred_body_ilc(_HEAD,BODY):- on_x_rtrace(BODY).
 %
 % Must Be Successfull  (isa/2).
 %
-mustIsa(I,C):-nonvar(I),!,isa(I,C),!.
-mustIsa(I,C):-when(nonvar(I),isa(I,C)).
+mustIsa(I,C):-nonvar(I),!,call_u(isa(I,C)),!.
+mustIsa(I,C):-when(nonvar(I),call_u(isa(I,C))).
 
 
 %= 	 	 

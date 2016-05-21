@@ -89,7 +89,7 @@ clause_b(G):- clause(baseKB:G,Body),call(Body).
 
 :- use_module(mpred_pfc).
 
-add_abox_module(baseKB):-!.
+% add_abox_module(baseKB):-!.
 add_abox_module(ABox):- must(atom(ABox)),
   must(mtCanAssert(ABox)),
   ain(baseKB:mtCycL(ABox)).
@@ -255,10 +255,10 @@ fileAssertMt(ABox):-
   (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);'$current_typein_module'(ABox)),mtCanAssert(ABox)))),!.
 fileAssertMt(ABox):- 
-   which_file(File)->current_module(ABox),module_property(ABox,file(File)),File\==ABox,!,
+   which_file(File)->current_module(ABox),module_property(ABox,file(File)),File\==ABox,
    mtCanAssert(ABox).
 fileAssertMt(ABox):-
-  which_file(File)->make_module_name_local(File,ABox),current_module(ABox),File\==ABox,!,
+  which_file(File)->make_module_name_local(File,ABox),current_module(ABox),File\==ABox,
    mtCanAssert(ABox).
 fileAssertMt(baseKB).
 
@@ -269,6 +269,7 @@ mtCanAssert(ABox):- clause_b(mtProlog(ABox)),!,fail.
 mtCanAssert(_).
 
 :- decl_shared(baseKB:dynamic,genlMt/2).
+
 :- decl_shared(baseKB:dynamic,mtCore/1).
 :- decl_shared(baseKB:dynamic,mtPrologLibrary/1).
 :- decl_shared(baseKB:dynamic,mtProlog/1).
@@ -295,16 +296,16 @@ get_current_default_tbox(baseKB).
 %
 % Sets Current Module.
 %
-set_defaultAssertMt(ABox):- must(mtCanAssert(ABox)),fail.
+set_defaultAssertMt(ABox):- sanity(mtCanAssert(ABox)),fail.
 %set_defaultAssertMt(M):- clause_b(mtProlog(M)),!,setup_module_ops(M).
-set_defaultAssertMt(ABox):- defaultAssertMt(QABox)->QABox==ABox,!.
+%set_defaultAssertMt(ABox):- defaultAssertMt(QABox)->QABox==ABox,!.
 set_defaultAssertMt(ABox):- 
   must_det_l((
     sanity(mtCanAssert(ABox)),
     get_current_default_tbox(TBox),
     ain(baseKB:mtCycL(ABox)),
     asserta_if_new(ABox:defaultTBoxMt(TBox)),
-    (TBox==ABox->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
+    (t_l:current_defaultAssertMt(ABox)->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
     '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
     setup_module_ops(ABox), 
     inherit_into_module(ABox,TBox))).
@@ -388,7 +389,7 @@ is_undefaulted(user).
 % Ensure Imports.
 %
 ensure_imports(baseKB):-!.
-ensure_imports(M):-ensure_imports_tbox(M,baseKB).
+ensure_imports(M):- ain(genlMt(M,baseKB)).
 
 :-multifile(lmcache:is_ensured_imports_tbox/2).
 :-dynamic(lmcache:is_ensured_imports_tbox/2).

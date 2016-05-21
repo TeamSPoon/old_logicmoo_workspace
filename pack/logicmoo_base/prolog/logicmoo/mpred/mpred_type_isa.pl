@@ -191,7 +191,7 @@ is_never_type(V):-never_type_why(V,_),!.
 % A.
 %
 :- meta_predicate a(+,?).
-a(C,I):- atom(C),G=..[C,I], no_repeats_old(clause_true(G)). % ;clause_true(isa(I,C))).
+a(C,I):- quietly((atom(C),G=..[C,I], no_repeats_old(clause_true(G)))).
 
 
 %= 	 	 
@@ -239,7 +239,6 @@ noncol_type('LogicalConnective').
 never_type_why(V,ftVar(isThis)):-is_ftVar(V),!.
 never_type_why(cheaply_u,cheaply_u(isThis)):-!.
 never_type_why(C,_):-a(tCol,C),!,fail. % already declared to be a type
-never_type_why(C,_):-isa(C,tCol),!,fail.
 never_type_why(C,noncol_type(T)):- noncol_type(T),a(T,C),!.
 never_type_why(F,decided_not_was_isa(F,W)):-decided_not_was_isa(F,W),!.
 %never_type_why(C):- is_ftCompound(C),functor(C,F,1),isa_asserted(F,tCol).
@@ -247,7 +246,7 @@ never_type_why(F,Why):-atom(F),functor(G,F,1),real_builtin_predicate(G),!,Why=(w
 % never_type_why(F):-dmsg(never_type_why(F)),!,asserta_if_new(isa(F,prologDynamic)).
 never_type_why(F,Why):-never_type_f(F),Why=is_never_type(F).
 never_type_why(F,Why):-prologSideEffects(F),Why=prologSideEffects(F).
-never_type_why(F,Why):- atom(F), arity(F,A),!,F\==isa, isa(F,_), A > 1,Why=(whynot( arity(F,A) )).
+never_type_why(F,Why):- atom(F), arity(F,A),!,F\==isa, call_u(isa(F,_)), A > 1,Why=(whynot( arity(F,A) )).
 never_type_why(M:C,Why):-atomic(M),!,never_type_why(C,Why).
 
 
@@ -851,7 +850,7 @@ isa_asserted_0(I,T):- atom(I), I = ttTypeByAction, T=ttTypeByAction,!,fail.
 isa_asserted_0(I,T):- nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
 % isa_asserted_0(I,T):- HEAD= isa(I, T),ruleBackward(HEAD,BODY),trace,call_mpred_body(HEAD,BODY).
 
-isa_asserted_0(I,T):- is_ftVar(T),!,tCol_gen(T),isa(I,T).
+isa_asserted_0(I,T):- is_ftVar(T),!,tCol_gen(T),call_u(isa(I,T)).
 isa_asserted_0(I,T):- atom(T),current_predicate(T,_:G),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);on_x_cont(G)).
 isa_asserted_0(I,T):- nonvar(I),(  ((is_ftVar(T);chk_ft(T)),if_defined(term_is_ft(I,T)))*->true;type_deduced(I,T) ).
 isa_asserted_0(I,T):- is_ftCompound(I),is_non_unit(I),is_non_skolem(I),!,get_functor(I,F),compound_isa(F,I,T).
@@ -897,7 +896,7 @@ dont_call_type_arity_one(_):-!,fail.
 dont_call_type_arity_one(tCol).
 dont_call_type_arity_one(ttExpressionType).
 dont_call_type_arity_one(ttAgentType).
-dont_call_type_arity_one(F):-isa(F,prologHybrid),!.
+dont_call_type_arity_one(F):-a(prologHybrid,F),!.
 
 
 %= 	 	 
@@ -1248,7 +1247,7 @@ assert_isa_ilc(I,T):-
 assert_isa_ilc_unchecked(I,T):- is_ftCompound(I),is_non_skolem(I),!,must((get_functor(I,F),assert_compound_isa(I,T,F))),!.
 assert_isa_ilc_unchecked(I,tCol):- must(show_call(why,decl_type(I))).
 assert_isa_ilc_unchecked(I,ttExpressionType):- must(show_call(why,define_ft(I))).
-assert_isa_ilc_unchecked(I,T):-   (( \+(isa(I,_)),\+(a(tCol,I))) -> ain(tCountable(I)) ; true),
+assert_isa_ilc_unchecked(I,T):-   (( \+(call_u(isa(I,_))),\+(a(tCol,I))) -> ain(tCountable(I)) ; true),
   w_tl([t_l:infSkipArgIsa,t_l:infSkipFullExpand],assert_hasInstance(T,I)).
 
 

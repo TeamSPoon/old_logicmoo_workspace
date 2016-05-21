@@ -344,12 +344,12 @@ deduceEachArg_WithArgIsa(F,N,[A|RGS]):- ignore((clause_asserted(argIsa(F,N,Type)
 % Deduce Each Argument With Type.
 %
 deduceEachArg_WithType(M,_):- (var(M);number(M)),!.
-deduceEachArg_WithType(M,tSpatialThing):-isa(M,tSpatialThing),!.
-deduceEachArg_WithType(M,tTemporalhing):-isa(M,tTemporalhing),!.
+deduceEachArg_WithType(M,tSpatialThing):-a(tSpatialThing,M),!.
+deduceEachArg_WithType(M,tTemporalhing):-a(tTemporalThing,M),!.
 deduceEachArg_WithType(M,M):-!.
 deduceEachArg_WithType(M,MT):- compound(M),!, (compound(MT)->(( M =..ARGS,MT =..ARGST,maplist(deduceEachArg_WithType,ARGS,ARGST))); true).
 deduceEachArg_WithType(_,MT):- (MT=ftTerm;ttExpressionType(MT)),!.
-deduceEachArg_WithType(M,MT):-isa(M,MT),!.
+deduceEachArg_WithType(M,MT):- call_u(isa(M,MT)),!.
 deduceEachArg_WithType(M,MT):- assert_isa_safe(M,MT),!.
 
 
@@ -611,7 +611,7 @@ make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 %
 % Special Head.
 %
-special_head(_,F,Why):-special_head0(F,Why),!,show_failure(why,not(isa(F,prologDynamic))).
+special_head(_,F,Why):-special_head0(F,Why),!,show_failure(why,\+(a(prologDynamic,F))).
 
 %= 	 	 
 
@@ -622,11 +622,11 @@ special_head(_,F,Why):-special_head0(F,Why),!,show_failure(why,not(isa(F,prologD
 special_head0(F,ttPredType):-a(ttPredType,F),!.
 special_head0(F,functorDeclares):-a(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-a(prologMacroHead,F),!.
-special_head0(F,pfcControlled):-a(pfcControlled,F),!.
+special_head0(F,pfcControlled):-a(pfcControlled,F).
 special_head0(isa,isa).
 special_head0(F,tCol):-a(tCol,F),!.
 special_head0(F,prologHybrid):-a(prologHybrid,F).
-special_head0(F,pfcControlled):-a(pfcControlled,F).
+
 
 
 
@@ -1102,8 +1102,8 @@ database_modify_assert(change(assert,AorZ),       G):-
  get_functor(G,F,_),!,
    (AorZ == a -> hooked_asserta(G);
     AorZ == z ->  hooked_assertz(G);
-    isa(F,prologOrdered) -> database_modify_assert(change(assert,z),G);
-    isa(F,prologSingleValued) -> database_modify_assert(change(assert,a),G);
+    a(prologOrdered,F) -> database_modify_assert(change(assert,z),G);
+    a(prologSingleValued,F) -> database_modify_assert(change(assert,a),G);
       hooked_asserta(G)).
 
 % ========================================

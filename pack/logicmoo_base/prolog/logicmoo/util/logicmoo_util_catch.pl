@@ -661,7 +661,7 @@ loading_file(FIn):- ((source_file0(F) *-> (retractall(t_l:last_source_file(_)),a
 source_file0(F):-source_location(F,_).
 source_file0(F):-prolog_load_context(file, F).
 source_file0(F):-prolog_load_context(source, F).
-source_file0(F):-seeing(Goal),is_stream(Goal),stream_property(Goal,file_name(F)),exists_file(F).
+source_file0(F):-seeing(S),is_stream(S),stream_property(S,file_name(F)),exists_file(F).
 source_file0(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),exists_file(F).
 source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property(S,file_name(E)),exists_file(E),
   line_count(S,Goal),Goal>0),_,fail),L),last(L,F).

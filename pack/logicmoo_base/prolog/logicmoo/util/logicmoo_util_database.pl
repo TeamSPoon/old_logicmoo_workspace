@@ -717,6 +717,9 @@ retractall_i(H):-expand_to_hb(H,HH,_),forall(clause_i(HH,_,Ref),erase(Ref)).
 %
 % Clause True.
 %
+clause_true(G):- strip_module(G,M,P),!,
+  (M2=M;(current_module(M2),M2\=M)),system:clause(M2:P,B,Ref),clause_property(Ref,module(M2)),
+     call(M2:B).
 clause_true(M:G):-!,system:clause(M:G,true)*->true;(current_module(M2),system:clause(M2:G,true)).
 clause_true(G):- !, cnotrace((current_module(M), \+ \+  system:clause(M:G,_,_))),!, system:clause(M:G,true).
 clause_true(M:G):-predicate_property(M:G,number_of_clauses(_)),!,system:clause(M:G,true).

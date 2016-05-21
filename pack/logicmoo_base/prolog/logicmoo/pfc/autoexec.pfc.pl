@@ -116,6 +116,7 @@
 
 :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('user_relationAllExists.pfc')).
 
+:- set_fileAssertMt(baseKB).
 
 :-multifile(lmconf:locked_baseKB/0).
 :-dynamic(lmconf:locked_baseKB/0).

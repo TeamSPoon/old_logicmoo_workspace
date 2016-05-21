@@ -56,7 +56,7 @@ type_action_info(tHumanPlayer,actCmdparse(ftListFn(ftTerm)),"Development test to
 
 agent_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt('==>'(parse_for(StringM) , [Term,LeftOver])).
 
-% mud_test("cmdparse test",...)
+% lmconf:mud_test("cmdparse test",...)
   
 
 % ===========================================================
@@ -498,12 +498,12 @@ is_parsable_type(vp).
 
 %:- begin_tests(test_bad_verb).
 
-mud_test(test_bad_verb, [ true(
+lmconf:mud_test(test_bad_verb, [ true(
        not(phrase(parseIsa(vtVerb,ff),[ff],[]))
        )] ).
 
 
-mud_test(food_is_a_droppable, [ true(
+lmconf:mud_test(food_is_a_droppable, [ true(
        parse_agent_text_command(iExplorer1,actDrop,[food],_D2,_E2))]).
 
 

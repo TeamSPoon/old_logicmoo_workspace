@@ -359,7 +359,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),\+ clause_u((Call)),n
 
 % deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call(why,(clause_u(Fact),ground(Call))).
 
-:- meta_predicate(mpred_op(?,?)).
+:- meta_predicate(mpred_op(?,+)).
 
 
 
@@ -688,10 +688,10 @@ lookq_s(M:(H:-B),R):- !,clauseq_s(M:H,B,R).
 lookq_s((H:-B),R):- !, clauseq_s(H,B,R).
 lookq_s(H,R):- clauseq_s(H,true,R).
 
-asserta_s(H):- fix_mp(H,H0),asserta_i(H0).
-assertz_s(H):- fix_mp(H,H0),assertz_i(H0).
-clause_s(H,B,R):- fix_mp(H,H0),clause_u(H0,B,R).
-clauseq_s(H,B,R):- fix_mp(H,M:H0),clause_u(M:H0,B,R),clause(M:HC,BC,R),H0=@=HC,BC=@=B.
+asserta_s(H):- fix_mp(clause(assert,asserta_s),H,M,H0),asserta_i(M:H0).
+assertz_s(H):- fix_mp(clause(assert,assertz_s),H,M,H0),assertz_i(M:H0).
+clause_s(H,B,R):- fix_mp(clause(clause,clause_s),H,M,H0),clause_u(M:H0,B,R).
+clauseq_s(H,B,R):- fix_mp(clause(clause,clauseq_s),H,M,H0),clause_u(M:H0,B,R),clause(M:HC,BC,R),H0=@=HC,BC=@=B.
 
 call_s(G0):-
   strip_module(G0,_,G),functor(G,F,A),
@@ -935,41 +935,49 @@ all_different_head_vals_2(_,_).
 
 %% mpred_rule_hb( +Outcome, ?OutcomeO, ?AnteO) is semidet.
 %
-% PFC Rule Head+body.
+% Calculate PFC Rule Head+body.
 %
-mpred_rule_hb(Outcome,OutcomeO,AnteO):-cnotrace((mpred_rule_hb_0(Outcome,OutcomeO,Ante),mpred_rule_hb_0(Ante,AnteO,_))),!.
+mpred_rule_hb(Outcome,OutcomeO,Body):- nonvar(OutcomeO),!,mpred_rule_hb(Outcome,OutcomeN,Body),must(OutcomeO=OutcomeN).
+mpred_rule_hb(Outcome,OutcomeO,BodyO):- nonvar(BodyO),!,mpred_rule_hb(Outcome,OutcomeO,BodyN),must(BodyN=BodyO).
+mpred_rule_hb(Outcome,OutcomeO,AnteO):- 
+  quietly((mpred_rule_hb_0(Outcome,OutcomeO,Ante),
+  mpred_rule_hb_0(Ante,AnteO,_))).
 % :-mpred_trace_nochilds(mpred_rule_hb/3).
 
 
-%% mpred_rule_hb_0( +Outcome, ?OutcomeO, ?VALUE3) is semidet.
+%% mpred_rule_hb_0( +Rule, -Head, -Body) is nondet.
 %
-% PFC rule Head+Body  Primary Helper.
+% Calculate PFC rule Head+Body  Primary Helper.
 %
+
+
 mpred_rule_hb_0(Outcome,OutcomeO,true):-is_ftVar(Outcome),!,OutcomeO=Outcome.
 mpred_rule_hb_0(Outcome,OutcomeO,true):- \+compound(Outcome),!,OutcomeO=Outcome.
-mpred_rule_hb_0((Outcome1,Outcome2),OutcomeO,AnteO):-!,mpred_rule_hb(Outcome1,Outcome1O,Ante1),mpred_rule_hb(Outcome2,Outcome2O,Ante2),
+mpred_rule_hb_0((Outcome1,Outcome2),OutcomeO,AnteO):- mpred_rule_hb(Outcome1,Outcome1O,Ante1),mpred_rule_hb(Outcome2,Outcome2O,Ante2),
                    conjoin(Outcome1O,Outcome2O,OutcomeO),
                    conjoin(Ante1,Ante2,AnteO).
-mpred_rule_hb_0((Ante1==>Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0((Ante1=>Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0((Ante1->Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-% mpred_rule_hb_0((Outcome/Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(rhs(Outcome),OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0({Outcome},OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0((Outcome<-Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0((Ante1 & Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0((Ante1 , Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0((Outcome<==>Ante1),OutcomeO,(Ante1,Ante2)):-mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0((Ante1<==>Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(_::::Outcome,OutcomeO,Ante2):-!,mpred_rule_hb_0(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(bt(Outcome,Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(pt(Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(pk(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(nt(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(spft(Outcome,Ante1a,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(que(Outcome,_),OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-% mpred_rule_hb_0(pfc Default(Outcome),OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0((Outcome:-Ante),Outcome,Ante):-!.
+mpred_rule_hb_0((Ante1==>Outcome),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1=>Outcome),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1->Outcome),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1*->Outcome),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+% mpred_rule_hb_0((Outcome/Ante1),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(rhs([Outcome]),OutcomeO,Ante2):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+% mpred_rule_hb_0(rhs([OutcomeH|OutcomeT]),OutcomeO,Ante2):- !, mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0({Outcome},OutcomeO,Ante2):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Outcome<-Ante1),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1 & Outcome),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1 , Outcome),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Outcome<==>Ante1),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1<==>Outcome),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(_::::Outcome,OutcomeO,Ante2):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb_0(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(bt(Outcome,Ante1),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(pt(Ante1,Outcome),OutcomeO,(Ante1,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(pk(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(nt(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(spft(Outcome,Ante1a,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):- (nonvar(Outcome)-> ! ; true),mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(que(Outcome,_),OutcomeO,Ante2):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+% mpred_rule_hb_0(pfc Default(Outcome),OutcomeO,Ante2):- (nonvar(Outcome)-> ! ; true), mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Outcome:-Ante),Outcome,Ante):-(nonvar(Outcome)-> ! ; true).
 mpred_rule_hb_0(Outcome,Outcome,true).
 
 
@@ -1543,7 +1551,7 @@ neg_in_code(G):-nonvar(G),loop_check(neg_in_code0(G)).
 neg_in_code0(call_u(G)):- !,~G.
 neg_in_code0(~(G)):- nonvar(G),!,  \+ ~G ,!.
 neg_in_code0(G):-   neg_may_naf(G), \+ call_u(G),!.
-neg_in_code0(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),call_u(R),!,call_u(Test).
+neg_in_code0(G):-  is_ftNonvar(G), a(prologSingleValued,G),must((if_missing_mask(G,R,Test),nonvar(R))),call_u(R),!,call_u(Test).
 
 
 :- meta_predicate neg_may_naf(0).
@@ -1789,7 +1797,7 @@ mpred_ignored(argIsa(F, A, argIsaFn(F, A))).
 mpred_ignored(genls(A,A)).
 mpred_ignored(isa(tCol,tCol)).
 %mpred_ignored(isa(W,tCol)):-mreq(lmconf:hasInstance_dyn(tCol,W)).
-mpred_ignored(isa(W,_)):-is_ftCompound(W),isa(W,pred_argtypes).
+mpred_ignored(isa(W,_)):-is_ftCompound(W),call_u(isa(W,meta_argtypes)).
 mpred_ignored(C):-clause_safe(C,true). 
 mpred_ignored(isa(_,Atom)):-atom(Atom),atom_concat(ft,_,Atom),!.
 mpred_ignored(isa(_,argIsaFn(_, _))).

@@ -33,14 +33,14 @@ mpred_userkb_file.
 %
 :- dynamic(lmconf:base_kb_pred_list/1).
 lmconf:base_kb_pred_list([
- (::::)/2,
- (<-)/2,
- (<==)/2,
- (<==>)/2,
- (==>)/2,
- (==>)/1,
- (nesc)/1,
- (~)/1,
+ abox:(::::)/2,
+ abox:(<-)/2,
+ % (<==)/2,
+ abox:(<==>)/2,
+ abox:(==>)/2,
+ abox:(==>)/1,
+ abox:(nesc)/1,
+ abox:(~)/1,
 %mpred_f/1, 
 mpred_f/2,mpred_f/3,mpred_f/4,mpred_f/5,mpred_f/6,mpred_f/7,
 %add_args/15,
@@ -50,7 +50,7 @@ mpred_f/2,mpred_f/3,mpred_f/4,mpred_f/5,mpred_f/6,mpred_f/7,
 mpred_undo_sys/3,
 addTiny_added/1,
 agent_call_command/2,
-mud_test/2,
+%lmconf:mud_test/2,
 type_action_info/3,
 argGenl/3,
 argIsa/3,
@@ -436,7 +436,7 @@ never_assert_u(pt(_,
        (trace->rhs([{trace}, prologSingleValued(B)]))),singletons):- trace,A\=B,trace.
 */
 
-
+on_modules_changed:-!.
 on_modules_changed :-
   forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox,\+ baseKB:mtCycL(M)),
       (default_module(abox,M)->true;catch(add_import_module(M,abox,start),_E,dmsg(add_import_module(M,abox,start))))),

@@ -15,7 +15,7 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_swilib,[]).
 % restore entry state
@@ -31,32 +31,46 @@
 
 % XPCE related autoloads
 
-:- use_module(system:library(pce),except([op(_,_,_)])).
-:- use_module(system:library(swi_compatibility)).
-:- use_module(system:library(pce_util)).
-:- use_module(system:library(pce_emacs)).
-:- use_module(system:library(swi_ide)).
-:- use_module(system:library(pce_edit)).
-:- use_module(system:library(edit_dialog)).
-:- use_module(system:library(swi_preferences)).
-:- use_module(system:library(pce_manual)).
-:- use_module(system:library(gui_tracer)).
-:- use_module(system:library(pce_meta)).
-:- use_module(system:library(portray_object)).
-:- use_module(system:library(keybinding)).
-:- use_module(system:library(emacs_tags)).
-:- use_module(system:library(pce_require)).
-:- use_module(system:library(pce_debug)).
+:- system:use_module(library(pce),except([op(_,_,_)])).
+:- system:use_module(library(swi_compatibility)).
+:- system:use_module(library(pce_util)).
+:- system:use_module(library(pce_emacs)).
+:- system:use_module(library(swi_ide)).
+:- system:use_module(library(pce_edit)).
+:- system:use_module(library(edit_dialog)).
+:- system:use_module(library(swi_preferences)).
+:- system:use_module(library(pce_manual)).
+:- system:use_module(library(gui_tracer)).
+:- system:use_module(library(pce_meta)).
+:- system:use_module(library(portray_object)).
+:- system:use_module(library(keybinding)).
+:- system:use_module(library(emacs_tags)).
+:- system:use_module(library(pce_require)).
+:- system:use_module(library(pce_debug)).
+:- system:use_module(library(help_message)).
+:- system:use_module(library(toolbar)).
+:- system:use_module(library(plot/plotter)).
+:- system:use_module(library(imageops)).
+:- system:use_module(library(pce_float_item)).
+
+:- user:use_module(library(pce_report)).
+:- user:use_module(library('swi/pce_debug_monitor')).
+:- user:use_module(library('swi/thread_monitor')).
+
+:- system:use_module(library(pce_report),except([colour/2])).
+:- system:use_module(library('swi/pce_debug_monitor'),except([colour/2,resource/3])).
+:- system:use_module(library('swi/thread_monitor'),except([colour/2,resource/3])).
 
 
-:- use_module(system:library(statistics)).
+:- system:use_module(library(statistics)).
 :- system:use_module(library(dialect/hprolog),[]).
 
 
 % ======================================================
 % Rest of the standard library
 % ======================================================
-:- use_module(system:library(backcomp), [ '$arch'/2,
+:- system:use_module(library(backcomp), [
+            '$arch'/2,
 	    '$version'/1,
 	    '$home'/1,
 	    '$argv'/1,
@@ -111,7 +125,7 @@
 	    hash/1,			% :PI
 	    set_base_module/1		% :Base
 	  ]).
-:- use_module(system:library(terms),[term_hash/2,		% @Term, -HashKey
+:- system:use_module(library(terms),[term_hash/2,		% @Term, -HashKey
 	    term_hash/4,		% @Term, +Depth, +Range, -HashKey
 	   % term_variables/2,		% @Term, -Variables
 	    term_variables/3,		% @Term, -Variables, +Tail
@@ -133,11 +147,12 @@
 :- dynamic http:location/3.
 :- multifile http:location/3.
 
-:- use_module(system:library(prolog_autoload)).
-:- use_module(system:library(prolog_clause)).
-:- use_module(system:library(occurs)).
-:- use_module(system:library(listing)).
-:- use_module(system:library(qsave)).
+:- system:use_module(library(prolog_autoload)).
+:- system:use_module(library(prolog_clause)).
+:- system:use_module(library(occurs)).
+:- system:use_module(library(listing)).
+:- user:use_module(library(clpfd)).
+:- system:use_module(library(qsave)).
 :- system:use_module(library(apply)).
 :- system:use_module(library(debug)).
 :- system:use_module(library(error)).
@@ -145,6 +160,8 @@
 :- system:use_module(library(operators)).
 :- system:use_module(library(option)).
 :- system:use_module(library(prolog_source)).
+:- system:use_module(library(prolog_history)).
+:- system:use_module(library(ansi_term)).
 :- system:use_module(library(prolog_xref)).
 :- system:use_module(library(readutil)).
 :- system:use_module(library(shlib)).
@@ -165,7 +182,7 @@
  ignore((
    \+ (member(C,['/terms.pl','/backcomp.pl',rdf,pengi,win_men,swicli,'swicli.pl',swicffi,quintus,solution_sequences,metaterm,coind,drac,'INDEX',jpl,nb_set,yall,settings]), atom_contains(M,C)),
    \+ (member(C,[persistency,chr,rewrite,bdb,check,xpath,record]),atom_contains(M,C)),
-   use_module(system:M)))).
+   system:use_module(M)))).
 
 :- include(library(pldoc/hooks)).
 

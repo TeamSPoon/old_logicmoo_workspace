@@ -97,6 +97,14 @@ wsh_w:wrap_shared(retract,1,dbreq):- is_user_module.
 wsh_w:wrap_shared(retractall,1,dbreq):- is_user_module.
 
 
+wsh_w:wrap_shared(mtCore,1,ereq).
+wsh_w:wrap_shared(mtPrologLibrary,1,ereq).
+wsh_w:wrap_shared(mtProlog,1,ereq).
+wsh_w:wrap_shared(mtCycL,1,ereq).
+wsh_w:wrap_shared(mtExact,1,ereq).
+wsh_w:wrap_shared(mtGlobal,1,ereq).
+
+
 %wsh_w:wrap_shared(lmcache:loaded_external_kbs,1,ereq).
 wsh_w:wrap_shared(argQuotedIsa,3,ereq).
 wsh_w:wrap_shared(arity,2,ereq).
@@ -160,14 +168,15 @@ wsh_w:wrap_shared(use_ideep_swi,0,ereq).
 system_goal_expansion_safe_wrap(T,_):- \+ compound(T),!,fail.
 system_goal_expansion_safe_wrap(T,_):- var(T),!,fail.
 system_goal_expansion_safe_wrap(MT:Goal,call_u(Goal)):-compound(Goal),MT==abox,!.
-system_goal_expansion_safe_wrap(M:T,M:O):- nonvar(T),!,functor(T,F,A),wsh_w:wrap_shared(F,A,How),safe_wrap(T,How,O).
-system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),wsh_w:wrap_shared(F,A,How),safe_wrap(T,How,I).
+system_goal_expansion_safe_wrap(M:T,M:O):- nonvar(T),!,functor(T,F,A),wsh_w:wrap_shared(F,A,How),!,safe_wrap(T,How,O).
+system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),wsh_w:wrap_shared(F,A,How),!,safe_wrap(T,How,I).
 
 
-system:sub_call_expansion(I,O):-nonvar(I),system_goal_expansion_safe_wrap(I,O).
-system:sub_body_expansion(I,O):-nonvar(I),system_goal_expansion_safe_wrap(I,O).
+%system:sub_call_expansion(I,O):-nonvar(I),system_goal_expansion_safe_wrap(I,O).
+%system:sub_body_expansion(I,O):-nonvar(I),system_goal_expansion_safe_wrap(I,O).
 
-% system:goal_expansion(I,P,O,P):- nonvar(I),system_goal_expansion_safe_wrap(I,O)->I\=@=O.
+system:goal_expansion(I,P,O,P):- prolog_load_context(module,M),
+   M\==user,M\==baseKB,nonvar(I),system_goal_expansion_safe_wrap(I,O)->I\=@=O.
 
 
 %% safe_wrap( Term, +How, -Wrapped) is semidet.
@@ -206,6 +215,16 @@ decl_shared(Plus,_:M:A):-!,decl_shared(Plus,M:A),!.
 decl_shared(Plus,F):-atom(F),!,decl_shared(Plus,F/_).
 decl_shared(Plus,M:F):-atom(F),!,decl_shared(Plus,M:F/_).
 
+decl_shared(Plus,M:F/A):-atom(F),!,
+ asserta_if_new(wsh_w:wrap_shared(F,A,M:ereq)),
+ ain(baseKB:prologHybrid(F)),
+ ignore((integer(A),
+   ain(baseKB:arity(F,A)),
+   baseKB:multifile(F/A),
+   functor(P,F,A),
+   call(Plus,M:P),
+   baseKB:discontiguous(F/A))).
+
 decl_shared(Plus,F/A):-atom(F),!,
  asserta_if_new(wsh_w:wrap_shared(F,A,ereq)),
  ain(baseKB:prologHybrid(F)),
@@ -216,16 +235,6 @@ decl_shared(Plus,F/A):-atom(F),!,
    call(Plus,P),
    baseKB:discontiguous(F/A))).
 
-
-decl_shared(Plus,M:F/A):-atom(F),!,
- asserta_if_new(wsh_w:wrap_shared(F,A,M:ereq)),
- ain(baseKB:prologHybrid(F)),
- ignore((integer(A),
-   ain(baseKB:arity(F,A)),
-   baseKB:multifile(F/A),
-   functor(P,F,A),
-   call(Plus,M:P),
-   baseKB:discontiguous(F/A))).
 
 
 decl_shared(Plus,M:P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared(Plus,M:F/A).

@@ -44,6 +44,7 @@
 :- include('mpred_header.pi').
 %:- endif.
 
+:- decl_shared(genls/2).
 
 :- dynamic(lmconf:current_source_suffix/1).
 
@@ -369,7 +370,7 @@ convertOneSpawnArg(Funct,N,A,O):-spawnOneSpawnArg(Funct,N,A,O).
 % Spawn One Spawn Argument.
 %
 spawnOneSpawnArg(Funct,N,Name,Inst):- 
-    must(argIsa(Funct,N,FunctArgType)),
+    must(call_u(argIsa(Funct,N,FunctArgType))),
     must(convertToInstance(Name,FunctArgType,Inst)),!.
 
 
@@ -379,8 +380,8 @@ spawnOneSpawnArg(Funct,N,Name,Inst):-
 %
 % Convert Converted To Instance.
 %
-convertToInstance(Name,FunctArgType,Inst):- isa(Name,FunctArgType),!,Inst=Name.
-convertToInstance(Name,COLTHING,TypeA):- isa(COLTHING,ttTypeType),createByNameMangle(Name,_,TypeA),assert_isa(TypeA,COLTHING).
+convertToInstance(Name,FunctArgType,Inst):- call_u(isa(Name,FunctArgType)),!,Inst=Name.
+convertToInstance(Name,COLTHING,TypeA):- a(ttTypeType,COLTHING),createByNameMangle(Name,_,TypeA),assert_isa(TypeA,COLTHING).
 convertToInstance(Name,COLTHING,TypeA):- genls(COLTHING,tCol),createByNameMangle(Name,_,TypeA),assert_isa(TypeA,COLTHING).
 convertToInstance(Name,FunctArgType,Inst):- createByNameMangle(Name,Inst,TypeA),
   %  assert_isa(Inst,FunctArgType),

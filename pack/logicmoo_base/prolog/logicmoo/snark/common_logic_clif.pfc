@@ -14,6 +14,10 @@ vim: set filetype=md:
 %  https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md
 */
 
+
+:- set_fileAssertMt(baseKB).
+% :- set_defaultAssertMt(baseKB).
+
 :-dynamic((if/2,iif/2)).
 
 :- if(current_prolog_flag(logicmoo_modules,default)).

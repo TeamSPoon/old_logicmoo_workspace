@@ -87,6 +87,8 @@ lmconf:mpred_skipped_module(eggdrop).
 :-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_)])).
 :-use_module(system:library('logicmoo/snark/common_logic_kb_hooks.pl')).
 
+:-use_module(system:library('logicmoo/mpred_online/mpred_www.pl')).
+
 
 
 
@@ -94,8 +96,12 @@ lmconf:mpred_skipped_module(eggdrop).
 :- reset_modules.
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
+:- enable_mpred_expansion.
 system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_expander(goal,system,I,P1,O,P2).
 system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_expander(term,system,I,P1,O,P2).
+
+
+system:clause_expansion(I,':-'(ainz(I))):-  get_lang(pfc).
 
 /*
 
@@ -171,14 +177,14 @@ user:lmbf:-
 
 
 :- list_undefined.
-% :- user:lmbf.
+:- user:lmbf.
 
 % 
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
 
-:- forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox),maybe_add_import_module(M,abox,start)).
-:- forall((current_module(M),M\=user,M\=system,M\=baseKB),maybe_add_import_module(M,baseKB,start)).
+%:- forall((current_module(M),M\=user,M\=system,M\=baseKB,M\=abox),maybe_add_import_module(M,abox,start)).
+%:- forall((current_module(M),M\=user,M\=system,M\=baseKB),maybe_add_import_module(M,baseKB,start)).
 
 :- list_undefined.
 :- reset_modules.

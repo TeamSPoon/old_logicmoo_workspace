@@ -18,7 +18,8 @@
           set_file_lang/1,
           pfc_dcg/0,
           get_original_term_source/1,
-           
+
+          set_lang/1,
            simplify_language_name/2,
            %is_undefaulted/1,
 
@@ -90,6 +91,7 @@
             convert_if_kif_string/4,
             get_file_type/2,
             get_lang/1,
+            get_lang0/1,
             get_last_time_file/3,
             get_op_alias/2,
             gload/0,
@@ -245,72 +247,6 @@
 %:- dynamic((registered_module_type/2, current_op_alias/2, lmconf:mpred_skipped_module/1, prolog_load_file_loop_checked/2, lmcache:mpred_directive_value/3, defaultAssertMt/1, lmconf:loaded_file_world_time/3, lmconf:never_reload_file/1, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, defaultAssertMt/1, disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_directive_value/3, lmconf:mpred_skipped_module/1, never_reload_file/1, prolog_load_file_loop_checked/2, registered_module_type/2, t_l:disable_mpred_term_expansions_globally/0, user:prolog_load_file/2, user:term_expansion/2)).
 %:- dynamic(registered_module_type/2).        
 
-:- use_module(user:library(backcomp), [ '$arch'/2,
-	    '$version'/1,
-	    '$home'/1,
-	    '$argv'/1,
-	    '$set_prompt'/1,
-	    '$strip_module'/3,
-	    '$declare_module'/3,
-	    '$module'/2,
-	    at_initialization/1,	% :Goal
-	    displayq/1,
-	    displayq/2,
-	    sformat/2,			% -String, +Fmt
-	    sformat/3,			% -String, +Fmt, +Args
-	    concat/3,
-	    concat_atom/2,		% +List, -Atom
-	    concat_atom/3,		% +List, +Sep, -Atom
-	    '$apropos_match'/2,		% +Needle, +Hashstack
-	    read_clause/1,		% -Term
-	    read_clause/2,		% +Stream, -Term
-	    read_variables/2,		% -Term, -VariableNames
-	    read_variables/3,		% +Stream, -Term, -VariableNames
-	    read_pending_input/3,	% +Stream, -List, ?Tail
-	    feature/2,
-	    set_feature/2,
-	    substring/4,
-	    string_to_list/2,		% ?String, ?Codes
-	    string_to_atom/2,		% ?String, ?Atom
-	    flush/0,
-	    write_ln/1,			% +Term
-	    proper_list/1,		% @Term
-	    free_variables/2,		% +Term, -Variables
-	    subsumes_chk/2,		% @Generic, @Specific
-	    subsumes/2,			% @Generic, @Specific
-	    hash_term/2,		% +Term, -Hash
-	    checklist/2,		% :Goal, +List
-	    sublist/3,			% :Goal, +List, -Sublist
-	    sumlist/2,			% +List, -Sum
-	    convert_time/2,		% +Stamp, -String
-	    convert_time/8,		% +String, -YMDmhs.ms
-	    'C'/3,			% +List, -Head, -Tail
-	    current_thread/2,		% ?Thread, ?Status
-	    current_mutex/3,		% ?Mutex, ?Owner, ?Count
-	    message_queue_size/2,	% +Queue, -TermsWaiting
-	    lock_predicate/2,		% +Name, +Arity
-	    unlock_predicate/2,		% +Name, +Arity
-	    current_module/2,		% ?Module, ?File
-	    export_list/2,		% +Module, -Exports
-	    setup_and_call_cleanup/3,	% :Setup, :Goal, :Cleanup
-	    setup_and_call_cleanup/4,	% :Setup, :Goal, ?Catcher, :Cleanup
-	    merge/3,			% +List1, +List2, -Union
-	    merge_set/3,		% +Set1, +Set2, -Union
-	    index/1,			% :Head
-	    hash/1,			% :PI
-	    set_base_module/1		% :Base
-	  ]).
-:- use_module(user:library(terms),[term_hash/2,		% @Term, -HashKey
-	    term_hash/4,		% @Term, +Depth, +Range, -HashKey
-	   % term_variables/2,		% @Term, -Variables
-	    term_variables/3,		% @Term, -Variables, +Tail
-	    variant/2,			% @Term1, @Term2
-	   % subsumes/2,			% +Generic, @Specific
-	   % subsumes_chk/2,		% +Generic, @Specific
-	    cyclic_term/1,		% @Term
-	   % acyclic_term/1,		% @Term
-	    term_subsumer/3,		% +Special1, +Special2, -General
-	    term_factorized/3]).
 
 :-   dynamic((lmconf:registered_mpred_file/1,lmconf:ignore_file_mpreds/1,lmconf:registered_module_type/2)).
 :- multifile((lmconf:registered_mpred_file/1,lmconf:ignore_file_mpreds/1,lmconf:registered_module_type/2)).
@@ -367,10 +303,11 @@ mpred_prolog_only_file(File):- file_name_extension(File,_,pfc),!,fail.
 
 :- prolog_load_context(directory,Dir),asserta(lmconf:mpred_loader_dir(Dir)).
 
-mpred_expander(Type,_,I,_,_,_):- cnotrace(dont_term_expansion(Type,I)),!,fail.
+mpred_expander(Type,_,I,_,_,_):- notrace(dont_term_expansion(Type,I)),!,fail.
 mpred_expander(_Type,_Module,I,PosI,O,PosI):- get_lang(pl),!, expand_isEach_or_fail(I,O).
 mpred_expander(Type,Module,I,PosI,O,PosO):-
    is_file_based_expansion(Type,I,PosI,O,PosO),
+   \+ current_prolog_flag(mpred_te,false),
    mpred_file_term_expansion(Type,Module,I,O).
 
 dont_term_expansion(Type,I):- 
@@ -393,17 +330,24 @@ dont_term_expansion(Type,I):-
 % mpred_file_term_expansion(_,_,_,_):- \+ current_predicate(_,_:mpred_loader_file),!,fail.
 mpred_file_term_expansion(_,_,I,_):- is_directive_form(I),!,fail.
 mpred_file_term_expansion(_,_,I,_):- is_ftVar(I),!,fail.
-mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !, Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
+mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !, Type = term, DefMod = user, 
+            do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
 mpred_file_term_expansion(_,_,_,_):- get_lang(pl),!,fail.
-mpred_file_term_expansion(Type,LoaderMod,(I:-B),OO):-B==true,!,mpred_file_term_expansion(Type,LoaderMod,I,OO).
-mpred_file_term_expansion(_Type,_LoaderMod,I,( :- must(ain(I)))):-!.
+% mpred_file_term_expansion(Type,LoaderMod,(I:-B),OO):-B==true,!,mpred_file_term_expansion(Type,LoaderMod,I,OO).
+% mpred_file_term_expansion(_Type,_LoaderMod,I,( :- must(ain(I)))):-!.
+
+mpred_file_term_expansion(Type,LoaderMod,I,OO):- !,
+   no_loop_check(mpred_file_term_expansion0(Type,LoaderMod,I,OO)).
+
+
+
 mpred_file_term_expansion(Type,LoaderMod,I,OO):-
  ((
   sanity((ground(Type:LoaderMod),nonvar(I),var(OO))),
   quietly_must(get_source_ref1(mfl(_,F,L))),!,
 
-  \+ mpred_prolog_only_file(F),
-  '$set_source_module'(M,M),
+% \+ mpred_prolog_only_file(F),
+  '$current_source_module'(M),
 % \+ mpred_prolog_only_module(M),
   '$module'(UM,M),
   b_getval('$term',TermWas),
@@ -421,10 +365,24 @@ mpred_file_term_expansion(Type,LoaderMod,I,OO):-
     (b_setval('$term',TermWas))),
   !,
   must(I\=@=O),O=OO,
-  cnotrace(wdmsg(I-->OO)))).
-  
+  wdmsg(I-->OO))).
 
-           
+
+% Ensure rule macro predicates are being used checked just before assert/query time
+mpred_file_term_expansion0(Type,LoaderMod,I,O):- 
+  sanity((ground(Type:LoaderMod),nonvar(I),var(O))),
+  quietly_must(get_source_ref1(mfl(_,F,L))),!,
+  b_getval('$term',TermWas), TermWas == I,
+  call_cleanup(
+        w_tl(t_l:current_why_source(mfl(LoaderMod,F,L)),
+        (( get_original_term_source(Orig), 
+           b_setval('$orig_term',Orig),
+           b_setval('$term',[]),
+           (O= (:- must(ain(I))))))),
+    b_setval('$term',TermWas)),!, wdmsg(I-->O).
+
+
+
 
 %% mpred_expand_file_module_clause( +File, +Module, +:Term, -:Expanded) is det.
 %
@@ -741,9 +699,7 @@ check_term_expansions:- not(do_term_expansions).
 
 
 
-:- use_module(library(lists)).
-:- use_module(library(terms)).
-:- use_module(library(base32)).
+% :- system:use_module(library(base32)).
 
 % :-autoload.
 
@@ -1235,11 +1191,19 @@ file_begin(WIn):-
    op_lang(W),
    enable_mpred_expansion)),!.
 
-set_file_lang(W):- 
+
+
+set_file_lang(W):-
+   % assert_until_eof(t_l:current_lang(W)),
    forall((which_file(Source);prolog_load_context(file,Source);prolog_load_context(source,Source)),
-   ignore(( \+ lmcache:mpred_directive_value(Source,language,W),
+   ignore((  % \+ lmcache:mpred_directive_value(Source,language,W),
    decache_file_type(Source),
+   wdmsg(lmcache:mpred_directive_value(Source,language,W)),
    assert_until_eof(Source,lmcache:mpred_directive_value(Source,language,W))))).
+
+
+set_lang(W):-
+    assert_until_eof(t_l:current_lang(W)).
 
 %% file_end( ?W) is det.
 %
@@ -1264,7 +1228,7 @@ same_language(LANG,LANGVAR):-
     simplify_language_name(LANG,LANGS),!,
     LANGS=LANGVARS.
 
-get_lang0(LANG):-t_l:current_lang(LANG).
+get_lang0(W) :- t_l:current_lang(W).
 get_lang0(W) :- prolog_load_context(file,Source)->lmcache:mpred_directive_value(Source,language,W).
 get_lang0(W) :- prolog_load_context(source,Source)->lmcache:mpred_directive_value(Source,language,W).
 get_lang0(W) :- loading_source_file(Source)->lmcache:mpred_directive_value(Source,language,W).
@@ -1677,7 +1641,8 @@ make_dynamic((H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(H)).
 make_dynamic(M:(H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(M:H)).
 make_dynamic(C):- loop_check(make_dynamic_ilc(C),true).
 
-make_dynamic_ilc(C):- compound(C),strip_module(C,M,_),get_functor(C,F,A),quietly_must(F\=='$VAR'),
+make_dynamic_ilc(C):- compound(C),strip_module(C,MIn,_),get_functor(C,F,A),quietly_must(F\=='$VAR'),
+  (\+ a(mtCycL,MIn) -> must(defaultAssertMt(M)) ; MIn =M),
   functor(P,F,A),
 
   ( \+predicate_property(M:P,_) -> kb_dynamic(M:F/A) ; 
@@ -1699,8 +1664,8 @@ make_dynamic_ilc(C):- compound(C),strip_module(C,M,_),get_functor(C,F,A),quietly
 
 
 
-:- use_module(library(shlib)).
-:- use_module(library(operators)).
+%:- system:use_module(library(shlib)).
+%:- system:use_module(library(operators)).
 
 :- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
 % filetypes 
@@ -2012,7 +1977,9 @@ force_reload_mpred_file(World,MFileIn):-
 %
 % Helper for Force Reloading of a Managed Predicate File.
 %
-force_reload_mpred_file2(World,MFileIn):- strip_module(MFileIn,NewModule,_), 
+force_reload_mpred_file2(World,MFileIn):- 
+ strip_module(MFileIn,_MaybeNewModule,_),
+ NewModule = World,
  with_source_module(NewModule,((
  % NewModule:ensure_loaded(logicmoo(mpred/mpred_userkb)),
  forall(must_locate_file(MFileIn,File),
@@ -2309,3 +2276,4 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 
 mpred_loader_file.
+

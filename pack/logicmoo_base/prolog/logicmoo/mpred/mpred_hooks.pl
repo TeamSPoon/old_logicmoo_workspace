@@ -1344,7 +1344,7 @@ call_f(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_f(P,A1,A2,A3,A4).
 %
 % Call False.
 %
-call_f(dac(d,_,_,_),P,A1,A2,A3):- mpred_f(P,A1,A2,A3).
+call_f(dac(d,_,_,_),P,A1,A2,A3):- call_u(mpred_f(P,A1,A2,A3)).
 call_f(dac(_,a,_,_),P,A1,A2,A3):- assertion_f([P,A1,A2,A3]).
 call_f(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_f(P,A1,A2,A3).
 
@@ -1354,7 +1354,7 @@ call_f(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_f(P,A1,A2,A3).
 %
 % Call False.
 %
-call_f(dac(d,_,_,_),P,A1,A2):- mpred_f(P,A1,A2).
+call_f(dac(d,_,_,_),P,A1,A2):- call_u(mpred_f(P,A1,A2)).
 call_f(dac(_,a,_,_),P,A1,A2):- assertion_f([P,A1,A2]).
 call_f(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_f(P,A1,A2).
 
@@ -1364,7 +1364,7 @@ call_f(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_f(P,A1,A2).
 %
 % Call False.
 %
-call_f(dac(d,_,_,_),P,A1):- mpred_f(P,A1).
+call_f(dac(d,_,_,_),P,A1):- call_u(mpred_f(P,A1)).
 call_f(dac(_,a,_,_),P,A1):- assertion_f([P,A1]).
 call_f(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_f(P,A1).
 

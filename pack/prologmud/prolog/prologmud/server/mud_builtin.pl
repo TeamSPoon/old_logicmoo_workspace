@@ -367,7 +367,14 @@ ttPredAndValueType("material").
 
 vtValue(Val)/(atom(Val),i_name_lc(Val,KW))==>mudKeyword(Val,KW).
 
-ttPredAndValueType(Str)/(i_name('mud',Str,Pred),i_name('vt',Str,VT)) ==> (ptRolePredicate(Pred),ttValueType(VT),mudKeyword(VT,Str),mudKeyword(Pred,Str),argIsa(Pred,2,VT),argIsa(Pred,1,tTemporalThing)).
+ttPredAndValueType(Str)/
+  (i_name('mud',Str,Pred),
+  i_name('vt',Str,VT)) ==> 
+    (ptRolePredicate(Pred),
+     ttValueType(VT),
+      mudKeyword(VT,Str),mudKeyword(Pred,Str),
+      argIsa(Pred,2,VT),
+      argIsa(Pred,1,tTemporalThing)).
 
 %relationMostInstance(arg1Isa,ptRolePredicate,tTemporalThing).
 %relationMostInstance(arg2QuotedIsa,ptRolePredicate,ftTerm).

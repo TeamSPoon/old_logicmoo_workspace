@@ -38,7 +38,7 @@
 
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-
-  forall(mud_test(Name,Test),run_mud_test(Name,Test)).
+  forall(lmconf:mud_test(Name,Test),run_mud_test(Name,Test)).
 
 action_info(actTests,"run run_mud_tests").
 
@@ -75,7 +75,7 @@ test_false(SomeGoal):- test_true(not(SomeGoal)).
 
 run_mud_test(Filter):-
    doall((
-   member(F/A,[mud_test/0,mud_test/1,mud_test/2]),   
+   member(F/A,[lmconf:mud_test/0,lmconf:mud_test/1,lmconf:mud_test/2]),   
    current_predicate(M:F/A),
    functor(H,F,A),
    not(predicate_property(M:H,imported_from(_))),
@@ -97,7 +97,7 @@ run_mud_test(Name,Test):-
 
 % define tests locally
 
-mud_test(test_movedist,
+lmconf:mud_test(test_movedist,
  (
   foc_current_agent(P),
    test_name("teleport to main enginering"),
@@ -219,7 +219,7 @@ hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg(chec
 % ---------------------------------------------------------------------------------------------
 
 
-% mud_test("local sanity tests",  do_mud_test_locals).
+% lmconf:mud_test("local sanity tests",  do_mud_test_locals).
 
 % w_tl/2
 

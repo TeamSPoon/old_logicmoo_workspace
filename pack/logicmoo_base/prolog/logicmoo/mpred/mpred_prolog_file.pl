@@ -126,11 +126,11 @@ process_this_script0(S):-
 %
 % Never Load Special.
 %
-never_load_special(_, Options) :-memberchk(must_be_module(true),Options).
-never_load_special(_Module:Spec, _) :- atom(Spec), atomic_list_concat(M,'.',Spec),length(M,L),L>7.
-never_load_special(_Module:library(Atom), Options) :- atom(Atom),member(must_be_module(true),Options),member(if(_),Options).
-% [if(true),imports([mpred_database_term/3]),register(false),silent(false)]
-never_load_special(_Module:_Spec, Options) :- member(must_be_module(true),Options),member(if(not_loaded),Options),member(imports([_/_]),Options).   
+
+never_load_special(Module:Spec, Options) :- wdmsg(check_load(Module:Spec,Options)),fail.
+never_load_special(_, Options) :- memberchk(must_be_module(true),Options),!.
+never_load_special(_, Options) :- memberchk(autoload(true),Options),!.
+never_load_special(_Module:_Spec, Options) :- member(if(not_loaded),Options),member(imports([_/_]),Options).   
 
 
 % :- use_module(library(logicmoo/util/logicmoo_util_filesystem)).
@@ -303,5 +303,11 @@ user:prolog_load_file(Module:Spec, Options):-
   \+ never_load_special(Module:Spec, Options),  
   catch(prolog_load_file_loop_checked(Module:Spec, Options),
    E,
-    ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))).
+    ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))),!.
+user:prolog_load_file(_Module:_Spec, _Options):- 
+  get_lang(pl),!,fail.
 
+user:prolog_load_file(Module:Spec, Options):- 
+   set_file_lang(pl),set_lang(pl),fail.
+   
+  

@@ -8,7 +8,7 @@
 :- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_user_file,
- [
+ [ /*
  op(1199,fx,('==>')), 
  op(1190,xfx,('::::')),
  op(1180,xfx,('==>')),
@@ -21,7 +21,7 @@
  op(600,yfx,'v'),
  op(350,xfx,'xor'),
  op(300,fx,'~'),
- op(300,fx,'-')]).
+ op(300,fx,'-') */ ]).
 % restore entry state
 :- reset_modules.
 
@@ -32,7 +32,7 @@
 :- set_prolog_flag(pfc_booted,false).
 :-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
 :- set_prolog_flag(pfc_booted,true).
-:- forall(wsh_w:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
+% :- forall(wsh_w:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
 
 /*
 :- set_prolog_flag(report_error,true).

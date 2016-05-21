@@ -20,29 +20,32 @@
 :- set_prolog_flag(lm_expanders,true).
 :- set_prolog_flag(mpred_te,true).
 
-:- system:use_module(library(logicmoo_utils)).
-:- system:use_module(library(logicmoo_base)).
-:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
+:- use_module(library(logicmoo_utils)).
+:- use_module(library(logicmoo_base)).
+%:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
 %:- system:use_module(library(logicmoo/mpred_online/mpred_pldoc_util)).
 :- ensure_webserver(3020).
+:- initialization(ensure_webserver(3020),restore).
+
 
 :- forall(debugging(X),nodebug(X)).
 
 :- set_prolog_flag(lm_expanders,false).
 :- set_prolog_flag(read_attvars,false).
 :- set_prolog_flag(mpred_te,false).
-:- use_module(library(socket)).
-:- system:use_module(library(eggdrop)).
+:- set_lang(pl).
+:- system:use_module(library(socket)).
+:- user:use_module(library(eggdrop)).
 :- forall(debugging(X),nodebug(X)).
-:- initialization(egg_go).
-:- egg_go.
+:- initialization(eggdrop:egg_go,restore).
+wbg:- eggdrop:egg_go.
 
 :- set_prolog_flag(lm_expanders,true).
 :- set_prolog_flag(mpred_te,true).
 
 :- forall(debugging(X),nodebug(X)).
 
-:- system:use_module(library(logicmoo_user)).
+:- user:use_module(library(logicmoo_user),except([op(_,_,_)])).
 %:- forall(debugging(X),nodebug(X)).
 
 %:- system:use_module(library(logicmoo/mpred_online/mpred_rdf)).
@@ -50,7 +53,7 @@
 % :- tdebug.
 
 % :- qsave_program('lm_user.prc').
-:- qsave_program('lm_webbot.prc').
+%:- qsave_program('lm_webbot.prc').
 
 :- threads.
 %:- use_listing_vars.

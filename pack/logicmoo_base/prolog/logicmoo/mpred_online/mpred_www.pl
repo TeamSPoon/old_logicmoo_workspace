@@ -176,7 +176,7 @@
 :- export((current_form_var0/1, get_http_session0/1, handler_logicmoo_cyclone_1/1, is_context0/1, make_quotable_0/2, pp_i2tml_0/1, pp_i2tml_1/1, put_string0/1, put_string0/2, sanity_test_000/0, show_edit_term0/3, show_edit_term1/3, show_select1/2, show_select2/3)).
 :- multifile((last_item_offered/1, http:location/3, http_dispatch:handler/4, http_session:session_data/2, http_session:urandom_handle/1, mpred_www:foobar/1, mpred_www:http_last_request/1, mpred_www:last_item_offered/1, system:'$init_goal'/3, user:file_search_path/2)).
 
-:- include(logicmoo(mpred/'mpred_header.pi')).
+%:- include(logicmoo(mpred/'mpred_header.pi')).
 :- system:use_module(library(logicmoo_utils)).
 :- system:use_module(library(logicmoo_swilib)).
 
@@ -1641,12 +1641,12 @@ lmconf:shared_hide_data(pt/2):- !, listing_filter(hideTriggers).
 lmconf:shared_hide_data(bt/2):- !, listing_filter(hideTriggers).
 lmconf:shared_hide_data((_:-
  cwc,
-        second_order(_,_G19865),
-        (   _G19865 = (_G19867,!,_G19871) ->
-                call(_G19867),  !,
-                call(_G19871)
+        second_order(_,G19865),
+        (   _G19865 = (G19867,!,G19871) ->
+                call(G19867),  !,
+                call(G19871)
         ;   CALL
-        ))):- CALL=@=call(_G19865).
+        ))):- CALL=@=call(G19865).
 
 lmconf:shared_hide_data(mpred_mark/3):- !,listing_filter(hideMeta).
 

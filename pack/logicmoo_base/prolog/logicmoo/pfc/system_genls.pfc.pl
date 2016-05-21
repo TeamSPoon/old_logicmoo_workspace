@@ -36,7 +36,8 @@ nearestGenls(C1,C2)==>
 
 ((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) ==> ({dif(Sub, Super)}, isa(I,Super))).
 
-% (isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, \+ ~(completelyAssertedCollection(Super))) ==> ({dif(Sub, Super)}, isa(I,Super)).
+%(isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, 
+%  \+ ~(completelyAssertedCollection(Super))) ==> ({dif(Sub, Super)}, isa(I,Super)).
 
 
 

@@ -203,7 +203,8 @@ term_is_ft_how(Term,Type):- clause_umt(quotedDefnIff(Type,Info)),nonvar(Info),
                  (append_term(Info,Term,CALL),call_u(CALL))),!.
 
 term_is_ft_how(Term,Type):- compound(Term),functor(Term,F,A),functor(Type,F,A),
-  once((t(meta_argtypes,Type),Type=..[_|Types],Term=..[_|Args],maplist(isa,Args,Types))).
+  once((a(meta_argtypes,Type),Type=..[_|Types],Term=..[_|Args],
+     maplist(t,Types,Args))).
 
 
 %= 	 	 
@@ -323,7 +324,7 @@ is_ftText(Arg):- \+ compound(Arg),!,fail.
 is_ftText(Arg):- text_to_string_safe(Arg,_),!.
 is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
 
-:- was_dynamic(coerce/3).
+% :- was_dynamic(coerce/3).
 :- was_export(coerce/4).
 
 %= 	 	 
@@ -332,7 +333,7 @@ is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
 %
 % Coerce.
 %
-coerce(What,Type,NewThing,_Else):-coerce(What,Type,NewThing),!.
+coerce(What,Type,NewThing,_Else):- call_u(coerce(What,Type,NewThing)),!.
 coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 
@@ -626,7 +627,7 @@ correctArgsIsa(_,G,GG):- get_functor(G,F,A),
   arg(_,vv('{}'/_,  genls/_,mpred_isa/_,
     t/2,arity/_,genls/_,'<=>'/_,pt/_,rhs/_,nt/_,bt/_,
     formatted_resultIsa/_,resultIsa/_,quotedDefnIff/_),F/A),!,must_equals(G,GG).
-correctArgsIsa(_,G,GG):- get_functor(G,F),t(functorDeclares,F),!,must_equals(G,GG).
+correctArgsIsa(_,G,GG):- get_functor(G,F),lookup_u(functorDeclares(F)),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- t_l:infSkipArgIsa, !,must_equals(G,GG).
 correctArgsIsa(Op,G,GG):- correctArgsIsa0(Op,G,GG),nonvar(GG),!.
 correctArgsIsa(Op,G,GG):- grtrace,correctArgsIsa0(Op,G,GG).
@@ -673,7 +674,7 @@ correctArgsIsa00(Op,[KP,Prop|Args],AA):-is_holds_true(KP),!,correctArgsIsa00(Op,
 correctArgsIsa00(Op,[KP,Prop|Args],[KP|AArgs]):-logical_functor_ft(KP),!,correctAnyType(Op,[Prop|Args],ftListFn(ftAskable),AArgs).
 correctArgsIsa00(Op,[KP,Prop|Args],[KP|AA]):-is_holds_false(KP),!,correctArgsIsa00(Op,[KP,Prop|Args],AA).
 %correctArgsIsa00(_ ,[Prop,Arg],[Prop,Arg]):- !.
-correctArgsIsa00(Op,[Prop,ArgI],[Prop,ArgO]):- isa(Prop,tCol),!, correctAnyType(query(ftID,Op),ArgI,Prop,ArgO).
+correctArgsIsa00(Op,[Prop,ArgI],[Prop,ArgO]):- a(tCol,Prop),!, correctAnyType(query(ftID,Op),ArgI,Prop,ArgO).
 correctArgsIsa00(Op,[Prop|Args],[Prop|AArgs]):- discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs).
 
 
@@ -935,7 +936,7 @@ correctType0(_ ,A,Type,AA):- functor(Type,F,A),
    fail),ignore(AA=A).
 
 
-correctType0(_ ,What,Type,NewThing):- coerce(What,Type,NewThing),!.
+correctType0(_ ,What,Type,NewThing):- call_u(coerce(What,Type,NewThing)),!.
 %TODO Confirm vtDirection is coerce/3'd correctType0(_ ,A,vtDirection,AA):- call((current_predicate(any_to_dir/2),!,call(any_to_dir,A,AA))),!.
 %TODO Confirm vtDirection is coerce/3'd correctType0(_ ,A,vtDirection,AA):- must_equals(A,AA).
 

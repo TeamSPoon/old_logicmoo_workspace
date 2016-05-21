@@ -47,7 +47,7 @@
 :- dynamic(baseKB:mtExact/1).
 
 baseKB:mtCycL(baseKB).
-baseKB:mtExact(baseKB).
+%baseKB:mtExact(baseKB).
 
 
 :- sanity((get_lang(PL)->pl=PL)).
@@ -57,6 +57,19 @@ baseKB:mtExact(baseKB).
 :- dynamic(mpred_mark/3).
 %:- nortrace.
 %:- break.
+
+
+tAtemporalNecessarilyEssentialCollectionType(ttModule).
+
+/*
+:- kb_dynamic(collectionConventionMt/2).
+:- dynamic(collectionConventionMt/2).
+tAtemporalNecessarilyEssentialCollectionType(ANECT)==> collectionConventionMt(ANECT,baseKB).
+*/
+
+tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
+       decontextualizedCollection(ANECT).
+
 
 :- dynamic(ttModule/1).
 :- dynamic(marker_supported/2).
@@ -90,9 +103,9 @@ baseKB:mtExact(baseKB).
 % :- mpred_ops.
 
 
-:- sanity((fix_mp(baseKB:arity(apathFn,2),O),O=baseKB:arity(apathFn,2))).
 
-:- sanity((fix_mp(arity(apathFn,2),O),O=baseKB:arity(apathFn,2))).
+
+%:- sanity((fix_mp(clause(assert,sanity),arity(apathFn,2),M,O),M:O=baseKB:arity(apathFn,2))).
 
 arity(apathFn,2).
 arity(isKappaFn,2).
@@ -119,7 +132,7 @@ arity(argsQuoted,1).
 arity(quasiQuote,1).
 
 
-
+:-ain(baseKB:mtCycL(baseKB)).
 
 % this mean to leave terms at EL:  foo('QuoteFn'([cant,touch,me])).
 
@@ -146,12 +159,11 @@ argsQuoted({}).
 argsQuoted(second_order).
 % argsQuoted((':-')).
 
-nondet.
 
 :- dynamic((==>)/2).
 %doing_slow_rules,
-:-ain(((prologBuiltin(F),{atom(F)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)})).
-((prologBuiltin(P),{compound(P),get_arity(P,F,A)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)}).
+%:-rtrace(ain(((prologBuiltin(F),{atom(F)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)}))).
+%((prologBuiltin(P),{compound(P),get_arity(P,F,A)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)}).
 
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
@@ -189,7 +201,7 @@ bt(P,_)==> (P:- mpred_bc_only(P)).
 %prologHybrid(X)/get_pifunctor(X,C)==>({\+ is_static_predicate(C), kb_dynamic(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
 
 
-(pass2,prologBuiltin(X)/get_pifunctor(X,C))==>({decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologBuiltin(F)).
+%(pass2,prologBuiltin(X)/get_pifunctor(X,C))==>({nop(decl_mpred_prolog(C)),get_functor(C,F,A)},arity(F,A),prologBuiltin(F)).
 
 % prologDynamic(X)/get_pifunctor(X,C)==>({kb_dynamic(C),decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologDynamic(F)).
 
@@ -263,15 +275,16 @@ hybrid_support(F,A) ==>{ must(kb_dynamic(F/A))}.
 
 
 
-
-
+/*
 genlMt(Mt1,Mt2),mtCycL(Mt1),mtProlog(Mt2) ==> 
   {maybe_add_module_import(Mt1,Mt2)}.
-
+*/
 /*
 genlMt(Mt1,Mt2),mtProlog(Mt1),mtCycL(Mt2) ==> 
   {trace_or_throw(oddly_genlMt(Mt1,Mt2))}.
 */
+
+baseKB:mtCycL(baseKB).
 
 predicateConventionMt(genlMt,baseKB).
 predicateConventionMt(regression_test,lmconf).
@@ -280,7 +293,7 @@ predicateConventionMt(regression_test,lmconf).
 
 tCol(tSet).  % = isa(tSet,tCol).
 
-mtProlog(Mt),predicateConventionMt(F,Mt)==>prologBuiltin(F).
+mtProlog(Mt),predicateConventionMt(F,Mt)/(Mt\==baseKB)==>prologBuiltin(F).
 
 % genlsFwd(Sub,Super)==> (isa(I,Super) :- isa(I,Sub)). 
 genlsFwd(Sub,Super)==> (t(Sub,I) ==> t(Super,I)). 
@@ -295,10 +308,16 @@ disjointWith(mtLibrary,mtPrologLibrary).
 
 :- sanity(get_lang(pfc)).
 
+tCol(tCol).
+tCol(tPred).
+tCol(tFunction).
+tCol(tRelation).
+tCol(ttTemporalType).
+tCol(ttExpressionType).
+tCol(functorDeclares).
+functorDeclares(ttModule).
 
-:- ain(ttModule(mtCycL,
-  comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),
-  genlsFwd(tMicrotheory))).
+tCol(Decl)==>functorDeclares(Decl).
 
 :- sanity(( fully_expand(((ttModule(mtCycL,
   comment("yada....................."),
@@ -306,22 +325,17 @@ disjointWith(mtLibrary,mtPrologLibrary).
   OO),dmsg(full_transform=OO),
       OO=(_,_))).
 
-
-:- sanity(( full_transform(clause(cuz,one),((ttModule(mtCycL,
-  comment("yada....................."),
-  genlsFwd(tMicrotheory)))),
-  OO),dmsg(full_transform=OO),
-      OO=(_,_))).
-
-:- listing(ttModule).
+:- ain(ttModule(mtCycL,
+  comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),
+  genlsFwd(tMicrotheory))).
 
 :- sanity(arity(ttModule,1)).
+
 :- sanity(\+ arity(ttModule,3)).
 :- sanity(\+ predicate_property(ttModule(_,_,_),_)).
 
 ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
   genlsFwd(tMicrotheory)).
-
 
 :- sanity(arity(ttModule,1)).
 :- sanity(\+ arity(ttModule,3)).
@@ -336,6 +350,7 @@ ttModule(mtLibrary,comment("PFC System modules such as 'mpred_loader' or 'mpred_
 
 % ttModule(mtLocal,comment("mtLocal(?Mt) is always scoped underneath baseKB")).
 
+ 
 
 mtExact(Mt)==> mtGlobal(Mt).
 
@@ -345,10 +360,11 @@ mtGlobal(lmcode).
 mtGlobal(system).
 
 ttModule(mtExact,
-  comment("mtExact(?Mt) states that all predicates the Mt specified should be called from ?Mt.")).
+  comment("mtExact(?Mt) states that all predicates the Mt specifies should be called and asserted using only this ?Mt.")).
 mtExact(lmconf).
 mtExact(lmcache).
 mtExact(t_l).
+
 mtExact(system).
 mtExact(Mt)==> mtGlobal(Mt).
 mtExact(Mt)==> ~genlMt(Mt,_).
@@ -417,5 +433,12 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 
 :-ain(pass2).
 
-:- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
-:- ain(mpred_database_term(F,_,_)==> predicateConventionMt(F,abox)).
+% :- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
+
+
+nondet.
+
+:- ain((mpred_database_term(F,_,_)==> ~ predicateConventionMt(F,baseKB))).
+
+% :- ain(((predicateConventionMt(F,abox),\+predicateConventionMt(F,baseKB)) ==> ~ predicateConventionMt(F,baseKB))).
+

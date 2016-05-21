@@ -9,11 +9,11 @@
 :-multifile(lmconf:regression_test/0).
 :-multifile(lmconf:feature_test/0).
 :- dynamic((        
-        lmconf:agent_call_command/2,
         lmconf:feature_test/0,
         lmconf:mud_test/2,
         lmconf:regression_test/0,
         lmconf:sanity_test/0,
+        lmconf:agent_call_command/2,
         lmconf:type_action_info/3)).
 
 

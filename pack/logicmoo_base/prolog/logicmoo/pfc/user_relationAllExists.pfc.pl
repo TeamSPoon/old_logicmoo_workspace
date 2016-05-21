@@ -1,7 +1,7 @@
 
 :- file_begin(pfc).
 
-
+:- set_fileAssertMt(baseKB).
 
 /*
 colen syntax and Mts
@@ -104,8 +104,9 @@ cycl('
 
 ptTransitiveBinaryPredicate(mudSubPart).
 
-(ptTransitiveBinaryPredicate(P)/ground(P)) ==>
-    ((t(P,A,B),t(P,B,C))/(ground(v(A,B,C)),A\==C,B\==C,A\==B) ==> t(P,A,C)).
+% all_different_vals
+(pass4,ptTransitiveBinaryPredicate(P)/ground(P) ==>
+     ((t(P,A,B),t(P,B,C))/(ground(v(A,B,C)),A\==C,B\==C,A\==B) ==> t(P,A,C))).
 
 /*
 ptTransitiveBinaryPredicate(genls).
@@ -265,7 +266,7 @@ genls(tHumanBody,tBodyPart).
 :-dmsg("-------------------------------------SDFDFSDFSDFSDFSDFSDDDDDDDDDDDDDDDDDDDD").
 
 
-relationAllExists(mudSubPart,tHominid,tHumanBody).
+pass4,relationAllExists(mudSubPart,tHominid,tHumanBody).
 
 :- break,read(_),read(_).
 
@@ -274,8 +275,8 @@ relationAllExists(mudSubPart,tHominid,tHumanBody).
 
 
 
-relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).
-relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
+pass4,relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).
+pass4,relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
 
 :- endif.
@@ -304,7 +305,10 @@ have to confirm how *most* works
 */
 
 
-isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),nonvar(C).
+isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),tCol(C).
+
+
+end_of_file.
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 

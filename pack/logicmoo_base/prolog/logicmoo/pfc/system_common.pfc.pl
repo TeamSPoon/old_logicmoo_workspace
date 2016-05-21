@@ -35,6 +35,12 @@
 
 :- begin_pfc.
 
+:- set_fileAssertMt(baseKB).
+:- set_defaultAssertMt(baseKB).
+
+:- prolog_load_context(module,Mod),sanity(Mod==baseKB),writeq(prolog_load_context(module,Mod)),nl.
+
+
 arity(genlPreds,2).
 
 :- dynamic(mpred_undo_sys/3).
@@ -154,10 +160,17 @@ prologBuiltin(agent_text_command/4,prologDynamic).
 
 tCol(tNotForUnboundPredicates).
 
+
+:- sanity(fileAssertMt(baseKB)).
+:- sanity(defaultAssertMt(baseKB)).
+
+
 tNotForUnboundPredicates(member).
 
 never_assert_u(vtVerb(BAD),vtVerbError):-fail,BAD=='[|]'.
 never_assert_u(prologSingleValued(BAD),var_prologSingleValued(BAD)):-is_ftVar(BAD).
+
+never_assert_u(baseKB:mtProlog(baseKB),must(mtCycL(baseKB))).
 
 never_assert_u(A,test_sanity(A)):-never_assert_u(A).
 
