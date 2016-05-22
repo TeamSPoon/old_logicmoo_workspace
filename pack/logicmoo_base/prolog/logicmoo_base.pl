@@ -36,8 +36,8 @@
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
-:- multifile(lmconf:mpred_is_impl_file/2).
-:- dynamic(lmconf:mpred_is_impl_file/2).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
 
 :- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
 
@@ -97,11 +97,11 @@ lmconf:mpred_skipped_module(eggdrop).
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
 :- enable_mpred_expansion.
-system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_expander(goal,system,I,P1,O,P2).
-system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_expander(term,system,I,P1,O,P2).
+system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
+system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
 
 
-system:clause_expansion(I,':-'(ainz(I))):-  get_lang(pfc).
+% system:clause_expansion(I,':-'(ainz(I))):-  get_lang(pfc).
 
 /*
 

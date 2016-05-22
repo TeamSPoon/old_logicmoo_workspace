@@ -27,9 +27,9 @@
 % :- abox:defaultTBoxMt(_)->true;('$current_typein_module'(M),asserta(abox:defaultTBoxMt(M))).
 
 
-:- dynamic(lmconf:mpred_is_impl_file/2).
-:- multifile(lmconf:mpred_is_impl_file/2).
-% :- volatile(lmconf:mpred_is_impl_file/2).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+% :- volatile(lmconf:mpred_is_impl_file/1).
 
 
 */

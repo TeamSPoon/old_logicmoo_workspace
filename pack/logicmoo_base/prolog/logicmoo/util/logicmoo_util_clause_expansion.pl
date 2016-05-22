@@ -19,7 +19,6 @@
           show_module_imports/0,
           show_module_imports/1,
           show_module_imports/2,
-          is_file_based_expansion/5,
           push_modules/0,
           reset_modules/0,
           current_smt/2,
@@ -27,9 +26,8 @@
           maybe_add_import_module/3,
           maybe_add_import_module/2,
           maybe_delete_import_module/2,
-          add_prolog_predicate/6,
           glean_prolog_impl_file/4,
-          add_genlMt/2,
+          
           without_lm_expanders/1,
 
           nb_current_or_nil/2,
@@ -116,7 +114,7 @@ appear in the source-code.
 
 
 
-is_user_module :- prolog_load_context(source,F), lmconf:mpred_is_impl_file(_,F),!,fail.
+is_user_module :- prolog_load_context(source,F), lmconf:mpred_is_impl_file(F),!,fail.
 is_user_module :- prolog_load_context(module,user). 
 is_user_module :- prolog_load_context(module,M), module_property(M,class(L)),L=library,!,fail.
 
@@ -125,8 +123,10 @@ get_named_value_goal(G,N=V):- functor_non_colon(G,N,_), ((\+ \+ G )-> V=true; V=
 
 get_pos_at_c(C,Num):-compound(C),arg(1,C,Num),number(Num).
 
-
 is_fbe(term,I,PosI):-!,
+    source_location(S,_),
+    prolog_load_context(file,S),
+    prolog_load_context(source,S),
    compound(PosI),nonvar(I),
    nb_current_or_nil('$term',Was), Was==I,
    nb_current_or_nil('$term_position', Pos),
@@ -135,6 +135,9 @@ is_fbe(term,I,PosI):-!,
    PosAt>0,!,At>=PosAt.
 
 is_fbe(goal,I,PosI):-!,
+    source_location(S,_),
+    prolog_load_context(file,S),
+    prolog_load_context(source,S),
    compound(PosI),nonvar(I),
    nb_current_or_nil('$term',Was), Was==[],
    nb_current_or_nil('$term_position', Pos),
@@ -160,10 +163,10 @@ sub_positional(P):- compound(P),functor(P,F,A),arg(A,P,[L|_]),compound(L),functo
 
 positional_seg(term_position(G2787,_,G2787,_,[_-_])).
 
-nb_current_or_nil(N,V):-nb_current(N,V)->true;V=[].
+nb_current_or_nil(N,V):- nb_current(N,V)->true;V=[].
 
 system_goal_expansion(Mod,I,P,O,P2):- 
-  hotrace((nb_current_or_nil('$term',Was),
+  notrace((nb_current_or_nil('$term',Was),
   get_named_value_goal(is_fbe(term,I,P),L1),
   get_named_value_goal(Was=@=I,L2),
   get_named_value_goal(sub_positional(P),L3),
@@ -256,8 +259,8 @@ call_whatnot_expansion(Mod,MMTE,[M-Preds|TList], Clause0, Pos0, Clause, Pos) :-
 :- system:multifile(lmconf:source_typein_modules/3),
    system:dynamic(lmconf:source_typein_modules/3).
 
-:- multifile(lmconf:mpred_is_impl_file/2).
-:- dynamic(lmconf:mpred_is_impl_file/2).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
 
 
 current_smt(SM,M):-
@@ -305,38 +308,6 @@ maybe_delete_import_module(From,To):- To = user,!,
 maybe_delete_import_module(To,From):-  ignore(catch(system:delete_import_module(To,From),E,writeln(E=delete_import_module(To,From)))).
 
 
-% ===========================================================================
-% add_prolog_predicate/6,glean_prolog_impl_file/2,complete_prolog_impl_file/2
-% ===========================================================================
-
-:- multifile(lmconf:known_prolog_file_prop/2).
-:- dynamic(lmconf:known_prolog_file_prop/2).
-
-add_genlMt(_,_):- \+ current_prolog_flag(logicmoo_glean,true),!.
-add_genlMt(From,Prop):-atom(Prop),!,add_genlMt(From,imports(Prop)).
-add_genlMt(From,CTo):-arg(1,CTo,To),From==To,!.
-add_genlMt(From,imports(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
-add_genlMt(From,maybe(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
-add_genlMt(baseKB,imports(logicmoo_user)):-!. % this means never will happen
-
-add_genlMt(lmcode,imports(baseKB)):- !, add_genlMt(baseKB,imports(lmcode)).
-add_genlMt(lmcode,imports(baseKB)):-!.
-
-% add_genlMt(_From,imports(To)):-arg(_,v(baseKB,logicmoo_user),To),!.
-add_genlMt(From,Prop):-lmconf:known_prolog_file_prop(From,Prop),!.
-add_genlMt(From,Prop):-assertz(lmconf:known_prolog_file_prop(From,Prop)),fail.
-add_genlMt(_,file(_)):-!.
-add_genlMt(_,uses(_)):-!.
-add_genlMt(From,Prop):-write('% '), writeln(add_genlMt(From,Prop)),fail.
-
-/*
-add_genlMt(From,imports(To)):-
-   catch(add_import_module(From,To,start),E,writeln(E=add_import_module(From,To))).
-*/
-
-add_genlMt(_,_).
-
-
 :- meta_predicate
         glean_prolog_impl_file(+,+,+,+).
 
@@ -345,70 +316,16 @@ add_genlMt(_,_).
 
 swi_module(M,Preds):- forall(member(P,Preds),M:export(P)). % ,dmsg(swi_module(M)).
 
-is_file_based_expansion(term,I,PosI,_O,_PosO):-!,
-   compound(PosI),nonvar(I),
-   nb_current('$term',Was), Was==I,
-   nb_current('$term_position', Pos),
-   get_pos_at(Pos,PosAt),
-   get_pos_at(PosI,At),!,
-   PosAt>0,!,At>=PosAt.
-
-is_file_based_expansion(goal,I,PosI,_O,_PosO):-!,
-   compound(PosI),nonvar(I),
-   %nb_current('$term',Was), Was\=[],Was=(:- _),
-   nb_current('$term_position', Pos),
-   get_pos_at(Pos,PosAt),
-   get_pos_at(PosI,At),!,
-   PosAt>0,!,At>=PosAt.
 
 get_pos_at(C,Num):-compound(C),arg(1,C,Num),number(Num).
 
 :- dynamic(lmconf:known_complete_prolog_impl_file/3).
 glean_prolog_impl_file(_,_,_,_):- current_prolog_flag(xref,true),!.
-glean_prolog_impl_file(_,_,_,_):- \+ source_location(_,_),!.
-
-glean_prolog_impl_file(end_of_file,File,SM,TypeIn):-lmconf:known_complete_prolog_impl_file(SM,File,TypeIn),!.
+glean_prolog_impl_file(_,File,SM,TypeIn):- lmconf:known_complete_prolog_impl_file(SM,File,TypeIn),!.
 glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_concat([_,_|_],'.pfc',File),!,
-   assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),
-   all_source_file_predicates_are_transparent,
-  % add_genlMt(logicmoo_user,imports(baseKB)),
-  % add_genlMt(SM,maybe(TypeIn)),
-  add_genlMt(lmcode,imports(SM)),
-  % add_genlMt(SM,imports(logicmoo_user)),
-  % add_genlMt(SM,imports(baseKB)),
-   forall(source_file(M:H,File),
-       ignore((functor(H,F,A),
-         (predicate_property(M:H,imported_from(Where))
-           -> add_prolog_predicate(SM,Where,H,F,A,File)
-          ; add_prolog_predicate(TypeIn,M,H,F,A,File))))),
-         fail.
+   lmconf:mpred_is_impl_file(File),
+   assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),all_source_file_predicates_are_transparent.
 
-glean_prolog_impl_file((:- module(Want,_PubList)),File,SM,TypeIn):-!,
-    add_genlMt(TypeIn, uses(SM)),
-    add_genlMt(lmcode, uses(SM)),
-    % add_genlMt(baseKB, imports(SM)),
-    % add_genlMt(baseKB, imports(lmcode)),
-    % add_genlMt(SM,imports(lmcode)),    
-    add_genlMt(lmcode, uses(Want)),
-    add_genlMt(SM, uses(Want)),
-    add_genlMt(Want, file(File)).
-
-glean_prolog_impl_file(_,File,SM,_TypeIn):-
-   add_genlMt(SM,  file(File)),
-   add_genlMt(SM, imports(logicmoo_user)).
-
-
-:- export(add_prolog_predicate/6).
-:- module_transparent(add_prolog_predicate/6).
-add_prolog_predicate(skip,_M,_H,_F,_A,_S):-!.
-add_prolog_predicate(_ImportTo,M,H,F,A,_S):-
-  ignore((
-       F\=='$mode',
-       F\=='$pldoc',
-       F\=='$exported_op',
-       ignore(((\+ atom_concat('$',_,F),export(M:F/A)))),
-       \+ predicate_property(M:H,transparent),
-       M:module_transparent(M:F/A))).
       
 
 show_module_imports(M):- show_module_imports(M,_),
@@ -433,10 +350,11 @@ show_module_imports:-
 % All Module Predicates Are Transparent.
 %
 all_source_file_predicates_are_transparent:-
-   prolog_load_context(source,File),
+    must(prolog_load_context(source,File)),
     dmsg(all_source_file_predicates_are_transparent(File)),
     forall((source_file(ModuleName:P,File),functor(P,F,A)),
-      ignore((
+      ignore(( 
+        ignore(( \+ atom_concat('$',_,F), ModuleName:export(ModuleName:F/A))),
             \+ (predicate_property(ModuleName:P,(transparent))),
                    % ( nop(dmsg(todo(module_transparent(ModuleName:F/A))))),
                    (module_transparent(ModuleName:F/A))))).
@@ -455,22 +373,24 @@ system:goal_expansion(I,P,O,P2):-
    prolog_load_context(module,Mod),
    without_lm_expanders((system_goal_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
 
-system:term_expansion(EOF,POS,O,POS2):- 
- current_prolog_flag(lm_expanders,true),
- is_file_based_expansion(term,EOF,POS,O,POS2),
+system:term_expansion(EOF,POS,_,_):-
+ is_fbe(term,EOF,POS),
+    % current_prolog_flag(lm_expanders,true),
  nonvar(EOF),
+ prolog_load_context(source,S),
  (EOF=end_of_file;EOF=(:-(module(_,_)))),
  prolog_load_context(module,M),
- M\==user, 
- ignore((    
-    source_location(S,_),
-    '$current_typein_module'(TM),
+ M\==user,
+   ignore(('$current_typein_module'(TM),
      glean_prolog_impl_file(EOF,S,M,TM))),fail.
 
 system:term_expansion(I,P,O,P2):- current_prolog_flag(lm_expanders,true), 
   prolog_load_context(module,Mod), 
    without_lm_expanders((system_term_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
 
+:- initialization(nb_setval( '$term_position',[]),restore).
+:- initialization(nb_setval( '$term',[]),restore).
+:- initialization(nb_setval( '$term_e',[]),restore).
 
-:- all_source_file_predicates_are_transparent.
+:- trace,all_source_file_predicates_are_transparent.
 

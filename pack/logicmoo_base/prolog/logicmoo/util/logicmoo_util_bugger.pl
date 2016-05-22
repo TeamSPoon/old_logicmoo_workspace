@@ -417,14 +417,9 @@
         writeSTDERR0/1,
         writeSavedPrompt/0.
 
-:- multifile
-        logLevel/2.
-:- dynamic
-        logLevel/2.
 
 :- use_module(library(gui_tracer)).
 :- use_module(library(check)).
-
 
 
 % :- use_module('logicmoo_util_rtrace').
@@ -2901,10 +2896,10 @@ bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
 
 
 % Installs exception reporter.
-:- multifile(user:
+:- multifile(user:prolog_exception_hook/4).
 
-prolog_exception_hook/4).
 :- dynamic(user:prolog_exception_hook/4).
+
 % Writes exceptions with stacktrace into stderr.
 % Fail/0 call at the end allows the exception to be
 % processed by other hooks too.
@@ -2937,7 +2932,7 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
     nl(ERR), fail)),
     set_prolog_flag(no_debug_ST,false).
 
-:-disabled_this.
+% :-disabled_this.
 
 :- dynamic(lmconf:no_buggery/0).
 % show the warnings origins

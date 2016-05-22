@@ -461,9 +461,9 @@ predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_proper
 
 :- style_check(-singleton).
 
-:- dynamic(lmconf:mpred_is_impl_file/2).
-:- multifile(lmconf:mpred_is_impl_file/2).
-:- volatile(lmconf:mpred_is_impl_file/2).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- volatile(lmconf:mpred_is_impl_file/1).
 
 :- if(false).
 :- else.
@@ -476,7 +476,7 @@ predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_proper
 %
 % Write Modules.
 %
-write_modules:- forall(lmconf:mpred_is_impl_file(_,F),(export_file_preds(F),list_file_preds(F))).
+write_modules:- forall(lmconf:mpred_is_impl_file(F),(export_file_preds(F),list_file_preds(F))).
 
 
 
@@ -528,9 +528,9 @@ export_module_preds:- source_context_module(M),source_file_property(S,module(M))
 merge_mode_and_varname(ModeAs,NameAs,ModeAs:NameAs).
 
 
-:- dynamic(lmconf:mpred_is_impl_file/2).
-:- multifile(lmconf:mpred_is_impl_file/2).
-:- volatile(lmconf:mpred_is_impl_file/2).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- volatile(lmconf:mpred_is_impl_file/1).
 
 
 %= 	 	 
@@ -539,7 +539,7 @@ merge_mode_and_varname(ModeAs,NameAs,ModeAs:NameAs).
 %
 % Target Module.
 %
-target_module(P,M):-mpred_source_file(M:P,F),lmconf:mpred_is_impl_file(_,F),make_module_name(F,M).
+target_module(P,M):-mpred_source_file(M:P,F),lmconf:mpred_is_impl_file(F),make_module_name(F,M).
 
 % autodoc_output_path(_,user):- !.
 

@@ -370,14 +370,19 @@ kb_dynamic(_:CM,M,PI,F,A):-
       define_maybe_exact(M,PI))).
 
 define_maybe_exact(M,PI):- a(mtExact,M),!, 
+   functor(PI,F,A),
+   M:multifile(M:F/A),
      ain(baseKB:predicateConventionMt(F,M)),
-     decl_shared(M:PI),
+     decl_shared(M:PI),     
      sanity(\+is_static_predicate(M:PI)),
      maybe_define_if_not_static(M,PI).
 define_maybe_exact(_,PI):-
      maybe_define_if_not_static(baseKB,PI).
 
 maybe_define_if_not_static(M,PI):- 
+      functor(PI,F,A),
+      M:multifile(M:F/A),
+      M:public(M:F/A),
       (is_static_predicate(M:PI) -> true ;
        (predicate_property(M:PI,dynamic) -> true ; icatch(M:dynamic(M:PI)))),!.
 

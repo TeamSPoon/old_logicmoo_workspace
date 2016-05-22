@@ -347,7 +347,7 @@ format_to_error(F,A):-lmcache:current_main_error_stream(Err),!,format(Err,F,A).
 %
 % Fresh Line Converted To Err.
 %
-fresh_line_to_err:- hotrace((flush_output_safe,lmcache:current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
+fresh_line_to_err:- notrace((flush_output_safe,lmcache:current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
 
 :- dynamic(lmcache:thread_current_input/2).
 :- dynamic(lmcache:thread_current_error_stream/2).
@@ -1539,8 +1539,8 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
-must(Goal):-  hotrace(is_release),!,call(Goal).
-must(Goal):-  hotrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),MGoal.
+must(Goal):-  notrace(is_release),!,call(Goal).
+must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),MGoal.
 
 
 %= 	 	 
@@ -1573,4 +1573,5 @@ get_must(Goal,CGoal):-
 
 %:- 'mpred_trace_none'(ddmsg(_)).
 %:- 'mpred_trace_none'(ddmsg(_,_)).
+
 
