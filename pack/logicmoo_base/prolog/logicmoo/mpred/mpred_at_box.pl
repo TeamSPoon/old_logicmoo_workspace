@@ -115,7 +115,6 @@ baseKB:mtProlog(Mt):-
          lmcache,
          t_l,
          
-         lmcode,
          logicmoo_base_file,
          logicmoo_user_file,
          logicmoo_util_attvar_reader,
@@ -143,7 +142,7 @@ baseKB:mtProlog(Mt):-
          logicmoo_util_varnames,
          logicmoo_util_with_assertions,
          logicmoo_utils_file,
-         lmcode,
+         system,
          mpred_agenda,
          mpred_at_box,
          mpred_expansion,
@@ -432,12 +431,12 @@ ensure_imports_tbox(M,TBox):-
 
 
 
-% :- inherit_into_module(logicmoo_user,lmcode).
+% :- inherit_into_module(logicmoo_user,system).
 
 fixup_module(_,_):-!.
 fixup_module(system,_).
 fixup_module(M,_L):- clause_b(tGlobal(M)),skip_user(M).
-fixup_module(lmcode,_L):-skip_user(lmcode).
+fixup_module(system,_L):-skip_user(system).
 fixup_module(_,[user]).
 fixup_module(M,_L):- skip_user(M).
 
@@ -579,7 +578,7 @@ baseKB:hybrid_support(genlMt,2).
 
 
 
-istAbove(Mt,Query):- Mt \== baseKB, Mt \== lmcode, genlMt(Mt,MtAbove),MtAbove:Query.
+istAbove(Mt,Query):- Mt \== baseKB, genlMt(Mt,MtAbove),MtAbove:Query.
 
 
 
@@ -648,7 +647,7 @@ retry_undefined(Mt, F, A):-  clause_b(mtCycLBroad(Mt)), baseKB_hybrid_support(F,
 retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(mtGlobal(CallerMt)),
    create_predicate_istAbove(CallerMt,F,A).
 
-retry_undefined(CallerMt,F,A):- current_predicate(lmcode:F/A), current_module(M),M\=lmcode,
+retry_undefined(CallerMt,F,A):- current_predicate(system:F/A), current_module(M),M\=system,
   current_predicate(M:F/A),functor(P,F,A),predicate_property(M:P,defined),\+predicate_property(M:P,imported_from(_)),
   CallerMt:import(M:F/A).
 
@@ -657,11 +656,11 @@ retry_undefined(CallerMt,F,A):-
     use_module(CallerMt:File),!.
    
 % Autoloads importing the entire other module
-retry_undefined(CallerMt,F,A):-
+retry_undefined(CallerMt,F,A):- fail,
        autoload_library_index(F,A,PredMt,File),
        asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
-       use_module(lmcode:File),!.
-       % system:add_import_module(CallerMt,lmcode,start).
+       use_module(system:File),!.
+       % system:add_import_module(CallerMt,system,start).
 
 
 

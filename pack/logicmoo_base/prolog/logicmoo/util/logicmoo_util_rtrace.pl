@@ -133,7 +133,7 @@ grtrace(Trace):- hotrace(( visible(+all),thread_leash(+all))), Trace.
 % Cno Trace.
 %
 cnotrace(Goal):- once(Goal).
-cnotrace:- true.
+cnotrace:- notrace.
 %:- mpred_trace_less(hotrace/1).
 %:- '$set_predicate_attribute'(hotrace(_), hide_childs, 0).
 %:- '$set_predicate_attribute'(hotrace(_), trace, 1).
@@ -155,8 +155,8 @@ hotrace:-notrace.
 %
 % Only leashs the main thread
 %
-thread_leash(-Some):- thread_self(main)->leash(-Some);true.
-thread_leash(+Some):- thread_self(main)->leash(+Some);true.
+%thread_leash(-Some):- thread_self(main)->leash(-Some);true.
+%thread_leash(+Some):- thread_self(main)->leash(+Some);true.
 thread_leash(Some):- thread_self(main)->leash(Some);true.
 
 :- meta_predicate hotrace(0).

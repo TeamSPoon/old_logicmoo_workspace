@@ -1332,7 +1332,7 @@ user:portray(A) :-  \+ tracing,
 %
 % Print Numbervars.
 %
-print_numbervars(H):- tlbugger:no_slow_io,!, writeq(H),!.
+print_numbervars(H):- (tlbugger:no_slow_io; tracing),!, writeq(H),!.
 print_numbervars(H):- must( \+ \+ ((on_x_log_fail(print_numbervars_maybe(H));on_x_log_fail(print_numbervars_1(H))))),!.
 
 
