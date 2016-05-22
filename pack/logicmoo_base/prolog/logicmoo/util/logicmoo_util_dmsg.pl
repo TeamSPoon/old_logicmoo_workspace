@@ -415,8 +415,8 @@ dmsg_text_to_string_safe(Expr,Forms):-on_x_fail(text_to_string(Expr,Forms)).
 %
 % Format Primary Helper.
 %
-fmt0(user_error,F,A):-!,lmcache:current_main_error_stream(Err),!,format(Err,F,A).
-fmt0(current_error,F,A):-!,lmcache:thread_current_error_stream(Err),!,format(Err,F,A).
+fmt0(user_error,F,A):-!,get_main_error_stream(Err),!,format(Err,F,A).
+fmt0(current_error,F,A):-!,get_thread_current_error(Err),!,format(Err,F,A).
 fmt0(X,Y,Z):-catchvvnt((format(X,Y,Z),flush_output_safe(X)),E,dfmt(E:format(X,Y))).
 
 %= 	 	 
@@ -539,7 +539,7 @@ fmt_or_pp(X):-format('~q~N',[X]).
 %
 % Using Output Converted To Console.
 %
-with_output_to_console(X):- lmcache:current_main_error_stream(Err),with_output_to_stream(Err,X).
+with_output_to_console(X):- get_main_error_stream(Err),!,with_output_to_stream(Err,X).
 
 %= 	 	 
 
@@ -547,7 +547,7 @@ with_output_to_console(X):- lmcache:current_main_error_stream(Err),with_output_t
 %
 % Using Output Converted To Main.
 %
-with_output_to_main(X):- lmcache:current_main_error_stream(Err),with_output_to_stream(Err,X).
+with_output_to_main(X):- get_main_error_stream(Err),!,with_output_to_stream(Err,X).
 
 
 %= 	 	 
@@ -556,7 +556,7 @@ with_output_to_main(X):- lmcache:current_main_error_stream(Err),with_output_to_s
 %
 % Dfmt.
 %
-dfmt(X):- lmcache:thread_current_error_stream(Err),with_output_to_stream(Err,fmt(X)).
+dfmt(X):- get_thread_current_error(Err),!,with_output_to_stream(Err,fmt(X)).
 
 %= 	 	 
 
@@ -564,7 +564,7 @@ dfmt(X):- lmcache:thread_current_error_stream(Err),with_output_to_stream(Err,fmt
 %
 % Dfmt.
 %
-dfmt(X,Y):- lmcache:thread_current_error_stream(Err), with_output_to_stream(Err,fmt(X,Y)).
+dfmt(X,Y):- get_thread_current_error(Err), with_output_to_stream(Err,fmt(X,Y)).
 
 
 %= 	 	 
@@ -574,7 +574,7 @@ dfmt(X,Y):- lmcache:thread_current_error_stream(Err), with_output_to_stream(Err,
 % Using Output Converted To Stream.
 %
 with_output_to_stream(Stream,Goal):-
-    current_output(Saved),
+   current_output(Saved),
    scce_orig(set_output(Stream),
          Goal,
          set_output(Saved)).
@@ -586,7 +586,7 @@ with_output_to_stream(Stream,Goal):-
 %
 % Converted To Stderror.
 %
-to_stderror(Call):- lmcache:thread_current_error_stream(Err), with_output_to_stream(Err,Call).
+to_stderror(Call):- get_thread_current_error(Err), with_output_to_stream(Err,Call).
 
 
 
@@ -625,8 +625,8 @@ setLogLevel(M,L):-retractall(logLevel(M,_)),(nonvar(L)->asserta(logLevel(M,L));t
 %
 % Log Level.
 %
-logLevel(debug,ERR):-lmcache:thread_current_error_stream(ERR).
-logLevel(error,ERR):-lmcache:thread_current_error_stream(ERR).
+logLevel(debug,ERR):-get_thread_current_error(ERR).
+logLevel(error,ERR):-get_thread_current_error(ERR).
 logLevel(private,none).
 logLevel(S,Z):-current_stream(_X,write,Z),trace,stream_property(Z,alias(S)).
 
@@ -1577,7 +1577,7 @@ flush_output_safe(X):-ignore(catchv(flush_output(X),_,true)).
 % Write Failure Log.
 %
 writeFailureLog(E,X):-
-  lmcache:thread_current_error_stream(ERR),
+  get_thread_current_error(ERR),
 		(fmt(ERR,'\n% error: ~q ~q\n',[E,X]),flush_output_safe(ERR),!,
 		%,true.
 		fmt('\n% error: ~q ~q\n',[E,X]),!,flush_output).

@@ -254,12 +254,12 @@ decl_mpred_prolog(_:CM,M,PI,F,A):-
       (integer(A)->assert_arity(F,A);true),
       define_maybe_prolog(M,PI,F,A))).
 
-define_maybe_prolog(M,PI,F,A):- predicate_property(M:PI,imported_from(system)),ain(prologBuiltin(F)).
+define_maybe_prolog(M,PI,F,_A):- predicate_property(M:PI,imported_from(system)),ain(prologBuiltin(F)).
 
 define_maybe_prolog(M,PI,F,A):- 
     (\+ predicate_property(M:PI,_); predicate_property(M:PI,imported_from(OM))),
     ((OM=system;current_module(OM)),predicate_property(OM:PI,_),\+ predicate_property(OM:PI,imported_from(_))),!,
-    decl_mpred_prolog(CM,OM,PI,F,A).
+    decl_mpred_prolog(M,OM,PI,F,A).
 
 define_maybe_prolog(M,PI,F,A):-
       assert_arity(F,A),

@@ -15,6 +15,8 @@
 :- module(logicmoo_util_catch,
           [ !/1,
             addLibraryDir/0,
+            get_main_error_stream/1,
+            get_thread_current_error/1,
             source_variables_l/1,
             as_clause_no_m/3,
             as_clause_w_m/4,
@@ -107,7 +109,7 @@
             slow_sanity/1,
             strip_arity/3,
             strip_f_module/2,
-            lmcache:thread_current_error_stream/1,
+            get_thread_current_error/1,
             throwNoLib/0,
             to_m_f_arity_pi/5,
             to_pi/2,
@@ -115,6 +117,9 @@
             warn_bad_functor/1,
             when_defined/1,
             with_main_error_to_output/1,
+            with_current_io/1,
+            with_error_to_main/1,
+            with_dmsg_to_main/1,
             with_main_input/1,
             with_main_io/1,
             with_preds/6,
@@ -165,6 +170,9 @@
         to_pi(?, ?),
         when_defined(:),
         with_main_error_to_output(0),
+        with_current_io(0),
+        with_dmsg_to_main(0),
+        with_error_to_main(0),
         with_main_input(0),
         with_main_io(0),
         with_preds(?, ?, ?, ?, ?, 0),
@@ -230,7 +238,7 @@
         skipWrapper/0,
         strip_arity/3,
         strip_f_module/2,
-        lmcache:thread_current_error_stream/1,
+        get_thread_current_error/1,
         throwNoLib/0,
         to_m_f_arity_pi/5,
         to_pi0/3,
@@ -291,6 +299,7 @@ is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
 
 :- thread_local(tlbugger:no_colors/0).
 :- thread_local(t_l:thread_local_current_main_error_stream/1).
+:- volatile(t_l:thread_local_current_main_error_stream/1).
 
 :- is_pdt_like-> assert(tlbugger:no_colors); true.
 
@@ -308,30 +317,49 @@ with_main_error_to_output(Goal):-
   w_tl(t_l:thread_local_current_main_error_stream(Out),Goal).
    
 
+with_current_io(Goal):-
+  current_input(IN),current_output(OUT),get_thread_current_error(Err),  
+  setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,Err)).
 
-%= 	 	 
 
-%% lmcache:thread_current_error_stream( ?Err) is semidet.
+with_dmsg_to_main(Goal):-
+  get_main_error_stream(Err),get_thread_current_error(ErrWas),Err=ErrWas,!,Goal.
+with_dmsg_to_main(Goal):-
+  get_main_error_stream(Err),get_thread_current_error(ErrWas),
+  current_input(IN),current_output(OUT),
+   w_tl(t_l:thread_local_current_main_error_stream(Err),
+   setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,ErrWas))).
+   
+with_error_to_main(Goal):-
+  get_main_error_stream(Err),get_thread_current_error(ErrWas),Err=ErrWas,!,Goal.
+with_error_to_main(Goal):-
+  get_main_error_stream(Err),get_thread_current_error(ErrWas),
+  current_input(IN),current_output(OUT),
+   w_tl(t_l:thread_local_current_main_error_stream(Err),
+   setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,ErrWas))).
+   
+   
+
+
+
+%% get_thread_current_error( ?Err) is det.
 %
 % Thread Current Error Stream.
 %
-lmcache:thread_current_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
-lmcache:thread_current_error_stream(Err):- thread_self(ID),lmcache:thread_current_error_stream(ID,Err),!.
-lmcache:thread_current_error_stream(Err):- stream_property(Err,alias(current_error)),!.
-lmcache:thread_current_error_stream(Err):- stream_property(Err,alias(user_error)),!.
-lmcache:thread_current_error_stream(Err):- lmcache:current_main_error_stream(Err),!.
+get_thread_current_error(Err):- t_l:thread_local_current_main_error_stream(Err),!.
+get_thread_current_error(Err):- thread_self(ID),lmcache:thread_current_error_stream(ID,Err),!.
+get_thread_current_error(Err):- stream_property(Err,alias(current_error)),!.
+get_thread_current_error(Err):- stream_property(Err,alias(user_error)),!.
+get_thread_current_error(Err):- get_main_error_stream(Err),!.
 
-%= 	 	 
-
-%% lmcache:current_main_error_stream( ?Err) is semidet.
+%% get_main_error_stream( ?Err) is det.
 %
 % Current Main Error Stream.
 %
-lmcache:current_main_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
-lmcache:current_main_error_stream(Err):- lmcache:thread_main(user,ID),lmcache:thread_current_error_stream(ID,Err).
-lmcache:current_main_error_stream(Err):- lmcache:thread_current_error_stream(main,Err).
-lmcache:current_main_error_stream(Err):- stream_property(Err,alias(user_error)),!.
-lmcache:current_main_error_stream(Err):- stream_property(Err,alias(current_error)),!.
+get_main_error_stream(Err):- lmcache:thread_main(user,ID),lmcache:thread_current_error_stream(ID,Err).
+get_main_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
+get_main_error_stream(Err):- stream_property(Err,alias(user_error)),!.
+get_main_error_stream(Err):- stream_property(Err,alias(current_error)),!.
 
 %= 	 	 
 
@@ -339,7 +367,7 @@ lmcache:current_main_error_stream(Err):- stream_property(Err,alias(current_error
 %
 % Format Converted To Error.
 %
-format_to_error(F,A):-lmcache:current_main_error_stream(Err),!,format(Err,F,A).
+format_to_error(F,A):-get_main_error_stream(Err),!,format(Err,F,A).
 
 %= 	 	 
 
@@ -347,11 +375,12 @@ format_to_error(F,A):-lmcache:current_main_error_stream(Err),!,format(Err,F,A).
 %
 % Fresh Line Converted To Err.
 %
-fresh_line_to_err:- notrace((flush_output_safe,lmcache:current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
+fresh_line_to_err:- notrace((flush_output_safe,get_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
 
 :- dynamic(lmcache:thread_current_input/2).
-:- dynamic(lmcache:thread_current_error_stream/2).
 :- volatile(lmcache:thread_current_input/2).
+
+:- dynamic(lmcache:thread_current_error_stream/2).
 :- volatile(lmcache:thread_current_error_stream/2).
 
 %= 	 	 
@@ -369,13 +398,14 @@ save_streams:- thread_self(ID), save_streams(ID).
 %
 % Save Streams.
 %
-save_streams(ID):- current_input(In),lmcache:thread_current_input(ID,In),!.
-save_streams(ID):-
+save_streams(ID):- 
+  retractall((lmcache:thread_current_input(ID,_))),
+  retractall((lmcache:thread_current_error_stream(ID,_))),
   current_input(In),asserta(lmcache:thread_current_input(ID,In)),
   thread_at_exit(retractall((lmcache:thread_current_input(ID,_)))),
   thread_at_exit(retractall((lmcache:thread_current_error_stream(ID,_)))),
   (stream_property(Err, alias(user_error));current_error(Err)),
-  asserta(lmcache:thread_current_error_stream(ID,Err)).
+              asserta(lmcache:thread_current_error_stream(ID,Err)).
 
 
 :- meta_predicate(with_main_input(0)).
@@ -1568,8 +1598,9 @@ get_must(Goal,CGoal):-
          ignore_each((rtrace(Goal),nortrace,trace,dtrace(Goal),badfood(Goal)))))
          *-> true ; (dumpST,ignore_each(((trace,dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).
 
-:- initialization(save_streams).
 :- save_streams.
+:- initialization(save_streams).
+:- initialization(save_streams,restore).
 
 %:- 'mpred_trace_none'(ddmsg(_)).
 %:- 'mpred_trace_none'(ddmsg(_,_)).

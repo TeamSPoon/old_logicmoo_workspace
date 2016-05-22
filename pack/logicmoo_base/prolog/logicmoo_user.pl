@@ -45,7 +45,9 @@
 :- set_prolog_flag(optimise,false).
 :- set_prolog_flag(last_call_optimisation,false).
 :- debug.
-:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 */
+:- at_start((Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)))).
+:- at_start((logicmoo_util_shared_dynamic:asserta_if_new((ereq(G):- !, call_u(G))))).
+:- at_start((ignore((logicmoo_util_shared_dynamic:retract((ereq(G):- find_and_call(G))),fail)))).
 
 :- reset_modules.

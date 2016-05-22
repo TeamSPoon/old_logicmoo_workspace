@@ -1241,6 +1241,7 @@ save_file_source_vars(F,T,Vs):- put_variable_names(Vs),!,w_tl(t_l:current_why_so
 %
 % Read Source Variables.
 %
+
 read_source_vars(File,In):-
    Module = module(_),
 	repeat,
@@ -1269,6 +1270,7 @@ read_source_vars(File,In):-
 %
 % read source file Variables  Secondary Helper.
 %
+read_source_file_vars_1('/usr/lib/swi-prolog/library/sandbox.pl'):-!.
 read_source_file_vars_1(File):-
    once(current_prolog_flag(xref, Was);Was=false),
    w_tl(set_prolog_flag(xref, true),

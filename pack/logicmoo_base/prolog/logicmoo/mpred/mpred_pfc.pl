@@ -372,9 +372,9 @@ unassertable((_,_)).
 
 :- style_check(+discontiguous).
 
-to_real_mt(Why,abox,ABOX):- must(loop_check(defaultAssertMt(ABOX),fail)),!,sanity(mtCanAssert(ABOX)).
-to_real_mt(Why,tbox,TBOX):- must(get_current_default_tbox(TBOX)),!.
-to_real_mt(Why,BOX,BOX).
+to_real_mt(_Why,abox,ABOX):- must(loop_check(defaultAssertMt(ABOX),fail)),!,sanity(mtCanAssert(ABOX)).
+to_real_mt(_Why,tbox,TBOX):- must(get_current_default_tbox(TBOX)),!.
+to_real_mt(_Why,BOX,BOX).
 
 %% fix_mp(+Why,+I,-O) is det.
 %

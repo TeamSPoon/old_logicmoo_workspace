@@ -1183,7 +1183,7 @@ update_changed_files:-!,thread_signal(main,update_changed_files0).
 %
 % Update Changed Files Primary Helper.
 %
-update_changed_files0 :- lmcache:current_main_error_stream(Err),with_output_to(Err,update_changed_files1).
+update_changed_files0 :- get_main_error_stream(Err),!,with_output_to(Err,update_changed_files1).
 
 %= 	 	 
 
@@ -1192,6 +1192,7 @@ update_changed_files0 :- lmcache:current_main_error_stream(Err),with_output_to(E
 % Update Changed Files Secondary Helper.
 %
 update_changed_files1 :- 
+   with_no_dmsg((
         set_prolog_flag(verbose_load,true),
         ensure_loaded(library(make)),
 	findall(File, make:modified_file(File), Reload0),
@@ -1207,7 +1208,7 @@ update_changed_files1 :-
 	->  true
 	;   
            true %list_undefined,list_void_declarations
-	).
+	))).
 
 :- export(remove_undef_search/0).
 % check:list_undefined:-real_list_undefined([]).

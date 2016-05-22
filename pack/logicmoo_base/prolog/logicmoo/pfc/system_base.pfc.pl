@@ -124,6 +124,7 @@ arity('<=>',2).
 arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
 arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
+mtCycL(baseKB).
 
 tCol(ttModule).
 tSet(ttModule).

@@ -392,5 +392,5 @@ system:term_expansion(I,P,O,P2):- current_prolog_flag(lm_expanders,true),
 :- initialization(nb_setval( '$term',[]),restore).
 :- initialization(nb_setval( '$term_e',[]),restore).
 
-:- trace,all_source_file_predicates_are_transparent.
+:- all_source_file_predicates_are_transparent.
 

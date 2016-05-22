@@ -344,19 +344,21 @@ mpred_file_term_expansion(Type,LoaderMod,I,OO):- !,
 % Ensure rule macro predicates are being used checked just before assert/query time
 mpred_file_term_expansion0(Type,LoaderMod,I,O):- 
   sanity((ground(Type:LoaderMod),nonvar(I),var(O))),
-  quietly_must(get_source_ref1(mfl(_,F,L))),!,
+  quietly_must(get_source_ref1(mfl(MF,F,L))),!,
   % \+ mpred_prolog_only_file(F),
+  must((proper_source_mod([LoaderMod,MF],AM))),
   b_getval('$term',TermWas), TermWas == I,
   call_cleanup(
-        w_tl(t_l:current_why_source(mfl(LoaderMod,F,L)),
+        w_tl(t_l:current_why_source(mfl(AM,F,L)),
         (( get_original_term_source(Orig), 
            b_setval('$orig_term',Orig),
            b_setval('$term',[]),
-           (O= (:- must(ain(I))))))),
+           (O= (:- must(mpred_ain(I,(mfl(AM,F,L),ax)))))))),
     b_setval('$term',TermWas)),!, wdmsg(I-->O).
 
 
-
+proper_source_mod(List,AM):- member(AM,List),call_u(mtCycL(AM)),!.
+proper_source_mod(List,AM):- member(AM,List),call_u(mtCanAssert(AM)),!.
 
 %% mpred_expand_file_module_clause( +File, +Module, +:Term, -:Expanded) is det.
 %

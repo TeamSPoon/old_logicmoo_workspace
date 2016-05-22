@@ -2424,8 +2424,6 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 
 /*
 
-:- logicmoo_util_shared_dynamic:asserta_if_new((ereq(G):- !, call_u(G))).
-:- ignore((logicmoo_util_shared_dynamic:retract((ereq(G):- find_and_call(G))),fail)).
 % :- logicmoo_util_shared_dynamic:listing(ereq/1).
 
 */

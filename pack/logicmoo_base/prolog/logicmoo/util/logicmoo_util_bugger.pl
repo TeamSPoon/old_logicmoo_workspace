@@ -2913,7 +2913,7 @@ bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
 disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame, _):- 
  \+ current_prolog_flag(no_debug_ST,true),
  set_prolog_flag(no_debug_ST,true),
- lmcache:thread_current_error_stream(ERR),
+ get_thread_current_error(ERR),
     (   Exception = error(Term) ;   Exception = error(Term, _)),
     Term \= type_error(number,_), 
     Term \= type_error(character_code,_), 

@@ -42,6 +42,7 @@
 :- user:use_module(library(eggdrop)).
 :- forall(prolog_debug:debugging(X,true,_),prolog_debug:nodebug(X)).
 :- initialization(eggdrop:egg_go,restore).
+:- initialization(eggdrop:egg_go).
 wbg:- eggdrop:egg_go.
 
 :- set_prolog_flag(lm_expanders,true).
@@ -52,13 +53,13 @@ wbg:- eggdrop:egg_go.
 size666_stacks:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 
 :- abolish(system:nondet/1).
-:- size666_stacks.
+:- at_start(size666_stacks).
 
 
 :- user:use_module(library(logicmoo_user),except([op(_,_,_)])).
 %:- forall(prolog_debug:debugging(X,true,_),prolog_debug:nodebug(X)).
-:- initialization(set_prolog_flag(mpred_te,false)).
-:- initialization(set_prolog_flag(mpred_te,false),restore).
+%:- initialization(set_prolog_flag(mpred_te,false)).
+%:- initialization(set_prolog_flag(mpred_te,false),restore).
 
 %:- system:use_module(library(logicmoo/mpred_online/mpred_rdf)).
 

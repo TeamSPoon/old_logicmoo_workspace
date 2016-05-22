@@ -98,8 +98,8 @@ add_abox_module(ABox):- must(atom(ABox)),
 :- dynamic(baseKB:mtNoPrologCode/1).
 baseKB:mtNoPrologCode(mpred_userkb).
 
-baseKB:mtProlog(Mt):- compound(Mt),!,fail.
 baseKB:mtProlog(Mt):- var(Mt),!,current_module(Mt),clause_b(mtProlog(Mt)).
+baseKB:mtProlog(Mt):- \+ atom(Mt),!,fail.
 baseKB:mtProlog(Mt):- \+ current_module(Mt),!,fail.
 baseKB:mtProlog(Mt):- clause_b(mtCycL(Mt)),!,fail.
 baseKB:mtProlog(Mt):- module_property(Mt,class(library)).
@@ -365,7 +365,6 @@ baseKB:mtCore(baseKB).
 %baseKB:mtGlobal(mpred_loader).
 
 :- dynamic(baseKB:mtGlobal/1).
-baseKB:mtGlobal(baseKB).
 baseKB:mtGlobal(boot_system).
 baseKB:mtGlobal(system_markers).
 baseKB:mtGlobal(system_singleValued).
@@ -511,9 +510,14 @@ add_import_predicate(Mt,Goal,OtherMt):-
    make_as_dynamic(imported_from(OtherMt),Mt,F,A),
    assert_if_new(( Mt:Goal :- OtherMt:Goal)).
   
-make_as_dynamic(Reason,Mt,F,A):- dynamic( Mt:F/A),
+make_as_dynamic(Reason,Mt,F,A):- 
+ must_det_l((
+   dynamic(Mt:F/A),
+   multifile(Mt:F/A),
+   discontiguous(Mt:F/A),
+   public(Mt:F/A),
    functor(Goal,F,A),
-   assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))).
+   assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))))).
 
 
 transitive_path(F,[Arg1,Arg2],Arg2):-
@@ -613,15 +617,15 @@ uses_predicate(CallerMt,F,A,retry):-
 %
 % Ensure istAbove/2 stub is present in ChildDefMt.
 %
-create_predicate_istAbove(abox,F,A):- 
-   defaultAssertMt(CallerMt),!,must(dynamic(CallerMt:F/A)),
-   show_call((*),create_predicate_istAbove(CallerMt,F,A)).
-create_predicate_istAbove(Mt,F,A):- clause_b(mtCycLBroad(Mt)), must(dynamic(Mt:F/A)),!.
-% create_predicate_istAbove(CallerMt,F,A):- mtGlobal(CallerMt),!,trace_or_throw(global_create_predicate_istAbove(CallerMt,F,A)).   
 
+create_predicate_istAbove(abox,F,A):- must(defaultAssertMt(CallerMt)),CallerMt\=abox,!,create_predicate_istAbove(CallerMt,F,A).
+
+% create_predicate_istAbove(CallerMt,F,A):- mtGlobal(CallerMt),!,trace_or_throw(global_create_predicate_istAbove(CallerMt,F,A)).   
 create_predicate_istAbove(CallerMt,F,A):-
-   sanity(\+ find_and_call(mtGlobal(CallerMt))),!,
-   functor(Goal,F,A),assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
+   show_failure(\+ find_and_call(mtProlog(CallerMt))),!,
+   make_as_dynamic(create_predicate_istAbove,CallerMt,F,A),
+   functor(Goal,F,A),
+   assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
 
 
 :- dynamic(lmcache:tried_to_retry_undefined/3).
@@ -635,14 +639,12 @@ create_predicate_istAbove(CallerMt,F,A):-
 % Every module has it''s own
 retry_undefined(CallerMt,'$pldoc',4):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
 
-retry_undefined(lmconf,F,A):-multifile(lmconf:F/A),dynamic(lmconf:F/A),!.
-retry_undefined(lmcache,F,A):-multifile(lmcache:F/A),volatile(lmcache:F/A),dynamic(lmcache:F/A),!.
-retry_undefined(t_l,F,A):-multifile(t_l:F/A),thread_local(t_l:F/A),!.
+retry_undefined(lmconf,F,A):- make_as_dynamic(retry_undefined(lmconf),lmconf,F,A),!.
+retry_undefined(lmcache,F,A):- volatile(lmcache:F/A),make_as_dynamic(retry_undefined(lmcache),lmcache,F,A),!.
+retry_undefined(t_l,F,A):- thread_local(t_l:F/A),!,make_as_dynamic(retry_undefined(t_l),t_l,F,A),!.
 
 retry_undefined(Mt, F, A):-  clause_b(mtCycLBroad(Mt)), baseKB_hybrid_support(F,A),
-   dynamic(Mt:F/A),
-   multifile(Mt:F/A),
-   discontiguous(Mt:F/A),!.
+   make_as_dynamic(mtCycLBroad(Mt),Mt,F,A).
 
 retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(mtGlobal(CallerMt)),
    create_predicate_istAbove(CallerMt,F,A).

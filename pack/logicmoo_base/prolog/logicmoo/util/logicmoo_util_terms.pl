@@ -858,8 +858,11 @@ call_n_times(N,Goal):-doall((between(2,N,_),once(Goal))),Goal.
 
 :- meta_predicate at_start(0).
 :- meta_predicate remember_at_start(+,0).
-:- dynamic(at_started/1).
-:- dynamic(needs_started/2).
+
+:- volatile(lmcache:at_started/1).
+:- volatile(lmcache:needs_started/2).
+:- dynamic(lmcache:at_started/1).
+:- dynamic(lmcache:needs_started/2).
 
 %= 	 	 
 
@@ -870,16 +873,22 @@ call_n_times(N,Goal):-doall((between(2,N,_),once(Goal))),Goal.
 at_start(Goal):-
 	copy_term(Goal,Named),
 	numbervars(Named,0,_,[attvar(bind),singletons(true)]),	
-        remember_at_start(Named,Goal).
+        initialization(remember_at_start(Named,Goal)),
+        initialization(remember_at_start(Named,Goal),restore).
 
-remember_at_start(Named,_):- at_started(Named),!.
-remember_at_start(Named,Goal):- compiling,!,ain(needs_started(Named,Goal)).
+remember_at_start(Named,_):- lmcache:at_started(Named),!.
+remember_at_start(Named,Goal):- compiling,!,call(assert,lmcache:needs_started(Named,Goal)).
 remember_at_start(Named,Goal):-
 	 catchv(
-		 (ain(at_started(Named)),on_f_debug((Goal))),
+		 (call(assert,lmcache:at_started(Named)),on_f_debug((Goal))),
 		 E,
-		 (retractall(at_started(Named)),ain(needs_started(Named,Goal)),trace_or_throw(E))).
+		 (retractall(lmcache:at_started(Named)),call(assert,lmcache:needs_started(Named,Goal)),trace_or_throw(E))).
 
+run_at_start:- forall(lmcache:needs_started(Named,Goal),remember_at_start(Named,Goal)).
+
+
+:- initialization(run_at_start).
+:- initialization(run_at_start,restore).
 
 :- export(list_to_set_safe/2).
 
