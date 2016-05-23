@@ -764,8 +764,14 @@ is_static_predicate(M:F/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A)
 is_static_predicate(M:F//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 % is_static_predicate(M:F):-!,atom(F),between(1,11,A),current_predicate(M:F/A),functor(FA,F,A),is_static_predicate(M:FA),!.
 is_static_predicate(F):- F\=(_:_),!,prolog_load_context(module,M),!,is_static_predicate(M:F).
-is_static_predicate(FA):-predicate_property_nt(FA,static),!,predicate_property_nt(FA,number_of_clauses(_)), \+ predicate_property_nt(FA,dynamic).
-is_static_predicate(FA):-once(predicate_property_nt(FA,_)),\+ predicate_property_nt(FA,dynamic).
+is_static_predicate(FA):-predicate_property_nt(FA,static),!,predicate_property_nt(FA,number_of_clauses(_)), 
+  catch(dynamic(FA),_,true),
+  \+ predicate_property_nt(FA,dynamic),
+  catch(multifile(FA),_,true).
+is_static_predicate(FA):- once(predicate_property_nt(FA,_)),
+    catch(dynamic(FA),_,true),
+    \+ predicate_property_nt(FA,dynamic),
+    catch(multifile(FA),_,true).
 
 
 

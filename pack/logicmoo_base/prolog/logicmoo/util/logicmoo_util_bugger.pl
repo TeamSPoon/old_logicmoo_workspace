@@ -1998,8 +1998,9 @@ atom_contains666(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 % Real Builtin Predicate.
 %
 real_builtin_predicate(G):- predicate_property(G,foreign),!.
-real_builtin_predicate(G):- predicate_property(G,imported_from(W))-> W==system,!.
-real_builtin_predicate(G):- strip_module(G,_,GS),predicate_property(system:GS,BI),BI==built_in,!.
+real_builtin_predicate(G):- \+ predicate_property(G,defined),!,fail.
+%real_builtin_predicate(G):- predicate_property(G,imported_from(W))-> W==system,!.
+%real_builtin_predicate(G):- strip_module(G,_,GS),predicate_property(system:GS,BI),BI==built_in,!.
 real_builtin_predicate(G):- 
    predicate_property(G,BI),BI==built_in,
    \+ predicate_property(G,dynamic),

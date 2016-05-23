@@ -479,6 +479,8 @@ arity(argQuoted,1).
 
 tCol(vtDirection).
 
+:- sanity(get_lang(pfc)).
+
 disjointWith(ttTemporalType,ttAbstractType).
 disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 
