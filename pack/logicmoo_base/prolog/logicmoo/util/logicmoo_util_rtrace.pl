@@ -282,17 +282,17 @@ restore_trace(Goal):-
 %
 % R Trace.
 %
-rtrace(Goal):- hotrace(tlbugger:rtracing),!, Goal.
+% rtrace(Goal):- hotrace(tlbugger:rtracing),!, Goal.
 
-rtrace(Goal):- wdmsg(rtrace(Goal)),!,
-    restore_trace(setup_call_cleanup_each(rtrace,(trace,Goal),nortrace)).
+% rtrace(Goal):- wdmsg(rtrace(Goal)),!, restore_trace(setup_call_cleanup_each(rtrace,(trace,Goal),nortrace)).
 
 
-rtrace(Goal):- wdmsg(rtrace(Goal)), 
+rtrace(Goal):- 
   ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
    '$leash'(OldL, OldL),'$visible'(OldV, OldV),
-   (Undo =   notrace(((hotrace,ignore(retract(tlbugger:rtracing)),'$leash'(_, OldL),'$visible'(_, OldV), Tracing)))),
-   (RTRACE = notrace((hotrace,asserta(tlbugger:rtracing),visible(+all),thread_leash(-all),thread_leash(+exception)))),!,
+   wdmsg(rtrace(Goal)),
+   (Undo =   (((notrace,ignore(retract(tlbugger:rtracing)),'$leash'(_, OldL),'$visible'(_, OldV), Tracing)))),
+   (RTRACE = ((notrace,asserta(tlbugger:rtracing),visible(+all),thread_leash(-all),thread_leash(+exception),trace))),!,
    setup_call_cleanup_each(RTRACE,(trace,Goal),Undo).
 /*
 :- '$set_predicate_attribute'(system:call_cleanup(_,_), trace, 0).

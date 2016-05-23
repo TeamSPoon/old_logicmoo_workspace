@@ -82,7 +82,7 @@
         rebuild_pred_into(0, 1, ?),
         rebuild_pred_into(0, 0, 1, ?),
         is_static_predicate_3(+, +, +),
-        is_static_predicate(:),
+        is_static_predicate(+),
         with_mfa(0, 3),
         with_mfa_of(3, +, +, +, +),
         with_pi(0, 4),
@@ -413,9 +413,16 @@ with_pfa(With,CallerMt, PredMt, PI):- context_module_of_file(CallerMt),with_pfa_
 %
 % Module Module Functor-arity Converted To Module F Functor-arity.
 %
+
+m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,FA):- ignore(CallerMt=PredMt),
+   var(CallerMt),!,must(call(ereq,defaultAssertMt(CallerMt))),
+   m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,FA).
+   
+
 m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,F/A):- var(A),atom(F),!,
-   forall(between(1,11,A),(functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A))).
-m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,F/A):-!,atom(F),functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A).
+   forall(between(1,11,A),(functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A))).   
+m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,F/A):-
+   atom(F),sanity(integer(A)),functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A).
 m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,PI):-functor(PI,F,A),CallerMt:call(Decl_mpred_hybrid,PredMt,PI,F/A).
 
 :-module_transparent(m_fa_to_m_p_fa/2).
@@ -751,11 +758,12 @@ is_static_predicate_3(PredMt,F,A):-
 % Static Predicate.
 %
 is_static_predicate(M:F):-atom(F),predicate_property_nt(M:F,static),!,predicate_property_nt(F,number_of_clauses(_)),\+ predicate_property_nt(F,dynamic).
-is_static_predicate(M:F):-atom(F),!,between(1,11,A),current_predicate(M:F/A),functor(FA,F,A),is_static_predicate(M:FA),!.
 is_static_predicate((M:F)/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate((M:F)//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
+% is_static_predicate(M:F):-!,atom(F),between(1,11,A),current_predicate(M:F/A),functor(FA,F,A),is_static_predicate(M:FA),!.
+is_static_predicate(F):- F\=(_:_),!,prolog_load_context(module,M),!,is_static_predicate(M:F).
 is_static_predicate(FA):-predicate_property_nt(FA,static),!,predicate_property_nt(FA,number_of_clauses(_)), \+ predicate_property_nt(FA,dynamic).
 is_static_predicate(FA):-once(predicate_property_nt(FA,_)),\+ predicate_property_nt(FA,dynamic).
 

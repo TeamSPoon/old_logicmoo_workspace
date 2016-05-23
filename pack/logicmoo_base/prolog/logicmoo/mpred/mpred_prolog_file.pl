@@ -127,7 +127,10 @@ process_this_script0(S):-
 % Never Load Special.
 %
 
-never_load_special(Module:Spec, Options) :- with_dmsg_to_main((dmsg(check_load(Module:Spec,Options)))),fail.
+
+never_load_special(_, [if(not_loaded)]):-!.
+never_load_special(_:library(make), [if(not_loaded)]):-!.
+% never_load_special(Module:Spec, Options) :- with_dmsg_to_main((dmsg(check_load(Module:Spec,Options)))),fail.
 never_load_special(_, Options) :- memberchk(must_be_module(true),Options),!.
 never_load_special(_, Options) :- memberchk(autoload(true),Options),!.
 never_load_special(_Module:_Spec, Options) :- member(if(not_loaded),Options),member(imports([_/_]),Options).   

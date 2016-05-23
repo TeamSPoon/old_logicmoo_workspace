@@ -77,7 +77,7 @@
   mpred_ain/1,mpred_ain/1,mpred_ain/2,ain/2,
   action_is_undoable/1,
   mpred_assumption/1,mpred_assumptions/2,mpred_axiom/1,bagof_or_nil/3,bases_union/2,brake/1,build_rhs/3,
-  mpred_BC_CACHE0/1,
+  mpred_BC_CACHE0/2,
   build_neg_test/4,build_rule/3,build_code_test/3,
   build_trigger/4,
   defaultmpred_select/1,fc_eval_action/2,
@@ -85,13 +85,13 @@
   justification/2,justifications/2,
   call_u/1,
   variant_u/2,
-  mpred_BC_CACHE/1,
+  mpred_BC_CACHE/2,
   mpred_call_no_bc/1,mpred_METACALL/2,mpred_METACALL/3,mpred_METACALL/3,
   mpred_halt/0,mpred_halt/1,mpred_halt/2,
   mpred_ain_db_to_head/2,mpred_ain_actiontrace/2,mpred_trace_op/2,mpred_add_support/2,mpred_ain_trigger_reprop/2,
   mpred_ain_by_type/2,
   mpred_prompt_ask/2,
-  mpred_METACALL/3,mpred_BC_w_cache/1,
+  mpred_METACALL/3,mpred_BC_w_cache/2,
   ain_fast/1,
   ain_fast/2,
   setup_mpred_ops/0,
@@ -159,17 +159,18 @@
       mpred_METACALL(1,-,+),
       mpred_METACALL(1,-,+),
       mpred_METACALL(1,+),
-      mpred_call_no_bc(0),
+      mpred_call_no_bc(:),
+      mpred_call_no_bc0(:),
       call_u(+),
-      mpred_BC_CACHE(+),
+      mpred_BC_CACHE(+,+),
+      mpred_BC_CACHE0(+,+),
       foreachl_do(0,?), 
       foreachl_do(+,?), % not all arg1s are callable
       with_no_mpred_breaks(0),
       fc_eval_action(0,-),
       clause_u(:,+,-),
       clause_u(:,-),
-      clause_u(:),
-      mpred_call_no_bc(+),
+      clause_u(:),      
       with_umt(+,0),
       brake(0),
       with_no_mpred_trace_exec(0),
@@ -547,10 +548,10 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(Why,MH,M,H))),
 % Using User Microtheory.
 %
 
-with_umt(U,G):- t_l:current_defaultAssertMt(W)->W=U,!,
-  call_from_module(U,G).
+% with_umt(U,G):- t_l:current_defaultAssertMt(W)->W=U,!,call_from_module(U,G).
 
-with_umt(U,P):- !,
+with_umt(user,P):- !,with_umt(baseKB,P).
+with_umt(U,P):-!,
  sanity(mtCanAssert(U)),
  gripe_time(30.0,
    w_tl(t_l:current_defaultAssertMt(U),
@@ -1677,20 +1678,15 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 % 
 % call_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
 
+call_u(M:G):- mtCanAssert(M),!,with_umt(M,G).
 call_u(G):- 
-  strip_module(G,M,P),
-  (mtCanAssert(M)-> W=M;defaultAssertMt(W)),
-   (('$current_source_module'(Was),Was=W) 
-      -> mpred_METACALL(mpred_BC_w_cache, P)
-      ; ( with_umt(W, mpred_METACALL(mpred_BC_w_cache, P)))).
+  notrace((strip_module(G,M,P),
+  (mtCanAssert(M)-> W=M;defaultAssertMt(W)))), 
+    with_umt(W,mpred_BC_w_cache(W,P)).
 
-mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_call_no_bc(P).
+mpred_BC_w_cache(W,P):- mpred_BC_CACHE(W,P),!,mpred_call_no_bc(P).
 
-mpred_BC_CACHE(P0):- bad_idea, \+ ((is_release,trace_or_throw(bad_idea(mpred_BC_CACHE(P0))))),!.
-mpred_BC_CACHE(P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(P0),true)).
-
-
-mpred_BC_CACHE0(MP):- strip_module(MP,M,P),mpred_BC_CACHE0(M,P).
+mpred_BC_CACHE(M,P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(M,P0),true)).
 
 mpred_BC_CACHE0(_,P00):- var(P00),!.
 mpred_BC_CACHE0(M,must(P00)):-!,mpred_BC_CACHE0(M,P00).
@@ -1714,13 +1710,21 @@ mpred_BC_CACHE0(M,P):-
 mpred_call_no_bc(P):- var(P),!,fail,trace,  mpred_fact(P).
 mpred_call_no_bc(baseKB:true):-!.
 mpred_call_no_bc(_):- stack_check,fail.
-mpred_call_no_bc(P):- nonvar(P),current_predicate(_,P),!, P.
 
-mpred_call_no_bc(P):- !, loop_check(mpred_METACALL(call_u, P)).
+mpred_call_no_bc(P):- no_repeats(mpred_call_no_bc0(P)).
 
-mpred_call_no_bc(P):- fail, loop_check_term(mpred_METACALL(call_u, P),
+mpred_call_no_bc0(P):- nonvar(P),current_predicate(_,P),!, P.
+mpred_call_no_bc0(P):- lookup_u(P).
+mpred_call_no_bc0(P):- loop_check(mpred_METACALL(call_u, P)).
+% mpred_call_no_bc(P):- loop_check(mpred_METACALL(call_u, P)); lookup_u(P).
+
+/*
+
+mpred_call_no_bc(P):- loop_check_term(mpred_METACALL(call_u, P),
   lc2(P),
    loop_check(mpred_METACALL(call_u, P),lookup_u(P))).
+
+*/
 
 pred_check(A):- var(A),!.
 % catch module prefix issues
@@ -2552,8 +2556,8 @@ mpred_test(G):- with_mpred_trace_exec(must(mpred_test_fok(G))).
 why_was_true(P):- mpred_why(P),!.
 why_was_true(P):- dmsg(justfied_true(P)),!.
 
-mpred_test_fok(\+ G):-!, ( \+ mpred_call_no_bc(G) -> wdmsg(passed_mpred_test(\+ G)) ; (log_failure(failed_mpred_test(\+ G)),!,ignore(why_was_true(G)),!,fail)).
-mpred_test_fok(G):- (mpred_call_no_bc(G) -> sanity(why_was_true(G)) ; (log_failure(failed_mpred_test(G))),!,fail).
+mpred_test_fok(\+ G):-!, ( \+ call_u(G) -> wdmsg(passed_mpred_test(\+ G)) ; (log_failure(failed_mpred_test(\+ G)),!,ignore(why_was_true(G)),!,fail)).
+mpred_test_fok(G):- (call_u(G) -> sanity(why_was_true(G)) ; (log_failure(failed_mpred_test(G))),!,fail).
 
 
 mpred_load_term(:- module(_,L)):-!, mpred_call_no_bc(maplist(export,L)).
@@ -3090,8 +3094,9 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((setup_mpred_ops)/0).
 :- module_transparent((mpred_load_term)/1).
 :- module_transparent((mpred_call_no_bc)/1).
+:- module_transparent((mpred_call_no_bc0)/1).
 :- module_transparent((call_u)/1).
-:- module_transparent((mpred_BC_w_cache)/1).
+:- module_transparent((mpred_BC_w_cache)/2).
 :- module_transparent((justifications)/2).
 :- module_transparent((ain_fast)/2).
 :- module_transparent((ain_fast)/1).
@@ -3289,15 +3294,14 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((assert_u)/1).
 :- module_transparent((call_u)/1).
 :- module_transparent((clause_u)/3).
-:- module_transparent((mpred_BC_CACHE)/1).
-:- module_transparent((mpred_call_no_bc)/1).
+:- module_transparent((mpred_BC_CACHE)/2).
 :- module_transparent((mpred_get_support)/2).
 :- module_transparent((pp_why)/1).
 :- module_transparent((pp_why)/0).
 :- module_transparent((mpred_notrace_exec)/0).
 :- module_transparent((maybe_mpred_break)/1).
 :- module_transparent((to_u)/2).
-:- module_transparent((mpred_BC_CACHE0)/1).
+:- module_transparent((mpred_BC_CACHE0)/2).
 :- module_transparent((mpred_eval_lhs_0)/2).
 :- module_transparent((cut_c)/0).
 :- module_transparent((push_current_choice)/1).

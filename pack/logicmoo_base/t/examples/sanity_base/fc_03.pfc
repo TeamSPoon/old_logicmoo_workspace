@@ -11,17 +11,16 @@
 
 :- use_module(library(logicmoo_base)).
 
-:- dmsg(begin_abc).
-              
 :- file_begin(pfc).
 
+:- defaultAssertMt(MT), wdmsg(begin_abc(MT)).
+              
 :- abolish(a,0).
 :- abolish(b,0).
 :- dynamic((a/0,b/0)).
 
 :- debug(mpred).
 :- mpred_trace_exec.
-
 
 a ==> b.
 a.
