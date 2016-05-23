@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# sanity_base files are ran with swiplb
+alias swiplb='/usr/bin/swipl -x lmb.prc '
+# sanity_user files are ran with swiplu
+alias swiplu='/usr/bin/swipl -x lm_user.prc '
+alias swipl='/usr/bin/swipl '
 
 
 cls  || true
@@ -16,7 +21,7 @@ EXIT() {
 set -o pipefail
 
 rm -f ./ALL.log.html || true
-rm -f ./sanity/ALL.log.html || true
+rm -f ./sanity_base/ALL.log.html || true
 
 
 echostatus(){
@@ -48,7 +53,7 @@ trap 'EXIT' 1 2 3 4 5 6 7 8 9
   echostatus $status $1
   ) 2>&1 |
   tee -i >( ./ansi2html.sh >> $1.log.html) 2>&1 |
-  tee -i -a >( ./ansi2html.sh >> ./sanity/ALL.log.html)
+  tee -i -a >( ./ansi2html.sh >> ./sanity_base/ALL.log.html)
   
   if [ $status -eq 7 ]; then
     return 7
@@ -65,7 +70,7 @@ export -f run_test_file echostatus EXIT
 
 if [ "$1" != "" ]; then
 
-   find ./sanity/ -name "*.p*" -name "$1" -and \( -not -name "*htm*" \) -print -exec  bash -c 'run_test_file $0' '{}' \;
+   find ./sanity_base/ -name "*.p*" -name "$1" -and \( -not -name "*htm*" \) -print -exec  bash -c 'run_test_file $0' '{}' \;
 
    #find ./ -name "*.p*" -and \( -not -name "*htm*" \) -print0  | grep "$1" | xargs -I % bash -c 'run_test_file '
 
@@ -73,63 +78,63 @@ else
 
 
 PASS01() {
-	run_test_file ./sanity/attvar_01.pl 
-	run_test_file ./sanity/attvar_02.pfc 
-	run_test_file ./sanity/attvar_03.pfc 
-	run_test_file ./sanity/attvar_05.pfc 
-	run_test_file ./sanity/attvar_06.pfc 
-	run_test_file ./sanity/attvar_07.pfc 
-	run_test_file ./sanity/attvar_08.pfc 
-	run_test_file ./sanity/attvar_09.pfc 
-	run_test_file ./sanity/attvar_10.pfc 
-	run_test_file ./sanity/attvar_11.pfc 
-	run_test_file ./sanity/chr_01.pl 
-	run_test_file ./sanity/fc_03.pfc
-	run_test_file ./sanity/fc_01.pfc
+	run_test_file ./sanity_base/attvar_01.pl 
+	run_test_file ./sanity_base/attvar_02.pfc 
+	run_test_file ./sanity_base/attvar_03.pfc 
+	run_test_file ./sanity_base/attvar_05.pfc 
+	run_test_file ./sanity_base/attvar_06.pfc 
+	run_test_file ./sanity_base/attvar_07.pfc 
+	run_test_file ./sanity_base/attvar_08.pfc 
+	run_test_file ./sanity_base/attvar_09.pfc 
+	run_test_file ./sanity_base/attvar_10.pfc 
+	run_test_file ./sanity_base/attvar_11.pfc 
+	run_test_file ./sanity_base/chr_01.pl 
+	run_test_file ./sanity_base/fc_03.pfc
+	run_test_file ./sanity_base/fc_01.pfc
 	
-	run_test_file ./sanity/fc_04.pfc 
-	run_test_file ./sanity/fc_05.pfc 
-	run_test_file ./sanity/fc_06.pfc 
-	run_test_file ./sanity/fc_07.pfc 
-	run_test_file ./sanity/fc_08.pfc 
-	run_test_file ./sanity/fc_09.pfc 
-	run_test_file ./sanity/fc_10.pfc 
-	run_test_file ./sanity/file_01.pfc 
-	run_test_file ./sanity/file_02.pfc 
-	run_test_file ./sanity/file_03.pfc 
-	run_test_file ./sanity/if_missing_01.pfc 
-	run_test_file ./sanity/if_missing_02.pfc 
-	run_test_file ./sanity/if_missing_03.pfc 
-	run_test_file ./sanity/nd_01.pl 
-	run_test_file ./sanity/pl_01.pfc 
+	run_test_file ./sanity_base/fc_04.pfc 
+	run_test_file ./sanity_base/fc_05.pfc 
+	run_test_file ./sanity_base/fc_06.pfc 
+	run_test_file ./sanity_base/fc_07.pfc 
+	run_test_file ./sanity_base/fc_08.pfc 
+	run_test_file ./sanity_base/fc_09.pfc 
+	run_test_file ./sanity_base/fc_10.pfc 
+	run_test_file ./sanity_base/file_01.pfc 
+	run_test_file ./sanity_base/file_02.pfc 
+	run_test_file ./sanity_base/file_03.pfc 
+	run_test_file ./sanity_base/if_missing_01.pfc 
+	run_test_file ./sanity_base/if_missing_02.pfc 
+	run_test_file ./sanity_base/if_missing_03.pfc 
+	run_test_file ./sanity_base/nd_01.pl 
+	run_test_file ./sanity_base/pl_01.pfc 
 	run_test_file ./api/mpred_01.pl 
 	run_test_file ./api/mpred_02.pl 
 	run_test_file ./api/utils_01.pl 
 	run_test_file ./api/utils_02.pl 
 	run_test_file ./fol/zenls.pfc 
-	run_test_file ./sanity/df_01.pfc 
-	run_test_file ./sanity/df_03.pfc 
-	run_test_file ./sanity/df_04.pfc 
-	run_test_file ./sanity/df_05.pfc 
-	run_test_file ./sanity/dl_01.pfc 
+	run_test_file ./sanity_base/df_01.pfc 
+	run_test_file ./sanity_base/df_03.pfc 
+	run_test_file ./sanity_base/df_04.pfc 
+	run_test_file ./sanity_base/df_05.pfc 
+	run_test_file ./sanity_base/dl_01.pfc 
 
 }
 
 eval PASS01
 
 FAIL01() {
-    run_test_file ./sanity/bc_01.pfc
-    run_test_file ./sanity/fc_02.pfc
-    run_test_file ./sanity/if_missing_04.pfc
-    run_test_file ./sanity/if_missing_05.pfc
-    run_test_file ./sanity/mpred_pfc_test_01.pl
-    run_test_file ./sanity/mpred_pfc_test_02.pl
-    run_test_file ./sanity/neg_01.pfc
+    run_test_file ./sanity_base/bc_01.pfc
+    run_test_file ./sanity_base/fc_02.pfc
+    run_test_file ./sanity_base/if_missing_04.pfc
+    run_test_file ./sanity_base/if_missing_05.pfc
+    run_test_file ./sanity_base/mpred_pfc_test_01.pl
+    run_test_file ./sanity_base/mpred_pfc_test_02.pl
+    run_test_file ./sanity_base/neg_01.pfc
 }
 
 EASY_PASS03() {
-	run_test_file ./sanity/attvar_04.pl
-	run_test_file ./sanity/fc_11.pfc
+	run_test_file ./sanity_base/attvar_04.pl
+	run_test_file ./sanity_base/fc_11.pfc
 	run_test_file ./pfc/pqr.pfc
 }
 
@@ -147,7 +152,7 @@ HARD_PASS04() {
 	run_test_file ./pfc/bc.pfc
 	run_test_file ./pfc/sanity_clauses.pfc
 	run_test_file ./pfc/sanity_neg.pfc
-	run_test_file ./sanity/df_02.pfc
+	run_test_file ./sanity_base/df_02.pfc
     
     run_test_file ./csp/4ct.pfc.pl
     run_test_file ./csp/einstein.pfc.pl

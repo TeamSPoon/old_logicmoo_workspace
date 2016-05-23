@@ -317,7 +317,7 @@ set_fileAssertMt(ABox):-
  sanity(mtCanAssert(ABox)),
  must_det_l((
    fileAssertMt(Was),
-   get_current_default_tbox(TBox),
+   % get_current_default_tbox(TBox),
    '$current_typein_module'(CM),
    '$current_source_module'(SM),
 
@@ -325,6 +325,7 @@ set_fileAssertMt(ABox):-
    which_file(File),
    assert_setting(lmconf:file_to_module(File,ABox)),
    assert_setting(lmcache:mpred_directive_value(File,module,ABox)),
+   % MAYBE? '$set_typein_module'(TBox),
 
    onEndOfFile(set_defaultAssertMt(Was)),
    onEndOfFile('$set_source_module'(SM)),
