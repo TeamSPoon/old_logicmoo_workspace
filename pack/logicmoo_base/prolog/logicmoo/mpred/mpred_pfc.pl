@@ -269,24 +269,23 @@ must_notrace(G):- must(quietly(G)).
 
 
 :- module_transparent((ensure_abox)/1).
+:- multifile(lmcache:has_pfc_database_preds/1).
+:- volatile(lmcache:has_pfc_database_preds/1).
 :- dynamic(lmcache:has_pfc_database_preds/1).
-ensure_abox(baseKB):-!.
+%ensure_abox(baseKB):-!.
 ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
-ensure_abox(logicmoo_user):-!, ensure_abox(baseKB).
-ensure_abox(logicmoo_user):-!,throw(logicmoo_user(  ensure_abox(baseKB))).
-ensure_abox(user):- !, ensure_abox(logicmoo_user),!.
+ensure_abox(user):- setup_module_ops(user),!,ensure_abox(baseKB),!.
 ensure_abox(M):- 
    asserta(lmcache:has_pfc_database_preds(M)),
-   setup_module_ops(M), 
-   ensure_imports(M),
-   % maybe_add_import_module(M,baseKB,end),
+   setup_module_ops(M),
+   set_prolog_flag(M:unknown,error),
+   ain(baseKB:mtCycL(M)),
    forall(mpred_database_term(F,A,_),
-     (functor(P,F,A),
-      must(\+((predicate_property(M:P,imported_from(W)),wdmsg(predicate_property(P,imported_from(W)))))))),
-  forall(mpred_database_term(F,A,_),
-       (M:dynamic(M:F/A),
+       (M:multifile(M:F/A),
+        M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
-        M:multifile(M:F/A))),!.
+        create_predicate_istAbove(M,F,A),        
+        M:module_transparent(M:F/A))),!.
 
 
 mnotrace(G):- (no_trace(G)),!.

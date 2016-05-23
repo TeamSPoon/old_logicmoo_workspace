@@ -161,6 +161,7 @@
 
 :-ain(baseKB:predicateConventionMt(mud_test,lmconf)).
 
+
 :- kb_dynamic((        
         lmconf:agent_call_command/2,
         lmconf:mud_test/2,

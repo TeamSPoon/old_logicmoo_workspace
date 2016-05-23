@@ -222,6 +222,7 @@ decl_shared(Plus,M:F/A):-atom(F),!,
    ain(baseKB:arity(F,A)),
    baseKB:multifile(F/A),
    functor(P,F,A),
+   baseKB:dynamic(F/A),
    call(Plus,M:P),
    baseKB:discontiguous(F/A))).
 
@@ -231,6 +232,7 @@ decl_shared(Plus,F/A):-atom(F),!,
  ignore((integer(A),
    ain(baseKB:arity(F,A)),
    baseKB:multifile(F/A),
+   baseKB:dynamic(F/A),
    functor(P,F,A),
    call(Plus,P),
    baseKB:discontiguous(F/A))).

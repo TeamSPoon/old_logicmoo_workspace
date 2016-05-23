@@ -295,18 +295,16 @@ get_current_default_tbox(baseKB).
 %
 % Sets Current Module.
 %
-set_defaultAssertMt(ABox):- sanity(mtCanAssert(ABox)),fail.
-%set_defaultAssertMt(M):- clause_b(mtProlog(M)),!,setup_module_ops(M).
-%set_defaultAssertMt(ABox):- defaultAssertMt(QABox)->QABox==ABox,!.
 set_defaultAssertMt(ABox):- 
+  sanity(mtCanAssert(ABox)),
   must_det_l((
-    sanity(mtCanAssert(ABox)),
+    ensure_abox(ABox),
     get_current_default_tbox(TBox),
     ain(baseKB:mtCycL(ABox)),
     asserta_if_new(ABox:defaultTBoxMt(TBox)),
-    (t_l:current_defaultAssertMt(ABox)->true;assert_setting(t_l:current_defaultAssertMt(ABox))),
-    '$set_source_module'(ABox),'$set_typein_module'(ABox),                        
-    setup_module_ops(ABox), 
+    assert_setting(t_l:current_defaultAssertMt(ABox)),
+    '$set_source_module'(ABox),
+    '$set_typein_module'(ABox),
     inherit_into_module(ABox,TBox))).
 
 :- '$hide'(set_defaultAssertMt(_)).
@@ -316,17 +314,17 @@ set_defaultAssertMt(ABox):-
 % Sets the File''s Module.
 %
 set_fileAssertMt(ABox):- 
+ sanity(mtCanAssert(ABox)),
  must_det_l((
-   defaultAssertMt(Was),
-   must(mtCanAssert(ABox)),
+   fileAssertMt(Was),
    get_current_default_tbox(TBox),
-   TBox:ensure_abox(ABox),
    '$current_typein_module'(CM),
    '$current_source_module'(SM),
 
    set_defaultAssertMt(ABox),
-   which_file(File),assert_setting(lmconf:file_to_module(File,ABox)),
-   assert_until_eof(lmcache:mpred_directive_value(File,module,ABox)),
+   which_file(File),
+   assert_setting(lmconf:file_to_module(File,ABox)),
+   assert_setting(lmcache:mpred_directive_value(File,module,ABox)),
 
    onEndOfFile(set_defaultAssertMt(Was)),
    onEndOfFile('$set_source_module'(SM)),
@@ -455,18 +453,6 @@ fixup_modules:-
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 % ============================================
 
 %% correct_module( ?M, ?X, ?T) is semidet.
@@ -512,9 +498,10 @@ add_import_predicate(Mt,Goal,OtherMt):-
   
 make_as_dynamic(Reason,Mt,F,A):- 
  must_det_l((
-   dynamic(Mt:F/A),
    multifile(Mt:F/A),
    discontiguous(Mt:F/A),
+   dynamic(Mt:F/A),
+   module_transparent(Mt:F/A),
    public(Mt:F/A),
    functor(Goal,F,A),
    assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))))).
@@ -527,34 +514,6 @@ transitive_path(F,[Arg1,SecondNodeMt|REST],Arg2):-
   call(F,Arg1,SecondNodeMt),stack_check,
   transitive_path(F,[SecondNodeMt|REST],Arg2).
 
-
-/*
-registerCycPred(Mt,_,F,A):-
-   lmcache:how_registered_pred(_,Mt,F,A),!.
-
-registerCycPred(Mt,Goal,F,A):-
-   correct_module(Mt,Goal,OtherMt), 
-   sanity(Mt \== OtherMt),
-   must(Mt \== OtherMt),
-   ain(tMicrotheory(Mt)),
-   registerCycPred(Mt,Goal,F,A,OtherMt),!.
-
-
-
-registerCycPred(Mt,Goal,_Pred,_Arity,OtherMt):- 
-  clause_b(mtGlobal(OtherMt)),
-  add_import_predicate(Mt,Goal,OtherMt),!.
-*/
-  /*
-registerCycPred(Mt,Goal,F,A,OtherMt):- fail,
-   transitive_path(genlMt,[Mt,SecondNodeMt|_],OtherMt),
-   make_as_dynamic(genlMt(Mt,OtherMt),Mt,F,A),
-   assert_if_new(( Mt:Goal :- SecondNodeMt:call(Goal))),!.
-
-registerCycPred(Mt,_Goal,F,A,OtherMt):-
-  dump_break,
-  make_as_dynamic(need_genlMt(Mt,OtherMt),Mt,F,A),!.
-   */
 
 
 autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_index(P,PredMt,File).
@@ -618,10 +577,8 @@ uses_predicate(CallerMt,F,A,retry):-
 % Ensure istAbove/2 stub is present in ChildDefMt.
 %
 
-create_predicate_istAbove(abox,F,A):- must(defaultAssertMt(CallerMt)),CallerMt\=abox,!,create_predicate_istAbove(CallerMt,F,A).
-
-% create_predicate_istAbove(CallerMt,F,A):- mtGlobal(CallerMt),!,trace_or_throw(global_create_predicate_istAbove(CallerMt,F,A)).   
-create_predicate_istAbove(CallerMt,F,A):-
+create_predicate_istAbove(abox,F,A):-  must(defaultAssertMt(CallerMt)),sanity(CallerMt\=abox),!,create_predicate_istAbove(CallerMt,F,A).
+create_predicate_istAbove(CallerMt,F,A):-   
    show_failure(\+ find_and_call(mtProlog(CallerMt))),!,
    make_as_dynamic(create_predicate_istAbove,CallerMt,F,A),
    functor(Goal,F,A),
@@ -639,23 +596,28 @@ create_predicate_istAbove(CallerMt,F,A):-
 % Every module has it''s own
 retry_undefined(CallerMt,'$pldoc',4):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
 
+% 3 very special Mts
 retry_undefined(lmconf,F,A):- make_as_dynamic(retry_undefined(lmconf),lmconf,F,A),!.
 retry_undefined(lmcache,F,A):- volatile(lmcache:F/A),make_as_dynamic(retry_undefined(lmcache),lmcache,F,A),!.
 retry_undefined(t_l,F,A):- thread_local(t_l:F/A),!,make_as_dynamic(retry_undefined(t_l),t_l,F,A),!.
 
+% adult-like Mt
 retry_undefined(Mt, F, A):-  clause_b(mtCycLBroad(Mt)), baseKB_hybrid_support(F,A),
    make_as_dynamic(mtCycLBroad(Mt),Mt,F,A).
 
+% child-like Mt
 retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(mtGlobal(CallerMt)),
    create_predicate_istAbove(CallerMt,F,A).
 
+% import built-ins ?
 retry_undefined(CallerMt,F,A):- current_predicate(system:F/A), current_module(M),M\=system,
-  current_predicate(M:F/A),functor(P,F,A),predicate_property(M:P,defined),\+predicate_property(M:P,imported_from(_)),
+  current_predicate(M:F/A),functor(P,F,A),predicate_property_nt(M:P,defined),\+predicate_property_nt(M:P,imported_from(_)),
   CallerMt:import(M:F/A).
 
+% our autoloader hacks
 retry_undefined(CallerMt,F,A):- 
-    autoload_library_index(F,A,_PredMt,File),
-    use_module(CallerMt:File),!.
+   autoload_library_index(F,A,_PredMt,File),
+   use_module(CallerMt:File),!.
    
 % Autoloads importing the entire other module
 retry_undefined(CallerMt,F,A):- fail,
@@ -666,7 +628,7 @@ retry_undefined(CallerMt,F,A):- fail,
 
 
 
-% System-like Autoloads
+% System-like Autoloads (TODO: confirm these can be removed)
 retry_undefined(CallerMt,debug,1):- use_module(CallerMt:library(debug)),!.
 retry_undefined(CallerMt,debugging,1):- use_module(CallerMt:library(debug)),!.
 retry_undefined(CallerMt,member,2):- use_module(CallerMt:library(lists)),!.
@@ -695,7 +657,7 @@ retry_undefined(CallerMt,F,A):-
 %retry_undefined(PredMt:debugm/2) :- add_import_module(PredMt,logicmoo_util_dmsg,start),!.
 
 
-:-module_transparent(make_shared_multifile/3).
+:- module_transparent(make_shared_multifile/3).
 :- export((make_shared_multifile)/3).
 
 

@@ -23,8 +23,9 @@
 :- debug(mpred).
 :- mpred_trace_exec.
 
-
+:- break.
 a ==> b.
+:- break.
 a.
 
 :- mpred_test(a).

@@ -86,8 +86,9 @@ prologHybrid(genls/2).
  with_pfa(With,((vtColor/1))).
  */
 
-% :-  dynamic((disjointWith/2,genls/2,isa/2,argIsa/3)).
-% :- discontiguous((disjointWith/2,genls/2,isa/2,argIsa/3,typeGenls/2)).
+:-  multifile((disjointWith/2,genls/2,isa/2,argIsa/3)).
+:-  dynamic((disjointWith/2,genls/2,isa/2,argIsa/3)).
+:- discontiguous((disjointWith/2,genls/2,isa/2,argIsa/3,typeGenls/2)).
 
 % :- autoload.
 

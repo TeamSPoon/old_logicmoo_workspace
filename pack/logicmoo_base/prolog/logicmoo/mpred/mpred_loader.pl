@@ -1163,7 +1163,9 @@ file_begin(WIn):-
  must_det_l((
    simplify_language_name(WIn,W),
    set_file_lang(W),
+   set_lang(W),
    fileAssertMt(Mt),
+   set_fileAssertMt(Mt),
    wdmsg(fileAssertMt(Mt)),
    op_lang(W),
    enable_mpred_expansion)),!.
@@ -1171,7 +1173,7 @@ file_begin(WIn):-
 
 
 set_file_lang(W):-
-   % assert_until_eof(t_l:current_lang(W)),
+   %assert_until_eof(t_l:current_lang(W)),
    forall((which_file(Source);prolog_load_context(file,Source);prolog_load_context(source,Source)),
    ignore((  % \+ lmcache:mpred_directive_value(Source,language,W),
    decache_file_type(Source),
@@ -1238,8 +1240,7 @@ op_alias(OP,OTHER):-retractall(current_op_alias(OP,_)),asserta(current_op_alias(
 %
 % Oper. Language.
 %
-op_lang(LANG):-retractall(current_op_alias(_,_)), retract(t_l:current_lang(Was)),!,assert_until_eof(t_l:current_lang(LANG)), onEndOfFile(asserta(t_l:current_lang(Was))).
-op_lang(LANG):- assert_until_eof(t_l:current_lang(LANG)).
+op_lang(_LANG):- !.
 
 
 

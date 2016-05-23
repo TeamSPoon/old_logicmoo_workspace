@@ -84,7 +84,7 @@ lmconf:mpred_skipped_module(eggdrop).
 :-use_module(system:library('logicmoo/snark/common_logic_boxlog.pl')).
 :-use_module(system:library('logicmoo/snark/common_logic_skolem.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_userkb.pl')).
-:-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_)])).
+:-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_),arity/2])).
 :-use_module(system:library('logicmoo/snark/common_logic_kb_hooks.pl')).
 
 :-use_module(system:library('logicmoo/mpred_online/mpred_www.pl')).
