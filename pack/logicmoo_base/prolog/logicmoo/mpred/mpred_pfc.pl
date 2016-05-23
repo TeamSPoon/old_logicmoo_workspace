@@ -248,7 +248,9 @@ mpred_database_term(mpred_is_spying_pred,2,debug).
 mpred_database_term(mpred_warnings,1,debug).
 mpred_database_term(why_buffer,2,debug).
 
+:- if(\+ current_predicate(system:must_notrace/1)).
 must_notrace(G):- must(quietly(G)).
+:- endif.
 
 % % :- '$set_source_module'(mpred_pfc).
 

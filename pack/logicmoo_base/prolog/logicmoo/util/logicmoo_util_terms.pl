@@ -696,7 +696,7 @@ nd_subst2( _X, _Sk, L, L ).
 % Univ Term.
 %
 univ_term(P1,[FS|ArgS]):- compound(FS),!,append_term(FS,ArgS,P1).
-univ_term(P1,[FS|ArgS]):- must(univ_safe(P1 , [FS|ArgS])).
+univ_term(P1,[FS|ArgS]):- on_x_debug(univ_safe(P1 , [FS|ArgS])).
 
 
 
