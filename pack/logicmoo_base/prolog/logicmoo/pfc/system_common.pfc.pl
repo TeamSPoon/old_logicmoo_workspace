@@ -195,7 +195,10 @@ completelyAssertedCollection(C)==>tCol(C).
 completelyAssertedCollection(tCol).  % a type is a type
 completelyAssertedCollection(tSpec). % A specification is sort of a type
 
+:- multifile tSpec/1.
+:- dynamic tSpec/1.
 :- discontiguous tSpec/1.
+tCol(tSpec).
 tSpec(tCol).  % A specification may be a type
 tSpec(meta_argtypes).  % A specification may be a syntactic description
 
