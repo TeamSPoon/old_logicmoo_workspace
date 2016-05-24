@@ -687,7 +687,9 @@ sformat(Str,Msg,Vs,Opts):- with_output_to_each(chars(Codes),(current_output(CO),
 %
 % Portray Clause W Variables.
 %
-portray_clause_w_vars(Out,Msg,Vs,Options):- \+ \+ ((prolog_listing:do_portray_clause(Out,Msg,[variable_names(Vs),numbervars(true),attributes(portray),character_escapes(true),quoted(true)|Options]))),!.
+portray_clause_w_vars(Out,Msg,Vs,Options):-
+  w_tl(set_prolog_flag(retry_undefined,false), \+ \+ ((prolog_listing:do_portray_clause(Out,Msg,[variable_names(Vs),
+      numbervars(true),attributes(portray),character_escapes(true),quoted(true)|Options])))),!.
 
 %= 	 	 
 

@@ -8,6 +8,9 @@
 
 :- module(bc_01,[]).
 
+:- make.
+:- set_prolog_flag(retry_undefined,true).
+
 %:- '$set_source_module'(baseKB).
 
 :- use_module(library(logicmoo_base)).

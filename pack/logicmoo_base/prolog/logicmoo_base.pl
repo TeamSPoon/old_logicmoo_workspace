@@ -158,6 +158,12 @@ user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_unde
 :- w_tl(t_l:side_effect_ok,doall(call_no_cuts(lmconf:module_local_init(abox,baseKB)))).
 % :- forall(lmconf:sanity_check,true).
 
+:-module_transparent(logicmoo_util_database:ain/1).
+:-module_transparent(logicmoo_util_database:aina/1).
+:-module_transparent(logicmoo_util_database:ainz/1).
+:-multifile(logicmoo_util_database:ain/1).
+:-multifile(logicmoo_util_database:aina/1).
+:-multifile(logicmoo_util_database:ainz/1).
 :- asserta_new((logicmoo_util_database:ainz(G):- !, call(mpred_ainz,G))).
 :- asserta_new((logicmoo_util_database:ain(G):- !, mpred_ain(G))).
 :- asserta_new((logicmoo_util_database:aina(G):- !, mpred_aina(G))).

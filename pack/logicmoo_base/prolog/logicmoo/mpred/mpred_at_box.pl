@@ -335,6 +335,7 @@ set_fileAssertMt(ABox):-
 
 make_module_name_local(A,B):- make_module_name_local0(A,B), \+ exists_file(B).
 
+
 make_module_name_local0(Source,KB):- clause_b(mtProlog(Source)),t_l:current_defaultAssertMt(KB),!.
 make_module_name_local0(Source,KB):- clause_b(mtGlobal(Source)),t_l:current_defaultAssertMt(KB),!.
 make_module_name_local0(Source,SetName):- lmconf:file_to_module(Source,SetName),!.
@@ -560,6 +561,9 @@ uses_predicate(CallerMt,F,A,_):-
    '$current_source_module'(SM),
    wdmsg(uses_predicate(SM,CallerMt,F,A)),
    assert(lmcache:tried_to_retry_undefined(SM:CallerMt,F,A)),fail.
+
+uses_predicate(_, (:-), 1, error) :- !,dumpST,break.
+uses_predicate(_, (:-), _, error) :- !,dumpST,break.
 uses_predicate(_, (/), _, error) :- !,dumpST,break.
 uses_predicate(_, (//), _, error) :- !,dumpST,break.
 uses_predicate(_, (:), _, error) :- !,dumpST,break.

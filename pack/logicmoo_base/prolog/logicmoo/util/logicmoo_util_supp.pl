@@ -16,9 +16,9 @@
 % ===================================================================
 */
 :- if(\+ current_predicate(system:must_or_die/1)).
-:- module(logicmoo_util_supp,[must_or_die/1,must_atomic/1,nop/1,no_trace/1,setup_call_cleanup_each/3]).
-%:- endif.
-% % :- '$set_source_module'(system).
+:- module(logicmoo_util_supp,[]).
+:- endif.
+:- '$set_source_module'(system).
 :- meta_predicate
       must_atomic(0),
       must_notrace(0),
@@ -29,8 +29,8 @@
       call_cleanup_each(0,0).
 
 :- if(\+ current_predicate(system:nop/1)).
-:- system:ensure_loaded(system:logicmoo_util_supp).
-:- endif.
+% :- system:ensure_loaded(system:logicmoo_util_supp).
+% :- endif.
 
 
 %% nop( ?VALUE1) is semidet.
@@ -55,7 +55,7 @@ must_atomic(Goal):- must_or_die(notrace(('$sig_atomic'(Goal)))).
 
 :- module_transparent(must_notrace/1).
 :- '$hide'(must_notrace/1).
-must_notrace(Goal):- no_trace(must_or_die(Goal)).
+system:must_notrace(Goal):- no_trace(must_or_die(Goal)).
 
 :- module_transparent(no_trace/1).
 :- '$hide'(no_trace/1).
@@ -75,7 +75,7 @@ call_cleanup_each(Goal, Cleanup) :-
 :- if( \+ current_predicate(setup_call_cleanup_each/3)).
 :- export(setup_call_cleanup_each/3).
 :- meta_predicate(setup_call_cleanup_each(0,0,0)).
-setup_call_cleanup_each(Setup,Goal,Cleanup):- 
+system:setup_call_cleanup_each(Setup,Goal,Cleanup):- 
    (current_prolog_flag(scce,Pred) ->
     (Pred==pure ->
      catch((
