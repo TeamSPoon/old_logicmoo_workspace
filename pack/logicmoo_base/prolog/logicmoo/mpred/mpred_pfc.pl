@@ -74,7 +74,7 @@
   mpred_fwc0/1,
   with_no_mpred_trace_exec/1,
   mpred_set_default/2,
-  mpred_ain/1,mpred_ain/1,mpred_ain/2,ain/2,
+  mpred_ain/1,mpred_ain/1,mpred_ain/2,
   action_is_undoable/1,
   mpred_assumption/1,mpred_assumptions/2,mpred_axiom/1,bagof_or_nil/3,bases_union/2,brake/1,build_rhs/3,
   mpred_BC_CACHE0/2,
@@ -180,7 +180,7 @@ push_current_choice/1,
 :- include('mpred_header.pi').
 
 :- meta_predicate 
-      each_E(:,+,+),
+      each_E(+,+,+),
       pfcl_do(0),
       pfcl_do(+), % not all arg1s are callable
       lookup_u(+),
@@ -726,11 +726,10 @@ mpred_aina(G,S):-mpred_ain(G,S).
 mpred_ain(_:P):- P==end_of_file,!.
 mpred_ain(P):- get_source_ref(UU),mpred_ain(P,UU).
 
-%%  ain(P,S) 
+%%  mpred_ain(P,S) 
 %
 %  asserts P into the dataBase with support from S.
 %
-ain(P,S):- mpred_ain(P,S).
 
 mpred_ain(MTP,S):- is_ftVar(MTP),!,trace_or_throw(var_mpred_ain(MTP,S)).
 mpred_ain(user:MTP,S):- !, must(mpred_ain(MTP,S)).
@@ -1701,13 +1700,14 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 % 
 % call_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
 
+call_u(M:G):- clause_b(mtProlog(M)),!,call(M:G).
 call_u(M:G):- sanity(clause_b(mtCycL(M))),!,with_umt(M,G).
 call_u(G):- 
-  notrace((strip_module(G,M,P),
-  (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)))), 
-    with_umt(W,mpred_BC_w_cache(W,P)).
+  quietly_must(((strip_module(G,M,P),
+  (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W))))),
+    with_umt(W, (mpred_BC_w_cache(W,P))).
 
-mpred_BC_w_cache(W,P):- mpred_BC_CACHE(W,P),!,mpred_call_no_bc(P).
+mpred_BC_w_cache(W,P):- must(mpred_BC_CACHE(W,P)),!,mpred_call_no_bc(P).
 
 mpred_BC_CACHE(M,P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(M,P0),true)).
 
@@ -1736,12 +1736,14 @@ mpred_call_no_bc(P):- var(P),!,fail,trace,  mpred_fact(P).
 mpred_call_no_bc(baseKB:true):-!.
 mpred_call_no_bc(_):- stack_check,fail.
 
-mpred_call_no_bc(P):- no_repeats(mpred_call_no_bc0(P)).
+mpred_call_no_bc(P):- loop_check(no_repeats(mpred_call_no_bc0(P))).
 
-mpred_call_no_bc0(P):- nonvar(P),current_predicate(_,P),!, P.
-mpred_call_no_bc0(P):- lookup_u(P).
-mpred_call_no_bc0(P):- loop_check(mpred_METACALL(call_u, P)).
-% mpred_call_no_bc(P):- loop_check(mpred_METACALL(call_u, P)); lookup_u(P).
+mpred_call_no_bc0(P):- !,defaultAssertMt(Mt), Mt:call(P).
+mpred_call_no_bc0(P):- mpred_call_with_no_triggers(P).
+mpred_call_no_bc0(P):- nonvar(P),lookup_u(P).
+%mpred_call_no_bc0(P):- nonvar(P),predicate_property(_,P),!, P.
+% mpred_call_no_bc0(P):- loop_check(mpred_METACALL(call_u, P)).
+
 
 /*
 
@@ -2582,7 +2584,7 @@ why_was_true(P):- mpred_why(P),!.
 why_was_true(P):- dmsg(justfied_true(P)),!.
 
 mpred_test_fok(\+ G):-!, ( \+ call_u(G) -> wdmsg(passed_mpred_test(\+ G)) ; (log_failure(failed_mpred_test(\+ G)),!,ignore(why_was_true(G)),!,fail)).
-mpred_test_fok(G):- (call_u(G) -> sanity(why_was_true(G)) ; (log_failure(failed_mpred_test(G))),!,fail).
+mpred_test_fok(G):- (call_u(G) -> ignore(sanity(why_was_true(G))) ; (log_failure(failed_mpred_test(G))),!,fail).
 
 
 mpred_load_term(:- module(_,L)):-!, mpred_call_no_bc(maplist(export,L)).

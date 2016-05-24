@@ -556,7 +556,9 @@ uses_predicate(Module,Name,Arity,Action) :-
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
 uses_predicate(CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
-uses_predicate(M,F,A,error):- lmcache:tried_to_retry_undefined(_SM:M,F,A),!.
+
+% keeps from calling this more than once
+uses_predicate(M,F,A,error):- '$current_source_module'(SM),lmcache:tried_to_retry_undefined(SM:M,F,A),!.
 uses_predicate(CallerMt,F,A,_):-
    '$current_source_module'(SM),
    wdmsg(uses_predicate(SM,CallerMt,F,A)),

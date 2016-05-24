@@ -1,12 +1,15 @@
 #!/usr/bin/env swipl
 %
-%  PFC is a language extension for prolog.. there is so much that can be done in this language extension to Prolog
+%  PFC is aaa language extension for prolog.. there is so much that can be done in this language extension to Prolog
 %
 % Dec 13, 2035
 % Douglas Miles
 
 
 :- module(sanity,[]).
+
+:- make.
+:- set_prolog_flag(retry_undefined,true).
 
 % :- use_module(library(logicmoo_user)).
 :- use_module(library(logicmoo_base)).
@@ -23,64 +26,65 @@
 :- must(context_module(sanity)).
 
 :- abolish(c,0).
-:- abolish(a,1).
+:- abolish(aaa,1).
 :- abolish(b,1).
-:- dynamic((a/1,b/1,c/0,f/1)).
+:- dynamic((aaa/1,b/1,c/0,f/1)).
 
 :- file_begin(pfc).
 
 :- must(context_module(sanity)).
 
-:- mpred_test(ain(a(z))).
+:- mpred_test(ain(aaa(zzz))).
 
-:- mpred_test(ain(==> a(z))).
-:- mpred_test(a(z)).
+:- mpred_test(ain(==> aaa(zzz))).
+:- mpred_test(aaa(zzz)).
 
-:- mpred_test(ain(a(z) ==> z(a))).
-:- mpred_test(z(a)).
+:- mpred_test(ain(aaa(zzz) ==> zzz(aaa))).
+:- mpred_test(zzz(aaa)).
 
-:- mpred_test(a(_)).
+:- mpred_test(aaa(_)).
 
 
 
-:- ain(~ a(z)).
+:- ain(~ aaa(zzz)).
 
-:- mpred_test(  ~(a(_))).
-:- mpred_test(\+ a(_)).
+:- mpred_test(  ~(aaa(zzz))).
+:- mpred_test(  ~(aaa(_))).
+:- mpred_test(\+ aaa(_)).
 
-~(~(a(z))).
+~(~(aaa(zzz))).
 
-:- dmsg('Ž'(a)).
+:- dmsg('Ž'(aaa)).
 
-'Ž'(a).
+'Ž'(aaa).
 
 :- op(666,fx,('¯\\_(?)_/¯')).
 
 
-% :- xlisting(a).
+% :- xlisting(aaa).
 
-% :-mpred_test(\+  ~(a(_))).
-% :-mpred_test(\+ a(_)).
+% :-mpred_test(\+  ~(aaa(_))).
+% :-mpred_test(\+ aaa(_)).
 
 % U=nt(A,B,C),spft(X,Y,Z),\+ \+
 
-(a(B),d(B),f(B)) ==> b(B).
-(a(B),d(B),e(B)) ==> b(B).
-(a(B),e(B),d(B)) ==> b(B).
+(aaa(B),d(B),f(B)) ==> b(B).
+(aaa(B),d(B),e(B)) ==> b(B).
+(aaa(B),e(B),d(B)) ==> b(B).
 
 d(q).
 % ?- nl,ZU=nt(_,_,_),ZU,spft(UMT,X,Y,Z),\+ \+ ZU=Z,nl.
 
 (b(_),e(q)) ==> c.
-(~a(B),~e(B)) ==> q.
+(~aaa(B),~e(B)) ==> q.
 
-a(B)==>d(B).
+aaa(B)==>d(B).
 
 :- mpred_test(\+c).
 
 ==> e(q).
 ==> b(q).
-==> a(q).
+==> aaa(q).
 
 :- mpred_test(c).
 
@@ -88,12 +92,12 @@ a(B)==>d(B).
 
 % Looking for answer like: (b(_),e(q))
 %       Supported By: e(q),pt(e(q),rhs([c]))
-%       Found positive trigger: a(q)
+%       Found positive trigger: aaa(q)
 %               body: rhs([d(q)])
 %
 %  =pred_eval_rhs1=
 %       Post1: d(q)
-%       Support: a(q),pt(a(q),rhs([d(q)]))
+%       Support: aaa(q),pt(aaa(q),rhs([d(q)]))
 
 
 

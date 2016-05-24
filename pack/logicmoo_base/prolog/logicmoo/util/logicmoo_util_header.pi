@@ -6,13 +6,116 @@
 :- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
 :- endif.
 
+
+
+:- system:thread_local(t_l: current_local_why/ 2).
+:- system:thread_local(t_l: current_why_source/ 1).
+:- system:thread_local(t_l: last_source_file/ 1).
+:- system:thread_local(t_l: last_src_loc/ 2).
+:- system:thread_local(t_l: testing_for_release/ 1).
+:- system:thread_local(t_l: thread_local_current_main_error_stream/ 1).
+:- system:thread_local(tlbugger: attributedVars/ 0).
+:- system:thread_local(tlbugger: dmsg_hook/ 1).
+:- system:thread_local(tlbugger: dmsg_match/ 2).
+:- system:thread_local(tlbugger: dont_skip_bugger/ 0).
+:- system:thread_local(tlbugger: has_auto_trace/ 1).
+:- system:thread_local(tlbugger: ifCanTrace/ 0).
+:- system:thread_local(tlbugger: ifWontTrace/ 0).
+:- system:thread_local(tlbugger: in_dmsg/ 1).
+:- system:thread_local(tlbugger: is_with_dmsg/ 1).
+:- system:thread_local(tlbugger: last_used_color/ 1).
+:- system:thread_local(tlbugger: no_buggery_tl/ 0).
+:- system:thread_local(tlbugger: no_colors/ 0).
+:- system:thread_local(tlbugger: no_slow_io/ 0).
+:- system:thread_local(tlbugger: old_no_repeats/ 0).
+:- system:thread_local(tlbugger: plain_attvars/ 0).
+:- system:thread_local(tlbugger: rbuild_pred_impl_cache/ 2).
+:- system:thread_local(tlbugger: rbuild_pred_impl_cache_pp/ 2).
+:- system:thread_local(tlbugger: rtracing/ 0).
+:- system:thread_local(tlbugger: saved_current_atom/ 2).
+:- system:thread_local(tlbugger: show_must_go_on/ 0).
+:- system:thread_local(tlbugger: skip_bugger/ 0).
+:- system:thread_local(tlbugger: skip_use_slow_sanity/ 0).
+:- system:thread_local(tlbugger: skipDMsg/ 0).
+:- system:thread_local(tlbugger: skipDumpST9/ 0).
+:- system:thread_local(tlbugger: skipMust/ 0).
+:- system:thread_local(tlbugger: wastracing/ 0).
+
+:- system:export(t_l: current_local_why/ 2).
+:- system:export(t_l: current_why_source/ 1).
+:- system:export(t_l: last_source_file/ 1).
+:- system:export(t_l: last_src_loc/ 2).
+:- system:export(t_l: testing_for_release/ 1).
+:- system:export(t_l: thread_local_current_main_error_stream/ 1).
+:- system:export(tlbugger: attributedVars/ 0).
+:- system:export(tlbugger: dmsg_hook/ 1).
+:- system:export(tlbugger: dmsg_match/ 2).
+:- system:export(tlbugger: dont_skip_bugger/ 0).
+:- system:export(tlbugger: has_auto_trace/ 1).
+:- system:export(tlbugger: ifCanTrace/ 0).
+:- system:export(tlbugger: ifWontTrace/ 0).
+:- system:export(tlbugger: in_dmsg/ 1).
+:- system:export(tlbugger: is_with_dmsg/ 1).
+:- system:export(tlbugger: last_used_color/ 1).
+:- system:export(tlbugger: no_buggery_tl/ 0).
+:- system:export(tlbugger: no_colors/ 0).
+:- system:export(tlbugger: no_slow_io/ 0).
+:- system:export(tlbugger: old_no_repeats/ 0).
+:- system:export(tlbugger: plain_attvars/ 0).
+:- system:export(tlbugger: rbuild_pred_impl_cache/ 2).
+:- system:export(tlbugger: rbuild_pred_impl_cache_pp/ 2).
+:- system:export(tlbugger: rtracing/ 0).
+:- system:export(tlbugger: saved_current_atom/ 2).
+:- system:export(tlbugger: show_must_go_on/ 0).
+:- system:export(tlbugger: skip_bugger/ 0).
+:- system:export(tlbugger: skip_use_slow_sanity/ 0).
+:- system:export(tlbugger: skipDMsg/ 0).
+:- system:export(tlbugger: skipDumpST9/ 0).
+:- system:export(tlbugger: skipMust/ 0).
+:- system:export(tlbugger: wastracing/ 0).
+
+:- system:import(t_l: current_local_why/ 2).
+:- system:import(t_l: current_why_source/ 1).
+:- system:import(t_l: last_source_file/ 1).
+:- system:import(t_l: last_src_loc/ 2).
+:- system:import(t_l: testing_for_release/ 1).
+:- system:import(t_l: thread_local_current_main_error_stream/ 1).
+:- system:import(tlbugger: attributedVars/ 0).
+:- system:import(tlbugger: dmsg_hook/ 1).
+:- system:import(tlbugger: dmsg_match/ 2).
+:- system:import(tlbugger: dont_skip_bugger/ 0).
+:- system:import(tlbugger: has_auto_trace/ 1).
+:- system:import(tlbugger: ifCanTrace/ 0).
+:- system:import(tlbugger: ifWontTrace/ 0).
+:- system:import(tlbugger: in_dmsg/ 1).
+:- system:import(tlbugger: is_with_dmsg/ 1).
+:- system:import(tlbugger: last_used_color/ 1).
+:- system:import(tlbugger: no_buggery_tl/ 0).
+:- system:import(tlbugger: no_colors/ 0).
+:- system:import(tlbugger: no_slow_io/ 0).
+:- system:import(tlbugger: old_no_repeats/ 0).
+:- system:import(tlbugger: plain_attvars/ 0).
+:- system:import(tlbugger: rbuild_pred_impl_cache/ 2).
+:- system:import(tlbugger: rbuild_pred_impl_cache_pp/ 2).
+:- system:import(tlbugger: rtracing/ 0).
+:- system:import(tlbugger: saved_current_atom/ 2).
+:- system:import(tlbugger: show_must_go_on/ 0).
+:- system:import(tlbugger: skip_bugger/ 0).
+:- system:import(tlbugger: skip_use_slow_sanity/ 0).
+:- system:import(tlbugger: skipDMsg/ 0).
+:- system:import(tlbugger: skipDumpST9/ 0).
+:- system:import(tlbugger: skipMust/ 0).
+:- system:import(tlbugger: wastracing/ 0).
+
+
+
+
+
 /*
 :- multifile((user:term_expansion/2,system:term_expansion/2)).
 :- dynamic((user:term_expansion/2,system:term_expansion/2)).
 :- multifile((user:goal_expansion/2,system:goal_expansion/2)).
 :- dynamic((user:goal_expansion/2,system:goal_expansion/2)).
-
-
 
 :- multifile
   %      user:'$pldoc'/4,

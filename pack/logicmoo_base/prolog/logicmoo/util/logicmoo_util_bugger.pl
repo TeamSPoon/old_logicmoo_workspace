@@ -2901,15 +2901,21 @@ bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
 
 :- dynamic(user:prolog_exception_hook/4).
 
-% Writes exceptions with stacktrace into stderr.
-% Fail/0 call at the end allows the exception to be
-% processed by other hooks too.
 
-%= 	 	 
+:- multifile(lmcache:thread_current_input/2).
+:- dynamic(lmcache:thread_current_input/2).
+:- volatile(lmcache:thread_current_input/2).
+
+:- multifile(lmcache:thread_current_error_stream/2).
+:- dynamic(lmcache:thread_current_error_stream/2).
+:- volatile(lmcache:thread_current_error_stream/2).
+
 
 %% disabled_this is semidet.
 %
-% Disabled This.
+% Writes exceptions with stacktrace into stderr.
+% Fail/0 call at the end allows the exception to be
+% processed by other hooks too.
 %
 disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame, _):- 
  \+ current_prolog_flag(no_debug_ST,true),

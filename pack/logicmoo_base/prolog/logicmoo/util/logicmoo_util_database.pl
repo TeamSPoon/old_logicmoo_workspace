@@ -60,30 +60,30 @@
             my_module_sensitive_code/1
           ]).
 :- meta_predicate
-        ain(:),
-        ain0(:),
-        pain(:),
-        paina(:),
-        painz(:),
-        aina(:),
-        ainz(:),
-        ainz_clause(:),
-        ainz_clause(:, ?),
+        ain(+),
+        ain0(+),
+        pain(+),
+        paina(+),
+        painz(+),
+        aina(+),
+        ainz(+),
+        ainz_clause(+),
+        ainz_clause(+, ?),
         expand_to_hb(?, ?, ?),
-        assert_if_new(:),
-        asserta_if_new(:),
-        asserta_new(:),
-        assertz_if_new(:),
+        assert_if_new(+),
+        asserta_if_new(+),
+        asserta_new(+),
+        assertz_if_new(+),
         call_provider(0),
-        clause_asserted(:),
-        clause_asserted(:, ?),
-        clause_asserted(:, ?, -),
+        clause_asserted(+),
+        clause_asserted(+, ?),
+        clause_asserted(+, ?, -),
         clause_safe(?, ?),
         debugCallWhy(?, 0),
         eraseall(+, +),
         find_and_call(+, +, ?),
         mpred_mop(+, 1, ?),
-        mpred_op_prolog(?, :),
+        mpred_op_prolog(?, +),
         mpred_op_prolog0(1,?),
         my_module_sensitive_code(?),
         dont_make_cyclic(0).
@@ -117,7 +117,7 @@
 :- endif.
 
 
-:- meta_predicate clause_safe(:, ?).
+:- meta_predicate clause_safe(+, ?).
 :- module_transparent clause_safe/2.
 :- export(clause_safe/2).
 
@@ -270,8 +270,8 @@ mpred_op_prolog0(OP,MTerm):- call(OP,MTerm).
 :- module_transparent((aina/1,ain/1,ainz/1,ain0/1,ainz_clause/1,ainz_clause/2,clause_asserted/2,expand_to_hb/3,clause_asserted/1,eraseall/2)).
 :- module_transparent((asserta_new/1,asserta_if_new/1,assertz_new/1,assertz_if_new/1,assert_if_new/1)). % ,assertz_if_new_clause/1,assertz_if_new_clause/2,clause_asserted/2,expand_to_hb/2,clause_asserted/1,eraseall/2)).
 
-:- meta_predicate paina(:),pain(:),painz(:),ain0(:),ainz_clause(:),ainz_clause(:,?).
-:- meta_predicate clause_asserted(:,?),expand_to_hb(?,?,?),clause_asserted(:),eraseall(+,+).
+:- meta_predicate paina(+),pain(+),painz(+),ain0(+),ainz_clause(+),ainz_clause(+,?).
+:- meta_predicate clause_asserted(+,?),expand_to_hb(?,?,?),clause_asserted(+),eraseall(+,+).
 
 % aina(NEW):-ignore((system:retract(NEW),fail)),system:asserta(NEW).
 % ainz(NEW):-ignore((system:retract(NEW),fail)),system:assertz(NEW).
@@ -289,7 +289,7 @@ eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall
 eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(system:clause(M:C,B,X),erase_safe(system:clause(M:C,B,X),X))).
 
 
-:-thread_local(t_l:std_provider/3).
+:-thread_local(t_l:asserted_std_provider/3).
 :-thread_local(t_l:current_std_provider/1).
 :-dynamic(lmconf:first_std_provider/2).
 :-dynamic(lmconf:next_std_provider/2).
@@ -303,7 +303,7 @@ eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(sys
 % Hook To [std_provider/3] For Module Logicmoo_util_database.
 % Managed Predicate Provider.
 %
-std_provider(OP,Term,PROVIDER):- t_l:std_provider(OP,Term,PROVIDER).
+std_provider(OP,Term,PROVIDER):- t_l:asserted_std_provider(OP,Term,PROVIDER).
 std_provider(_,_,PROVIDER):- t_l:current_std_provider(PROVIDER).
 std_provider(OP,Term,PROVIDER):- lmconf:first_std_provider(OP,Term,PROVIDER).
 
@@ -540,7 +540,7 @@ hb_to_clause(H,B,(H:-B)).
 
 
 :-export(clause_asserted/1).
-:-meta_predicate(clause_asserted(:)).
+:-meta_predicate(clause_asserted(+)).
 
 %= 	 	 
 
@@ -550,8 +550,8 @@ hb_to_clause(H,B,(H:-B)).
 %
 clause_asserted(C):- expand_to_hb(C,H,B),clause_asserted(H,B).
 
-:-export(clause_asserted/2).
-:-meta_predicate(clause_asserted(:,?)).
+:- export(clause_asserted/2).
+:- meta_predicate(clause_asserted(+,?)).
 
 %= 	 	 
 
@@ -562,7 +562,7 @@ clause_asserted(C):- expand_to_hb(C,H,B),clause_asserted(H,B).
 clause_asserted(H,B):-clause_asserted(H,B,_).
 
 :-export(clause_asserted/3).
-:-meta_predicate(clause_asserted(:,?,-)).
+:-meta_predicate(clause_asserted(+,?,-)).
 
 %= 	 	 
 

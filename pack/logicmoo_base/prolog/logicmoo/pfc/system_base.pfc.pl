@@ -388,17 +388,15 @@ mtCore(Mt)==>tMicrotheory(Mt).
 
 */
 
-mtCycL(O)==>{setup_module_ops(O)}.
+mtCycL(O)==>{ensure_abox(O)}.
 
 {module_property(Mt,class(library))} ==> mtPrologLibrary(Mt).
 
 mtPrologLibrary(Mt)==>mtGlobal(Mt).
 
-mtGlobal(Mt)==>(mtCore(Mt),~mtLocal(Mt)).
 
-(tMicrotheory(Mt), ~ mtCycL(Mt)) <==> mtProlog(Mt).
-
-(genlMt(Mt,baseKB)/(Mt \==baseKB ), \+ mtCore(Mt)) ==> mtLocal(Mt).
+% TODO: stop next line from killing mtCycL(baseKB)
+%  (tMicrotheory(Mt), ~ mtCycL(Mt)) <==> mtProlog(Mt).
 
 % mtCycL(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
 mtGlobal(Mt)==>genlMt(baseKB,Mt).

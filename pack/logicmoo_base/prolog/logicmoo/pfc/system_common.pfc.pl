@@ -333,7 +333,7 @@ prologSideEffects(resolveConflict/1).
 
 % :- prolog.
 % tPred
-ttPredType(isEach(meta_argtypes,pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,prologMultiValued,
+ttPredType(isEach(pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,prologMultiValued,
  pfcBcTrigger,
  prologSingleValued,prologMacroHead,notAssertable,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,prologEquality,prologPTTP,
  prologSideEffects,prologHybrid,prologListValued)).
@@ -341,6 +341,7 @@ ttPredType(isEach(meta_argtypes,pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMust
 completelyAssertedCollection(isEach(tCol,tPred,pfcControlled)).
 ttPredType(C)==>completelyAssertedCollection(C).
 
+% genls(meta_argtypes,ftSpec).
 
 ~(ttExpressionType(prologEquality)).
 ttPredType(prologEquality).
@@ -753,7 +754,6 @@ tCol(tFunction).
 tCol(tInferInstanceFromArgType).
 tCol(tPred).
 tCol(tRelation).
-tCol(meta_argtypes).
 tCol(ttTemporalType).
 tCol(ttTypeType).
 % tCol(tPathway).
