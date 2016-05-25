@@ -411,7 +411,7 @@ fix_mp(Why, '~'(G0), M, '~'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
 fix_mp(Why,'?-'(G0),M, '?-'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
 fix_mp(Why,':-'(G0),M, ':-'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
 fix_mp(Why,(G :- B),M,( GO :- B)):- !, fix_mp(Why,G,M,GO).
-fix_mp(_Why,Mt:P,M,P):- clause_b(mtCycL(Mt)),!.
+fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtCycL(Mt)),!.
 fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtExact(Mt)),!.
 fix_mp(_Why,P,S,GO):- predicate_property_nt(P,imported_from(S)),!,strip_module(P,M,GO).
 fix_mp(Why,M:P,MT,P):- to_real_mt(Why,M,MT)->M\==MT,!.
