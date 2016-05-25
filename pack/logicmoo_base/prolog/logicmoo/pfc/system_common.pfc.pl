@@ -321,10 +321,10 @@ prologSideEffects(resolveConflict/1).
   ({    
     functor(G,F,A),
      (var(M)->must(defaultAssertMt(M));true),
-     (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
-     (var(M)->predicate_property(M:G,exported);true),
+     (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property_safe(M:G,imported_from(_))));true),
+     (var(M)->predicate_property_safe(M:G,exported);true),
      % must(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         
-     % (predicate_property(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
+     % (predicate_property_safe(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
      kb_dynamic(M:F/A),
      show_failure(hybrid_support, \+ is_static_predicate(F/A))}),
      prologHybrid(F),
@@ -380,9 +380,9 @@ pfcControlled(argIsa).
 
 :- must(ain((tSet(C)==>
  ( {atom(C), functor(Head,C,1),
-  ( \+(predicate_property(Head,S1))-> kb_dynamic(C/1); true),
+  ( \+(predicate_property_safe(Head,S1))-> kb_dynamic(C/1); true),
   Head=..[C,S2],nop((S1:S2)),
- (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
+ (predicate_property_safe(Head,dynamic)->true;show_pred_info(Head))},
    functorDeclares(C),
    pfcControlled(C),
    arity(C,1),
@@ -391,12 +391,12 @@ pfcControlled(argIsa).
 
 
 ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1),
-  call(\+ predicate_property(Head,defined) -> kb_dynamic(F/1);true),
+  call(\+ predicate_property_safe(Head,defined) -> kb_dynamic(F/1);true),
   Head=..[F,I],
-  call(predicate_property(Head,dynamic)->true;show_pred_info(Head))},
+  call(predicate_property_safe(Head,dynamic)->true;show_pred_info(Head))},
    ~functorDeclares(F),
    arity(F,1),
-   (Head/predicate_property(Head,dynamic)==>{ignore(retract(Head))}),
+   (Head/predicate_property_safe(Head,dynamic)==>{ignore(retract(Head))}),
    ((isa(I,F))==>{ignore(retract(isa(I,F)))}).
 
 arity(prologMacroHead,1).
@@ -407,14 +407,14 @@ ttPredType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,
   predCanHaveSingletons,prologDynamic,tPred,prologMacroHead,prologListValued,prologSingleValued)).
 prologMacroHead(prologMacroHead).
 ttPredType(X)==>functorDeclares(X).
-functorDeclares(X)==>tSet(X).
+tSet(X)==>functorDeclares(X).
 functorDeclares(X)==>tCol(X).
 % prologMacroHead(X)==>functorDeclares(X).
 % prologMacroHead(pddlSomethingIsa/2).
 tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 
 prologBuiltin(A) :- cwc,head_to_functor_name(A, B),prologBuiltin(B).
-prologBuiltin(P) :- cwc,is_ftCompound(P),!,get_functor(P,F,A),functor(C,F,A),(predicate_property(C,built_in)). % predicate_property(P,static)).
+prologBuiltin(P) :- cwc,is_ftCompound(P),!,get_functor(P,F,A),functor(C,F,A),(predicate_property_safe(C,built_in)). % predicate_property_safe(P,static)).
 ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,head_to_functor_name(I,F),call(PT,F)).
 
 
@@ -452,6 +452,7 @@ completelyAssertedCollection(C)==>completeExtentAsserted(C).
 
 completeExtentAsserted(genlPreds).
 completeExtentAsserted(defnSufficient).
+
 
 :- kb_dynamic(ttNotTemporalType/1).
 ttNotTemporalType(ftInt).

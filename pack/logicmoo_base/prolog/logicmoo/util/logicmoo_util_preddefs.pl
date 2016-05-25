@@ -26,7 +26,7 @@
             (dynamic_safe)/1,
             (dynamic_safe)/3,
             op_safe/3,
-            % system:predicate_property_nt/2,
+            % system:predicate_property_safe/2,
             dynamic_transparent/1,
             fill_args/2,
             get_module_of/2,
@@ -147,9 +147,9 @@ call_from_module(NewModule,Goal):-
       ('$set_source_module'(OldSModule),'$set_typein_module'(OldModule))).
 
 
-:- meta_predicate(system:predicate_property_nt(:,?)).
+:- meta_predicate(system:predicate_property_safe(:,?)).
 
-system:predicate_property_nt(A,B):- 
+system:predicate_property_safe(A,B):- 
   quietly(w_tl(set_prolog_flag(retry_undefined,false),
    predicate_property(A,B))).
 
@@ -530,7 +530,7 @@ with_pfa_group(With,CallerMt, PredMt, PI):- must(with_pfa_single(With,CallerMt, 
 % Using Pfa Single.
 %
 with_pfa_single(With,CallerMt, PredMt, FA):- lmconf:mpred_is_decl_called(With,CallerMt, PredMt, FA),!.
-% with_pfa_single(With,_CallerMt, PredMt, FA):- to_canonical_mpi(FA,P), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property_nt(RM:P,imported_from(_)), PredMt==RM))))),fail.
+% with_pfa_single(With,_CallerMt, PredMt, FA):- to_canonical_mpi(FA,P), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property_safe(RM:P,imported_from(_)), PredMt==RM))))),fail.
 with_pfa_single([], _CallerMt, _M, _FA):-!.
 with_pfa_single([With|List],CallerMt, PredMt, FA):- is_list(List),!,with_pfa_single(With,CallerMt, PredMt, FA),!,with_pfa_single(List,CallerMt, PredMt, FA).
 with_pfa_single(With,CallerMt, PredMt, FA):- lmconf:mpred_is_decl_called(With,CallerMt0, M0, FA),M0\==PredMt, dmsg(with_pfa_single(With,CallerMt->CallerMt0, PredMt->M0, FA)),!,asserta(lmconf:mpred_is_decl_called(With,CallerMt, PredMt, FA)),!.
@@ -606,8 +606,8 @@ call_if_defined(G):-current_predicate(_,G),G.
 %
 % F Predicate Property.
 %
-p_predicate_property(P,PP):-predicate_property_nt(P,PP),!.
-p_predicate_property(_:P,PP):-predicate_property_nt(P,PP).
+p_predicate_property(P,PP):-predicate_property_safe(P,PP),!.
+p_predicate_property(_:P,PP):-predicate_property_safe(P,PP).
 %current_bugger_predicate(PredMt:FF/FA):-nonvar(FF),!,current_predicate(PredMt:FF,FA).
 %current_bugger_predicate(FF/FA):-nonvar(FF),!,!,current_predicate(FF/FA).
 :- module_transparent(current_predicate_module/2).
@@ -679,7 +679,7 @@ multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 %
 % Dynamic If Missing.
 %
-dynamic_if_missing(F/A):-functor_safe(X,F,A),predicate_property_nt(X,_),!.
+dynamic_if_missing(F/A):-functor_safe(X,F,A),predicate_property_safe(X,_),!.
 dynamic_if_missing(F/A):-dynamic([F/A]).
 
 
@@ -726,8 +726,8 @@ get_module_of_4(P,F,A,PredMt):- trace, debugCall(get_module_of_4(P,F,A,PredMt)).
 %
 get_module_of(V,PredMt):-var(V),!,current_module(PredMt).
 get_module_of(F/A,PredMt):-!,functor_catch(P,F,A),!,get_module_of(P,PredMt).
-get_module_of(P,PredMt):-predicate_property_nt(P,imported_from(PredMt)),!.
-get_module_of(P,PredMt):-predicate_property_nt(_:P,imported_from(PredMt)),!.
+get_module_of(P,PredMt):-predicate_property_safe(P,imported_from(PredMt)),!.
+get_module_of(P,PredMt):-predicate_property_safe(_:P,imported_from(PredMt)),!.
 get_module_of(MM:_,PredMt):-!,MM=PredMt.
 get_module_of(P,PredMt):-functor_catch(P,F,A),get_module_of_4(P,F,A,PredMt).
 
@@ -745,9 +745,9 @@ get_module_of(P,PredMt):-functor_catch(P,F,A),get_module_of_4(P,F,A,PredMt).
 %
 is_static_predicate_3(PredMt,F,A):- 
   functor_safe(FA,F,A),  
-  PredMt:once(predicate_property_nt(FA,_)),
-  \+ predicate_property_nt(FA,dynamic),
-    \+ ((predicate_property_nt(PredMt:FA,imported_from(Where)),
+  PredMt:once(predicate_property_safe(FA,_)),
+  \+ predicate_property_safe(FA,dynamic),
+    \+ ((predicate_property_safe(PredMt:FA,imported_from(Where)),
     Where \== PredMt)).
 
 
@@ -757,20 +757,20 @@ is_static_predicate_3(PredMt,F,A):-
 %
 % Static Predicate.
 %
-is_static_predicate(M:F):-atom(F),predicate_property_nt(M:F,static),!,predicate_property_nt(F,number_of_clauses(_)),\+ predicate_property_nt(F,dynamic).
+is_static_predicate(M:F):-atom(F),predicate_property_safe(M:F,static),!,predicate_property_safe(F,number_of_clauses(_)),\+ predicate_property_safe(F,dynamic).
 is_static_predicate((M:F)/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate((M:F)//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 % is_static_predicate(M:F):-!,atom(F),between(1,11,A),current_predicate(M:F/A),functor(FA,F,A),is_static_predicate(M:FA),!.
 is_static_predicate(F):- F\=(_:_),!,prolog_load_context(module,M),!,is_static_predicate(M:F).
-is_static_predicate(FA):-predicate_property_nt(FA,static),!,predicate_property_nt(FA,number_of_clauses(_)), 
+is_static_predicate(FA):-predicate_property_safe(FA,static),!,predicate_property_safe(FA,number_of_clauses(_)), 
   catch(dynamic(FA),_,true),
-  \+ predicate_property_nt(FA,dynamic),
+  \+ predicate_property_safe(FA,dynamic),
   catch(multifile(FA),_,true).
-is_static_predicate(FA):- once(predicate_property_nt(FA,_)),
+is_static_predicate(FA):- once(predicate_property_safe(FA,_)),
     catch(dynamic(FA),_,true),
-    \+ predicate_property_nt(FA,dynamic),
+    \+ predicate_property_safe(FA,dynamic),
     catch(multifile(FA),_,true).
 
 
@@ -808,8 +808,8 @@ convert_to_dynamic(FA):- strip_module(FA,PredMt,FA0), get_functor(FA0,F,A), conv
 %
 % Convert Converted To Dynamic.
 %
-convert_to_dynamic(PredMt,F,A):-  functor(C,F,A), predicate_property_nt(PredMt:C,dynamic),!.
-convert_to_dynamic(PredMt,F,A):-  functor(C,F,A),\+ predicate_property_nt(PredMt:C,_),if_defined(kb_dynamic(PredMt:C),(PredMt:((dynamic(PredMt:F/A),multifile(PredMt:F/A),export(PredMt:F/A))))),!.
+convert_to_dynamic(PredMt,F,A):-  functor(C,F,A), predicate_property_safe(PredMt:C,dynamic),!.
+convert_to_dynamic(PredMt,F,A):-  functor(C,F,A),\+ predicate_property_safe(PredMt:C,_),if_defined(kb_dynamic(PredMt:C),(PredMt:((dynamic(PredMt:F/A),multifile(PredMt:F/A),export(PredMt:F/A))))),!.
 convert_to_dynamic(PredMt,F,A):-  functor(C,F,A),findall((C:-B),clause(C,B),List),rebuild_as_dyn(PredMt,C,F,A),maplist(assertz,List),!.
 
 % kb_dynamic = 
@@ -822,7 +822,7 @@ convert_to_dynamic(PredMt,F,A):-  functor(C,F,A),findall((C:-B),clause(C,B),List
 %
 % Rebuild Converted To Dyn.
 %
-rebuild_as_dyn(PredMt,C,_,_):- predicate_property_nt(PredMt:C,dynamic),!.
+rebuild_as_dyn(PredMt,C,_,_):- predicate_property_safe(PredMt:C,dynamic),!.
 rebuild_as_dyn(PredMt,C,F,A):- redefine_system_predicate(PredMt:C),PredMt:abolish(F,A),dynamic(PredMt:F/A),multifile(PredMt:F/A),export(F/A),!.
 
 
@@ -832,7 +832,7 @@ rebuild_as_dyn(PredMt,C,F,A):- redefine_system_predicate(PredMt:C),PredMt:abolis
 %
 % Dynamic Safely Paying Attention To Corner Cases.
 %
-dynamic_safe(PredMt,F,A):- functor(C,F,A),predicate_property_nt(C,imported_from(system)),!,dmsg(warn(predicate_property_nt(PredMt:C,imported_from(system)))).
+dynamic_safe(PredMt,F,A):- functor(C,F,A),predicate_property_safe(C,imported_from(system)),!,dmsg(warn(predicate_property_safe(PredMt:C,imported_from(system)))).
 dynamic_safe(PredMt,F,A):- (is_static_predicate(PredMt:F/A) 
   -> show_call(why,convert_to_dynamic(PredMt,F,A)) ; on_x_log_cont((dynamic(PredMt:F/A),multifile(PredMt:F/A)))). % , warn_module_dupes(PredMt,F,A).
 :- op(1150,fx,lmconf:dynamic_safe).
@@ -856,10 +856,10 @@ pred_prop(PredMt:F/A, (dynamic(PredMt:F/A)) ,(dynamic), show_call(why,compile_pr
 % If Static F, Generate a Proof.
 %
 :- module_transparent(is_static_why/5).
-is_static_why(PredMt,P,_,_,_):- predicate_property_nt(PredMt:P,dynamic),!,fail.
-is_static_why(PredMt,P,F,A,WHY):- show_success(predicate_property_nt(PredMt:P,static)),!,WHY=static(PredMt:F/A).
+is_static_why(PredMt,P,_,_,_):- predicate_property_safe(PredMt:P,dynamic),!,fail.
+is_static_why(PredMt,P,F,A,WHY):- show_success(predicate_property_safe(PredMt:P,static)),!,WHY=static(PredMt:F/A).
 
-defined_predicate(PredMt:P):- (current_predicate(_,PredMt:P),( \+ predicate_property_nt(PredMt:P,imported_from(_)))).
+defined_predicate(PredMt:P):- (current_predicate(_,PredMt:P),( \+ predicate_property_safe(PredMt:P,imported_from(_)))).
 
 %= 	 	 
 
@@ -905,15 +905,15 @@ rebuild_pred_into(_,NMC,AssertZ,_):-tlbugger:rbuild_pred_impl_cache(NMC,AssertZ)
 rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
   listing(OMC),
   asserta(tlbugger:rbuild_pred_impl_cache(NMC,AssertZ)),
-  show_call(rebuild_pred_into,(predicate_property_nt(OMC,number_of_clauses(_)))),
+  show_call(rebuild_pred_into,(predicate_property_safe(OMC,number_of_clauses(_)))),
   strip_module(OMC, OM, OC),
   strip_module(NMC, NM, NC),
    must_det_l((
       '$set_source_module'(Before, OM),
       functor(NC,NF,A), functor(OC,OF,A),
-      (show_call(why,predicate_property_nt(OMC,number_of_clauses(_)))),
-      must_pi(show_failure(why,predicate_property_nt(OMC,number_of_clauses(_)))),
-      forall(predicate_property_nt(OC,PP),asserta(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
+      (show_call(why,predicate_property_safe(OMC,number_of_clauses(_)))),
+      must_pi(show_failure(why,predicate_property_safe(OMC,number_of_clauses(_)))),
+      forall(predicate_property_safe(OC,PP),asserta(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
       findall((OC:-B),((clause(OC,B),assertz(pp_clauses((OC:-B))))),List),
       '$set_source_module'( NM),
       forall(member(-PP,OtherTraits),retractall(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
@@ -924,7 +924,7 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       garbage_collect_clauses,
       ignore(convert_to_dynamic(NM,NF,A)),
       garbage_collect_clauses,
-      %must_pi( \+ predicate_property_nt(NMC,_)),
+      %must_pi( \+ predicate_property_safe(NMC,_)),
       %once(memberchk(CC,List)->true;(CC=((NC:-fail,1234)))),
       %convert_to_dynamic(NM,NF,A),
       %ignore(on_x_log_throw(tlbugger:rbuild_pred_impl_cache_pp(NC,(dynamic))->dynamic(NF/A);true)),

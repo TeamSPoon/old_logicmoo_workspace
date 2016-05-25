@@ -93,8 +93,10 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
 :- kb_dynamic(mpred_undo_sys/3).
 :- kb_dynamic(arity/2).
 
+
 :- dynamic(arity/2).
 :- dynamic(disjointWith/2).
+:- dynamic(genlsFwd/2).
 
 % prologHybrid(arity/2).
 
@@ -107,7 +109,7 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
 
 
 
-tCol(A)/atom(A)==>{kb_dynamic(A/1)}.
+tCol(A)/atom(A)==>{call(kb_dynamic(A/1))}.
 
 tCol(tCol).
 tCol(tPred).
@@ -259,7 +261,7 @@ mpred_mark(pfcRHSF,1)/(fail,atom(F),functor(Head,F,1),
  \+ prologDynamic(F),
  \+ ~(tCol(F)),
  \+ specialFunctor(F),
- \+ predicate_property(Head,built_in))==>completelyAssertedCollection(F).
+ \+ predicate_property_safe(Head,built_in))==>completelyAssertedCollection(F).
 */
 % mpred_mark(Type,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
 
@@ -272,7 +274,7 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 
 %:- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
 %mp_test_agr(_,_,_,_,_,_,_,_,_,_).
-%:- mpred_test(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
+%:- mpred_test(predicate_property_safe(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
 % becomes         mp_test_agr(+,+,-,?,^,:,0,1,0,0)
 
 
@@ -302,11 +304,15 @@ genlMt(Mt1,Mt2),mtProlog(Mt1),mtCycL(Mt2) ==>
 
 baseKB:mtCycL(baseKB).
 
+baseKB:predicateConventionMt(predicateConventionMt,baseKB).
+baseKB:predicateConventionMt(collectionConventionMt,baseKB).
+
 predicateConventionMt(genlMt,baseKB).
 predicateConventionMt(regression_test,lmconf).
 
 
-collectionConventionMt(tMicrotheory,baseKB).
+
+baseKB:collectionConventionMt(tMicrotheory,baseKB).
 collectionConventionMt(mtCycL,baseKB).
 collectionConventionMt(Col,Where)==>predicateConventionMt(Col,Where).
 
@@ -323,9 +329,9 @@ ttModule(M)==>tSet(M).
 ttModule(MtType)==>genlsFwd(MtType,tMicrotheory).
 ttModule(mtProlog).
 
-disjointWith(mtLibrary,mtPrologLibrary).
+disjointWith(mtUserCodeLibrary,mtBuiltinLibrary).
 
-% partition(mtProlog, mtLibrary, mtPrologLibrary, mtUserCodeLibrary).
+% partition(mtProlog, mtBuiltinLibrary, mtUserCodeLibrary).
 
 :- sanity(get_lang(pfc)).
 
@@ -344,21 +350,18 @@ tCol(Decl)==>functorDeclares(Decl).
 :- sanity(arity(ttModule,1)).
 
 :- sanity(\+ arity(ttModule,3)).
-:- sanity(\+ predicate_property(ttModule(_,_,_),_)).
+:- sanity(\+ predicate_property_safe(ttModule(_,_,_),_)).
 
 ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
   genlsFwd(tMicrotheory)).
 
 :- sanity(arity(ttModule,1)).
 :- sanity(\+ arity(ttModule,3)).
-:- sanity(\+ predicate_property(ttModule(_,_,_),_)).
+:- sanity(\+ predicate_property_safe(ttModule(_,_,_),_)).
 
-
-ttModule(mtPrologLibrary,comment("Builtin Prolog code modules such as 'lists' or 'apply'"),
+ttModule(mtBuiltinLibrary,comment("Builtin Prolog code modules such as 'lists' or 'apply' and PFC system like 'mpred_loader' or 'mpred_type_wff'"),
   genlsFwd(mtProlog),genlsFwd(mtCore)).
 
-ttModule(mtLibrary,comment("PFC System modules such as 'mpred_loader' or 'mpred_type_wff'"),
-   genlsFwd(mtProlog)).
 
 % ttModule(mtLocal,comment("mtLocal(?Mt) is always scoped underneath baseKB")).
 
@@ -401,9 +404,12 @@ mtCore(Mt)==>tMicrotheory(Mt).
 
 mtCycL(O)==>{call(ensure_abox(O))}.
 
-{module_property(Mt,class(library))} ==> mtPrologLibrary(Mt).
+:- dynamic(nondet/0).
+{module_property(Mt,class(library))} ==> mtBuiltinLibrary(Mt).
+% TODO the above is secretly the next line (confirm fixered)
+% (nondet,{module_property(Mt,class(library))}) ==> mtBuiltinLibrary(Mt).
 
-mtPrologLibrary(Mt)==>mtGlobal(Mt).
+mtBuiltinLibrary(Mt)==>mtGlobal(Mt).
 
 
 
@@ -425,8 +431,8 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 :- dynamic(baseKB:isRegisteredCycPred/3).
 
 ({fail,current_module(Mt),
-   predicate_property(Mt:P,defined), 
- \+ predicate_property(Mt:P,imported_from(_)),
+   predicate_property_safe(Mt:P,defined), 
+ \+ predicate_property_safe(Mt:P,imported_from(_)),
  functor(P,F,A)})
   ==>baseKB:isRegisteredCycPred(Mt,F,A).
 
@@ -445,7 +451,6 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 :-ain(pass2).
 
 % :- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
-
 
 nondet.
 

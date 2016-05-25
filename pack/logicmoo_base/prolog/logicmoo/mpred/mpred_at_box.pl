@@ -273,7 +273,7 @@ mtCanAssert(_).
 :- decl_shared(baseKB:dynamic,genlMt/2).
 
 :- decl_shared(baseKB:dynamic,mtCore/1).
-:- decl_shared(baseKB:dynamic,mtPrologLibrary/1).
+:- decl_shared(baseKB:dynamic,mtBuiltinLibrary/1).
 :- decl_shared(baseKB:dynamic,mtProlog/1).
 :- decl_shared(baseKB:dynamic,mtCycL/1).
 :- decl_shared(baseKB:dynamic,mtExact/1).
@@ -472,12 +472,12 @@ correct_module(M,G,T):-functor(G,F,A),quietly_must(correct_module(M,G,F,A,T)),!.
 correct_module(abox,G,F,A,T):- !, defaultAssertMt(M),correct_module(M,G,F,A,T).
 correct_module(tbox,G,F,A,T):- !, get_current_default_tbox(M),correct_module(M,G,F,A,T).
 correct_module(user,G,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,G,F,A,T).
-correct_module(HintMt,Goal,_,_,OtherMt):- predicate_property_nt(HintMt:Goal,imported_from(OtherMt)).
-correct_module(_,Goal,_,_,OtherMt):- predicate_property_nt(Goal,imported_from(OtherMt)).
+correct_module(HintMt,Goal,_,_,OtherMt):- predicate_property_safe(HintMt:Goal,imported_from(OtherMt)).
+correct_module(_,Goal,_,_,OtherMt):- predicate_property_safe(Goal,imported_from(OtherMt)).
 correct_module(HintMt,_,_,_,HintMt):- call_u(mtExact(HintMt)).
-correct_module(HintMt,Goal,_,_,HintMt):- predicate_property_nt(HintMt:Goal,exported).
-correct_module(_,Goal,_,_,OtherMt):- var(OtherMt),!, predicate_property_nt(OtherMt:Goal,file(_)).
-correct_module(_,Goal,_,_,OtherMt):- clause_b(mtGlobal(OtherMt)), predicate_property_nt(OtherMt:Goal,file(_)).
+correct_module(HintMt,Goal,_,_,HintMt):- predicate_property_safe(HintMt:Goal,exported).
+correct_module(_,Goal,_,_,OtherMt):- var(OtherMt),!, predicate_property_safe(OtherMt:Goal,file(_)).
+correct_module(_,Goal,_,_,OtherMt):- clause_b(mtGlobal(OtherMt)), predicate_property_safe(OtherMt:Goal,file(_)).
 correct_module(MT,_,_,_,MT):-!.
 
 
@@ -492,7 +492,7 @@ add_import_predicate(Mt,Goal,OtherMt):- fail,
    catch(add_import_module(Mt,OtherMt,end),
        error(permission_error(add_import,module,baseKB),
        context(system:add_import_module/3,'would create a cycle')),fail),
-   must(predicate_property_nt(Mt:Goal,imported_from(OtherMt))),!.
+   must(predicate_property_safe(Mt:Goal,imported_from(OtherMt))),!.
 
 add_import_predicate(Mt,Goal,OtherMt):- catch(Mt:import(OtherMt:Goal),_,fail),!.
 add_import_predicate(Mt,Goal,OtherMt):- 
@@ -622,7 +622,7 @@ retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(mtGlob
 
 % import built-ins ?
 retry_undefined(CallerMt,F,A):- current_predicate(system:F/A), current_module(M),M\=system,
-  current_predicate(M:F/A),functor(P,F,A),predicate_property_nt(M:P,defined),\+predicate_property_nt(M:P,imported_from(_)),
+  current_predicate(M:F/A),functor(P,F,A),predicate_property_safe(M:P,defined),\+predicate_property_safe(M:P,imported_from(_)),
   CallerMt:import(M:F/A).
 
 % our autoloader hacks

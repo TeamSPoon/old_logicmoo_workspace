@@ -293,7 +293,7 @@ cheaply_u(G):- loop_check(cheaply_u_ilc(G),loop_check_term(cheaply_u_ilc(G),ilc2
 cheaply_u_ilc(P):- strip_module(P,_,C),P\==C,!,cheaply_u_ilc(C).
 cheaply_u_ilc(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
 cheaply_u_ilc(call(ereq,G)):- !,cheaply_u_ilc(G).
-cheaply_u_ilc(P):- predicate_property_nt(P,number_of_rules(N)),N=0,!,lookup_u(P).
+cheaply_u_ilc(P):- predicate_property_safe(P,number_of_rules(N)),N=0,!,lookup_u(P).
 cheaply_u_ilc(G):- call_u(G).
 
 %= 	 	 

@@ -413,7 +413,7 @@ fix_mp(Why,':-'(G0),M, ':-'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
 fix_mp(Why,(G :- B),M,( GO :- B)):- !, fix_mp(Why,G,M,GO).
 fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtCycL(Mt)),!.
 fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtExact(Mt)),!.
-fix_mp(_Why,P,S,GO):- predicate_property_nt(P,imported_from(S)),!,strip_module(P,M,GO).
+fix_mp(_Why,P,S,GO):- predicate_property_safe(P,imported_from(S)),!,strip_module(P,M,GO).
 fix_mp(Why,M:P,MT,P):- to_real_mt(Why,M,MT)->M\==MT,!.
 fix_mp(Why,G,M,GO):- strip_module(G,_,GO),get_consequent_functor(GO,F,A),loop_check(convention_to_mt(Why,F,A,M),fail),!.
 
@@ -1720,7 +1720,7 @@ mpred_BC_CACHE(M,P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(M,P0),true))
 
 mpred_BC_CACHE0(_,P00):- var(P00),!.
 mpred_BC_CACHE0(M,must(P00)):-!,mpred_BC_CACHE0(M,P00).
-mpred_BC_CACHE0(M,P):- predicate_property_nt(M:P,static),!.
+mpred_BC_CACHE0(M,P):- predicate_property_safe(M:P,static),!.
 mpred_BC_CACHE0(_, :-(_,_)):-!.
 mpred_BC_CACHE0(_,bt(_,_)):-!.
 mpred_BC_CACHE0(M,P):- 
@@ -2211,8 +2211,8 @@ code_sentence_op(call(_)).
 code_sentence_op(call_u(_)).
 code_sentence_op(mpred_call_no_bc(_,_)).
 code_sentence_op(Test):- 
-  predicate_property_nt(Test,built_in),
-  predicate_property_nt(Test,meta_predicate(PP)), \+ (( arg(_,PP,N), N \= 0)).
+  predicate_property_safe(Test,built_in),
+  predicate_property_safe(Test,meta_predicate(PP)), \+ (( arg(_,PP,N), N \= 0)).
 
 
 %% all_closed(+C) is semidet.

@@ -1168,6 +1168,7 @@ file_begin(WIn):-
    set_fileAssertMt(Mt),
    wdmsg(fileAssertMt(Mt)),
    op_lang(W),
+   set_prolog_flag(retry_undefined,true),
    enable_mpred_expansion)),!.
 
 
@@ -1183,6 +1184,7 @@ set_file_lang(W):-
 
 set_lang(W):-
     assert_until_eof(t_l:current_lang(W)).
+    
 
 %% file_end( ?W) is det.
 %

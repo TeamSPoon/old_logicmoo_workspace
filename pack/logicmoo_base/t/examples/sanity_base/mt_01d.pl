@@ -13,7 +13,7 @@
 
 :- begin_pfc.
 
-:- set_defaultFileMt(cycKB1).
+:- set_fileAssertMt(cycKB1).
 
 loves(sally,joe).
 

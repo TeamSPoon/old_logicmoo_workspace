@@ -3,6 +3,8 @@
 
 :- set_fileAssertMt(baseKB).
 
+:- dynamic(pass4/0).
+
 /*
 colen syntax and Mts
 

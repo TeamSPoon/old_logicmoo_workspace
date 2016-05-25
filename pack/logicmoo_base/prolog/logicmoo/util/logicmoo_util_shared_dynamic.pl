@@ -98,7 +98,7 @@ wsh_w:wrap_shared(retractall,1,dbreq):- is_user_module.
 
 
 wsh_w:wrap_shared(mtCore,1,ereq).
-wsh_w:wrap_shared(mtPrologLibrary,1,ereq).
+wsh_w:wrap_shared(mtBuiltinLibrary,1,ereq).
 wsh_w:wrap_shared(mtProlog,1,ereq).
 wsh_w:wrap_shared(mtCycL,1,ereq).
 wsh_w:wrap_shared(mtExact,1,ereq).

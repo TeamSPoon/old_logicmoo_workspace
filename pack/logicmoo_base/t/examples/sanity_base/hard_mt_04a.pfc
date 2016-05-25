@@ -22,7 +22,9 @@ baseKB:mtCycL(socialMt).
 :- begin_pfc.
 
 
-baseKB:predicateConventionMt(loves,socialMt).
+mt1:predicateConventionMt(loves,socialOneMt).
+
+mt2:predicateConventionMt(loves,socialTwoMt).
 
 :- must((fix_mp(clause(_,_),loves(x,y),M,P),M:P==socialMt:loves(x,y))).
 
