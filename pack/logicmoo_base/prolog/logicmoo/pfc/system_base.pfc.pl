@@ -45,6 +45,7 @@
 
 :- dynamic(baseKB:mtCycL/1).
 :- dynamic(baseKB:mtExact/1).
+:- dynamic(baseKB:predicateConventionMt/2).
 
 baseKB:mtCycL(baseKB).
 %baseKB:mtExact(baseKB).
@@ -69,13 +70,16 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==> collectionConventionMt(AN
 tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
        decontextualizedCollection(ANECT).
 
+tAtemporalNecessarilyEssentialCollectionType(ANECT)==> 
+        collectionConventionMt(ANECT,baseKB).
+
 
 :- dynamic(ttModule/1).
 :- dynamic(marker_supported/2).
 
 :- dynamic(pass2/0).
 
-
+(P/mpred_non_neg_literal(P) ==> { remove_negative_version(P) } ).
 
 :- dynamic(mpred_mark_C/1).
 
@@ -102,6 +106,17 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
 % :- mpred_ops.
 
 
+
+tCol(A)/atom(A)==>{kb_dynamic(A/1)}.
+
+tCol(tCol).
+tCol(tPred).
+tCol(tFunction).
+tCol(tRelation).
+tCol(ttTemporalType).
+tCol(ttExpressionType).
+tCol(functorDeclares).
+functorDeclares(ttModule).
 
 
 %:- sanity((fix_mp(clause(assert,sanity),arity(apathFn,2),M,O),M:O=baseKB:arity(apathFn,2))).
@@ -290,6 +305,11 @@ baseKB:mtCycL(baseKB).
 predicateConventionMt(genlMt,baseKB).
 predicateConventionMt(regression_test,lmconf).
 
+
+collectionConventionMt(tMicrotheory,baseKB).
+collectionConventionMt(mtCycL,baseKB).
+collectionConventionMt(Col,Where)==>predicateConventionMt(Col,Where).
+
 % mtExact(Mt)==>{kb_dynamic(Mt)}.
 
 tCol(tSet).  % = isa(tSet,tCol).
@@ -308,15 +328,6 @@ disjointWith(mtLibrary,mtPrologLibrary).
 % partition(mtProlog, mtLibrary, mtPrologLibrary, mtUserCodeLibrary).
 
 :- sanity(get_lang(pfc)).
-
-tCol(tCol).
-tCol(tPred).
-tCol(tFunction).
-tCol(tRelation).
-tCol(ttTemporalType).
-tCol(ttExpressionType).
-tCol(functorDeclares).
-functorDeclares(ttModule).
 
 tCol(Decl)==>functorDeclares(Decl).
 
@@ -388,11 +399,12 @@ mtCore(Mt)==>tMicrotheory(Mt).
 
 */
 
-mtCycL(O)==>{ensure_abox(O)}.
+mtCycL(O)==>{call(ensure_abox(O))}.
 
 {module_property(Mt,class(library))} ==> mtPrologLibrary(Mt).
 
 mtPrologLibrary(Mt)==>mtGlobal(Mt).
+
 
 
 % TODO: stop next line from killing mtCycL(baseKB)

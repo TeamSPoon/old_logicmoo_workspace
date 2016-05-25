@@ -111,7 +111,6 @@ prologHybrid(genls/2).
 
 % These next 2 might be best as builtins?
 ((~(P)/(mpred_non_neg_literal(P),copy_term(P,PP))) ==> \+ PP ).
-(P/mpred_non_neg_literal(P) ==> { remove_negative_version(P) } ).
 % (P/mpred_non_neg_literal(P) ==> (\+ ~(P))).
 % ((P/(mpred_non_neg_literal(P),copy_term(P,PP))) ==> (~ ~ PP )).
 
@@ -300,10 +299,11 @@ tCol(C)/(atom(C),TCI=..[C,I]) ==> ({decl_type(C)},arity(C,1),mpred_univ(C,I,TCI)
 (tCol(C)/(atom(C), \+ is_static_predicate(C/1) )) ==> {kb_dynamic(C/1)}.
 
 (tCol(C)/(atom(C),TCI=..[C,I],\+ is_static_predicate(C/1), \+ completelyAssertedCollection(C))) 
-  ==> ((TCI:- 
+  ==> {call(assert_if_new((
+  ((TCI :- 
     ((cwc,
     lazy(( \+ ~(TCI))),
-    isa_backchaing(I,C))))).
+    isa_backchaing(I,C))))))))}.
 
 % (tInferInstanceFromArgType(Col),tCol(Col)/i_name('',Col,ColName),tPred(Prop)/i_name('',Prop,PropName),{ColName=PropName}==> tInferInstanceFromArgType(Prop)).
 
@@ -390,16 +390,14 @@ pfcControlled(argIsa).
    tCol(C))))).
 
 
-ttExpressionType(P) ==> {get_functor(P,C), functor(Head,C,1),
-  (\+(predicate_property(Head,S1))-> (kb_dynamic(C/1));true),  
-  Head=..[C,I],
-  nop((S1)),
- (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
-   ~(functorDeclares(C)),
-   % isa(C,prologDynamic),
-   arity(C,1),
-   ((Head)/predicate_property(Head,dynamic)==>{ignore(retract(Head))}),
-   ((isa(I,C))==>{ignore(retract(isa(I,C)))}).
+ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1),
+  call(\+ predicate_property(Head,defined) -> kb_dynamic(F/1);true),
+  Head=..[F,I],
+  call(predicate_property(Head,dynamic)->true;show_pred_info(Head))},
+   ~functorDeclares(F),
+   arity(F,1),
+   (Head/predicate_property(Head,dynamic)==>{ignore(retract(Head))}),
+   ((isa(I,F))==>{ignore(retract(isa(I,F)))}).
 
 arity(prologMacroHead,1).
 
@@ -571,7 +569,7 @@ isa('CycLTerm',ttNonGenled).
 :- kb_dynamic(quotedIsa/2).
 
 
-isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),(current_predicate(C,M:CI),\+ predicate_property(M:CI,imported_from(_))), call_u(call(M:CI)).
+isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),(current_predicate(C,M:CI),\+ predicate_property(M:CI,imported_from(_))), call_u(M:CI).
 isa(I,C):- isa_backchaing(I,C).
 isa(I,C):- cwc, is_ftNonvar(C),ttExpressionType(C),!,quotedIsa(I,C).
 

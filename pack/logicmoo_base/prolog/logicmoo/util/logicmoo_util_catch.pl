@@ -39,6 +39,8 @@
             catchv/3,
             catchvvnt/3,
             current_source_file/1,current_source_location0/1,
+            lmcache:current_main_error_stream/1,
+            lmcache:thread_current_input/2,
             dbgsubst/4,            
             dbgsubst0/4,
             ddmsg/1,
@@ -190,6 +192,7 @@
         bubbled_ex/1,
         bubbled_ex_check/1,
         current_source_file/1,
+        lmcache:current_main_error_stream/1,
         dbgsubst/4,
         dbgsubst0/4,
         ddmsg/1,
@@ -337,13 +340,6 @@ with_error_to_main(Goal):-
    
    
 
-:- multifile(lmcache:thread_current_input/2).
-:- dynamic(lmcache:thread_current_input/2).
-:- volatile(lmcache:thread_current_input/2).
-
-:- multifile(lmcache:thread_current_error_stream/2).
-:- dynamic(lmcache:thread_current_error_stream/2).
-:- volatile(lmcache:thread_current_error_stream/2).
 
 
 %% get_thread_current_error( ?Err) is det.
@@ -380,6 +376,12 @@ format_to_error(F,A):-get_main_error_stream(Err),!,format(Err,F,A).
 % Fresh Line Converted To Err.
 %
 fresh_line_to_err:- notrace((flush_output_safe,get_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
+
+:- dynamic(lmcache:thread_current_input/2).
+:- volatile(lmcache:thread_current_input/2).
+
+:- dynamic(lmcache:thread_current_error_stream/2).
+:- volatile(lmcache:thread_current_error_stream/2).
 
 %= 	 	 
 

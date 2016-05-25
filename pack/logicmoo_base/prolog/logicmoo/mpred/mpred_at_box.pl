@@ -70,6 +70,9 @@
 
          which_file/1
     ]).
+
+:-dynamic(unused_predicate/4).
+
 %:- endif.
 :- set_prolog_flag(retry_undefined,false).
 
@@ -335,7 +338,6 @@ set_fileAssertMt(ABox):-
 
 make_module_name_local(A,B):- make_module_name_local0(A,B), \+ exists_file(B).
 
-
 make_module_name_local0(Source,KB):- clause_b(mtProlog(Source)),t_l:current_defaultAssertMt(KB),!.
 make_module_name_local0(Source,KB):- clause_b(mtGlobal(Source)),t_l:current_defaultAssertMt(KB),!.
 make_module_name_local0(Source,SetName):- lmconf:file_to_module(Source,SetName),!.
@@ -545,9 +547,7 @@ baseKB:hybrid_support(genlMt,2).
 
 istAbove(Mt,Query):- Mt \== baseKB, genlMt(Mt,MtAbove),MtAbove:Query.
 
-
-
-uses_predicate(M:F/A,R):- uses_predicate(M,F,A,R).
+uses_predicate(M:F/A,R):- !, uses_predicate(M,F,A,R).
 uses_predicate(F/A,R):- uses_predicate(user,F,A,R).
 
 
@@ -558,7 +558,11 @@ uses_predicate(Module,Name,Arity,Action) :-
 uses_predicate(CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
 
 % keeps from calling this more than once
-uses_predicate(M,F,A,error):- '$current_source_module'(SM),lmcache:tried_to_retry_undefined(SM:M,F,A),!.
+uses_predicate(M,F,A,error):- '$current_source_module'(SM),
+  lmcache:tried_to_retry_undefined(SM:M,F,A),!,
+  wdmsg(unused_predicate(SM,M,F,A)).
+
+
 uses_predicate(CallerMt,F,A,_):-
    '$current_source_module'(SM),
    wdmsg(uses_predicate(SM,CallerMt,F,A)),

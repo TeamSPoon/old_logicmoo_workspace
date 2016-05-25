@@ -629,8 +629,8 @@ pred_subst(_Pred ,P,       _, _,       P     ).
 %
 % Univ Safely Paying Attention To Corner Cases.
 %
-univ_safe(P,[L|L1]):- nonvar(P), must((var(L);atom(L))),!, P=..[L|L1].
-univ_safe(P,L):- sanity(nonvar(P);is_list(L)),P=..L.
+univ_safe(P,[L|L1]):- nonvar(P), must((var(L);atom(L))),!,on_x_debug(( P=..[L|L1] )).
+univ_safe(P,L):- must_det(is_list(L)),on_x_debug((P=..L)).
 
 % ===================================================================
 % Substitution based on ==
@@ -670,10 +670,10 @@ nd_subst(  P, X,Sk, P1 ) :- functor(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
 % Nd Subst Secondary Helper.
 %
 nd_subst1( _,  _, P, 0, P  ).
-nd_subst1( X, Sk, P, N, P1 ) :- N > 0, must(univ_term(P , [F|Args])),
+nd_subst1( X, Sk, P, N, P1 ) :- N > 0, univ_term(P , [F|Args]),
             nd_subst2( X, Sk, Args, ArgS ),
             nd_subst2( X, Sk, [F], [FS] ),
-            must(univ_term(P1 , [FS|ArgS])).
+            univ_term(P1 , [FS|ArgS]).
 
 
 %= 	 	 
@@ -696,7 +696,7 @@ nd_subst2( _X, _Sk, L, L ).
 % Univ Term.
 %
 univ_term(P1,[FS|ArgS]):- compound(FS),!,append_term(FS,ArgS,P1).
-univ_term(P1,[FS|ArgS]):- on_x_debug(univ_safe(P1 , [FS|ArgS])).
+univ_term(P1,[FS|ArgS]):- univ_safe(P1 , [FS|ArgS]).
 
 
 

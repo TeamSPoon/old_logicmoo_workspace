@@ -405,20 +405,30 @@ to_real_mt(_Why,BOX,BOX).
 % Ensure modules are correct when asserting/calling information into the correct MTs
 %
 %fix_mp(Why,I,UO):- compound(UO),trace,UO=(U:O),!,quietly_must(fix_mp(Why,I,U,O)).
-%fix_mp(Why,I,UO):- quietly_must(fix_mp(Why,I,U,O)),maybe_prepend_mt(U,I,UO).
+fix_mp(Why,I,UO):- quietly_must(fix_mp(Why,I,U,O)),maybe_prepend_mt(U,I,UO).
 
 
 
-fix_mp(Why,I,ABox,I):- defaultAssertMt(ABox),!.
-/*
-fix_mp(Nonvar,Var,ABox,VarO):- sanity(nonvar(Nonvar)), is_ftVar(Var),!,Var=VarO,ignore(abox=ABox).
-
+fix_mp(Nonvar,Var,ABox,VarO):- sanity(nonvar(Nonvar)), is_ftVar(Var),!,Var=VarO,defaultAssertMt(ABox),!.
 fix_mp(Why, '~'(G0), M, '~'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
 fix_mp(Why,'?-'(G0),M, '?-'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
 fix_mp(Why,':-'(G0),M, ':-'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
-
 fix_mp(Why,(G :- B),M,( GO :- B)):- !, fix_mp(Why,G,M,GO).
-fix_mp(Why,M:P,M,P):- clause_b(mtCycL(M)),!.
+fix_mp(_Why,Mt:P,M,P):- clause_b(mtCycL(Mt)),!.
+fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtExact(Mt)),!.
+fix_mp(_Why,P,S,GO):- strip_module(P,M,GO),predicate_property(M:GO,imported_from(S)),!.
+fix_mp(Why,M:P,MT,P):- to_real_mt(Why,M,MT)->M\==MT,!.
+fix_mp(Why,G,M,GO):- strip_module(G,_,GO),get_consequent_functor(GO,F,A),loop_check(convention_to_mt(Why,F,A,M),fail),!.
+
+fix_mp(Why,I,ABox,I):- defaultAssertMt(ABox),!.
+
+/*
+fix_mp(Why,Junct,ABox,Result):- fail, (mpred_db_type(Junct,rule);(functor(Junct,F,_),bad_head_pred(F))),!,
+   must((mpred_rule_hb(Junct,HC,BC),nonvar(HC))),
+   Junct=..[F|List],
+   must_maplist(fix_mp(call(hb(HC,BC,Op))),List,ListO),
+   Result=..[F|ListO],
+   defaultAssertMt(ABox),!.
 
 %fix_mp(call(hb(HC,_BC,Op)),H,M,HH):- contains_var(H,HC),!,
 %   fix_mp(clause(assert,Op),H,M,HH).
@@ -426,23 +436,12 @@ fix_mp(Why,M:P,M,P):- clause_b(mtCycL(M)),!.
 fix_mp(call(hb(_HC,BC,Op)),B,M,BB):- contains_var(B,BC),B\=@=BC,!,
    fix_mp(call(Op),B,M,BB).
 
-fix_mp(Why,Junct,abox,Result):- (mpred_db_type(Junct,rule);(functor(Junct,F,_),bad_head_pred(F))),!,
-   must((mpred_rule_hb(Junct,HC,BC),nonvar(HC))),
-   Junct=..[F|List],
-   must_maplist(fix_mp(call(hb(HC,BC,Op))),List,ListO),
-   Result=..[F|ListO].
 
-fix_mp(Why,P,S,GO):- strip_module(P,M,GO),predicate_property(M:GO,imported_from(S)),!.
-
-fix_mp(Why,Mt:P,Mt,P):- clause_b(mtExact(Mt)),!.
-fix_mp(Why,Mt:P,Mt,P):- clause_b(mtCycL(Mt)).
 
 % fix_mp(Why,Unassertable,_,_):- Why = clause(_,_), unassertable(Unassertable),!,trace_or_throw(unassertable_fix_mp(Why,Unassertable)).
 
-fix_mp(Why,M:P,MT,P):- to_real_mt(Why,M,MT),M\==MT,!.
-fix_mp(Why,G,M,GO):- strip_module(G,_,GO),get_consequent_functor(GO,F,A),loop_check(convention_to_mt(Why,F,A,M),fail),!.
-fix_mp(Why,P,M,P):- defaultAssertMt(M),!.
 */
+
 
 
 convention_to_mt(Why,F,A,RealMt):-convention_to_symbolic_mt_ec(Why,F,A,Mt),to_real_mt(Why,Mt,RealMt).
@@ -451,11 +450,14 @@ convention_to_mt(Why,F,A,RealMt):-convention_to_symbolic_mt_ec(Why,F,A,Mt),to_re
 get_consequent_functor(G,F,A):- strip_module(G,_,GO),remove_meta_wrapper(GO,Unwrap),nonvar(Unwrap),functor(Unwrap,F,A),!.
 
 remove_meta_wrapper(Head,Unwrap):- is_ftVar(Head),!,Head=Unwrap.
-remove_meta_wrapper(~ Head,Unwrap):- !, remove_meta_wrapper(Head,Unwrap).
-remove_meta_wrapper( \+ Head,Unwrap):- !, remove_meta_wrapper(Head,Unwrap).
-remove_meta_wrapper( ( _,Head),Unwrap):- !, remove_meta_wrapper(Head,Unwrap).
-remove_meta_wrapper( Head,UnwrapO):- mpred_rule_hb(Head,Unwrap,_),nonvar(Unwrap),!,Head \=@= Unwrap,!,remove_meta_wrapper(Unwrap,UnwrapO).
-remove_meta_wrapper(Unwrapped,Unwrapped).
+remove_meta_wrapper( Head,UnwrapO):- fail, mpred_rule_hb(Head,Unwrap,_),nonvar(Unwrap),
+  Head \=@= Unwrap,!,remove_meta_wrapper2(Unwrap,UnwrapO).
+remove_meta_wrapper(Head,Unwrap):- remove_meta_wrapper2(Head,Unwrap).
+
+remove_meta_wrapper2(~ Head,Unwrap):- nonvar(Head),!, remove_meta_wrapper(Head,Unwrap).
+remove_meta_wrapper2( \+ Head,Unwrap):- nonvar(Head),!, remove_meta_wrapper(Head,Unwrap).
+remove_meta_wrapper2( ( _,Head),Unwrap):-nonvar(Head),!, remove_meta_wrapper(Head,Unwrap).
+remove_meta_wrapper2(Unwrapped,Unwrapped).
 
 bad_head_pred([]).
 bad_head_pred('[]').
@@ -476,10 +478,11 @@ convention_to_symbolic_mt(_Why,predicateConventionMt,2,baseKB):-!.
 convention_to_symbolic_mt(_Why,genlMt,2,baseKB):-!.
 convention_to_symbolic_mt(_Why,mtCycL,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,mtProlog,1,baseKB):-!.
+convention_to_symbolic_mt(_Why,functorDeclares,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,F,A,abox):- mpred_database_term(F,A,_).
-convention_to_symbolic_mt(_Why,F,_,Mt):- clause_b(predicateConventionMt(F,Mt)),!.
+convention_to_symbolic_mt(_Why,F,_,Mt):-  call_u(predicateConventionMt(F,Mt)),!.
 convention_to_symbolic_mt(_Why,F,A,abox):- wsh_w:wrap_shared(F,A,ereq).
-convention_to_symbolic_mt(_Why,_,_,M):- atom(M),!.
+% convention_to_symbolic_mt(_Why,_,_,M):- atom(M),!.
 
 full_transform(Why,MH,MHH):-
    must(fully_expand(clause(Why,full_transform),MH,MHH)),
@@ -1476,9 +1479,10 @@ filter_buffer_n_test(Name,N,Fact):- filter_buffer_get_n(Name,FactS,N),
 %
 mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc==fwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
-% mpred_fwc1(support_hilog(_,_)):-!.
+mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
   dmsg(mpred_fwc1(Fact)),
+  %ignore((mpred_non_neg_literal(Fact),remove_negative_version(Fact))),
   mpred_do_rule(Fact),
   copy_term_vn(Fact,F),
   % check positive triggers
@@ -1738,9 +1742,11 @@ mpred_call_no_bc(_):- stack_check,fail.
 
 mpred_call_no_bc(P):- loop_check(no_repeats(mpred_call_no_bc0(P))).
 
-mpred_call_no_bc0(P):- !,defaultAssertMt(Mt), Mt:call(P).
-mpred_call_no_bc0(P):- mpred_call_with_no_triggers(P).
-mpred_call_no_bc0(P):- nonvar(P),lookup_u(P).
+% mpred_call_no_bc0(P):- lookup_u(P).
+% mpred_call_no_bc0(P):-  defaultAssertMt(Mt), Mt:lookup_u(P).
+mpred_call_no_bc0(P):-  defaultAssertMt(Mt), Mt:call(P).
+% TODO .. mpred_call_no_bc0(P):-  defaultAssertMt(Mt), clause_b(genlMt(Mt,SuperMt)), call_umt(SuperMt,P).
+%mpred_call_no_bc0(P):- mpred_call_with_no_triggers(P).
 %mpred_call_no_bc0(P):- nonvar(P),predicate_property(_,P),!, P.
 % mpred_call_no_bc0(P):- loop_check(mpred_METACALL(call_u, P)).
 
@@ -2777,7 +2783,7 @@ mpred_add_support(P,(Fact,Trigger)):-
   assert_u_confirm_if_missing(spft(P,Fact,Trigger)).
 
 mpred_get_support(P,(Fact,Trigger)):-
-    lookup_u(spft(P,Fact,Trigger)).
+      lookup_u(spft(P,Fact,Trigger)).
 
 
 mpred_rem_support_if_exists(P,(Fact,Trigger)):-

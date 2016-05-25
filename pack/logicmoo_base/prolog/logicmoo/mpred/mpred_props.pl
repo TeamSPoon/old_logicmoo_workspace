@@ -357,6 +357,8 @@ kb_dynamic(_:CM,M,PI,F,A):-var(A),!,
    forall(between(1,11,A),kb_dynamic(CM,M,PI,F,A)),!.
 kb_dynamic(CM:M,lmconf,PI,F,A):- M\==lmconf, must(kb_dynamic(CM:lmconf,lmconf,PI,F,A)).
 
+kb_dynamic(CM:baseKB,M,PI,F,A):- M==abox, defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic(CM:baseKB,Mt,PI,F,A)).
+
 kb_dynamic(CM:baseKB,M,PI,F,A):- defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic(CM:baseKB,Mt,PI,F,A)).
 kb_dynamic(_:CM,    M,PI,F,A):- atom(PI),A==0,get_arity(PI,F,A),
    \+(is_static_predicate(F/A)),!,

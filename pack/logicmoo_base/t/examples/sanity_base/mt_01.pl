@@ -13,20 +13,19 @@
 :- user:use_module(library(logicmoo_base)).
 % :- user:use_module(library(logicmoo_user)).
 
-%:- add_import_module(mt_01,baseKB,end).
-
-:- set_defaultAssertMt(myMt).
 
 :- begin_pfc.
 
-predicateConventionMt(loves/2,socialMt).
+:- set_defaultAssertMt(myMt).
 
-mt1:like(sally,joe).
+baseKB:mtCycL(socialMt).
 
-genlMt(mt1,socialMt).
+socialMt:loves(sally,joe).
 
-like(Sally,Joe)==>loves(Joe,Sally).
+:- set_defaultAssertMt(myMt).
 
-:- mpred_must(loves(joe,sally)).
+:- mpred_test(clause_u(socialMt:loves(_,_))).
+:- mpred_test(\+clause_u(myMt:loves(_,_))).
+
 
 

@@ -27,12 +27,15 @@ mpred_userkb_file.
 :- '$set_source_module'(baseKB).
 :- '$set_typein_module'(baseKB).
 
+:- ain(arity(functorDeclares, 1)).
+
 %% base_kb_pred_list( ?VALUE1) is semidet.
 %
 % Base Knowledge Base Predicate List.
 %
 :- dynamic(lmconf:base_kb_pred_list/1).
 lmconf:base_kb_pred_list([
+ functorDeclares/1,
  abox:(::::)/2,
  abox:(<-)/2,
  % (<==)/2,
@@ -92,7 +95,6 @@ elInverse/2,
 % lmconf:feature_test/0,
 formatted_resultIsa/2,
 function_corisponding_predicate/2,
-functorDeclares/1,
 transitiveViaArgInverse/3,
 genls/2,
 grid_key/1,
@@ -195,6 +197,10 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- set_fileAssertMt(baseKB).
 
 kb_dynamic_m(E):- with_source_module(baseKB,kb_dynamic(baseKB:E)).
+
+:- multifile(baseKB:predicateConventionMt/2).
+:- dynamic(baseKB:predicateConventionMt/2).
+
 
 :- lmconf:base_kb_pred_list(List),call(must_maplist(kb_dynamic_m,List)).
 

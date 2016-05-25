@@ -162,10 +162,6 @@
 :-ain(baseKB:predicateConventionMt(mud_test,lmconf)).
 
 
-:- kb_dynamic((        
-        lmconf:agent_call_command/2,
-        lmconf:mud_test/2,
-        lmconf:type_action_info/3)).
 
 :- multifile((        
         lmconf:feature_test/0,

@@ -760,7 +760,8 @@ transitive_lc_nr(_,A,A).
 %
 % Managed Predicate Expand.
 %
-mpred_expand_rule(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_database_term(F,A,_),
+mpred_expand_rule(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),
+   mpred_database_term(F,A,_),
    PfcRule=[F|Args],maplist(fully_expand_goal(assert),Args,ArgsO),!,Out=..[F|ArgsO].
 
 
@@ -1093,6 +1094,7 @@ replaced_module(_,tbox,TBox):-get_current_default_tbox(TBox).
 maybe_prepend_mt(MT,I,O):- t_l:current_defaultAssertMt(ABOX)->ABOX==MT,!,maybe_prepend_mt(abox,I,O).
 maybe_prepend_mt(abox,H,HH):-nonvar(HH),trace,maybe_prepend_mt(abox,H,HHH),must(HHH=HH),!.
 maybe_prepend_mt(abox,H,HH):-var(H),must(HH=H),!.
+maybe_prepend_mt(_,CL,CL):- compound(CL),CL=(_,_),!.
 maybe_prepend_mt(_,H,HH):-predicateSystemCode(H,HH),!.
 maybe_prepend_mt(abox,_:HH,HH):-!.
 maybe_prepend_mt(abox,HH,HH):-!.
@@ -1100,7 +1102,8 @@ maybe_prepend_mt(Mt,Mt:HH,Mt:HH):-!.
 maybe_prepend_mt(_,Mt:HH,Mt:HH):-!.
 maybe_prepend_mt(Mt,HH,Mt:HH):-!.
 
-predicateSystemCode(P,PP):-strip_module(P,_,PP),predicate_property(system:PP,defined),\+ predicate_property(system:PP,imported_from(baseKB)).
+predicateSystemCode(P,PP):-strip_module(P,_,PP),predicate_property(system:PP,defined),
+  \+ predicate_property(system:PP,imported_from(baseKB)).
 
 %% remodulize( ?Why, ?H, ?HH) is det.
 %
@@ -1717,7 +1720,7 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 
 % -  dmsg_hook(db_op(query(HLDS,call),holds_t(ft_info,tCol,'$VAR'(_)))):-trace_or_throw(dtrace).
 
-fixed_negations(I,O):-notrace((fix_negations(I,O),!,I\=@=O)),!.
+fixed_negations(I,O):- ((fix_negations(I,O),!,I\=@=O)),!.
 fix_negations(P0,P0):- not_ftCompound(P0),!.
 fix_negations(~(P0),~(P0)):- not_ftCompound(P0),!.
 fix_negations(\+(P0),\+(P0)):- not_ftCompound(P0),!.

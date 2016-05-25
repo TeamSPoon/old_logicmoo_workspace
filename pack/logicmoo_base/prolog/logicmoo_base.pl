@@ -83,9 +83,10 @@ lmconf:mpred_skipped_module(eggdrop).
 
 :-use_module(system:library('logicmoo/snark/common_logic_boxlog.pl')).
 :-use_module(system:library('logicmoo/snark/common_logic_skolem.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_userkb.pl')).
-:-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_),arity/2])).
 :-use_module(system:library('logicmoo/snark/common_logic_kb_hooks.pl')).
+:-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_)])). % ,arity/2,mpred_is_tracing_exec/0, (~)/1
+
+:-use_module(system:library('logicmoo/mpred/mpred_userkb.pl')).
 
 :-use_module(system:library('logicmoo/mpred_online/mpred_www.pl')).
 
@@ -145,8 +146,10 @@ lmconf:sanity_check:- doall((baseKB:mtProlog(M),
 :- set_prolog_flag(retry_undefined,false).
 
 % Enable System
-system:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_undefined,true),loop_check(mpred_at_box:uses_predicate(MFA, Action)).
-user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_undefined,true),loop_check(mpred_at_box:uses_predicate(MFA, Action)).
+system:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_undefined,true),
+    must(loop_check(mpred_at_box:uses_predicate(MFA, Action),true)).
+user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_undefined,true),
+    must(loop_check(mpred_at_box:uses_predicate(MFA, Action),true)).
 
 :- set_prolog_flag(system:unknown,error).
 :- set_prolog_flag(user:unknown,error).

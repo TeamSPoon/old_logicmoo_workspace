@@ -7,22 +7,21 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(mt_01,[]).
+:- module(mt_01a,[]).
 
-:- user:use_module(library(logicmoo_utils)).
-:- user:use_module(library(logicmoo_base)).
-% :- user:use_module(library(logicmoo_user)).
+% :- use_module(library(logicmoo_base)).
 
+:- set_defaultAssertMt(mt_01a).
 
 :- begin_pfc.
 
 :- set_defaultAssertMt(myMt).
 
-:- rtrace,trace.
+:- begin_pfc.
 
-socialMt:loves(sally,joe).
+predicateConventionMt(loves,socialMt).
 
-:- set_defaultAssertMt(myMt).
+loves(sally,joe).
 
 :- mpred_test(clause_u(socialMt:loves(_,_))).
 :- mpred_test(\+clause_u(myMt:loves(_,_))).

@@ -718,7 +718,7 @@ check_term_expansions:- not(do_term_expansions).
 is_code_body(P):- cnotrace(cwc==P ; (compound(P),arg(1,P,E),is_code_body(E))),!.
 
 
-% :- meta_predicate(with_source_module(+,(*))).
+% :- meta_predicate(with_source_module(:,(*))).
 
 
 
