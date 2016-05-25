@@ -218,9 +218,7 @@ push_current_choice/1,
 :- meta_predicate mpred_retract_i_or_warn_1(+).
 :- meta_predicate not_not_ignore_mnotrace(+).
 
-:- if(\+ current_predicate(system:must_notrace/1)).
-system:must_notrace(G):- must(quietly(G)).
-:- endif.
+system:must_notrace_pfc(G):- must(quietly(G)).
 
 /*
 
@@ -296,7 +294,6 @@ mpred_database_term(why_buffer,2,debug).
 :- multifile(lmcache:has_pfc_database_preds/1).
 :- volatile(lmcache:has_pfc_database_preds/1).
 :- dynamic(lmcache:has_pfc_database_preds/1).
-%ensure_abox(baseKB):-!.
 ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
 ensure_abox(user):- setup_module_ops(user),!,ensure_abox(baseKB),!.
 ensure_abox(M):- 
@@ -416,7 +413,7 @@ fix_mp(Why,':-'(G0),M, ':-'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
 fix_mp(Why,(G :- B),M,( GO :- B)):- !, fix_mp(Why,G,M,GO).
 fix_mp(_Why,Mt:P,M,P):- clause_b(mtCycL(Mt)),!.
 fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtExact(Mt)),!.
-fix_mp(_Why,P,S,GO):- strip_module(P,M,GO),predicate_property(M:GO,imported_from(S)),!.
+fix_mp(_Why,P,S,GO):- predicate_property_nt(P,imported_from(S)),!,strip_module(P,M,GO).
 fix_mp(Why,M:P,MT,P):- to_real_mt(Why,M,MT)->M\==MT,!.
 fix_mp(Why,G,M,GO):- strip_module(G,_,GO),get_consequent_functor(GO,F,A),loop_check(convention_to_mt(Why,F,A,M),fail),!.
 
@@ -496,7 +493,7 @@ same_modules(MH,MHH):- strip_module(MH,HM,_),strip_module(MHH,HHM,_),!,
 listing_u(P):-mpred_call_no_bc(listing(P)).
 
 attvar_op_fully(Why,MH):- !, attvar_op(Why,MH).
-attvar_op_fully(Why,M:H):- must_notrace(fully_expand(change(Why,attvar_op_fully),H,HH)),!,each_E(attvar_op(Why),M:HH,[]).
+attvar_op_fully(Why,M:H):- must_notrace_pfc(fully_expand(change(Why,attvar_op_fully),H,HH)),!,each_E(attvar_op(Why),M:HH,[]).
 attvar_op_fully(Why,MH):- full_transform(Why, MH,MHH),each_E(attvar_op(Why),MHH,[]).
 
 assert_u(MH):-  fix_mp(clause(assert,assert_u),MH,M,H),attvar_op_fully(assert_i, M:H),expire_tabled_list(H).
@@ -532,7 +529,7 @@ clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u((H:-B),BB,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u(MH,B,R):- Why = clause(clause,clause_u),
  ((mnotrace(fix_mp(Why,MH,M,H)),clause_i(M:H,B,R))*->true;
-   (fix_mp(Why,MH,M,CALL),clause_i(M:CALL,B,R))).
+   (fix_mp(Why,MH,M,CALL)->clause_i(M:CALL,B,R))).
 % clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
 %clause_u(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
@@ -559,6 +556,7 @@ lookup_u(MH,Ref):- nonvar(Ref),!,
 
 lookup_u((MH,H),Ref):- nonvar(MH),!,lookup_u(MH),lookup_u(H,Ref).
 lookup_u(MH,Ref):- clause_u(MH,true,Ref).
+
 /*
 lookup_u(MH,Ref):- must(mnotrace(fix_mp(Why,MH,M,H))), 
                     on_x_debug(clause_u(M:H,B,Ref)),
@@ -736,8 +734,14 @@ mpred_ain(P):- get_source_ref(UU),mpred_ain(P,UU).
 
 mpred_ain(MTP,S):- is_ftVar(MTP),!,trace_or_throw(var_mpred_ain(MTP,S)).
 mpred_ain(user:MTP,S):- !, must(mpred_ain(MTP,S)).
+
+mpred_ain(ToMt:P,(mfl(FromMt,File,Lineno),UserWhy)):- ToMt \== FromMt,
+ defaultAssertMt(ABox), ToMt \== ABox,!,
+  with_umt(ToMt,(mpred_ain(ToMt:P,(mfl(ToMt,File,Lineno),UserWhy)))).
+  
 mpred_ain(MTP,S):- stack_check, strip_module(MTP,MT,P),P\==MTP,!,
   with_umt(MT,mpred_ain(P,S)),!.
+
 mpred_ain(P,S):- 
   full_transform(ain,P,P0),!,
   gripe_time(0.6,must(ain_fast(P0,S))),!.
@@ -1167,8 +1171,7 @@ mpred_ain_trigger_reprop(nt(Trigger,Test,Body),Support):-
 
 mpred_ain_trigger_reprop(BT,Support):-
   BT = bt(Trigger,Body),!,
-  % if_defined_else(attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),true),!,
-  assert_if_new((Trigger:-mpred_bc_only(Trigger))),
+  attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),
   mpred_mark_as(Support,Trigger,pfcBcTrigger),
   % if_defined_else(kb_dynamic(Trigger),true), 
   mpred_trace_msg('~N~n\tAdding backwards~n\t\ttrigger: ~p~n\t\tbody: ~p~n\t Support: ~p~n',[Trigger,Body,Support]),
@@ -1562,7 +1565,7 @@ mpred_define_bc_rule(Head,_ZBody,Parent_rule):-
   fail.
 
 mpred_define_bc_rule(Head,Body,Parent_rule):-
-  must_notrace(get_source_ref1(U)),
+  must_notrace_pfc(get_source_ref1(U)),
   copy_term(Parent_rule,Parent_ruleCopy),
   build_rhs(U,Head,Rhs),
   foreachl_do(mpred_nf(Body,Lhs),
@@ -1709,7 +1712,7 @@ call_u(M:G):- sanity(clause_b(mtCycL(M))),!,with_umt(M,G).
 call_u(G):- 
   quietly_must(((strip_module(G,M,P),
   (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W))))),
-    with_umt(W, (mpred_BC_w_cache(W,P))).
+    with_umt(W, mpred_BC_w_cache(W,P)).
 
 mpred_BC_w_cache(W,P):- must(mpred_BC_CACHE(W,P)),!,mpred_call_no_bc(P).
 
@@ -1717,20 +1720,19 @@ mpred_BC_CACHE(M,P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(M,P0),true))
 
 mpred_BC_CACHE0(_,P00):- var(P00),!.
 mpred_BC_CACHE0(M,must(P00)):-!,mpred_BC_CACHE0(M,P00).
-mpred_BC_CACHE0(M,P):- predicate_property(M:P,static),!.
+mpred_BC_CACHE0(M,P):- predicate_property_nt(M:P,static),!.
 mpred_BC_CACHE0(_, :-(_,_)):-!.
 mpred_BC_CACHE0(_,bt(_,_)):-!.
 mpred_BC_CACHE0(M,P):- 
- ignore((
+ M:ignore((
   cyclic_break(P),
- % acyclic_term(P),
  % trigger any bc rules.
-  lookup_u(M:bt(P,Trigger)),
+  lookup_u(bt(P,Trigger)),
   copy_term_vn(bt(P,Trigger),bt(CP,CTrigger)),
   % must(M:mpred_get_support(bt(CP,Trigger),S)),
   must(lookup_u(spft(bt(CP,_Trigger),F,T))),
   S = (F,T),
-  M:mpred_eval_lhs(CTrigger,S),
+  mpred_eval_lhs(CTrigger,S),
   fail)).
 
 
@@ -1995,9 +1997,9 @@ mpred_connective('\\+').
 % Process Rule.
 %
 process_rule(Lhs,Rhs,Parent_rule):-
-  must_notrace(get_source_ref1(U)),
+  must_notrace_pfc(get_source_ref1(U)),
   copy_term(Parent_rule,Parent_ruleCopy),
-  quietly(build_rhs(U,Rhs,Rhs2)),
+  build_rhs(U,Rhs,Rhs2),
   foreachl_do(mpred_nf(Lhs,Lhs2), 
           build_rule(Lhs2,rhs(Rhs2),(Parent_ruleCopy,U))).
 
@@ -2205,10 +2207,12 @@ code_sentence_op(-(_)).
 code_sentence_op((_,_)).
 code_sentence_op((_;_)).
 code_sentence_op(\+(_)).
-code_sentence_op(mpred_call_no_bc(_)).
+code_sentence_op(call(_)).
+code_sentence_op(call_u(_)).
 code_sentence_op(mpred_call_no_bc(_,_)).
-code_sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_property(Test,built_in),  
-  \+ (( arg(_,PP,N), N \= 0)).
+code_sentence_op(Test):- 
+  predicate_property_nt(Test,built_in),
+  predicate_property_nt(Test,meta_predicate(PP)), \+ (( arg(_,PP,N), N \= 0)).
 
 
 %% all_closed(+C) is semidet.
@@ -2267,7 +2271,7 @@ mpred_assertz_w_support(P,Support):-
 %
 
 clause_asserted_u(MH):- sanity((nonvar(MH), \+ is_static_predicate(MH))),fail.
-%clause_asserted_u(MH):- \+ ground(MH),must_notrace(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
+%clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
 clause_asserted_u((MH:-B)):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,clause_asserted_i((M:H :-B )).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_i(M:H).
 

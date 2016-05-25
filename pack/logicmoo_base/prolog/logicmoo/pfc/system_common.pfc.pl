@@ -569,7 +569,7 @@ isa('CycLTerm',ttNonGenled).
 :- kb_dynamic(quotedIsa/2).
 
 
-isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),(current_predicate(C,M:CI),\+ predicate_property(M:CI,imported_from(_))), call_u(M:CI).
+isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),current_predicate(C,CI),call_u(CI).
 isa(I,C):- isa_backchaing(I,C).
 isa(I,C):- cwc, is_ftNonvar(C),ttExpressionType(C),!,quotedIsa(I,C).
 

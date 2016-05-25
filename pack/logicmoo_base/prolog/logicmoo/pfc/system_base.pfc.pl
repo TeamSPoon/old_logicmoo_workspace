@@ -148,7 +148,7 @@ arity(argsQuoted,1).
 arity(quasiQuote,1).
 
 
-:-ain(baseKB:mtCycL(baseKB)).
+:-call(asserta_if_new, baseKB:mtCycL(baseKB)).
 
 % this mean to leave terms at EL:  foo('QuoteFn'([cant,touch,me])).
 

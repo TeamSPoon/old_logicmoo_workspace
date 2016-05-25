@@ -303,12 +303,12 @@ set_defaultAssertMt(ABox):-
   must_det_l((
     ensure_abox(ABox),
     get_current_default_tbox(TBox),
-    ain(baseKB:mtCycL(ABox)),
-    asserta_if_new(ABox:defaultTBoxMt(TBox)),
+    asserta_new(TBox:mtCycL(ABox)),
+    asserta_new(ABox:defaultTBoxMt(TBox)),
     assert_setting(t_l:current_defaultAssertMt(ABox)),
     '$set_source_module'(ABox),
     '$set_typein_module'(ABox),
-    inherit_into_module(ABox,TBox))).
+    nop(inherit_into_module(ABox,TBox)))).
 
 :- '$hide'(set_defaultAssertMt(_)).
 

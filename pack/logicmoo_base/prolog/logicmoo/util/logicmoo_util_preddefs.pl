@@ -136,7 +136,7 @@ with_source_module(NewModule,Goal):-
 %
 % Call Using Module.
 %
-:- meta_predicate call_from_module(+,0).
+:- meta_predicate call_from_module(+,+).
 call_from_module(NewModule,Goal):-
    '$current_typein_module'(OldModule),
    '$current_source_module'(OldSModule),

@@ -6,11 +6,12 @@
 :- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
 :- endif.
 
-/*
 :- multifile((user:term_expansion/2,system:term_expansion/2)).
 :- dynamic((user:term_expansion/2,system:term_expansion/2)).
-:- multifile((user:goal_expansion/2,system:goal_expansion/2)).
-:- dynamic((user:goal_expansion/2,system:goal_expansion/2)).
+:- multifile((user:goal_expansion/4,system:goal_expansion/4)).
+:- dynamic((user:goal_expansion/4,system:goal_expansion/4)).
+
+/*
 
 
 

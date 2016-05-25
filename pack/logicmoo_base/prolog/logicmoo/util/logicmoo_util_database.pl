@@ -289,7 +289,7 @@ eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall
 eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(system:clause(M:C,B,X),erase_safe(system:clause(M:C,B,X),X))).
 
 
-:-thread_local(t_l:std_provider/3).
+:-thread_local(t_l:std_provider_asserted/3).
 :-thread_local(t_l:current_std_provider/1).
 :-dynamic(lmconf:first_std_provider/2).
 :-dynamic(lmconf:next_std_provider/2).
@@ -303,7 +303,7 @@ eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(sys
 % Hook To [std_provider/3] For Module Logicmoo_util_database.
 % Managed Predicate Provider.
 %
-std_provider(OP,Term,PROVIDER):- t_l:std_provider(OP,Term,PROVIDER).
+std_provider(OP,Term,PROVIDER):- t_l:std_provider_asserted(OP,Term,PROVIDER).
 std_provider(_,_,PROVIDER):- t_l:current_std_provider(PROVIDER).
 std_provider(OP,Term,PROVIDER):- lmconf:first_std_provider(OP,Term,PROVIDER).
 
@@ -653,7 +653,7 @@ attributes_equal(L,R,[H|TODO]):- select(H,L,LL), select(HH,R,RR),H =HH,!,
 %
 % Clause For Internal Interface.
 %
-clause_i(HB):- expand_to_hb(HB,H,B),clause_i(H,B,_).
+clause_i(HB):- expand_to_hb(HB,H,B)->clause_i(H,B,_).
 clause_i(H,B):- clause_i(H,B,_).
 % clause_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 % clause_i(H,B,Ref):- system:clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
@@ -661,7 +661,7 @@ clause_i(H,B):- clause_i(H,B,_).
 clause_i(H,B,R):- nonvar(R),!, 
   dont_make_cyclic((must(system:clause(H0,BC,R)),must(split_attrs(BC,AV,B0)),!,must((AV,!,B=B0,H=H0)))).
 
-clause_i(H0,B0,Ref):-system:clause(H0,B0,Ref).
+% clause_i(H0,B0,Ref):-system:clause(H0,B0,Ref).
 clause_i(H0,B0,Ref):-
  copy_term(H0:B0, H:B, Attribs),
  dont_make_cyclic((    
