@@ -19,7 +19,7 @@
 
 :- dynamic((foob/1,if_missing/2,good/1)).
 
-:- use_module(library(logicmoo_user)).
+:- use_module(library(logicmoo_base)).
 
 :- mpred_reset.
 

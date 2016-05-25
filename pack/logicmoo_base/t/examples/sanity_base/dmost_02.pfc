@@ -19,34 +19,36 @@
 :- mpred_trace.
 :- begin_pfc.
 
-meta_argtypes(most(ftAssertable)).
+:- dynamic(ddmost/1).
+
+meta_argtypes(ddmost(ftAssertable)).
 
 % BWD chaining
-most((Q <- P))/mpred_literal(Q) ==> (Q <-(P, \+ ~(Q))).
+ddmost((Q <- P))/mpred_literal(Q) ==> (Q <- (P, \+ ~(Q))).
 
 % FWD chaining
-most(P==>Q)/nonvar(Q) ==> (((P ==> most(Q)))).
+ddmost(P==>Q)/nonvar(Q) ==> (((P ==> ddmost(Q)))).
 
 % NEG chaining
-most(~Q)/mpred_positive_literal(Q)  ==>  (( \+ Q ) ==> ~ Q ).
+ddmost(~Q)/mpred_positive_literal(Q)  ==>  (( \+ Q ) ==> ~ Q ).
 
 % POS chaining 1
-most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test, (\+ ~Q )) ==> Q )).
+ddmost(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test, (\+ ~Q )) ==> Q )).
 
 % POS chaining 2
-most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( Test, \+(R=Q))) ==> (\+ Q))).
+ddmost(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( Test, \+(R=Q))) ==> (\+ Q))).
 
 % POS chaining 1+2
-% most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
+% ddmost(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
 
 :- dynamic(b/1).
 :- dynamic(c/1).
 
-most(c(X)==>b(X)).
+ddmost(c(X)==>b(X)).
 
 c(1).
 
-:- mpred_test(most(b(1))).
+:- mpred_test(ddmost(b(1))).
 
 :- mpred_test(b(1)).
 

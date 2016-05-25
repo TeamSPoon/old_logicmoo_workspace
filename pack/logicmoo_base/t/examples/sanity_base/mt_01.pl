@@ -11,7 +11,7 @@
 
 :- user:use_module(library(logicmoo_utils)).
 :- user:use_module(library(logicmoo_base)).
-% :- user:use_module(library(logicmoo_user)).
+
 
 
 :- begin_pfc.

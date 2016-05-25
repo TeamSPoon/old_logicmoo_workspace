@@ -17,25 +17,6 @@
 :- mpred_trace.
 :- begin_pfc.
 
-meta_argtypes(most(ftAssertable)).
-
-% BWD chaining
-most((Q <- P))/mpred_literal(Q) ==> (Q <-(P, \+ ~(Q))).
-
-% FWD chaining
-most(P==>Q)/nonvar(Q) ==> (((P ==> most(Q)))).
-
-% NEG chaining
-most(~Q)/mpred_positive_literal(Q)  ==>  (( \+ Q ) ==> ~ Q ).
-
-% POS chaining 1
-most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test, (\+ ~Q )) ==> Q )).
-
-% POS chaining 2
-most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( Test, \+(R=Q))) ==> (\+ Q))).
-
-% POS chaining 1+2
-% most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
 
 :- dynamic(mudFacing/2).
 

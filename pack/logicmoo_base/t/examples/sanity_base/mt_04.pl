@@ -11,7 +11,7 @@
 
 :- user:use_module(library(logicmoo_utils)).
 :- user:use_module(library(logicmoo_base)).
-% :- user:use_module(library(logicmoo_user)).
+
 
 %:- add_import_module(mt_01,baseKB,end).
 

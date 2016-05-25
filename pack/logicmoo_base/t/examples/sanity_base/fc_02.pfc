@@ -11,7 +11,6 @@
 :- make.
 :- set_prolog_flag(retry_undefined,true).
 
-% :- use_module(library(logicmoo_user)).
 :- use_module(library(logicmoo_base)).
 
 :- must(context_module(sanity)).

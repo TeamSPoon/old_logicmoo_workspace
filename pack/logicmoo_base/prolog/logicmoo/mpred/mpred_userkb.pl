@@ -113,7 +113,7 @@ localityOfObject/2,
 meta_argtypes/1,
 mpred_action/1,
 mdefault/1, % pfc
-most/1, % pfc
+% most/1, % pfc
 mpred_do_and_undo_method/2,
 %mpred_isa/2,
 %mpred_manages_unknowns/0,

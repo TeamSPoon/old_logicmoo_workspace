@@ -2,7 +2,7 @@
 
 :- use_module(library(logicmoo_user)).
 
-%% equality axiomm
+%% equality axiom
 
 equal(A,B) ==> equal(B,A).
 
