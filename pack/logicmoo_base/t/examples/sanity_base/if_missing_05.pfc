@@ -21,8 +21,6 @@
 
 :- use_module(library(logicmoo_base)).
 
-:- mpred_reset.
-
 :- mpred_trace.
 :- mpred_watch.
 
@@ -57,7 +55,7 @@
 
 :-  (mpred_withdraw( good(az) )).
 
-:- listing([foob,good]).
+% :- listing([foob,good]).
 
 :- call( \+foob(az)).
 

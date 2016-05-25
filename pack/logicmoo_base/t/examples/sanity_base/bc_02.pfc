@@ -22,13 +22,13 @@
 
 :-ain((bc_q(N) <- bc_p(N))).
 :- pp_DB.
-:- break.
+
 
 
 bc_p(a).
 bc_p(b).
 
-:- break.
+
 
 ?- must(call_u(bc_p(b))).
 

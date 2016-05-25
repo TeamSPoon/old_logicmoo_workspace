@@ -575,10 +575,14 @@ uses_predicate(_, (//), _, error) :- !,dumpST,break.
 uses_predicate(_, (:), _, error) :- !,dumpST,break.
 % uses_predicate(_, '>>',  4, error) :- !,dumpST,break.
 uses_predicate(_, '[|]', _, error) :- !,dumpST,break.
+
 uses_predicate(Module, Name, Arity, Action) :- fail,
 	current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
+
+uses_predicate(System, _,_, error):- module_property(System,class(system)),!.
+uses_predicate(System, _,_, error):- module_property(System,class(library)),!.
 
 uses_predicate(CallerMt,F,A,retry):- 
     loop_check(retry_undefined(CallerMt,F,A),dump_break).
