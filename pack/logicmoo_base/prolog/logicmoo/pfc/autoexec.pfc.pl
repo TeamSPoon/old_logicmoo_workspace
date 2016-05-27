@@ -118,8 +118,8 @@
 
 :- set_fileAssertMt(baseKB).
 
-:-multifile(lmconf:locked_baseKB/0).
-:-dynamic(lmconf:locked_baseKB/0).
+:- multifile(lmconf:locked_baseKB/0).
+:- dynamic(lmconf:locked_baseKB/0).
 :- asserta((lmconf:locked_baseKB)).
 
 

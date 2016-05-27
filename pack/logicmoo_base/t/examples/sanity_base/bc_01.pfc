@@ -9,18 +9,22 @@
 :- module(bc_01,[]).
 
 :- make.
+:- set_prolog_flag(logicmoo_debug,true).
 :- set_prolog_flag(retry_undefined,true).
-
-%:- '$set_source_module'(baseKB).
 
 :- use_module(library(logicmoo_base)).
 
-% :- set_prolog_IO(user_input,user_output,user_output).
-
-:- begin_pfc.
 
 :- dynamic(bc_q/1).
 :- dynamic(bc_p/1).
+
+:- debug(mpred).
+:- mpred_trace_msg("before trace").
+:- mpred_trace_exec.
+
+:- begin_pfc.
+
+:- mpred_trace_msg("after trace").
 
 :- debug(mpred).
 :- mpred_trace_exec.
@@ -29,6 +33,7 @@
 :- ain((bc_q(N) <- bc_p(N))).
 bc_p(a).
 bc_p(b).
+
 
 
 ?- must(call_u(bc_p(b))).

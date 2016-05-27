@@ -1502,19 +1502,16 @@ need_speed:-fail.
 %
 % If Is A Release.
 
-% is_release:-!.
-%is_release:- 1 is random(4),!.
-is_release:- !,fail.
-is_release :- \+ not_is_release.
-:- export(not_is_release/0).
+is_release:- current_prolog_flag(logicmoo_debug,true),!,fail.
+is_release:- \+ (1 is random(10)).
 
-%= 	 	 
+
 
 %% not_is_release is semidet.
 %
 % Not If Is A Release.
 %
-% not_is_release:- 1 is random(4).
+:- export(not_is_release/0).
 not_is_release:- \+ is_release.
 
 

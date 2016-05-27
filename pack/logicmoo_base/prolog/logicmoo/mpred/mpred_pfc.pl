@@ -289,6 +289,8 @@ mpred_database_term(why_buffer,2,debug).
 :- thread_local(t_l:no_mpred_breaks/0).
 
 
+user:current_abox(M):-prolog_load_context(module,user:M).
+system:current_abox(M):-prolog_load_context(module,system:M).
 
 :- module_transparent((ensure_abox)/1).
 :- multifile(lmcache:has_pfc_database_preds/1).
@@ -299,6 +301,7 @@ ensure_abox(user):- setup_module_ops(user),!,ensure_abox(baseKB),!.
 ensure_abox(M):- 
    asserta(lmcache:has_pfc_database_preds(M)),
    assert_if_new(baseKB:mtCycL(M)),
+   assert_if_new(M:current_abox(M)),
    setup_module_ops(M),
    set_prolog_flag(M:unknown,error),
    forall(mpred_database_term(F,A,_),
@@ -572,27 +575,12 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(Why,MH,M,H))),
 % Using User Microtheory.
 %
 
-% with_umt(U,G):- t_l:current_defaultAssertMt(W)->W=U,!,call_from_module(U,G).
-
+with_umt(U,G):- t_l:current_defaultAssertMt(W)->W=U,!,call_from_module(U,G).
 with_umt(user,P):- !,with_umt(baseKB,P).
-with_umt(U,P):- \+ clause_b(mtCycL(U)),!,
- defaultAssertMt(W),
- gripe_time(30.0,
+with_umt(M,P):- 
+  (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)),!,
    w_tl(t_l:current_defaultAssertMt(W),
-     call_from_module(W,P))).
-with_umt(U,P):- !,
- gripe_time(30.0,
-   w_tl(t_l:current_defaultAssertMt(U),
-     call_from_module(U,P))).
-/*
-with_umt(U,G):-
- demodulize(call(with_umt),G,P),
-  gripe_time(30.0,
-   w_tl(t_l:current_defaultAssertMt(U),
-     call_from_module(U,P))).
-
-*/
-
+     call_from_module(W,P)).
 
 
 
@@ -1173,9 +1161,9 @@ mpred_ain_trigger_reprop(nt(Trigger,Test,Body),Support):-
   \+ mpred_call_no_bc(Test),
   mpred_eval_lhs(Body,((\+Trigger),NT)).
 
-mpred_ain_trigger_reprop(BT,Support):-
+mpred_ain_trigger_reprop(BT,Support):- 
   BT = bt(Trigger,Body),!,
-  attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),
+  ain_fast((Trigger:-mpred_bc_only(Trigger))),
   mpred_mark_as(Support,Trigger,pfcBcTrigger),
   % if_defined_else(kb_dynamic(Trigger),true), 
   mpred_trace_msg('~N~n\tAdding backwards~n\t\ttrigger: ~p~n\t\tbody: ~p~n\t Support: ~p~n',[Trigger,Body,Support]),
@@ -1572,9 +1560,10 @@ mpred_define_bc_rule(Head,Body,Parent_rule):-
   must_notrace_pfc(get_source_ref1(U)),
   copy_term(Parent_rule,Parent_ruleCopy),
   build_rhs(U,Head,Rhs),
+  ain_fast((Head:-mpred_bc_only(Head))),
   foreachl_do(mpred_nf(Body,Lhs),
           (build_trigger(Parent_ruleCopy,Lhs,rhs(Rhs),Trigger),
-           mpred_ain(bt(Head,Trigger),(Parent_ruleCopy,U)))).
+           ain_fast(bt(Head,Trigger),(Parent_ruleCopy,U)))).
  
 :-nb_setval('$pfc_current_choice',[]).
 
@@ -1711,15 +1700,25 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 % 
 % call_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
 
-call_u(M:G):- nonvar(M),var(G),!,mpred_fact_mp(M,G).
-call_u(M:G):- clause_b(mtProlog(M)),!,call(M:G).
-call_u(M:G):- sanity(clause_b(mtCycL(M))),!,with_umt(M,G).
-call_u(G):- 
-  quietly_must(((strip_module(G,M,P),
-  (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W))))),
-    with_umt(W, mpred_BC_w_cache(W,P)).
+call_u(G):- var(G),!,dtrace,defaultAssertMt(W),mpred_fact_mp(W,G).
+call_u(M:G):- var(M),!,trace_or_throw(var_call_u(M:G)).
+call_u(M:G):- clause_b(mtProlog(M)),nonvar(G),!,sanity(predicate_property_safe(M:G,defined)),call(M:G).
+call_u(M:G):- nonvar(M),var(G),!,with_umt(M,mpred_fact_mp(M,G)).
 
-mpred_BC_w_cache(W,P):- must(mpred_BC_CACHE(W,P)),!,mpred_call_no_bc(P).
+call_u(G):- strip_module(G,M,P),
+  set_prolog_flag(retry_undefined, true),
+  (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)),!,
+    with_umt(W, P).
+
+
+/*
+call_u(G):- strip_module(G,M,P),
+  set_prolog_flag(retry_undefined, true),
+  (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)),
+    with_umt(W, mpred_BC_w_cache(W,P)).
+*/
+
+mpred_BC_w_cache(W,P):- must(mpred_BC_CACHE(W,P)),!,loop_check(mpred_call_no_bc(P)).
 
 mpred_BC_CACHE(M,P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(M,P0),true)).
 
@@ -1736,8 +1735,7 @@ mpred_BC_CACHE0(_,P):-
   lookup_u(bt(P,Trigger)),
   copy_term_vn(bt(P,Trigger),bt(CP,CTrigger)),
   must(lookup_u(spft(bt(CP,_Trigger),F,T))),
-  S = (F,T),
-  mpred_eval_lhs(CTrigger,S),
+  mpred_eval_lhs(CTrigger,(F,T)),
   fail)).
 
 
@@ -1757,14 +1755,6 @@ mpred_call_no_bc0(P):-  defaultAssertMt(Mt), Mt:call(P).
 %mpred_call_no_bc0(P):- nonvar(P),predicate_property_safe(P,_),!, P.
 % mpred_call_no_bc0(P):- loop_check(mpred_METACALL(call_u, P)).
 
-
-/*
-
-mpred_call_no_bc(P):- loop_check_term(mpred_METACALL(call_u, P),
-  lc2(P),
-   loop_check(mpred_METACALL(call_u, P),lookup_u(P))).
-
-*/
 
 pred_check(A):- var(A),!.
 % catch module prefix issues

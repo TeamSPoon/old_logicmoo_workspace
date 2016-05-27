@@ -107,7 +107,10 @@ wsh_w:wrap_shared(mtGlobal,1,ereq).
 
 %wsh_w:wrap_shared(lmcache:loaded_external_kbs,1,ereq).
 wsh_w:wrap_shared(argQuotedIsa,3,ereq).
+
 wsh_w:wrap_shared(arity,2,ereq).
+wsh_w:wrap_shared(functorDeclares,1,ereq).
+
 wsh_w:wrap_shared(call_OnEachLoad,1,ereq).
 wsh_w:wrap_shared(completeExtentEnumerable,1,ereq).
 wsh_w:wrap_shared(completelyAssertedCollection,1,ereq).
@@ -115,7 +118,6 @@ wsh_w:wrap_shared(constrain_args_pttp,2,ereq).
 wsh_w:wrap_shared(cycPlus2,2,ereq).
 wsh_w:wrap_shared(cycPred,2,ereq).
 wsh_w:wrap_shared(decided_not_was_isa,2,ereq).
-wsh_w:wrap_shared(functorDeclares,1,ereq).
 wsh_w:wrap_shared(genls,2,ereq).
 wsh_w:wrap_shared(isa,2,ereq).
 wsh_w:wrap_shared(lambda,5,ereq).

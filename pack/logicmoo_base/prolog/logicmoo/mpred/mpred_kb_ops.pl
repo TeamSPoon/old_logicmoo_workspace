@@ -282,9 +282,9 @@ mpred_facts_and_universe/1
       map_unless(1,:,*,*),      
       is_callable(0),     
       deducedSimply(0),
-      cnstrn0(0,*),
+      cnstrn0(:,+),
       cnstrn(0),
-      cnstrn(*,0),
+      cnstrn(+,:),
       attvar_op(1,*),
       % clause_u(+,+,-),
       % call_u(+),
@@ -1708,8 +1708,11 @@ mpred_call_with_no_triggers_uncaugth(Clause) :-  strip_module(Clause,_,F),
 %
 % PFC Backchaining Only.
 %
+
+mpred_bc_only(G):- !,defaultAssertMt(W), mpred_BC_w_cache(W,G).
 mpred_bc_only(M:G):- !, with_umt(M,mpred_bc_only0(G)).
 mpred_bc_only(G):- !, call_u(mpred_bc_only0(G)).
+
 
 % % :- '$set_source_module'(mpred_kb_ops).
 
@@ -2338,7 +2341,7 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 %
 % Rule Backward.
 %
-ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(call_u,call_u),F))).
+ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(call_u,mpred_bc_only),F))).
 %ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
 
 %% ruleBackward0(+F, ?Condition) is semidet.

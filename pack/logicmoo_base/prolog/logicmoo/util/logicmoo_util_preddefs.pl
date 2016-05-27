@@ -143,7 +143,7 @@ call_from_module(NewModule,Goal):-
    strip_module(Goal,_,Call),
     setup_call_cleanup_each(
       ('$set_typein_module'(NewModule),'$set_source_module'(NewModule)), 
-      (NewModule:(Call, true)),
+      NewModule:Call,
       ('$set_source_module'(OldSModule),'$set_typein_module'(OldModule))).
 
 
@@ -310,6 +310,7 @@ make_transparent(_CallerMt,PredMt,PI,F/A):-
 %
 % Context Module Of File.
 %
+context_module_of_file(CallerMt):- prolog_load_context(source,_), prolog_load_context(module,CallerMt).
 context_module_of_file(CallerMt):- prolog_load_context(source,F), make_module_name00(F,CallerMt),current_module(CallerMt0),CallerMt==CallerMt0,!.
 context_module_of_file(CallerMt):-  '$set_source_module'(CallerMt,CallerMt),!.
 context_module_of_file(CallerMt):- source_context_module(CallerMt),!.
@@ -393,7 +394,7 @@ save_was(Was,CallerMt, PredMt, P):- functor(P,F,A), save_was(Was,CallerMt, PredM
 % Using Pfa.
 %
 with_pfa(With, PI):- 
-  context_module_of_file(CallerMt),with_pfa_group(only_3rd(With),CallerMt, user, PI).
+  context_module_of_file(CallerMt)->with_pfa_group(only_3rd(With),CallerMt, user, PI).
 
 :-module_transparent(with_pfa/4).
 
@@ -403,7 +404,7 @@ with_pfa(With, PI):-
 %
 % Using Pfa.
 %
-with_pfa(With,CallerMt, PredMt, PI):- context_module_of_file(CallerMt),with_pfa_group(only_3rd(With),CallerMt, PredMt, PI).
+with_pfa(With,CallerMt, PredMt, PI):- context_module_of_file(CallerMt)->with_pfa_group(only_3rd(With),CallerMt, PredMt, PI).
 
 :-module_transparent(m_m_fa_to_m_p_fa/4).
 

@@ -34,6 +34,8 @@
 :- set_prolog_flag(pfc_booted,true).
 % :- forall(wsh_w:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
 
+:- set_prolog_flag(pfc_booted,false).
+
 /*
 :- set_prolog_flag(report_error,true).
 :- set_prolog_flag(fileerrors,false).

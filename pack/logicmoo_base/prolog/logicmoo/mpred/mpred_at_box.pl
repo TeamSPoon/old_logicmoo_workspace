@@ -29,7 +29,7 @@
          autoload_library_index/4,
          baseKB_hybrid_support/2,
          uses_predicate/2,
-         uses_predicate/4,
+         uses_predicate/5,
          correct_module/3,
          correct_module/5,
          defaultAssertMt/1,
@@ -527,9 +527,11 @@ autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_ind
 :- dynamic(baseKB:hybrid_support/2).
 baseKB_hybrid_support(F,A):-wsh_w:wrap_shared(F,A,_).
 baseKB_hybrid_support(F,A):-clause_b(hybrid_support(F,A)).
-baseKB:hybrid_support(arity,2).
 baseKB:hybrid_support(predicateConventionMt,2).
+
 baseKB:hybrid_support(functorDeclares,1).
+baseKB:hybrid_support(arity,2).
+
 baseKB:hybrid_support(spft,3).
 
 baseKB:hybrid_support(mtCycL,1).
@@ -543,48 +545,47 @@ baseKB:hybrid_support(genlMt,2).
 
 % hybrid_support (like spft/3) must be defined directly in every module and then aggregated thru genlMts (thus to baseKB)
 
+:- dynamic(lmcache:tried_to_retry_undefined/4).
 
 
 istAbove(Mt,Query):- Mt \== baseKB, genlMt(Mt,MtAbove),MtAbove:Query.
 
-uses_predicate(M:F/A,R):- !, uses_predicate(M,F,A,R).
-uses_predicate(F/A,R):- uses_predicate(user,F,A,R).
+uses_predicate(M:F/A,R):- !, '$current_source_module'(SM), uses_predicate(SM,M,F,A,R).
+uses_predicate(F/A,R):- '$current_source_module'(SM),'$current_typein_module'(M),uses_predicate(M,SM,F,A,R).
 
-
-uses_predicate(Module,Name,Arity,Action) :- 
+uses_predicate(SM,Module,Name,Arity,Action) :- 
       current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
-uses_predicate(CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
+uses_predicate(_,CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
 
 % keeps from calling this more than once
-uses_predicate(M,F,A,error):- '$current_source_module'(SM),
-  lmcache:tried_to_retry_undefined(SM:M,F,A),!,
+uses_predicate(SM,M,F,A,error):- 
+  lmcache:tried_to_retry_undefined(SM,M,F,A),!,
   wdmsg(unused_predicate(SM,M,F,A)).
 
 
-uses_predicate(CallerMt,F,A,_):-
-   '$current_source_module'(SM),
+uses_predicate(SM,CallerMt,F,A,_):-
    wdmsg(uses_predicate(SM,CallerMt,F,A)),
-   assert(lmcache:tried_to_retry_undefined(SM:CallerMt,F,A)),fail.
+   assert(lmcache:tried_to_retry_undefined(SM,CallerMt,F,A)),fail.
 
-uses_predicate(_, (:-), 1, error) :- !,dumpST,break.
-uses_predicate(_, (:-), _, error) :- !,dumpST,break.
-uses_predicate(_, (/), _, error) :- !,dumpST,break.
-uses_predicate(_, (//), _, error) :- !,dumpST,break.
-uses_predicate(_, (:), _, error) :- !,dumpST,break.
-% uses_predicate(_, '>>',  4, error) :- !,dumpST,break.
-uses_predicate(_, '[|]', _, error) :- !,dumpST,break.
+uses_predicate(_,_, (:-), 1, error) :- !,dumpST,break.
+uses_predicate(_,_, (:-), _, error) :- !,dumpST,break.
+uses_predicate(_,_, (/), _, error) :- !,dumpST,break.
+uses_predicate(_,_, (//), _, error) :- !,dumpST,break.
+uses_predicate(_,_, (:), _, error) :- !,dumpST,break.
+% uses_predicate(SM,_, '>>',  4, error) :- !,dumpST,break.
+uses_predicate(_,_, '[|]', _, error) :- !,dumpST,break.
 
-uses_predicate(Module, Name, Arity, Action) :- fail,
+uses_predicate(_,Module, Name, Arity, Action) :- fail,
 	current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
 
-uses_predicate(System, _,_, error):- module_property(System,class(system)),!.
-uses_predicate(System, _,_, error):- module_property(System,class(library)),!.
+uses_predicate(_,System, _,_, error):- module_property(System,class(system)),!.
+uses_predicate(_,System, _,_, error):- module_property(System,class(library)),!.
 
-uses_predicate(CallerMt,F,A,retry):- 
+uses_predicate(_SM,CallerMt,F,A,retry):- 
     loop_check(retry_undefined(CallerMt,F,A),dump_break).
 
 %% create_predicate_istAbove(+ChildDefMt,+F,+A) is semidet.
@@ -600,7 +601,6 @@ create_predicate_istAbove(CallerMt,F,A):-
    assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
 
 
-:- dynamic(lmcache:tried_to_retry_undefined/3).
 
 
 % Module defines the type

@@ -36,6 +36,7 @@ mpred_userkb_file.
 :- dynamic(lmconf:base_kb_pred_list/1).
 lmconf:base_kb_pred_list([
  functorDeclares/1,
+ arity/2,
  abox:(::::)/2,
  abox:(<-)/2,
  % (<==)/2,
@@ -202,6 +203,7 @@ kb_dynamic_m(E):- with_source_module(baseKB,kb_dynamic(baseKB:E)).
 :- dynamic(baseKB:predicateConventionMt/2).
 
 
+% :- lmconf:base_kb_pred_list([A,B|_List]),rtrace(call(must_maplist(kb_dynamic_m,[A,B]))).
 :- lmconf:base_kb_pred_list(List),call(must_maplist(kb_dynamic_m,List)).
 
 
