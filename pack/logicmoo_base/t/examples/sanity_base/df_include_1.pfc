@@ -6,19 +6,16 @@
 % Douglas Miles
 %  cls ; kill -9 %1 ; fg ; swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/base/'sanity_abc.pfc'))."
 
-:- module(sanity,[]).
+:- module(df_include_1,[]).
 
 :- use_module(library(logicmoo_base)).
 
-:- module(sanity).
+:- debug(mpred).
+:- mpred_trace_exec.
+
+:- include('df_include.pfc').
 
 :- begin_pfc.
-
-:- dynamic(meta_argtypes/1).
-
-:- include('df_include.pi').
-
-:- module(sanity).
 
 :- dynamic((a/1,b/1,c/1)).
 
@@ -26,7 +23,7 @@ a(X) ==> c(X).
 most(c(X) ==> b(X)) .
 a(1).
 
-:- listing([a/1,b/1,c/1,(==>)/2,most/1,pt,nt,bt]).
+:- listing(df_include_1:[a/1,b/1,c/1,df_include_1:(==>)/2,most/1,df_include_1:pt/2,df_include_1:nt,df_include_1:bt]).
 
 :- mpred_test(b(1)).
 

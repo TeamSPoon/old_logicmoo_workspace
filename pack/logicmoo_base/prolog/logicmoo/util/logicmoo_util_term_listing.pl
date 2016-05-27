@@ -666,10 +666,10 @@ unify_listing_header(Pred):-functor_safe(Pred,F,A),unify_listing_header(Pred,F,A
 % Unify Listing Header.
 %
 unify_listing_header(CntxtPred,F,A):- (format('~n/* Prediate: ~q / ~q ~n',[F,A,CntxtPred])),fail.
-unify_listing_header(Cntxt:Pred,_F,_A):- Cntxt:printAll(predicate_property(Pred,PP),PP),fail.
+unify_listing_header(Cntxt:Pred,_F,_A):- Cntxt:printAll(predicate_property_safe(Pred,PP),PP),fail.
 unify_listing_header(Cntxt:Pred,_F,_A):- (Cntxt:format('~n ~q. ~n */ ~n',[Pred])),fail.
-unify_listing_header(Cntxt:Pred,F,A):- Cntxt:predicate_property(Pred,dynamic),(format(':-dynamic(~q).~n',[F/A])),fail.
-unify_listing_header(Cntxt:Pred,F,A):- Cntxt:predicate_property(Pred,multifile),(format(':-multifile(~q).~n',[F/A])),fail.
+unify_listing_header(Cntxt:Pred,F,A):- Cntxt:predicate_property_safe(Pred,dynamic),(format(':-dynamic(~q).~n',[F/A])),fail.
+unify_listing_header(Cntxt:Pred,F,A):- Cntxt:predicate_property_safe(Pred,multifile),(format(':-multifile(~q).~n',[F/A])),fail.
 unify_listing_header(_Cntxt:_FileMatch,_F,_A).
 
 :- meta_predicate unify_listing(:,?,?).
@@ -849,7 +849,7 @@ buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lm
 :- multifile((synth_clause_for/5)).
 :- export((synth_clause_for/5)).
 
-% bookeepingPredicate(M:G):- member(M:F/A,[M:'$exported_op'/3]),current_module(M),functor(G,F,A),once(predicate_property(M:G,_)).
+% bookeepingPredicate(M:G):- member(M:F/A,[M:'$exported_op'/3]),current_module(M),functor(G,F,A),once(predicate_property_safe(M:G,_)).
 
 %= 	 	 
 
@@ -877,7 +877,7 @@ predicateUsesCall(_:G):-
 %
 % Source Text Predicate.
 %
-sourceTextPredicate(M:G):- source_file((M:el_holds(_,_,_,_,_,_,_)),F) -> source_file(M:G,F).
+sourceTextPredicate(M:G):- M=el_assertions, source_file((M:el_holds(_,_,_,_,_,_,_)),F) -> source_file(M:G,F).
 %sourceTextPredicate(el_assertions:G):- between(4,16,A),functor(G,el_holds,A),current_predicate(_,el_assertions:G).
 %sourceTextPredicate(el_assertions:G):- between(4,16,A),functor(G,el_holds_implies,A),current_predicate(_,el_assertions:G).
 %sourceTextPredicate(el_assertions:G):- between(4,16,A),functor(G,el_holds_implies_t,A),current_predicate(_,el_assertions:G).
@@ -953,9 +953,9 @@ synth_clause_ref(_:no_xlisting(_),_B,_Ref, _Size, _CALL):-!,fail.
 synth_clause_ref(_:in_prolog_listing(_),_B,_Ref, _Size, _CALL):-!,fail.
 synth_clause_ref(_:varname_info(_,_,_,_),_B,_Ref,_Size, _CALL):- \+ listing_filter(showAll),!,fail.
 
-synth_clause_ref(M:H,B,Ref, 250, SYNTH):- \+ listing_filter(hideMeta), SYNTH= (findall(PP,predicate_property(M:H,PP),PPL),Ref=0,CPPL=..[pp|PPL],B=M:(pp(CPPL))).
+synth_clause_ref(M:H,B,Ref, 250, SYNTH):- \+ listing_filter(hideMeta), SYNTH= (findall(PP,predicate_property_safe(M:H,PP),PPL),Ref=0,CPPL=..[pp|PPL],B=M:(pp(CPPL))).
 synth_clause_ref(MHG,B,Ref, 213, SYNTH):- predicateUsesCall(MHG),synth_in_listing(MHG), !, SYNTH= (on_x_fail(MHG),Ref=0,B=predicateUsedCall).
-synth_clause_ref(M:H,B,Ref,Size, SYNTH):- predicate_property(M:H,number_of_clauses(Size)),synth_in_listing(M:H),
+synth_clause_ref(M:H,B,Ref,Size, SYNTH):- predicate_property_safe(M:H,number_of_clauses(Size)),synth_in_listing(M:H),
   (Size > 5000 ->  ( \+ listing_filter(skipLarge), asserta(t_l:large_predicates(M:H,Size)),fail) ; SYNTH = m_clause(M,H,B,Ref)).
 
 
@@ -1002,7 +1002,7 @@ term_matches_hb(D,(F1;FS),H,B):-!, (term_matches_hb(D,F1,H,B);term_matches_hb(D,
 term_matches_hb(D,-(C),H,B):-nonvar(C),!,\+(term_matches_hb(D,C,H,B)).
 term_matches_hb(D,not(C),H,B):-nonvar(C),!,\+(term_matches_hb(D,C,H,B)).
 term_matches_hb(D,+(C),H,B):-nonvar(C),!, term_matches_hb(D,C,H,B).
-term_matches_hb(_,module(M),H,_):-!,predicate_property(H,imported_from(M)).
+term_matches_hb(_,module(M),H,_):-!,predicate_property_safe(H,imported_from(M)).
 term_matches_hb(D,h(P),H,_):-!,term_matches_hb(D,P,H,666666).
 term_matches_hb(D,b(P),_,B):-!,term_matches_hb(D,P,B,666666).
 term_matches_hb(_,string(HO),H,B):- nonvar(HO),logicmoo_util_first:term_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
@@ -1060,7 +1060,7 @@ nonvar_search(F/A):-!,nonvar(F),nonvar(A).
 %
 cur_predicate(M:F/A,M:P):-atomic(M),compound(P),!,ignore(functor(P,F,A)).
 cur_predicate(M:F/A,M:P):-
-   current_predicate(M:F/A),functor(P,F,A),\+ ((predicate_property(M:P,imported_from(_)))).
+   current_predicate(M:F/A),functor(P,F,A),\+ ((predicate_property_safe(M:P,imported_from(_)))).
 
 /*
 cur_predicate(M:F/A,MP):-atom(M),var(F),!,cur_predicate(M,F/A,MP).
@@ -1251,10 +1251,10 @@ mp(_,P,MP):-MP=P.
 %
 bad_pred(M:P):-!,atom(M),bad_pred(P). 
 %bad_pred(P):-functor(P,F,A),arg(_,v(cur_predicates/_,mpred_op/_,mpred_op00/_,mpred_op0/_,mpred_op_loop/_,do_expand_args_l/3),F/A).
-%bad_pred(P):-predicate_property(P,autoloaded(_)).
-%bad_pred(P):-not(predicate_property(P,number_of_clauses(_))).
-%bad_pred(P):-predicate_property(P,imported_from(_)),predicate_property(P,static).
-%bad_pred(P):-predicate_property(P,foreign).
+%bad_pred(P):-predicate_property_safe(P,autoloaded(_)).
+%bad_pred(P):-not(predicate_property_safe(P,number_of_clauses(_))).
+%bad_pred(P):-predicate_property_safe(P,imported_from(_)),predicate_property_safe(P,static).
+%bad_pred(P):-predicate_property_safe(P,foreign).
 
 :- export(portray_hbr/3).
 :- export(portray_hb/2).
@@ -1269,7 +1269,7 @@ bad_pred(M:P):-!,atom(M),bad_pred(P).
 portray_hbr(M:P,M:pp(PPL),_):- (atom(P);compound(P)),format('~N~n'),
        in_cmt(writeq(P=PPL)),!,format('~N~n').
 
-portray_hbr(M:P,M:predicate_property(P,Props),_):- (atom(P);compound(P)),
+portray_hbr(M:P,M:predicate_property_safe(P,Props),_):- (atom(P);compound(P)),
        % functor(P,F,A), NEWH = pp(M:F/A,Props),
        NEWH = Props,
        in_cmt(portray_one_line(NEWH)),!.
@@ -1356,7 +1356,7 @@ make_headkey(H,NK):-copy_term_nat(H,NK),numbervars(NK),!.
 %
 % Pretty Print Listing.
 %
-pp_listing(Pred):- functor_safe(Pred,F,A),functor_safe(FA,F,A),findall(NV,predicate_property(FA,NV),LIST),dmsg((pp(Pred):-LIST)),nl,listing(FA).
+pp_listing(Pred):- functor_safe(Pred,F,A),functor_safe(FA,F,A),findall(NV,predicate_property_safe(FA,NV),LIST),dmsg((pp(Pred):-LIST)),nl,listing(FA).
 
 
 
@@ -1436,7 +1436,7 @@ prolog:locate_clauses(A, OutOthers) :-
  (       
    w_tl(t_l:in_prolog_listing(A),
     ( 
-    ignore((predicate_property(lmconf:hook_mpred_listing(A),number_of_clauses(C)),C>0,
+    ignore((predicate_property_safe(lmconf:hook_mpred_listing(A),number_of_clauses(C)),C>0,
       current_prolog_flag(xlisting,true),doall(call_no_cuts(lmconf:hook_mpred_listing(A))))),    
    prolog:locate_clauses(A, OutOthers))))),!.
 

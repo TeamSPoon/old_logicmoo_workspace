@@ -1548,10 +1548,11 @@ mpred_retry(G):- fail; cnotrace(G).
 neg_in_code(G):-nonvar(G),loop_check(neg_in_code0(G)).
 :- meta_predicate neg_in_code0(*).
 :- export(neg_in_code0/1).
+neg_in_code0(G):- var(G),!,lookup_u(~ G).
 neg_in_code0(call_u(G)):- !,~G.
 neg_in_code0(~(G)):- nonvar(G),!,  \+ ~G ,!.
 neg_in_code0(G):-   neg_may_naf(G), \+ call_u(G),!.
-neg_in_code0(G):-  is_ftNonvar(G), a(prologSingleValued,G),must((if_missing_mask(G,R,Test),nonvar(R))),call_u(R),!,call_u(Test).
+neg_in_code0(G):-  is_ftNonvar(G), a(prologSingleValued,G),must((if_missing_mask(G,R,Test),nonvar(R),nonvar(Test))),call_u(R),!,call_u(Test).
 
 
 :- meta_predicate neg_may_naf(0).

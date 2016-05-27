@@ -33,4 +33,8 @@ b(t).
 \+ a(t).
 
 :- mpred_test(\+ a(t)).
+
+% ensure the retraction of a(t) did not remove b(t) ! 
+:- listing(b/1).
+
 :- mpred_test(b(t)).

@@ -7,13 +7,11 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(mt_01,[]).
+:- module(mt_04,[]).
 
-:- user:use_module(library(logicmoo_utils)).
-:- user:use_module(library(logicmoo_base)).
+:- use_module(library(logicmoo_base)).
 
-
-%:- add_import_module(mt_01,baseKB,end).
+:- begin_pfc.
 
 :- set_defaultAssertMt(myMt).
 
@@ -21,18 +19,20 @@ mtProlog(code1).
 mtCycL(kb2).
 mtCycL(kb3).
 
-% code1: (a <- b).
-code1: (a:-b).
-
 
 kb2: (b).
 
-genlMt(kb2,code1).
+baseKB:genlMt(kb2,code1).
 
 kb2: (?- a).
 
 genlMt(kb3,kb2).
 
 kb3: (a==>c).
+
+
+
+% code1: (a <- b).
+:- ain((code1: (a:-b))).
 
 

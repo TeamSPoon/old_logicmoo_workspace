@@ -21,8 +21,10 @@
 % Douglas Miles
 */
 
-:- load_files(library(prolog_stack)).
-:- ain((prolog_stack:stack_guard(none))).
+
+
+% :- load_files(library(prolog_stack)).
+% :- ain((prolog_stack:stack_guard(none))).
 
 :- assert_until_eof(infSupertypeName).
 :- onEndOfFile(dmsg(infSupertypeName)).
@@ -295,7 +297,11 @@ prologHybrid(isEach((mudLastCmdSuccess/2 ))).
 
 :- dynamic(mudDescription/2).
 :- dynamic((tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
-:- dynamic((mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgent/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
+:- dynamic((mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2,
+   chargeCapacity/2, mudEnergy/2, tCol/1, tAgent/1, tItem/1, tRegion/1, instVerbOverride/3,
+   mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2,
+   mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2,
+   mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
 
 
 
@@ -333,6 +339,8 @@ prologSingleValued(mudBareHandDamage(tAgent,ftInt),prologHybrid).
 % prologSingleValued(mudEnergy(tChargeAble,ftInt(90)),prologHybrid).
 prologSingleValued(mudEnergy(tChargeAble,ftInt),prologHybrid).
 prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
+prologSingleValued(mudNonHunger(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
+prologSingleValued(mudHygiene(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
 prologSingleValued(mudFacing(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid).
 prologSingleValued(mudHealth(tObj,ftInt),prologHybrid).
 prologSingleValued(mudHeight(tObj,ftInt),prologHybrid).
@@ -512,6 +520,8 @@ genls(ttTypeByAction,tCol).
 
 
 % (isa(Inst,Type),isa(Type,ttTypeByAction)) ==> isa(Inst,tHasAction).
+
+genls(A,B)==>tCol(A),tCol(B).
 
 genls(tAgent,tObj).
 genls(tAgent,tSpatialThing).
@@ -960,8 +970,9 @@ prologHybrid(normalAgentGoal(tStatPred,ftTerm)).
 
 (tStatPred(Pred)==>(ptRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
 
-(normalAgentGoal(Pred,_)/atom(Pred) ==>
- ({AT=..[Pred,tAgent,ftPercent]},meta_argtypes(AT),prologHybrid(Pred),tStatPred(Pred))).
+:- ain(((normalAgentGoal(Pred,N)/atom(Pred) ==>
+ ({AT=..[Pred,tAgent,ftPercent]},{kb_dynamic(Pred,2)},meta_argtypes(AT),argSingleValueDefault(Pred,2,N),prologHybrid(Pred),tStatPred(Pred))))).
+
 
 normalAgentGoal(mudEnergy,90).
 normalAgentGoal(mudNonHunger,90).
@@ -1041,6 +1052,8 @@ O = [
 :- mpred_trace_exec.
 
 :- on_x_debug(ain(tAgent(iExplorer1))).
+
+:- mpred_fwd(tAgent(iExplorer1)).
 
 :-must(mudFacing(iExplorer1,vNorth)).
 

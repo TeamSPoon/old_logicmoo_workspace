@@ -393,8 +393,8 @@ unassertable((_,_)).
 
 :- style_check(+discontiguous).
 
-to_real_mt(_Why,abox,ABOX):- must(loop_check(defaultAssertMt(ABOX),fail)),!,sanity(mtCanAssert(ABOX)).
-to_real_mt(_Why,tbox,TBOX):- must(get_current_default_tbox(TBOX)),!.
+to_real_mt(_Why,abox,ABOX):- defaultAssertMt(ABOX),!.
+to_real_mt(_Why,tbox,TBOX):- get_current_default_tbox(TBOX),!.
 to_real_mt(_Why,BOX,BOX).
 
 %% fix_mp(+Why,+I,-O) is det.
@@ -575,19 +575,23 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(Why,MH,M,H))),
 % with_umt(U,G):- t_l:current_defaultAssertMt(W)->W=U,!,call_from_module(U,G).
 
 with_umt(user,P):- !,with_umt(baseKB,P).
-with_umt(U,P):-!,
- sanity(clause_b(mtCycL(U))),
+with_umt(U,P):- \+ clause_b(mtCycL(U)),!,
+ defaultAssertMt(W),
+ gripe_time(30.0,
+   w_tl(t_l:current_defaultAssertMt(W),
+     call_from_module(W,P))).
+with_umt(U,P):- !,
  gripe_time(30.0,
    w_tl(t_l:current_defaultAssertMt(U),
      call_from_module(U,P))).
-
+/*
 with_umt(U,G):-
  demodulize(call(with_umt),G,P),
   gripe_time(30.0,
    w_tl(t_l:current_defaultAssertMt(U),
      call_from_module(U,P))).
 
-
+*/
 
 
 
@@ -1031,12 +1035,12 @@ set_fc_mode(Mode):- asserta(t_l:mpred_fc_mode(Mode)).
 
 % mpred_enqueue(P,S):- get_fc_mode(P,S,Mode), must(Mode=direct),fail.
 mpred_enqueue(P,S):-
-  (get_fc_mode(P,S,Mode)
-    -> (Mode=direct  -> loop_check_term(mpred_fwc(P),plus_fwc(P),true) ;
+ ( (must(get_fc_mode(P,S,Mode))
+    -> (Mode=direct  -> loop_check_term(mpred_fwc(P),mpred_enqueue(P),true) ;
 	Mode=depth   -> mpred_asserta_w_support(que(P),S) ;
 	Mode=breadth -> mpred_assert_w_support(que(P),S) ;
 	true         -> mpred_error("Unrecognized pm mode: ~p", Mode))
-     ; mpred_error("No pm mode")).
+     ; mpred_error("No pm mode"))),!.
 
 
 %% mpred_remove_old_version( :TermIdentifier) is semidet.
@@ -1707,6 +1711,7 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 % 
 % call_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
 
+call_u(M:G):- nonvar(M),var(G),!,mpred_fact_mp(M,G).
 call_u(M:G):- clause_b(mtProlog(M)),!,call(M:G).
 call_u(M:G):- sanity(clause_b(mtCycL(M))),!,with_umt(M,G).
 call_u(G):- 
@@ -1723,13 +1728,13 @@ mpred_BC_CACHE0(M,must(P00)):-!,mpred_BC_CACHE0(M,P00).
 mpred_BC_CACHE0(M,P):- predicate_property_safe(M:P,static),!.
 mpred_BC_CACHE0(_, :-(_,_)):-!.
 mpred_BC_CACHE0(_,bt(_,_)):-!.
-mpred_BC_CACHE0(M,P):- 
- M:ignore((
+mpred_BC_CACHE0(_,spft(_,_,_)):-!.
+mpred_BC_CACHE0(_,P):- 
+ ignore((
   cyclic_break(P),
  % trigger any bc rules.
   lookup_u(bt(P,Trigger)),
   copy_term_vn(bt(P,Trigger),bt(CP,CTrigger)),
-  % must(M:mpred_get_support(bt(CP,Trigger),S)),
   must(lookup_u(spft(bt(CP,_Trigger),F,T))),
   S = (F,T),
   mpred_eval_lhs(CTrigger,S),
@@ -1749,7 +1754,7 @@ mpred_call_no_bc(P):- loop_check(no_repeats(mpred_call_no_bc0(P))).
 mpred_call_no_bc0(P):-  defaultAssertMt(Mt), Mt:call(P).
 % TODO .. mpred_call_no_bc0(P):-  defaultAssertMt(Mt), clause_b(genlMt(Mt,SuperMt)), call_umt(SuperMt,P).
 %mpred_call_no_bc0(P):- mpred_call_with_no_triggers(P).
-%mpred_call_no_bc0(P):- nonvar(P),predicate_property(_,P),!, P.
+%mpred_call_no_bc0(P):- nonvar(P),predicate_property_safe(P,_),!, P.
 % mpred_call_no_bc0(P):- loop_check(mpred_METACALL(call_u, P)).
 
 
@@ -2396,6 +2401,10 @@ mpred_retract_i_or_warn(X):-
 :-retractall(baseKB:spft(a,b,c)).
 
 %  mpred_fact(P) is true if fact P was asserted into the database via add.
+
+
+mpred_fact_mp(M,G):- current_predicate(_,M:G),\+ predicate_property_safe(M:G,imported_from(_)),
+  mpred_fact(G),ignore((lookup_u(G,Ref),clause_property(Ref,module(MW)))),MW=M.
 
 mpred_fact(P):- mpred_fact(P,true).
 

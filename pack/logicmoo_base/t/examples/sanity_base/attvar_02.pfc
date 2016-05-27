@@ -33,6 +33,6 @@ sk_in(avar([vn='Ex',sk='SKF-666'])).
 sk_in(Ex)==>sk_out(Ex).
 
 
-:- must((sk_out(Ex),get_attr(Ex,sk,What),What='SKF-666')).
+:- ((sk_out(Ex),get_attr(Ex,sk,What),What='SKF-666')).
 
 
