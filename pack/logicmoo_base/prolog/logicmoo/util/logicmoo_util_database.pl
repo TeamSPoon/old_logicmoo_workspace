@@ -470,6 +470,7 @@ expand_to_hb( M:((H :- B)),M:H,B):-!.
 expand_to_hb( ((H :- B)),H,B):-!.
 expand_to_hb( H,  H,  true).
 
+clausify_attributes(V,V):- \+ current_prolog_flag(assert_attvars,true),!.
 clausify_attributes(V,V):- \+ compound(V),!.
 clausify_attributes(M:Data,M:THIS):- !,clausify_attributes(Data,THIS).
 clausify_attributes([H|T],[HH|TT]):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
@@ -658,10 +659,11 @@ clause_i(H,B):- clause_i(H,B,_).
 % clause_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 % clause_i(H,B,Ref):- system:clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
 
+clause_i(H0,B0,Ref):- \+ current_prolog_flag(assert_attvars,true),!, system:clause(H0,B0,Ref).
+
 clause_i(H,B,R):- nonvar(R),!, 
   dont_make_cyclic((must(system:clause(H0,BC,R)),must(split_attrs(BC,AV,B0)),!,must((AV,!,B=B0,H=H0)))).
 
-% clause_i(H0,B0,Ref):-system:clause(H0,B0,Ref).
 clause_i(H0,B0,Ref):-
  copy_term(H0:B0, H:B, Attribs),
  dont_make_cyclic((    
