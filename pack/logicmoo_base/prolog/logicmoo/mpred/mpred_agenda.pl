@@ -411,7 +411,7 @@ do_all_of_ilc(When):-  repeat,do_stuff_of_ilc(When), not(more_to_do(When)).
 %
 % More Converted To Do.
 %
-more_to_do(When):-predicate_property(lmconf:will_call_after(When,_),number_of_clauses(N)),!,N>0.
+more_to_do(When):-predicate_property_safe(lmconf:will_call_after(When,_),number_of_clauses(N)),!,N>0.
 
 
 %= 	 	 
@@ -599,7 +599,7 @@ rescan_mpred_facts_local:-wno_tl(lmconf:use_cyc_database,(must_det(rescan_duplic
 %
 % Rescan Duplicated Facts.
 %
-rescan_duplicated_facts:- !, hotrace( forall(member(M,[moo,user,world,hook]), forall((predicate_property(M:H,dynamic),arity(F,A),functor(H,F,A)), rescan_duplicated_facts(M,H)))).
+rescan_duplicated_facts:- !, hotrace( forall(member(M,[moo,user,world,hook]), forall((predicate_property_safe(M:H,dynamic),arity(F,A),functor(H,F,A)), rescan_duplicated_facts(M,H)))).
 
 %= 	 	 
 
@@ -641,7 +641,7 @@ rerun_database_hooks:-time_call(doall((isa_asserted(I,C),run_database_hooks(chan
 reduce_fact_heads(_M,_H,CF1,CF1):-!. % no change
 reduce_fact_heads(M,H,CF1,CF2):- 
  ignore((
-   predicate_property(M:H,dynamic),
+   predicate_property_safe(M:H,dynamic),
    length(CF1,F1),length(CF2,F2),
    dmsg(reduce_fact_heads(M,H,from(F1,F2))),
    retractall(M:H),
@@ -656,8 +656,8 @@ reduce_fact_heads(M,H,CF1,CF2):-
 % Gather Fact Heads.
 %
 gather_fact_heads(M,H):- (nonvar(M)->true; member(M,[dbase,moo,world,user,hook])), current_predicate(M:F/A), arity(F,A),
-  once((once((A>0,atom(F),F\=(:),var(H), on_x_rtrace(functor_catch(H,F,A)))),compound(H),predicate_property(M:H,number_of_clauses(_)),
-  not((arg(_,vv(system,bugger,logicmoo_util_dcg,user),M);predicate_property(M:H,imported_from(_)))))).
+  once((once((A>0,atom(F),F\=(:),var(H), on_x_rtrace(functor_catch(H,F,A)))),compound(H),predicate_property_safe(M:H,number_of_clauses(_)),
+  not((arg(_,vv(system,bugger,logicmoo_util_dcg,user),M);predicate_property_safe(M:H,imported_from(_)))))).
 
 
 /*

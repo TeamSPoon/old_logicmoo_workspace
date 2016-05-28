@@ -89,8 +89,6 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 
 :- '$set_source_module'('user').
 
-:- ensure_loaded(library(prologmud/vworld/world)).
-
 :- asserta(t_l:disable_px).
 
 add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_game_dir(Else).

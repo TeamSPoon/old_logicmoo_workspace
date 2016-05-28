@@ -187,7 +187,7 @@ term_is_ft(Term,Type):- is_ftVar(Term),!,member(Type,[ftVar,ftProlog]).
 term_is_ft(_ANY,Type):- Type==ftVar,!,fail.
 term_is_ft([T|Term],ftListFn(Type)):-is_list_of(Type,[T|Term]).
 term_is_ft(_ANY,Type):- nonvar(Type),(ttExpressionType==Type;(\+ ttExpressionType(Type))),!,fail.
-term_is_ft(Term,Type):- nonvar(Type), (no_repeats_old(Type,(term_is_ft_how(Term,Type)))*->!;true).
+term_is_ft(Term,Type):- nonvar(Type), term_is_ft_how(Term,Type),!.
 term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subft(Was,Type))).
 
 
@@ -502,7 +502,7 @@ argIsa_call_0(F,N,Type):-a(tCol,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
 argIsa_call_0(Compound,N,Type):-compound(Compound),!,arg(N,Compound,Type),tCol(Type).
 argIsa_call_0(F,N,Type):-between(1,2,N),argIsa_call_3(F,Type).
 argIsa_call_0(F,N,ftTerm):- N = 1, atom(F), current_predicate(F/N).
-argIsa_call_0(F,N,ftAskable):- atom(F), current_predicate(F/A),between(1,A,N),functor(P,F,A), predicate_property(P,meta_predicate(P)),arg(N,P,Number),number(Number),!.
+argIsa_call_0(F,N,ftAskable):- atom(F), current_predicate(F/A),between(1,A,N),functor(P,F,A), predicate_property_safe(P,meta_predicate(P)),arg(N,P,Number),number(Number),!.
 % argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
 
 

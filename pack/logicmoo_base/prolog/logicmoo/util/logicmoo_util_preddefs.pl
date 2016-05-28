@@ -26,7 +26,6 @@
             (dynamic_safe)/1,
             (dynamic_safe)/3,
             op_safe/3,
-            % system:predicate_property_safe/2,
             dynamic_transparent/1,
             fill_args/2,
             get_module_of/2,
@@ -147,11 +146,6 @@ call_from_module(NewModule,Goal):-
       ('$set_source_module'(OldSModule),'$set_typein_module'(OldModule))).
 
 
-:- meta_predicate(system:predicate_property_safe(:,?)).
-
-system:predicate_property_safe(A,B):- 
-  quietly(w_tl(set_prolog_flag(retry_undefined,false),
-   predicate_property(A,B))).
 
 dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
 

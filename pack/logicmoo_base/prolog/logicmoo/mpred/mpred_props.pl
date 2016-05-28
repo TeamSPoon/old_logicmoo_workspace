@@ -257,11 +257,11 @@ decl_mpred_prolog(_:CM,M,PI,F,A):-
       define_maybe_prolog(M,PI,F,A),
       ain(prologBuiltin(F)))).
 
-define_maybe_prolog(M,PI,F,_A):- predicate_property(M:PI,imported_from(system)),ain(prologBuiltin(F)).
+define_maybe_prolog(M,PI,F,_A):- predicate_property_safe(M:PI,imported_from(system)),ain(prologBuiltin(F)).
 
 define_maybe_prolog(M,PI,F,A):- 
-    (\+ predicate_property(M:PI,_); predicate_property(M:PI,imported_from(OM))),
-    ((OM=system;current_module(OM)),predicate_property(OM:PI,_),\+ predicate_property(OM:PI,imported_from(_))),!,
+    (\+ predicate_property_safe(M:PI,_); predicate_property_safe(M:PI,imported_from(OM))),
+    ((OM=system;current_module(OM)),predicate_property_safe(OM:PI,_),\+ predicate_property_safe(OM:PI,imported_from(_))),!,
     decl_mpred_prolog(M,OM,PI,F,A).
 
 define_maybe_prolog(M,PI,F,A):-
@@ -390,7 +390,7 @@ maybe_define_if_not_static(M,PI):-
       M:multifile(M:F/A),
       M:public(M:F/A),
       (is_static_predicate(M:PI) -> true ;
-       (predicate_property(M:PI,dynamic) -> true ; icatch(M:dynamic(M:PI)))),!.
+       (predicate_property_safe(M:PI,dynamic) -> true ; icatch(M:dynamic(M:PI)))),!.
 
 
 :- op(1120,fx,(kb_dynamic)).

@@ -289,7 +289,7 @@ show_pred_info(PI):-
         doall(show_call(why,call_u(isa(Head,_)))),
         functor(Head,F,_),
         doall(show_call(why,call_u(isa(F,_)))),
-       ((current_predicate(_,M:Head), (\+ predicate_property(M:Head,imported_from(_))))
+       ((current_predicate(_,M:Head), (\+ predicate_property_safe(M:Head,imported_from(_))))
           -> show_pred_info_0(M:Head); 
              wdmsg(cannot_show_pred_info(M:Head))),!.
 
@@ -301,7 +301,7 @@ show_pred_info(PI):-
 % show Predicate info  Primary Helper.
 %
 show_pred_info_0(Head):- 
-        doall(show_call(why,predicate_property(Head,_))),
+        doall(show_call(why,predicate_property_safe(Head,_))),
         (has_cl(Head)->doall((show_call(why,clause(Head,_))));hotrace((listing(Head)))),!.
 
 
@@ -462,12 +462,12 @@ mpred_list_triggers_1(What):-
    print_db_items('ArgTypes',argIsa(_,_,_),What),
    print_db_items('ArgTypes',argQuotedIsa(_,_,_),What),
    print_db_items('ArgTypes',meta_argtypes(_),What),
-   print_db_items('ArgTypes',predicate_property(G,meta_predicate(G)),What),
+   print_db_items('ArgTypes',predicate_property_safe(G,meta_predicate(G)),What),
    print_db_items('ArgTypes',resultGenls(_,_),What),
    print_db_items('ArgTypes',resultIsa(_,_),What),
    print_db_items('Arity',arity(_,_),What),
    print_db_items('Arity',current_predicate(_),What),
-   print_db_items('MetaFacts Predicate',predicate_property(_,_),What),
+   print_db_items('MetaFacts Predicate',predicate_property_safe(_,_),What),
    print_db_items('Sources',module_property(_,_),What),
    print_db_items('Sources',predicateConventionMt(_,_),What),
    print_db_items('Sources',source_file(_,_),What),

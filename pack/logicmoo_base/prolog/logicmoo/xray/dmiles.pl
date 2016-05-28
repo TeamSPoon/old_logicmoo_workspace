@@ -257,7 +257,7 @@ apply_to_tree(P,Wff,Wff1) :- call(P,Wff,Wff1),!.
 apply_to_tree(P,Wff,Wff) :- \+ compound(Wff),!.
 apply_to_tree(P,Wff,Wff1) :- call(P,Wff,Wff1),!.
 apply_to_tree(P,(A :- B),(A1 :- B1)) :- apply_to_tree(P,A,A1),apply_to_tree(P,B,B1).
-apply_to_tree(P,Wff,Wff1) :- predicate_property(Wff,meta_predicate(_)),
+apply_to_tree(P,Wff,Wff1) :- predicate_property_safe(Wff,meta_predicate(_)),
                Wff=..[F|Args],
                maplist(apply_to_tree(P),Args,Args1),
                Wff1=..[F|Args1]

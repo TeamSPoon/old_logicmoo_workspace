@@ -283,9 +283,12 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 
 
 ((marker_supported(F,A)/is_ftNameArity(F,A),prologHybrid(F)))==>hybrid_support(F,A).
+((marker_supported(F,A)/(is_ftNameArity(F,A),correct_module(abox,_,F,A,Mt),Mt\=abox,
+   \+ predicateConventionMt(F,_), mtExact(Mt))))==>predicateConventionMt(F,Mt).
 
 hybrid_support(F,A) ==>{ must(kb_dynamic(F/A))}.
 
+mtExact(Mt)/module_predicate(Mt,F,A)==>predicateConventionMt(F,Mt),arity(F,A).
 
 
 
@@ -330,12 +333,8 @@ mtProlog(Mt),predicateConventionMt(F,Mt)/(Mt\==baseKB)==>prologBuiltin(F).
 genlsFwd(Sub,Super)==> (t(Sub,I) ==> t(Super,I)). 
 
 ttModule(M)==>tSet(M).
-ttModule(MtType)==>genlsFwd(MtType,tMicrotheory).
+ttModule(MtType)==>genls(MtType,tMicrotheory).
 ttModule(mtProlog).
-
-disjointWith(mtUserCodeLibrary,mtBuiltinLibrary).
-
-% partition(mtProlog, mtBuiltinLibrary, mtUserCodeLibrary).
 
 :- sanity(get_lang(pfc)).
 
@@ -357,25 +356,20 @@ tCol(Decl)==>functorDeclares(Decl).
 :- sanity(\+ predicate_property_safe(ttModule(_,_,_),_)).
 
 ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
-  genlsFwd(tMicrotheory)).
+  genls(tMicrotheory)).
 
 :- sanity(arity(ttModule,1)).
 :- sanity(\+ arity(ttModule,3)).
 :- sanity(\+ predicate_property_safe(ttModule(_,_,_),_)).
 
-ttModule(mtBuiltinLibrary,comment("Builtin Prolog code modules such as 'lists' or 'apply' and PFC system like 'mpred_loader' or 'mpred_type_wff'"),
-  genlsFwd(mtProlog),genlsFwd(mtCore)).
+ttModule(mtProlog,comment("Builtin Prolog code modules such as 'lists' or 'apply' and PFC system like 'mpred_loader' or 'mpred_type_wff'"),
+  genlsFwd(mtProlog),genls(mtCore)).
 
 
 % ttModule(mtLocal,comment("mtLocal(?Mt) is always scoped underneath baseKB")).
 
- 
-
-mtExact(Mt)==> mtGlobal(Mt).
-
 ttModule(mtGlobal,comment("mtGlobal(?Mt) states the Mt is always findable during inheritance")).
 mtGlobal(baseKB).
-mtGlobal(lmcode).
 mtGlobal(system).
 
 ttModule(mtExact,
@@ -383,37 +377,27 @@ ttModule(mtExact,
 mtExact(lmconf).
 mtExact(lmcache).
 mtExact(t_l).
-
-mtExact(system).
 mtExact(Mt)==> mtGlobal(Mt).
-mtExact(Mt)==> ~genlMt(Mt,_).
+
 
 ttModule(mtCore,comment("mtCore(?Mt) states Mt specified is builtin")).
 mtCore(user).
 mtCore(everythingPCS).
 mtCore(inferencePCS).
-mtCore(Mt)==>tMicrotheory(Mt).
+genls(mtCore,tMicrotheory).
 
 
+mtCycL(O)==>{call(ensure_abox(O))},~mtProlog(O).
 
-
-
-
-/*
-{module_property(Mt,class(user)),
-   (atom_concat('common_logic_',_,Mt);atom_concat('logicmoo_util_',_,Mt);atom_concat('mpred_',_,Mt))} 
-    ==>  mtGlobal(Mt).
-
-*/
-
-mtCycL(O)==>{call(ensure_abox(O))}.
 
 :- dynamic(nondet/0).
-{module_property(Mt,class(library))} ==> mtBuiltinLibrary(Mt).
-% TODO the above is secretly the next line (confirm fixered)
-% (nondet,{module_property(Mt,class(library))}) ==> mtBuiltinLibrary(Mt).
 
-mtBuiltinLibrary(Mt)==>mtGlobal(Mt).
+{module_property(Mt,class(user)),
+   (atom_concat('common_logic_',_,Mt);atom_concat('logicmoo_util_',_,Mt);atom_concat('mpred_',_,Mt))} 
+    ==>  mtProlog(Mt).
+{module_property(Mt,class(library))} ==> mtProlog(Mt).
+{module_property(Mt,class(system))} ==> mtProlog(Mt).
+% TODO the above is secretly the next line (confirm fixered)
 
 
 
@@ -421,7 +405,7 @@ mtBuiltinLibrary(Mt)==>mtGlobal(Mt).
 %  (tMicrotheory(Mt), ~ mtCycL(Mt)) <==> mtProlog(Mt).
 
 % mtCycL(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
-mtGlobal(Mt)==>genlMt(baseKB,Mt).
+codeRule(mtGlobal(Mt)==>genlMt(baseKB,Mt)).
 
 baseKB:isRegisteredCycPred(apply,maplist,3).
 

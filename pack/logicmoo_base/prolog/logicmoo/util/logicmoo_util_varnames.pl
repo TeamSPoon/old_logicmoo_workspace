@@ -847,7 +847,7 @@ save_clause_vars(MHB,Vs,Why):-  ( \+ \+ (logicmoo_util_term_listing:as_clause_w_
 %
 % Locate Clause Ref.
 %
-locate_clause_ref(M,H,_MB,_B,_ClauseRef):- ( \+ (predicate_property(M:H,number_of_clauses(_)))),( \+ (predicate_property(_:H,number_of_clauses(_)))),!,fail.
+locate_clause_ref(M,H,_MB,_B,_ClauseRef):- ( \+ (predicate_property_safe(M:H,number_of_clauses(_)))),( \+ (predicate_property_safe(_:H,number_of_clauses(_)))),!,fail.
 locate_clause_ref(M,H,MB,B,ClauseRef):-clause_asserted(M:H,MB:B,ClauseRef).
 locate_clause_ref(_M,H,MB,B,ClauseRef):-clause_asserted(H,MB:B,ClauseRef).
 locate_clause_ref(_M,H,MB,B,ClauseRef):-clause_asserted(_:H,MB:B,ClauseRef).

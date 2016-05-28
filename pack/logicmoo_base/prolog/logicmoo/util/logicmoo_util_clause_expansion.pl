@@ -16,6 +16,7 @@
           [
 
           swi_module/2,
+          predicate_property_safe/2,
           show_module_imports/0,
           show_module_imports/1,
           show_module_imports/2,
@@ -114,6 +115,12 @@ appear in the source-code.
 
 :- meta_predicate get_named_value_goal(0,*).
 
+:- meta_predicate(system:predicate_property_safe(:,?)).
+
+system:predicate_property_safe(A,B):- current_prolog_flag(retry_undefined,false),!,predicate_property(A,B).
+system:predicate_property_safe(A,B):- 
+  quietly(w_tl(set_prolog_flag(retry_undefined,false),
+   predicate_property(A,B))).
 
 
 is_user_module :- prolog_load_context(source,F), lmconf:mpred_is_impl_file(F),!,fail.
@@ -217,8 +224,8 @@ preds_visible(Mod,[F/A|List], MList):-
  findall(MVis-F/A,
   ((default_module(Mod,MVis),
   functor(P,F,A),
-  predicate_property(MVis:P,defined),
-  \+ predicate_property(MVis:P,imported_from(_)))),
+  predicate_property_safe(MVis:P,defined),
+  \+ predicate_property_safe(MVis:P,imported_from(_)))),
  MEList),
  preds_visible(Mod,List, NextMEList),
  append(MEList,NextMEList,MList).
@@ -360,7 +367,7 @@ all_source_file_predicates_are_transparent(File):-
     forall((source_file(ModuleName:P,File),functor(P,F,A)),
       ignore(( 
         ignore(( \+ atom_concat('$',_,F), ModuleName:export(ModuleName:F/A))),
-            \+ (predicate_property(ModuleName:P,(transparent))),
+            \+ (predicate_property_safe(ModuleName:P,(transparent))),
                    % ( nop(dmsg(todo(module_transparent(ModuleName:F/A))))),
                    (module_transparent(ModuleName:F/A))))).
 

@@ -1698,7 +1698,7 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 %  Note: a bug almost fixed is that this sometimes the side effect of catching 
 %  facts and not assigning the correct justifications
 % 
-% call_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
+% call_u(P):- predicate_property_safe(P,number_of_rules(N)),N=0,!,lookup_u(P).
 
 call_u(G):- var(G),!,dtrace,defaultAssertMt(W),mpred_fact_mp(W,G).
 call_u(M:G):- var(M),!,trace_or_throw(var_call_u(M:G)).
@@ -1773,9 +1773,9 @@ mpred_METACALL(How, Cut, (P1;P2)):- !, mpred_METACALL(How, Cut, P1); mpred_METAC
 mpred_METACALL(How, Cut, (P1->P2)):- !, mpred_METACALL(How, Cut, P1)-> mpred_METACALL(How, Cut, P2).
 mpred_METACALL(How, Cut, (P1*->P2)):- !, mpred_METACALL(How, Cut, P1)*-> mpred_METACALL(How, Cut, P2).
 %  check for system predicates first
-% mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call_u(P).
+% mpred_METACALL(_How, _SCut, P):- predicate_property_safe(P,built_in),!, call_u(P).
 mpred_METACALL(_How, _Cut, (H:-B)):- clause_u((H:-B)).
-mpred_METACALL( How,   Cut, P) :- fail, predicate_property(P,number_of_clauses(_)),!,
+mpred_METACALL( How,   Cut, P) :- fail, predicate_property_safe(P,number_of_clauses(_)),!,
      clause_u(P,Condition),
      mpred_METACALL(How,Cut,Condition),
        (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);mpred_call_no_bc(Cut))).

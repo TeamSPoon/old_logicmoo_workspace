@@ -460,7 +460,7 @@ on_modules_changed :-
 %
 never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
   functor(P,F,A),
-  ignore(predicate_property(M:P,exported)),
+  ignore(predicate_property_safe(M:P,exported)),
   defined_predicate(M:P),  
   is_static_why(M,P,F,A,R),
   Why = static(M:P-F/A,R).

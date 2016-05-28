@@ -513,7 +513,7 @@ fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,Call)).
 ensure_predicate_reachable(_,_):- fast_mud,!.
 %ensure_predicate_reachable(M,C):-functor(C,F,A),ensure_predicate_reachable(M,C,F,A),fail.
 ensure_predicate_reachable(_,_):- is_release,!.
-ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)),M\=Other,
+ensure_predicate_reachable(M,C):-once((predicate_property_safe(C,imported_from(Other)),M\=Other,
                                        source_context_module(CM),
                                        dmsg(wrong_import_module(M,Other:C,from(CM))),
                                        ignore(delete_import_module(CM,Other)),
@@ -1231,10 +1231,10 @@ retract_all(HB) :- ignore((retract(HB),fail)).
 %
 % If Is A Static Predicate.
 %
-is_static_pred(Head:-_):-!,predicate_property(Head,_),not(predicate_property(Head,dynamic)).
-is_static_pred(Head):-  predicate_property(Head,static),!.
-is_static_pred(Head):- predicate_property(Head,_), !, \+ (predicate_property(Head,dynamic)).
-is_static_pred(Head):-  predicate_property(Head,meta_predicate),!.
+is_static_pred(Head:-_):-!,predicate_property_safe(Head,_),not(predicate_property_safe(Head,dynamic)).
+is_static_pred(Head):-  predicate_property_safe(Head,static),!.
+is_static_pred(Head):- predicate_property_safe(Head,_), !, \+ (predicate_property_safe(Head,dynamic)).
+is_static_pred(Head):-  predicate_property_safe(Head,meta_predicate),!.
 
 
 %= 	 	 
@@ -1313,7 +1313,7 @@ ensure_dynamic(':-'(_)):-!.
 ensure_dynamic(Head):- Head\=isa(_,_),
    get_functor(Head,F,A),
    functor(PF,F,A),
-   (\+ predicate_property(PF,_)->show_call(why,(dynamic(F/A),multifile(F/A),export(F/A)));
+   (\+ predicate_property_safe(PF,_)->show_call(why,(dynamic(F/A),multifile(F/A),export(F/A)));
    (is_static_pred(PF)-> 
      ((listing(F/A),dmsg(want_to_assert(ensure_dynamic(Head),decl_mpred_prolog(F,A,Head))),nop(dtrace))); true)).
 

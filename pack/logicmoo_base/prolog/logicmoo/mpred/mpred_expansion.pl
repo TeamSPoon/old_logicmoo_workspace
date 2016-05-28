@@ -1102,8 +1102,8 @@ maybe_prepend_mt(Mt,Mt:HH,Mt:HH):-!.
 maybe_prepend_mt(_,Mt:HH,Mt:HH):-!.
 maybe_prepend_mt(Mt,HH,Mt:HH):-!.
 
-predicateSystemCode(P,PP):-strip_module(P,_,PP),predicate_property(system:PP,defined),
-  \+ predicate_property(system:PP,imported_from(baseKB)).
+predicateSystemCode(P,PP):-strip_module(P,_,PP),predicate_property_safe(system:PP,defined),
+  \+ predicate_property_safe(system:PP,imported_from(baseKB)).
 
 %% remodulize( ?Why, ?H, ?HH) is det.
 %
@@ -1140,7 +1140,7 @@ must_remodulize(Why,H,HHH):-must(demodulize(Why,H,HHH)),!.
 %
 % If Is A Meta Functor.
 %
-is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_property(Sent,meta_predicate(_));is_sentence_functor(F);F==pfcDefault),!.
+is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_property_safe(Sent,meta_predicate(_));is_sentence_functor(F);F==pfcDefault),!.
  
 
 
@@ -1489,7 +1489,7 @@ into_mpred_form6(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
 into_mpred_form6(C,isa,_,2,_,C):-!.
 into_mpred_form6(C,_,_,_,_,isa(I,T)):-was_isa_syntax(C,I,T),!.
 into_mpred_form6(_X,t,P,_N,A,O):-!,(atom(P)->O=..[P|A];O=..[t,P|A]).
-into_mpred_form6(G,_,_,1,_,G):-predicate_property(G,number_of_rules(N)),N >0, !.
+into_mpred_form6(G,_,_,1,_,G):-predicate_property_safe(G,number_of_rules(N)),N >0, !.
 into_mpred_form6(G,F,C,1,_,O):-real_builtin_predicate(G),!,into_mpred_form(C,OO),O=..[F,OO].
 into_mpred_form6(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[holds_f,P|A]).
 into_mpred_form6(_X,H,P,_N,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[t,P|A]).
@@ -1558,7 +1558,7 @@ transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),
 transform_holds_3(_,A,A):- (not_ftCompound(A)),!.
 transform_holds_3(_,props(Obj,Props),props(Obj,Props)):-!.
 %transform_holds_3(Op,Sent,OUT):-Sent=..[And|C12],is_sentence_functor(And),!,maplist(transform_holds_3(Op),C12,O12),OUT=..[And|O12].
-transform_holds_3(_,A,A):-compound(A),functor(A,F,N), predicate_property(A,_),arity(F,N),!.
+transform_holds_3(_,A,A):-compound(A),functor(A,F,N), predicate_property_safe(A,_),arity(F,N),!.
 transform_holds_3(HFDS,M:Term,M:OUT):-atom(M),!,transform_holds_3(HFDS,Term,OUT).
 transform_holds_3(HFDS,[P,A|ARGS],DBASE):- is_ftVar(P),!,DBASE=..[HFDS,P,A|ARGS].
 transform_holds_3(HFDS, ['[|]'|ARGS],DBASE):- trace_or_throw(list_transform_holds_3(HFDS,['[|]'|ARGS],DBASE)).
@@ -1682,7 +1682,7 @@ db_reop_l(Op,DATA):-no_loop_check(db_op0(Op,DATA)).
 %
 expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
 
-% db_op_simpler(query(HLDS,_),MODULE:C0,call_u(call,MODULE:C0)):- atom(MODULE), is_ftNonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
+% db_op_simpler(query(HLDS,_),MODULE:C0,call_u(call,MODULE:C0)):- atom(MODULE), is_ftNonvar(C0),not(not(predicate_property_safe(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
 
 %= 	 	 
 

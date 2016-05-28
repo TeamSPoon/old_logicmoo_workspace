@@ -288,9 +288,9 @@ is_crossfile_module_0(user).
 to_mfa_0(_,user,SM:FA,SM:FA):-!.
 to_mfa_0(_,_,SM:FA,SM:FA):- is_crossfile_module_0(SM),!.
 to_mfa_0(_,PM,_:FA,PM:FA):- is_crossfile_module_0(PM),!.
-to_mfa_0(FM,PM,SM:F/A, SM:F/A):- PM = SM,PM = FM, functor(P,F,A) , (predicate_property(SM:P,thread_local);predicate_property(SM:P,multifile);predicate_property(SM:P,dynamic)),!.
+to_mfa_0(FM,PM,SM:F/A, SM:F/A):- PM = SM,PM = FM, functor(P,F,A) , (predicate_property_safe(SM:P,thread_local);predicate_property_safe(SM:P,multifile);predicate_property_safe(SM:P,dynamic)),!.
 to_mfa_0(FM,PM,SM:FA, FA ):- PM = SM,PM = FM,!.
-to_mfa_0(FM,PM,SM:F/A, SM:F/A):- FM == PM,PM\==SM, functor(P,F,A), predicate_property(SM:P,multifile),!.
+to_mfa_0(FM,PM,SM:F/A, SM:F/A):- FM == PM,PM\==SM, functor(P,F,A), predicate_property_safe(SM:P,multifile),!.
 to_mfa_0(FM,PM,SM:FA, FA):- FM == PM,PM\==SM, !.
 to_mfa_0(_,_,SM:FA,SM:FA):-!.
 
@@ -324,14 +324,14 @@ list_file_preds(S,FM):-
    predsort(functor_compare,List,Set),
    findall(MFA, (member(MP-MFA,Set), \+ helper_name(MFA)),Exports),
    findall(MFA, (member(MP-MFA,Set), helper_name(MFA)),Non_Exports),
-   findall(MFA, (member(MP-MFA,Set),predicate_property(MP,multifile)),Multifile),
+   findall(MFA, (member(MP-MFA,Set),predicate_property_safe(MP,multifile)),Multifile),
    format('~N~n~n% File: ~w ~n',[S]),
-   findall(META,(member(MP-MFA,Set),predicate_property(MP,meta_predicate(META))),MPList),
-   % findall(MFA, (member(MP-MFA,Set),predicate_property(MP,transparent),\+ predicate_property(MP,meta_predicate(_))),Transparent),
-   findall(MFA, (member(MP-MFA,Set),predicate_property(MP,transparent)),Transparent),
-   findall(MFA, (member(MP-MFA,Set),predicate_property(MP,thread_local)),ThreadLocal),
-   findall(MFA, (member(MP-MFA,Set),predicate_property(MP,dynamic),\+ predicate_property(MP,thread_local)),Dynamic),   
-   findall(MFA, (member(MP-MFA,Set),predicate_property(MP,volatile)),Volatile),
+   findall(META,(member(MP-MFA,Set),predicate_property_safe(MP,meta_predicate(META))),MPList),
+   % findall(MFA, (member(MP-MFA,Set),predicate_property_safe(MP,transparent),\+ predicate_property_safe(MP,meta_predicate(_))),Transparent),
+   findall(MFA, (member(MP-MFA,Set),predicate_property_safe(MP,transparent)),Transparent),
+   findall(MFA, (member(MP-MFA,Set),predicate_property_safe(MP,thread_local)),ThreadLocal),
+   findall(MFA, (member(MP-MFA,Set),predicate_property_safe(MP,dynamic),\+ predicate_property_safe(MP,thread_local)),Dynamic),   
+   findall(MFA, (member(MP-MFA,Set),predicate_property_safe(MP,volatile)),Volatile),
    format('~N:- module(~q, [~n',[FM]),   
    list_item_per_line(format('~N  ',[]),8,Exports),
    list_item_per_line(format('~N    ',[]),20,Non_Exports),
@@ -358,8 +358,8 @@ list_file_preds(S,FM):-
 % Module Meta Transparent.
 %
 module_meta_transparent(M:F/A):-must(functor(P,F,A)),!,module_meta_transparent(M:P).
-module_meta_transparent(M:P):-predicate_property(M:P,meta_predicate(_)),!.
-module_meta_transparent(M:P):-predicate_property(M:P,transparent),!.
+module_meta_transparent(M:P):-predicate_property_safe(M:P,meta_predicate(_)),!.
+module_meta_transparent(M:P):-predicate_property_safe(M:P,transparent),!.
 module_meta_transparent(M:P):-functor(P,F,A),module_transparent(M:F/A),!. % ground(P),M:meta_predicate(P),!.
 % module_meta_transparent(M:P):-P=..[_|Args],maplist('='(?),Args),module_meta_transparent(M:P).
 module_meta_transparent(_).
@@ -385,7 +385,7 @@ mpred_source_file(M:P,S):- no_repeats(mpred_source_file_0(M:P,S)).
 % Managed Predicate source file  Primary Helper.
 %
 mpred_source_file_0(M:P,S):- !, source_file(M:P,S). % ,once((to_comparable_name_arity(P,F,A))),nop(assert_if_new(lmconf:sf_known(S,F,A,M))).
-mpred_source_file_0(M:P,S):- current_module(M),predicate_property(M:P,file(S)),\+ predicate_property(M:P,imported_from(_)). % to_comparable_name_arity(P,F,A).
+mpred_source_file_0(M:P,S):- current_module(M),predicate_property_safe(M:P,file(S)),\+ predicate_property_safe(M:P,imported_from(_)). % to_comparable_name_arity(P,F,A).
 mpred_source_file_0(M:P,S):- var(P)-> (lmconf:sf_known(S,F,A,M),functor(P,F,A)) ; (functor(P,F,A),lmconf:sf_known(S,F,A,M)).
 
 % Return the correct M for the F/A
@@ -396,8 +396,8 @@ mpred_source_file_0(M:P,S):- var(P)-> (lmconf:sf_known(S,F,A,M),functor(P,F,A)) 
 %
 % Current Predicate Module-functor-arity.
 %
-current_predicate_mfa(M,F,A):-atom(F),integer(A),!,no_repeats(M:F/A,((functor(P,F,A),current_predicate(_,M:P),\+ predicate_property(M:P,imported_from(_))))).
-current_predicate_mfa(M,F,A):-no_repeats(M:F/A,((current_predicate(_,M:P),functor(P,F,A),\+ predicate_property(M:P,imported_from(_))))).
+current_predicate_mfa(M,F,A):-atom(F),integer(A),!,no_repeats(M:F/A,((functor(P,F,A),current_predicate(_,M:P),\+ predicate_property_safe(M:P,imported_from(_))))).
+current_predicate_mfa(M,F,A):-no_repeats(M:F/A,((current_predicate(_,M:P),functor(P,F,A),\+ predicate_property_safe(M:P,imported_from(_))))).
 
 
 %= 	 	 
@@ -456,7 +456,7 @@ export_file_preds(FileMatch):- forall(must(filematch(FileMatch,File)),
 %
 % Predicate Declare Module.
 %
-predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_property(RM:Pred,imported_from(_)),must(RM\==user).
+predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_property_safe(RM:Pred,imported_from(_)),must(RM\==user).
 
 
 :- style_check(-singleton).
@@ -495,7 +495,7 @@ export_file_preds(NotUser,S,M,P,F,A):- predicate_decl_module(P,RM),RM\==M,!,expo
 export_file_preds(NotUser,S,M,P,F,A):- M:export(M:F/A), fail. % export anyways
 export_file_preds(NotUser,S,M,P,F,A):- M:module_transparent(F/A), fail.
 % export_file_preds(NotUser,S,M,P,F,A):- module_meta_transparent(M:F/A),fail.
-export_file_preds(NotUser,S,M,P,F,A):- must(predicate_property(M:P,transparent)).
+export_file_preds(NotUser,S,M,P,F,A):- must(predicate_property_safe(M:P,transparent)).
 
 :- style_check(+singleton).
 
@@ -606,8 +606,8 @@ w_tl(set_prolog_flag(xref,false),
 %
 autodoc_module(M):- 
     doall((      
-      source_file(M:P,File), \+ predicate_property(M:P,imported_from(_)),
-      ignore(predicate_property(M:P,line_count(Start))),
+      source_file(M:P,File), \+ predicate_property_safe(M:P,imported_from(_)),
+      ignore(predicate_property_safe(M:P,line_count(Start))),
       must((autodoc_stream_data(_,M, File ,Start-_,P,P,_Vs))))).
 
 
@@ -739,8 +739,8 @@ autodoc_stream_pred(FromLine,File,P):-!,get_functor(P,F,A),autodoc_stream_pred(F
 % Autodoc Predicate.
 %
 autodoc_pred(M,M:P0):- t_l:last_predicate_help_shown(M,_,P0),!.
-autodoc_pred(M,M:P0):- once(to_comparable_name_arity(P0,F,A)),functor(P,F,A), M \==baseKB , (predicate_property(baseKB:P,_),
-   \+predicate_property(baseKB:P,imported_from(_))),!.
+autodoc_pred(M,M:P0):- once(to_comparable_name_arity(P0,F,A)),functor(P,F,A), M \==baseKB , (predicate_property_safe(baseKB:P,_),
+   \+predicate_property_safe(baseKB:P,imported_from(_))),!.
 autodoc_pred(M,M:P0):- once(to_comparable_name_arity(P0,F,A)), clause(M:'$pldoc'(F/A, _, S, D),true),S\==D,!.
 autodoc_pred(_,MP):- MP = _:end_of_file, !.
 autodoc_pred(M,M:P0):- 
@@ -867,10 +867,10 @@ attempt_head_varnames_0(NameH):- get_clause_vars(NameH),!.
 % Attempt Head Pred Modes.
 %
 attempt_head_modes(M:ModeH):- clause(M:'$mode'(ModeH, _Det),true),!.
-attempt_head_modes(M:ModeH):- predicate_property(M:ModeH,meta_predicate(ModeH)),!.
-attempt_head_modes(_:ModeH):- predicate_property(_:ModeH,meta_predicate(ModeH)),!.
-attempt_head_modes(M:ModeH):- predicate_property(M:ModeH,number_of_clauses(Nth)),attempt_head_modes_0(Nth,Nth,M:ModeH),!.
-attempt_head_modes(_:ModeH):- predicate_property(M:ModeH,number_of_clauses(Nth)),attempt_head_modes_0(Nth,Nth,M:ModeH),!.
+attempt_head_modes(M:ModeH):- predicate_property_safe(M:ModeH,meta_predicate(ModeH)),!.
+attempt_head_modes(_:ModeH):- predicate_property_safe(_:ModeH,meta_predicate(ModeH)),!.
+attempt_head_modes(M:ModeH):- predicate_property_safe(M:ModeH,number_of_clauses(Nth)),attempt_head_modes_0(Nth,Nth,M:ModeH),!.
+attempt_head_modes(_:ModeH):- predicate_property_safe(M:ModeH,number_of_clauses(Nth)),attempt_head_modes_0(Nth,Nth,M:ModeH),!.
 attempt_head_modes(NotFound):-dmsg(attempt_head_modes(NotFound)),!.
 
 
@@ -1010,8 +1010,8 @@ name_to_mode(P,N,_Name,?):-!.
 %
 % Prefixed Module.
 %
-prefixed_module(_M,MN,P,MN:P):-predicate_property('$attvar':P,number_of_clauses(_)),\+ predicate_property('$attvar':P,imported_from(_)),!.
-prefixed_module(_M,MN,P,MN:P):-predicate_property('system':P,number_of_clauses(_)),\+ predicate_property('system':P,imported_from(_)),!.
+prefixed_module(_M,MN,P,MN:P):-predicate_property_safe('$attvar':P,number_of_clauses(_)),\+ predicate_property_safe('$attvar':P,imported_from(_)),!.
+prefixed_module(_M,MN,P,MN:P):-predicate_property_safe('system':P,number_of_clauses(_)),\+ predicate_property_safe('system':P,imported_from(_)),!.
 prefixed_module(M,M,DocH,DocH):-!.
 prefixed_module(_M,MN,DocH,MN:DocH).
 
@@ -1022,7 +1022,7 @@ prefixed_module(_M,MN,DocH,MN:DocH).
 %
 % System Predicate.
 %
-system_pred(M2:P):-predicate_property(_:P,imported_from(system)),current_predicate(_,M2:P), \+ predicate_property(M2:P,imported_from(_)).
+system_pred(M2:P):-predicate_property_safe(_:P,imported_from(system)),current_predicate(_,M2:P), \+ predicate_property_safe(M2:P,imported_from(_)).
 
 
 

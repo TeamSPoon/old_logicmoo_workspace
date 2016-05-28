@@ -134,8 +134,8 @@
 my_module_sensitive_code(_E):- source_context_module(CM),writeln(source_context_module=CM).
 
 
-% clause_safe(M:H,B):-!,predicate_property(M:H,number_of_clauses(_)),system:clause(H,B).
-% clause_safe(H,B):-predicate_property(_:H,number_of_clauses(_)),system:clause(H,B).
+% clause_safe(M:H,B):-!,predicate_property_safe(M:H,number_of_clauses(_)),system:clause(H,B).
+% clause_safe(H,B):-predicate_property_safe(_:H,number_of_clauses(_)),system:clause(H,B).
 
 %= 	 	 
 
@@ -143,7 +143,7 @@ my_module_sensitive_code(_E):- source_context_module(CM),writeln(source_context_
 %
 % Clause Safely Paying Attention To Corner Cases.
 %
-clause_safe(H,B):-predicate_property(H,number_of_clauses(C)),C>0,system:clause(H,B).
+clause_safe(H,B):-predicate_property_safe(H,number_of_clauses(C)),C>0,system:clause(H,B).
 
 :- meta_predicate if_flag_true(+,:).
 if_flag_true(TF,Goal):-
@@ -606,7 +606,7 @@ modulize_head(MH,M:H):- strip_module(MH,Cm,H),!,
 
 modulize_head_fb(From,H,Fallback,M:H):- 
  cnotrace((findall(M:H,
-  ((no_repeats(M, ((current_modules_from(From,M),current_predicate(_,M:H),\+ predicate_property(M:H,imported_from(_))))))->true;
+  ((no_repeats(M, ((current_modules_from(From,M),current_predicate(_,M:H),\+ predicate_property_safe(M:H,imported_from(_))))))->true;
   M=Fallback),List))),
  member(M:H,List).
 
@@ -742,9 +742,9 @@ clause_true(G):- strip_module(G,M,P),!,
      call(M2:B).
 clause_true(M:G):-!,system:clause(M:G,true)*->true;(current_module(M2),system:clause(M2:G,true)).
 clause_true(G):- !, cnotrace((current_module(M), \+ \+  system:clause(M:G,_,_))),!, system:clause(M:G,true).
-clause_true(M:G):-predicate_property(M:G,number_of_clauses(_)),!,system:clause(M:G,true).
-clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).
-clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).
+clause_true(M:G):-predicate_property_safe(M:G,number_of_clauses(_)),!,system:clause(M:G,true).
+clause_true(_:G):-!,predicate_property_safe(M:G,number_of_clauses(_)),system:clause(M:G,true).
+clause_true(G):-!,predicate_property_safe(M:G,number_of_clauses(_)),system:clause(M:G,true).
 
 :-export(retract_eq/1).
 

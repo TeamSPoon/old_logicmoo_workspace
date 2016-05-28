@@ -203,8 +203,8 @@ match_predicates(MSpec,MatchesO):- catch('$dwim':'$find_predicate'(MSpec,Matches
 match_predicates(_:[],_M,_P,_F,_A):-!,fail.
 match_predicates(IM:(ASpec,BSpec),M,P,F,A):-!, (match_predicates(IM:(ASpec),M,P,F,A);match_predicates(IM:(BSpec),M,P,F,A)).
 match_predicates(IM:[ASpec|BSpec],M,P,F,A):-!, (match_predicates(IM:(ASpec),M,P,F,A);match_predicates(IM:(BSpec),M,P,F,A)).
-match_predicates(IM:IF/IA,M,P,F,A):- '$find_predicate'(IM:P,Matches),member(CM:F/A,Matches),functor(P,F,A),(predicate_property(CM:P,imported_from(M))->true;CM=M),IF=F,IA=A.
-match_predicates(Spec,M,P,F,A):- '$find_predicate'(Spec,Matches),member(CM:F/A,Matches),functor(P,F,A),(predicate_property(CM:P,imported_from(M))->true;CM=M).
+match_predicates(IM:IF/IA,M,P,F,A):- '$find_predicate'(IM:P,Matches),member(CM:F/A,Matches),functor(P,F,A),(predicate_property_safe(CM:P,imported_from(M))->true;CM=M),IF=F,IA=A.
+match_predicates(Spec,M,P,F,A):- '$find_predicate'(Spec,Matches),member(CM:F/A,Matches),functor(P,F,A),(predicate_property_safe(CM:P,imported_from(M))->true;CM=M).
 
 :- module_transparent(if_may_hide/1).
 % = :- meta_predicate(if_may_hide(0)).
@@ -227,7 +227,7 @@ if_may_hide(G):-G.
 % Using Unlocked Predicate.
 %
 with_unlocked_pred(Pred,Goal):-
-   (predicate_property(Pred,foreign)-> true ;
+   (predicate_property_safe(Pred,foreign)-> true ;
   (
  ('$get_predicate_attribute'(Pred, system, 0) -> Goal ;
  ('$set_predicate_attribute'(Pred, system, 0),
@@ -758,7 +758,7 @@ snumbervars(Term,Start,End,List):-numbervars(Term,Start,End,List).
 %
 % Module Predicate.
 %
-module_predicate(ModuleName,P,F,A):-current_predicate(ModuleName:F/A),functor_catch(P,F,A), not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
+module_predicate(ModuleName,P,F,A):-current_predicate(ModuleName:F/A),functor_catch(P,F,A), not((( predicate_property_safe(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
 
 
 :- export((user_ensure_loaded/1)).
@@ -819,7 +819,7 @@ export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
 % Module Predicate.
 %
 module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor_safe(P,F,A),
-   not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
+   not((( predicate_property_safe(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
 
 :- module_transparent(module_predicates_are_exported/0).
 :- module_transparent(module_predicates_are_exported/1).
@@ -907,8 +907,8 @@ arg_is_transparent(Arg):- number(Arg).
 module_meta_predicates_are_transparent(_):-!.
 module_meta_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
-      ignore(((predicate_property(ModuleName:P,(meta_predicate( P ))),
-            not(predicate_property(ModuleName:P,(transparent))), (compound(P),arg(_,P,Arg),arg_is_transparent(Arg))),
+      ignore(((predicate_property_safe(ModuleName:P,(meta_predicate( P ))),
+            not(predicate_property_safe(ModuleName:P,(transparent))), (compound(P),arg(_,P,Arg),arg_is_transparent(Arg))),
                    (nop(dmsg(todo(module_transparent(ModuleName:F/A)))),
                    (module_transparent(ModuleName:F/A)))))).
 
@@ -924,7 +924,7 @@ module_meta_predicates_are_transparent(ModuleName):-
 all_module_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
       ignore((
-            not(predicate_property(ModuleName:P,(transparent))),
+            not(predicate_property_safe(ModuleName:P,(transparent))),
                    ( nop(dmsg(todo(module_transparent(ModuleName:F/A))))),
                    (module_transparent(ModuleName:F/A))))).
 
@@ -939,7 +939,7 @@ quiet_all_module_predicates_are_transparent(_):-!.
 quiet_all_module_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
       ignore((
-            not(predicate_property(ModuleName:P,(transparent))),
+            not(predicate_property_safe(ModuleName:P,(transparent))),
                    nop(dmsg(todo(module_transparent(ModuleName:F/A)))),
                    (module_transparent(ModuleName:F/A))))).
 

@@ -1142,8 +1142,8 @@ disable_mpred_expansion:- (( t_l:disable_px) -> true ;
 predicate_is_undefined_fa(F,A):-
   \+ current_predicate(_:F/A),
   functor(P,F,A),
-  \+ predicate_property(_:P,exported),
-  \+ predicate_property(_:P,static).
+  \+ predicate_property_safe(_:P,exported),
+  \+ predicate_property_safe(_:P,static).
 
 
 :-multifile(lmconf:locked_baseKB/0).
@@ -1561,9 +1561,9 @@ mpred_term_expansion(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
 %
 % Can Be Dynamic.
 %
-can_be_dynamic(H):- predicate_property(H,dynamic),!.
-can_be_dynamic( \+ H):- nonvar(H), predicate_property(H,dynamic),!.
-can_be_dynamic(H):- \+ is_static_pred(H), \+ predicate_property(H,static),  \+ predicate_property(H,meta_predicate(_)).
+can_be_dynamic(H):- predicate_property_safe(H,dynamic),!.
+can_be_dynamic( \+ H):- nonvar(H), predicate_property_safe(H,dynamic),!.
+can_be_dynamic(H):- \+ is_static_pred(H), \+ predicate_property_safe(H,static),  \+ predicate_property_safe(H,meta_predicate(_)).
 
 
 
@@ -1626,10 +1626,10 @@ make_dynamic_ilc(C):- compound(C),strip_module(C,MIn,_),get_functor(C,F,A),quiet
   (\+ a(mtCycL,MIn) -> must(defaultAssertMt(M)) ; MIn =M),
   functor(P,F,A),
 
-  ( \+predicate_property(M:P,_) -> kb_dynamic(M:F/A) ; 
-    (predicate_property(M:P,dynamic)->true;dynamic_safe(M:P))),!,
+  ( \+predicate_property_safe(M:P,_) -> kb_dynamic(M:F/A) ; 
+    (predicate_property_safe(M:P,dynamic)->true;dynamic_safe(M:P))),!,
   kb_dynamic(M:F/A),
-  quietly_must((predicate_property(M:P,dynamic))).
+  quietly_must((predicate_property_safe(M:P,dynamic))).
 
 % once(lmconf:mpred_is_impl_file(F);asserta(lmconf:mpred_is_impl_file(F))).
 
@@ -1641,7 +1641,7 @@ make_dynamic_ilc(C):- compound(C),strip_module(C,MIn,_),get_functor(C,F,A),quiet
 
 % :-set_prolog_flag(allow_variable_name_as_functor,true).
 
-% :- source_location(S,_),forall(loading_source_file(H,S),ignore(( \+predicate_property(M:H,built_in), functor(H,F,A),M:module_transparent(F/A),M:export(F/A)))).
+% :- source_location(S,_),forall(loading_source_file(H,S),ignore(( \+predicate_property_safe(M:H,built_in), functor(H,F,A),M:module_transparent(F/A),M:export(F/A)))).
 
 
 

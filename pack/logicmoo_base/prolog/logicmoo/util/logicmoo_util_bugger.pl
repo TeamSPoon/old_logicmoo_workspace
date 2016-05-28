@@ -1533,10 +1533,10 @@ functor_source_file0(M,P,F,A,File):-current_predicate(F/A),functor_safe(P,F,A),s
 % Predicate Module.
 %
 predicate_module(P,M):- var(P),!,trace_or_throw(var_predicate_module(P,M)).
-predicate_module(P,M):- predicate_property(P,imported_from(M)),!.
-predicate_module(F/A,M):- atom(F),integer(A),functor(P,F,A),P\==F/A,predicate_property(P,imported_from(M)),!.
-predicate_module(Ctx:P,M):- Ctx:predicate_property(P,imported_from(M)),!.
-predicate_module(Ctx:F/A,M):- Ctx:((atom(F),integer(A),functor(P,F,A),P\==F/A,predicate_property(P,imported_from(M)))),!.
+predicate_module(P,M):- predicate_property_safe(P,imported_from(M)),!.
+predicate_module(F/A,M):- atom(F),integer(A),functor(P,F,A),P\==F/A,predicate_property_safe(P,imported_from(M)),!.
+predicate_module(Ctx:P,M):- Ctx:predicate_property_safe(P,imported_from(M)),!.
+predicate_module(Ctx:F/A,M):- Ctx:((atom(F),integer(A),functor(P,F,A),P\==F/A,predicate_property_safe(P,imported_from(M)))),!.
 predicate_module(M:_,M):-!. %strip_module(P,M,_F),!.
 predicate_module(_P,user):-!. %strip_module(P,M,_F),!.
 % predicate_module(P,M):- strip_module(P,M,_F),!.
@@ -1598,7 +1598,7 @@ tryHide(MFA):- tryCatchIgnore(mpred_trace_less(MFA)).
 % hide  Trace Module Functor a.
 %
 hideTraceMFA(_,M:F,A,T):-!,hideTraceMFA(M,F,A,T),!.
-hideTraceMFA(M,F,A,T):-nonvar(A),functor_safe(P,F,A),predicate_property(P,imported_from(IM)),IM \== M,!,nop(dmsg(doHideTrace(IM,F,A,T))),hideTraceMFA(IM,F,A,T),!.
+hideTraceMFA(M,F,A,T):-nonvar(A),functor_safe(P,F,A),predicate_property_safe(P,imported_from(IM)),IM \== M,!,nop(dmsg(doHideTrace(IM,F,A,T))),hideTraceMFA(IM,F,A,T),!.
 hideTraceMFA(M,F,A,T):-hideTraceMFAT(M,F,A,T),!.
 
 
@@ -1740,7 +1740,7 @@ traceAll:- current_predicate(F/N),
   functor_safe(P,F,N),
   local_predicate(P,F/N),
   trace(F/N, +fail),fail.
-traceAll:- not((predicate_property(clearCateStack/1,_))),!.
+traceAll:- not((predicate_property_safe(clearCateStack/1,_))),!.
 traceAll:-findall(_,(member(F,[member/2,dmsg/1,takeout/3,findall/3,clearCateStack/1]),trace(F, -all)),_).
 */
 
@@ -1930,7 +1930,7 @@ on_f_log_ignore(Goal):-ignore(logOnFailure0(on_x_log_throw(Goal))).
 %
 beenCaught(must(Goal)):- !, beenCaught(Goal).
 beenCaught((A,B)):- !,beenCaught(A),beenCaught(B).
-beenCaught(Goal):- fail, predicate_property(Goal,number_of_clauses(_Count)), clause(Goal,(_A,_B)),!,clause(Goal,Body),beenCaught(Body).
+beenCaught(Goal):- fail, predicate_property_safe(Goal,number_of_clauses(_Count)), clause(Goal,(_A,_B)),!,clause(Goal,Body),beenCaught(Body).
 beenCaught(Goal):- catchv(once(Goal),E,(dmsg(caugth(Goal,E)),beenCaught(Goal))),!.
 beenCaught(Goal):- traceAll,dmsg(tracing(Goal)),debug,trace,Goal.
 
@@ -1974,8 +1974,8 @@ kill_term_expansion:-
 local_predicate(_,_/0):-!,fail.
 local_predicate(_,_/N):-N>7,!,fail.
 local_predicate(P,_):-real_builtin_predicate(P),!,fail.
-local_predicate(P,_):-predicate_property(P,imported_from(_)),!,fail.
-%local_predicate(P,_):-predicate_property(P,file(F)),!,atom_contains666(F,'aiml_'),!.
+local_predicate(P,_):-predicate_property_safe(P,imported_from(_)),!,fail.
+%local_predicate(P,_):-predicate_property_safe(P,file(F)),!,atom_contains666(F,'aiml_'),!.
 local_predicate(P,F/N):-functor_safe(P,F,N),!,fail.
 
 
@@ -1997,13 +1997,13 @@ atom_contains666(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 %
 % Real Builtin Predicate.
 %
-real_builtin_predicate(G):- predicate_property(G,foreign),!.
-real_builtin_predicate(G):- \+ predicate_property(G,defined),!,fail.
-%real_builtin_predicate(G):- predicate_property(G,imported_from(W))-> W==system,!.
-%real_builtin_predicate(G):- strip_module(G,_,GS),predicate_property(system:GS,BI),BI==built_in,!.
+real_builtin_predicate(G):- predicate_property_safe(G,foreign),!.
+real_builtin_predicate(G):- \+ predicate_property_safe(G,defined),!,fail.
+%real_builtin_predicate(G):- predicate_property_safe(G,imported_from(W))-> W==system,!.
+%real_builtin_predicate(G):- strip_module(G,_,GS),predicate_property_safe(system:GS,BI),BI==built_in,!.
 real_builtin_predicate(G):- 
-   predicate_property(G,BI),BI==built_in,
-   \+ predicate_property(G,dynamic),
+   predicate_property_safe(G,BI),BI==built_in,
+   \+ predicate_property_safe(G,dynamic),
    functor(G,F,_),!,
    (if_defined(defaultTBoxMt(M),fail),
    (if_defined(M:mpred_isa(F,prologHybrid),fail);
@@ -2160,7 +2160,7 @@ prolog_ecall_fa(_,_,F,A,Call):-
 prolog_ecall_fa(BDepth,Wrapper,F,A,Call):-
   (on_prolog_ecall(F,A,each,true);BDepth>0),!,
   BDepth1 is BDepth-1,
-  predicate_property(Call,number_of_clauses(_Count)),
+  predicate_property_safe(Call,number_of_clauses(_Count)),
   % any with bodies
   clause(Call,NT),NT \== true,!,
   clause(Call,Body),
@@ -2276,8 +2276,8 @@ is_deterministic(nonvar(_)).
 is_deterministic(not(_)).
 is_deterministic(once(_)).
 is_deterministic(var(_)).
-%is_deterministic(Call):-predicate_property(Call,nodebug),!.
-%is_deterministic(Call):-predicate_property(Call,foreign),!.
+%is_deterministic(Call):-predicate_property_safe(Call,nodebug),!.
+%is_deterministic(Call):-predicate_property_safe(Call,foreign),!.
 
 
 
@@ -2319,7 +2319,7 @@ prolog_must_not(_Call):-!.
 printPredCount(Msg,Pred,N1):- compound(Pred), debugOnFailureEach((arg(_,Pred,NG))),nonvar(NG),!,
   findall(Pred,Pred,LEFTOVERS),length(LEFTOVERS,N1),dmsg(num_clauses(Msg,Pred,N1)),!.
 
-printPredCount(Msg,Pred,N1):-!,functor_safe(Pred,File,A),functor_safe(FA,File,A), predicate_property(FA,number_of_clauses(N1)),dmsg(num_clauses(Msg,File/A,N1)),!.
+printPredCount(Msg,Pred,N1):-!,functor_safe(Pred,File,A),functor_safe(FA,File,A), predicate_property_safe(FA,number_of_clauses(N1)),dmsg(num_clauses(Msg,File/A,N1)),!.
 
 
 
@@ -2480,7 +2480,7 @@ caller_module(Module,Skipped):- module_stack(Module,_), \+ arg(_,Skipped,Module)
 %
 module_stack(M,prolog_load_context):- prolog_load_context(module, M).
 module_stack(M,'$current_typein_module'):- '$current_typein_module'(M).
-module_stack(M,of):- predicate_property(M:of(_,_),imported_from(func)).
+module_stack(M,of):- predicate_property_safe(M:of(_,_),imported_from(func)).
 module_stack(M,frame):- prolog_current_frames(Each), prolog_frame_attribute(Each,context_module,M).
 
 
@@ -2680,7 +2680,7 @@ traceIf(Call):-ignore((Call,trace)).
 %
 % Module Ho Trace.
 %
-module_hotrace(M):- forall(predicate_property(P,imported_from(M)),mpred_trace_nochilds(M:P)).
+module_hotrace(M):- forall(predicate_property_safe(P,imported_from(M)),mpred_trace_nochilds(M:P)).
 
 
 

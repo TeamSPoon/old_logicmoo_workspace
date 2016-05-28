@@ -421,7 +421,7 @@ ensure_imports_tbox(M,TBox):-
    ignore(maybe_delete_import_module(M,TBox)),
    ignore(maybe_delete_import_module(TBox,M)),
    forall((user:current_predicate(_,TBox:P),
-      \+ predicate_property(TBox:P,imported_from(_))),
+      \+ predicate_property_safe(TBox:P,imported_from(_))),
       add_import_predicate(M,P,TBox)),
    inherit_into_module(M,user),
    skip_user(M),
@@ -472,6 +472,8 @@ correct_module(M,G,T):-functor(G,F,A),quietly_must(correct_module(M,G,F,A,T)),!.
 correct_module(abox,G,F,A,T):- !, defaultAssertMt(M),correct_module(M,G,F,A,T).
 correct_module(tbox,G,F,A,T):- !, get_current_default_tbox(M),correct_module(M,G,F,A,T).
 correct_module(user,G,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,G,F,A,T).
+
+correct_module(HintMt,Goal,F,A,OtherMt):-var(Goal),functor(Goal,F,A),!,correct_module(HintMt,Goal,F,A,OtherMt).
 correct_module(HintMt,Goal,_,_,OtherMt):- predicate_property_safe(HintMt:Goal,imported_from(OtherMt)).
 correct_module(_,Goal,_,_,OtherMt):- predicate_property_safe(Goal,imported_from(OtherMt)).
 correct_module(HintMt,_,_,_,HintMt):- call_u(mtExact(HintMt)).

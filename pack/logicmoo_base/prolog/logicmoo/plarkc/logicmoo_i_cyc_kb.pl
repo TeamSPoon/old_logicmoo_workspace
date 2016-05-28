@@ -403,7 +403,7 @@ ltkb1:-
       told,
       retractall(tinyKB0(comment(_,_))))).
 
-ltkb2:- doall((filematch(logicmoo('plarkc/mpred_cyc_kb_tinykb.pl'),F),must(source_file(X,F)),predicate_property(X,dynamic),retract(X:-_))).
+ltkb2:- doall((filematch(logicmoo('plarkc/mpred_cyc_kb_tinykb.pl'),F),must(source_file(X,F)),predicate_property_safe(X,dynamic),retract(X:-_))).
 
 
 mpred_prepend_type(X,_):- \+ atom(X),!,fail.

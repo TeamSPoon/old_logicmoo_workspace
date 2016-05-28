@@ -867,7 +867,7 @@ bookeepingPredicateXRef(_:G):-member(F/A,[xref_defined/3,xref_called/3,xref_expo
 % Predicate Uses Call.
 %
 predicateUsesCall(_:G):-
-  member(F/A,[module_property/2,predicate_property/2,pengine_property/2,current_pengine_application/1,source_file_property/2,
+  member(F/A,[module_property/2,predicate_property_safe/2,pengine_property/2,current_pengine_application/1,source_file_property/2,
             source_file/2,current_prolog_flag/2,current_op/3]),functor(G,F,A).
 
 

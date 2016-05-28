@@ -48,7 +48,7 @@ end_of_file.
 :- meta_predicate(dshow_all(0)).
 dshow_all(G):-forall( G,(writeq(G),nl)).
 
-% :- dshow_all(predicate_property(ffooo,_)).
+% :- dshow_all(predicate_property_safe(ffooo,_)).
 
 
 % Simpler example than example12.pl, but the number of predicates involved in mutual recursion will also increase at runtime.
