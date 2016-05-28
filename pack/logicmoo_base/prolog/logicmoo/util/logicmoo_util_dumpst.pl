@@ -493,6 +493,7 @@ dtrace:- wdmsg("DUMP_TRACE_BREAK/0"), dtrace(system:break).
 % (debug) Trace.
 %
 
+dtrace(G):- strip_module(G,_,break),\+ thread_self(main),!.
 dtrace(G):- tlbugger:has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
 dtrace(G):- cnotrace((tracing,cnotrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(cnotrace,restore_trace((leash(+all),dumptrace(G))),trace).
 

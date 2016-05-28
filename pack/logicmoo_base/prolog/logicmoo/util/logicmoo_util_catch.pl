@@ -1475,16 +1475,15 @@ is_recompile:-fail.
 
 % sanity is used for type checking (is not required)
 % sanity(Goal):-!.
-%% sanity( :GoalGoal) is semidet.
+%% sanity( :GoalGoal) is det.
 %
 % Optional Sanity Checking.
 %
 sanity(P):- hotrace((\+ is_recompile,is_release,!,nop(P))).
 sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(sanity,Goal)).
-sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
-sanity(Goal):- quietly(Goal)*->true;
-  ((ignore(setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),
-    rtrace(Goal),wdmsg(end_FAIL_in(Goal)))),!,break)).
+sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
+sanity(Goal):- quietly(Goal),!.
+sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:break).
 
 compare_results(N+NVs,O+OVs):-
    NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).

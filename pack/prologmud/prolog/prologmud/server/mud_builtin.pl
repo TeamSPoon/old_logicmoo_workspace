@@ -515,16 +515,17 @@ meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
 meta_argtypes(apathFn(tRegion,vtDirection)).
 meta_argtypes(xyzFn(tRegion,ftInt,ftInt,ftInt)).
 
-:- set_prolog_flag(assert_attvars,true).
+% :- set_prolog_flag(assert_attvars,true).
 
 tCol(ttTypeByAction).
 genls(ttTypeByAction,tCol).
-(isa(X,ttTypeByAction) ==> isa(X,tCol)).
 
+:-w_tl(set_prolog_flag(assert_attvars,true),
+ ain(((isa(X,ttTypeByAction) ==> isa(X,tCol))))).
 
 % (isa(Inst,Type),isa(Type,ttTypeByAction)) ==> isa(Inst,tHasAction).
 
-genls(A,B)==>tCol(A),tCol(B).
+genls(A,B)/ground(genls(A,B))==>tCol(A),tCol(B).
 
 genls(tAgent,tObj).
 genls(tAgent,tSpatialThing).

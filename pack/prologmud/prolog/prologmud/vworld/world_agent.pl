@@ -169,15 +169,6 @@ send_command_completed_message(Agent,Where,Done,CMD):-
                 raise_location_event(Where,actNotice(reciever,Message)),flush_output]))),!.
 
 
-correctCommand_0(Who,CMD,OUT):-
-   compound(CMD),
-   must(current_agent(Who)),
-   CMD=..[F|ARGS],   
-   functor(CMD,F,A),
-   functor(MATCH,F,A),!,
-   vtActionTemplate(MATCH),compound(MATCH),MATCH=..[F|TYPES],
-   correctEachTypeOrFail(Who,F,query(t, must),ARGS,TYPES,NEWS),!,
-   OUT=..[F|NEWS],!.
 
 correctCommand(_,CMD,CMD):-!.
 correctCommand(Who,CMD,OUT):-compound(CMD),show_failure(correctCommand_0(Who,CMD,OUT)),!.
@@ -190,6 +181,15 @@ correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)), show_f
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- (coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- !,acceptableArg(Arg,Type),!,Inst = Arg.
 
+correctCommand_0(Who,CMD,OUT):-
+   compound(CMD),
+   must(current_agent(Who)),
+   CMD=..[F|ARGS],   
+   functor(CMD,F,A),
+   functor(MATCH,F,A),!,
+   vtActionTemplate(MATCH),compound(MATCH),MATCH=..[F|TYPES],
+   correctEachTypeOrFail(Who,F,query(t, must),ARGS,TYPES,NEWS),!,
+   OUT=..[F|NEWS],!.
 
 acceptableArg(Arg,Type):-dmsg(acceptableArg(Arg,Type)).
 
@@ -336,3 +336,6 @@ display_stats(Agents) :-
 		  write('Dam= ' ), write(Dam), write('  '),
 		  write('Score = '), write(Scr), nl,
 		  write('Inventory = '), write(Inv), nl)).
+
+:- all_source_file_predicates_are_transparent.
+

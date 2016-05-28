@@ -492,10 +492,11 @@ download_and_install_el:-
 
 % :- asserta(lmcache:loaded_external_kbs(mud)),show_call(kbp_to_mpred_t).
 
-:- system:ensure_loaded(prologmud(vworld/world_agent)).
-:- system:ensure_loaded(prologmud(parsing/parser_imperative)).
-:- system:ensure_loaded(prologmud(parsing/simple_decl_parser)). 
+:- baseKB:ensure_loaded(prologmud(vworld/world_agent)).
+:- ensure_loaded(prologmud(parsing/parser_imperative)).
+:- ensure_loaded(prologmud(parsing/simple_decl_parser)). 
 :- system:ensure_loaded(prologmud(vworld/world)).
+:- dynamic(baseKB:mudStowing/2).
 
 /*
 :- system:ensure_loaded(logicmoo(parsing/parser_talk)). 
@@ -512,19 +513,19 @@ download_and_install_el:-
 
 % NPC planners
 :- include_mpred_files(prologmud(mobs/'?*.pl')).
-:- include_mpred_files('../src_assets/mobs/?*.pl').
+:- exists_directory('../src_assets/mobs/')->include_mpred_files('../src_assets/mobs/?*.pl');true.
 % :- xperimental->include_mpred_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
 
 :-wdmsg(loading_actions).
 
 % Action/Commands implementation
 :- include_mpred_files(prologmud(actions/'?*.pl')).
-:- include_mpred_files('../src_assets/actions/?*.pl').
+:- exists_directory('../src_assets/actions/')->include_mpred_files('../src_assets/actions/?*.pl');true.
 % :- xperimental->include_mpred_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 % New Objects
 :- include_mpred_files(prologmud(objs/'?*.pl')).
-:- include_mpred_files('../src_assets/objs/?*.pl').
+:- exists_directory('../src_assets/objs/')->include_mpred_files('../src_assets/objs/?*.pl');true.
 % :- xperimental->include_mpred_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 
@@ -551,7 +552,7 @@ download_and_install_el:-
 %:-forall(make_tabled_perm(grab_argsIsa(F,Types)),dmsg(grab_argsIsa(F,Types))).
 
 
-:- show_entry(ensure_mpred_file_loaded(prologmud(server/builtin))).
+% :- show_entry(ensure_mpred_file_loaded(prologmud(server/builtin))).
 % :- must(rescan_pfc).
 :- show_entry(forall(filematch('*/*.plmoo', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X)))).
 
@@ -566,7 +567,7 @@ download_and_install_el:-
 :- show_entry(forall(filematch(prologmud('*/?*.plmoo'), X),dmsg(X))).
 :- show_entry(ensure_mpred_file_loaded(prologmud('*/?*.plmoo'))).
 :- show_entry(forall(filematch(prologmud('*/*/?*.plmoo'), X),dmsg(X))).
-:- show_entry(ensure_mpred_file_loaded(prologmud('*/*/?*.plmoo'))).
+%:- show_entry(ensure_mpred_file_loaded(prologmud('*/*/?*.plmoo'))).
 
 % puts world into running state
 % :- must(old_setup).
@@ -635,3 +636,4 @@ lundef :- A = [],
 %:-mred_untrace.
 %:-mred_no_spy_all.
 
+:- set_prolog_flag(assert_attvars,true).

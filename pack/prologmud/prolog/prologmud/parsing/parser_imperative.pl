@@ -19,6 +19,8 @@
                    objects_match/3,
                    match_object/2,
                    object_string/2,
+                   save_fmt_a_0/2,
+                   save_fmt_a/2,
                    coerce/3,
                    parseIsa//2,
                    phrase_parseForTypes_9//2,
@@ -180,7 +182,7 @@ save_fmt_a_0(O,t(E,_)):-!,save_fmt_a(O,E).
 save_fmt_a_0(O,E):-compound(O),arg(1,O,E),!,save_fmt_a(O,E).
 save_fmt_a_0(_,A):-atom_length(A,L),L =< 1.
 save_fmt_a_0(_,A):-vtSkippedPrintNames(A),!.
-save_fmt_a_0(O,E):-to_case_breaks(E,List),maplist(save_fmt_a(O),List).
+save_fmt_a_0(O,E):-to_case_breaks(E,List),must_maplist(save_fmt_a(O),List).
 
 
 object_name_is_descriptive(O):- (isa(O,tCol);isa(O,tPred);t(functorDeclares,O);isa(O,ttValueType),isa(O,name_is_descriptive)).
@@ -656,6 +658,7 @@ longest_string(Order,TStr1,TStr2):-
 */
 
 :- include(prologmud(mud_footer)).
+:- all_source_file_predicates_are_transparent.
 
 end_of_file.
 

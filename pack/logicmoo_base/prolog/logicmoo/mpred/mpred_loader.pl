@@ -143,6 +143,7 @@
             must_compile_special_clause/1,
             expand_term_to_load_calls/2,
             must_locate_file/2,
+            maybe_locate_file/2,
             myDebugOnError/1,
             onEndOfFile/1,
             op_alias/2,
@@ -629,7 +630,7 @@ term_expand_local_each(CM,X,F,A,X):-lmconf:registered_module_type(CM,dynamic),dy
 % Include Managed Predicate Files.
 %
 include_mpred_files(Mask):- 
-     forall(must_locate_file(Mask,E),ensure_mpred_file_loaded(E)).
+     forall(maybe_locate_file(Mask,E),ensure_mpred_file_loaded(E)).
 /*
 module(M,Preds):-
     'format'(user_output /*e*/,'% visting module ~w.~n',[M]),
@@ -1930,6 +1931,9 @@ ensure_mpred_file_loaded(World,FileIn):-
 must_locate_file(FileIn,File):-
   quietly_must(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File)).
 
+maybe_locate_file(FileIn,File):-
+  quietly(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File)).
+
 
 
 
@@ -1959,7 +1963,8 @@ force_reload_mpred_file(World,MFileIn):-
 %
 % Helper for Force Reloading of a Managed Predicate File.
 %
-force_reload_mpred_file2(World,MFileIn):- 
+force_reload_mpred_file2(WorldIn,MFileIn):- 
+ must(call_u(mtCycL(WorldIn)->World=WorldIn;defaultAssertMt(World))),
  strip_module(MFileIn,_MaybeNewModule,_),
  NewModule = World,
  with_source_module(NewModule,((
