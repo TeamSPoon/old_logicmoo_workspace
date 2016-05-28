@@ -311,13 +311,13 @@ onSpawn_0(_Modality,ClassFact):- ClassFact=..[FunctArgType,Name],modality(FunctA
  onSpawn_0(FunctArgType,Name).
    
 onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,Name],
- tCol(FunctArgType),
+ call_u(tCol(FunctArgType)),
  createByNameMangle(Name,Inst,TypeA),
- assert_isa(TypeA,tCol),
+ call_u((assert_isa(TypeA,tCol),
  assert_isa(Inst,FunctArgType),
- assert_isa(Inst,TypeA),
+ assert_isa(Inst,TypeA))),
  fully_expand(clause(assert,onSpawn),t(Modality,genls(TypeA,FunctArgType)),TO),
- ain(TO),!.
+ call_u(ain(TO)),!.
 
 onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
   must_det(onSpawn_f_args(Modality,Funct,InstADeclB)).
@@ -330,10 +330,10 @@ onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
 % Whenever Spawn Functor Arguments.
 %
 onSpawn_f_args(Modality,Funct,List):-
-  must(convertSpawnArgs(Funct,1,List,NewList)),
+  call_u(must(convertSpawnArgs(Funct,1,List,NewList))),
    Later =.. [Funct|NewList],
    fully_expand(clause(assert,onSpawn),t(Modality,Later),TO),
-   ain(TO),!. 
+   call_u(ain(TO)),!. 
   % call_after_mpred_load_slow(w_tl(deduceArgTypes(Funct), ain(Later))))),!.
 
 
@@ -382,10 +382,10 @@ spawnOneSpawnArg(Funct,N,Name,Inst):-
 %
 convertToInstance(Name,FunctArgType,Inst):- call_u(isa(Name,FunctArgType)),!,Inst=Name.
 convertToInstance(Name,COLTHING,TypeA):- a(ttTypeType,COLTHING),createByNameMangle(Name,_,TypeA),assert_isa(TypeA,COLTHING).
-convertToInstance(Name,COLTHING,TypeA):- genls(COLTHING,tCol),createByNameMangle(Name,_,TypeA),assert_isa(TypeA,COLTHING).
+convertToInstance(Name,COLTHING,TypeA):- call_u(genls(COLTHING,tCol)),createByNameMangle(Name,_,TypeA),assert_isa(TypeA,COLTHING).
 convertToInstance(Name,FunctArgType,Inst):- createByNameMangle(Name,Inst,TypeA),
   %  assert_isa(Inst,FunctArgType),
-    ain(genls(TypeA,FunctArgType)),!.
+    call_u(ain(genls(TypeA,FunctArgType))),!.
 
 
 mpred_type_naming_file.
