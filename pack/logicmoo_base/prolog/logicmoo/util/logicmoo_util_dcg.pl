@@ -16,6 +16,7 @@
          isVarOrVAR/1,
 
 
+         dcgOneOrMore//1,
          dcgOptional//1,
          dcgOptionalGreedy//1,
          dcgAnd//2,
@@ -23,6 +24,7 @@
          dcgAnd//4,
          dcgMust//1,
          dumpList/1,
+         dcgSeqLen//1,
          dcgOr//2,
          dcgNot//1,
          theString//1,
@@ -99,7 +101,7 @@
 
 isVarOrVAR(V):-var(V),!.
 isVarOrVAR('$VAR'(_)).
-isVar(V):-isVarOrVAR(V);isQVar(V).
+isVar(V):- (isVarOrVAR(V);isQVar(V)),!.
 isQVar(Cvar):-atom(Cvar),atom_concat('?',_,Cvar).
 
 :- dynamic 
@@ -378,6 +380,8 @@ dumpList(_,[]):-!.
 :- retract(double_quotes_was_in_dcg(WAS)),set_prolog_flag(double_quotes,WAS).
 :- endif.
 
+:- all_source_file_predicates_are_transparent.
+
 end_of_file.
 
 sentenceTagger(English,Tagged).
@@ -391,6 +395,7 @@ testPhrase(Dcg,English):-
          phrase(Dcg,Tagged,Left),
          nl,nl,writeq(left),         
          nl,dumpList(Left).
+
 
 
 

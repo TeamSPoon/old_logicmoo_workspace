@@ -297,7 +297,7 @@ mpred_facts_and_universe/1
 
  :- meta_predicate mpred_get_support_one(0,*).
  :- meta_predicate mpred_get_support_precanonical_plus_more(0,*).
- :- meta_predicate '__aux_maplist/2_cnstrn0+1'(*,0).
+ % :- meta_predicate '__aux_maplist/2_cnstrn0+1'(*,0).
  :- meta_predicate repropagate_1(0).
  :- meta_predicate trigger_supporters_list(0,*).
  :- meta_predicate repropagate_meta_wrapper_rule(0).

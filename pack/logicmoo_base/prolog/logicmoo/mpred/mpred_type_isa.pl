@@ -677,9 +677,10 @@ not_mud_isa(I,C):-loop_check(not_mud_isa(I,C,_)).
 %
 % not Application  (isa/2).
 %
-not_mud_isa(F, CAC,Why):- cheaply_u(completelyAssertedCollection(CAC)),!,atom(CAC),current_predicate(_:CAC/1),G=..[CAC,F],\+((G)),!,Why=completelyAssertedCollection(CAC).
+not_mud_isa(F, CAC,Why):- baseKB:( cheaply_u(completelyAssertedCollection(CAC)),!,atom(CAC),current_predicate(_:CAC/1),
+   G=..[CAC,F],\+(call_u(G)),!,Why=completelyAssertedCollection(CAC)).
 not_mud_isa(I,C,Why):-not_mud_isa0(I,C),Why=not_mud_isa0(I,C).
-not_mud_isa(G,tTemporalThing,Why):- ((a(tCol,G),Why=a(tCol,G));(tPred(G),Why=tPred(G))).
+not_mud_isa(G,tTemporalThing,Why):- baseKB:call_u((a(tCol,G),Why=a(tCol,G));(tPred(G),Why=tPred(G))).
 not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 
 
@@ -905,7 +906,9 @@ dont_call_type_arity_one(F):-a(prologHybrid,F),!.
 %
 %  (isa/2) atom call.
 %
-isa_atom_call(T,G):-loop_check(isa_atom_call_ilc(T,G)).
+isa_atom_call(T,G):-
+   w_tl(set_prolog_flag(retry_undefined,false),
+   loop_check(isa_atom_call_ilc(T,G))).
 
 
 %= 	 	 

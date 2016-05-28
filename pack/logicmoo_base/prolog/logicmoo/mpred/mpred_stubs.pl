@@ -521,7 +521,7 @@ call_wdmsg(P,MP,F,A):- local_q_mpred_isa(F,prologHybrid),must(A>1),into_functor_
 call_wdmsg(P,MP,F,A):-  
   (\+ local_q_mpred_isa(F,prologDynamic)), 
   (\+ local_q_mpred_isa(F,prologBuiltin)), 
-  functor(FA,F,A), /*kb_dynamic(FA), */ into_functor_form(t,MP,DB),!, 
+  /* functor(FA,F,A), kb_dynamic(FA), */ into_functor_form(t,MP,DB),!, 
   append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
 call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(local_q_mpred_isa(F,prologDynamic);local_q_mpred_isa(F,prologBuiltin)),!,call_u(CALL).
 %call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),call_u(CALL))).

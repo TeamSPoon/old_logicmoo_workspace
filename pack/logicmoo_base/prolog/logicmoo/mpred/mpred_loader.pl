@@ -1153,6 +1153,7 @@ simplify_language_name(W,W2):-var(W),!,W2=W.
 simplify_language_name(mpred,pfc).
 simplify_language_name(plmoo,pfc).
 simplify_language_name(prolog,pl).
+simplify_language_name(code,pl).
 simplify_language_name(W,W).
 
 %% file_begin( ?W) is det.

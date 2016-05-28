@@ -77,6 +77,8 @@
 :- endif.
 
 
+:- set_prolog_flag(logicmoo_debug,false).
+
 %:- set_prolog_flag(trace_gc,false).
 %:- set_prolog_flag(backtrace_depth,400).
 

@@ -178,8 +178,10 @@ decl_mpred_mfa(M,FF,A):-
 % Declare Managed Predicate Hybrid.
 %
 
-decl_mpred_prolog(A):-not(compound(A)),!,ain00(prologHybrid(A)).
-% ain(love(isEach(a/1,b/2,c/1,d),mother).
+decl_mpred_prolog(A):-not(compound(A)),!,ain00(prologBuiltin(A)).
+decl_mpred_prolog(A):-!,ain(prologBuiltin(A)).
+
+% ain(love(isEach(a/1,b/2,c/1,d),mother)).
 % ain(loves(isElement(a/1,b/2,c/1,d),mother)).
 decl_mpred_prolog(M):- M =.. [isEach|List],!,must_maplist(decl_mpred_prolog,List).
 decl_mpred_prolog(List):-is_list(List),!,must_maplist(decl_mpred_prolog,List).
@@ -252,7 +254,8 @@ decl_mpred_prolog(_:CM,M,PI,F,A):-
       ((var(CM),nonvar(M))->CM=M;true),
       ((var(PI),integer(A))->functor(PI,F,A);true),
       (integer(A)->assert_arity(F,A);true),
-      define_maybe_prolog(M,PI,F,A))).
+      define_maybe_prolog(M,PI,F,A),
+      ain(prologBuiltin(F)))).
 
 define_maybe_prolog(M,PI,F,_A):- predicate_property(M:PI,imported_from(system)),ain(prologBuiltin(F)).
 
@@ -267,6 +270,7 @@ define_maybe_prolog(M,PI,F,A):-
    %sanity(\+ M == baseKB),
       ain(predicateConventionMt(F,M)),
       ain(~prologHybrid(F)),
+      ain(prologBuiltin(F)),
       (\+ is_static_predicate(M:PI)->ain(prologDynamic(F));true),
       ain(mpred_isa(PI,predCanHaveSingletons)),!.
 

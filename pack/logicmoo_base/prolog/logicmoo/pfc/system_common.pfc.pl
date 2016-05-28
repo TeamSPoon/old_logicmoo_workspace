@@ -813,7 +813,7 @@ argIsa(Prop,N,Type),{number(N)},ttExpressionType(Type) ==> argQuotedIsa(Prop,N,T
 :- kb_dynamic(mudLabelTypeProps/3).
 :- shared_multifile(mudLabelTypeProps/3).
 :- forall(ttPredType(F),must((decl_type(F),ain(isa(F,functorDeclares)),ain(genls(F,tPred))))).
-:-  /**/ export(mtForPred/2).
+% :-  /**/ export(mtForPred/2).
 
 /*
 :- rtrace.
@@ -977,6 +977,8 @@ subFormat(ftVar,ftProlog).
 subFormat(ftVoprop,ftRest(ftVoprop)).
 subFormat(ftVoprop,ftTerm).
 
+subFormat(COL1,COL2)==>(ttExpressionType(COL1),ttExpressionType(COL2)).
+
 
 tCol(W)==>{guess_supertypes(W)}.
 
@@ -1055,10 +1057,9 @@ quotedDefnIff(ftRest(Type),is_rest_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftListFn(Type),is_list_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftCodeIs(SomeCode),SomeCode):- cwc, is_ftNonvar(SomeCode).
 
-
+(ttExpressionType(FT)/append_term(FT,Arg,Head)==> ((Head:- !, term_is_ft(Arg,FT)))).
 
 % tCol(Type),(ptBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G ==> relationMostInstance(Pred,Type,Value).
-
 
 
 %((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))==>genls(Col1,Col2)).

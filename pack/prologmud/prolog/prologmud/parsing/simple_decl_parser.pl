@@ -224,8 +224,11 @@ assert_text_now(Ctx,CtxISA,String):-
 
 (describedTyped(ISA),isa(Ctx,ISA),mudDescription(Ctx,String)/ ( \+asserted_text(Ctx,String,_), \+assert_text(Ctx,String))) ==> mudDescriptionHarder(Ctx,String).
 
+:- export(to_icase_strs/2).
 to_icase_strs(WL,IC):-maplist(to_icase_str,WL,IC).
 
+
+:- export(to_icase_str/2).
 % to_icase_str(SL,IC):-string_to_atom(SL,SA),string_to_atom(SS,SA),when(?=(IC,Y),(trace,(Y=SA;Y=SS))).
 to_icase_str(SL,IC):-string_to_atom(SL,SA),string_to_atom(SS,SA),when(nonvar(IC);?=(IC,IC),(IC=SA;IC=SS)).
 

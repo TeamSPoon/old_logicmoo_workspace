@@ -7,7 +7,7 @@
 % Dec 13, 2035
 %
 */
-:-swi_module(moo_testing,
+:-swi_module(mud_testing,
 	[run_mud_tests/0,
         run_mud_test/2,
         test_name/1,
@@ -96,6 +96,29 @@ run_mud_test(Name,Test):-
 
 
 % define tests locally
+
+
+:- mpred_trace_exec.
+:- set_prolog_flag(logicmoo_debug,true).
+
+lmconf:mud_test(test_fwc_1,
+  (on_x_debug(ain(tAgent(iExplorer1))),
+   nop(mpred_fwc(tAgent(iExplorer1))),
+   % test_false(mudFacing(iExplorer1,vSouth)),
+   test_true(mudFacing(iExplorer1,vNorth)),
+   ain(mudFacing(iExplorer1,vSouth)),
+   test_false(mudFacing(iExplorer1,vNorth)),
+   test_true(mudFacing(iExplorer1,vSouth)))).
+
+lmconf:mud_test(test_fwc_2,
+  (ain(tAgent(iExplorer1)),
+    mpred_fwc1(tAgent(iExplorer1)),
+   mpred_remove(mudFacing(iExplorer1,vSouth)),
+   test_true(mudFacing(iExplorer1,vNorth)),
+   test_false(mudFacing(iExplorer1,vSouth)))).
+
+:- mpred_notrace_exec.
+
 
 lmconf:mud_test(test_movedist,
  (
@@ -192,16 +215,11 @@ mud_test_local :-do_agent_action("look").
 mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 % ---------------------------------------------------------------------------------------------
-mud_test_local:-
-  test_name("Tests our types to populate bad_instance/2 at level 5"),
-  retractall(is_instance_consistent(_,_)),
-  retractall(bad_instance(_,_)),
-  forall(genls(T,tSpatialThing),check_consistent(T,1000)),
-  listing(bad_instance/2).
 
 :-thread_local t_l:is_checking_instance/1.
 
-:-decl_mpred_prolog(check_consistent(ftTerm,ftInt)).
+:-ain(prologBuiltin(check_consistent(ftTerm,ftInt))).
+% :-decl_mpred_prolog(check_consistent(ftTerm,ftInt)).
 :-decl_mpred_prolog(is_instance_consistent(ftTerm,ftInt)).
 :-decl_mpred_prolog(bad_instance(ftTerm,ftTerm)).
 :-decl_mpred_prolog(is_checking_instance(ftTerm)).
@@ -217,6 +235,12 @@ check_consistent_0(Type,Scope):- once(tSet(Type)),
 
 hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg(checked_consistent(object_string(_,Obj,0-5,String))).
 % ---------------------------------------------------------------------------------------------
+mud_test_local:-
+  test_name("Tests our types to populate bad_instance/2 at level 5"),
+  retractall(is_instance_consistent(_,_)),
+  retractall(bad_instance(_,_)),
+  forall(genls(T,tSpatialThing),check_consistent(T,1000)),
+  listing(bad_instance/2).
 
 
 % lmconf:mud_test("local sanity tests",  do_mud_test_locals).
@@ -267,4 +291,4 @@ mud_test_local :- at_start(must_det(run_mud_tests)).
 
 :- module_predicates_are_exported.
 
-:- module_meta_predicates_are_transparent(moo_testing).
+:- module_meta_predicates_are_transparent(mud_testing).

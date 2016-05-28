@@ -8,7 +8,7 @@
 % Dec 13, 2035
 %
 */
-% :-swi_module(world_agent,[]).
+% :-swi_module(world_agent,[get_session_id/1]).
 
 :- include(prologmud(mud_header)).
 /*
@@ -237,7 +237,7 @@ foc_current_agent(P):-
              become_player(P)]),!.
                
 
-:-user:ensure_loaded(library(http/http_session)).
+:-system:ensure_loaded(library(http/http_session)).
 
 :-export(get_session_id/1).
 get_session_id(IDIn):-guess_session_ids(ID),nonvar(ID),!,ID=IDIn.
@@ -261,7 +261,8 @@ guess_session_ids(In):-thread_self(ID),thread_util:has_console(ID,In,_Out,_Err).
 :-export(my_random_member/2).
 my_random_member(LOC,LOCS):- must_det((length(LOCS,Len),Len>0)),random_permutation(LOCS,LOCS2),!,member(LOC,LOCS2).
 
-:-export(random_instance/3).
+:-multifile(system:random_instance/3).
+:-export(system:random_instance/3).
 
 random_instance_no_throw(Type,Value,Test):-random_instance_no_throw0(Type,Value,Test).
 
@@ -278,7 +279,7 @@ random_instance_no_throw0(Type,Value,Test):- compound(Type),get_functor(Type,F,G
                          Formatted=..[F|ArgTypes],functor(Value,F,A),Value=..[F|ValueArgs],must((maplist(random_instance_no_throw,ArgTypes,ValueArgs,_),Test)).
 random_instance_no_throw0(Type,Value,Test):-must(( findall(V,isa(V,Type),Possibles),Possibles\=[])),!,must((my_random_member(Value,Possibles),Test)).
 
-random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
+system:random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
 
 
 

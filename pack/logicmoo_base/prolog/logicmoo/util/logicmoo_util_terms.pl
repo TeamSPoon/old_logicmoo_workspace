@@ -828,7 +828,7 @@ functor_h('$VAR'(Obj),F,A):- !, trace_or_throw(var_functor_h('$VAR'(Obj),F,A)).
 
 functor_h(Obj,F,A):-atom(F),strip_module(Obj,_M,P),functor(P,F,A).
 functor_h(Obj,F,A):-var(F),strip_module(Obj,_M,P),functor(P,F,A).
-functor_h(Obj,M:F,A):-strip_module(Obj,M,P),!,functor(P,F,A).
+functor_h(M:Obj,M:F,A):-(nonvar(Obj);nonvar(F)),functor_h(Obj,F,A).
 
 functor_h([L|Ist],F,A):- is_list([L|Ist]),!,var(F),L=F,length(Ist,A).
 functor_h(F//A,F,Ap2):-number(A),!,Ap2 is A+2,( atom(F) ->  true ; current_predicate(F/Ap2)).
@@ -1117,7 +1117,7 @@ call_no_cuts(CALL):-functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_sa
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
 
 %:- module_predicates_are_exported.
-%:- all_module_predicates_are_transparent(logicmoo_util_terms).
+% :- all_module_predicates_are_transparent(logicmoo_util_terms).
 
 
 %= 	 	 

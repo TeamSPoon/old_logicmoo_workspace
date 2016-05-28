@@ -48,6 +48,7 @@
             erase_safe/2,
             eraseall/2,
             find_and_call/1,
+            somehow_callable/1,
             find_and_call/3,
             std_provider/3,
             mpred_mop/3,
@@ -146,11 +147,18 @@ clause_safe(H,B):-predicate_property(H,number_of_clauses(C)),C>0,system:clause(H
 
 :- meta_predicate if_flag_true(+,:).
 if_flag_true(TF,Goal):-
-  (current_predicate(_,TF)-> 
-    (TF->Goal;true);
-   (current_prolog_flag(TF,F) -> 
-     (F\=false -> Goal; true);
-     trace_or_throw(if_flag_true(TF,Goal)))).
+  (current_prolog_flag(TF,F) -> 
+    (F\=false -> find_and_call(Goal); true);
+   (find_and_call(TF)->find_and_call(Goal);true)).
+
+/*
+if_flag_true(TF,Goal):-
+  (somehow_callable(TF)-> 
+    (find_and_call(TF)->find_and_call(Goal);true);
+  (current_prolog_flag(TF,F) -> 
+    (F\=false -> find_and_call(Goal); true);
+   trace_or_throw(if_flag_true(TF,Goal)))).
+*/
 
 %= 	 	 
 
@@ -212,6 +220,7 @@ find_and_call(_,_,  G):-current_predicate(_,C:G),!,find_and_call(C,G).
 find_and_call(C,M,  G):-trace,C:on_x_rtrace(M:G).
 
 
+
 %= 	 	 
 
 %% find_and_call( :TermG) is semidet.
@@ -222,6 +231,15 @@ find_and_call(C:G):-current_predicate(_,C:G),!,find_and_call(C,G).
 find_and_call(_:G):-current_predicate(_,R:G),!,find_and_call(R:G).
 find_and_call(G):-current_predicate(_,G),!,loop_check(on_x_rtrace(G)).
 find_and_call(G):-current_predicate(_,R:G),!,find_and_call(R:G).
+
+
+%% somehow_callable( :TermG) is semidet.
+%
+% Detects if find_and_call/1 will be able to call the term
+%
+somehow_callable(G):-current_predicate(_,G),!.
+somehow_callable(_:G):-!,current_predicate(_,_:G),!.
+somehow_callable(G):-current_predicate(_,_:G),!.
 
 
 %= 	 	 

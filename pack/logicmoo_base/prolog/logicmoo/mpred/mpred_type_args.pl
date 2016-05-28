@@ -187,6 +187,7 @@ term_is_ft(Term,Type):- is_ftVar(Term),!,member(Type,[ftVar,ftProlog]).
 term_is_ft(_ANY,Type):- Type==ftVar,!,fail.
 term_is_ft([T|Term],ftListFn(Type)):-is_list_of(Type,[T|Term]).
 term_is_ft(_ANY,Type):- nonvar(Type),(ttExpressionType==Type;(\+ ttExpressionType(Type))),!,fail.
+term_is_ft(Term,Type):- nonvar(Type), (no_repeats_old(Type,(term_is_ft_how(Term,Type)))*->!;true).
 term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subft(Was,Type))).
 
 

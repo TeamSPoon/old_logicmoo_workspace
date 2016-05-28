@@ -4383,7 +4383,7 @@ is_cyckb_t_pred(mtAnthropacity, 2).
 is_cyckb_t_pred(mtContainsResultsOfApplyingStrategy, 3).
 is_cyckb_t_pred(mtDefinesCulture, 2).
 is_cyckb_t_pred(mtFocalContent, 2).
-is_cyckb_t_pred(mtForPredPopTask, 2).
+is_cyckb_t_pred(predicateConventionMtPopTask, 2).
 is_cyckb_t_pred(mtHasFocalContentSentence, 2).
 is_cyckb_t_pred(mtImageDepicts, 2).
 is_cyckb_t_pred(mtInferenceFunction, 2).

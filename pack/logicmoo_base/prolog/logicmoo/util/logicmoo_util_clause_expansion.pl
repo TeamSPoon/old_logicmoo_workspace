@@ -27,7 +27,9 @@
           maybe_add_import_module/2,
           maybe_delete_import_module/2,
           glean_prolog_impl_file/4,
-          
+
+          all_source_file_predicates_are_transparent/0,
+          all_source_file_predicates_are_transparent/1,
           without_lm_expanders/1,
 
           nb_current_or_nil/2,
@@ -343,14 +345,17 @@ show_module_imports:-
   forall(current_module(M),show_module_imports(M)).
   
 
-:- module_transparent(all_source_file_predicates_are_transparent/0).
-
 %% all_source_file_predicates_are_transparent() is det.
 %
 % All Module Predicates Are Transparent.
 %
+:- module_transparent(all_source_file_predicates_are_transparent/0).
 all_source_file_predicates_are_transparent:-
-    must(prolog_load_context(source,File)),
+  must(prolog_load_context(source,SFile)),all_source_file_predicates_are_transparent(SFile),
+  must(prolog_load_context(file,File)),all_source_file_predicates_are_transparent(File).
+
+:- module_transparent(all_source_file_predicates_are_transparent/1).
+all_source_file_predicates_are_transparent(File):-
     dmsg(all_source_file_predicates_are_transparent(File)),
     forall((source_file(ModuleName:P,File),functor(P,F,A)),
       ignore(( 

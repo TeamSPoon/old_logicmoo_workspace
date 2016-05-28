@@ -19,3 +19,6 @@
 
 % :- asserta_if_new(t_l:disable_px).
 
+:- all_source_file_predicates_are_transparent.
+
+

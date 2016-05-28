@@ -553,11 +553,15 @@ istAbove(Mt,Query):- Mt \== baseKB, genlMt(Mt,MtAbove),MtAbove:Query.
 uses_predicate(M:F/A,R):- !, '$current_source_module'(SM), uses_predicate(SM,M,F,A,R).
 uses_predicate(F/A,R):- '$current_source_module'(SM),'$current_typein_module'(M),uses_predicate(M,SM,F,A,R).
 
-uses_predicate(SM,Module,Name,Arity,Action) :- 
+uses_predicate(_,Module,Name,Arity,Action) :- 
       current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
 uses_predicate(_,CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
+
+uses_predicate(baseKB,System, F,A,R):- System\==baseKB,
+   (module_property(System,class(system));module_property(System,class(library));module_property(System,class(user))),!,
+   uses_predicate(System,baseKB,F,A,R),!.
 
 % keeps from calling this more than once
 uses_predicate(SM,M,F,A,error):- 

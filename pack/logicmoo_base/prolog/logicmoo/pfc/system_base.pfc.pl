@@ -107,6 +107,10 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
 :- set_file_lang(pfc).
 % :- mpred_ops.
 
+arity(alwaysGaf,1).
+alwaysGaf(alwaysGaf).
+alwaysGaf(pfcRHS).
+alwaysGaf(pfcLHS).
 
 
 tCol(A)/atom(A)==>{call(kb_dynamic(A/1))}.

@@ -137,7 +137,10 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 genls(tPartofObj,tItem).
 
-tSet(tPlayer).
+tSet(tSet).
+
+
+:- rtrace(ain(tSet(tPlayer))).
 
 
 % defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
@@ -512,7 +515,7 @@ meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
 meta_argtypes(apathFn(tRegion,vtDirection)).
 meta_argtypes(xyzFn(tRegion,ftInt,ftInt,ftInt)).
 
-
+:- set_prolog_flag(assert_attvars,true).
 
 tCol(ttTypeByAction).
 genls(ttTypeByAction,tCol).
@@ -954,9 +957,9 @@ Unsuccessful attempt by is a rulebook. [19
 
 prologBuiltin(random_path_dir/1).
 random_path_dir(Dir):-nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
-random_path_dir(Dir):-random_instance(vtBasicDir,Dir,true).
-random_path_dir(Dir):-random_instance(vtBasicDirPlusUpDown,Dir,true).
-random_path_dir(Dir):-random_instance(vtDirection,Dir,true).
+random_path_dir(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
+random_path_dir(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
+random_path_dir(Dir):- call(call,random_instance(vtDirection,Dir,true)).
 
 prologBuiltin(ensure_some_pathBetween(tRegion,tRegion)).
 
@@ -1048,29 +1051,4 @@ O = [
 ((argQuotedIsa(Pred, _, 'CycLSentence') ==> 'SententialOperator'(Pred))).
 
 */
-
-:- mpred_trace_exec.
-
-:- on_x_debug(ain(tAgent(iExplorer1))).
-
-:- mpred_fwd(tAgent(iExplorer1)).
-
-:-must(mudFacing(iExplorer1,vNorth)).
-
-:- ain(mudFacing(iExplorer1,vSouth)).
-
-:-must(\+ mudFacing(iExplorer1,vNorth)).
-
-:-must(mudFacing(iExplorer1,vSouth)).
-
-:-mpred_remove(mudFacing(iExplorer1,vSouth)).
-
-:-must(\+ mudFacing(iExplorer1,vSouth)).
-
-:-must(mudFacing(iExplorer1,vNorth)).
-
-% genls(tExplorer,tHumanPlayer).
-isa(iExplorer1,tHumanPlayer).
-
-:- mpred_notrace_exec.
 

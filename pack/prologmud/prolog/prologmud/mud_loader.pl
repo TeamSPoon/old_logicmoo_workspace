@@ -40,7 +40,7 @@
 
 
 % [Optionaly] load the mpred_online system
-% :- if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online))).
+% :- if_file_exists(system:ensure_loaded(library(logicmoo/mpred_online))).
 
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
 
@@ -89,6 +89,8 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 
 :- '$set_source_module'('user').
 
+:- ensure_loaded(library(prologmud/vworld/world)).
+
 :- asserta(t_l:disable_px).
 
 add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_game_dir(Else).
@@ -98,7 +100,7 @@ now_try_game_dir(Else):-
  enumerate_files(game('.'), GAMEDIR) *-> 
   ((exists_directory(GAMEDIR) -> 
     with_all_dmsg(( 
-      % forall(enumerate_files(game('**/*.pl'),X),user:ensure_loaded(X)),
+      % forall(enumerate_files(game('**/*.pl'),X),system:ensure_loaded(X)),
       forall(no_repeats_old(X,enumerate_files(game('**/*.plmoo'),X)),declare_load_dbase(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).
 
 
@@ -188,7 +190,7 @@ hard_work:-
    )))),!.
 
 % [Required] load the mud PFCs
-:- show_entry(gripe_time(40,user:ensure_loaded(prologmud(server/mud_builtin)))).
+:- show_entry(gripe_time(40,system:ensure_loaded(prologmud(server/mud_builtin)))).
 
 
 slow_work:- wno_tl( prevent_transform_moo_preds , within_user(at_start(hard_work))).
@@ -391,13 +393,13 @@ Proof end.
 
 
 
-:- user:ensure_loaded(library(logicmoo_base)).
-:- user:ensure_loaded(prologmud(server/mud_telnet)).
-% :- user:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
-:- user:ensure_loaded(prologmud(server/mud_irc)).
-:- user:ensure_loaded(prologmud(vworld/world)).
+:- system:ensure_loaded(library(logicmoo_base)).
+:- system:ensure_loaded(prologmud(server/mud_telnet)).
+% :- system:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
+:- system:ensure_loaded(prologmud(server/mud_irc)).
+:- system:ensure_loaded(prologmud(vworld/world)).
 
-:- user:ensure_loaded(prologmud(server/mud_testing)).
+:- system:ensure_loaded(prologmud(server/mud_testing)).
 
 
 /*
@@ -466,46 +468,46 @@ make_qlfs:-
 :- include_mpred_files('../src_asserts/pldata/?*.pl').
 
 */
-:-export(user:ensure_nl_loaded/1).
-user:ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
+:-export(system:ensure_nl_loaded/1).
+system:ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 
-% :- user:ensure_loaded(logicmoo(pldata/tiny_kb)).
+% :- system:ensure_loaded(logicmoo(pldata/tiny_kb)).
 /*
-:- user:ensure_nl_loaded(logicmoo(pldata/nldata_freq_pdat)).
-:- user:ensure_nl_loaded(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
-:- user:ensure_nl_loaded(logicmoo(pldata/nldata_colloc_pdat)).
-:- user:ensure_nl_loaded(logicmoo(pldata/nldata_cycl_pos0)).
-:- user:ensure_nl_loaded(logicmoo(pldata/nldata_dictionary_some01)).
-:- user:ensure_nl_loaded(logicmoo(pldata/nldata_talk_db_pdat)).
+:- system:ensure_nl_loaded(logicmoo(pldata/nldata_freq_pdat)).
+:- system:ensure_nl_loaded(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
+:- system:ensure_nl_loaded(logicmoo(pldata/nldata_colloc_pdat)).
+:- system:ensure_nl_loaded(logicmoo(pldata/nldata_cycl_pos0)).
+:- system:ensure_nl_loaded(logicmoo(pldata/nldata_dictionary_some01)).
+:- system:ensure_nl_loaded(logicmoo(pldata/nldata_talk_db_pdat)).
 */
-% :- user:ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
-% :- user:ensure_loaded(logicmoo(pldata/hl_holds)).
-% :- user:ensure_loaded(logicmoo(pldata/mworld0)).
-% :- user:ensure_nl_loaded(logicmoo(pldata/transform_dump)).
-% :- catch(user:ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
+% :- system:ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
+% :- system:ensure_loaded(logicmoo(pldata/hl_holds)).
+% :- system:ensure_loaded(logicmoo(pldata/mworld0)).
+% :- system:ensure_nl_loaded(logicmoo(pldata/transform_dump)).
+% :- catch(system:ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
 download_and_install_el:-
   shell('wget -N http://logicmoo.org/devel/LogicmooDeveloperFramework/TEMP~/www.logicmoo.org/downloads/datafiles/PlDataBinary.zip',_),
   shell('unzip -u -d ../src_assets/pldata/ PlDataBinary.zip'),
-  catch(user:ensure_loaded(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
+  catch(system:ensure_loaded(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
 
-%:- xperimental_big_data->catch(user:ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
+%:- xperimental_big_data->catch(system:ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
 
 % :- asserta(lmcache:loaded_external_kbs(mud)),show_call(kbp_to_mpred_t).
 
-:- user:ensure_loaded(prologmud(vworld/world_agent)).
-:- user:ensure_loaded(prologmud(parsing/parser_imperative)).
-:- user:ensure_loaded(prologmud(parsing/simple_decl_parser)). 
-:- user:ensure_loaded(prologmud(vworld/world)).
+:- system:ensure_loaded(prologmud(vworld/world_agent)).
+:- system:ensure_loaded(prologmud(parsing/parser_imperative)).
+:- system:ensure_loaded(prologmud(parsing/simple_decl_parser)). 
+:- system:ensure_loaded(prologmud(vworld/world)).
 
 /*
-:- user:ensure_loaded(logicmoo(parsing/parser_talk)). 
-:- user:ensure_loaded(logicmoo(parsing/parser_e2c)). 
-:- user:ensure_loaded(logicmoo(parsing/parser_CURT)). 
-:- user:ensure_loaded(logicmoo(parsing/parser_chat80)). 
+:- system:ensure_loaded(logicmoo(parsing/parser_talk)). 
+:- system:ensure_loaded(logicmoo(parsing/parser_e2c)). 
+:- system:ensure_loaded(logicmoo(parsing/parser_CURT)). 
+:- system:ensure_loaded(logicmoo(parsing/parser_chat80)). 
 */
 
-%:- user:ensure_loaded(logicmoo(dbase/mpred_ext_lisp)).
-%:- user:ensure_loaded(logicmoo(dbase/mpred_ext_chr)).
+%:- system:ensure_loaded(logicmoo(dbase/mpred_ext_lisp)).
+%:- system:ensure_loaded(logicmoo(dbase/mpred_ext_chr)).
 
 
 :-wdmsg(loading_mobs).
@@ -598,8 +600,6 @@ download_and_install_el:-
 % FLUX AGENT SYSTEM WITH GOLOG
 % :- if_flag_true(true,use_module(logicmoo('indigolog/indigolog_main_swi_flux.pl'))).
 
-% LOGICMOO DATABASE LOGIC ENGINE SERVER
-%:- if_flag_true(true,use_module(logicmoo('database/logicmoo.swi'))).
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version

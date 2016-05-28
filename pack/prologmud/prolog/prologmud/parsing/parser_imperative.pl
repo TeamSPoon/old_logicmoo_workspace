@@ -393,7 +393,7 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 
 
-'==>'(pfcControlled(name_text_now(ftTerm,ftString))).
+:- ain('==>'(pfcControlled(name_text_now(ftTerm,ftString)))).
 
 name_text(Name,Text):- nonvar(Text),!,name_text_now(Name,TextS),equals_icase(Text,TextS),!.
 name_text(Name,Text):- var(Name),!,mudKeyword(Name,Text).

@@ -376,8 +376,8 @@ get_source_ref1(M):- get_source_ref10(M),!.
 get_source_ref1(_).
 
 get_source_ref10(M):- current_why(M), nonvar(M) , M =mfl(_,_,_).
-
 get_source_ref10(mfl(M,F,L)):- defaultAssertMt(M), source_location(F,L).
+
 get_source_ref10(mfl(M,F,L)):- defaultAssertMt(M), current_source_file(F:L).
 get_source_ref10(mfl(M,F,_L)):- defaultAssertMt(M), current_source_file(F).
 get_source_ref10(mfl(M,_F,_L)):- defaultAssertMt(M).
@@ -405,7 +405,7 @@ to_real_mt(_Why,BOX,BOX).
 % Ensure modules are correct when asserting/calling information into the correct MTs
 %
 %fix_mp(Why,I,UO):- compound(UO),trace,UO=(U:O),!,quietly_must(fix_mp(Why,I,U,O)).
-fix_mp(Why,I,UO):- quietly_must(fix_mp(Why,I,U,O)),maybe_prepend_mt(U,I,UO).
+fix_mp(Why,I,UO):- quietly_must(fix_mp(Why,I,U,O)),maybe_prepend_mt(U,O,UO).
 
 
 
@@ -416,11 +416,11 @@ fix_mp(Why,':-'(G0),M, ':-'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
 fix_mp(Why,(G :- B),M,( GO :- B)):- !, fix_mp(Why,G,M,GO).
 fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtCycL(Mt)),!.
 fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtExact(Mt)),!.
-fix_mp(_Why,P,S,GO):- predicate_property_safe(P,imported_from(S)),!,strip_module(P,M,GO).
+fix_mp(_Why,P,S,GO):- predicate_property_safe(P,imported_from(S)),!,strip_module(P,_,GO).
 fix_mp(Why,M:P,MT,P):- to_real_mt(Why,M,MT)->M\==MT,!.
 fix_mp(Why,G,M,GO):- strip_module(G,_,GO),get_consequent_functor(GO,F,A),loop_check(convention_to_mt(Why,F,A,M),fail),!.
 
-fix_mp(Why,I,ABox,I):- defaultAssertMt(ABox),!.
+fix_mp(_Why,I,ABox,I):- defaultAssertMt(ABox),!.
 
 /*
 fix_mp(Why,Junct,ABox,Result):- fail, (mpred_db_type(Junct,rule);(functor(Junct,F,_),bad_head_pred(F))),!,
@@ -758,6 +758,7 @@ remove_negative_version(P):-
 
      
 fwc1s_post1s(10,20):- fresh_mode,!.
+fwc1s_post1s(1,2):- current_prolog_flag(logicmoo_safe,true),!.
 fwc1s_post1s(10,20):- defaultAssertMt(Mt)->Mt=baseKB,!.
 fwc1s_post1s(1,2).
 
@@ -861,7 +862,6 @@ mpred_post1(P,S):- !,
   gripe_time(0.6, must(get_mpred_assertion_status(P,PP,WasA))),!,
   gripe_time(0.6, must(mpred_post_update4(WasA,P,S,Was))),!.
   
-
 
 
 get_mpred_assertion_status(P,PP,WasO):- 
