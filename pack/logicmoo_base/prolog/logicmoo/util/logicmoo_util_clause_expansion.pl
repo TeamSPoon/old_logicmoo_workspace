@@ -352,7 +352,7 @@ show_module_imports:-
 :- module_transparent(all_source_file_predicates_are_transparent/0).
 all_source_file_predicates_are_transparent:-
   must(prolog_load_context(source,SFile)),all_source_file_predicates_are_transparent(SFile),
-  must(prolog_load_context(file,File)),all_source_file_predicates_are_transparent(File).
+  must(prolog_load_context(file,File)),(SFile==File->true;all_source_file_predicates_are_transparent(File)).
 
 :- module_transparent(all_source_file_predicates_are_transparent/1).
 all_source_file_predicates_are_transparent(File):-
