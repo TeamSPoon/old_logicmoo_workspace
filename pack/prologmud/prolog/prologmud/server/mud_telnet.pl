@@ -143,7 +143,7 @@ run_session(In,Out):-
   asserta(t_l:telnet_prefix([isSelfAgent,wants,to])),
   retractall(t_l:wants_logout(O)))),!,
   repeat,     
-         once(session_loop(In,Out)),
+      once(session_loop(In,Out)),
       retract(t_l:wants_logout(O)),!,
       thread_self(Id),
       retractall(lmcache:session_io(_,_,_,Id)),      

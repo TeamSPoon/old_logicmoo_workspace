@@ -179,7 +179,7 @@ make_builtin(P):-
  get_arity(P,F,A),
   show_failure(why,(atom(F),integer(A))),
   functor(B,F,A),
-  (predicate_property_safe(B,built_in) -> true ;
+  (predicate_property(B,built_in) -> true ;
   (w_tl(set_prolog_flag(access_level,system),lock_predicate(F/A)),
   check_context_module,
     ain(prologBuiltin(F)),ain(arity(F,A)))).
@@ -361,8 +361,8 @@ change( retract,one)  using =
 change( retract,all)  using =
 
 same_functors(Head1,Head2):-must_det(get_functor(Head1,F1,A1)),must_det(get_functor(Head2,F2,A2)),!,F1=F2,A1=A2.
-good_for_hybrid(H,F):- not(local_q_mpred_isa(F,_ANY_)),predicate_property_safe(H,number_of_clauses(0)),predicate_property_safe(H,dynamic).
-ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicate_property_safe(PHead,dynamic)->true;(predicate_property_safe(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
+good_for_hybrid(H,F):- not(local_q_mpred_isa(F,_ANY_)),predicate_property(H,number_of_clauses(0)),predicate_property(H,dynamic).
+ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicate_property(PHead,dynamic)->true;(predicate_property(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
 
 */
 
@@ -388,7 +388,7 @@ local_q_mpred_isa(F,C):- call_u(isa(F,C)).
 % If Is A Proc.
 %
 is_proc(V):-is_ftVar(V),!,fail.
-is_proc(F):- functor(P,F,1),predicate_property_safe(P,_),must(not(local_q_mpred_isa(F,tCol))).
+is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(local_q_mpred_isa(F,tCol))).
 
 % -- CODEBLOCK
 
@@ -1040,12 +1040,12 @@ smart_decl_database(AR,PRED):- dbase2pred2svo(DBASE,PRED,SVO),!,smart_db_op(AR,D
 
 smart_db_op(change( retract,AR),A,B,C):- retract_ar_fact(AR,A), retract_ar_fact(AR,B),  retract_ar_fact(AR,C).
 
-retract_ar_fact(all,What):- predicate_property_safe(What,dynamic), !, doall((retract_ar_fact(one,What),fail)).
-retract_ar_fact(all,What):- not(predicate_property_safe(What,_)),!.
+retract_ar_fact(all,What):- predicate_property(What,dynamic), !, doall((retract_ar_fact(one,What),fail)).
+retract_ar_fact(all,What):- not(predicate_property(What,_)),!.
 retract_ar_fact(all,What):- copy_term(What,WO),ignore(once(WO)),must_det(What=@=WO).
 
-retract_ar_fact(one,What):- predicate_property_safe(What,dynamic),!, clause(What,true),retract(What:-true).
-retract_ar_fact(one,What):- predicate_property_safe(What,_),!, clause_safe(What,true),!.
+retract_ar_fact(one,What):- predicate_property(What,dynamic),!, clause(What,true),retract(What:-true).
+retract_ar_fact(one,What):- predicate_property(What,_),!, clause_safe(What,true),!.
 retract_ar_fact(one,What):- dmsg(mssing(retract_ar_fact(one,What))).
 
 

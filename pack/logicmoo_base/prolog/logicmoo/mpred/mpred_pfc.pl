@@ -416,7 +416,7 @@ fix_mp(Why,':-'(G0),M, ':-'(CALL)):-nonvar(G0),!,fix_mp(Why,G0,M,CALL).
 fix_mp(Why,(G :- B),M,( GO :- B)):- !, fix_mp(Why,G,M,GO).
 fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtCycL(Mt)),!.
 fix_mp(_Why,Mt:P,Mt,P):- clause_b(mtExact(Mt)),!.
-fix_mp(_Why,P,S,GO):- predicate_property_safe(P,imported_from(S)),!,strip_module(P,_,GO).
+fix_mp(_Why,P,S,GO):- predicate_property(P,imported_from(S)),!,strip_module(P,_,GO).
 fix_mp(Why,M:P,MT,P):- to_real_mt(Why,M,MT)->M\==MT,!.
 fix_mp(Why,G,M,GO):- strip_module(G,_,GO),get_consequent_functor(GO,F,A),loop_check(convention_to_mt(Why,F,A,M),fail),!.
 
@@ -481,7 +481,7 @@ convention_to_symbolic_mt(_Why,mtProlog,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,functorDeclares,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,F,A,abox):- mpred_database_term(F,A,_).
 convention_to_symbolic_mt(_Why,F,_,Mt):-  call_u(predicateConventionMt(F,Mt)),!.
-convention_to_symbolic_mt(_Why,F,A,abox):- wsh_w:wrap_shared(F,A,ereq).
+convention_to_symbolic_mt(_Why,F,A,abox):- lmconf:wrap_shared(F,A,ereq).
 % convention_to_symbolic_mt(_Why,_,_,M):- atom(M),!.
 
 full_transform(Why,MH,MHH):-
@@ -1698,11 +1698,11 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 %  Note: a bug almost fixed is that this sometimes the side effect of catching 
 %  facts and not assigning the correct justifications
 % 
-% call_u(P):- predicate_property_safe(P,number_of_rules(N)),N=0,!,lookup_u(P).
+% call_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
 
 call_u(G):- var(G),!,dtrace,defaultAssertMt(W),mpred_fact_mp(W,G).
 call_u(M:G):- var(M),!,trace_or_throw(var_call_u(M:G)).
-call_u(M:G):- clause_b(mtProlog(M)),nonvar(G),!,sanity(predicate_property_safe(M:G,defined)),call(M:G).
+call_u(M:G):- clause_b(mtProlog(M)),nonvar(G),!,sanity(predicate_property(M:G,defined)),call(M:G).
 call_u(M:G):- nonvar(M),var(G),!,with_umt(M,mpred_fact_mp(M,G)).
 
 call_u(G):- strip_module(G,M,P),
@@ -1724,7 +1724,7 @@ mpred_BC_CACHE(M,P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(M,P0),true))
 
 mpred_BC_CACHE0(_,P00):- var(P00),!.
 mpred_BC_CACHE0(M,must(P00)):-!,mpred_BC_CACHE0(M,P00).
-mpred_BC_CACHE0(M,P):- predicate_property_safe(M:P,static),!.
+mpred_BC_CACHE0(M,P):- predicate_property(M:P,static),!.
 mpred_BC_CACHE0(_, :-(_,_)):-!.
 mpred_BC_CACHE0(_,bt(_,_)):-!.
 mpred_BC_CACHE0(_,spft(_,_,_)):-!.
@@ -1749,12 +1749,13 @@ mpred_call_no_bc(P):- loop_check(no_repeats(mpred_call_no_bc0(P))).
 
 % mpred_call_no_bc0(P):- lookup_u(P).
 % mpred_call_no_bc0(P):-  defaultAssertMt(Mt), Mt:lookup_u(P).
-mpred_call_no_bc0(P):-  defaultAssertMt(Mt), Mt:call(P).
+% mpred_call_no_bc0((A,B)):-!, mpred_call_no_bc0(A),mpred_call_no_bc0(B).
+%mpred_call_no_bc0(P):-  defaultAssertMt(Mt),current_predicate(_,Mt:P),!,Mt:call(P).
+%mpred_call_no_bc0(P):-  defaultAssertMt(Mt),rtrace(Mt:call(P)).
 % TODO .. mpred_call_no_bc0(P):-  defaultAssertMt(Mt), clause_b(genlMt(Mt,SuperMt)), call_umt(SuperMt,P).
 %mpred_call_no_bc0(P):- mpred_call_with_no_triggers(P).
-%mpred_call_no_bc0(P):- nonvar(P),predicate_property_safe(P,_),!, P.
-% mpred_call_no_bc0(P):- loop_check(mpred_METACALL(call_u, P)).
-
+% mpred_call_no_bc0(P):- nonvar(P),predicate_property(P,defined),!, P.
+mpred_call_no_bc0(P):- loop_check(mpred_METACALL(ereq, P)).
 
 pred_check(A):- var(A),!.
 % catch module prefix issues
@@ -1762,25 +1763,59 @@ pred_check(A):- nonvar(A),must(atom(A)).
 
 mpred_METACALL(How,P):- mpred_METACALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);mpred_call_no_bc(Cut))).
 
+mpred_METACALL(How, Cut, Var):- var(Var),!,trace_or_throw(var_mpred_METACALL_MI(How,Cut,Var)).
 %  this is probably not advisable due to extreme inefficiency.
-mpred_METACALL(How, Cut,Var):- var(Var),!,trace_or_throw(var_mpred_METACALL_MI(How,Cut,Var)).
+mpred_METACALL(_How,_Cut, Var):-is_ftVar(Var),!,mpred_call_with_no_triggers(Var).
 mpred_METACALL(How, Cut, mpred_call_no_bc(G0)):- !,mpred_METACALL(How, Cut, (G0)).
 mpred_METACALL(_How, Cut, mpred_METACALL(How2, G0)):- !,mpred_METACALL(How2, Cut, (G0)).
 mpred_METACALL(How, Cut, mpred_METACALL(G0)):- !,mpred_METACALL(How, Cut, (G0)).
 mpred_METACALL(_How, cut(true), !):- !.
-mpred_METACALL(How, Cut, (P1,P2)):- !, mpred_METACALL(How, Cut, P1), mpred_METACALL(How, Cut, P2).
-mpred_METACALL(How, Cut, (P1;P2)):- !, mpred_METACALL(How, Cut, P1); mpred_METACALL(How, Cut, P2).
-mpred_METACALL(How, Cut, (P1->P2)):- !, mpred_METACALL(How, Cut, P1)-> mpred_METACALL(How, Cut, P2).
-mpred_METACALL(How, Cut, (P1*->P2)):- !, mpred_METACALL(How, Cut, P1)*-> mpred_METACALL(How, Cut, P2).
+
+mpred_METACALL(How, Cut, (C1->C2;C3)):-!,(mpred_METACALL(How, Cut, C1)->mpred_METACALL(How, Cut, C2);mpred_METACALL(How, Cut, C3)).
+mpred_METACALL(How, Cut, (C1*->C2;C3)):-!,(mpred_METACALL(How, Cut, C1)*->mpred_METACALL(How, Cut, C2);mpred_METACALL(How, Cut, C3)).
+
+mpred_METACALL(How, Cut, (C1->C2)):-!,(mpred_METACALL(How, Cut, C1)->mpred_METACALL(How, Cut, C2)).
+mpred_METACALL(How, Cut, (C1*->C2)):-!,(mpred_METACALL(How, Cut, C1)*->mpred_METACALL(How, Cut, C2)).
+mpred_METACALL(How, Cut, (C1,C2)):-!,mpred_METACALL(How, Cut, C1),mpred_METACALL(How, Cut, C2).
+mpred_METACALL(How, Cut, (C1;C2)):-!,(mpred_METACALL(How, Cut, C1);mpred_METACALL(How, Cut, C2)).
 %  check for system predicates first
-% mpred_METACALL(_How, _SCut, P):- predicate_property_safe(P,built_in),!, call_u(P).
+% mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call_u(P).
+
+
+mpred_METACALL(How, Cut, M):- mpred_expansion:fixed_negations(M,O),!,mpred_METACALL(How, Cut, O).
+mpred_METACALL(How, Cut, U:X):-U==user,!,mpred_METACALL(How, Cut, X).
+mpred_METACALL(How, Cut, t(A,B)):-(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).
+mpred_METACALL(How, Cut, isa(B,A)):-(atom(A)->true;(no_repeats(tCol(A)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).
+%mpred_METACALL(How, Cut, t(A,B)):-!,(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).
+mpred_METACALL(How, Cut, t(A,B,C)):-!,(atom(A)->true;(no_repeats(arity(A,2)),atom(A))),ABC=..[A,B,C],mpred_METACALL(How, Cut, ABC).
+mpred_METACALL(How, Cut, t(A,B,C,D)):-!,(atom(A)->true;(no_repeats(arity(A,3)),atom(A))),ABC=..[A,B,C,D],mpred_METACALL(How, Cut, ABC).
+mpred_METACALL(How, Cut, t(A,B,C,D,E)):-!,(atom(A)->true;(no_repeats(arity(A,4)),atom(A))),ABC=..[A,B,C,D,E],mpred_METACALL(How, Cut, ABC).
+mpred_METACALL(How, Cut, call(X)):- !, mpred_METACALL(How, Cut, X).
+mpred_METACALL(How, Cut, call_u(X)):- !, mpred_METACALL(How, Cut, X).
+mpred_METACALL(How, Cut, \+(X)):- !, \+ mpred_METACALL(How, Cut, X).
+mpred_METACALL(How, Cut, call_u(X)):- !, mpred_METACALL(How, Cut, X).
+mpred_METACALL(_How, _Cut, clause(H,B,Ref)):-!,clause_u(H,B,Ref).
+mpred_METACALL(_How, _Cut, clause(H,B)):-!,clause_u(H,B).
+mpred_METACALL(_How, _Cut, clause(HB)):-expand_to_hb(HB,H,B),!,clause_u(H,B).
+mpred_METACALL(_How, _Cut, asserta(X)):- !, aina(X).
+mpred_METACALL(_How, _Cut, assertz(X)):- !, ainz(X).
+mpred_METACALL(_How, _Cut, assert(X)):- !, mpred_ain(X).
+mpred_METACALL(_How, _Cut, retract(X)):- !, mpred_remove(X).
+% TODO: test removal
+%mpred_METACALL(How, Cut, prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
+%mpred_METACALL(How, Cut, HB):-hotrace((fully_expand_warn(mpred_call_0,HB,HHBB))),!,mpred_METACALL(How, Cut, HHBB).
+%mpred_METACALL(How, Cut, argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(mpred_METACALL(How, Cut, argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
+% TODO: test removal
+% mpred_METACALL(How, Cut, isa(H,B)):-!,isa_asserted(H,B).
 mpred_METACALL(_How, _Cut, (H:-B)):- clause_u((H:-B)).
-mpred_METACALL( How,   Cut, P) :- fail, predicate_property_safe(P,number_of_clauses(_)),!,
+%mpred_METACALL(How, Cut, (H)):- is_static_pred(H),!,show_pred_info(H),dtrace(mpred_METACALL(How, Cut, (H))).
+mpred_METACALL( How,   Cut, P) :- fail, predicate_property(P,number_of_clauses(_)),!,
      clause_u(P,Condition),
      mpred_METACALL(How,Cut,Condition),
        (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);mpred_call_no_bc(Cut))).
 
 % mpred_METACALL(_How,_SCut, P):- must(current_predicate(_,M:P)),!, call_u(M:P).
+%mpred_METACALL(How, Cut, H):- !, w_tl(t_l:infAssertedOnly(H),call_u(H)).
 mpred_METACALL(How, _SCut, P):- call(How,P).
 
 
@@ -2169,6 +2204,8 @@ build_code_test(WS,{Test},TestO) :- !,build_code_test(WS,Test,TestO).
 build_code_test(_Sup,!,cut_c):-!.
 build_code_test(WS,rhs(Test),rhs(TestO)) :- !,build_code_test(WS,Test,TestO).
 build_code_test(WS,Test,TestO):- is_list(Test),must_maplist(build_code_test(WS),Test,TestO).
+build_code_test(_WS,(H:-B),clause_asserted_u(H,B)):- !.
+build_code_test(_WS,M:(H:-B),clause_asserted_u(M:H,B)):- !.
 build_code_test(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],must_maplist(build_code_test(WS),TestL,TestLO),TestO=..[F|TestLO],!.
 build_code_test(WS,Test,Test):- must(mpred_mark_as(WS,Test,pfcCallCodeTst)),!.
 build_code_test(_,Test,Test).
@@ -2205,9 +2242,10 @@ code_sentence_op(\+(_)).
 code_sentence_op(call(_)).
 code_sentence_op(call_u(_)).
 code_sentence_op(mpred_call_no_bc(_,_)).
+code_sentence_op(Test:-_):-!,code_sentence_op(Test).
 code_sentence_op(Test):- 
-  predicate_property_safe(Test,built_in),
-  predicate_property_safe(Test,meta_predicate(PP)), \+ (( arg(_,PP,N), N \= 0)).
+  predicate_property(Test,built_in),
+  predicate_property(Test,meta_predicate(PP)), \+ (( arg(_,PP,N), N \= 0)).
 
 
 %% all_closed(+C) is semidet.
@@ -2265,9 +2303,10 @@ mpred_assertz_w_support(P,Support):-
 % PFC Clause For User Interface.
 %
 
+
 clause_asserted_u(MH):- sanity((nonvar(MH), \+ is_static_predicate(MH))),fail.
 %clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
-clause_asserted_u((MH:-B)):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,clause_asserted_i((M:H :-B )).
+clause_asserted_u((MH:-B)):- !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,clause_asserted_i((M:H :-B )).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_i(M:H).
 
 
@@ -2393,7 +2432,7 @@ mpred_retract_i_or_warn(X):-
 %  mpred_fact(P) is true if fact P was asserted into the database via add.
 
 
-mpred_fact_mp(M,G):- current_predicate(_,M:G),\+ predicate_property_safe(M:G,imported_from(_)),
+mpred_fact_mp(M,G):- current_predicate(_,M:G),\+ predicate_property(M:G,imported_from(_)),
   mpred_fact(G),ignore((lookup_u(G,Ref),clause_property(Ref,module(MW)))),MW=M.
 
 mpred_fact(P):- mpred_fact(P,true).

@@ -113,8 +113,8 @@ pttp_assert_real_wid(ID,X):-
 :- meta_predicate(is_static_predicate_pttp(0,?)).
 is_static_predicate_pttp(M:(Y:-_),Why):-!,is_static_predicate_pttp(M:Y,Why).
 is_static_predicate_pttp((Y:-_),Why):-!,is_static_predicate_pttp(Y,Why).
-is_static_predicate_pttp(_:Y,file(F)):-!,predicate_property_safe(_:Y,file(F)),not(predicate_property_safe(_:Y,dynamic)).
-is_static_predicate_pttp(Y,file(F)):-predicate_property_safe(_:Y,file(F)),not(predicate_property_safe(_:Y,dynamic)).
+is_static_predicate_pttp(_:Y,file(F)):-!,predicate_property(_:Y,file(F)),not(predicate_property(_:Y,dynamic)).
+is_static_predicate_pttp(Y,file(F)):-predicate_property(_:Y,file(F)),not(predicate_property(_:Y,dynamic)).
 
 
 % -- CODEBLOCK

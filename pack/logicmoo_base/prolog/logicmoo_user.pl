@@ -32,7 +32,7 @@
 :- set_prolog_flag(pfc_booted,false).
 :-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
 :- set_prolog_flag(pfc_booted,true).
-% :- forall(wsh_w:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
+% :- forall(lmconf:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
 
 :- set_prolog_flag(pfc_booted,false).
 
@@ -49,7 +49,10 @@
 :- debug.
 */
 :- at_start((Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)))).
-:- at_start((logicmoo_util_shared_dynamic:asserta_if_new((ereq(G):- !, call_u(G))))).
-:- at_start((ignore((logicmoo_util_shared_dynamic:retract((ereq(G):- find_and_call(G))),fail)))).
+:- at_start((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, call_u(G))))).
+:- at_start((ignore((logicmoo_util_shared_dynamic:call(retract,(ereq(G):- find_and_call(G))),fail)))).
 
 :- reset_modules.
+
+:- set_prolog_flag(retry_undefined,true).
+

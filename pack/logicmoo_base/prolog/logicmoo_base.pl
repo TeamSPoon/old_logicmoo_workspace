@@ -60,13 +60,24 @@ lmconf:mpred_skipped_module(eggdrop).
 
 :-use_module(system:library('logicmoo/mpred/mpred_at_box.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_expansion.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_kb_ops.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_listing.pl')).
-:-use_module(system:library('logicmoo/snark/common_logic_sexpr.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_loader.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_pfc.pl'),except([op(_,_,_)])).
 :-use_module(system:library('logicmoo/mpred/mpred_prolog_file.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_props.pl')).
+
+:-use_module(system:library('logicmoo/mpred/mpred_kb_ops.pl')).
+:-multifile( baseKB:predicateConventionMt/2).
+:-dynamic( baseKB:predicateConventionMt/2).
+:-multifile( baseKB:predicateConventionMt/2).
+:-dynamic( baseKB:predicateConventionMt/2).
+:- kb_dynamic(lmcache:loaded_external_kbs/1).
+:- kb_dynamic(lmconf:mpred_skipped_module/1).
+
+
+:-use_module(system:library('logicmoo/mpred/mpred_userkb.pl')).
+
+:-use_module(system:library('logicmoo/snark/common_logic_sexpr.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_listing.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_storage.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_stubs.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_type_constraints.pl')).
@@ -86,7 +97,7 @@ lmconf:mpred_skipped_module(eggdrop).
 :-use_module(system:library('logicmoo/snark/common_logic_kb_hooks.pl')).
 :-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_)])). % ,arity/2,mpred_is_tracing_exec/0, (~)/1
 
-:-use_module(system:library('logicmoo/mpred/mpred_userkb.pl')).
+
 
 :-use_module(system:library('logicmoo/mpred_online/mpred_www.pl')).
 
@@ -108,8 +119,8 @@ system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(t
 
 :- autoload. % ([verbose(false)]).
 
-bad_thing_to_do:- doall((clause(wsh_w:wrap_shared(F,A,ereq),Body),
-    retract(( wsh_w:wrap_shared(F,A,ereq):- Body )), 
+bad_thing_to_do:- doall((clause(lmconf:wrap_shared(F,A,ereq),Body),
+    retract(( lmconf:wrap_shared(F,A,ereq):- Body )), 
       between(0,9,A),ain((arity(F,A),pfcControlled(F),prologHybrid(F))),fail)).
 
 % :- doall((current_module(W),import_module(W,system),\+ import_module(W, user), W\==baseKB, add_import_module(lmcode,W,end))).

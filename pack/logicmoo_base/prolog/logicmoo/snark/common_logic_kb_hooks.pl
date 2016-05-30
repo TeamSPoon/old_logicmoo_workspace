@@ -115,7 +115,7 @@ kbp_t(_):- \+ lmcache:loaded_external_kbs(_),!,fail.
 %
 % Knowledge Base False.
 %
-kb_f(X):-assertion_f(X).
+kb_f(X):- assertion_f(X).
 
 
 
@@ -457,7 +457,7 @@ kbp_t_list(PLIST):- apply(cyckb_t,PLIST).
 kbp_t_list(PLIST,Proof):- kbp_t_list(PLIST,_A,Proof).
 
 % 
-%  current_predicate(F/A),functor(P,F,A),predicate_property_safe(P,number_of_clauses(N)),dif(B,true), clause(P, B, Ref),B\=(!,_), B=true.
+%  current_predicate(F/A),functor(P,F,A),predicate_property(P,number_of_clauses(N)),dif(B,true), clause(P, B, Ref),B\=(!,_), B=true.
 
 :- was_export(kbp_t_list/3). 
 kbp_t_list(PLIST,Props):- tiny_kb_ASSERTION(PLIST,Props).
@@ -680,7 +680,7 @@ convert_easy_strings2:-
 %
 % Drain Assert Next Buffer.
 %
-drain_assert_next_buffer:- predicate_property_safe(assert_next_queue(_),number_of_clauses(CL)),dmsg(drain_assert_next_buffer(CL)),
+drain_assert_next_buffer:- predicate_property(assert_next_queue(_),number_of_clauses(CL)),dmsg(drain_assert_next_buffer(CL)),
  time_call(doall((retract(assert_next_queue(Call)),asserta_if_new(Call)))).
 
 

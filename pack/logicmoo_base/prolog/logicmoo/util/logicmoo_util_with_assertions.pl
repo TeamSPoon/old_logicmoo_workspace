@@ -171,5 +171,5 @@ check_thread_local_1m(t_l:_):-!.
 check_thread_local_1m((H:-_)):-!,check_thread_local_1m(H).
 check_thread_local_1m(tlbugger:_):-!.
 %check_thread_local_1m(lmconf:_):-!.
-check_thread_local_1m(TLHead):- slow_sanity(predicate_property_safe(TLHead,(thread_local))).
+check_thread_local_1m(TLHead):- slow_sanity(predicate_property(TLHead,(thread_local))).
 

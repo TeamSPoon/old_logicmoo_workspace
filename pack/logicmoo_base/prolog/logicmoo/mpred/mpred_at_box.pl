@@ -34,6 +34,10 @@
          correct_module/5,
          defaultAssertMt/1,
          ensure_imports/1,
+         is_parent_goal/1,
+         is_parent_goal/2,
+          has_parent_goal/1,
+          has_parent_goal/2,
          fileAssertMt/1,
          get_current_default_tbox/1,
          in_mpred_kb_module/0,
@@ -70,6 +74,23 @@
 
          which_file/1
     ]).
+
+:- module_transparent((         baseKB_hybrid_support/2,
+         uses_predicate/2,
+         uses_predicate/5,
+         correct_module/3,
+         correct_module/5,
+         defaultAssertMt/1,
+         ensure_imports/1,
+                                is_parent_goal/1,
+                                is_parent_goal/2,
+                                has_parent_goal/1,
+                                has_parent_goal/2,
+         fileAssertMt/1,
+         get_current_default_tbox/1,
+         in_mpred_kb_module/0,
+         istAbove/2,
+         make_as_dynamic/4)).
 
 :-dynamic(unused_predicate/4).
 
@@ -273,7 +294,6 @@ mtCanAssert(_).
 :- decl_shared(baseKB:dynamic,genlMt/2).
 
 :- decl_shared(baseKB:dynamic,mtCore/1).
-:- decl_shared(baseKB:dynamic,mtBuiltinLibrary/1).
 :- decl_shared(baseKB:dynamic,mtProlog/1).
 :- decl_shared(baseKB:dynamic,mtCycL/1).
 :- decl_shared(baseKB:dynamic,mtExact/1).
@@ -421,7 +441,7 @@ ensure_imports_tbox(M,TBox):-
    ignore(maybe_delete_import_module(M,TBox)),
    ignore(maybe_delete_import_module(TBox,M)),
    forall((user:current_predicate(_,TBox:P),
-      \+ predicate_property_safe(TBox:P,imported_from(_))),
+      \+ predicate_property(TBox:P,imported_from(_))),
       add_import_predicate(M,P,TBox)),
    inherit_into_module(M,user),
    skip_user(M),
@@ -474,12 +494,12 @@ correct_module(tbox,G,F,A,T):- !, get_current_default_tbox(M),correct_module(M,G
 correct_module(user,G,F,A,T):- fail,!,defaultAssertMt(M),correct_module(M,G,F,A,T).
 
 correct_module(HintMt,Goal,F,A,OtherMt):-var(Goal),functor(Goal,F,A),!,correct_module(HintMt,Goal,F,A,OtherMt).
-correct_module(HintMt,Goal,_,_,OtherMt):- predicate_property_safe(HintMt:Goal,imported_from(OtherMt)).
-correct_module(_,Goal,_,_,OtherMt):- predicate_property_safe(Goal,imported_from(OtherMt)).
+correct_module(HintMt,Goal,_,_,OtherMt):- predicate_property(HintMt:Goal,imported_from(OtherMt)).
+correct_module(_,Goal,_,_,OtherMt):- predicate_property(Goal,imported_from(OtherMt)).
 correct_module(HintMt,_,_,_,HintMt):- call_u(mtExact(HintMt)).
-correct_module(HintMt,Goal,_,_,HintMt):- predicate_property_safe(HintMt:Goal,exported).
-correct_module(_,Goal,_,_,OtherMt):- var(OtherMt),!, predicate_property_safe(OtherMt:Goal,file(_)).
-correct_module(_,Goal,_,_,OtherMt):- clause_b(mtGlobal(OtherMt)), predicate_property_safe(OtherMt:Goal,file(_)).
+correct_module(HintMt,Goal,_,_,HintMt):- predicate_property(HintMt:Goal,exported).
+correct_module(_,Goal,_,_,OtherMt):- var(OtherMt),!, predicate_property(OtherMt:Goal,file(_)).
+correct_module(_,Goal,_,_,OtherMt):- clause_b(mtGlobal(OtherMt)), predicate_property(OtherMt:Goal,file(_)).
 correct_module(MT,_,_,_,MT):-!.
 
 
@@ -494,7 +514,7 @@ add_import_predicate(Mt,Goal,OtherMt):- fail,
    catch(add_import_module(Mt,OtherMt,end),
        error(permission_error(add_import,module,baseKB),
        context(system:add_import_module/3,'would create a cycle')),fail),
-   must(predicate_property_safe(Mt:Goal,imported_from(OtherMt))),!.
+   must(predicate_property(Mt:Goal,imported_from(OtherMt))),!.
 
 add_import_predicate(Mt,Goal,OtherMt):- catch(Mt:import(OtherMt:Goal),_,fail),!.
 add_import_predicate(Mt,Goal,OtherMt):- 
@@ -509,6 +529,7 @@ make_as_dynamic(Reason,Mt,F,A):-
    dynamic(Mt:F/A),
    module_transparent(Mt:F/A),
    public(Mt:F/A),
+   on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
    functor(Goal,F,A),
    assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))))).
 
@@ -527,8 +548,9 @@ autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_ind
 
 :- multifile(baseKB:hybrid_support/2).
 :- dynamic(baseKB:hybrid_support/2).
-baseKB_hybrid_support(F,A):-wsh_w:wrap_shared(F,A,_).
+baseKB_hybrid_support(F,A):-lmconf:wrap_shared(F,A,_).
 baseKB_hybrid_support(F,A):-clause_b(hybrid_support(F,A)).
+
 baseKB:hybrid_support(predicateConventionMt,2).
 
 baseKB:hybrid_support(functorDeclares,1).
@@ -552,8 +574,21 @@ baseKB:hybrid_support(genlMt,2).
 
 istAbove(Mt,Query):- Mt \== baseKB, genlMt(Mt,MtAbove),MtAbove:Query.
 
+
+% make sure we ignore calls to predicate_property/2  (or thus '$define_predicate'/1)
+% uses_predicate(_,error):-prolog_current_frame(F), prolog_frame_attribute(F,parent_goal,predicate_property(_,_)),!.
 uses_predicate(M:F/A,R):- !, '$current_source_module'(SM), uses_predicate(SM,M,F,A,R).
 uses_predicate(F/A,R):- '$current_source_module'(SM),'$current_typein_module'(M),uses_predicate(M,SM,F,A,R).
+
+
+
+is_parent_goal(G):- prolog_current_frame(F),prolog_frame_attribute(F,parent_goal, G).
+is_parent_goal(F,G):-prolog_frame_attribute(F,parent_goal, G).
+
+
+has_parent_goal(G):- prolog_current_frame(F),prolog_frame_attribute(F,parent, PF),has_parent_goal(PF,G).
+has_parent_goal(F,G):-prolog_frame_attribute(F,goal, G);(prolog_frame_attribute(F,parent, PF),has_parent_goal(PF,G)).
+
 
 uses_predicate(_,Module,Name,Arity,Action) :- 
       current_prolog_flag(autoload, true),
@@ -561,19 +596,8 @@ uses_predicate(_,Module,Name,Arity,Action) :-
 	Action = retry.
 uses_predicate(_,CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
 
-uses_predicate(baseKB,System, F,A,R):- System\==baseKB,
-   (module_property(System,class(system));module_property(System,class(library));module_property(System,class(user))),!,
-   uses_predicate(System,baseKB,F,A,R),!.
-
-% keeps from calling this more than once
-uses_predicate(SM,M,F,A,error):- 
-  lmcache:tried_to_retry_undefined(SM,M,F,A),!,
-  wdmsg(unused_predicate(SM,M,F,A)).
-
-
-uses_predicate(SM,CallerMt,F,A,_):-
-   wdmsg(uses_predicate(SM,CallerMt,F,A)),
-   assert(lmcache:tried_to_retry_undefined(SM,CallerMt,F,A)),fail.
+uses_predicate(BaseKB,System, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),!,
+   must(uses_predicate(System,BaseKB,F,A,R)),!.
 
 uses_predicate(_,_, (:-), 1, error) :- !,dumpST,break.
 uses_predicate(_,_, (:-), _, error) :- !,dumpST,break.
@@ -583,6 +607,33 @@ uses_predicate(_,_, (:), _, error) :- !,dumpST,break.
 % uses_predicate(SM,_, '>>',  4, error) :- !,dumpST,break.
 uses_predicate(_,_, '[|]', _, error) :- !,dumpST,break.
 
+% make sure we ignore calls to predicate_property/2  (or thus '$define_predicate'/1)
+uses_predicate(_,_,_,_,error):-prolog_current_frame(F), 
+  (is_parent_goal(F,'$define_predicate'(_));
+   is_parent_goal(F,'assert_u'(_));
+   has_parent_goal(F,'$syspreds':property_predicate(_,_))),!.
+
+uses_predicate(CallerMt,baseKB,predicateConventionMt,2,retry):-
+  create_predicate_istAbove(baseKB,predicateConventionMt,2),
+   system:import(baseKB:predicateConventionMt/2),!.
+
+uses_predicate(CallerMt, baseKB, F, A,retry):-
+  create_predicate_istAbove(baseKB,F,A),
+   system:import(baseKB:F/A),!.
+
+uses_predicate(System, BaseKB, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),!,
+   create_predicate_istAbove(BaseKB,F,A),
+    system:import(BaseKB:F/A),!.
+
+% keeps from calling this more than once
+uses_predicate(SM,M,F,A,error):- 
+  lmcache:tried_to_retry_undefined(SM,M,F,A),!,
+  wdmsg(unused_predicate(SM,M,F,A)),backtrace(800),break.
+
+uses_predicate(SM,CallerMt,F,A,_):-
+   wdmsg(uses_predicate(SM,CallerMt,F,A)),
+   assert(lmcache:tried_to_retry_undefined(SM,CallerMt,F,A)),fail.
+
 uses_predicate(_,Module, Name, Arity, Action) :- fail,
 	current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
@@ -591,8 +642,9 @@ uses_predicate(_,Module, Name, Arity, Action) :- fail,
 uses_predicate(_,System, _,_, error):- module_property(System,class(system)),!.
 uses_predicate(_,System, _,_, error):- module_property(System,class(library)),!.
 
-uses_predicate(_SM,CallerMt,F,A,retry):- 
-    loop_check(retry_undefined(CallerMt,F,A),dump_break).
+uses_predicate(SM,CallerMt,F,A,R):- 
+    loop_check_term(retry_undefined(CallerMt,F,A),dump_break_loop_check_uses_predicate(SM,CallerMt,F,A,retry),dump_break),
+    R=retry.
 
 %% create_predicate_istAbove(+ChildDefMt,+F,+A) is semidet.
 %
@@ -609,15 +661,11 @@ create_predicate_istAbove(CallerMt,F,A):-
 
 
 
-% Module defines the type
-% retry_undefined(M:F/A):- lmcache:tried_to_retry_undefined(M,F,A),!.
-% retry_undefined(M:F/A):- assert(lmcache:tried_to_retry_undefined(M,F,A)),fail.
-
-
 % Every module has it''s own
 retry_undefined(CallerMt,'$pldoc',4):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
 
 % 3 very special Mts
+% Module defines the type
 retry_undefined(lmconf,F,A):- make_as_dynamic(retry_undefined(lmconf),lmconf,F,A),!.
 retry_undefined(lmcache,F,A):- volatile(lmcache:F/A),make_as_dynamic(retry_undefined(lmcache),lmcache,F,A),!.
 retry_undefined(t_l,F,A):- thread_local(t_l:F/A),!,make_as_dynamic(retry_undefined(t_l),t_l,F,A),!.
@@ -632,7 +680,7 @@ retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(mtGlob
 
 % import built-ins ?
 retry_undefined(CallerMt,F,A):- current_predicate(system:F/A), current_module(M),M\=system,
-  current_predicate(M:F/A),functor(P,F,A),predicate_property_safe(M:P,defined),\+predicate_property_safe(M:P,imported_from(_)),
+  current_predicate(M:F/A),functor(P,F,A),predicate_property(M:P,defined),\+predicate_property(M:P,imported_from(_)),
   CallerMt:import(M:F/A).
 
 % our autoloader hacks

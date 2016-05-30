@@ -1670,8 +1670,8 @@ pp_now.
 %
 % This Listing.
 %
-this_listing(M:F/A):-functor(H,F,A),predicate_property_safe(M:H,number_of_causes(_)),!, forall(clause(M:H,Body),pp_i2tml((M:H :- Body))).
-this_listing(M:F/A):-functor(H,F,A),predicate_property_safe(H,number_of_causes(_)),!, forall(clause(H,Body),pp_i2tml((M:H :- Body))).
+this_listing(M:F/A):-functor(H,F,A),predicate_property(M:H,number_of_causes(_)),!, forall(clause(M:H,Body),pp_i2tml((M:H :- Body))).
+this_listing(M:F/A):-functor(H,F,A),predicate_property(H,number_of_causes(_)),!, forall(clause(H,Body),pp_i2tml((M:H :- Body))).
 this_listing(M:F/A):-listing(M:F/A),!.
 this_listing(MFA):-listing(MFA).
 
@@ -2014,8 +2014,8 @@ functor_to_color(_G,argGenls,_,'white').
 functor_to_color(_,_,1,yellow).
 
 
-functor_to_color(G,_,_,'lightgrey'):-predicate_property_safe(G,foreign).
-functor_to_color(G,_,_,'cyc-logo-3-t'):-predicate_property_safe(G,built_in).
+functor_to_color(G,_,_,'lightgrey'):-predicate_property(G,foreign).
+functor_to_color(G,_,_,'cyc-logo-3-t'):-predicate_property(G,built_in).
 
 functor_to_color(_,-,_,red).
 functor_to_color(_,not,_,red).
@@ -2620,7 +2620,7 @@ write_tail(Other, Style) :-		%  |junk]
 %
 portable_listing :-
 	current_predicate(_, Pred),
-        predicate_property_safe(Pred,number_of_clauses(_)),
+        predicate_property(Pred,number_of_clauses(_)),
 	nl,
 	clause(Pred, Body),
 	rok_portray_clause((Pred:-Body)),

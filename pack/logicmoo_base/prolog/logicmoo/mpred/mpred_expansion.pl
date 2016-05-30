@@ -55,7 +55,8 @@
 */
 %:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_expansion,
-          [ acceptable_xform/2,
+          [ a/2,
+            acceptable_xform/2,
             additiveOp/1,
             alt_calls/1,
             any_op_to_call_op/2,
@@ -255,6 +256,28 @@ Writing in Prolog is actually really easy for a MUD is when X is chosen
 */
 
 
+
+% ============================================
+% inital a/2 database
+% ============================================
+
+% lmconf:hasInstance_dyn(W,SS):-nonvar(W),nonvar(SS),SS=isKappaFn(_,S),nonvar(S),!.
+
+
+/*
+disabled a(T,I):- not(current_predicate(deduce_M/1)),!,lmconf:hasInstance_dyn(T,I).
+disabled a(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(lmconf:hasInstance_dyn(T,I)))),fail))).
+disabled a(T,I):- rdf_x(I,rdf:type,T).
+*/
+
+%% a( ?C, ?I) is nondet.
+%
+% A.
+%
+:- meta_predicate a(+,?).
+a(C,I):- quietly((atom(C),G=..[C,I], no_repeats_old(clause_true(G)))).
+
+
 %=  :- was_export(alt_calls/1).
 
 %= 	 	 
@@ -293,7 +316,7 @@ cheaply_u(G):- loop_check(cheaply_u_ilc(G),loop_check_term(cheaply_u_ilc(G),ilc2
 cheaply_u_ilc(P):- strip_module(P,_,C),P\==C,!,cheaply_u_ilc(C).
 cheaply_u_ilc(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
 cheaply_u_ilc(call(ereq,G)):- !,cheaply_u_ilc(G).
-cheaply_u_ilc(P):- predicate_property_safe(P,number_of_rules(N)),N=0,!,lookup_u(P).
+cheaply_u_ilc(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
 cheaply_u_ilc(G):- call_u(G).
 
 %= 	 	 
@@ -542,7 +565,7 @@ is_stripped_module(Mt):- call_u(mtExact(Mt)),!,fail.
 %is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
 is_stripped_module(abox).
 % is_stripped_module(_):-!,fail.
-is_stripped_module(baseKB).
+% is_stripped_module(baseKB).
 % is_stripped_module(A):- defaultAssertMt(AB),!,AB=A.
 
 
@@ -870,8 +893,8 @@ fully_expand_head(A,B,C):-
    must(
     loop_check_term(
         transitive_lc(try_expand_head_dif(A),B3,C),
-        fully_expand_head(A,B,C), 
-        (wdmsg(loop_try_expand_head_dif(A)),B3=C))),!.
+        fully_expand_head_loop(A,B), 
+        (wdmsg(loop_try_expand_head_dif(A,B)),B3=C))),!.
 
 try_expand_head_dif(A,B,C):-try_expand_head(A,B,C), B\=@=C,!.
 try_expand_head_dif(_,B,B).
@@ -887,6 +910,7 @@ try_expand_head(Op,Sent,SentO):- transitive_lc(db_expand_0(Op),Sent,OO),!,SentO=
 
 
 
+:- meta_predicate temp_comp(*,*,2,?).
 
 temp_comp(H,B,PRED,OUT):- nonvar(H),term_variables(B,Vs1),Vs1\==[], term_attvars(B,AVs1), AVs1==[],   
    must_atomic((asserta(('$temp_comp123'(H,B):- B),Ref),clause('$temp_comp123'(H,_),BO,Ref),erase(Ref))),
@@ -934,7 +958,7 @@ db_expand_0(Op,Sent,SentO):- transitive_lc(db_expand_chain(Op),Sent,SentO)-> Sen
 
 db_expand_0(Op,EL,O):- is_list(EL),!,must_maplist(db_expand_0(Op),EL,O).
 
-db_expand_0(Op,(H:-B),OUT):-temp_comp(H,B,db_expand_0(Op),OUT).
+db_expand_0(Op,(H:-B),OUT):- temp_comp(H,B,db_expand_0(Op),OUT).
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_0(Op,INot,O).
 db_expand_0(Op,THOLDS,OUT):- THOLDS=..[t,P|ARGS],atom(P),!,HOLDS=..[P|ARGS],db_expand_0(Op,HOLDS,OUT).
@@ -1102,8 +1126,8 @@ maybe_prepend_mt(Mt,Mt:HH,Mt:HH):-!.
 maybe_prepend_mt(_,Mt:HH,Mt:HH):-!.
 maybe_prepend_mt(Mt,HH,Mt:HH):-!.
 
-predicateSystemCode(P,PP):-strip_module(P,_,PP),predicate_property_safe(system:PP,defined),
-  \+ predicate_property_safe(system:PP,imported_from(baseKB)).
+predicateSystemCode(P,PP):-strip_module(P,_,PP),predicate_property(system:PP,defined),
+  \+ predicate_property(system:PP,imported_from(baseKB)).
 
 %% remodulize( ?Why, ?H, ?HH) is det.
 %
@@ -1140,7 +1164,7 @@ must_remodulize(Why,H,HHH):-must(demodulize(Why,H,HHH)),!.
 %
 % If Is A Meta Functor.
 %
-is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_property_safe(Sent,meta_predicate(_));is_sentence_functor(F);F==pfcDefault),!.
+is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_property(Sent,meta_predicate(_));is_sentence_functor(F);F==pfcDefault),!.
  
 
 
@@ -1489,7 +1513,7 @@ into_mpred_form6(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
 into_mpred_form6(C,isa,_,2,_,C):-!.
 into_mpred_form6(C,_,_,_,_,isa(I,T)):-was_isa_syntax(C,I,T),!.
 into_mpred_form6(_X,t,P,_N,A,O):-!,(atom(P)->O=..[P|A];O=..[t,P|A]).
-into_mpred_form6(G,_,_,1,_,G):-predicate_property_safe(G,number_of_rules(N)),N >0, !.
+into_mpred_form6(G,_,_,1,_,G):-predicate_property(G,number_of_rules(N)),N >0, !.
 into_mpred_form6(G,F,C,1,_,O):-real_builtin_predicate(G),!,into_mpred_form(C,OO),O=..[F,OO].
 into_mpred_form6(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[holds_f,P|A]).
 into_mpred_form6(_X,H,P,_N,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[t,P|A]).
@@ -1558,7 +1582,7 @@ transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),
 transform_holds_3(_,A,A):- (not_ftCompound(A)),!.
 transform_holds_3(_,props(Obj,Props),props(Obj,Props)):-!.
 %transform_holds_3(Op,Sent,OUT):-Sent=..[And|C12],is_sentence_functor(And),!,maplist(transform_holds_3(Op),C12,O12),OUT=..[And|O12].
-transform_holds_3(_,A,A):-compound(A),functor(A,F,N), predicate_property_safe(A,_),arity(F,N),!.
+transform_holds_3(_,A,A):-compound(A),functor(A,F,N), predicate_property(A,_),arity(F,N),!.
 transform_holds_3(HFDS,M:Term,M:OUT):-atom(M),!,transform_holds_3(HFDS,Term,OUT).
 transform_holds_3(HFDS,[P,A|ARGS],DBASE):- is_ftVar(P),!,DBASE=..[HFDS,P,A|ARGS].
 transform_holds_3(HFDS, ['[|]'|ARGS],DBASE):- trace_or_throw(list_transform_holds_3(HFDS,['[|]'|ARGS],DBASE)).
@@ -1682,7 +1706,7 @@ db_reop_l(Op,DATA):-no_loop_check(db_op0(Op,DATA)).
 %
 expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
 
-% db_op_simpler(query(HLDS,_),MODULE:C0,call_u(call,MODULE:C0)):- atom(MODULE), is_ftNonvar(C0),not(not(predicate_property_safe(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
+% db_op_simpler(query(HLDS,_),MODULE:C0,call_u(call,MODULE:C0)):- atom(MODULE), is_ftNonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
 
 %= 	 	 
 
@@ -1720,7 +1744,7 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 
 % -  dmsg_hook(db_op(query(HLDS,call),holds_t(ft_info,tCol,'$VAR'(_)))):-trace_or_throw(dtrace).
 
-fixed_negations(I,O):- ((fix_negations(I,O),!,I\=@=O)),!.
+fixed_negations(I,O):- fix_negations(I,O)->I\=@=O.
 fix_negations(P0,P0):- not_ftCompound(P0),!.
 fix_negations(~(P0),~(P0)):- not_ftCompound(P0),!.
 fix_negations(\+(P0),\+(P0)):- not_ftCompound(P0),!.
@@ -1745,7 +1769,7 @@ reduce_clause_from_fwd(Op,(B==>H),HH):-B==true,reduce_clause_from_fwd(Op,H,HH).
 reduce_clause_from_fwd(Op,I,O):- fixed_negations(I,M),reduce_clause_from_fwd(Op,M,O).
 reduce_clause_from_fwd(Op,(==>H),HH):-!,reduce_clause_from_fwd(Op,H,HH).
 reduce_clause_from_fwd(Op,(H<- B),HH):-B==true,reduce_clause_from_fwd(Op,H,HH).
-reduce_clause_from_fwd(Op,(B<==> H),HH):-B==true,reduce_clause_from_fwd(Op,H,HH).
+reduce_clause_from_fwd(Op,(B<==> H),HH):-B==true,reduce_clause_from_fwd(Op,'==>'(H),HH).
 reduce_clause_from_fwd(Op,(H<==> B),HH):-B==true,reduce_clause_from_fwd(Op,H,HH).
 reduce_clause_from_fwd(Op,(H,B),(HH,BB)):-!,reduce_clause_from_fwd(Op,H,HH),reduce_clause_from_fwd(Op,B,BB).
 reduce_clause_from_fwd(_Op,H,H).

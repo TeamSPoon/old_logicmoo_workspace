@@ -257,11 +257,11 @@ argIsa(mudFacing,2,vtDirection).
 argIsa(mudMemory,2,ftTerm).
 
 /*
-tms_reject_why(mudAtLoc(iArea1025, _),isa(iArea1025,tRegion)).
-tms_reject_why(localityOfObject(iArea1025, iOfficeRoom7),isa(iArea1025,tRegion)).
-tms_reject_why(localityOfObject(R,_),isa(R,tRegion)):- isa(R,tRegion).
-tms_reject_why(mudFacing(R,_),isa(R,tRegion)):- isa(R,tRegion).
-tms_reject_why(mudAtLoc(R,_),isa(R,tRegion)):- isa(R,tRegion).
+never_assert_u(mudAtLoc(iArea1025, _),isa(iArea1025,tRegion)).
+never_assert_u(localityOfObject(iArea1025, iOfficeRoom7),isa(iArea1025,tRegion)).
+never_assert_u(localityOfObject(R,_),isa(R,tRegion)):- isa(R,tRegion).
+never_assert_u(mudFacing(R,_),isa(R,tRegion)):- isa(R,tRegion).
+never_assert_u(mudAtLoc(R,_),isa(R,tRegion)):- isa(R,tRegion).
 
 %deduce_facts_forward(localityOfObject(_,Region),isa(Region,tSpatialThing)).
 deduce_facts_forward(localityOfObject(Obj,_),isa(Obj,tObj)).
@@ -655,12 +655,13 @@ arity(bordersOn,2).
 bordersOn(R1,R2):-is_asserted(pathDirLeadsTo(R1,Dir,R2)),nop(Dir).
 bordersOn(R1,R2):-is_asserted(pathDirLeadsTo(R2,Dir,R1)),nop(Dir).
 
-ensure_some_pathBetween(R1,R2):- bordersOn(R1,R2),!.
-ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), \+(is_asserted(pathDirLeadsTo(R1,Dir,_))),must(reverse_dir(Dir,Rev)),\+(is_asserted(pathDirLeadsTo(R2,Rev,_))),!, 
+ensure_some_pathBetween(R1,R2):- cwc,bordersOn(R1,R2),!.
+ensure_some_pathBetween(R1,R2):- cwc,random_path_dir(Dir), \+(is_asserted(pathDirLeadsTo(R1,Dir,_))),must(reverse_dir(Dir,Rev)),\+(is_asserted(pathDirLeadsTo(R2,Rev,_))),!, 
    must((ain(pathDirLeadsTo(R1,Dir,R2)),ain(pathDirLeadsTo(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- trace,must((ain(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),ain(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
+ensure_some_pathBetween(R1,R2):- cwc,dtrace,must((ain(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),ain(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
 
-bordersOn(R1,R2)/ground(bordersOn(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion), {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
+bordersOn(R1,R2)/ground(bordersOn(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion), 
+  {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
 
 
 % ==================================================

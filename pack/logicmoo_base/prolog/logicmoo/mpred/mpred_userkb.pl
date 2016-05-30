@@ -197,15 +197,15 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
 
-kb_dynamic_m(E):- with_source_module(baseKB,kb_dynamic(baseKB:E)).
+kb_dynamic_m(E):- with_source_module(baseKB,decl_shared(kb_dynamic,E)).
 
 :- multifile(baseKB:predicateConventionMt/2).
 :- dynamic(baseKB:predicateConventionMt/2).
 
+:- kb_dynamic(mpred_online:semweb_startup).
 
 % :- lmconf:base_kb_pred_list([A,B|_List]),rtrace(call(must_maplist(kb_dynamic_m,[A,B]))).
 :- lmconf:base_kb_pred_list(List),call(must_maplist(kb_dynamic_m,List)).
-
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -460,7 +460,7 @@ on_modules_changed :-
 %
 never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
   functor(P,F,A),
-  ignore(predicate_property_safe(M:P,exported)),
+  ignore(predicate_property(M:P,exported)),
   defined_predicate(M:P),  
   is_static_why(M,P,F,A,R),
   Why = static(M:P-F/A,R).

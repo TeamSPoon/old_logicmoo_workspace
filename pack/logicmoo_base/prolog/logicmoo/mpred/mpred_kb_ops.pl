@@ -290,6 +290,7 @@ mpred_facts_and_universe/1
       % call_u(+),
       assertz_mu(+),      
       assertz_mu(+,+),
+      if_missing(+),
       assert_mu(+),
       ain_minfo_2(1,*),
       ain_minfo(1,*),
@@ -318,7 +319,7 @@ mpred_facts_and_universe/1
 %
 % Managed Predicate Univ.
 %
-mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property_safe(Head,number_of_clauses(_)).
+mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
 
 %% oncely( :GoalCall) is semidet.
 %
@@ -586,7 +587,7 @@ is_side_effect_disabled:- t_l:noDBaseMODs(_),!.
 % Functor Converted To Module-functor-arity.
 %
 f_to_mfa(EF,R,F,A):-w_get_fa(EF,F,A),
-              (((current_predicate(F/A),functor(P,F,A),predicate_property_safe(_M:P,imported_from(R)))*->true;
+              (((current_predicate(F/A),functor(P,F,A),predicate_property(_M:P,imported_from(R)))*->true;
               current_predicate(F/A),functor(P,F,A),source_file(R:P,_SF))),
               current_predicate(R:F/A).
 
@@ -633,7 +634,7 @@ is_mpred_action(P):-is_static_predicate(P).
 %
 % PFC If Is A Builtin.
 %
-mpred_is_builtin(P):- predicate_property_safe(P,built_in), \+ predicate_property_safe(P,dynamic).
+mpred_is_builtin(P):- predicate_property(P,built_in), \+ predicate_property(P,dynamic).
 
 /* UNUSED TODAY
 
@@ -1477,8 +1478,8 @@ mpred_get_support_via_sentence(G,call_u(G)):- call_u(G).
 % PFC Get Support Via Clause Database.
 %
 mpred_get_support_via_clause_db(\+ P,OUT):- mpred_get_support_via_clause_db(~(P),OUT).
-mpred_get_support_via_clause_db(\+ P,(naf(g),g)):- !, predicate_property_safe(P,number_of_clauses(_)),\+ clause(P,_Body).
-mpred_get_support_via_clause_db(P,OUT):- predicate_property_safe(P,number_of_clauses(N)),N>0,
+mpred_get_support_via_clause_db(\+ P,(naf(g),g)):- !, predicate_property(P,number_of_clauses(_)),\+ clause(P,_Body).
+mpred_get_support_via_clause_db(P,OUT):- predicate_property(P,number_of_clauses(N)),N>0,
    clause_u(P,Body),(Body==true->Sup=(g);
     (support_ok_via_clause_body(P),mpred_get_support_precanonical_plus_more(Body,Sup))),
    OUT=(Sup,g).
@@ -1564,7 +1565,7 @@ neg_in_code0(G):-  is_ftNonvar(G), a(prologSingleValued,G),must((if_missing_mask
 % Negated May Negation-by-faliure.
 %
 neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause_u(prologNegByFailure(F),true),!.
-neg_may_naf(P):- is_ftCompound(P),predicate_property_safe(P,static).
+neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
 
 
 %=
@@ -1649,11 +1650,11 @@ mpred_call_0(G):- strip_module(G,M,P),sanity(nonvar(P)),functor(P,F,_),mpred_cal
 mpred_call_1(_,G,_):- is_side_effect_disabled,!,mpred_call_with_no_triggers(G).
 
 mpred_call_1(M,G,F):- sanity(\+  is_side_effect_disabled),
-               (ground(G); \+ current_predicate(_,M:G) ; \+ (predicate_property_safe(M:G,number_of_clauses(CC)),CC>1)), 
+               (ground(G); \+ current_predicate(_,M:G) ; \+ (predicate_property(M:G,number_of_clauses(CC)),CC>1)), 
     
                 ignore((loop_check(call_with_bc_triggers(M:G)),maybeSupport(G,(g,ax)),fail)),
                  \+ current_predicate(F,M:G),\+ current_predicate(_,_:G),
-                 doall(show_call(predicate_property_safe(_UM:G,_PP))),
+                 doall(show_call(predicate_property(_UM:G,_PP))),
                  debug(mpred),
                  fail,
                  %TODO remove this failure
@@ -1790,7 +1791,7 @@ pfcBC_Cache(F) :- mpred_call_only_facts(pfcBC_Cache,F),
 %
 maybeSupport(P,_):-mpred_ignored(P),!.
 maybeSupport(P,S):-( \+ ground(P)-> true;
-  (predicate_property_safe(P,dynamic)->mpred_ain(P,S);true)).
+  (predicate_property(P,dynamic)->mpred_ain(P,S);true)).
 
 
 %% mpred_ignored( :TermC) is semidet.
@@ -1812,7 +1813,7 @@ mpred_ignored(isa(_,argIsaFn(_, _))).
 %
 % Has Clause.
 %
-has_cl(H):-predicate_property_safe(H,number_of_clauses(_)).
+has_cl(H):-predicate_property(H,number_of_clauses(_)).
 
 % an action is undoable if there exists a method for undoing it.
 
@@ -1844,7 +1845,7 @@ mpred_cleanup:- forall((no_repeats(F-A,(mpred_mark(pfcRHS,F,A),A>1))),mpred_clea
 %
 % PFC Cleanup.
 %
-mpred_cleanup(F,A):-functor(P,F,A),predicate_property_safe(P,dynamic)->mpred_cleanup_0(P);true.
+mpred_cleanup(F,A):-functor(P,F,A),predicate_property(P,dynamic)->mpred_cleanup_0(P);true.
 
 
 %% mpred_cleanup_0( +P) is semidet.
@@ -2004,7 +2005,7 @@ clause_or_call(M:H,B):-is_ftVar(M),!,no_repeats(M:F/A,(f_to_mfa(H,M,F,A))),M:cla
 clause_or_call(isa(I,C),true):-!,call_u(isa_asserted(I,C)).
 clause_or_call(genls(I,C),true):-!,on_x_log_throw(call_u(genls(I,C))).
 clause_or_call(H,B):- clause(src_edit(_Before,H),B).
-clause_or_call(H,B):- predicate_property_safe(H,number_of_clauses(C)),predicate_property_safe(H,number_of_rules(R)),((R*2<C) -> (clause_u(H,B)*->!;fail) ; clause_u(H,B)).
+clause_or_call(H,B):- predicate_property(H,number_of_clauses(C)),predicate_property(H,number_of_rules(R)),((R*2<C) -> (clause_u(H,B)*->!;fail) ; clause_u(H,B)).
 clause_or_call(H,true):- call_u(should_call_for_facts(H)),no_repeats(on_x_log_throw(H)).
 
 
@@ -2021,7 +2022,7 @@ should_call_for_facts(H):- get_functor(H,F,A),call_u(should_call_for_facts(H,F,A
 % Should Call For Facts.
 %
 should_call_for_facts(_,F,_):- a(prologSideEffects,F),!,fail.
-should_call_for_facts(H,_,_):- modulize_head(H,HH), \+ predicate_property_safe(HH,number_of_clauses(_)),!.
+should_call_for_facts(H,_,_):- modulize_head(H,HH), \+ predicate_property(HH,number_of_clauses(_)),!.
 should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcRHS,F,A)),!,fail.
 should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcMustFC,F,A)),!,fail.
 should_call_for_facts(_,F,_):- a(prologDynamic,F),!.
@@ -2172,7 +2173,7 @@ pred_u2(P):-clause_true(arity(F,A)),functor(P,F,A),has_db_clauses(P).
 % Has Database Clauses.
 %
 has_db_clauses(PI):-modulize_head(PI,P),
-   predicate_property_safe(P,number_of_clauses(NC)),\+ predicate_property_safe(P,number_of_rules(NC)), \+ \+ clause_u(P,true).
+   predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause_u(P,true).
 
 
 
@@ -2244,12 +2245,12 @@ repropagate(_):-  check_context_module,fail.
 
 repropagate(P):-  is_ftVar(P),!.
 repropagate(P):-  meta_wrapper_rule(P),!,call_u(repropagate_meta_wrapper_rule(P)).
-repropagate(P):-  \+ predicate_property_safe(P,_),'$find_predicate'(P,PP),PP\=[],!,forall(member(M:F/A,PP),
+repropagate(P):-  \+ predicate_property(P,_),'$find_predicate'(P,PP),PP\=[],!,forall(member(M:F/A,PP),
                                                           must((functor(Q,F,A),repropagate_1(M:Q)))).
 repropagate(F/A):- is_ftNameArity(F,A),!,functor(P,F,A),!,repropagate(P).
 repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 
-repropagate(P):-  \+ predicate_property_safe(_:P,_),dmsg(undefined_repropagate(P)),dumpST,dtrace,!,fail.
+repropagate(P):-  \+ predicate_property(_:P,_),dmsg(undefined_repropagate(P)),dumpST,dtrace,!,fail.
 repropagate(P):-  repropagate_0(P).
 
 

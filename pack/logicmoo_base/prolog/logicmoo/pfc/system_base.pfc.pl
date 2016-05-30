@@ -265,7 +265,7 @@ mpred_mark(pfcRHSF,1)/(fail,atom(F),functor(Head,F,1),
  \+ prologDynamic(F),
  \+ ~(tCol(F)),
  \+ specialFunctor(F),
- \+ predicate_property_safe(Head,built_in))==>completelyAssertedCollection(F).
+ \+ predicate_property(Head,built_in))==>completelyAssertedCollection(F).
 */
 % mpred_mark(Type,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
 
@@ -278,7 +278,7 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 
 %:- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
 %mp_test_agr(_,_,_,_,_,_,_,_,_,_).
-%:- mpred_test(predicate_property_safe(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
+%:- mpred_test(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
 % becomes         mp_test_agr(+,+,-,?,^,:,0,1,0,0)
 
 
@@ -353,14 +353,14 @@ tCol(Decl)==>functorDeclares(Decl).
 :- sanity(arity(ttModule,1)).
 
 :- sanity(\+ arity(ttModule,3)).
-:- sanity(\+ predicate_property_safe(ttModule(_,_,_),_)).
+:- sanity(\+ predicate_property(ttModule(_,_,_),_)).
 
 ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
   genls(tMicrotheory)).
 
 :- sanity(arity(ttModule,1)).
 :- sanity(\+ arity(ttModule,3)).
-:- sanity(\+ predicate_property_safe(ttModule(_,_,_),_)).
+:- sanity(\+ predicate_property(ttModule(_,_,_),_)).
 
 ttModule(mtProlog,comment("Builtin Prolog code modules such as 'lists' or 'apply' and PFC system like 'mpred_loader' or 'mpred_type_wff'"),
   genlsFwd(mtProlog),genls(mtCore)).
@@ -419,8 +419,8 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 :- dynamic(baseKB:isRegisteredCycPred/3).
 
 ({fail,current_module(Mt),
-   predicate_property_safe(Mt:P,defined), 
- \+ predicate_property_safe(Mt:P,imported_from(_)),
+   predicate_property(Mt:P,defined), 
+ \+ predicate_property(Mt:P,imported_from(_)),
  functor(P,F,A)})
   ==>baseKB:isRegisteredCycPred(Mt,F,A).
 

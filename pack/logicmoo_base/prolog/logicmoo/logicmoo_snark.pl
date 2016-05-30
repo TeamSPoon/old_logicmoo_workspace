@@ -39,7 +39,7 @@ with_ukb_snark(KB,G):- with_umt(KB,G).
 % Hook To [checkkb:m1/0] For Module Logicmoo_snark.
 % Module Secondary Helper.
 %
-:- add_library_search_path('./mpred_online/',[ '*.pl']).
+%:- add_library_search_path('./mpred_online/',[ '*.pl']).
 checkKB:m1:- gripe_time(40,ensure_loaded(baseKB:logicmoo(mpred_online/mpred_www))),if_defined(ensure_webserver), make,list_undefined.
 
 % :- hook_message_hook.

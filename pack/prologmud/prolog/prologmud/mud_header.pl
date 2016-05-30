@@ -17,9 +17,9 @@
 :- file_begin(code).
 :- op(1150,fx,kb_dynamic).
 
-:- kb_dynamic(  irc_event_hooks/3).
+:- kb_dynamic(  lmconf:irc_event_hooks/3).
 :- kb_dynamic(  deliver_event_hooks/2).
-:- kb_dynamic   irc_user_plays/3.
+:- kb_dynamic   lmconf:irc_user_plays/3.
 
 :- thread_local t_l:wants_logout/1.
 :- kb_dynamic t_l:wants_logout/1.
@@ -93,7 +93,7 @@
 % :- kb_dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
 :- kb_dynamic(mpred_online:semweb_startup).
-
+:- break.
 :- kb_dynamic(  tChannel/1).
 
 
@@ -105,8 +105,9 @@
 :- thread_local   t_l:repl_to_string/2.
 :- thread_local   t_l:repl_writer/2.
 :- kb_dynamic   lmcache:loaded_external_kbs/1.
+:- break.
 :- kb_dynamic   loading_module_h/1.
-:- kb_dynamic   registered_module_type/2.
+:- kb_dynamic   lmconf:registered_module_type/2.
 :- kb_dynamic   must_compile_special_clause_file/1.
 
 % HOOKS
@@ -117,7 +118,7 @@
 :- kb_dynamic   fact_always_true/1.
 :- kb_dynamic   fact_is_false/2.
 :- kb_dynamic   fact_maybe_deduced/1.
-:- kb_dynamic   tms_reject_why/2.
+:- kb_dynamic   never_assert_u/2.
 :- kb_dynamic   impl_coerce_hook/3.
 
 :- kb_dynamic   create_random_fact/1.

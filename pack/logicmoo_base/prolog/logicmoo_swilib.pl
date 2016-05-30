@@ -223,7 +223,8 @@
 :- system:use_module(library(http/http_wrapper)).
 
 
-:- M=pldoc_process,ignore((module_property(M,file(S)),source_file(PI,S),
+:- M=pldoc_process,ignore((module_property(M,file(S)),
+   source_file(PI,S),
    \+ ((predicate_property(M:PI,imported_from(U)),U\==M)),
    functor(PI,F,A),import(F/A),fail)).
 

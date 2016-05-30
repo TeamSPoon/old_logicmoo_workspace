@@ -694,7 +694,7 @@ wrap_univ(Body ,[WapperPred,[P]]):-is_wrapper_pred(WapperPred),compound(P),P=..F
 wrap_univ(Body ,[WapperPred,P]):-is_wrapper_pred(WapperPred),compound(P),P=..F_ARGS,!,wrap_univ(Body ,[WapperPred|F_ARGS]).
 wrap_univ(Body ,[F1,F2|ARGS]):- F1==F2,!,wrap_univ(Body ,[F1|ARGS]).
 wrap_univ(_Body,[F|ARGS]):- must((atom(F),is_list(ARGS))),length(ARGS,A),must(A>1),functor(P,F,A),fail,
-  (predicate_property_safe(P,_)->fail;(dmsg(once(warn(no_predicate_property(P)))))),fail.
+  (predicate_property(P,_)->fail;(dmsg(once(warn(no_predicate_property(P)))))),fail.
 wrap_univ(Body ,[F|List]):- must((Body=..[F|List])).
 
 is_wrapper_pred(VarPred):-is_ftVar(VarPred),!,fail.
@@ -1280,12 +1280,12 @@ builtin_why(_,int_query,_,_):-!,fail.
 builtin_why(_,query,_,_):-!,fail.
 builtin_why(_,F,_,int_):- atom_concat(_,'_int',F),!.
 builtin_why(_,F,_,int_):- atom_concat('int_',_,F),!,fail.
-builtin_why(P,_,_,meta_predicate(P)):- predicate_property_safe(P,meta_predicate(P)).
-builtin_why(P,_,_,thread_local):- predicate_property_safe(P,thread_local).
+builtin_why(P,_,_,meta_predicate(P)):- predicate_property(P,meta_predicate(P)).
+builtin_why(P,_,_,thread_local):- predicate_property(P,thread_local).
 builtin_why(P,_,_,source_file(F)):- source_file(P,F).
 builtin_why(P,_,_,built_in):- real_builtin_predicate(P).
-builtin_why(P,_,_,transparent):- predicate_property_safe(P,transparent).
-% builtin_why(P,_,_,number_of_rules(N)):- predicate_property_safe(P,number_of_rules(N)),N>0.
+builtin_why(P,_,_,transparent):- predicate_property(P,transparent).
+% builtin_why(P,_,_,number_of_rules(N)):- predicate_property(P,number_of_rules(N)),N>0.
 builtin_why(X,0):-atom(X).
 %builtin_why(P,2,t(P,2)):-t(P,_,_),!,fail.
 %builtin_why(P,3,t(P,3)):-t(P,_,_,_),!,fail.

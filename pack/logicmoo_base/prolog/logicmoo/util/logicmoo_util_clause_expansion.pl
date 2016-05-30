@@ -16,7 +16,6 @@
           [
 
           swi_module/2,
-          predicate_property_safe/2,
           show_module_imports/0,
           show_module_imports/1,
           show_module_imports/2,
@@ -38,8 +37,8 @@
           is_fbe/3,
           is_user_module/0,
           
-          system_term_expansion/5,
-          system_goal_expansion/5,
+          lmce_system_term_expansion/5,
+          lmce_system_goal_expansion/5,
           expand_whatnot/6,
           preds_visible/3,
           do_ge/6,
@@ -104,7 +103,7 @@ appear in the source-code.
               system:sub_call_expansion/2)).
 
 
-:- module_transparent((is_user_module/0,without_lm_expanders/1,system_term_expansion/5,system_goal_expansion/5,functor_non_colon/3)).
+:- module_transparent((is_user_module/0,without_lm_expanders/1,lmce_system_term_expansion/5,lmce_system_goal_expansion/5,functor_non_colon/3)).
 :- use_module(logicmoo_util_dmsg).
 :- use_module(logicmoo_util_rtrace).
 
@@ -114,14 +113,6 @@ appear in the source-code.
 :- dynamic(system:term_expansion/4).
 
 :- meta_predicate get_named_value_goal(0,*).
-
-:- meta_predicate(system:predicate_property_safe(:,?)).
-
-system:predicate_property_safe(A,B):- current_prolog_flag(retry_undefined,false),!,predicate_property(A,B).
-system:predicate_property_safe(A,B):- 
-  quietly(w_tl(set_prolog_flag(retry_undefined,false),
-   predicate_property(A,B))).
-
 
 is_user_module :- prolog_load_context(source,F), lmconf:mpred_is_impl_file(F),!,fail.
 is_user_module :- prolog_load_context(module,user). 
@@ -157,24 +148,24 @@ is_fbe(goal,I,PosI):-!,
 functor_non_colon(G,F,A):- compound(G), functor(G,':',2),arg(2,G,GG),!,functor_non_colon(GG,F,A).
 functor_non_colon(G,F,A):- functor(G,F,A).
 
-system_term_expansion(_,I,_P,_O,_P2):-  notrace( var(I) ),!,fail.
+lmce_system_term_expansion(_,I,_P,_O,_P2):-  notrace( var(I) ),!,fail.
 
-system_term_expansion(Mod,end_of_file,P,O,P2):-  !, expand_whatnot(Mod,clause_expansion,end_of_file,P,O,P2).
-system_term_expansion(_,I,P,_O,_P2):- \+ is_fbe(term,I,P),!,fail.
+lmce_system_term_expansion(Mod,end_of_file,P,O,P2):-  !, expand_whatnot(Mod,clause_expansion,end_of_file,P,O,P2).
+lmce_system_term_expansion(_,I,P,_O,_P2):- \+ is_fbe(term,I,P),!,fail.
 
-system_term_expansion(Mod,(:- B),P,O,P2):- !, expand_whatnot(Mod,directive_expansion,(:- B),P,O,P2).
-system_term_expansion(_,I,_P,_O,_P2):- nb_setval('$term_e',I),fail.
-system_term_expansion(Mod,(H ),P,O,P2):- expand_whatnot(Mod,clause_expansion,H ,P,O,P2).
-% system_term_expansion(Mod,(H :- I),P,(H :- O),P2):- expand_whatnot(Mod,body_expansion,I,P,O,P2).
+lmce_system_term_expansion(Mod,(:- B),P,O,P2):- !, expand_whatnot(Mod,directive_expansion,(:- B),P,O,P2).
+lmce_system_term_expansion(_,I,_P,_O,_P2):- nb_setval('$term_e',I),fail.
+lmce_system_term_expansion(Mod,(H ),P,O,P2):- expand_whatnot(Mod,clause_expansion,H ,P,O,P2).
+% lmce_system_term_expansion(Mod,(H :- I),P,(H :- O),P2):- expand_whatnot(Mod,body_expansion,I,P,O,P2).
 
-% system_goal_expansion(I,P,O,P2):- var(I),!,fail.
+% lmce_system_goal_expansion(I,P,O,P2):- var(I),!,fail.
 sub_positional(P):- compound(P),functor(P,F,A),arg(A,P,[L|_]),compound(L),functor(L,F,_).
 
 positional_seg(term_position(G2787,_,G2787,_,[_-_])).
 
 nb_current_or_nil(N,V):- nb_current(N,V)->true;V=[].
 
-system_goal_expansion(Mod,I,P,O,P2):- 
+lmce_system_goal_expansion(Mod,I,P,O,P2):- 
   notrace((nb_current_or_nil('$term',Was),
   get_named_value_goal(is_fbe(term,I,P),L1),
   get_named_value_goal(Was=@=I,L2),
@@ -224,8 +215,8 @@ preds_visible(Mod,[F/A|List], MList):-
  findall(MVis-F/A,
   ((default_module(Mod,MVis),
   functor(P,F,A),
-  predicate_property_safe(MVis:P,defined),
-  \+ predicate_property_safe(MVis:P,imported_from(_)))),
+  predicate_property(MVis:P,defined),
+  \+ predicate_property(MVis:P,imported_from(_)))),
  MEList),
  preds_visible(Mod,List, NextMEList),
  append(MEList,NextMEList,MList).
@@ -367,7 +358,7 @@ all_source_file_predicates_are_transparent(File):-
     forall((source_file(ModuleName:P,File),functor(P,F,A)),
       ignore(( 
         ignore(( \+ atom_concat('$',_,F), ModuleName:export(ModuleName:F/A))),
-            \+ (predicate_property_safe(ModuleName:P,(transparent))),
+            \+ (predicate_property(ModuleName:P,(transparent))),
                    % ( nop(dmsg(todo(module_transparent(ModuleName:F/A))))),
                    (module_transparent(ModuleName:F/A))))).
 
@@ -383,7 +374,7 @@ without_lm_expanders(Goal):-
 system:goal_expansion(I,P,O,P2):- 
   current_prolog_flag(lm_expanders,true),
    prolog_load_context(module,Mod),
-   without_lm_expanders((system_goal_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
+   without_lm_expanders((lmce_system_goal_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
 
 system:term_expansion(EOF,POS,_,_):-
  is_fbe(term,EOF,POS),
@@ -398,7 +389,7 @@ system:term_expansion(EOF,POS,_,_):-
 
 system:term_expansion(I,P,O,P2):- current_prolog_flag(lm_expanders,true), 
   prolog_load_context(module,Mod), 
-   without_lm_expanders((system_term_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
+   without_lm_expanders((lmce_system_term_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
 
 :- initialization(nb_setval( '$term_position',[]),restore).
 :- initialization(nb_setval( '$term',[]),restore).

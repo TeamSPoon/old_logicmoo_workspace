@@ -14,7 +14,7 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_isa.pl
 %:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_type_isa,
-          [ a/2,
+          [ 
             assert_compound_isa/3,
             assert_hasInstance/2,
             assert_isa/2,
@@ -125,19 +125,6 @@ transitive_P_r_l(3,?,?,?),
 
 
 
-% ============================================
-% inital a/2 database
-% ============================================
-
-% lmconf:hasInstance_dyn(W,SS):-nonvar(W),nonvar(SS),SS=isKappaFn(_,S),nonvar(S),!.
-
-
-
-/*
-disabled a(T,I):- not(current_predicate(deduce_M/1)),!,lmconf:hasInstance_dyn(T,I).
-disabled a(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(lmconf:hasInstance_dyn(T,I)))),fail))).
-disabled a(T,I):- rdf_x(I,rdf:type,T).
-*/
 
 
 %= 	 	 
@@ -183,15 +170,6 @@ is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morpholo
 is_never_type(V):-is_ftVar(V),!,fail.
 is_never_type(V):-never_type_why(V,_),!.
 
-
-%= 	 	 
-
-%% a( ?C, ?I) is nondet.
-%
-% A.
-%
-:- meta_predicate a(+,?).
-a(C,I):- quietly((atom(C),G=..[C,I], no_repeats_old(clause_true(G)))).
 
 
 %= 	 	 
@@ -852,7 +830,7 @@ isa_asserted_0(I,T):- nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
 % isa_asserted_0(I,T):- HEAD= isa(I, T),ruleBackward(HEAD,BODY),trace,call_mpred_body(HEAD,BODY).
 
 isa_asserted_0(I,T):- is_ftVar(T),!,tCol_gen(T),call_u(isa(I,T)).
-isa_asserted_0(I,T):- atom(T),current_predicate(T,_:G),G=..[T,I],(predicate_property_safe(G,number_of_clauses(_))->clause(G,true);on_x_cont(G)).
+isa_asserted_0(I,T):- atom(T),current_predicate(T,_:G),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);on_x_cont(G)).
 isa_asserted_0(I,T):- nonvar(I),(  ((is_ftVar(T);chk_ft(T)),if_defined(term_is_ft(I,T)))*->true;type_deduced(I,T) ).
 isa_asserted_0(I,T):- is_ftCompound(I),is_non_unit(I),is_non_skolem(I),!,get_functor(I,F),compound_isa(F,I,T).
 isa_asserted_0(I,T):- nonvar(T),!,isa_asserted_1(I,T).
@@ -918,8 +896,8 @@ isa_atom_call(T,G):-
 %  (isa/2) atom call Inside Of Loop Checking.
 %
 isa_atom_call_ilc(_,G):- real_builtin_predicate(G),!,G.
-%isa_atom_call_ilc(_,G):- predicate_property_safe(G,number_of_clauses(_)),!,clause(G,B),call_mpred_body(G,B).
-isa_atom_call_ilc(_,G):- predicate_property_safe(G,number_of_rules(R)),R>0,!,G.
+%isa_atom_call_ilc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,B),call_mpred_body(G,B).
+isa_atom_call_ilc(_,G):- predicate_property(G,number_of_rules(R)),R>0,!,G.
 
 
 
@@ -1356,7 +1334,7 @@ assert_isa_hooked_after(_,ttExpressionType):-!.
 assert_isa_hooked_after(I,T):- not(completelyAssertedCollection(T)),impliedSubClass(T,ST),completelyAssertedCollection(ST),assert_isa(I,ST).
 :- was_export(impliedSubClass/2).
 impliedSubClass(T,ST):-ground(T:ST),is_known_false(genls(T,ST)),!,fail.
-impliedSubClass(T,ST):-predicate_property_safe(transitive_subclass(T,ST),_),!,call_tabled(isa(T,ST),transitive_subclass(T,ST)).
+impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_tabled(isa(T,ST),transitive_subclass(T,ST)).
 */
 
 % one of 4 special cols

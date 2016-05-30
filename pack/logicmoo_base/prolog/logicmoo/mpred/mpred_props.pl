@@ -253,15 +253,15 @@ decl_mpred_prolog(_:CM,M,PI,F,A):-
    must_det_l((    
       ((var(CM),nonvar(M))->CM=M;true),
       ((var(PI),integer(A))->functor(PI,F,A);true),
-      (integer(A)->assert_arity(F,A);true),
       define_maybe_prolog(M,PI,F,A),
-      ain(prologBuiltin(F)))).
+      ain(prologBuiltin(F)),
+      (integer(A)->assert_arity(F,A);true))).
 
-define_maybe_prolog(M,PI,F,_A):- predicate_property_safe(M:PI,imported_from(system)),ain(prologBuiltin(F)).
+define_maybe_prolog(M,PI,F,_A):- predicate_property(M:PI,imported_from(system)),ain(prologBuiltin(F)).
 
 define_maybe_prolog(M,PI,F,A):- 
-    (\+ predicate_property_safe(M:PI,_); predicate_property_safe(M:PI,imported_from(OM))),
-    ((OM=system;current_module(OM)),predicate_property_safe(OM:PI,_),\+ predicate_property_safe(OM:PI,imported_from(_))),!,
+    (\+ predicate_property(M:PI,_); predicate_property(M:PI,imported_from(OM))),
+    ((OM=system;current_module(OM)),predicate_property(OM:PI,_),\+ predicate_property(OM:PI,imported_from(_))),!,
     decl_mpred_prolog(M,OM,PI,F,A).
 
 define_maybe_prolog(M,PI,F,A):-
@@ -302,11 +302,11 @@ define_maybe_prolog(M,PI,F,A):-
 % Declare Managed Predicate Hybrid.
 %
 
-kb_dynamic(A):-not(compound(A)),!,ain00(prologHybrid(A)).
-% ain(love(isEach(a/1,b/2,c/1,d),mother).
+% kb_dynamic(A):- \+(compound(A)),!,ain00(prologHybrid(A)).
+% ain(love(isEach(a/1,b/2,c/1,d),mother)).
 % ain(loves(isElement(a/1,b/2,c/1,d),mother)).
 kb_dynamic(M):- M =.. [isEach|List],!,must_maplist(kb_dynamic,List).
-kb_dynamic(List):-is_list(List),!,must_maplist(kb_dynamic,List).
+kb_dynamic(List):- is_list(List),!,must_maplist(kb_dynamic,List).
 kb_dynamic(MPI):- must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),MPI))),!.
 
 
@@ -325,7 +325,7 @@ kb_dynamic(P):- must(call_u(with_pi(P,kb_dynamic))).
 % Declare Managed Predicate Hybrid.
 %
 kb_dynamic(M,F,A):-integer(A),!,must(functor(PI,F,A)),kb_dynamic(M,PI,F/A).
-kb_dynamic(M,PI,FA):- must(kb_dynamic(_,M,PI,FA)).
+kb_dynamic(M,PI,FA):- prolog_load_context(module,CM),must(kb_dynamic(CM,M,PI,FA)).
 
 
 %= 	 	 
@@ -359,7 +359,16 @@ kb_dynamic(Any,M,PI,MFAIn):-
 
 kb_dynamic(_:CM,M,PI,F,A):-var(A),!,
    forall(between(1,11,A),kb_dynamic(CM,M,PI,F,A)),!.
-kb_dynamic(CM:M,lmconf,PI,F,A):- M\==lmconf, must(kb_dynamic(CM:lmconf,lmconf,PI,F,A)).
+
+
+kb_dynamic(CM:OM,M,PI,F,A):-M==OM,kb_dynamic(CM,M,PI,F,A).
+
+kb_dynamic(CM:Imp,M,PI,F,A):-M==CM,kb_dynamic(CM,M,PI,F,A),
+  (CM==baseKB->true;((   CM:export(CM:F/A), Imp:import(CM:F/A),system:import(CM:F/A), dmsg(system:import(CM:F/A))))).
+
+% kb_dynamic(CM,M,PI,F,A):- dmsg(kb_dynamic(CM,M,PI,F,A)),fail.
+
+% kb_dynamic(CM:M,lmconf,PI,F,A):- M\==lmconf, must(kb_dynamic(CM:lmconf,lmconf,PI,F,A)).
 
 kb_dynamic(CM:baseKB,M,PI,F,A):- M==abox, defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic(CM:baseKB,Mt,PI,F,A)).
 
@@ -372,25 +381,29 @@ kb_dynamic(_:CM,M,PI,F,A):-
    must_det_l((    
       ((var(CM),nonvar(M))->CM=M;true),
       ((var(PI),integer(A))->functor(PI,F,A);true),
-      (integer(A)->assert_arity(F,A);true),
-      define_maybe_exact(M,PI))).
+      define_maybe_exact(M,PI),
+      (integer(A)->assert_arity(F,A);true))),!.
 
-define_maybe_exact(M,PI):- a(mtExact,M),!, 
-   functor(PI,F,A),
+define_maybe_exact(M,PI):- % a(mtExact,M),!, 
+   must_det_l((    functor(PI,F,A),
    M:multifile(M:F/A),
      ain(baseKB:predicateConventionMt(F,M)),
      decl_shared(M:PI),     
      sanity(\+is_static_predicate(M:PI)),
-     maybe_define_if_not_static(M,PI).
+     maybe_define_if_not_static(M,PI))),!.
 define_maybe_exact(_,PI):-
      maybe_define_if_not_static(baseKB,PI).
 
 maybe_define_if_not_static(M,PI):- 
-      functor(PI,F,A),
-      M:multifile(M:F/A),
-      M:public(M:F/A),
+  must_det_l((
+              functor_h(PI,F,A),
+              M:multifile(M:F/A),
+              M:public(M:F/A),
+              on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
+              M:discontiguous(M:F/A),
+              M:module_transparent(M:F/A),      
       (is_static_predicate(M:PI) -> true ;
-       (predicate_property_safe(M:PI,dynamic) -> true ; icatch(M:dynamic(M:PI)))),!.
+       (predicate_property(M:PI,dynamic) -> true ; icatch(M:dynamic(M:PI)))))),!.
 
 
 :- op(1120,fx,(kb_dynamic)).
@@ -407,7 +420,7 @@ maybe_define_if_not_static(M,PI):-
 
 
 
-% mpred_isa(F,prologDynamic):- not(mpred_isa(F,prologHybrid)),(F=ttPredType;(current_predicate(F/1);not(t(F,tCol)))).
+% mpred_isa(F,prologDynamic):- \+ (mpred_isa(F,prologHybrid)),(F=ttPredType;(current_predicate(F/1);not(t(F,tCol)))).
 mpred_isa(G,predProxyAssert(ain)):- atom(G),prologMacroHead(G).
 mpred_isa(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
 mpred_isa(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).

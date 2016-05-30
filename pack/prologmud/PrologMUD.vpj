@@ -33,13 +33,13 @@
 				N="../games/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes=".git/;*.*~;*~/"/>
+				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
 		</Folder>
 		<Folder Name="../logicmoo_base">
 			<F
 				N="../logicmoo_base/*.*"
 				Recurse="1"
-				Excludes=".git/;*.*~;*~/;*.html;*.unused;*.bak"/>
+				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/;*.html;*.unused;*.bak"/>
 		</Folder>
 		<Folder Name="../logicmoo_nlu">
 			<Folder Name="prolog">
@@ -56,14 +56,14 @@
 				N="prolog/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes=".git/;*.*~;*~/"/>
+				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
 		</Folder>
 		<Folder Name="t">
 			<F
 				N="t/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes="git/;*.*~;*~/"/>
+				Excludes="git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
 		</Folder>
 		<Folder Name="../../">
 			<F N="../../.gitattributes"/>
@@ -83,7 +83,7 @@
 				N="runtime/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes=".git/;*.*~;*~/"/>
+				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
 		</Folder>
 		<Folder Name="runtime">
 			<F N="runtime/README.md"/>

@@ -150,7 +150,7 @@ replace_nth_arglist/4,
 replace_nth_ref/5,
 same_vars/2,
 %tf_result/2,
-%tms_reject_why/2,
+%never_assert_u/2,
 update_value/3
 ]).
 
@@ -346,7 +346,7 @@ telnet_fmt_shown/3,
 term_anglify_last/2,
 term_anglify_np/3,
 term_anglify_np_last/3,
-tms_reject_why/2,
+never_assert_u/2,
 % use_cyc_database/0,
 verb_after_arg/3
 */
@@ -401,7 +401,7 @@ update_value/3,
 % %%% :- shared_multifile default_type_props/3.
 % %%% :- shared_multifile fact_always_true/1.
 % %%% :- shared_multifile fact_maybe_deduced/1.
-% %%% :- shared_multifile tms_reject_why/2.
+% %%% :- shared_multifile never_assert_u/2.
 % %%% :- shared_multifile fskel/7.
 % %%% :- shared_multifile hooked_random_instance/3.
 
@@ -916,7 +916,7 @@ relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc),
 % Callable True/false.
 %
 callable_tf(P,2):- mpred_arity_pred(P),!,fail.
-callable_tf(F,A):- functor_safe(P,F,A),predicate_property_safe(P,_),!.
+callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
 
 
 

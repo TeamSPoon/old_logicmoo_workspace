@@ -140,10 +140,10 @@ env_mpred_op(OP,P):- trace,trace_or_throw(unk_env_mpred_op(OP,P)).
 env_shadow(OP,P):-lmconf:call(OP,P).
 
 :- dynamic( in_dyn/2).
-in_dyn(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predicate_property_safe(Call,_) -> loop_check(Call)).
-in_dyn(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property_safe(Call,_), !, loop_check(Call).
-in_dyn_pred(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predicate_property_safe(Call,_) -> loop_check(Call)).
-in_dyn_pred(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property_safe(Call,_), !, loop_check(Call).
+in_dyn(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
+in_dyn(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property(Call,_), !, loop_check(Call).
+in_dyn_pred(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
+in_dyn_pred(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property(Call,_), !, loop_check(Call).
 
 
 get_mp_arity(F,A):- defaultAssertMt(M),if_defined(M:arity(F,A)).
@@ -285,7 +285,7 @@ env_mpred_op_1(ENV,OP,P):-env_learn_pred(ENV,P),lg_op2(ENV,OP,OP2),!,call(OP2,P)
 env_mpred_op_1(_,OP,P):-call(OP,P).
 
 %ppi(P):-functor(P,tp_node,_),!.
-%ppi(P):-predicate_property_safe(P,number_of_clauses(NC)),!,(NC<2000->true;(dmsg((number_of_clauses(NC):-P)))),!.
+%ppi(P):-predicate_property(P,number_of_clauses(NC)),!,(NC<2000->true;(dmsg((number_of_clauses(NC):-P)))),!.
 ppi(_).
 
 
@@ -303,14 +303,14 @@ env_1_info(Type,[predcount(NC)|Infos]):-
    harvest_preds(Type,PFAs),
     findall(F/A - PredInf,
       (member(functor(P,F,A),PFAs),
-        predicate_property_safe(P,number_of_clauses(NC)),
+        predicate_property(P,number_of_clauses(NC)),
         env_predinfo(P,PredInf),
         flag(Sym,X,X+NC)),
     Infos),flag(Sym,NC,0).
 
 env_predinfo(PIn,Infos):- functor_h(PIn,F,A),get_mp_arity(F,A),functor(P,F,A),findall(Info,pred_1_info(P,F,A,Info),Infos).
 
-pred_1_info(P,_,_,Info):- member(Info:Prop,[count(NC):number_of_clauses(NC),mf:multifile,dyn:dynamic,vol:volitile,local:local]),predicate_property_safe(P,Prop).
+pred_1_info(P,_,_,Info):- member(Info:Prop,[count(NC):number_of_clauses(NC),mf:multifile,dyn:dynamic,vol:volitile,local:local]),predicate_property(P,Prop).
 pred_1_info(_,F,A,Info):- prop_mpred(Info,F,A).
 pred_1_info(_,F,A,F/A).
 
