@@ -428,8 +428,9 @@ m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,PI):-functor(PI,F,A),CallerMt
 %
 % Module Functor-arity Converted To Module F Functor-arity.
 %
+m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt:PredMt:FA):- !, m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
 m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt:FA):- !, m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
-m_fa_to_m_p_fa(Decl_mpred_hybrid,FA):-  m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
+m_fa_to_m_p_fa(Decl_mpred_hybrid,FA):- defaultAssertMt(PredMt), m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
 
  
 :-module_transparent(only_3rd/4).
@@ -446,6 +447,8 @@ only_3rd(With,CallerMt, PredMt, PI):-
 only_3rd([],_CallerMt, _M, _PI):- !.
 only_3rd([With|List],CallerMt, PredMt, PI):- is_list(List),!,only_3rd(With,CallerMt, PredMt, PI),only_3rd(List,CallerMt, PredMt, PI).
 only_3rd(With,user, user, PI):-!, show_call(with_pi,call(With,PI)).
+only_3rd(WithList,CallerMt, MOD, F/A):- !,only_3rd(WithList,CallerMt, MOD , MOD:F/A).
+only_3rd(With,_, _, CallerMt:PI):-!, show_call(with_pi,call(With,CallerMt:PI)).
 only_3rd(With,CallerMt, user, PI):-!, show_call(with_pi,call(With,CallerMt:PI)).
 % only_3rd(With,user, PredMt, PI):-!, show_call(with_pi,call(With,PredMt:PI)).
 only_3rd(With,CallerMt, PredMt, PI):- CallerMt:call(With,PredMt:PI).
@@ -765,6 +768,7 @@ is_static_module(M):- module_property(M,class(library)),!.
 % Static Predicate.
 %
 is_static_predicate(M:Var):- var(Var),!,is_static_module(M). % fail,trace_or_throw(var_is_static_predicate(Var)).
+is_static_predicate(M:M:H):-!,is_static_predicate(M:H).
 is_static_predicate((H:-_)):-!,is_static_predicate(H).
 is_static_predicate(~(H)):-!,is_static_predicate(H).
 is_static_predicate(M:'~'(H)):-!,is_static_predicate(M:H).

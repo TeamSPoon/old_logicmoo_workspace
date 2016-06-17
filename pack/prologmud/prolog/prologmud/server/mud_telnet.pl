@@ -271,8 +271,9 @@ telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignor
 % ===========================================================
 % DEFAULT TEXT
 % ===========================================================
+:- dynamic(baseKB:mudLastCommand/2).
 look_brief(Agent):- prop(Agent,mudLastCommand,X),nonvar(X),functor(X,actLook,_),!.
-look_brief(Agent):- not(prop(Agent,mudNeedsLook,vTrue)),!.
+look_brief(Agent):- \+ prop(Agent,mudNeedsLook,vTrue),!.
 look_brief(Agent):- must(prop(Agent,mudNeedsLook,vTrue)),look_as(Agent),!.
 
 merge_elements(V,V):-not(is_list((V))),!.
@@ -368,14 +369,14 @@ inst_label(_Obj,'&&').
 % ===================================================================
 % Display world
 show_room_grid_old(Room) :-  
-	gridValue(Room,1,G,_),
+	call_u(gridValue(Room,1,G,_)),
 	length(G,N),
 	M is N + 1,
 	cmdShowRoomGrid(Room,1,1,M),!.
 
 cmdShowRoomGrid(Room,Old,N,N) :-
 	New is Old + 1,
-	\+ gridValue(Room,New,N,_),
+	\+ call_u(gridValue(Room,New,N,_)),
 	nl,
 	!.
 
@@ -580,3 +581,4 @@ call_pred(Call, Options) :-
 	;   Call = prolog
 	).
 
+:- add_import_module(mud_telnet,baseKB,end).

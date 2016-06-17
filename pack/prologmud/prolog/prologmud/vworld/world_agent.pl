@@ -100,7 +100,7 @@ agent_call_unparsed(A,C):-  w_tl(tlbugger:old_no_repeats, agent_call_unparsed_0(
 
 agent_call_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_unparsed(Agent,Var)).
 
-agent_call_unparsed_0(_Gent,Atom):- Atom='[]' ;Atom='''' ;Atom='""' ; (atomic(Atom);atom_length(Atom,0)),!.
+agent_call_unparsed_0(_Gent,Atom):- Atom='[]' ;Atom='''' ;Atom='""' ; (atomic(Atom);(atom(Atom),atom_length(Atom,0))),!.
 % execute a prolog command including prolog/0
 agent_call_unparsed_0(_Gent,Atom):- atomic(Atom), catch((
    (once((on_x_fail(read_term_from_atom(Atom,OneCmd,[variables(VARS)])),
@@ -217,7 +217,7 @@ with_agent0(P,CALL):-
  thread_self(Self),
  ((get_agent_session(P,O),lmcache:session_io(O,_In,_Out,Id),Id\=Self)->Wrap=thread_signal_blocked(Id);Wrap=call),!,
   call(Wrap, 
-    w_tl([put_server_no_max,lmcache:session_agent(TS,P),lmcache:agent_session(P,TS)],
+    w_tl([t_l:put_server_no_max,lmcache:session_agent(TS,P),lmcache:agent_session(P,TS)],
       with_output_to_pred(deliver_event(P),CALL))).
 
 has_tty(O):-no_repeats(O,lmcache:session_io(O,_,_,_)).
@@ -272,9 +272,10 @@ random_instance_no_throw0(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RT
    checkAnyType(query(_,_),RValue,Type,Value),
    must_det(Test).
 
-random_instance_no_throw0(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),!,call(Fact),Test.
+random_instance_no_throw0(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),
+   Fact=..[Pred,Value],current_predicate(Pred/1),!,call(Fact),Test.
 random_instance_no_throw0(Type,Value,Test):- compound(Type),get_functor(Type,F),atom_concat('random_',F,Pred),current_predicate(F/1),Fact=..[Pred,Value],
-  predicate_property(Fact,_),!,Fact,Test.
+  current_predicate(Pred/1),!,Fact,Test.
 random_instance_no_throw0(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),t(meta_argtypes,Formatted),
                          Formatted=..[F|ArgTypes],functor(Value,F,A),Value=..[F|ValueArgs],must((maplist(random_instance_no_throw,ArgTypes,ValueArgs,_),Test)).
 random_instance_no_throw0(Type,Value,Test):-must(( findall(V,isa(V,Type),Possibles),Possibles\=[])),!,must((my_random_member(Value,Possibles),Test)).

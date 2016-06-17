@@ -40,4 +40,8 @@ nearestGenls(C1,C2)==>
 %  \+ ~(completelyAssertedCollection(Super))) ==> ({dif(Sub, Super)}, isa(I,Super)).
 
 
-
+((genls(C1,C2)/(atom(C1),atom(C2))==>
+ {get_functor(C1,F1),get_functor(C2,F2),
+   P1 =.. [F1,X],
+    P2 =.. [F2,X],
+    asserta_if_new(baseKB:((P2:-loop_check(P1)))}))).

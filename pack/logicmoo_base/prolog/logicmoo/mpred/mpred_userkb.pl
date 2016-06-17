@@ -163,6 +163,7 @@ tNearestReachableItem/1,
 tNotForUnboundPredicates/1,
 tPred/1,
 tRegion/1,
+tAgent/1,
 tRelation/1,
 tried_guess_types_from_name/1,
 tSet/1,
@@ -310,8 +311,8 @@ skolem(X,Vs,SK):-skolem_in_code(X,Vs,SK).
 %
 % True Structure.
 %
-t(P,A1,A2):- mpred_fa_call(P,2,call(P,A1,A2)).
-t(P,A1,A2):- call_u(t(P,A1,A2)).
+t(P,A1,A2):- loop_check(mpred_fa_call(P,2,call(P,A1,A2))).
+t(P,A1,A2):- loop_check(call_u(t(P,A1,A2))).
 
 
 

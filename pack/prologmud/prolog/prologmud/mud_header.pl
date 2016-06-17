@@ -93,7 +93,7 @@
 % :- kb_dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
 :- kb_dynamic(mpred_online:semweb_startup).
-:- break.
+% :- break.
 :- kb_dynamic(  tChannel/1).
 
 
@@ -105,7 +105,7 @@
 :- thread_local   t_l:repl_to_string/2.
 :- thread_local   t_l:repl_writer/2.
 :- kb_dynamic   lmcache:loaded_external_kbs/1.
-:- break.
+% :- break.
 :- kb_dynamic   loading_module_h/1.
 :- kb_dynamic   lmconf:registered_module_type/2.
 :- kb_dynamic   must_compile_special_clause_file/1.
@@ -137,10 +137,11 @@
 :- kb_dynamic   provide_mpred_write_attributes/2.
 
 % DYN HOOKS
-:- kb_dynamic   is_never_type/1.
+% :- kb_dynamic   is_never_type/1.
 
 % DYN FOR CODE
 :- kb_dynamic lmcache:after_mpred_load/0.
+:- thread_local lmconf:use_cyc_database/0.
 :- kb_dynamic lmconf:use_cyc_database/0.
 
 :- kb_dynamic   fact_is_false/2.

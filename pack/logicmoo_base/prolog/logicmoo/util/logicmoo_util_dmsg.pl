@@ -1284,8 +1284,8 @@ mesg_color(T,C):-functor(T,F,_),!,functor_color(F,C),!.
 % Functor Word.
 %
 f_word("",""):-!.
-f_word(T,A):-concat_atom(List,' ',T),member(A,List),atom_length(A,L),L>0,!.
-f_word(T,A):-concat_atom(List,'_',T),member(A,List),atom_length(A,L),L>0,!.
+f_word(T,A):-concat_atom(List,' ',T),member(A,List),atom(A),atom_length(A,L),L>0,!.
+f_word(T,A):-concat_atom(List,'_',T),member(A,List),atom(A),atom_length(A,L),L>0,!.
 f_word(T,A):- string_to_atom(T,P),sub_atom(P,0,10,_,A),A\==P,!.
 f_word(T,A):- string_to_atom(T,A),!.
 

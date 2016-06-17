@@ -871,7 +871,7 @@ module_predicates_are_exported0(ModuleName):-
 export_if_noconflict(M,F/A):- current_module(M2),M2\=M,module_property(M2,exports(X)),
    member(F/A,X),dmsg(skipping_export(M2=M:F/A)),!,
    must(M:export(M:F/A)),
-   must(M2:import(M:F/A)).
+   (M2==system->true;must(M2:import(M:F/A))).
 export_if_noconflict(M,F/A):-M:export(F/A).
 
 % module_predicates_are_not_exported_list(ModuleName,Private):- once((length(Private,Len),dmsg(module_predicates_are_not_exported_list(ModuleName,Len)))),fail.

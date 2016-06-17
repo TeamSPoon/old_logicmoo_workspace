@@ -113,9 +113,9 @@ which_f/1,
 add_arg_parts_of_speech/4,
 verb_after_arg/3,
 local_qh_mpred_isa/2,
-fact_always_true/1,
 
 /*
+fact_always_true/1,
 create_random_fact/1,
 
 deduce_facts/2,
@@ -323,9 +323,9 @@ verb_after_arg/3
 :- meta_predicate call_whichlist_t(?,0,?).
 
 :- dynamic((
-(which_t)/1,
-fact_always_true/1
+(which_t)/1
 /*
+fact_always_true/1
 add_arg_parts_of_speech/4,
 agent_action_queue/3,
 agent_text_command/4,
@@ -429,6 +429,7 @@ update_value/3,
 
 
 :- multifile(lmconf:use_cyc_database/0).
+:- thread_local(lmconf:use_cyc_database/0).
 % % %%% :- shared_multifile decl_database_hook/2.
 
 

@@ -180,7 +180,7 @@ save_fmt_a(P,A):-loop_check(save_fmt_a_0(P,A),true),!.
 save_fmt_a_0(_,E):-var(E),!.
 save_fmt_a_0(O,t(E,_)):-!,save_fmt_a(O,E).
 save_fmt_a_0(O,E):-compound(O),arg(1,O,E),!,save_fmt_a(O,E).
-save_fmt_a_0(_,A):-atom_length(A,L),L =< 1.
+save_fmt_a_0(_,A):-atom(A),atom_length(A,L),L =< 1.
 save_fmt_a_0(_,A):-vtSkippedPrintNames(A),!.
 save_fmt_a_0(O,E):-to_case_breaks(E,List),must_maplist(save_fmt_a(O),List).
 

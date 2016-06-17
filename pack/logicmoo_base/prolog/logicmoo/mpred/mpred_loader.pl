@@ -307,11 +307,10 @@ mpred_prolog_only_file(_).
 :- prolog_load_context(directory,Dir),asserta(lmconf:mpred_loader_dir(Dir)).
 
 mpred_te(Type,_,I,_,_,_):- hotrace(dont_term_expansion(Type,I)),!,fail.
+mpred_te(_Type,_Module,I,PosI,O,PosI):- get_lang(pl), expand_kif_string_or_fail(pl_te,I,O),!.
 mpred_te(_Type,_Module,I,PosI,O,PosI):- get_lang(pl),!, expand_isEach_or_fail(I,O),!.
-mpred_te(Type,Module,I,PosI,O,PosO):-
-   prolog_load_context(file,S),
-   prolog_load_context(source,S),
-   \+ current_prolog_flag(mpred_te,false),
+mpred_te(Type,Module,I,PosI,O,PosO):- \+ current_prolog_flag(mpred_te,false),
+   prolog_load_context(file,S),prolog_load_context(source,S),   
    mpred_file_term_expansion(Type,Module,I,O)->PosO=PosI.
 
 dont_term_expansion(Type,I):- 

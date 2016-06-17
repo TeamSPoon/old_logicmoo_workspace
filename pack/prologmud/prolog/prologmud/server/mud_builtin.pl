@@ -256,6 +256,9 @@ argIsa(mudFacing,1,tObj).
 argIsa(mudFacing,2,vtDirection).
 argIsa(mudMemory,2,ftTerm).
 
+tCol(vtVerb).
+tSet(vtVerb).
+
 /*
 never_assert_u(mudAtLoc(iArea1025, _),isa(iArea1025,tRegion)).
 never_assert_u(localityOfObject(iArea1025, iOfficeRoom7),isa(iArea1025,tRegion)).

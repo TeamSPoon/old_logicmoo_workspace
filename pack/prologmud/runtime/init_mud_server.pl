@@ -64,12 +64,24 @@
 
 :- file_begin(pfc).
 
+:-assert_isa(iRR7,tRR).
+:-ain(genls(tRR,tRRP)).
+:-must( isa(iRR7,tRRP) ).
+% :-must( tRRP(iRR7) ).
+
+%:- break.
+
+
 % [Optional] Creates or suppliments a world
 
 tCol(tRegion).
 tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
+
+
+%genlsFwd(tLivingRoom,tRegion).
+%genlsFwd(tOfficeRoom,tRegion).
 
 % create some seats
 tExplorer(iExplorer1).
@@ -112,6 +124,9 @@ pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 
 mpred_argtypes(bordersOn(tRegion,tRegion)).
 mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
+
+tRegion(iLivingRoom7).
+tRegion(iOfficeRoom7).
 
 :-onSpawn(localityOfObject(tExplorer,tLivingRoom)).
 :-onSpawn(localityOfObject(iCommanderdata66,tOfficeRoom)).

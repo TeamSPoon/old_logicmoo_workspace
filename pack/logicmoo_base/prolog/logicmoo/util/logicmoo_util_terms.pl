@@ -792,15 +792,15 @@ remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
 %= 	 	 
 
-%% functor_h( ?Obj, ?F) is semidet.
+%% functor_h( ?Obj, ?F) is nondet.
 %
 % Functor Head.
 %
-functor_h(Obj,F):- functor_h(Obj,F,_),!.
+functor_h(Obj,F):- functor_h(Obj,F,_).
 
 %= 	 	 
 
-%% get_functor( ?Obj, ?FO) is semidet.
+%% get_functor( ?Obj, ?FO) is det.
 %
 % Get Functor.
 %
@@ -830,14 +830,17 @@ functor_h(M:Obj,MF,A):-(callable(Obj);atom(F)),!,functor_h(Obj,F,A),(MF=F;MF=M:F
 functor_h(F//A,F,Ap2):-number(A),!,Ap2 is A+2,( atom(F) ->  true ; current_predicate(F/Ap2)).
 functor_h(F/A,F,A):-number(A),!,( atom(F) ->  true ; current_predicate(F/A)).
 functor_h(Obj,F,A):-atom(F),strip_module(Obj,_M,P),functor(P,F,A).
-functor_h(Obj,F,A):-var(F),strip_module(Obj,_M,P),functor(P,F,A).
 
 functor_h([L|Ist],F,A):- is_list([L|Ist]),!,var(F),L=F,length(Ist,A).
 functor_h(M:_,F,A):- atom(M),!, ( M=F -> current_predicate(F/A) ; current_predicate(M:F/A)).
-functor_h(':-'(Obj),F,A):-!,functor_h(Obj,F,A).
-functor_h(':-'(Obj,_),F,A):-!,functor_h(Obj,F,A).
+functor_h(':-'(Obj),F,A):- nonvar(Obj), !,functor_h(Obj,F,A).
+
+functor_h(':-'(Obj,_),F,A):- nonvar(Obj), !,functor_h(Obj,F,A).
 functor_h(Obj,F,0):- string(Obj),!,must_det(atom_string(F,Obj)).
-functor_h(Obj,Obj,0):-not(compound(Obj)),!.
+
+functor_h(Obj,Obj,0):- \+ compound(Obj),!.
+
+functor_h(Obj,F,A):-var(F),!,strip_module(Obj,_M,P),functor(P,F,A).
 functor_h(Obj,F,A):-functor(Obj,F,A).
 
 

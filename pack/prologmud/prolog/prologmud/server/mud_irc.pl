@@ -6,6 +6,7 @@
 % Dec 13, 2035
 %
 */
+end_of_file.
 
 % :-module(mud_irc, [irc_mud_event_hook/3, deliver_to_irc/2 ]).
 

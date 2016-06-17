@@ -576,7 +576,7 @@ istAbove(Mt,Query):- Mt \== baseKB, genlMt(Mt,MtAbove),MtAbove:Query.
 
 
 % make sure we ignore calls to predicate_property/2  (or thus '$define_predicate'/1)
-% uses_predicate(_,error):-prolog_current_frame(F), prolog_frame_attribute(F,parent_goal,predicate_property(_,_)),!.
+uses_predicate(_,error):- prolog_current_frame(F), show_success(prolog_frame_attribute(F,parent_goal,predicate_property(_,_))),!.
 uses_predicate(M:F/A,R):- !, '$current_source_module'(SM), uses_predicate(SM,M,F,A,R).
 uses_predicate(F/A,R):- '$current_source_module'(SM),'$current_typein_module'(M),uses_predicate(M,SM,F,A,R).
 
@@ -619,11 +619,11 @@ uses_predicate(CallerMt,baseKB,predicateConventionMt,2,retry):-
 
 uses_predicate(CallerMt, baseKB, F, A,retry):-
   create_predicate_istAbove(baseKB,F,A),
-   system:import(baseKB:F/A),!.
+   must(system:import(baseKB:F/A)),!.
 
 uses_predicate(System, BaseKB, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),!,
    create_predicate_istAbove(BaseKB,F,A),
-    system:import(BaseKB:F/A),!.
+    must(system:import(BaseKB:F/A)),!.
 
 % keeps from calling this more than once
 uses_predicate(SM,M,F,A,error):- 

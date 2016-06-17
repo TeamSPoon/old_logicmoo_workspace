@@ -57,9 +57,9 @@
 :- user:use_module(library('swi/pce_debug_monitor')).
 :- user:use_module(library('swi/thread_monitor')).
 
-:- system:use_module(library(pce_report),except([colour/2])).
-:- system:use_module(library('swi/pce_debug_monitor'),except([colour/2,resource/3])).
-:- system:use_module(library('swi/thread_monitor'),except([colour/2,resource/3])).
+:- call((system:use_module(library(pce_report)))). % ,except([colour/2])))).
+:- call((system:use_module(library('swi/pce_debug_monitor')))). %,except([colour/2,resource/3])))).
+:- call((system:use_module(library('swi/thread_monitor')))).
 
 
 :- system:use_module(library(statistics)).

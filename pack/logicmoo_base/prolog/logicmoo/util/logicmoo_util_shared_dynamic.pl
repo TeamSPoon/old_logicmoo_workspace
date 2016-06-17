@@ -100,6 +100,7 @@ lmconf:wrap_shared(retractall,1,dbreq):- is_user_module.
 
 lmconf:wrap_shared(mtCore,1,ereq).
 lmconf:wrap_shared(mtProlog,1,ereq).
+lmconf:wrap_shared(tAgent,1,ereq).
 lmconf:wrap_shared(mtCycL,1,ereq).
 lmconf:wrap_shared(mtExact,1,ereq).
 lmconf:wrap_shared(mtGlobal,1,ereq).
@@ -228,9 +229,9 @@ decl_shared(Plus,M:F/A):-atom(F),!,
    on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
    ain(baseKB:predicateConventionMt(F,M)),
    functor(P,F,A),
-      once(on_f_throw( (M:F/A)\== (lmconf:loaded_external_kbs/1))),
-      once(on_f_throw( (M:F/A)\== (mpred_online:semweb_startup/0))),
-      once(on_f_throw( (M:F/A)\== (lmconf:irc_user_plays/3))),
+      %once(on_f_throw( (M:F/A)\== (lmconf:loaded_external_kbs/1))),
+      %once(on_f_throw( (M:F/A)\== (mpred_online:semweb_startup/0))),
+      %once(on_f_throw( (M:F/A)\== (lmconf:irc_user_plays/3))),
    call(Plus,M:P),
    % (find_and_call(mtCycL(M))->ain(baseKB:prologHybrid(F));true),
    ain(baseKB:arity(F,A)) )).
@@ -243,9 +244,9 @@ decl_shared(Plus,F/A):-atom(F),!,
    baseKB:dynamic(F/A),
    baseKB:discontiguous(F/A),
    baseKB:public(F/A),
-      once(on_f_throw( (F/A)\== (loaded_external_kbs/1))),
-      once(on_f_throw( (F/A)\== (semweb_startup/0))),
-      once(on_f_throw( (F/A)\== (irc_user_plays/3))),
+     % once(on_f_throw( (F/A)\== (loaded_external_kbs/1))),
+     % once(on_f_throw( (F/A)\== (semweb_startup/0))),
+     % once(on_f_throw( (F/A)\== (irc_user_plays/3))),
    
    ain(baseKB:arity(F,A)),
    functor(P,F,A),

@@ -294,6 +294,13 @@ tSet(C)==>completelyAssertedCollection(C).
 %underkill - Though it is making bad things happen 
 % ttExpressionType(C)==> ~completelyAssertedCollection(C).
 
+
+%% mpred_univ( ?C, ?I, ?Head) is semidet.
+%
+% Managed Predicate Univ.
+%
+% TODO decide if still needed mpred_univ(C,I,Head):- cwc,atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
+
 tCol(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),mpred_univ(C,I,TCI),
  {decl_type(C), 
   ignore((
@@ -302,7 +309,7 @@ tCol(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),mpred_univ(C,I,TCI),
    \+ completelyAssertedCollection(C),
    call(assert_if_new((
    ((TCI :- 
-    ((cwc, predicate_property(TCI,number_or_rules(1)),
+    ((cwc, predicate_property(TCI,number_of_rules(1)),
     lazy(( \+ ~(TCI))),
     isa_backchaing(I,C))))))))))}).
 
@@ -387,9 +394,9 @@ pfcControlled(argIsa).
    functorDeclares(C),
    pfcControlled(C),
    arity(C,1),
-   % (isa(I,C)/ground(I:C)==>Head),
    tCol(C))))).
 
+(tSet(C)/atom(C) ==> ({Head=..[C,I]}, (isa(I,C)/ground(I:C)==>Head))).
 
 ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1),
   call(\+ predicate_property(Head,defined) -> kb_dynamic(F/1);true),
@@ -417,8 +424,6 @@ tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 prologBuiltin(A) :- cwc,head_to_functor_name(A, B),prologBuiltin(B).
 prologBuiltin(P) :- cwc,is_ftCompound(P),!,get_functor(P,F,A),functor(C,F,A),(predicate_property(C,built_in)). % predicate_property(P,static)).
 ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,head_to_functor_name(I,F),call(PT,F)).
-
-
 
 
 

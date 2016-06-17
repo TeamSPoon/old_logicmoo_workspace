@@ -1078,12 +1078,12 @@ atom_to_value(V,ftDice(T1,T2,-T3)):- atomic_list_concat_safe([D1,'d',D2,'-',D3],
 
 %= 	 	 
 
-%% any_to_relation( ?A, ?F) is semidet.
+%% any_to_relation( ?A, ?F) is det.
 %
 % Any Converted To Relation.
 %
 any_to_relation(A,F):-atomic(A),!,any_to_atom(A,F).
-any_to_relation(A,F):-functor_h(A,F).
+any_to_relation(A,F):-functor_h(A,F),!.
 
 
 %= 	 	 

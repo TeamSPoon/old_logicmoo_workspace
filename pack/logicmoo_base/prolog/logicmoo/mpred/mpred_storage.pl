@@ -245,6 +245,7 @@ world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 %
 get_pifunctor(t,PHead):-!,between(1,9,A),functor(PHead,t,A).
 get_pifunctor(isa,isa(_,_)).
+get_pifunctor(baseKB:isa/2,baseKB:isa(_,_)).
 get_pifunctor(Head,PHead):- get_pifunctor(Head,PHead,_,_),!.
 
 %= 	 	 
@@ -753,7 +754,7 @@ req_old2(C0):- nop(dmsg(call_u(C0))), !,preq(call_u,/*to_exp*/(C0)).
 % Mreq Old Extended Helper.
 %
 mreq_old2(C0):- nop(dmsg(call_u(C0))), agenda_rescan_for_module_ready,
-   no_loop_check(w_tl([-infInstanceOnly(_),-t_l:infAssertedOnly(_),-t_l:noRandomValues(_)],
+   no_loop_check(w_tl([-t_l:infInstanceOnly(_),-t_l:infAssertedOnly(_),-t_l:noRandomValues(_)],
      preq(must,/*to_exp*/(C0)))).
 
 % -  ireq(Query) = Normal query (May not use second order logic) (must be asserted on isntance) (used mainly by 2nd order logic to avoid looping)
@@ -766,7 +767,7 @@ mreq_old2(C0):- nop(dmsg(call_u(C0))), agenda_rescan_for_module_ready,
 %
 ireq(C0):- nop(dmsg(ireq(C0))), 
   agenda_rescan_for_module_ready,
-   no_loop_check(w_tl([+infInstanceOnly(_), +t_l:infAssertedOnly(_),+t_l:noRandomValues(_)],preq(ireq,/*to_exp*/(C0)))).
+   no_loop_check(w_tl([+t_l:infInstanceOnly(_), +t_l:infAssertedOnly(_),+t_l:noRandomValues(_)],preq(ireq,/*to_exp*/(C0)))).
 
 % -  call_props(Obj,QueryPropSpecs)
 

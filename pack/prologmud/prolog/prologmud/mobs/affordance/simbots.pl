@@ -555,7 +555,7 @@ affordance_side_effects(Agent,Templ,Template):-
       Templ=..[ActVerb|ARGS],
       verb_affordance(ActVerb,Types,_,_,_),args_match_types(ARGS,Types),!,must(Template=..[ActVerb,Types]),
       findall(t(Trait,Agent,Real), verb_affordance(ActVerb,Types,Trait,_Think,Real),NewAdds),
-      show_call(forall(member(Add,NewAdds),db_assert_sv(Add))))).
+      show_call(forall(member(Add,NewAdds),mpred_ain(Add))))). % db_assert_sv
 
 affordance_message(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
       verb_desc_or_else(ActVerb,Types,Mesg),args_match_types(ARGS,Types),!,must(Template=..[ActVerb,Types]),

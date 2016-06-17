@@ -254,7 +254,6 @@ clause_or_call/2,
 check_context_module/0,
 call_with_bc_triggers/1,
 
-mpred_univ/3,
 attvar_op/2,
 %supporters_list/2,
 %justifications/2,
@@ -266,7 +265,6 @@ mpred_facts_and_universe/1
           ]).
 %:- endif.
 
-:- dynamic(mpred_univ/3).
 
 
 :- meta_predicate 
@@ -314,12 +312,6 @@ mpred_facts_and_universe/1
 :- meta_predicate(oncely(0)).
 :- was_export(oncely/1).
 
-
-%% mpred_univ( ?C, ?I, ?Head) is semidet.
-%
-% Managed Predicate Univ.
-%
-mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
 
 %% oncely( :GoalCall) is semidet.
 %

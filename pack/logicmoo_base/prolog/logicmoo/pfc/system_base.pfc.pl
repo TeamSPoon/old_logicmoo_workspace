@@ -207,7 +207,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 %prologBuiltin(resolveConflict/1).
 
 :- dynamic(bt/2).
-bt(P,_)==> (P:- mpred_bc_only(P)).
+bt(P,_)/ground(P) ==> (P:- mpred_bc_only(P)).
 
 ((prologHybrid(F),arity(F,A)/is_ftNameArity(F,A))==>hybrid_support(F,A)).
 (hybrid_support(F,A)/is_ftNameArity(F,A))==>prologHybrid(F),arity(F,A).

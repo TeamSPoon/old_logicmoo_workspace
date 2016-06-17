@@ -46,6 +46,7 @@
 
 :- decl_shared(genls/2).
 
+:- thread_local(lmconf:current_source_suffix/1).
 :- dynamic(lmconf:current_source_suffix/1).
 
 % ================================================
@@ -298,7 +299,9 @@ modality(~,[never],[]).
 %
 onSpawn(A):-A==true,!.
 onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
-onSpawn(ClassFact):-fully_expand(clause(assert,onSpawn),ClassFact,ClassFactO),!,onSpawn_0(t,ClassFactO).
+onSpawn(ClassFact):-
+  fully_expand(clause(assert,onSpawn),ClassFact,ClassFactO),!,
+  onSpawn_0(t,ClassFactO).
 
 
 %= 	 	 
@@ -307,17 +310,21 @@ onSpawn(ClassFact):-fully_expand(clause(assert,onSpawn),ClassFact,ClassFactO),!,
 %
 % Whenever spawn  Primary Helper.
 %
-onSpawn_0(_Modality,ClassFact):- ClassFact=..[FunctArgType,Name],modality(FunctArgType,_,_),!,
- onSpawn_0(FunctArgType,Name).
+onSpawn_0(_Modality,ClassFact):- 
+ ClassFact=..[FunctArgType,Name],
+ modality(FunctArgType,_,_),!,
+ must(onSpawn_0(FunctArgType,Name)).
    
 onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,Name],
+
+ must_det((
  call_u(tCol(FunctArgType)),
  createByNameMangle(Name,Inst,TypeA),
  call_u((assert_isa(TypeA,tCol),
  assert_isa(Inst,FunctArgType),
  assert_isa(Inst,TypeA))),
  fully_expand(clause(assert,onSpawn),t(Modality,genls(TypeA,FunctArgType)),TO),
- call_u(ain(TO)),!.
+ call_u(ain(TO)))),!.
 
 onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
   must_det(onSpawn_f_args(Modality,Funct,InstADeclB)).
@@ -330,10 +337,11 @@ onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
 % Whenever Spawn Functor Arguments.
 %
 onSpawn_f_args(Modality,Funct,List):-
+ must_det((
   call_u(must(convertSpawnArgs(Funct,1,List,NewList))),
    Later =.. [Funct|NewList],
    fully_expand(clause(assert,onSpawn),t(Modality,Later),TO),
-   call_u(ain(TO)),!. 
+   call_u(ain(TO)))),!. 
   % call_after_mpred_load_slow(w_tl(deduceArgTypes(Funct), ain(Later))))),!.
 
 

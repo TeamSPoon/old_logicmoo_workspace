@@ -101,7 +101,7 @@ init_location_grid(LocName,LocType):-
 
 % process map file (world.map.pl)
 init2(LocName,LocType,Y,1) :-
-	gridValue(LocName,1,Y,L),
+	call_u(gridValue(LocName,1,Y,L)),
 	!,
 	init3(LocName,LocType,xyzFn(LocName,1,Y,_),L).
 init2(_LocName,_LocType,_,_).

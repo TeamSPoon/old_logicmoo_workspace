@@ -188,7 +188,7 @@ hard_work:-
    )))),!.
 
 % [Required] load the mud PFCs
-% :- show_entry(gripe_time(40,system:ensure_loaded(prologmud(server/mud_builtin)))).
+:- show_entry(gripe_time(40,system:ensure_loaded(prologmud(server/mud_builtin)))).
 
 
 slow_work:- wno_tl( prevent_transform_moo_preds , within_user(at_start(hard_work))).

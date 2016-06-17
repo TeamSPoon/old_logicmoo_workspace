@@ -345,6 +345,11 @@ kb_dynamic(F,Other):-
 :- was_export((kb_dynamic)/4).
 
 
+no_need_to_import(lmconf).
+no_need_to_import(system).
+no_need_to_import(baseKB).
+
+
 %% kb_dynamic( ?CM, ?M, ?PIN, :TermF) is semidet.
 %
 % Declare Managed Predicate Hybrid Inside Of Loop Checking.
@@ -360,11 +365,11 @@ kb_dynamic(Any,M,PI,MFAIn):-
 kb_dynamic(_:CM,M,PI,F,A):-var(A),!,
    forall(between(1,11,A),kb_dynamic(CM,M,PI,F,A)),!.
 
-
 kb_dynamic(CM:OM,M,PI,F,A):-M==OM,kb_dynamic(CM,M,PI,F,A).
 
-kb_dynamic(CM:Imp,M,PI,F,A):-M==CM,kb_dynamic(CM,M,PI,F,A),
-  (CM==baseKB->true;((   CM:export(CM:F/A), Imp:import(CM:F/A),system:import(CM:F/A), dmsg(system:import(CM:F/A))))).
+kb_dynamic(CM:Imp,M,PI,F,A):-M==CM,
+   kb_dynamic(CM,M,PI,F,A),
+   (CM==baseKB->true;((   CM:export(CM:F/A),dmsg(Imp:import(CM:F/A)), Imp:import(CM:F/A)))).
 
 % kb_dynamic(CM,M,PI,F,A):- dmsg(kb_dynamic(CM,M,PI,F,A)),fail.
 
@@ -384,9 +389,10 @@ kb_dynamic(_:CM,M,PI,F,A):-
       define_maybe_exact(M,PI),
       (integer(A)->assert_arity(F,A);true))),!.
 
+define_maybe_exact(system,PI):- !,must((defaultAssertMt(Mt),define_maybe_exact(Mt,PI))),!.
 define_maybe_exact(M,PI):- % a(mtExact,M),!, 
    must_det_l((    functor(PI,F,A),
-   M:multifile(M:F/A),
+     M:multifile(M:F/A),
      ain(baseKB:predicateConventionMt(F,M)),
      decl_shared(M:PI),     
      sanity(\+is_static_predicate(M:PI)),

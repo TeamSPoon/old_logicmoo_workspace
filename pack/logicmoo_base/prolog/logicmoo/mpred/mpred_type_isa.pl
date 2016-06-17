@@ -167,8 +167,7 @@ is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morpholo
 %
 % If Is A Never Type.
 %
-is_never_type(V):-is_ftVar(V),!,fail.
-is_never_type(V):-never_type_why(V,_),!.
+is_never_type(V):-nonvar(V),never_type_why(V,_),!.
 
 
 
@@ -276,9 +275,9 @@ type_prefix(dcg,ftSyntaxOperator).
 type_prefix(dcg,ftTextType).
 type_prefix(txt,ftTextType).
 type_prefix(sk,ftSkolemFunction).
-type_prefix(is,tFunction).
-type_prefix(a,tFunction).
-type_prefix(t,tFunction).
+%type_prefix(is,tPred).
+%type_prefix(a,tFunction).
+%type_prefix(t,tSet).
 type_prefix(fn,tFunction).
 type_prefix(mud,tMudPred).
 type_prefix(mud,tPred).
@@ -350,7 +349,7 @@ was_isa0(t(C,I),I,C).
 was_isa0(t(P,I,C),I,C):-!,P==isa.
 was_isa0(isa(I,C),I,C).
 was_isa0(M:G,I,C):-atom(M),!,was_isa0(G,I,C).
-was_isa0(G,I,C):-G=..[C,I],!,is_typef(C),!,not(is_never_type(C)).
+was_isa0(G,I,C):-G=..[C,I],!,is_typef(C),!,\+ (is_never_type(C)).
 was_isa0(t(C,I),I,C):- new_was_isa, atom(C),!.
 
 
