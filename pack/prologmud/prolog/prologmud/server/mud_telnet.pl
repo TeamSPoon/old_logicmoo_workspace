@@ -25,6 +25,8 @@
          login_and_run_nodebug/0
       ]).
 
+:- add_import_module(mud_telnet,baseKB,end).
+
 /** <module>  
 % Initial Telnet/Text console 
 % ALL telnet client business logic is here (removed from everywhere else!)
@@ -34,6 +36,8 @@
 % Dec 13, 2035
 %
 */ 
+
+:- set_file_lang(pl).
 
 % % :- '$set_source_module'(mud_telnet).
 %:- maybe_add_import_module(mud_telnet,baseKB,start).
@@ -69,7 +73,7 @@ sanify_thread(ID):-
 
 % :- register_module_type (utility).
 
-:-  use_module(library(threadutil)).
+% :-  use_module(library(threadutil)).
 
 % ===========================================================
 % TELNET REPL + READER
@@ -81,8 +85,10 @@ start_mud_telnet(Port):-
 :- volatile(main_thread_error_stream/1).
 :- dynamic(main_thread_error_stream/1).
 
-save_error_stream:-  ignore((thread_self(main),(quintus:current_stream(2, write, Err),asserta(main_thread_error_stream(Err))))).
-:- initialization(save_error_stream).
+save_error_stream:- main_thread_error_stream(_),!.
+save_error_stream:- ignore((thread_self(main),(quintus:current_stream(2, write, Err),asserta(main_thread_error_stream(Err))))).
+:- initialization(save_error_stream,restore).
+:- save_error_stream.
 
 get_main_thread_error_stream(user_error):-!.
 get_main_thread_error_stream(ES):-main_thread_error_stream(ES),!.
@@ -191,17 +197,12 @@ set_tty_control(TF):-
    set_stream(user_input, tty(TF)),
    set_prolog_flag(tty_control, TF))))),!.
 
-:-ain(( deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
-      foreach(no_repeats(get_agent_sessions(A,O)),
-         foreach(no_repeats(lmcache:session_io(O,_In,Out,_Id)),
-          fmtevent(Out,NewEvent))))).
-
 fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).
 fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).
 
 :-thread_local(t_l:telnet_prefix/1).
 
-:-set_tty_control(true).
+% :-set_tty_control(true).
 
 :-export(prompt_read/4).
 prompt_read_telnet(In,Out,Prompt,Atom):-
@@ -582,3 +583,9 @@ call_pred(Call, Options) :-
 	).
 
 :- add_import_module(mud_telnet,baseKB,end).
+
+:-assert_if_new(( lmconf:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
+      foreach(no_repeats(get_agent_sessions(A,O)),
+         foreach(no_repeats(lmcache:session_io(O,_In,Out,_Id)),
+          fmtevent(Out,NewEvent))))).
+

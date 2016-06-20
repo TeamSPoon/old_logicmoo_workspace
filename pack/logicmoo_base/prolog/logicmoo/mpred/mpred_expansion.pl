@@ -533,7 +533,9 @@ fully_expand(X,Y):- must((fully_expand(clause(unknown,cuz),X,Y))).
 %  pfc(_,_) - for salient language based analysis at a human level
 %
 
-fully_expand(Op,Sent,SentO):-
+fully_expand(Op,Sent,SentO):-fully_expand0(Op,Sent,SentO),!. % assert_if_new(fully_expanded_test(Op,Sent,SentO)).
+
+fully_expand0(Op,Sent,SentO):-
   must(once((/*hotrace*/((cyclic_break((Sent)),
      must(/*hotrace*/((deserialize_attvars(Sent,SentI)))),
      w_tl_e(t_l:no_kif_var_coroutines(true),(((fully_expand_now(Op,SentI,SentO))))),

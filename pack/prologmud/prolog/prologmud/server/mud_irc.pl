@@ -16,7 +16,7 @@ end_of_file.
 :-ain(( prologDynamic(lmconf:irc_user_plays(tAgent,ftAtom,ftAtom)))).
 :-ain(( prologOrdered(agent_action_queue(tAgent,ftTerm,ftTerm)))).
 
-:-ain(( deliver_event_hooks(Agent,Event):- fail,ignore(once(deliver_to_irc(Agent,Event))))).
+:-ain(( lmconf:deliver_event_hooks(Agent,Event):- fail,ignore(once(deliver_to_irc(Agent,Event))))).
 lmconf:irc_event_hooks(Channel,User,Stuff):- fail,ignore(once(irc_mud_event_hook(Channel,User,Stuff))).
 
 invite_to_mud(Nick):-eggdrop:to_egg('.tcl putserv "PRIVMSG ~w :DCC CHAT chat 73.37.100.94 4000"',[Nick]).

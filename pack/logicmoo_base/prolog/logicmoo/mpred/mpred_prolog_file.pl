@@ -287,7 +287,7 @@ ensure_mpred_file_consulted(M:File,Options):-
 %
 % Load File Some Type.
 %
-load_file_some_type(M:File,Options):-call_from_module(M,must(load_files(M:File,Options))),!.
+load_file_some_type(M:File,Options):- call_from_module(M,must(load_files(M:File,Options))),!.
 
 
 
@@ -301,13 +301,12 @@ load_file_some_type(M:File,Options):-call_from_module(M,must(load_files(M:File,O
 % Prolog Load File.
 %
 
-user:prolog_load_file(Module:Spec, Options):-
+user:prolog_load_file(Module:Spec, Options):- fail,
   Spec \== 'MKINDEX.pl',
-  \+ never_load_special(Module:Spec, Options),  
   catch(prolog_load_file_loop_checked(Module:Spec, Options),
    E,
     ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))),!.
-user:prolog_load_file(_,_):- get_lang(pl),!,fail.
-user:prolog_load_file(_,_):- set_file_lang(pl),set_lang(pl),fail.
+%user:prolog_load_file(_,_):- get_lang(pl),!,fail.
+%user:prolog_load_file(_,_):- set_file_lang(pl),set_lang(pl),fail.
    
   

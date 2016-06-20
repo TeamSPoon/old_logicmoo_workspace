@@ -18,7 +18,7 @@
 :- op(1150,fx,kb_dynamic).
 
 :- kb_dynamic(  lmconf:irc_event_hooks/3).
-:- kb_dynamic(  deliver_event_hooks/2).
+:- kb_dynamic(  lmconf:deliver_event_hooks/2).
 :- kb_dynamic   lmconf:irc_user_plays/3.
 
 :- thread_local t_l:wants_logout/1.

@@ -146,3 +146,78 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
 :- write('\n?- user:ensure_loaded(run_mud_game). % to begin loading mud worlds').
 % :- user:ensure_loaded(start_mud_server).
+
+
+end_of_file.
+
+arning:
+Warning: baseKB:get_instance_default_props/2, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/mobs/prey.pl:85:7: 2-nd clause of baseKB:spawn_prey/1
+Warning: baseKB:guess_arity/3, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_agent.pl:279:83: 5-th clause of baseKB:random_instance_no_throw0/3
+Warning: baseKB:is_fact_consistent/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_2d.pl:328:143: 3-th clause of baseKB:create_random_fact/1
+Warning: baseKB:is_instance_consistent/2, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:232:29: 2-nd clause of baseKB:check_consistent/2
+Warning: baseKB:list_to_atomics_list/2, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_text.pl:130:75: 1-st clause of baseKB:join_for_string/2
+Warning: baseKB:logOnFailureIgnore/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:215:1: 1-st clause of baseKB:assert_text_now/3
+Warning: baseKB:member_eq/2, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/parsing/parser_imperative.pl:176:18: 8-th clause of baseKB:save_fmt_e/2
+Warning: '/root/lib/swipl/pack/prologmud/prolog/prologmud/parsing/parser_imperative.pl':638:27: Illegal UTF-8 start
+Warning: baseKB:mudWielding/2, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/parsing/parser_imperative.pl:638:27: 2-nd clause of baseKB:mudDistance/3
+Warning: baseKB:prevent_transform_moo_preds/0, which is referenced by
+Warning:        1-st clause of baseKB:slow_work/0: 1-st clause of baseKB:slow_work/0
+Warning: baseKB:replace_nth_arglist/5, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_text.pl:68:65: 1-st clause of baseKB:term_anglify_args/6
+Warning: baseKB:show_load_call/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_text.pl:363:64: 3-th clause of baseKB:add_description_kv/3
+Warning: baseKB:tag_pos/2, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:238:106: 1-st clause of baseKB:translation_for/5
+Warning: kellerStorage:kellerStorageTestSuite/0, which is referenced by
+Warning:        1-st clause of lmconf:mud_test_local/0: 1-st clause of lmconf:mud_test_local/0
+Warning: lmconf:check_consistent/2, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:242: 16-th clause of lmconf:mud_test_local/0
+Warning: lmconf:do_agent_action/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:218:24: 14-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:276:25: 17-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:281:24: 18-th clause of lmconf:mud_test_local/0
+Warning: lmconf:foc_current_agent/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:187:3: 7-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:193:3: 8-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:199:6: 9-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:204:6: 10-th clause of lmconf:mud_test_local/0
+Warning: lmconf:get_all_templates/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:208:51: 11-th clause of lmconf:mud_test_local/0
+Warning: lmconf:req1/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:214:23: 13-th clause of lmconf:mud_test_local/0
+Warning: lmconf:run_mud_tests/0, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:288:43: 20-th clause of lmconf:mud_test_local/0
+Warning: lmconf:test_false/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:184:3: 6-th clause of lmconf:mud_test_local/0
+Warning: lmconf:test_name/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:171:3: 3-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:175:3: 4-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:179:3: 5-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:183:3: 6-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:188:3: 7-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:192:3: 8-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:198:6: 9-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:203:6: 10-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:208:3: 11-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:211:3: 12-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:242: 16-th clause of lmconf:mud_test_local/0
+Warning: lmconf:test_true/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:172:3: 3-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:176:3: 4-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:180:3: 5-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:189:3: 7-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:195:3: 8-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:212:6: 12-th clause of lmconf:mud_test_local/0
+Warning: lmconf:test_true_req/1, which is referenced by
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:200:7: 9-th clause of lmconf:mud_test_local/0
+Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_testing.pl:205:7: 10-th clause of lmconf:mud_test_local/0
+true.
+

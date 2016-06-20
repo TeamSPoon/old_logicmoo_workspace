@@ -1368,6 +1368,7 @@ pp_listing(Pred):- functor_safe(Pred,F,A),functor_safe(FA,F,A),findall(NV,predic
 %
 % Predicate Indicator Converted To Head (list Version).
 %
+pi_to_head_l(I,O):-var(I),!,trace_or_throw(var_pi_to_head_l(I,O)).
 pi_to_head_l(M:PI, M:Head) :- !,
 	pi_to_head_l(PI, Head).
 pi_to_head_l(Name/Arity, Head) :- !,

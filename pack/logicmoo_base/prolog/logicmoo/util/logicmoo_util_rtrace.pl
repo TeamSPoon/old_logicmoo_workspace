@@ -208,7 +208,7 @@ restore_guitracer:- ignore((retract(t_l:wasguitracer(GWas)),set_prolog_flag(gui_
 %
 % R Trace.
 %
-rtrace:- hotrace((assert_if_new(tlbugger:rtracing),hotrace,visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception))),trace. % save_guitracer,noguitracer
+rtrace:- notrace,assert_if_new(tlbugger:rtracing),visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception),trace. % save_guitracer,noguitracer
 
 %= 	 	 
 
@@ -216,7 +216,7 @@ rtrace:- hotrace((assert_if_new(tlbugger:rtracing),hotrace,visible(+all),visible
 %
 % Nor Trace.
 %
-nortrace:- hotrace,retractall(tlbugger:rtracing), visible(+all),visible(+exception),thread_leash(+all),thread_leash(+exception). % restore_guitracer,ignore(retract(tlbugger:rtracing)))).
+nortrace:- notrace,retractall(tlbugger:rtracing), visible(+all),visible(+exception),thread_leash(+all),thread_leash(+exception). % restore_guitracer,ignore(retract(tlbugger:rtracing)))).
 
 
 push_tracer_and_notrace:- hotrace((push_tracer,nortrace,hotrace)).

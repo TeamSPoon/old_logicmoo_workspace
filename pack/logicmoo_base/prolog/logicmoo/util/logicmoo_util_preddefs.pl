@@ -136,6 +136,9 @@ with_source_module(NewModule,Goal):-
 % Call Using Module.
 %
 :- meta_predicate call_from_module(+,+).
+
+call_from_module(NewModule,Goal):- sanity((atom(NewModule),nonvar(Goal))),fail.
+call_from_module(NewModule,( H:-B ) ):- !, call_from_module(NewModule, clause_asserted_call(H,B) ).
 call_from_module(NewModule,Goal):-
    '$current_typein_module'(OldModule),
    '$current_source_module'(OldSModule),
@@ -778,6 +781,10 @@ is_static_predicate((M:F)/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,
 is_static_predicate((M:F)//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
+
+is_static_predicate(F/A):-!,atom(F),current_predicate(F/A),!,functor(FA,F,A),is_static_predicate(FA).
+is_static_predicate(F//A2):-A is A2+2, !,atom(F),current_predicate(F/A),!,functor(FA,F,A),is_static_predicate(FA).
+
 is_static_predicate(FA):- predicate_property(FA,dynamic),!,fail.
 is_static_predicate(FA):- predicate_property(FA,undefined),!,fail.
 % is_static_predicate(M:F):-!,atom(F),between(1,11,A),current_predicate(M:F/A),functor(FA,F,A),is_static_predicate(M:FA),!.

@@ -39,7 +39,9 @@
 
 :- set_file_lang(pl).
 
-:- sanity((get_lang(PL)->pl=PL)).
+:- sanity(get_lang(pl)).
+:- set_file_lang(pfc).
+
 
 :- set_fileAssertMt(baseKB).
 
@@ -207,7 +209,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 %prologBuiltin(resolveConflict/1).
 
 :- dynamic(bt/2).
-bt(P,_)/ground(P) ==> (P:- mpred_bc_only(P)).
+bt(P,_)/nonvar(P) ==> (P:- mpred_bc_only(P)).
 
 ((prologHybrid(F),arity(F,A)/is_ftNameArity(F,A))==>hybrid_support(F,A)).
 (hybrid_support(F,A)/is_ftNameArity(F,A))==>prologHybrid(F),arity(F,A).
@@ -418,12 +420,15 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 
 :- dynamic(baseKB:isRegisteredCycPred/3).
 
-({fail,current_module(Mt),
+/*
+:- ((rtrace, trace)).
+
+(({fail,current_module(Mt),
    predicate_property(Mt:P,defined), 
  \+ predicate_property(Mt:P,imported_from(_)),
  functor(P,F,A)})
-  ==>baseKB:isRegisteredCycPred(Mt,F,A).
-
+  ==>baseKB:isRegisteredCycPred(Mt,F,A)).
+*/
 
 /* prolog_listing:listing */
 % :- printAll(baseKB:isRegisteredCycPred/3).

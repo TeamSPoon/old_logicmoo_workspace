@@ -23,6 +23,7 @@
 
 :- include(mud_header).
 
+
 :- retractall(t_l:disable_px).
 
 :- set_prolog_flag(generate_debug_info, true).
@@ -43,6 +44,8 @@
 % :- if_file_exists(system:ensure_loaded(library(logicmoo/mpred_online))).
 
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
+
+:- system:ensure_loaded(prologmud(server/mud_telnet)).
 
 % xyzFn(R,X,Y,Z):-dmsg(xyzFn(R,X,Y,Z)),trace_or_throw(xyzFn(R,X,Y,Z)).
 
@@ -188,8 +191,8 @@ hard_work:-
    )))),!.
 
 % [Required] load the mud PFCs
+:- set_prolog_flag(pfc_booted,false).
 :- show_entry(gripe_time(40,system:ensure_loaded(prologmud(server/mud_builtin)))).
-
 
 slow_work:- wno_tl( prevent_transform_moo_preds , within_user(at_start(hard_work))).
 
@@ -391,8 +394,7 @@ Proof end.
 
 
 
-:- system:ensure_loaded(library(logicmoo_base)).
-:- system:ensure_loaded(prologmud(server/mud_telnet)).
+% :- system:ensure_loaded(library(logicmoo_base)).
 % :- system:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
 :- system:ensure_loaded(prologmud(server/mud_irc)).
 :- system:ensure_loaded(prologmud(vworld/world)).
@@ -635,5 +637,7 @@ lundef :- A = [],
 
 %:-mred_untrace.
 %:-mred_no_spy_all.
+
+:- set_prolog_flag(pfc_booted,true).
 
 :- set_prolog_flag(assert_attvars,true).

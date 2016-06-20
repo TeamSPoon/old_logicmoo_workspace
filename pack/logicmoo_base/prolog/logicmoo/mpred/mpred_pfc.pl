@@ -485,7 +485,7 @@ convention_to_symbolic_mt(_Why,F,A,abox):- lmconf:wrap_shared(F,A,ereq).
 % convention_to_symbolic_mt(_Why,_,_,M):- atom(M),!.
 
 full_transform(Why,MH,MHH):-
-   must(fully_expand(clause(Why,full_transform),MH,MHH)),
+   must(fully_expand(clause(Why,full_transform),MH,MHH)),!,
    sanity(same_modules(MH,MHH)).
 
 same_modules(MH,MHH):- strip_module(MH,HM,_),strip_module(MHH,HHM,_),!,
@@ -605,9 +605,11 @@ mpred_call_no_bc(G):- G.
 %
 each_E(P,HV,S):- var(HV),!,apply(P,[HV|S]).
 each_E(P,M:(H,T),S) :- must_be(atom,M),!,each_E(P,M:H,S), each_E(P,M:T,S).
+each_E(P,M:[H],S) :- must_be(atom,M),!,each_E(P,M:H,S).
 each_E(P,M:[H|T],S) :- must_be(atom,M),!,each_E(P,M:H,S), each_E(P,M:T,S).
 each_E(P,M:HT,S) :- M=='$si$',!,apply(P,[M:HT|S]).
 each_E(P,M:HT,S) :- !, must_be(atom,M),M:each_E(P,HT,S).
+each_E(P,[H],S) :- !, each_E(P,H,S).
 each_E(P,[H|T],S) :- !, each_E(P,H,S), each_E(P,T,S).
 each_E(P,(H,T),S) :- !, each_E(P,H,S), each_E(P,T,S).
 each_E(P,H,S) :- apply(P,[H|S]).
@@ -736,7 +738,7 @@ mpred_ain(MTP,S):- stack_check, strip_module(MTP,MT,P),P\==MTP,!,
 
 mpred_ain(P,S):- 
   full_transform(ain,P,P0),!,
-  gripe_time(0.6,must(ain_fast(P0,S))),!.
+  must(ain_fast(P0,S)),!.
 
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
 
@@ -750,6 +752,14 @@ ain_fast(P,S):-
   each_E(mpred_post1,P,[S]),
   mpred_run.
 
+
+remove_negative_version(P) :- \+ mpred_non_neg_literal(P),!.
+remove_negative_version((H:-B)):- !,
+  % TODO extract_predciates((H:-B),Preds),trust(Preds),
+  with_no_mpred_trace_exec((
+  once((get_source_ref_stack(S),!,
+  must(mpred_ain(\+ (~(H) :- B), S)))))),!.
+
 remove_negative_version(P):-
   % TODO extract_predciates(P,Preds),trust(Preds),
   with_no_mpred_trace_exec((
@@ -759,7 +769,7 @@ remove_negative_version(P):-
      
 fwc1s_post1s(10,20):- fresh_mode,!.
 fwc1s_post1s(1,2):- current_prolog_flag(logicmoo_safe,true),!.
-fwc1s_post1s(10,20):- defaultAssertMt(Mt)->Mt=baseKB,!.
+fwc1s_post1s(10,20):- defaultAssertMt(Mt)->Mt==baseKB,!.
 fwc1s_post1s(1,2).
 
 fresh_mode :- \+ current_prolog_flag(pfc_booted,true).
@@ -790,19 +800,26 @@ mpred_post(P, S):- full_transform(post,P,P0),each_E(mpred_post1,P0,[S]).
 
 mpred_post1(    P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post1( P0,   S).
 
-mpred_post1( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
+mpred_post1(Fact, _):- ground(Fact),fwc1s_post1s(One,_Two),Three is One * 3, filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
+
+mpred_post1(P,S):- gripe_time(0.6,mpred_post12(P,S)).
+
+
+:- module_transparent(mpred_post1/2).
+:- module_transparent(mpred_post12/2).
+:- export(mpred_post12/2).
+
+mpred_post12( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 
 % TODO - FIGURE OUT WHY THIS IS NEEDED
-mpred_post1(  ~ P,   S):- 
+mpred_post12( ~ P,   S):- 
    with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
-
-mpred_post1(Fact, _):- fwc1s_post1s(One,_Two),Three is One * 3, filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
 
 % Two version exists of this function one expects for a clean database (fresh_mode) and adds new information.
 % tries to assert a fact or set of fact to the database.
 % The other version is if the program is been running before loading this module.
 %
-mpred_post1(P,S):- 
+mpred_post12(P,S):- 
   fresh_mode,!,
   % db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
@@ -818,7 +835,7 @@ mpred_post1(P,S):-
   
 /*
 % this would be the very inital by Tim Finnin...
-mpred_post1(P,S):- 
+mpred_post12(P,S):- 
   %  db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
   mpred_add_support(P,S),
@@ -832,7 +849,7 @@ mpred_post1(P,S):-
 
 /*
 % Expects a clean database and adds new information.
-mpred_post1(P,S):-  fail,!,  
+mpred_post12(P,S):-  fail,!,  
   % db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
   must( \+ \+ mpred_add_support(P,S)),
@@ -850,7 +867,7 @@ mpred_post1(P,S):-  fail,!,
 % (running the program is been running before loading this module)
 %
 %  (gets the status in Support and in Database)
-mpred_post1(P,S):- !,
+mpred_post12(P,S):- !,
 
 % set_varname_list([]),!,
 
@@ -1442,7 +1459,7 @@ mpred_fwc(Ps):- each_E(mpred_fwc0,Ps,[]).
 %  Avoid loop while calling mpred_fwc1(P)
 % 
 % this line filters sequential (and secondary) dupes
-mpred_fwc0(Fact):- fwc1s_post1s(_One,Two),Six is Two * 3,filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
+mpred_fwc0(Fact):- ground(Fact),fwc1s_post1s(_One,Two),Six is Two * 3,filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
 mpred_fwc0(Fact):- copy_term_vn(Fact,FactC),
       mpred_fwc1(FactC).
 
@@ -1461,11 +1478,8 @@ filter_buffer_get_n(_,[],_).
 
 
 % filter_buffer_n_test(_Name,_,_Fact):- \+ need_speed, !,fail.
-filter_buffer_n_test(Name,_,Fact):- 
-   nb_current(Name,Fact1s),
-   member(FF,Fact1s),Fact=@=FF,!.
 filter_buffer_n_test(Name,N,Fact):- filter_buffer_get_n(Name,FactS,N),
-  nb_setval(Name,[Fact|FactS]),fail.
+   (memberchk(Fact,FactS)-> true ; (nb_setval(Name,[Fact|FactS]),fail)).
 
 
 %% mpred_fwc1(+P) is det.
@@ -1587,6 +1601,7 @@ mpred_eval_lhs(X,S):-
 %
 %  Helper of evaling something on the LHS of a rule.
 % 
+mpred_eval_lhs_0(Var,Support):- var(Var),!,trace_or_throw(var_mpred_eval_lhs_0(Var,Support)).
 mpred_eval_lhs_0((Test*->Body),Support):-  % Noncutted ->
   !,
   mpred_call_no_bc(Test),
@@ -1764,6 +1779,7 @@ pred_check(A):- nonvar(A),must(atom(A)).
 mpred_METACALL(How,P):- mpred_METACALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);mpred_call_no_bc(Cut))).
 
 mpred_METACALL(How, Cut, Var):- var(Var),!,trace_or_throw(var_mpred_METACALL_MI(How,Cut,Var)).
+mpred_METACALL(How, Cut, (H:-B)):-!,mpred_METACALL(How, Cut, clause_asserted_call(H,B)).
 %  this is probably not advisable due to extreme inefficiency.
 mpred_METACALL(_How,_Cut, Var):-is_ftVar(Var),!,mpred_call_with_no_triggers(Var).
 mpred_METACALL(How, Cut, mpred_call_no_bc(G0)):- !,mpred_METACALL(How, Cut, (G0)).
@@ -2303,6 +2319,8 @@ mpred_assertz_w_support(P,Support):-
 % PFC Clause For User Interface.
 %
 
+:- module_transparent(clause_asserted_call/2).
+clause_asserted_call(H,B):-clause_asserted(H,B).
 
 clause_asserted_u(MH):- sanity((nonvar(MH), \+ is_static_predicate(MH))),fail.
 %clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).

@@ -506,7 +506,7 @@ onEndOfFile(Call):- which_file(F), asserta(t_l:on_eof(F,Call)).
 %
 assert_until_eof(F):- must_det_l((loading_source_file(File),assert_until_eof(File,F))).
 
-assert_until_eof(File,F):- must_det_l((asserta(F,Ref),asserta((t_l:on_eof(File,ignore(erase(Ref))))))).
+assert_until_eof(File,F):-dmsg(assert_until_eof(File,F)),must_det_l((asserta(F,Ref),asserta((t_l:on_eof(File,ignore(erase(Ref))))))).
 
 :- style_check(+singleton).
 :- style_check(-discontiguous).
@@ -1164,24 +1164,27 @@ simplify_language_name(W,W).
 file_begin(WIn):- 
  must_det_l((
    simplify_language_name(WIn,W),
-   set_file_lang(W),
    set_lang(W),
+   set_file_lang(W),   
    fileAssertMt(Mt),
    set_fileAssertMt(Mt),
    wdmsg(fileAssertMt(Mt)),
    op_lang(W),
    set_prolog_flag(retry_undefined,true),
-   enable_mpred_expansion)),!.
+   enable_mpred_expansion)),!,
+   must(get_lang(W)).
 
 
 
 set_file_lang(W):-
    %assert_until_eof(t_l:current_lang(W)),
-   forall((which_file(Source);prolog_load_context(file,Source);prolog_load_context(source,Source)),
+   forall((prolog_load_context(file,Source);which_file(Source);prolog_load_context(source,Source)),
    ignore((  % \+ lmcache:mpred_directive_value(Source,language,W),
    decache_file_type(Source),
    wdmsg(lmcache:mpred_directive_value(Source,language,W)),
-   assert_until_eof(Source,lmcache:mpred_directive_value(Source,language,W))))).
+   (Source = '/root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/pfc/system_common.pfc.pl'-> must(W=pfc);true),
+   assert_until_eof(Source,lmcache:mpred_directive_value(Source,language,W))))),
+   must(get_lang(W)).
 
 
 set_lang(W):-
@@ -1204,14 +1207,16 @@ file_end(WIn):-
 % Get Language.
 % Inside File.
 %
-get_lang(LANG):- hotrace((get_lang0(LANGVAR)->same_language(LANG,LANGVAR))).
+get_lang(LANG):- ((get_lang0(LANGVAR)->same_language(LANG,LANGVAR))).
 
 same_language(LANG,LANGVAR):- 
     simplify_language_name(LANGVAR,LANGVARS),
     simplify_language_name(LANG,LANGS),!,
     LANGS=LANGVARS.
 
-get_lang0(W) :- t_l:current_lang(W).
+:-thread_local( t_l:current_lang/1).
+
+get_lang0(W) :- t_l:current_lang(W),!.
 get_lang0(W) :- prolog_load_context(file,Source)->lmcache:mpred_directive_value(Source,language,W).
 get_lang0(W) :- prolog_load_context(source,Source)->lmcache:mpred_directive_value(Source,language,W).
 get_lang0(W) :- loading_source_file(Source)->lmcache:mpred_directive_value(Source,language,W).

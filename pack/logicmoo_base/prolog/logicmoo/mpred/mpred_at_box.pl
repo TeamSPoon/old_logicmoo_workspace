@@ -576,7 +576,7 @@ istAbove(Mt,Query):- Mt \== baseKB, genlMt(Mt,MtAbove),MtAbove:Query.
 
 
 % make sure we ignore calls to predicate_property/2  (or thus '$define_predicate'/1)
-uses_predicate(_,error):- prolog_current_frame(F), show_success(prolog_frame_attribute(F,parent_goal,predicate_property(_,_))),!.
+% uses_predicate(_,error):- prolog_current_frame(F), show_success(prolog_frame_attribute(F,parent_goal,predicate_property(_,_))),!.
 uses_predicate(M:F/A,R):- !, '$current_source_module'(SM), uses_predicate(SM,M,F,A,R).
 uses_predicate(F/A,R):- '$current_source_module'(SM),'$current_typein_module'(M),uses_predicate(M,SM,F,A,R).
 
@@ -606,6 +606,7 @@ uses_predicate(_,_, (//), _, error) :- !,dumpST,break.
 uses_predicate(_,_, (:), _, error) :- !,dumpST,break.
 % uses_predicate(SM,_, '>>',  4, error) :- !,dumpST,break.
 uses_predicate(_,_, '[|]', _, error) :- !,dumpST,break.
+uses_predicate(User, User, module, 2, error):-!.
 
 % make sure we ignore calls to predicate_property/2  (or thus '$define_predicate'/1)
 uses_predicate(_,_,_,_,error):-prolog_current_frame(F), 
@@ -613,9 +614,13 @@ uses_predicate(_,_,_,_,error):-prolog_current_frame(F),
    is_parent_goal(F,'assert_u'(_));
    has_parent_goal(F,'$syspreds':property_predicate(_,_))),!.
 
+
+uses_predicate(CallerMt,CallerMt,predicateConventionMt,2,retry):-
+  create_predicate_istAbove(CallerMt,predicateConventionMt,2),!.
+  
 uses_predicate(CallerMt,baseKB,predicateConventionMt,2,retry):-
-  create_predicate_istAbove(baseKB,predicateConventionMt,2),
-   system:import(baseKB:predicateConventionMt/2),!.
+  create_predicate_istAbove(baseKB,predicateConventionMt,2).
+  
 
 uses_predicate(CallerMt, baseKB, F, A,retry):-
   create_predicate_istAbove(baseKB,F,A),

@@ -149,10 +149,12 @@ functor_non_colon(G,F,A):- compound(G), functor(G,':',2),arg(2,G,GG),!,functor_n
 functor_non_colon(G,F,A):- functor(G,F,A).
 
 lmce_system_term_expansion(_,I,_P,_O,_P2):-  notrace( var(I) ),!,fail.
+lmce_system_term_expansion(_, ':-'(I) ,_P,_O,_P2):-  notrace( var(I) ),!,fail.
 
 lmce_system_term_expansion(Mod,end_of_file,P,O,P2):-  !, expand_whatnot(Mod,clause_expansion,end_of_file,P,O,P2).
 lmce_system_term_expansion(_,I,P,_O,_P2):- \+ is_fbe(term,I,P),!,fail.
 
+lmce_system_term_expansion(_, (:-module(_, _)) ,_P,_O,_P2):-!,fail.
 lmce_system_term_expansion(Mod,(:- B),P,O,P2):- !, expand_whatnot(Mod,directive_expansion,(:- B),P,O,P2).
 lmce_system_term_expansion(_,I,_P,_O,_P2):- nb_setval('$term_e',I),fail.
 lmce_system_term_expansion(Mod,(H ),P,O,P2):- expand_whatnot(Mod,clause_expansion,H ,P,O,P2).

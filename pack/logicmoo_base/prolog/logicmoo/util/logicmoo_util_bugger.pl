@@ -2378,12 +2378,13 @@ time_call(Call):-
 % Gripe Time.
 %
 gripe_time(TooLong,Goal):- statistics(cputime,StartCPU),
+  copy_term(Goal,CopyGoal),
   statistics(walltime,[StartWALL,_]),
   (Goal*->Success=true;Success=fail),
   once((statistics(walltime,[EndWALL,_]),statistics(cputime,EndCPU),
      ElapseCPU is EndCPU-StartCPU,
      (ElapseCPU>TooLong 
-        -> wdmsg(gripe_CPUTIME(warn(ElapseCPU>TooLong),Goal))
+        -> (wdmsg(gripe_CPUTIME(warn(ElapseCPU>TooLong),Goal)),((ElapseCPU < 2.0)->once(rtrace(CopyGoal));true))
         ; (ElapseWALL is (EndWALL-StartWALL)/1000,
              (ElapseWALL>TooLong 
                   -> wdmsg(gripe_WALLTIME(warn(ElapseWALL>TooLong),cputime=ElapseCPU,Goal))

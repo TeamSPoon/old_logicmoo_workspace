@@ -8,8 +8,10 @@
 started_mud_server.
 
 
-
-
+% :- make.
+:- add_import_module(mpred_storage,baseKB,end).
+:- listing({}/1).
+:- listing(mudAtLoc/2).
 % ==============================
 % MUD GAME CODE LOADS
 % ==============================

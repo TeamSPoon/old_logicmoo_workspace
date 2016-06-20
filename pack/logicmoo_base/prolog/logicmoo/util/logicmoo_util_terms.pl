@@ -822,7 +822,7 @@ get_functor(Obj,FO,AO):- must(functor_h(Obj,F,A)),!,FO=F,AO=A.
 %
 % Functor Head.
 %
-functor_h(Obj,F,A):- var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
+functor_h(Obj,F,A):- var(Obj),!,trace_or_throw(var_functor_h(Obj,F,A)).
 functor_h('$VAR'(Obj),F,A):- !, trace_or_throw(var_functor_h('$VAR'(Obj),F,A)).
 % functor_h(Obj,F,A):- var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
 

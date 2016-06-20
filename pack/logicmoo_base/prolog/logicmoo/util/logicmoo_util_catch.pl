@@ -1464,7 +1464,7 @@ quietly(G):- on_x_f(hide_trace(G),
                      fail).
 
 :- if(current_prolog_flag(optimise,true)).
-is_recompile.
+is_recompile:-fail.
 :- else.
 is_recompile:-fail.
 :- endif.
@@ -1479,7 +1479,7 @@ is_recompile:-fail.
 %
 % Optional Sanity Checking.
 %
-sanity(P):- hotrace((\+ is_recompile,is_release,!,nop(P))).
+sanity(_):- notrace((is_release, \+ is_recompile)),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(sanity,Goal)).
 sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
 sanity(Goal):- quietly(Goal),!.

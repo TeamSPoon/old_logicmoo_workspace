@@ -383,25 +383,32 @@ pfcControlled(argIsa).
 %typeProps(tCoffeeCup,[mudColor(vBlack),mudColor(isEach(vBrown,vBlack)),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
 %props(iCoffeeCup7,[mudColor(vBlack),mudColor(isEach(vBrown,vBlack)),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
 
-==>tSet(tSet).
-
+:- must(rtrace(get_lang(pfc))).
 
 :- must(ain((tSet(C)==>
  ( {atom(C), functor(Head,C,1),
-  ( \+(predicate_property(Head,S1))-> kb_dynamic(C/1); true),
-  Head=..[C,S2],nop((S1:S2)),
+  ( \+(predicate_property(Head,_))-> kb_dynamic(C/1); true),
+  
  (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
    functorDeclares(C),
    pfcControlled(C),
    arity(C,1),
    tCol(C))))).
 
-(tSet(C)/atom(C) ==> ({Head=..[C,I]}, (isa(I,C)/ground(I:C)==>Head))).
+==>tSet(vtVerb).
+:- must(tSet(vtVerb)).
+
+:- call((system:rtrace)).
+==>tSet(tSet).
+:- notrace.
+:- nortrace.
+:- break.
+% (tSet(C)/atom(C) ==> ({Head=..[C,I]}, (isa(I,C)/ground(I:C)==>Head))).
 
 ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1),
-  call(\+ predicate_property(Head,defined) -> kb_dynamic(F/1);true),
+  call((\+ predicate_property(Head,defined) -> kb_dynamic(F/1);true)),
   Head=..[F,I],
-  call(predicate_property(Head,dynamic)->true;show_pred_info(Head))},
+  call((predicate_property(Head,dynamic)->true;show_pred_info(Head)))},
    ~functorDeclares(F),
    arity(F,1),
    (Head/predicate_property(Head,dynamic)==>{ignore(retract(Head))}),
