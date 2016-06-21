@@ -596,7 +596,6 @@ parseIsa(isMost(List),Term1) --> {!},parseIsaMost(List,Term1).
 
 parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String,Type,Term)}.
 
-% With CHRs, one can introduce user­defined hard­wired constraints into a given high­level host language. In this extended abstract the host the language is Prolog, a CLP language with equality over Herbrand terms as the only its only built­in constraint. We claim that using our logic based language allows for reasoning  about, inspection and modification of a constraint system. 
 parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 

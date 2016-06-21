@@ -145,7 +145,7 @@ arity(is_never_type,1).
 arity(prologSingleValued,1).
 arity('<=>',2).
 arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
-arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
+arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(Z,1))), arity(F,Z))).
 
 mtCycL(baseKB).
 
@@ -229,7 +229,7 @@ bt(P,_)/nonvar(P) ==> (P:- mpred_bc_only(P)).
 
 % prologDynamic(X)/get_pifunctor(X,C)==>({kb_dynamic(C),decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologDynamic(F)).
 
-isa(F,pfcMustFC) ==> pfcControlled(F).
+pfcMustFC(F) ==> pfcControlled(F).
 
 % catching of misinterpreations
 /*
@@ -243,7 +243,10 @@ pfcControlled(C)==>prologHybrid(C).
 
 :- dynamic(hybrid_support/2).
 
-mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A),isa(F,S1)).
+%'==>'((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A), ==>(isa(F,S1))))).
+% ((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A),t(S1,F)))).
+((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A),{ASSERT=..[S1,F]},ASSERT))).
+
 mpred_mark(pfcPosTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
 mpred_mark(pfcNegTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
 mpred_mark(pfcBcTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
@@ -296,12 +299,6 @@ mtExact(Mt)/module_predicate(Mt,F,A)==>predicateConventionMt(F,Mt),arity(F,A).
 
 
 
-
-
-
-
-
-
 /*
 genlMt(Mt1,Mt2),mtCycL(Mt1),mtProlog(Mt2) ==> 
   {maybe_add_module_import(Mt1,Mt2)}.
@@ -323,7 +320,7 @@ predicateConventionMt(regression_test,lmconf).
 
 baseKB:collectionConventionMt(tMicrotheory,baseKB).
 collectionConventionMt(mtCycL,baseKB).
-collectionConventionMt(Col,Where)==>predicateConventionMt(Col,Where).
+collectionConventionMt(Col,Where) ==> predicateConventionMt(Col,Where).
 
 % mtExact(Mt)==>{kb_dynamic(Mt)}.
 
@@ -332,9 +329,10 @@ tCol(tSet).  % = isa(tSet,tCol).
 mtProlog(Mt),predicateConventionMt(F,Mt)/(Mt\==baseKB)==>prologBuiltin(F).
 
 % genlsFwd(Sub,Super)==> (isa(I,Super) :- isa(I,Sub)). 
-genlsFwd(Sub,Super)==> (t(Sub,I) ==> t(Super,I)). 
+:- ain_expanded((genlsFwd(Sub,Super)==> (t(Sub,I) ==> t(Super,I)))).
 
 ttModule(M)==>tSet(M).
+
 ttModule(MtType)==>genls(MtType,tMicrotheory).
 ttModule(mtProlog).
 
@@ -342,13 +340,15 @@ ttModule(mtProlog).
 
 tCol(Decl)==>functorDeclares(Decl).
 
-:- sanity(( fully_expand(((ttModule(mtCycL,
+:- sanity(( fully_expand_now(cuz,((ttModule(mtCycL,
   comment("yada....................."),
   genlsFwd(tMicrotheory)))),
   OO),dmsg(full_transform=OO),
       OO=(_,_))).
 
-:- ain(ttModule(mtCycL,
+:- set_prolog_flag(dialect_pfc,true).
+
+:- ain_expanded(ttModule(mtCycL,
   comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),
   genlsFwd(tMicrotheory))).
 
@@ -357,15 +357,15 @@ tCol(Decl)==>functorDeclares(Decl).
 :- sanity(\+ arity(ttModule,3)).
 :- sanity(\+ predicate_property(ttModule(_,_,_),_)).
 
-ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
-  genls(tMicrotheory)).
+:- ain_expanded(ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
+  genls(tMicrotheory))).
 
 :- sanity(arity(ttModule,1)).
 :- sanity(\+ arity(ttModule,3)).
 :- sanity(\+ predicate_property(ttModule(_,_,_),_)).
 
-ttModule(mtProlog,comment("Builtin Prolog code modules such as 'lists' or 'apply' and PFC system like 'mpred_loader' or 'mpred_type_wff'"),
-  genlsFwd(mtProlog),genls(mtCore)).
+:- ain_expanded(ttModule(mtProlog,comment("Builtin Prolog code modules such as 'lists' or 'apply' and PFC system like 'mpred_loader' or 'mpred_type_wff'"),
+  genlsFwd(mtProlog),genls(mtCore))).
 
 
 % ttModule(mtLocal,comment("mtLocal(?Mt) is always scoped underneath baseKB")).
@@ -451,3 +451,4 @@ nondet.
 
 % :- ain(((predicateConventionMt(F,abox),\+predicateConventionMt(F,baseKB)) ==> ~ predicateConventionMt(F,baseKB))).
 
+:- set_prolog_flag(dialect_pfc,false).

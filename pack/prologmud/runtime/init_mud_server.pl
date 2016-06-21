@@ -2,6 +2,7 @@
 /** <module> MUD server startup script in SWI-Prolog
 
 */
+:- set_prolog_flag(dialect_pfc,false).
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
@@ -54,6 +55,7 @@
 % MUD SERVER CODE LOADS
 % ==============================
 
+:- set_prolog_flag(dialect_pfc,false).
 % [Required] load the mud system
 :- show_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_loader)))).
 
@@ -63,6 +65,7 @@
 % ==============================
 
 :- file_begin(pfc).
+:- set_prolog_flag(dialect_pfc,true).
 
 :-assert_isa(iRR7,tRR).
 :-ain(genls(tRR,tRRP)).
@@ -102,6 +105,9 @@ wearsClothing(iExplorer7,'iBoots773').
 wearsClothing(iExplorer7,'iCommBadge774').
 wearsClothing(iExplorer7,'iGoldUniform775').
 mudStowing(iExplorer7,'iPhaser776').
+
+:- set_prolog_flag(dialect_pfc,true).
+
 pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
@@ -116,6 +122,7 @@ wearsClothing(iCommanderdata66,'iBoots673').
 wearsClothing(iCommanderdata66,'iCommBadge674').
 wearsClothing(iCommanderdata66,'iGoldUniform675').
 mudStowing(iCommanderdata66,'iPhaser676').
+
 pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iCommBadge674',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
@@ -132,6 +139,8 @@ tRegion(iOfficeRoom7).
 :-onSpawn(localityOfObject(iCommanderdata66,tOfficeRoom)).
 :-onSpawn(bordersOn(tLivingRoom,tOfficeRoom)).
 
+:- set_prolog_flag(dialect_pfc,false).
+
 :- file_begin(pl).
 
 % [Optionaly] Start the telent server % iCommanderdata66
@@ -141,6 +150,7 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 :- rl_add_history( 'start_telnet.' ).
 :- rl_add_history( 'user:ensure_loaded(start_mud_server).' ).
 :- rl_add_history( 'login_and_run.' ).
+:- set_prolog_flag(mud_running,true).
 
 % :-  statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T), qsave_program(run_mud_server,[map('run_mud_server.sav'),global(G),trail(T),local(L)]).
 

@@ -188,14 +188,14 @@ mudLocOnSurface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
 :-export(same_regions/2).
 same_regions(Agent,Obj):-inRegion(Agent,Where1),dif(Agent,Obj),inRegion(Obj,Where2),Where1=Where2.
 
-:-ain(prologHybrid(inRegion(tObj,tRegion))).
+:-ain_expanded(prologHybrid(inRegion(tObj,tRegion))).
 %prologPTTP(localityOfObject(tObj,tSpatialthing)).
 
 %:- ensure_universal_stub(prologPTTP,inRegion/2).
 %:- ensure_universal_stub(prologPTTP,mudTestAgentWearing/2).
 
-prologHybrid(mudAtLoc/2).
-meta_argtypes(mudAtLoc(tObj,tSpatialThing)).
+:- ain_expanded(prologHybrid(mudAtLoc/2)).
+:- ain_expanded(meta_argtypes(mudAtLoc(tObj,tSpatialThing))).
 
 
 % compute the most specific location description
@@ -525,7 +525,7 @@ in_world_move0(LOC,Agent,Dir) :-
         locationToRegion(LOC,Region1),
         locationToRegion(XXYY,Region2),
               ((expire_dont_add, clr(mudAtLoc(Agent,LOC)))),
-        ((expire_dont_add, ain(mudAtLoc(Agent,XXYY)),
+        ((expire_dont_add, ain_expanded(mudAtLoc(Agent,XXYY)),
         sanity((is_asserted(mudAtLoc(Agent,LOC2)),LOC2 \== LOC)))),         
    ifThen(( Region1\==Region2) ,raise_location_event(LOC,actNotice(reciever,actLeave(Agent,Region1,to(Dir))))),
         reverse_dir(Dir,Rev),

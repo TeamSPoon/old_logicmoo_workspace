@@ -788,7 +788,7 @@ plus_fwc(P):- gripe_time(0.6,
 % tries to assert a fact or set of fact to the database.  For
 % each fact (or the singleton) mpred_post1 is called. It always succeeds.
 %
-mpred_post(P, S):- full_transform(post,P,P0),each_E(mpred_post1,P0,[S]).
+mpred_post(P, S):- fully_expand_now(post,P,P0),each_E(mpred_post1,P0,[S]).
 
 
 %% mpred_post1(+P,+S) is det.
@@ -1495,8 +1495,7 @@ mpred_fwc1(Fact):-
   mpred_do_rule(Fact),
   copy_term_vn(Fact,F),
   % check positive triggers
-  functor(Fact,MF,MA),
-  loop_check_term(mpred_do_fcpt(Fact,F),MF/MA,true),
+  loop_check(mpred_do_fcpt(Fact,F),true),
   % check negative triggers
   mpred_do_fcnt(Fact,F).
 
@@ -1996,7 +1995,7 @@ mpred_compile_rhs_term(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhs_term(Sup,P,P
    build_code_test(Sup,C,C0),!.
 
 mpred_compile_rhs_term(Sup,I,OO):- 
-  full_transform(compile_rhs,I,O),
+  fully_expand(compile_rhs,I,O),
   must(\+ \+ mpred_mark_as(Sup,O,pfcRHS)),!,build_consequent(Sup,O,OO).
 
 mpred_compile_rhs_term(Sup,I,O):- build_consequent(Sup,I,O).

@@ -84,6 +84,7 @@
             remodulize/3,
             replaced_module/3,
             do_expand_args/3,
+            ain_expanded/1,
             do_expand_args/3,
             do_expand_args_l/3,
             do_expand_args_pa/4,
@@ -151,6 +152,7 @@
             translateOneArg/8,
             was_isa_syntax/3,
           mpred_expansion_file/0,
+          
          temp_comp/4,
          get_ruleRewrite/2,
          expand_kif_string_or_fail/3,
@@ -164,6 +166,7 @@
 :- meta_predicate 
    % mpred_expansion
    cheaply_u(+),
+   ain_expanded(+),
    cheaply_u_ilc(+),
    db_expand_maplist(2,*,*,*,*),
    % mpred_expansion
@@ -522,6 +525,7 @@ fully_expand(X,Y):- must((fully_expand(clause(unknown,cuz),X,Y))).
 
 
 
+ain_expanded(III):- fully_expand_now(change(assert,ain_expanded),III,OOO),ain(OOO).
 
 %% fully_expand( ++Op, ^Sent, --SentO) is det.
 %
@@ -533,7 +537,20 @@ fully_expand(X,Y):- must((fully_expand(clause(unknown,cuz),X,Y))).
 %  pfc(_,_) - for salient language based analysis at a human level
 %
 
-fully_expand(Op,Sent,SentO):-fully_expand0(Op,Sent,SentO),!. % assert_if_new(fully_expanded_test(Op,Sent,SentO)).
+in_dialect_pfc:- 
+  (current_prolog_flag(dialect_pfc,true); 
+  (source_location(F,_W),( atom_concat(_,'.pfc.pl',F);atom_concat(_,'.plmoo',F);atom_concat(_,'.pfc',F)))),!.
+
+
+fully_expand(Op,Sent,SentO):- in_dialect_pfc,!,fully_expand0(Op,Sent,SentO).
+fully_expand(Op,'==>'(Sent),SentO):-nonvar(Sent),!,fully_expand0(Op,Sent,SentO).
+fully_expand(Op,Sent,Sent):- \+ current_prolog_flag(mud_running,true),!.
+fully_expand(Op,Sent,SentO):-fully_expand0(Op,Sent,SentO),!,gripe_if_expanded(Op,Sent,SentO).
+
+gripe_if_expanded(Op,Sent,SentO):-
+   (Sent \=@= SentO-> (wdmsg(gripe_if_expanded(Op)),wdmsg(Sent),wdmsg(SentO),dtrace) ; true).
+
+ % assert_if_new(fully_expanded_test(Op,Sent,SentO)).
 
 fully_expand0(Op,Sent,SentO):-
   must(once((/*hotrace*/((cyclic_break((Sent)),

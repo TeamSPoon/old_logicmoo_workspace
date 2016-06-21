@@ -13,8 +13,8 @@ end_of_file.
 :- include(prologmud(mud_header)).
 
 
-:-ain(( prologDynamic(lmconf:irc_user_plays(tAgent,ftAtom,ftAtom)))).
-:-ain(( prologOrdered(agent_action_queue(tAgent,ftTerm,ftTerm)))).
+:-ain_expanded(( prologDynamic(lmconf:irc_user_plays(tAgent,ftAtom,ftAtom)))).
+:-ain_expanded(( prologOrdered(agent_action_queue(tAgent,ftTerm,ftTerm)))).
 
 :-ain(( lmconf:deliver_event_hooks(Agent,Event):- fail,ignore(once(deliver_to_irc(Agent,Event))))).
 lmconf:irc_event_hooks(Channel,User,Stuff):- fail,ignore(once(irc_mud_event_hook(Channel,User,Stuff))).

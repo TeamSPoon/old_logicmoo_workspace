@@ -30,10 +30,13 @@
 :- onEndOfFile(dmsg(infSupertypeName)).
 
 :- include(prologmud(mud_header)).
+
+
 :- '$set_source_module'(baseKB).
 :- file_begin(pfc).
 :- set_defaultAssertMt(baseKB).
 
+:- set_prolog_flag(dialect_pfc,true).
 
 :- retractall(t_l:disable_px).
 
@@ -76,6 +79,7 @@ isa(iWorld7,tWorld).
 %ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
 
 
+:- dynamic(tItem/1).
 
 typeGenls(tAgent,ttAgentType).
 typeGenls(tItem,ttItemType).
@@ -230,7 +234,7 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
 ((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) ==> ((disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
 
-isa(Col1, ttObjectType) ==> ~isa(Col1, ttExpressionType).
+isa(Col1, ttObjectType) ==> ~ttExpressionType(Col1).
 
 neg(isa(I,Super)) <- {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Super)).
 % disjointWith(P1,P2) ==> {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <==> isa(C,P2)).
@@ -616,8 +620,8 @@ ttTypeFacet(tChannel).
 typeGenls(tAgent,ttAgentType).
 typeGenls(tItem,ttItemType).
 typeGenls(tObj,ttObjectType).
-:-ain(isa(tObj,ttTemporalType)).
-:-ain(isa(tRegion,ttTemporalType)).
+:-ain_expanded(isa(tObj,ttTemporalType)).
+:-ain_expanded(isa(tRegion,ttTemporalType)).
 typeGenls(tRegion,ttRegionType).
 typeGenls(ttAgentType,tAgent).
 typeGenls(ttItemType,tItem).
@@ -1011,6 +1015,8 @@ normalAgentGoal(Pred,Val)==>  (tAgent(A)==>mdefault(t(Pred,A,Val))).
 
 genls(tRoom,tRegion).
 
+:- set_prolog_flag(dialect_pfc,false).
+
 /*
 
  the CycL language extends Prolog's first order logic capabilities with some higher order logics.  
@@ -1057,3 +1063,4 @@ O = [
 
 */
 
+:- set_prolog_flag(dialect_pfc,false).

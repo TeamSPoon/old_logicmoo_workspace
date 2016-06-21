@@ -296,7 +296,7 @@ rescan_argIsa(F,N,Type):- ignore(( arity(F,A), functor(M,F,A),forall((clause_ass
 %
 deduceEachArgType(Var):- \+ compound(Var),!.
 deduceEachArgType(meta_argtypes(MT)):- !, rescan_meta_argtypes(MT).
-deduceEachArgType(tRelation(M)):-compound(M),functor(M,F,A),ain(meta_argtypes(M)),ain(tRelation(F)),ain(arity(F,A)).
+deduceEachArgType(tRelation(M)):-compound(M),functor(M,F,A),ain_expanded(meta_argtypes(M)),ain(tRelation(F)),ain(arity(F,A)).
 deduceEachArgType(M):-functor(M,F,A),M=..[F|ARGS],deduceEachArgType(F,A,ARGS).
 
 %= 	 	 
@@ -733,7 +733,7 @@ clr0(P):-
 %
 % Preq.
 %
-preq(P,C0):- agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
+preq(P,C0In):- fully_expand_now(query(preq),C0In,C0), agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
 
 % -  call_u(Query) = Normal query
 
@@ -777,7 +777,7 @@ ireq(C0):- nop(dmsg(ireq(C0))),
 %
 % Call Props.
 %
-call_props(Obj,PropSpecs):- call_u(props(Obj,PropSpecs)).
+call_props(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
 
 %= 	 	 
 
@@ -869,7 +869,7 @@ upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
 %
 % Upprop.
 %
-upprop(C0):- ain(C0).
+upprop(C0):- ain_expanded(C0).
 % -  padd(Obj,Prop,Value)
 
 %= 	 	 
@@ -878,7 +878,7 @@ upprop(C0):- ain(C0).
 %
 % Padd.
 %
-padd(Obj,PropSpecs):- ain((props(Obj,PropSpecs))).
+padd(Obj,PropSpecs):- ain_expanded((props(Obj,PropSpecs))).
 % -  padd(Obj,Prop,Value)
 
 %= 	 	 
@@ -887,7 +887,7 @@ padd(Obj,PropSpecs):- ain((props(Obj,PropSpecs))).
 %
 % Padd.
 %
-padd(Obj,Prop,Value):- ain((t(Prop,Obj,Value))).
+padd(Obj,Prop,Value):- ain_expanded((t(Prop,Obj,Value))).
 % -  props(Obj,Prop,Value)
 
 %= 	 	 
@@ -1030,7 +1030,7 @@ db_must_asserta_confirmed_sv(CNEW,A,NEW):-
    replace_arg(CNEW,A,NOW,CNOW),
    sanity(not(singletons_throw_else_fail(CNEW))),
    mpred_modify(change(assert,sv),CNEW),!,
-   ain(CNEW),
+   ain_expanded(CNEW),
    sanity(confirm_hook(CNEW:NEW=@=CNOW:NOW)),!.
 
 db_must_asserta_confirmed_sv(CNEW,A,NEW):-dmsg(unconfirmed(db_must_asserta_confirmed_sv(CNEW,A,NEW))).
@@ -1098,7 +1098,7 @@ database_modify_0(change(assert,AZ),          G):- database_modify_assert(change
 %
 % Database Modify Assert.
 %
-database_modify_assert(change(assert,_AorZ),       G):- !,ain(G).
+database_modify_assert(change(assert,_AorZ),       G):- !,ain_expanded(G).
 database_modify_assert(change(assert,AorZ),       G):- 
  get_functor(G,F,_),!,
    (AorZ == a -> hooked_asserta(G);

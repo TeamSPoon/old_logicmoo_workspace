@@ -179,7 +179,7 @@ decl_mpred_mfa(M,FF,A):-
 %
 
 decl_mpred_prolog(A):-not(compound(A)),!,ain00(prologBuiltin(A)).
-decl_mpred_prolog(A):-!,ain(prologBuiltin(A)).
+decl_mpred_prolog(A):-!,ain_expanded(prologBuiltin(A)).
 
 % ain(love(isEach(a/1,b/2,c/1,d),mother)).
 % ain(loves(isElement(a/1,b/2,c/1,d),mother)).
@@ -254,7 +254,7 @@ decl_mpred_prolog(_:CM,M,PI,F,A):-
       ((var(CM),nonvar(M))->CM=M;true),
       ((var(PI),integer(A))->functor(PI,F,A);true),
       define_maybe_prolog(M,PI,F,A),
-      ain(prologBuiltin(F)),
+      ain_expanded(prologBuiltin(F)),
       (integer(A)->assert_arity(F,A);true))).
 
 define_maybe_prolog(M,PI,F,_A):- predicate_property(M:PI,imported_from(system)),ain(prologBuiltin(F)).
@@ -303,8 +303,8 @@ define_maybe_prolog(M,PI,F,A):-
 %
 
 % kb_dynamic(A):- \+(compound(A)),!,ain00(prologHybrid(A)).
-% ain(love(isEach(a/1,b/2,c/1,d),mother)).
-% ain(loves(isElement(a/1,b/2,c/1,d),mother)).
+% ain_expanded(love(isEach(a/1,b/2,c/1,d),mother)).
+% ain_expanded(loves(isElement(a/1,b/2,c/1,d),mother)).
 kb_dynamic(M):- M =.. [isEach|List],!,must_maplist(kb_dynamic,List).
 kb_dynamic(List):- is_list(List),!,must_maplist(kb_dynamic,List).
 kb_dynamic(MPI):- must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),MPI))),!.
@@ -566,7 +566,7 @@ decl_mpred(M):-loop_check(with_pi(M,decl_mpred_4),true).
 % Declare Managed Predicate Helper Number 4..
 %
 decl_mpred_3(user,prologSingleValued(ARGS),prologSingleValued/1):- compound(ARGS),get_functor(ARGS,F,A),!, 
-   ain(arity(F,A)),ain(prologSingleValued(F)),ain(meta_argtypes(ARGS)),!.
+   ain(arity(F,A)),ain(prologSingleValued(F)),ain_expanded(meta_argtypes(ARGS)),!.
 decl_mpred_3(_,F,F/0):-!,assert_hasInstance(tPred,F).
 decl_mpred_3(M,PI,F/A):-
    decl_mpred(F,A),
@@ -623,7 +623,7 @@ decl_mpred_2(_,meta_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(A
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_mt_why(F,A).
 
 decl_mpred_2(F,A):-once(lmconf:mpred_provide_write_attributes(F,A)).
-decl_mpred_2(F,Prop):-ain(mpred_isa(F,Prop)).
+decl_mpred_2(F,Prop):-ain_expanded(mpred_isa(F,Prop)).
 
 
 %= 	 	 
@@ -693,7 +693,7 @@ add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_
 %
 % Add Managed Predicate Prop Gleaned Helper Number 4..
 %
-add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,ain(meta_argtypes(Arg1,Arg1)),decl_mpred(Arg1,FRGS).
+add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,ain_expanded(meta_argtypes(Arg1)),decl_mpred(Arg1,FRGS).
 add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 

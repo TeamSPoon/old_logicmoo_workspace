@@ -60,7 +60,7 @@ db_call(_,Y):-old_call,!,predicate_property(Y,_),!, call(Y).
 db_call(What,X):-invoke_call(call(What),X).
 
 
-ain(X):-ain(X).
+%ain(X):-ain(X).
 rem(X):-pfcRem(X).
 
 

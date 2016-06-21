@@ -120,7 +120,7 @@ prologHybrid(genls/2).
 %(P/mpred_non_neg_literal(P), ~(P)) ==> conflict(P).
 
 %:- rtrace,trace.
-prologBuiltin(mpred_select/2).
+==>(prologBuiltin(mpred_select/2)).
 % :- nortrace,cnotrace.
 
 :- kb_dynamic(conflict/1).
@@ -388,8 +388,7 @@ pfcControlled(argIsa).
 :- must(ain((tSet(C)==>
  ( {atom(C), functor(Head,C,1),
   ( \+(predicate_property(Head,_))-> kb_dynamic(C/1); true),
-  
- (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
+    (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
    functorDeclares(C),
    pfcControlled(C),
    arity(C,1),
@@ -402,7 +401,7 @@ pfcControlled(argIsa).
 ==>tSet(tSet).
 :- notrace.
 :- nortrace.
-:- break.
+% :- break.
 % (tSet(C)/atom(C) ==> ({Head=..[C,I]}, (isa(I,C)/ground(I:C)==>Head))).
 
 ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1),

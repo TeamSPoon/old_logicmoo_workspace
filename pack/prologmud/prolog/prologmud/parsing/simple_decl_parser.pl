@@ -37,23 +37,26 @@ parserVars_local(A,N,V,Type):-parserVars(A,N,V,Type).
 
 parserVars_falback(_,N,V,Type):-parserVars_local(global,N,V,Type).
 
+vtColor(vRed).
 
-isa(vRed,vtColor).
+ttValueType(vtColor).
+
+:- ain_expanded('==>'((isa(X,ttValueType)/(X\==vtValue)),(genls(X,vtValue),completelyAssertedCollection(X)))).
+
+:- rtrace.
 
 completelyAssertedCollection(vtValue).
 
-
-
-isa(vtColor,ttValueType).
-:- ain('==>'(isa(X,ttValueType),(genls(X,vtValue),completelyAssertedCollection(X)))).
-
 isa(vtValue,ttValueType).
+
+:- show_call(_,get_lang(_)).
+% :- break.
 
 typeGenls(ttValueType,vtValue).
 
 
 :-must(vtColor(vRed)).
-% :-must((isa(vRed,REDISA),genls(REDISA,vtValue))).
+:-must((isa(vRed,REDISA),genls(REDISA,vtValue))).
 
 toCol(Txt,I,TCOL):-member(TCOL,[tCol,tObj,tSpatialThing,vtValue,ttTypeType]),show_success(toCol_0(Txt,I,TCOL)),!.
 
@@ -317,6 +320,7 @@ tSmall(X) <==> mudSize(X,vSmall).
 
 % set of green things in the world
 tSet(tGreen).
+:- trace.
 tGreen(X) <==> mudColor(X,vGreen).
 
 %:-assertz_if_new(parserTest(iWorld7,"All green books are small.", (tGreen(X),tBook(X))==>tSmall(X))).
@@ -466,4 +470,4 @@ Persuasion rules have outcomes persuasion succeeds (success) and persuasion fail
 Unsuccessful attempt by is a rulebook. [19
 
 */
-
+ 

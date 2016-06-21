@@ -20,7 +20,7 @@ mtCycL(kb2).
 mtCycL(kb3).
 
 
-kb2: (b).
+kb2:b.
 
 baseKB:genlMt(kb2,code1).
 

@@ -133,7 +133,7 @@ transitive_P_r_l(3,?,?,?),
 %
 % Assert Has Instance.
 %
-assert_hasInstance(T,I):-  sanity(ground(T:I)),ain(isa(I,T)),!,expire_tabled_list(all).
+assert_hasInstance(T,I):-  sanity(ground(T:I)),ain_expanded(isa(I,T)),!,expire_tabled_list(all).
 
 % ========================================
 % is_typef(F).
@@ -1127,7 +1127,7 @@ guess_typetypes_0(TtTypeType):-atom_concat(tt,TypeType,TtTypeType),atom_concat(T
 system:term_expansion(isa(Compound,PredArgTypes),
   (:-dmsg(ain(wizza(Compound,PredArgTypes))))):-
   lmconf:isa_pred_now_locked,
-   ground(Compound:PredArgTypes),show_call(why,ain(isa(Compound,PredArgTypes))),!.
+   ground(Compound:PredArgTypes),show_call(why,ain_expanded(isa(Compound,PredArgTypes))),!.
 */
 
 
@@ -1213,7 +1213,7 @@ assert_isa_ilc(_I,T):- member(T,[ftString]),!.
 assert_isa_ilc(I,T):- is_list(I),!,maplist(assert_isa_reversed(T),I).
 assert_isa_ilc(I,T):- not(not(a(T,I))),!.
 assert_isa_ilc(I,T):- hotrace(chk_ft(T)),(is_ftCompound(I)->dmsg(once(dont_assert_c_is_ft(I,T)));dmsg(once(dont_assert_is_ft(I,T)))),rtrace((chk_ft(T))).
-assert_isa_ilc(I,T):- once(decl_type(T)),!,G=..[T,I], ain(G),(not_mud_isa(I,T,Why)->throw(Why);true),!.
+assert_isa_ilc(I,T):- once(decl_type(T)),!,G=..[T,I], ain_expanded(G),(not_mud_isa(I,T,Why)->throw(Why);true),!.
 assert_isa_ilc(I,T):- 
   skipped_table_call(must((assert_isa_ilc_unchecked(I,T),!,show_failure(why,isa_backchaing(I,T))))).
   
@@ -1242,7 +1242,7 @@ assert_compound_isa(I,_,_):- is_ftCompound(I), I\=resultIsaFn(_),glean_pred_prop
 assert_compound_isa(I,T,_):- hotrace(chk_ft(T)),dmsg(once(dont_assert_is_ft(I,T))),rtrace((chk_ft(T))).
 %assert_compound_isa(I,T,F):- is_Template(I),!,assert_hasInstance(T,I),show_call(why,ain(resultIsa(I,T))),assert_hasInstance(T,resultIsaFn(F)).
 assert_compound_isa(I,T,F):- ignore((is_Template(I),w_tl(infConfidence(vWeak),assert_predArgTypes(I)))),
-   hooked_asserta(isa(I,T)),assert_hasInstance(T,I),show_call(why,ain(resultIsa(F,T))),assert_hasInstance(T,resultIsaFn(F)),!.
+   hooked_asserta(isa(I,T)),assert_hasInstance(T,I),show_call(why,ain_expanded(resultIsa(F,T))),assert_hasInstance(T,resultIsaFn(F)),!.
    
 
 

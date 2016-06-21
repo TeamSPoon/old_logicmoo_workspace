@@ -476,7 +476,7 @@ do_define_affordance(LIST):-(member(subjType= SType,LIST);member(alsoType= SType
   decl_type(Type),do_define_type_affordance(Type,LIST).
 
 do_define_type_affordance1(Type,_= Type):-!.
-do_define_type_affordance1(Type,subjType= String):- ain(nameStrings(Type,String)).
+do_define_type_affordance1(Type,subjType= String):- ain_expanded(nameStrings(Type,String)).
 
 
 do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),ain(genls(Type,ParentType)).

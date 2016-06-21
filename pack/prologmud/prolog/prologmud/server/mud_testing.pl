@@ -222,7 +222,7 @@ lmconf:mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))
 
 :-thread_local t_l:is_checking_instance/1.
 
-:-ain(prologBuiltin(check_consistent(ftTerm,ftInt))).
+:-ain_expanded(prologBuiltin(check_consistent(ftTerm,ftInt))).
 % :-decl_mpred_prolog(check_consistent(ftTerm,ftInt)).
 :-decl_mpred_prolog(is_instance_consistent(ftTerm,ftInt)).
 :-decl_mpred_prolog(bad_instance(ftTerm,ftTerm)).
