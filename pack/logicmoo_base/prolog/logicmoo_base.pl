@@ -109,11 +109,20 @@ lmconf:mpred_skipped_module(eggdrop).
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
 :- enable_mpred_expansion.
-system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
-system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
+% system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
+%system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
+
+base_clause_expansion(I,O):-  expand_kif_string_or_fail(pl_te,I,O),!.
+base_clause_expansion( :-(I), :-(O)):- !, expand_isEach_or_fail(I,O),!.
+base_clause_expansion(I,':-'(ain_expanded(I))):- in_dialect_pfc,!.
+base_clause_expansion(I,':-'(ain_expanded(I))):- get_consequent_functor(I,F,A),call_u(hybrid_support(F,A)),!.
+base_clause_expansion(I,O):- expand_isEach_or_fail(I,O),!.
+base_clause_expansion(I,O):- mpred_term_expansion(I,O)->I\=@=O,!.
+
+system:clause_expansion(I,PosI,O,PosI):- I\=end_of_file, base_clause_expansion(I,O),!.
+system:clause_expansion(I,P1,O,P2):- I==end_of_file, current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
 
 
-% system:clause_expansion(I,':-'(ainz(I))):-  get_lang(pfc).
 
 /*
 
@@ -184,14 +193,14 @@ user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_unde
 
 % Load boot base file
 user:lmbf:- 
-  set_prolog_flag(mpred_te,true),
-  set_prolog_flag(pfc_booted,false),
-  with_umt(baseKB,
-  time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc'))))),
+ w_tl( set_prolog_flag(mpred_te,true),
+   w_tl(set_prolog_flag(pfc_booted,false),
+     with_umt(baseKB,
+  time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc'))))))),
   set_prolog_flag(pfc_booted,true).
 
  :- meta_predicate mpred_expansion:temp_comp(*,*,2,?).
- :- meta_predicate mpred_storage:mdel(0).
+ :- meta_predicate mpred_storage:mdel(+).
  :- meta_predicate mpred_type_isa:assert_isa_hooked_after(?,1).
  :- meta_predicate mpred_pfc:attvar_op_fully(1,?).
 
@@ -207,4 +216,9 @@ user:lmbf:-
 %:- forall((current_module(M),M\=user,M\=system,M\=baseKB),maybe_add_import_module(M,baseKB,start)).
 
 :- list_undefined.
+
+:- set_prolog_flag(lm_expanders,false).
+% :- set_prolog_flag(read_attvars,false).
+:- set_prolog_flag(mpred_te,false).
+
 :- reset_modules.

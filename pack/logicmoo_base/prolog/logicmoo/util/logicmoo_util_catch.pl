@@ -1480,9 +1480,9 @@ is_recompile:-fail.
 % Optional Sanity Checking.
 %
 sanity(_):- notrace((is_release, \+ is_recompile)),!.
-sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(sanity,Goal)).
-sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
+% sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
 sanity(Goal):- quietly(Goal),!.
+sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
 sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:break).
 
 compare_results(N+NVs,O+OVs):-

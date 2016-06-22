@@ -52,7 +52,7 @@
 % :- multifile prolog:message/3.
 % prolog:message(git(update_versions),A,A):-!.
 
-:- use_module(library(settings)).
+:- system:use_module(library(settings)).
 % :- use_module(library(check)).
 % :- make.
 %:- portray_text(true).
@@ -90,7 +90,6 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 
 :- file_begin(prolog).
 
-:- '$set_source_module'('user').
 
 :- asserta(t_l:disable_px).
 
@@ -192,7 +191,7 @@ hard_work:-
 
 % [Required] load the mud PFCs
 :- set_prolog_flag(pfc_booted,false).
-:- show_entry(gripe_time(40,system:ensure_loaded(prologmud(server/'mud_builtin.pfc')))).
+:- show_entry(gripe_time(40,system:force_reload_mpred_file(prologmud(server/'mud_builtin.pfc')))).
 
 slow_work:- wno_tl( prevent_transform_moo_preds , within_user(at_start(hard_work))).
 
@@ -381,7 +380,7 @@ Proof end.
 %:- use_module(library(random)).
 %:- use_module(library(date)).
 % This one is for use with SWI
-:- use_module(library(quintus)).
+%:- use_module(library(quintus)).
 
 
 % logicmoo utils shared with other systems
@@ -394,7 +393,12 @@ Proof end.
 
 
 
-% :- system:ensure_loaded(library(logicmoo_base)).
+:- system:ensure_loaded(library(logicmoo_user)).
+
+
+% :- system:ensure_loaded(('/root/lib/swipl/pack/prologmud/prolog/prologmud/actions/eat.pl')).
+
+
 % :- system:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
 :- system:ensure_loaded(prologmud(server/mud_irc)).
 :- system:ensure_loaded(prologmud(vworld/world)).

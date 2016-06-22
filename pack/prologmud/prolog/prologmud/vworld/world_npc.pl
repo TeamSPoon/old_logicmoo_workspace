@@ -98,14 +98,16 @@ agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=isRandom(ftC
 agent_text_command(Agent,["prolog"],Agent,actProlog(prolog_repl)).
 % agent_text_command(Agent,["tlocals"],Agent,actProlog(tlocals)).
 
+:-export(warnOnError/1).
+:-module_transparent(warnOnError/1).
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
 agent_call_command(Agent,actProlog(C)) :- (side_effect_prone),true,nonvar(C),agent_call_safely(Agent,C).
 
 :-export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
-agent_call_safely(RC,X,[]) :- !, '@'(no_trace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true)))))))),user).
-agent_call_safely(RC,X,Vars) :-  '@'(no_trace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,Vars)))))))),user).
+agent_call_safely(RC,X,[]) :- !, call_u(no_trace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true))))))))).
+agent_call_safely(RC,X,Vars) :-  call_u(no_trace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,Vars))))))))).
 
 atom_to_term_safe(A,T,O):-catch(atom_to_term(A,T,O),_,fail),T\==end_of_file.
 any_to_callable(S,X,Vs):-string(C),!,string_to_atom(S,C),atom_to_term_safe(C,X,Vs).

@@ -96,7 +96,7 @@
   ain_fast/2,
   setup_mpred_ops/0,
   mpred_assert_w_support/2,mpred_asserta_w_support/2,mpred_assertz_w_support/2,mpred_basis_list/2,mpred_bt_pt_combine/3,mpred_child/2,mpred_children/2,
-  mpred_classifyFacts/4,mpred_collect_supports/1,mpred_unhandled_command/3,mpred_compile_rhs_term/3,mpred_conjoin/3,mpred_connective/1,
+  mpred_classifyFacts/4,mpred_collect_supports/1,mpred_unhandled_command/3,mpred_compile_rhs_term/3,mpred_conjoin/3,mpred_neg_connective/1,
   mpred_database_item/1,mpred_database_term/3,
   mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
   mpred_descendants/2,mpred_enqueue/2,mpred_error/1,mpred_error/2,mpred_eval_lhs/2,mpred_eval_lhs_0/2,mpred_eval_rhs/2,mpred_fact/1,
@@ -116,6 +116,7 @@
   remove_if_unsupported/1,remove_selection/1,mpred_withdraw1/2,
 
   mpred_post1/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,clause_asserted_u/1,
+  
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
   fa_to_p/3,
@@ -124,6 +125,8 @@
           asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,
           retract_u0/1,retractall_u0/1,
   clause_u/1,clause_u/2,clause_u/3,
+  clause_ii/3,clause_asserted_ii/1,
+
   lookup_u/1,
 
 mpred_load_term/1,
@@ -187,6 +190,7 @@ push_current_choice/1,
       mnotrace(0),
       fix_mp(+,+,-,-),
       clause_asserted_u(+),
+      clause_asserted_ii(+),
       mpred_get_support(+,-),
       mpred_fact(?,0),
       mpred_test(+),
@@ -204,6 +208,7 @@ push_current_choice/1,
       with_no_mpred_breaks(0),
       fc_eval_action(0,-),
       clause_u(+,+,-),
+      clause_ii(+,+,-),
       clause_u(+,-),
       clause_u(+),      
       with_umt(+,+),
@@ -283,6 +288,7 @@ mpred_database_term(why_buffer,2,debug).
 :- module_transparent((assert_u_confirmed_was_missing/1,mpred_trace_exec/0,pfcl_do/1,
   mpred_post1/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
                        asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,
+                       clause_ii/3,clause_asserted_ii/1,
                        retract_u0/1,retractall_u0/1,
   mpred_trace_op/3)).
 
@@ -452,8 +458,11 @@ get_consequent_functor(G,F,A):- strip_module(G,_,GO),remove_meta_wrapper(GO,Unwr
 remove_meta_wrapper(Head,Unwrap):- is_ftVar(Head),!,Head=Unwrap.
 remove_meta_wrapper( Head,UnwrapO):- fail, mpred_rule_hb(Head,Unwrap,_),nonvar(Unwrap),
   Head \=@= Unwrap,!,remove_meta_wrapper2(Unwrap,UnwrapO).
+remove_meta_wrapper( ( Head :- _ ),Unwrap):- nonvar(Head), !, remove_meta_wrapper2(Head,Unwrap).
+remove_meta_wrapper(Head,Unwrap):- strip_module(Head,_,HeadM),Head\=@=HeadM,!,remove_meta_wrapper(HeadM,Unwrap).
 remove_meta_wrapper(Head,Unwrap):- remove_meta_wrapper2(Head,Unwrap).
 
+remove_meta_wrapper2(Head,Unwrap):- strip_module(Head,_,HeadM),Head\=@=HeadM,!,remove_meta_wrapper2(HeadM,Unwrap).
 remove_meta_wrapper2(~ Head,Unwrap):- nonvar(Head),!, remove_meta_wrapper(Head,Unwrap).
 remove_meta_wrapper2( \+ Head,Unwrap):- nonvar(Head),!, remove_meta_wrapper(Head,Unwrap).
 remove_meta_wrapper2( ( _,Head),Unwrap):-nonvar(Head),!, remove_meta_wrapper(Head,Unwrap).
@@ -527,12 +536,13 @@ clause_u(H,B):- clause_u(H,B,_).
 %
 % PFC Clause.
 %
-clause_u(MH,B,R):- nonvar(R),!,must(clause_i(M:H,B,R)),must((MH=(M:H);MH=(H))),!.
+clause_u(MH,B,R):- nonvar(R),!,must(clause_ii(M:H,B,R)),must((MH=(M:H);MH=(H))),!.
+clause_u(H,B,Ref):-var(H),!,trace_or_throw(var_clause_u(H,B,Ref)).
 clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u((H:-B),BB,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u(MH,B,R):- Why = clause(clause,clause_u),
- ((mnotrace(fix_mp(Why,MH,M,H)),clause_i(M:H,B,R))*->true;
-   (fix_mp(Why,MH,M,CALL)->clause_i(M:CALL,B,R))).
+ ((mnotrace(fix_mp(Why,MH,M,H)),clause_ii(M:H,B,R))*->true;
+   (fix_mp(Why,MH,M,CALL)->clause_ii(M:CALL,B,R))).
 % clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
 %clause_u(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
@@ -583,6 +593,7 @@ with_umt(M,P):-
      call_from_module(W,P)).
 
 
+clause_ii(H,B,R):-clause_i(H,B,R).
 
 %:- else
 /*
@@ -594,7 +605,7 @@ retract_u((H:-B)):-!, clause_u(H,B,R),erase(R).
 retract_u(H):-!, clause_u(H,true,R),erase(R).
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)).
 clause_u(H,B):- clause_u(H,B,_).
-clause_u(H,B,R):- clause_i(H,B,R).
+clause_u(H,B,R):- clause_ii(H,B,R).
 mpred_call_no_bc(G):- G.
 */
 %:- endif.
@@ -767,7 +778,7 @@ remove_negative_version(P):-
   must(mpred_ain(\+ (~(P)), S)))))),!.
 
      
-fwc1s_post1s(10,20):- fresh_mode,!.
+fwc1s_post1s(100000,200000):- fresh_mode,!.
 fwc1s_post1s(1,2):- current_prolog_flag(logicmoo_safe,true),!.
 fwc1s_post1s(10,20):- defaultAssertMt(Mt)->Mt==baseKB,!.
 fwc1s_post1s(1,2).
@@ -819,12 +830,12 @@ mpred_post12( ~ P,   S):-
 % tries to assert a fact or set of fact to the database.
 % The other version is if the program is been running before loading this module.
 %
-mpred_post12(P,S):- 
+mpred_post12(P,S):- fail,
   fresh_mode,!,
   % db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
  \+ \+ mpred_add_support(P,S),
-  (\+ mpred_unique_u(P) -> true ;
+  ( (\+ mpred_unique_u(P)) -> true ;
   ( assert_u_confirm_if_missing(P),
      !,
      mpred_trace_op(add,P,S),
@@ -833,19 +844,19 @@ mpred_post12(P,S):-
      !)),
   plus_fwc(P),!.
   
-/*
+
 % this would be the very inital by Tim Finnin...
-mpred_post12(P,S):- 
-  %  db mpred_ain_db_to_head(P,P2),
+mpred_post12(P,S):- fail, fresh_mode,
+ ignore(( %  db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
   mpred_add_support(P,S),
   mpred_unique_u(P),
-  assert_u_confirmed_was_missing(P),
+  assert_u_confirm_if_missing(P),
   mpred_trace_op(add,P,S),
   !,
-  mpred_enqueue(P,S),
+  mpred_enqueue(P,S))),
   !.
-*/
+
 
 /*
 % Expects a clean database and adds new information.
@@ -880,10 +891,9 @@ mpred_post12(P,S):- !,
   gripe_time(0.6, must(mpred_post_update4(WasA,P,S,Was))),!.
   
 
-
-get_mpred_assertion_status(P,PP,WasO):- 
-  (clause_asserted_u(P)->(Was=identical,!);
-   (lookup_u(PP,Ref)*->must((lookup_u(HB,Ref),Was= partial(HB)));Was= unique)),
+get_mpred_assertion_status(P,PP,WasO):-
+  (clause_asserted_u(P)-> Was=identical;
+    (lookup_u(PP,Ref)*-> must((lookup_u(HB,Ref),Was= partial(HB)));Was= unique)) ,
   !,WasO=Was.
 
 % The cyclic_break is when we have regressions arouind ~ ~ ~ ~ ~
@@ -894,8 +904,8 @@ get_mpred_support_status(P,_S, PP,(FF,TT),Was):-
     ; Was = none) -> true ; ignore(Was=Simular)).
 
 
-same_file_facts(F,FF):- FF=@=F,!.
 same_file_facts(mfl(M,F,_),mfl(M,FF,_)):-nonvar(M),!, FF=@=F.
+same_file_facts(F,FF):- FF=@=F,!.
 
 
 %% mpred_post_update4(++AssertionStatus, +Ps, +S, ++SupportStatus) is det.
@@ -903,71 +913,62 @@ same_file_facts(mfl(M,F,_),mfl(M,FF,_)):-nonvar(M),!, FF=@=F.
 % Physically assert the Knowledge+Support Data based on statuses
 %
 mpred_post_update4(Was,P,S,What):- 
- not_not_ignore_mnotrace(((get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
+  not_not_ignore_mnotrace(( (get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
   fix_mp(clause(assert,post),P,M,PP),
   must(S=(F,T)),wdmsg(call_mpred_post4:- (Was,post1=M:PP,fact=F,trig=T,What)))),
   fail.
+
 mpred_post_update4(identical,_P,_S,exact):-!.
 
-mpred_post_update4(identical,P,S,simular(_)):-!,mpred_add_support(P,S).
-
-mpred_post_update4(identical,P,S,none):-!,mpred_add_support(P,S),mpred_enqueue(P,S).
-
 mpred_post_update4(unique,P,S,none):-!,
-  must(mpred_add_support(P,S)),
-  must(assert_u_confirmed_was_missing(P)),
-  must(mpred_trace_op(add,P,S)),
-  !,
-  must(mpred_enqueue(P,S)),
-  !,
-  (must(plus_fwc(P))->!;(rtrace(plus_fwc(P)),break)),!.
+  mpred_add_support(P,S),
+  assert_u_confirmed_was_missing(P),
+  mpred_trace_op(add,P,S),
+  mpred_enqueue(P,S).
+
+mpred_post_update4(identical,P,S,none):-!,mpred_add_support(P,S),
+    mpred_enqueue(P,S).
+
+mpred_post_update4(identical,P,S,simular(_)):- !,mpred_add_support(P,S).
+
+mpred_post_update4(Was,P,S,What):- 
+  not_not_ignore_mnotrace(( \+ (get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
+  fix_mp(clause(assert,post),P,M,PP),
+  must(S=(F,T)),wdmsg(mpred_post_update4:- (Was,post1=M:PP,fact=F,trig=T,What)))),
+  fail.
 
 mpred_post_update4(partial(_Other),P,S,none):-!,
- must( \+ \+ mpred_add_support(P,S)),
-  assert_u_confirmed_was_missing(P),!,
+  mpred_add_support(P,S),
+  assert_u_confirmed_was_missing(P),
   mpred_trace_op(add,P,S),
-  !,
-  mpred_enqueue(P,S),
-  !.
-
+  mpred_enqueue(P,S).
+  
 mpred_post_update4(partial(_Other),P,S,exact):-!,
- must( \+ \+ mpred_add_support(P,S)),
-  assert_u_confirmed_was_missing(P),!,
+  assert_u_confirmed_was_missing(P),
   mpred_trace_op(add,P,S),
-  !,
-  mpred_enqueue(P,S),
-  !.
+  mpred_enqueue(P,S).
 
 mpred_post_update4(unique,P,S,exact):-!,
   assert_u_confirmed_was_missing(P),
-  mpred_trace_op(add,P,S),
-   !,
-   mpred_enqueue(P,S),
-   !.
+  mpred_trace_op(add,P,S).
 
 
-mpred_post_update4(partial(_),P,S,exact):-!,
+mpred_post_update4(partial(_),P,S,exact):- !,
   assert_u_confirmed_was_missing(P),
-  mpred_trace_op(add,P,S),
-   !,
-   mpred_enqueue(P,S),
-   !.
+  mpred_trace_op(add,P,S).
 
-mpred_post_update4(partial(_),P,S,simular(_)):-
-  mpred_add_support(P,S),!,
+
+mpred_post_update4(partial(_),P,S,simular(_)):- !,
+  mpred_add_support(P,S),
   ignore((mpred_unique_u(P),assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S))),
-   !,
-   mpred_enqueue(P,S),
-   !.
+  mpred_enqueue(P,S).
 
-
-mpred_post_update4(unique,P,S,simular(_)):-
-  mpred_add_support(P,S),!,
+mpred_post_update4(unique,P,S,simular(_)):-!,
+  mpred_add_support(P,S),
   assert_u_confirmed_was_missing(P),
   mpred_trace_op(add,P,S),
-   !,
-   mpred_enqueue(P,S),
-   !.
+  mpred_enqueue(P,S).
+  
 
 mpred_post_update4(Was,P,S,What):-dmsg(mpred_post_update4(Was,P,S,What)),trace,fail.
 
@@ -1041,7 +1042,7 @@ set_fc_mode(Mode):- asserta(t_l:mpred_fc_mode(Mode)).
 % mpred_enqueue(P,S):- get_fc_mode(P,S,Mode), must(Mode=direct),fail.
 mpred_enqueue(P,S):-
  ( (must(get_fc_mode(P,S,Mode))
-    -> (Mode=direct  -> loop_check_term(mpred_fwc(P),mpred_enqueue(P),true) ;
+    -> (Mode=direct  -> loop_check_term(mpred_fwc(P),mpred_enqueueing(P),true) ;
 	Mode=depth   -> mpred_asserta_w_support(que(P),S) ;
 	Mode=breadth -> mpred_assert_w_support(que(P),S) ;
 	true         -> mpred_error("Unrecognized pm mode: ~p", Mode))
@@ -1489,6 +1490,7 @@ filter_buffer_n_test(Name,N,Fact):- filter_buffer_get_n(Name,FactS,N),
 mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc==fwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 mpred_fwc1(support_hilog(_,_)):-!.
+% mpred_fwc1(singleValuedInArg(_, _)):-!.
 mpred_fwc1(Fact):- 
   dmsg(mpred_fwc1(Fact)),
   %ignore((mpred_non_neg_literal(Fact),remove_negative_version(Fact))),
@@ -2021,20 +2023,22 @@ mpred_negated_literal(P):-
   mpred_negation(P,Q),
   mpred_positive_literal(Q).
 
+mpred_literal(X):- is_ftVar(X),!.
 mpred_literal(X):- mpred_negated_literal(X),!.
 mpred_literal(X):- mpred_positive_literal(X),!.
-mpred_literal(X):- is_ftVar(X),!.
 
-mpred_positive_literal(X):-   is_ftNonvar(X),
+mpred_positive_literal(X):-  
+  is_ftNonvar(X),
+  \+ mpred_db_type(X,rule),
   get_functor(X,F,_), 
-  \+ mpred_connective(F),
+  \+ mpred_neg_connective(F),
   !.
 
 
 
-mpred_connective('-').
-% mpred_connective('~').
-mpred_connective('\\+').
+mpred_neg_connective('-').
+% mpred_neg_connective('~').
+mpred_neg_connective('\\+').
 
 
 %% process_rule(+Lhs, ?Rhs, ?Parent_rule) is semidet.
@@ -2321,10 +2325,12 @@ mpred_assertz_w_support(P,Support):-
 :- module_transparent(clause_asserted_call/2).
 clause_asserted_call(H,B):-clause_asserted(H,B).
 
+clause_asserted_ii(HB):-clause_asserted_i(HB),!.
+
 clause_asserted_u(MH):- sanity((nonvar(MH), \+ is_static_predicate(MH))),fail.
 %clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
-clause_asserted_u((MH:-B)):- !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,clause_asserted_i((M:H :-B )).
-clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_i(M:H).
+clause_asserted_u((MH:-B)):- !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,clause_asserted_ii((M:H :-B )).
+clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_ii(M:H).
 
 
 variant_u(HeadC,Head_copy):-variant_i(HeadC,Head_copy).

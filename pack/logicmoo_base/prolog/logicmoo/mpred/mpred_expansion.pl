@@ -544,7 +544,7 @@ in_dialect_pfc:-
 
 fully_expand(Op,Sent,SentO):- in_dialect_pfc,!,fully_expand0(Op,Sent,SentO).
 fully_expand(Op,'==>'(Sent),SentO):-nonvar(Sent),!,fully_expand0(Op,Sent,SentO).
-fully_expand(Op,Sent,Sent):- \+ current_prolog_flag(mud_running,true),!.
+fully_expand(_,Sent,Sent):- \+ current_prolog_flag(mud_running,true),!.
 fully_expand(Op,Sent,SentO):-fully_expand0(Op,Sent,SentO),!,gripe_if_expanded(Op,Sent,SentO).
 
 gripe_if_expanded(Op,Sent,SentO):-
@@ -553,10 +553,11 @@ gripe_if_expanded(Op,Sent,SentO):-
  % assert_if_new(fully_expanded_test(Op,Sent,SentO)).
 
 fully_expand0(Op,Sent,SentO):-
+ gripe_time(0.2,((
   must(once((/*hotrace*/((cyclic_break((Sent)),
      must(/*hotrace*/((deserialize_attvars(Sent,SentI)))),
      w_tl_e(t_l:no_kif_var_coroutines(true),(((fully_expand_now(Op,SentI,SentO))))),
-     cyclic_break((SentO))))))).
+     cyclic_break((SentO)))))))))).
 
 %% fully_expand_now( ++Op, ^Sent, --SentO) is det.
 %
@@ -593,8 +594,10 @@ is_stripped_module(abox).
 %
 % Expand isEach/Ns.
 
+/*
 expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),quietly_must(demodulize(clause(_,_),
    Sent,SentM)),Sent\=@=SentM,!,bagof(O,do_expand_args(isEach,SentM,O),SentO),!.
+*/
 expand_isEach_or_fail(Sent,SentO):-
     bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L.
 
@@ -618,6 +621,8 @@ fully_expand_clause(Op,Sent,SentO):- sanity(is_ftNonvar(Op)),sanity(var(SentO)),
 fully_expand_clause(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
 fully_expand_clause(Op,Sent,SentO):- expand_isEach_or_fail(Sent,SentM),SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
 fully_expand_clause(_,(:-(Sent)),(:-(Sent))):-!.
+
+
 fully_expand_clause(Op,Sent,SentO):- is_list(Sent),!,must_maplist(fully_expand_clause(Op),Sent,SentO).
 fully_expand_clause(Op,(B,H),Out):- !,fully_expand_clause(Op,H,HH),fully_expand_clause(Op,B,BB),!,must(Out=(BB,HH)).
 fully_expand_clause(Op,':-'(Sent),Out):-!,fully_expand_goal(Op,Sent,SentO),!,must(Out=':-'(SentO)).

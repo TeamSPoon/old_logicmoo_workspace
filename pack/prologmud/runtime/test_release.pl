@@ -8,9 +8,9 @@
 % Setup Testing Options
 % ==============================
 
-:- asserta(load_mud_www).
+:- asserta(lmconf:load_mud_www).
 :- asserta(t_l:verify_side_effect_buffer).
-:- asserta(skip_el_assertions).
+:- asserta(lmconf:skip_el_assertions).
 
 
 % ==============================
@@ -51,7 +51,7 @@
 :- gripe_time(40,with_no_mpred_expansions(if_file_exists(test_for_release(logicmoo(logicmoo_engine))))).
 
 
-:- asserta(skip_el_assertions).
+:- asserta(lmconf:skip_el_assertions).
 :- dynamic  el_assertions:el_holds/4.
 :- dynamic  el_assertions:el_holds/10.
 :- dynamic  el_assertions:el_holds/11.

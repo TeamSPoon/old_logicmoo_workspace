@@ -22,8 +22,8 @@ mpred_sv(Pred,Arity)==> prologSingleValued(Pred),arity(Pred,Arity),singleValuedI
 % prologSingleValued(Pred),arity(Pred,Arity), \+ singleValuedInArg(Pred,_) ==> singleValuedInArg(Pred,Arity).
 
 
-mdefault(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg(Pred,Arity))).
-
+% mdefault(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg(Pred,Arity))).
+(((prologSingleValued(Pred),arity(Pred,Arity),{\+singleValuedInArg(Pred,_)})==> singleValuedInArg(Pred,Arity))).
 
 
 ((singleValuedInArg(Pred,_))==>(prologSingleValued(Pred))).
@@ -35,10 +35,14 @@ singleValuedInArg(singleValuedInArg,2).
 
 prologHybrid(singleValuedInArgDefault, 3).
 prologHybrid(singleValuedInArgDefault(prologSingleValued,ftInt,ftTerm)).
+
 ((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) ==> relationMostInstance(P,Most,V)).
+
 (singleValuedInArgDefault(SingleValued,ArgN,S1)/ground(S1) ==> singleValuedInArg(SingleValued,ArgN)).
+
 {FtInt=2},singleValuedInArgDefault(PrologSingleValued,FtInt,FtTerm),arity(PrologSingleValued,FtInt),
   argIsa(PrologSingleValued,1,Col)==>relationMostInstance(PrologSingleValued,Col,FtTerm).
+
 ((singleValuedInArgDefault(F, N, DEF)/is_ftNonvar(DEF), arity(F,A),
    {functor(P,F,A),replace_arg(P,N,DEF,Q),replace_arg(Q,N,WAS,R)})
        ==> mdefault( Q <- ({ground(P)},~R/nonvar(WAS)))).

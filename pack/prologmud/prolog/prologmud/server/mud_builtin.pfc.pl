@@ -36,8 +36,6 @@
 :- file_begin(pfc).
 :- set_defaultAssertMt(baseKB).
 
-:- set_prolog_flag(dialect_pfc,true).
-
 :- retractall(t_l:disable_px).
 
 :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/pfc/autoexec.pfc')).
@@ -117,22 +115,22 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 
 
-isa(arity,ptBinaryPredicate).
+ptBinaryPredicate(arity).
 
-(arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate).
+(arity(Pred,2),tPred(Pred)) <==> ptBinaryPredicate(Pred).
 prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
-relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),tRolePredicate(BP)).
+%relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),tRolePredicate(BP)).
 prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
 relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 
-((isa(Inst,ttSpatialType), tCol(Inst)) ==> genls(Inst,tSpatialThing)).
+ttSpatialType(Inst) ==> genls(Inst,tSpatialThing).
 
 % (isa(Inst,Type), tCol(Inst)) ==> isa(Type,ttTypeType).
 % (isa(TypeType,ttTypeType) , isa(Inst,TypeType), genls(SubInst,Inst)) ==> isa(SubInst,TypeType).
 
-(ttExpressionType(FT),{compound(FT)})==>meta_argtypes(FT).
+(sometimesSlow, ttExpressionType(FT),{compound(FT)})==>meta_argtypes(FT).
 
-==> tCol(vtDirection).
+tCol(vtDirection).
 
 disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 disjointWith(tObj,tRegion).
@@ -149,8 +147,7 @@ tSet(tSet).
 
 % defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 % dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
-% dividesBetween(tItem,tPathway).
-% dividesBetween(tItem,tPathways).
+% disjointWith(tItem,tPathway).
 %:-export(repl_to_string(tAgent,ftTerm)).
 %:-export(repl_writer(tAgent,ftTerm)).
 %:-export(repl_writer/2).
@@ -167,20 +164,20 @@ formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
 
 % isa(Col1, ttObjectType) ==> neg(isa(Col1, ttExpressionType)).
 
-==> tCol(tCol).
-==> tCol(tPred).
-==> tCol(tFunction).
-==> tCol(tRelation).
-==> tCol(ttSpatialType).
-==> tCol(ttExpressionType).
-==> tCol(functorDeclares).
+tCol(tCol).
+tCol(tPred).
+tCol(tFunction).
+tCol(tRelation).
+tCol(ttSpatialType).
+tCol(ttExpressionType).
+tCol(functorDeclares).
 % tCol(ArgsIsa):-mpred_is_trigger(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
-==> tCol(ttExpressionType).
-==> tSpec(vtActionTemplate).
-==> tCol(tRegion).
-==> tCol(tContainer).
+tCol(ttExpressionType).
+tSpec(vtActionTemplate).
+tCol(tRegion).
+tCol(tContainer).
 
 %(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) ==> meta_argtypes(ArgTypes).
 
@@ -202,7 +199,7 @@ tCol(tFly).
 prologHybrid(localityOfObject(tObj,tSpatialThing)).
 
 
-(tCol(Inst), {isa_from_morphology(Inst,Type)}) ==> isa(Inst,Type).
+(sometimesSlow, tCol(Inst), {isa_from_morphology(Inst,Type)}) ==> isa(Inst,Type).
 
 % HOW TO MAKE THIS FAST? isa(Inst,Type) <= {isa_from_morphology(Inst,Type)}.
 
@@ -222,6 +219,9 @@ completelyAssertedCollection(tCarryAble).
 completelyAssertedCollection(vtVerb).
 % :-rnotrace.
 
+tSet(ttTypeByAction).
+:-rtrace(ain(tCol(ttTypeByAction))).
+
 genls(ttTypeByAction,completelyAssertedCollection).
 
 % dividesBetween(tItem,tPathway).
@@ -231,16 +231,17 @@ dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
+((sometimesBuggy,genls(A,B)/ground(genls(A,B)))==>{call((call((trace,baseKB:(must(ain(baseKB:tCol(A))),must(ain(baseKB:tCol(B))))))))}).
 
-((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) ==> ((disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
+((sometimesBuggy,dividesBetween(S,C1,C2),{ground(S:C1:C2)}) ==> ((disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
 
-isa(Col1, ttObjectType) ==> ~ttExpressionType(Col1).
+ttObjectType(Col1) ==> ~ttExpressionType(Col1).
 
 neg(isa(I,Super)) <- {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Super)).
 % disjointWith(P1,P2) ==> {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <==> isa(C,P2)).
 
 
-==> tCol(ttSpatialType).
+tCol(ttSpatialType).
 
 % Representations
 vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
@@ -295,9 +296,9 @@ tCol(vtVerb).
 %isa(AT,ttAgentType):- genls(AT,ttAgentGeneric).
 %genls(AT,ttAgentGeneric):- isa(AT,ttAgentType).
 %subFormat(ftTextType,ftText).
-predIsFlag(tItem(ftID),[predIsFlag]).
+%predIsFlag(tItem(ftID),[predIsFlag]).
 %predIsFlag(tRegion(ftID),[predIsFlag]).
-predIsFlag(tRegion(ftID),tCol).
+%predIsFlag(tRegion(ftID),tCol).
 predIsFlag(tThinking(tAgent),[predIsFlag]).
 prologHybrid(isEach(mudLastCommand/2,mudNamed/2, mudSpd/2,mudStr/2,typeGrid/3)).
 prologHybrid(isEach((mudContains/2))).
@@ -351,7 +352,9 @@ prologSingleValued(mudEnergy(tChargeAble,ftInt),prologHybrid).
 prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
 prologSingleValued(mudNonHunger(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
 prologSingleValued(mudHygiene(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
-prologSingleValued(mudFacing(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid).
+
+:- time(ain_expanded((prologSingleValued(mudFacing(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid)))).
+
 prologSingleValued(mudHealth(tObj,ftInt),prologHybrid).
 prologSingleValued(mudHeight(tObj,ftInt),prologHybrid).
 prologSingleValued(mudHeight(tSpatialThing,ftInt),prologHybrid).
@@ -517,22 +520,19 @@ genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
 genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
 genls(isEach(tRegion,tAgent),tChannel).
 
-tCol(meta_argtypes).
+tPred(meta_argtypes).
 meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
 meta_argtypes(apathFn(tRegion,vtDirection)).
 meta_argtypes(xyzFn(tRegion,ftInt,ftInt,ftInt)).
 
 % :- set_prolog_flag(assert_attvars,true).
 
-tCol(ttTypeByAction).
 genls(ttTypeByAction,tCol).
 
-:-w_tl(set_prolog_flag(assert_attvars,true),
- ain(((isa(X,ttTypeByAction) ==> isa(X,tCol))))).
+:-w_tl(set_prolog_flag(assert_attvars,true),ain(((ttTypeByAction(X) ==> tSet(X))))).
 
 % (isa(Inst,Type),isa(Type,ttTypeByAction)) ==> isa(Inst,tHasAction).
 
-genls(A,B)/ground(genls(A,B))==>tCol(A),tCol(B).
 
 genls(tAgent,tObj).
 genls(tAgent,tSpatialThing).
@@ -635,8 +635,7 @@ typeGenls(ttRegionType,tRegion).
 prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
 % defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
-% dividesBetween(tItem,tPathways).
-(dividesBetween(tAgent,tMale,tFemale)).
+dividesBetween(tAgent,tMale,tFemale).
 dividesBetween(tAgent,tPlayer,tNpcPlayer).
 dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgent).
@@ -743,26 +742,25 @@ genls(tPartofFurnature,tPartofObj).
 genls(tPartofObj,tItem).
 
 
-dividesBetween(S,C1,C2)/ground(v(S,C1,C2)) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+(sometimesBuggy,dividesBetween(S,C1,C2)/ground(v(S,C1,C2))) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
 % disjointWith(P1,P2) ==> (not(isa(C,P1)) <==> isa(C,P2)).
 
-% isa(Col1, ttObjectType) ==> ~isa(Col1, ttExpressionType).
 
-==> tCol(tCol).
-==> tCol(tPred).
-==> tCol(tFunction).
-==> tCol(tRelation).
-==> tCol(ttSpatialType).
-==> tCol(ttExpressionType).
-% ==> tCol(functorDeclares).
+tCol(tCol).
+tCol(tPred).
+tCol(tFunction).
+tCol(tRelation).
+tCol(ttSpatialType).
+tCol(ttExpressionType).
+%  tCol(functorDeclares).
 % tCol(ArgsIsa):-ttPredType(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
-==> tCol(ttExpressionType).
-==> tSpec(vtActionTemplate).
-==> tCol(tRegion).
-==> tCol(tContainer).
+tCol(ttExpressionType).
+tSpec(vtActionTemplate).
+tCol(tRegion).
+tCol(tContainer).
 
 isa(tRegion,ttSpatialType).
 isa(tRelation,ttAbstractType).
@@ -804,13 +802,13 @@ mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 
 %TOO SLOW isa(I,SC)<=isa(I,C),genls(C,SC).
 
-(wearsClothing(A,I)==>{ain(tAgent(A)),ain(tClothing(I))}).
+wearsClothing(A,I)==>tAgent(A),tClothing(I).
 
 
 genls(tBread, tFood).
 
 typeProps(tCrackers,
-  [mudColor(vTan),isa(tBread),
+  [mudColor(vTan),tBread,
    mudShape(isEach(vCircular,vFlat)),
    mudSize(vSmall),
    mudTexture(isEach(vDry,vCoarse))]).
@@ -983,7 +981,8 @@ prologHybrid(normalAgentGoal(tStatPred,ftTerm)).
 (tStatPred(Pred)==>(ptRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
 
 :- ain(((normalAgentGoal(Pred,N)/atom(Pred) ==>
- ({AT=..[Pred,tAgent,ftPercent]},{kb_dynamic(Pred,2)},meta_argtypes(AT),argSingleValueDefault(Pred,2,N),prologHybrid(Pred),tStatPred(Pred))))).
+ ({AT=..[Pred,tAgent,ftPercent]},{kb_dynamic(Pred,2)},
+     meta_argtypes(AT),argSingleValueDefault(Pred,2,N),prologHybrid(Pred),tStatPred(Pred))))).
 
 
 normalAgentGoal(mudEnergy,90).
@@ -1064,3 +1063,8 @@ O = [
 */
 
 :- set_prolog_flag(dialect_pfc,false).
+
+
+% :- time(rtrace(ain_expanded(prologSingleValued(mudFacing666(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid)))).
+
+% :- profile((ain_expanded(prologSingleValued(mudFacing666(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid)))).

@@ -624,11 +624,11 @@ uses_predicate(CallerMt,baseKB,predicateConventionMt,2,retry):-
 
 uses_predicate(CallerMt, baseKB, F, A,retry):-
   create_predicate_istAbove(baseKB,F,A),
-   must(system:import(baseKB:F/A)),!.
+   nop(system:import(baseKB:F/A)),!.
 
 uses_predicate(System, BaseKB, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),!,
    create_predicate_istAbove(BaseKB,F,A),
-    must(system:import(BaseKB:F/A)),!.
+    nop(system:import(BaseKB:F/A)),!.
 
 % keeps from calling this more than once
 uses_predicate(SM,M,F,A,error):- 

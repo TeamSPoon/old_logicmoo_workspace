@@ -301,11 +301,23 @@ load_file_some_type(M:File,Options):- call_from_module(M,must(load_files(M:File,
 % Prolog Load File.
 %
 
+user:prolog_load_file(Module:Spec, Options):-
+  set_prolog_flag(dialect_pfc,false), fail.
+
+user:prolog_load_file(Module:Spec, Options):-
+   \+ exists_source(Spec),
+   \+ \+ (filematch(Module:Spec,O),exists_file(O)),
+  doall((filematch(Module:Spec,SpecO),
+   catch(prolog_load_file_loop_checked(Module:SpecO, Options),
+    E,
+     ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:SpecO, Options),throw(E)))))),!.
+
+
 user:prolog_load_file(Module:Spec, Options):- fail,
   Spec \== 'MKINDEX.pl',
-  catch(prolog_load_file_loop_checked(Module:Spec, Options),
-   E,
-    ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))),!.
+   catch(prolog_load_file_loop_checked(Module:Spec, Options),
+    E,
+     ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))),!.
 %user:prolog_load_file(_,_):- get_lang(pl),!,fail.
 %user:prolog_load_file(_,_):- set_file_lang(pl),set_lang(pl),fail.
    

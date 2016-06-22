@@ -302,16 +302,16 @@ tSet(C)==>completelyAssertedCollection(C).
 % TODO decide if still needed mpred_univ(C,I,Head):- cwc,atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
 
 tCol(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),mpred_univ(C,I,TCI),
- {decl_type(C), 
+ {call_u((decl_type(C), 
   ignore((
    \+ is_static_predicate(C/1),
    kb_dynamic(C/1),
    \+ completelyAssertedCollection(C),
-   call(assert_if_new((
+   call_u(ain((
    ((TCI :- 
-    ((cwc, predicate_property(TCI,number_of_rules(1)),
-    lazy(( \+ ~(TCI))),
-    isa_backchaing(I,C))))))))))}).
+    ((cwc, call_u((predicate_property(TCI,number_of_rules(1)),
+    lazy(( \+ call_u(~(TCI)))),
+    isa_backchaing(I,C))))))))))))))}).
 
 % (tInferInstanceFromArgType(Col),tCol(Col)/i_name('',Col,ColName),tPred(Prop)/i_name('',Prop,PropName),{ColName=PropName}==> tInferInstanceFromArgType(Prop)).
 
@@ -386,9 +386,9 @@ pfcControlled(argIsa).
 :- must(rtrace(get_lang(pfc))).
 
 :- must(ain((tSet(C)==>
- ( {atom(C), functor(Head,C,1),
-  ( \+(predicate_property(Head,_))-> kb_dynamic(C/1); true),
-    (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
+ ( {atom(C), functor(Head,C,1), call(BHead=baseKB:Head),
+  ( \+(predicate_property(BHead,_))-> kb_dynamic(C/1); true),
+    (predicate_property(BHead,dynamic)->true;show_pred_info(BHead))},
    functorDeclares(C),
    pfcControlled(C),
    arity(C,1),
@@ -397,22 +397,21 @@ pfcControlled(argIsa).
 ==>tSet(vtVerb).
 :- must(tSet(vtVerb)).
 
-:- call((system:rtrace)).
+% :- call((system:rtrace)).
 ==>tSet(tSet).
-:- notrace.
-:- nortrace.
+%:- notrace.
+%:- nortrace.
 % :- break.
 % (tSet(C)/atom(C) ==> ({Head=..[C,I]}, (isa(I,C)/ground(I:C)==>Head))).
 
-ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1),
-  call((\+ predicate_property(Head,defined) -> kb_dynamic(F/1);true)),
+ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1), call(BHead=baseKB:Head),
+  call((\+ predicate_property(BHead,defined) -> kb_dynamic(F/1);true)),
   Head=..[F,I],
-  call((predicate_property(Head,dynamic)->true;show_pred_info(Head)))},
-   ~functorDeclares(F),
-   arity(F,1),
-   (Head/predicate_property(Head,dynamic)==>{ignore(retract(Head))}),
-   ((isa(I,F))==>{ignore(retract(isa(I,F)))}).
-
+  call((predicate_property(BHead,dynamic)->(ain(Head==>{ignore(retract(Head))}));show_pred_info(BHead)))},
+  ~functorDeclares(F),
+  arity(F,1).
+   
+   
 arity(prologMacroHead,1).
 
 
@@ -429,7 +428,7 @@ tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 
 prologBuiltin(A) :- cwc,head_to_functor_name(A, B),prologBuiltin(B).
 prologBuiltin(P) :- cwc,is_ftCompound(P),!,get_functor(P,F,A),functor(C,F,A),(predicate_property(C,built_in)). % predicate_property(P,static)).
-ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,head_to_functor_name(I,F),call(PT,F)).
+ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,head_to_functor_name(I,F),call_u(call(PT,F))).
 
 
 
@@ -733,10 +732,10 @@ prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/
 
 :- ignore(show_failure(why,arity(typeProps,2))).
 :- must(call_u(arity(typeProps,2))).
-:- ain((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,predCanHaveSingletons,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
-:- ain((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
-:- ain((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
-:- ain((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologDynamic,prologBuiltin,prologKIF,prologMacroHead,prologListValued,prologSingleValued),tPred))).
+:- ain_expanded((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,predCanHaveSingletons,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
+:- ain_expanded((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
+:- ain_expanded((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
+:- ain_expanded((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologDynamic,prologBuiltin,prologKIF,prologMacroHead,prologListValued,prologSingleValued),tPred))).
 :- assert_hasInstance(tCol,tCol).
 :- file_begin(pfc).
 
@@ -813,7 +812,7 @@ typeGenls(ttValueType,vtValue).
 % :- must((vtColor(vRed))).
 
 
-:- assertz_if_new((argIsa(Prop,N,Type) :- cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type))))).
+:- ain((argIsa(Prop,N,Type) :- cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type))))).
 
 argIsa(Prop,N,Type),{number(N)},ttExpressionType(Type) ==> argQuotedIsa(Prop,N,Type).
 
@@ -898,6 +897,11 @@ genls('VariableArityRelation',tAvoidForwardChain).
 genls('CommutativeRelation',tAvoidForwardChain).
 genls('tFunction',tAvoidForwardChain).
 genls('EvaluatableRelation',tAvoidForwardChain).
+
+tSet('CommutativeRelation').
+tSet('EvaluatableRelation').
+tSet('SententialRelation').
+tSet('VariableArityRelation').
 
 
 tCol(completeIsaAsserted).

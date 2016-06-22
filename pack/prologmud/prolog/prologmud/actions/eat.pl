@@ -25,6 +25,7 @@
 genls(tFood,tEatAble).
 action_info(actEat(tEatAble),"nourish oneself").
 
+
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it

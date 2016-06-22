@@ -33,7 +33,7 @@
 
 :- set_prolog_flag(lm_expanders,true).
 % :- set_prolog_flag(read_attvars,false).
-:- set_prolog_flag(mpred_te,true).
+%:- set_prolog_flag(mpred_te,true).
 
 :- '$set_source_module'(baseKB).
 
@@ -345,8 +345,6 @@ tCol(Decl)==>functorDeclares(Decl).
   genlsFwd(tMicrotheory)))),
   OO),dmsg(full_transform=OO),
       OO=(_,_))).
-
-:- set_prolog_flag(dialect_pfc,true).
 
 :- ain_expanded(ttModule(mtCycL,
   comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),

@@ -220,7 +220,7 @@ get_it:-
   (user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_call_kb)),
    load_language_file(pldata/clex_iface),
    load_language_file(pldata/nldata_BRN_WSJ_LEXICON),
-   if_defined(skip_el_assertions,load_language_file(library(el_holds/el_assertions))),
+   if_defined(lmconf:skip_el_assertions,load_language_file(library(el_holds/el_assertions))),
    load_language_file(pldata/nldata_freq_pdat),
    load_language_file(pldata/nldata_cycl_pos0)),!.
 

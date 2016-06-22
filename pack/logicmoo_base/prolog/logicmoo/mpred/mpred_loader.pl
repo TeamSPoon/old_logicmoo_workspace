@@ -314,6 +314,7 @@ mpred_te(Type,Module,I,PosI,O,PosO):- \+ current_prolog_flag(mpred_te,false),
    mpred_file_term_expansion(Type,Module,I,O)->PosO=PosI.
 
 dont_term_expansion(Type,I):- 
+   current_prolog_flag(lm_expanders,false);
    var(I);
    I=(_ --> _) ;    
    current_prolog_flag(xref,true);
@@ -1522,7 +1523,7 @@ mpred_term_expansion_by_storage_type(_M,C,must_compile_special):- must_compile_s
 mpred_term_expansion(Fact,Fact):- get_functor(Fact,F,_A),(a(prologDynamic,F)),!.
 mpred_term_expansion(Fact,(:- ((cl_assert(Dir,Fact))))):- mpred_term_expansion_by_pred_class(Dir,Fact,_Output),!.
 
-mpred_term_expansion(MC,(:- cl_assert(ct(How),MC))):- strip_module(MC,M,C),hotrace(mpred_rule_hb(C,H,_B)),
+mpred_term_expansion(MC,(:- cl_assert(ct(How),MC))):- fail, strip_module(MC,M,C),hotrace(mpred_rule_hb(C,H,_B)),
   (mpred_term_expansion_by_storage_type(M,H,How)->true;(C \= (_:-_),mpred_term_expansion_by_storage_type(M,C,How))),!.
 
 
@@ -1550,10 +1551,10 @@ mpred_term_expansion((M:Fact:- BODY),(:- ((cl_assert(Dir,M:Fact:- BODY))))):- no
 % Specific "*FILE*" based default
 mpred_term_expansion(Fact,(:- ((cl_assert(dyn(get_lang(dyn)),Fact))))):- get_lang(dyn),!.
 mpred_term_expansion(Fact,(:- ((cl_assert(kif(get_lang(kif)),Fact))))):- get_lang(kif),!.
-mpred_term_expansion(Fact,(:- ((cl_assert(pfc(get_lang(pfc)),Fact))))):- get_lang(pfc),!.
 %mpred_term_expansion(Fact,(:- ((cl_assert(pfc(in_mpred_kb_module),Fact))))):- in_mpred_kb_module,!.
 %mpred_term_expansion(Fact,(:- ((cl_assert(pfc(get_lang(pl)),Fact))))):- get_lang(pl),!.
 mpred_term_expansion(Fact,Fact):- get_lang(pl),!.
+%mpred_term_expansion(Fact,(:- ((cl_assert(pfc(get_lang(pfc)),Fact))))):- get_lang(pfc),!.
 
 /*
 mpred_term_expansion(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
@@ -1986,7 +1987,9 @@ force_reload_mpred_file2(WorldIn,MFileIn):-
    system:assert(lmconf:loaded_file_world_time(File,World,NewTime)),    
    DBASE = DBASE,
    wno_tl(t_l:disable_px,
-     show_call((with_source_module(NewModule,load_files(NewModule:File, [module(NewModule)]))))),
+     w_tl(set_prolog_flag(lm_expanders,true),
+      w_tl(set_prolog_flag(mpred_te,true),
+     show_call((with_source_module(NewModule,load_files(NewModule:File, [module(NewModule)]))))))),
    catch((w_tl(t_l:loading_mpred_file(World,File),     
       load_mpred_on_file_end(World,File))),
     Error,

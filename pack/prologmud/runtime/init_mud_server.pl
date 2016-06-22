@@ -18,8 +18,7 @@
         lmconf:type_action_info/3)).
 
 
-:- user:ensure_loaded(logicmoo_repl).
-
+:- ensure_loaded(logicmoo_repl).
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).
@@ -40,7 +39,7 @@
 % :- set_prolog_flag(gc,true).
 % Yet turning it off we cant even startup without crashing
 
-:- doall(show_call(current_prolog_flag(_N,_V))).
+:- doall(printAll(current_prolog_flag(_N,_V))).
 
 % ==========================================================
 % Regression tests that first run whenever a person stats the MUD on the public server
@@ -151,6 +150,9 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 :- rl_add_history( 'user:ensure_loaded(start_mud_server).' ).
 :- rl_add_history( 'login_and_run.' ).
 :- set_prolog_flag(mud_running,true).
+
+oinfo(O):- xlisting((O, - spft, - ( ==> ), - pt , - nt , - bt , - mdefault)).
+
 
 % :-  statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T), qsave_program(run_mud_server,[map('run_mud_server.sav'),global(G),trail(T),local(L)]).
 

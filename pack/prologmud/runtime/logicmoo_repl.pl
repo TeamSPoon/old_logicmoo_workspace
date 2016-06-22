@@ -7,21 +7,20 @@
 :- set_prolog_stack(local, limit(16*10**9)).
 :- set_prolog_stack(trail, limit(16*10**9)).
 
-:- ensure_loaded(setup_paths).
+:- system:ensure_loaded(setup_paths).
 
 % ==============================
 % Load logicmoo REPL Base
 % ==============================
-:- asserta(load_mud_www).
-%USER :- user:ensure_loaded(library(logicmoo_user)).
-
+:- asserta(lmconf:load_mud_www).
+:- user:ensure_loaded(library(logicmoo_user)).
 
 % :- statistics.
 user:file_search_path(prologmud, library(prologmud)).
-setup_rl_read_history:-
+setup_rl_read_history_0:-
   ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
-:- setup_rl_read_history.
-:- initialization(setup_rl_read_history,now).
+:- setup_rl_read_history_0.
+:- initialization(setup_rl_read_history_0,restore).
 
 % ==============================
 % Default Daemons
@@ -29,7 +28,7 @@ setup_rl_read_history:-
 
 % :- use_module(library(persistency)).
 
-:- asserta(load_mud_www).
+:- asserta(lmconf:load_mud_www).
 
 
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
@@ -46,7 +45,7 @@ setup_rl_read_history:-
 
 
 % [Optionaly] Load the Logicmoo WWW System
-:- if(if_defined(load_mud_www)).
+:- if(if_defined(lmconf:load_mud_www)).
 /*
 :- (if_file_exists(user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www)))).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).
@@ -57,9 +56,7 @@ setup_rl_read_history:-
 */
 :- endif.
 
-:- (if_file_exists(user:ensure_loaded(library(logicmoo_base)))).
-
-%USER :- (if_file_exists(user:ensure_loaded(library(logicmoo_user)))).
+:- (if_file_exists(system:ensure_loaded(library(logicmoo_user)))).
 
 % ==============================
 % Load the infernce engine
