@@ -482,18 +482,11 @@ quietly_must(G):- /*no_trace*/(must(G)).
 :- meta_predicate if_defined(0).
 :- export(if_defined/1).
 
-%= 	 	 
-
 %% if_defined( ?G) is semidet.
 %
 % If Defined.
 %
-if_defined(G):-current_predicate(_,G),!,G.
-if_defined(C:G):-current_predicate(_,C:G),!,C:G.
-if_defined(_:G):-current_predicate(_,R:G),!,R:G.
-if_defined(G):-current_predicate(_,R:G),!,R:G.
-if_defined(Goal):- tlbugger:show_must_go_on,!,if_defined(Goal,((dmsg(warn_undefined(Goal))),dtrace,!,fail)).
-if_defined(Goal):- !, if_defined(Goal,(dmsg(warn_undefined(Goal)),dtrace)).
+if_defined(Goal):- if_defined(Goal,((dmsg(warn_undefined(Goal))),!,fail)).
 
 :- meta_predicate if_defined(0,0).
 :- export(if_defined/2).
