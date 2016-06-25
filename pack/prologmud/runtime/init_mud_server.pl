@@ -55,8 +55,17 @@
 % ==============================
 
 :- set_prolog_flag(dialect_pfc,false).
+
+:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
+%:- initialization(ensure_webserver(3020)).
+%:- initialization(ensure_webserver(3020),now).
+%:- initialization(ensure_webserver(3020),restore).
+
 % [Required] load the mud system
 :- show_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_loader)))).
+
+
+:- set_prolog_flag(logicmoo_debug,true).
 
 
 % ==============================
@@ -126,7 +135,7 @@ pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWea
 pddlSomethingIsa('iCommBadge674',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
-
+  
 
 mpred_argtypes(bordersOn(tRegion,tRegion)).
 mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
@@ -149,7 +158,6 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 :- rl_add_history( 'start_telnet.' ).
 :- rl_add_history( 'user:ensure_loaded(start_mud_server).' ).
 :- rl_add_history( 'login_and_run.' ).
-:- set_prolog_flag(mud_running,true).
 
 oinfo(O):- xlisting((O, - spft, - ( ==> ), - pt , - nt , - bt , - mdefault)).
 

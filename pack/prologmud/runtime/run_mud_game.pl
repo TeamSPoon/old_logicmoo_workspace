@@ -7,6 +7,8 @@
 :- user:ensure_loaded(init_mud_server).
 started_mud_server.
 
+:- push_modules.
+:- '$current_source_module'(user)->'$set_source_module'('baseKB');true.
 
 % :- make.
 :- add_import_module(mpred_storage,baseKB,end).
@@ -33,11 +35,14 @@ started_mud_server.
 % ==============================
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(login_and_run)).
-:- if_startup_script(initialization(login_and_run)).
+:- if_startup_script(initialization(login_and_run,restore)).
 
 % So scripted versions don't just exit
 :- if_startup_script(at_start(prolog)).
 
+:- listing(is_in_world/1).
+
+:- pop_modules.
 
 end_of_file.
 

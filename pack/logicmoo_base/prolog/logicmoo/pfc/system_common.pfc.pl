@@ -406,7 +406,7 @@ pfcControlled(argIsa).
 
 ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1), call(BHead=baseKB:Head),
   call((\+ predicate_property(BHead,defined) -> kb_dynamic(F/1);true)),
-  Head=..[F,I],
+  Head=..[F,_],
   call((predicate_property(BHead,dynamic)->(ain(Head==>{ignore(retract(Head))}));show_pred_info(BHead)))},
   ~functorDeclares(F),
   arity(F,1).

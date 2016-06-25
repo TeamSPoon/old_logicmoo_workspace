@@ -60,7 +60,7 @@ with_each_item(P,H,S) :- apply(P,[H|S]).
 with_no_x(G):- getenv('DISPLAY',DISP),!,call_cleanup((unsetenv('DISPLAY'),with_no_x(G)),setenv('DISPLAY',DISP)).
 with_no_x(G):- current_prolog_flag(gui,true),!,call_cleanup((set_prolog_flag(gui,false),with_no_x(G)),set_prolog_flag(gui,true)).
 with_no_x(G):- current_prolog_flag(gui_tracer,true),!,call_cleanup((noguitracer,with_no_x(G)),guitracer).
-with_no_x(G):- call(G).
+with_no_x(G):- w_tl(tlbugger:show_must_go_on,call(G)).
 
 
 %% wtg( ?M, :GoalCall) is nondet.

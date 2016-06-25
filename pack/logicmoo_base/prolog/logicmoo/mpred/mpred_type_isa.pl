@@ -697,7 +697,7 @@ lmconf:module_local_init:- ain((isa(I,T):- cwc,isa_backchaing(I,T))).
 isa_backchaing(I,T):- T==ftVar,!,is_ftVar(I).
 isa_backchaing(I,T):- nonvar(I),is_ftVar(I),!,T=ftVar.
 isa_backchaing(_,T):- T==ftProlog,!.
-isa_backchaing(I,T):-  I==T,I=ttTypeByAction,!,fail.
+isa_backchaing(I,T):- I==T,I=ttTypeByAction,!,fail.
 
 
 isa_backchaing(I,T):- is_ftVar(I),is_ftVar(T),!,tCol_gen(T),nonvar(T),isa_backchaing(I,T).

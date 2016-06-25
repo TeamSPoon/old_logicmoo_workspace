@@ -744,7 +744,7 @@ mpred_ain(ToMt:P,(mfl(FromMt,File,Lineno),UserWhy)):- ToMt \== FromMt,
  defaultAssertMt(ABox), ToMt \== ABox,!,
   with_umt(ToMt,(mpred_ain(ToMt:P,(mfl(ToMt,File,Lineno),UserWhy)))).
   
-mpred_ain(MTP,S):- stack_check, strip_module(MTP,MT,P),P\==MTP,!,
+mpred_ain(MTP,S):- sanity(stack_check), strip_module(MTP,MT,P),P\==MTP,!,
   with_umt(MT,mpred_ain(P,S)),!.
 
 mpred_ain(P,S):- 
@@ -1183,7 +1183,7 @@ mpred_ain_trigger_reprop(BT,Support):-
   BT = bt(Trigger,Body),!,
   ain_fast((Trigger:-mpred_bc_only(Trigger))),
   mpred_mark_as(Support,Trigger,pfcBcTrigger),
-  % if_defined_else(kb_dynamic(Trigger),true), 
+  % if_defined(kb_dynamic(Trigger),true), 
   mpred_trace_msg('~N~n\tAdding backwards~n\t\ttrigger: ~p~n\t\tbody: ~p~n\t Support: ~p~n',[Trigger,Body,Support]),
   mpred_assert_w_support(BT,Support),
   mpred_bt_pt_combine(Trigger,Body,Support).
@@ -1759,7 +1759,7 @@ mpred_BC_CACHE0(_,P):-
 % I''d like to remove this soon
 mpred_call_no_bc(P):- var(P),!,fail,trace,  mpred_fact(P).
 mpred_call_no_bc(baseKB:true):-!.
-mpred_call_no_bc(_):- stack_check,fail.
+mpred_call_no_bc(_):- sanity(stack_check),fail.
 
 mpred_call_no_bc(P):- loop_check(no_repeats(mpred_call_no_bc0(P))).
 

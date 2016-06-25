@@ -245,7 +245,7 @@ get_session_id(IDIn):-guess_session_ids(ID),nonvar(ID),!,ID=IDIn.
 % return any thread locally set session
 guess_session_ids(ID):-t_l:session_id(ID).
 % irc session
-guess_session_ids(ID):-if_defined_else(chat_config:chat_isWith(_,ID),true).
+guess_session_ids(ID):-if_defined(chat_config:chat_isWith(_,ID),true).
 % telnet session
 guess_session_ids(ID):-thread_self(TID),lmcache:session_io(ID,_,_,TID).
 % returns http sessions as well
@@ -276,7 +276,7 @@ random_instance_no_throw0(Type,Value,Test):- atom(Type),atom_concat('random_',Ty
    Fact=..[Pred,Value],current_predicate(Pred/1),!,call(Fact),Test.
 random_instance_no_throw0(Type,Value,Test):- compound(Type),get_functor(Type,F),atom_concat('random_',F,Pred),current_predicate(F/1),Fact=..[Pred,Value],
   current_predicate(Pred/1),!,Fact,Test.
-random_instance_no_throw0(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),t(meta_argtypes,Formatted),
+random_instance_no_throw0(Type,Value,Test):- compound(Type),get_functor(Type,F,A),functor(Formatted,F,A),t(meta_argtypes,Formatted),
                          Formatted=..[F|ArgTypes],functor(Value,F,A),Value=..[F|ValueArgs],must((maplist(random_instance_no_throw,ArgTypes,ValueArgs,_),Test)).
 random_instance_no_throw0(Type,Value,Test):-must(( findall(V,isa(V,Type),Possibles),Possibles\=[])),!,must((my_random_member(Value,Possibles),Test)).
 

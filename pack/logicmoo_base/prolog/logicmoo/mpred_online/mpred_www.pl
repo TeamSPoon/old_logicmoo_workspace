@@ -569,7 +569,7 @@ handler_logicmoo_cyclone(Request):-
 % handler logicmoo cyclone  Secondary Helper.
 %
 handler_logicmoo_cyclone_1(Request):-
- with_no_x((
+ nodebugx( with_no_x((
  on_x_log_fail((
    format('Content-type: text/html~n~n',[]),
    format('<!DOCTYPE html>',[]),
@@ -579,7 +579,7 @@ handler_logicmoo_cyclone_1(Request):-
       member(path(PATH),Request),
     directory_file_path(_,FCALL,PATH),
    once(get_param_req(call,Call);(current_predicate(FCALL/0),Call=FCALL);get_param_sess(call,Call,edit1term)),
-   cnotrace(Call),!,flush_output)))).
+   cnotrace(Call),!,flush_output))))).
    
 
 

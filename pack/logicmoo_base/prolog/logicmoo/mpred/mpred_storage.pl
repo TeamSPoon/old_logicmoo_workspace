@@ -20,7 +20,6 @@
 :- module(mpred_storage,
           [ % ain/1,
           %  add_0/1,
-            add_fast/1,
             call_props/2,
             clr/1,
             clr0/1,
@@ -785,7 +784,9 @@ call_props(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
 %
 % Iprops.
 %
-iprops(Obj,PropSpecs):- ireq(/*to_exp*/(props(Obj,PropSpecs))).
+iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
+
+:- asserta((baseKB:props(Obj,PropSpecs):-  ireq(props(Obj,PropSpecs)))).
 
 
 
@@ -820,7 +821,7 @@ add_0(A):-  throw(depricated),  is_ftVar(A),!,trace_or_throw(var_add(A)).
 add_0(((H1,H2):-B)):-!,add_0((H1:-B)),add_0((H2:-B)).
 add_0(((H1,H2))):-!,add_0((H1)),add_0((H2)).
 add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
-add_0(A):- A =(:-(_Term)), !, must(add_fast(A)).
+add_0(A):- A =(:-(Term)), !, call_u(Term).
 % add_0(C0):-check_override(ain(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
 %add_0(C0):- ignore((ground(C0),asserta(lmconf:already_added_this_round(C0)))),!,must(ain_fast(C0)),!.
@@ -841,17 +842,17 @@ implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(
 %implied_skipped(Skipped):-lmconf:already_added_this_round(Skipped),(clause_u(Skipped)).
 
 
-:- was_export(add_fast/1).
+:- was_export(ain/1).
 % -  ain(Assertion)
 % ain_fast(C0):- must_det((ain_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(why,ain_fast(C0)),rtrace(ain_fast(C0)),dtrace(ireq(C0))))))))),!.
 
 %= 	 	 
 
-%% add_fast( ?Term) is semidet.
+%% ain( ?Term) is semidet.
 %
 % Add Fast.
 %
-add_fast(Term):-mpred_numbervars_with_names(Term),mpred_modify(change(assert,ain), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
+% ain(Term):-mpred_numbervars_with_names(Term),ain(Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
 
 % -  upprop(Obj,PropSpecs) update the properties
 

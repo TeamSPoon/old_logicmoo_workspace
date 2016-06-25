@@ -115,7 +115,8 @@ lmconf:mpred_skipped_module(eggdrop).
 base_clause_expansion(I,O):-  expand_kif_string_or_fail(pl_te,I,O),!.
 base_clause_expansion( :-(I), :-(O)):- !, expand_isEach_or_fail(I,O),!.
 base_clause_expansion(I,':-'(ain_expanded(I))):- in_dialect_pfc,!.
-base_clause_expansion(I,':-'(ain_expanded(I))):- get_consequent_functor(I,F,A),call_u(hybrid_support(F,A)),!.
+base_clause_expansion(I,':-'(ain_expanded(I))):- get_consequent_functor(I,F,_),
+   (call_u(hybrid_support(F,_));call_u(prologMacroHead(F))),!.
 base_clause_expansion(I,O):- expand_isEach_or_fail(I,O),!.
 base_clause_expansion(I,O):- mpred_term_expansion(I,O)->I\=@=O,!.
 

@@ -407,7 +407,7 @@ file_to_stream(package(Pkg,LocalPath),Stream) :-!,
    % build global path
    atomic_list_concat([PkgPath|LocalPath], '/',  GlobalPath),file_to_stream(GlobalPath,Stream).
 file_to_stream(Spec,Stream):-compound(Spec),!,file_to_stream(match(Spec),Stream).
-file_to_stream(URL,Stream):-sub_string(URL,_,_,_,":/"),sub_string(URL,0,4,_,'http'), !, if_defined_else(http_open:http_open(URL,HTTP_Stream,[ cert_verify_hook(file_to_stream_ssl_verify)]),fail),copy_stream(HTTP_Stream,Stream),!.
+file_to_stream(URL,Stream):-sub_string(URL,_,_,_,":/"),sub_string(URL,0,4,_,'http'), !, if_defined(http_open:http_open(URL,HTTP_Stream,[ cert_verify_hook(file_to_stream_ssl_verify)]),fail),copy_stream(HTTP_Stream,Stream),!.
 file_to_stream(URL,Stream):-atom_concat('file://', File, URL),!,file_to_stream(File,Stream).
 file_to_stream(URL,Stream):-atom_concat('file:', File, URL),!,file_to_stream(File,Stream).
 file_to_stream(URL,Stream):-on_x_fail(atomic_list_concat(['package://',Pkg,'/', Path], URL)),file_to_stream(package(Pkg,Path),Stream).

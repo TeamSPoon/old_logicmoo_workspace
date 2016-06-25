@@ -477,7 +477,7 @@ format_to_message(Format,Args,Info):-
 %
 fmt9(fmt0(F,A)):-on_x_fail(fmt0(F,A)),!.
 fmt9(Msg):- catch(((string(Msg);atom(Msg)),format(Msg,[x1,x2,x3])),_,fail),!.
-fmt9(Msg):- if_defined_else(portray_clause_w_vars(Msg),print(Msg)).
+fmt9(Msg):- if_defined(portray_clause_w_vars(Msg),print(Msg)).
 
 % :-reexport(library(ansi_term)).
 :- use_module(library(ansi_term)).
@@ -851,7 +851,7 @@ if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.
 % (debug)message.
 %
 dmsg(C):- notrace((tlbugger:no_slow_io,!,writeln(dmsg(C)))).
-dmsg(V):- w_tl(set_prolog_flag(retry_undefined,false), if_defined_else(dmsg0(V),logicmoo_util_catch:ddmsg(V))).
+dmsg(V):- w_tl(set_prolog_flag(retry_undefined,false), if_defined(dmsg0(V),logicmoo_util_catch:ddmsg(V))).
 %dmsg(F,A):- notrace((tlbugger:no_slow_io,on_x_fail(format(atom(S),F,A))->writeln(dmsg(S));writeln(dmsg_fail(F,A)))),!.
 
 %= 	 	 
@@ -860,7 +860,7 @@ dmsg(V):- w_tl(set_prolog_flag(retry_undefined,false), if_defined_else(dmsg0(V),
 %
 % (debug)message.
 %
-dmsg(F,A):- if_defined_else(dmsg0(F,A),logicmoo_util_catch:ddmsg(F,A)).
+dmsg(F,A):- if_defined(dmsg0(F,A),logicmoo_util_catch:ddmsg(F,A)).
 
 
 
@@ -1171,7 +1171,7 @@ ansicall(_Out,_,Call):- tlbugger:skipDumpST9,!,Call.
 
 ansicall(_,_,Call):-tlbugger:no_slow_io,!,Call.
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
-ansicall(_,_,Call):- if_defined_else(in_pengines,fail),!,Call.
+ansicall(_,_,Call):- if_defined(in_pengines,fail),!,Call.
 ansicall(Out,Ctrl,Call):-
    retractall(tlbugger:last_used_color(_)),asserta(tlbugger:last_used_color(Ctrl)),ansicall0(Out,Ctrl,Call),!.
 

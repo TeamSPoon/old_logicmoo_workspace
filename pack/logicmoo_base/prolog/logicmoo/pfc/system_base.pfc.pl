@@ -37,11 +37,6 @@
 
 :- '$set_source_module'(baseKB).
 
-:- set_file_lang(pl).
-
-:- sanity(get_lang(pl)).
-:- set_file_lang(pfc).
-
 
 :- set_fileAssertMt(baseKB).
 
@@ -52,8 +47,6 @@
 baseKB:mtCycL(baseKB).
 %baseKB:mtExact(baseKB).
 
-
-:- sanity((get_lang(PL)->pl=PL)).
 
 
 %:- rtrace.

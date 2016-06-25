@@ -239,9 +239,9 @@ mostSpecificLocalityOfObject(Obj,Where):-
                         (tPathway(Obj),localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)).
 
 
-mudDoorwayDir(Region,apathFn(Region,Dir),Dir) :- tPathway(apathFn(Region,Dir)).
+mudDoorwayDir(Region,apathFn(Region,Dir),Dir) :-  tPathway(apathFn(Region,Dir)).
 
-mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):-calc_from_center_xyz(Region,Dir,2,X,Y,Z).
+mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):- call_u(calc_from_center_xyz(Region,Dir,2,X,Y,Z)).
 
 % :-kif_tell(localityOfObject(A,B) &  localityOfObject(B,C) ==> localityOfObject(A,C)).
 
@@ -283,12 +283,12 @@ mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
 
 
 is_in_world(Obj):-isa_asserted(Obj,tRegion),!.
-is_in_world(Obj):-clause(mudAtLoc(Obj,_),true),!.
+is_in_world(Obj):-clause_u(mudAtLoc(Obj,_),true),!.
 is_in_world(Obj):-clause(mudStowing(Who,Obj),true),!,is_in_world(Who).
 is_in_world(Obj):-mudSubPart(What,Obj),is_in_world(What),!.
 
-put_in_world(Obj):-is_in_world(Obj),!.
-put_in_world(Obj):-random_xyzFn(LOC),add_fast(mudAtLoc(Obj,LOC)).
+put_in_world(Obj):- is_in_world(Obj),!.
+put_in_world(Obj):- random_xyzFn(LOC),ain(mudAtLoc(Obj,LOC)),ain(mudNeedsLook(Obj,vTrue)).
 
 
 /*
@@ -325,7 +325,8 @@ create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),hooked
 %  suggest a random fact that is probably is not already true
 create_random_fact(G) :- into_functor_form(t,G,MPred),G\=@=MPred,!,create_random_fact(MPred).
 create_random_fact(G) :- is_asserted(G),!,dmsg((create_random_fact(G) :- is_asserted(G))).
-create_random_fact(t(mudAtLoc,Obj,LOC)) :- !,nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
+create_random_fact(t(mudAtLoc,Obj,LOC)) :- !,nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),
+   \+ ( ~ mudAtLoc(Obj,LOC)))).
 create_random_fact(t(localityOfObject,Obj,Region)) :- !, nonvar(Obj),not_asserted((localityOfObject(Obj,_))),
   if_defined(asserted_or_deduced(localityOfObject(Obj,Region))).
 create_random_fact(t(Other,Obj,Default)) :- nonvar(Obj),argIsa(Other,2,Type),random_instance_no_throw(Type,Default,ground(Default)),!.

@@ -102,6 +102,7 @@ agent_text_command(Agent,["prolog"],Agent,actProlog(prolog_repl)).
 :-module_transparent(warnOnError/1).
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
+agent_call_command(Agent,actProlog(prolog_repl)) :- prolog_repl.
 agent_call_command(Agent,actProlog(C)) :- (side_effect_prone),true,nonvar(C),agent_call_safely(Agent,C).
 
 :-export(agent_call_safely/2).

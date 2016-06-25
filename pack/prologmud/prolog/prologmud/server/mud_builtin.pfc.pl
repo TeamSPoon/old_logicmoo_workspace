@@ -456,7 +456,7 @@ prologHybrid(mudListPrice(tItem,ftNumber)).
 prologHybrid(mudOpaqueness(ftTerm,ftPercent)).
 prologHybrid(mudPossess(tAgent,tObj)).
 prologHybrid(mudShape(tSpatialThing,vtShape)).
-prologHybrid(mudSize(tSpatialThing,ftTerm)).
+prologHybrid(mudSize(tSpatialThing,vtSize)).
 prologHybrid(mudTextSame(ftText,ftText)).
 prologHybrid(mudTexture(tSpatialThing,vtTexture)).
 prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
@@ -581,7 +581,6 @@ vtBasicDirPlusUpDown(vUp).
 %localityOfObject(Inner,Outer):- lmconf:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
 meta_argtypes(mudMaterial(tSpatialThing,vtMaterial)).
-meta_argtypes(mudSize(tSpatialThing,vtSize)).
 meta_argtypes(mudTexture(tSpatialThing,vtTexture)).
 meta_argtypes(mudWearing(tAgent,tWearAble)).
 meta_argtypes(pathName(tRegion,vtDirection,ftString)).

@@ -33,9 +33,9 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
-		<Folder Name="games">
+		<Folder Name="prologmud/games">
 			<F
-				N="games/*.*"
+				N="prologmud/games/*.*"
 				Recurse="1"
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
@@ -47,6 +47,14 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
+    <Folder Name="jellyfish">
+                        <F
+                                N="jellyfish/*.*"
+                                Recurse="1"
+                                Refilter="1"
+                                Excludes=".git/;*.*~;*~/"/>
+                </Folder>
+
 		<Folder Name="hMUD">
 			<F
 				N="hMUD/*.*"

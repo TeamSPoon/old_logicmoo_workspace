@@ -542,13 +542,8 @@ in_dialect_pfc:-
   (source_location(F,_W),( atom_concat(_,'.pfc.pl',F);atom_concat(_,'.plmoo',F);atom_concat(_,'.pfc',F)))),!.
 
 
-fully_expand(Op,Sent,SentO):- in_dialect_pfc,!,fully_expand0(Op,Sent,SentO).
-fully_expand(Op,'==>'(Sent),SentO):-nonvar(Sent),!,fully_expand0(Op,Sent,SentO).
-fully_expand(_,Sent,Sent):- \+ current_prolog_flag(mud_running,true),!.
-fully_expand(Op,Sent,SentO):-fully_expand0(Op,Sent,SentO),!,gripe_if_expanded(Op,Sent,SentO).
+fully_expand(Op,Sent,SentO):-fully_expand0(Op,Sent,SentO),!.
 
-gripe_if_expanded(Op,Sent,SentO):-
-   (Sent \=@= SentO-> (wdmsg(gripe_if_expanded(Op)),wdmsg(Sent),wdmsg(SentO),dtrace) ; true).
 
  % assert_if_new(fully_expanded_test(Op,Sent,SentO)).
 
@@ -1650,8 +1645,8 @@ holds_args(HOFDS,FIST):- is_ftCompound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),
 % Do Expand Arguments.
 %
 :- was_export((do_expand_args/3)).
+do_expand_args(_,Term,TermO):- \+ compound(Term),!,must(Term=TermO).
 do_expand_args(Exp,M:Sent,M:SentO):- atom(M),!,do_expand_args(Exp,Sent,SentO).
-do_expand_args(_,Term,Term):- \+ compound(Term),!.
 do_expand_args(_,Term,Term):- functor(Term,F,_),cheaply_u(argsQuoted(F)),!.
 do_expand_args(Exp,[L|IST],Out):- !,must(do_expand_args_l(Exp,[L|IST],Out)).
 do_expand_args(Exp,Term,Out):- Term=..[P|ARGS],do_expand_args_pa(Exp,P,ARGS,Out).
@@ -1665,7 +1660,7 @@ do_expand_args(Exp,Term,Out):- Term=..[P|ARGS],do_expand_args_pa(Exp,P,ARGS,Out)
 %
 
 % allows ?- fully_expand(arity(isEach([X,TY,OO]),4),O).
-do_expand_args_pa(Exp,Exp,[ARGS],Out):- is_list(ARGS),!,member(Out,ARGS).
+do_expand_args_pa(Exp,Exp,[ARGS|Some],Out):- (Some==[]),is_list(ARGS),!,member(Out,ARGS).
 % allows ?- fully_expand(arity(isEach(X,TY,OO),4),O).
 do_expand_args_pa(Exp,Exp,ARGS,Out):- !,member(Out,ARGS).
 do_expand_args_pa(Exp,P,ARGS,Out):- do_expand_args_l(Exp,ARGS,EARGS), Out=..[P|EARGS].
@@ -1677,9 +1672,12 @@ do_expand_args_pa(Exp,P,ARGS,Out):- do_expand_args_l(Exp,ARGS,EARGS), Out=..[P|E
 %
 % Do Expand Arguments (list Version).
 %
+
+% do_expand_args_l(Exp,ARGS,EARGS):- do_expand_args(Exp,A,E),do_expand_args_l(Exp,RGS,ARGS).
+
 do_expand_args_l(_,A,A):- is_ftVar(A),!.
-do_expand_args_l(_,[],[]):- !.
-do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- do_expand_args(Exp,A,E),do_expand_args_l(Exp,RGS,ARGS).
+do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- is_list(RGS),!,do_expand_args(Exp,A,E),do_expand_args_l(Exp,RGS,ARGS).
+do_expand_args_l(_,A,A).
 
 
 

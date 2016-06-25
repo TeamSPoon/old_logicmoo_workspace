@@ -541,7 +541,7 @@ check_real_context_module:- sanity((context_module(M1),defaultAssertMt(M2),must(
 %
 % Mreq.
 %
-mreq(G):- if_defined_else(G,fail).
+mreq(G):- if_defined(G,fail).
 
 % ======================= mpred_file('pfccore').	% core of Pfc.
 

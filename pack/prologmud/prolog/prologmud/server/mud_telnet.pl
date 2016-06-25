@@ -275,7 +275,7 @@ telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignor
 :- dynamic(baseKB:mudLastCommand/2).
 look_brief(Agent):- prop(Agent,mudLastCommand,X),nonvar(X),functor(X,actLook,_),!.
 look_brief(Agent):- \+ prop(Agent,mudNeedsLook,vTrue),!.
-look_brief(Agent):- must(prop(Agent,mudNeedsLook,vTrue)),look_as(Agent),!.
+look_brief(Agent):- must(prop(Agent,mudNeedsLook,vTrue)),call_u(look_as(Agent)),!.
 
 merge_elements(V,V):-not(is_list((V))),!.
 merge_elements([],[]):-!.

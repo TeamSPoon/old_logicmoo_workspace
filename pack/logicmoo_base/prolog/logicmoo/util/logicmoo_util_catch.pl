@@ -58,7 +58,7 @@
             ib_multi_transparent33/1,
             if_defined/1,
             if_defined/2,
-            if_defined_else/2,
+            if_defined/2,
             input_key/1,
             is_ftCompound/1,
             not_ftCompound/1,
@@ -145,9 +145,9 @@
 		catchvvnt(0, ?, 0),
 		catchv(0, ?, 0),
 		
-		if_defined(:),
-		if_defined(:, 0),
-		if_defined_else(:, 0),
+		if_defined(0),
+		if_defined(0, 0),
+		if_defined(0, 0),
 		ddmsg_call(0),
 		on_x_fail(0),
 		on_x_log_throw(0),
@@ -155,7 +155,7 @@
 		
 		on_x_log_cont(0),
 		on_x_log_fail(0),
-		if_defined_else(:, 0),        
+		if_defined(0, 0),        
 
         must(0),
         must_det(0),
@@ -479,7 +479,7 @@ doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 quietly_must(G):- /*no_trace*/(must(G)).
 
 
-:- meta_predicate if_defined(:).
+:- meta_predicate if_defined(0).
 :- export(if_defined/1).
 
 %= 	 	 
@@ -488,36 +488,27 @@ quietly_must(G):- /*no_trace*/(must(G)).
 %
 % If Defined.
 %
-if_defined(C:G):-current_predicate(_,C:G),!,on_x_fail(C:G).
-if_defined(_:G):-current_predicate(_,R:G),!,on_x_fail(R:G).
-if_defined(G):-current_predicate(_,R:G),!,on_x_fail(R:G).
-if_defined(G):-current_predicate(_,G),!,on_x_fail(G).
-if_defined(Goal):- tlbugger:show_must_go_on,!,if_defined(Goal,((dmsg(warn_undefined(Goal))),!,fail)).
-if_defined(Goal):- !, if_defined(Goal,(dmsg(warn_undefined(Goal)),trace)).
+if_defined(G):-current_predicate(_,G),!,G.
+if_defined(C:G):-current_predicate(_,C:G),!,C:G.
+if_defined(_:G):-current_predicate(_,R:G),!,R:G.
+if_defined(G):-current_predicate(_,R:G),!,R:G.
+if_defined(Goal):- tlbugger:show_must_go_on,!,if_defined(Goal,((dmsg(warn_undefined(Goal))),dtrace,!,fail)).
+if_defined(Goal):- !, if_defined(Goal,(dmsg(warn_undefined(Goal)),dtrace)).
 
-:- meta_predicate if_defined(:,0).
+:- meta_predicate if_defined(0,0).
 :- export(if_defined/2).
-
-%= 	 	 
 
 %% if_defined( ?Goal, :GoalElse) is semidet.
 %
-% If Defined.
-%
-if_defined(Goal,_Else):-current_predicate(_,Goal),!,Goal.
-if_defined(_:Goal,Else):-current_predicate(_,OM:Goal)->OM:Goal;(writeln(warn_undefined(Goal)),Else).
-
-:- meta_predicate if_defined_else(:,0).
-:- export(if_defined_else/2).
-
-%= 	 	 
-
-%% if_defined_else( ?Goal, :GoalElse) is semidet.
-%
 % If Defined Else.
 %
-if_defined_else(Goal,_Else):-current_predicate(_,Goal),!,Goal.
-if_defined_else(_:Goal,Else):-current_predicate(_,OM:Goal)->OM:Goal;Else.
+if_defined(Goal,_Else):- current_predicate(_,Goal),!,Goal.
+if_defined(_:Goal,Else):- !, current_predicate(_,OM:Goal)->OM:Goal;Else.
+if_defined(Goal,  Else):- current_predicate(_,OM:Goal)->OM:Goal;Else.
+
+
+
+
 
 :- meta_predicate when_defined(:).
 :- export(when_defined/1).

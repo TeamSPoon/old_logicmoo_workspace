@@ -538,7 +538,7 @@ transitive_path(F,[Arg1,Arg2],Arg2):-
   dif(Arg1,Arg2),call(F,Arg1,Arg2),!.
 transitive_path(F,[Arg1,SecondNodeMt|REST],Arg2):-
   dif(Arg1,Arg2),dif(Arg1,SecondNodeMt),
-  call(F,Arg1,SecondNodeMt),stack_check,
+  call(F,Arg1,SecondNodeMt),sanity(stack_check),
   transitive_path(F,[SecondNodeMt|REST],Arg2).
 
 

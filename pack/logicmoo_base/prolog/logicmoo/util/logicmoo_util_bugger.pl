@@ -1075,7 +1075,7 @@ meta_interp_signal(_:meta_callable(_,_)).
 %
 % Meta Interp.
 %
-meta_interp(CE,A):- hotrace((var(A); \+ if_defined_else(stack_check,fail))),!, throw(meta_interp(CE,A)).
+meta_interp(CE,A):- hotrace((var(A); \+ if_defined(stack_check,fail))),!, throw(meta_interp(CE,A)).
 meta_interp(_CE,A):- thread_leash(+all),meta_interp_signal(A),!,fail.
 meta_interp(CE,M:X):- atom(M),!,meta_interp(CE,X).
 meta_interp(_,true):-!.

@@ -71,16 +71,16 @@ agent_call_command(Agent,actLook(_Dir,SObj)):-
 look_as(Agent):- mudAtLoc(Agent,LOC),cmdLook(Agent,LOC),!.
 
 :-export(cmdLook/2).
-cmdLook(Agent,LOC):- garbage_collect_atoms, call(cmdLook_proc,Agent,LOC),!.
+cmdLook(Agent,LOC):- garbage_collect_atoms, call_u(call(cmdLook_proc,Agent,LOC)),!.
 
 :-export(cmdLook_proc/3).
 cmdLook_proc(Agent,LOC):- 
-   with_no_modifications(w_tl(mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
+   with_no_modifications(w_tl(mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))),
+   ain(props(Agent,mudNeedsLook(vFalse))).
 cmdLook_proc_0(Agent,LOC):-
  findall(Show,on_command_show(Agent,actLook,Show),MORELOOK),
   % implicit in next command clr(props(Agent,mudNeedsLook(_))),
-   ain(props(Agent,mudNeedsLook(vFalse))),
-     show_kb_preds(Agent,LOC,
+   show_kb_preds(Agent,LOC,
          [
          location= nop(LOC),
       % TODO make this work

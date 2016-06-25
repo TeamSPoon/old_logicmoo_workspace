@@ -82,6 +82,9 @@ spawn_prey(10) :-
 spawn_prey(N) :-
        Prey = tPrey(N),
        assert_isa(Prey,tPrey),
+       put_in_world(Prey),!.
+
+       /*
        get_instance_default_props(Prey,Traits),
 	\+ mudAgentTurnnum(Prey,_),
          req1(predInstMax(Prey,mudEnergy,NRG)),
@@ -93,9 +96,11 @@ spawn_prey(N) :-
          ain(mudAgentTurnnum(Prey,1)),
          clr(mudPossess(Prey,_)),
 	set_stats(Prey,Traits),
-	put_in_world(Prey),
-        add_missing_instance_defaults(Prey),
+	
+        % add_missing_instance_defaults(Prey),
 	!.
+        */
+
 spawn_prey(N) :-
 	Ntemp is N + 1,
 	spawn_prey(Ntemp).
