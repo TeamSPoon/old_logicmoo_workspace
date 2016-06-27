@@ -658,7 +658,7 @@ uses_predicate(SM,CallerMt,F,A,R):-
 
 create_predicate_istAbove(abox,F,A):-  must(defaultAssertMt(CallerMt)),sanity(CallerMt\=abox),!,create_predicate_istAbove(CallerMt,F,A).
 create_predicate_istAbove(CallerMt,F,A):-   
-   show_failure(\+ find_and_call(mtProlog(CallerMt))),!,
+   show_failure(\+ find_and_call(baseKB:mtProlog(CallerMt))),!,
    make_as_dynamic(create_predicate_istAbove,CallerMt,F,A),
    functor(Goal,F,A),
    assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
@@ -680,7 +680,7 @@ retry_undefined(Mt, F, A):-  clause_b(mtCycLBroad(Mt)), baseKB_hybrid_support(F,
    make_as_dynamic(mtCycLBroad(Mt),Mt,F,A).
 
 % child-like Mt
-retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(mtGlobal(CallerMt)),
+retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(baseKB:mtGlobal(CallerMt)),
    create_predicate_istAbove(CallerMt,F,A).
 
 % import built-ins ?

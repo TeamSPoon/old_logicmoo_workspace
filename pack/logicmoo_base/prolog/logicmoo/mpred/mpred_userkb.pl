@@ -203,7 +203,7 @@ kb_dynamic_m(E):- with_source_module(baseKB,decl_shared(kb_dynamic,E)).
 :- multifile(baseKB:predicateConventionMt/2).
 :- dynamic(baseKB:predicateConventionMt/2).
 
-:- kb_dynamic(mpred_online:semweb_startup).
+% :- kb_dynamic(mpred_online:semweb_startup/0).
 
 % :- lmconf:base_kb_pred_list([A,B|_List]),rtrace(call(must_maplist(kb_dynamic_m,[A,B]))).
 :- lmconf:base_kb_pred_list(List),call(must_maplist(kb_dynamic_m,List)).

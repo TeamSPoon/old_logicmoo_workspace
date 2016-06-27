@@ -235,7 +235,7 @@ dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
-dividesBetween(tAgent,tPlayer,tNpcPlayer).
+dividesBetween(tAgent,tAgent,tNpcPlayer).
 
 dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 

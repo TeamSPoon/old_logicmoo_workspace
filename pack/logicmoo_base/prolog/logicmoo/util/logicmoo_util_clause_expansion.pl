@@ -115,8 +115,9 @@ appear in the source-code.
 :- meta_predicate get_named_value_goal(0,*).
 
 is_user_module :- prolog_load_context(source,F), lmconf:mpred_is_impl_file(F),!,fail.
-is_user_module :- prolog_load_context(module,user). 
 is_user_module :- prolog_load_context(module,M), module_property(M,class(L)),L=library,!,fail.
+is_user_module :- prolog_load_context(module,user). 
+is_user_module.
 
 
 get_named_value_goal(G,N=V):- functor_non_colon(G,N,_), ((\+ \+ G )-> V=true; V=false).

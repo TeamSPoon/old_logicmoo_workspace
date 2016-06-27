@@ -284,21 +284,21 @@ system:random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Val
 
 
 
-get_dettached_npc(P):- random_instance_no_throw(tAgent,P,\+ isa(P,tHumanPlayer)).
+get_dettached_npc(P):- random_instance_no_throw(tAgent,P,\+ isa(P,tHumanControlled)).
 
 generate_new_player(P):- var(P),!,must_det_l([gensym(iExplorer,N),not((isa_asserted(N,tAgent))),P=N,ensure_new_player(P)]),!.
 generate_new_player(P):- ensure_new_player(P),!.
 
-ensure_new_player(P):- must_det_l([nonvar(P),assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgent)]),!.
+ensure_new_player(P):- must_det_l([nonvar(P),assert_isa(P,tExplorer),assert_isa(P,tHumanControlled),assert_isa(P,tAgent)]),!.
 
-detach_player(P):- lmcache:agent_session(P,_),!,trace_or_throw(detach_player(P)).
-detach_player(_).
+assumed_detached_player(P):- lmcache:agent_session(P,_),!,trace_or_throw(assumed_detached_player(P)).
+assumed_detached_player(_).
 
 :-export(become_player/1).
 become_player(P):- once(current_agent(Was)),Was=P,!.
 become_player(P):- get_session_id(O),retractall(lmcache:agent_session(_,O)),
-  assert_isa(P,tHumanPlayer),must(create_agent(P))->
-  detach_player(P),asserta_new(lmcache:agent_session(P,O)),!.
+  assert_isa(P,tHumanControlled),must(create_agent(P))->
+  assumed_detached_player(P),asserta_new(lmcache:agent_session(P,O)),!.
 
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).

@@ -541,13 +541,7 @@ in_dialect_pfc:-
   (current_prolog_flag(dialect_pfc,true); 
   (source_location(F,_W),( atom_concat(_,'.pfc.pl',F);atom_concat(_,'.plmoo',F);atom_concat(_,'.pfc',F)))),!.
 
-
-fully_expand(Op,Sent,SentO):-fully_expand0(Op,Sent,SentO),!.
-
-
- % assert_if_new(fully_expanded_test(Op,Sent,SentO)).
-
-fully_expand0(Op,Sent,SentO):-
+fully_expand(Op,Sent,SentO):-
  gripe_time(0.2,((
   must(once((/*hotrace*/((cyclic_break((Sent)),
      must(/*hotrace*/((deserialize_attvars(Sent,SentI)))),
@@ -559,13 +553,14 @@ fully_expand0(Op,Sent,SentO):-
 % Fully Expand Now.
 
 fully_expand_now(Op,Sent,SentO):- 
+ ((
  copy_term(Sent,NoVary),
  cyclic_break((NoVary)),
- must((dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause(Op,Sent,BO))),!,
+ must((dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause_now(Op,Sent,BO))),!,
     SentO=BO,
     must(Sent=@=NoVary),
    ignore(((fail,cnotrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
-    (Sent \=@= lmconf:SentO), dmsg(fully_expand_now(Op,(Sent --> SentO)))))))))))),!.
+    (Sent \=@= lmconf:SentO), dmsg(fully_expand_now(Op,(Sent --> SentO)))))))))))))),!.
 
      
 :- decl_shared(mtExact/1).
@@ -604,13 +599,14 @@ expand_kif_string_or_fail(Why,I,O):- string(I), atom_contains(I,'('),
   put_variable_names(Vs)->
   must(sexpr_sterm_to_pterm(Wff,PTerm))->
   PTerm\=@=I -> 
-  fully_expand(Why,PTerm,O).
+  fully_expand_now(Why,PTerm,O).
 
 
 %% fully_expand_clause( ++Op, :TermSent, -- SentO) is det.
 %
 % Fully Expand Clause.
 %
+fully_expand_clause_now(Op,Sent,SentO):-memoize_on(fully_expand,Sent->SentO,fully_expand_clause(Op,Sent,SentO)).
 
 fully_expand_clause(Op,Sent,SentO):- sanity(is_ftNonvar(Op)),sanity(var(SentO)),var(Sent),!,Sent=SentO.
 fully_expand_clause(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
@@ -704,7 +700,7 @@ as_is_term('wid'(_,_,_)).
 as_is_term('call'(_)).
 % as_is_term0('{}'(_)).
 as_is_term('ignore'(_)).
-as_is_term(_:NC):-!,as_is_term(NC).
+as_is_term(_:NC):-!,as_is_term(NC). 
 as_is_term(NC):-exact_args(NC),!.
 as_is_term(NC):-functor(NC,Op,2),infix_op(Op,_).
 as_is_term(NC):-loop_check(is_unit(NC)),!.
@@ -811,14 +807,14 @@ mpred_expand_rule(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),
 %
 % Database Expand Final.
 %
-
+% db_expand_final(Op,Sent,Sent):- Sent=..[_,A],atom(A),!.
 db_expand_final(_ ,NC,NC):-as_is_term(NC),!.
+db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),(not_ftCompound(T)),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
 db_expand_final(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_final(Op,Sent,SentO).
 db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),cheaply_u(argsQuoted(F)),!.
 db_expand_final(_, arity(F,A),arity(F,A)):- not_ftCompound(F),not_ftCompound(A),!.
 db_expand_final(_, tPred(V),tPred(V)):-!,fail, not_ftCompound(V),!.
-db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),(not_ftCompound(T)),!.
 %db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),db_expand_final(_,T,_),!.
 db_expand_final(_ ,isa(Atom,PredArgTypes), tRelation(Atom)):-PredArgTypes==meta_argtypes,atom(Atom),!.
 db_expand_final(Op, meta_argtypes(Args),    O  ):-is_ftCompound(Args),functor(Args,Pred,A),
@@ -905,18 +901,18 @@ fully_expand_head_throw_if_loop(A1,B1,C1):- must(loop_check_term(fully_expand_he
 %
 % Database Expand A Noloop.
 %
-fully_expand_head(A,B,C):-
-   subst(B,mpred_isa,isa,B1),
-   into_mpred_form(B1,B2),
-   B2=B3,
+
+fully_expand_head(Why,Before,After):-
+   subst(Before,mpred_isa,isa,Before1),
+   into_mpred_form(Before1,Before2),
    must(
     loop_check_term(
-        transitive_lc(try_expand_head_dif(A),B3,C),
-        fully_expand_head_loop(A,B), 
-        (wdmsg(loop_try_expand_head_dif(A,B)),B3=C))),!.
+        transitive_lc(try_expand_head_dif(Why),Before2,After),
+        fully_expand_head_loop(Why,Before), 
+        (wdmsg(loop_try_expand_head_dif(Why,Before)),Before2=After))),!.
 
-try_expand_head_dif(A,B,C):-try_expand_head(A,B,C), B\=@=C,!.
-try_expand_head_dif(_,B,B).
+try_expand_head_dif(Why,Before,After):-try_expand_head(Why,Before,After)-> Before\=@=After,!.
+try_expand_head_dif(_,Before,Before).
 
 %db_expand_0(Op,Sent,SentO):- is_meta_functor(Sent,F,List),F\=t,!,must_maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
 %db_expand_0(_ ,NC,OUT):-mpred_expand(NC,OUT),NC\=@=OUT,!.
@@ -950,9 +946,8 @@ temp_comp(H,B,PRED,OUT):- nonvar(H),term_variables(B,Vs1),Vs1\==[], term_attvars
 %
 % :- meta_predicate(term_expansion(':'(:-),(:-))).
 % :- mode(term_expansion(+,--)).
-
 db_expand_0(Op,Sent,SentO):- sanity(is_ftNonvar(Op)),sanity(var(SentO)),var(Sent),!,Sent=SentO.
-db_expand_0(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause(Op,SentM,SentO).
+db_expand_0(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause_now(Op,SentM,SentO).
 db_expand_0(Op,M:Sent,SentO):- is_stripped_module(M),!,db_expand_0(Op,Sent,SentO).
 db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.
 
@@ -964,6 +959,9 @@ db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),
 db_expand_0(_,Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
 db_expand_0(Op,Sent,SentO):- arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F),fail,asserted_argIsa_known(F,2,_),!,
   correctArgsIsa(Op,Sent,SentO),!.
+
+db_expand_0(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
+
 db_expand_0(Op,t(Sent),SentO):- is_ftNonvar(Sent),fully_expand_head(Op,Sent,SentO).
 db_expand_0(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
 %==SKIPPED==%  db_expand_0(_ ,NC,NC):- as_is_term(NC),!.
@@ -998,12 +996,12 @@ db_expand_0(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_0(Op,Se
 db_expand_0(Op,M:Sent,R:SentO):- replaced_module(Op,M,R),!,db_expand_0(Op,Sent,SentO).
 
 
-db_expand_0(Op,pddlSomethingIsa(I,EL),O):- listToE(EL,E),fully_expand_clause(Op,isa(I,E),O).
-db_expand_0(Op,pddlDescription(I,EL),O):- listToE(EL,E),fully_expand_clause(Op,mudDescription(I,E),O).
-db_expand_0(Op,pddlObjects(I,EL),O):- listToE(EL,E),fully_expand_clause(Op,isa(E,I),O).
-db_expand_0(Op,pddlSorts(I,EL),O):- listToE(EL,E),fully_expand_clause(Op,genls(E,I),O).
-db_expand_0(Op,pddlTypes(EL),O):- listToE(EL,E),fully_expand_clause(Op,isa(E,tCol),O).
-db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),fully_expand_clause(Op,prologHybrid(E),O).
+db_expand_0(Op,pddlSomethingIsa(I,EL),O):- listToE(EL,E),fully_expand_clause_now(Op,isa(I,E),O).
+db_expand_0(Op,pddlDescription(I,EL),O):- listToE(EL,E),fully_expand_clause_now(Op,mudDescription(I,E),O).
+db_expand_0(Op,pddlObjects(I,EL),O):- listToE(EL,E),fully_expand_clause_now(Op,isa(E,I),O).
+db_expand_0(Op,pddlSorts(I,EL),O):- listToE(EL,E),fully_expand_clause_now(Op,genls(E,I),O).
+db_expand_0(Op,pddlTypes(EL),O):- listToE(EL,E),fully_expand_clause_now(Op,isa(E,tCol),O).
+db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),fully_expand_clause_now(Op,prologHybrid(E),O).
 
 db_expand_0(Op,DECL,O):- arg(_,DECL,S),string(S),DECL=..[F|Args],maplist(destringify,Args,ArgsO),
   ArgsO\=@=Args,!,DECLM=..[F|ArgsO],db_expand_0(Op,DECLM,O).
@@ -1830,7 +1828,6 @@ to_predicate_isas(C,CO):-C=..[F|CL],must_maplist(to_predicate_isas,CL,CLO),!,CO=
 exact_args(Q):-is_ftVar(Q),!,fail.
 exact_args(isEach):-!,fail.
 exact_args(Q):- \+ compound(Q), !.
-exact_args(Q):- Q=..[_,A],atomic(A),!.
 exact_args(_:Q):- !,loop_check(exact_args0(Q),fail).
 exact_args(Q):- exact_args0(Q),!.
 

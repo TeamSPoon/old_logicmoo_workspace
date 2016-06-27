@@ -78,14 +78,21 @@
 			<F N="../../StartMUDServer.bat"/>
 			<F N="../../startMUDServer.sh"/>
 		</Folder>
+		<Folder Name="../prologmud">
+			<Folder Name="games">
+				<F
+					N="../prologmud/games/*.*"
+					Recurse="1"
+					Refilter="0"
+					Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
+			</Folder>
+		</Folder>
 		<Folder Name="runtime">
 			<F
 				N="runtime/*.*"
 				Recurse="1"
 				Refilter="0"
 				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
-		</Folder>
-		<Folder Name="runtime">
 			<F N="runtime/README.md"/>
 		</Folder>
 	</Files>

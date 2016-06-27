@@ -56,7 +56,10 @@ mpred_non_neg_literal/1,
 % defaultAssertMt/1,
 retract_mu/1,
 assert_mu/4,
+asserta_mu/2,
 asserta_mu/1,
+assertz_mu/2,
+assertz_mu/1,
 ruleBackward0/2,
 ruleBackward/2,
 fwd_ok/1,
@@ -151,7 +154,7 @@ map_first_arg/3,
 map_first_arg/2,
 map_literals/3,
 map_literals/2,
-update_single_valued_arg/2,
+update_single_valued_arg/3,
 has_body_atom/2,
 is_action_body/1,
 is_bc_body/1,
@@ -227,7 +230,7 @@ has_functor/1,
 
 
 
-update_single_valued_arg/2,
+update_single_valued_arg/3,
 ruleBackward/2,
 retract_eq_quitely_f/1,
 neg_in_code/1,
@@ -265,11 +268,21 @@ mpred_facts_and_universe/1
           ]).
 %:- endif.
 
+:- module_transparent retract_mu/1,
+               assert_mu/4,
+               assert_mu/1,
+               asserta_mu/2,
+               asserta_mu/1,
+               assertz_mu/2,
+               assertz_mu/1,
+               physical_side_effect/1.
+:- module_transparent(attvar_op/2).
+:- module_transparent(attvar_op/2).
 
 
 :- meta_predicate 
       pred_head(1,*),
-      physical_side_effect(0),
+      physical_side_effect(+),
       oncely(0),
       naf(0),
       
@@ -283,13 +296,14 @@ mpred_facts_and_universe/1
       cnstrn0(:,+),
       cnstrn(0),
       cnstrn(+,:),
-      attvar_op(1,*),
+      attvar_op(+,+),
       % clause_u(+,+,-),
       % call_u(+),
       assertz_mu(+),      
       assertz_mu(+,+),
       if_missing(+),
       assert_mu(+),
+      assert_mu(+,+,+,+),
       ain_minfo_2(1,*),
       ain_minfo(1,*),
         whenAnd(0,0).
@@ -363,7 +377,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),\+ clause_u((Call)),n
 mpred_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
 mpred_op(clause_u,H):-!,clause_u(H).
 mpred_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,mpred_op(Op, HH).
-mpred_op(~(_,Op),  H ):- !, show_call(why,not(mpred_op(Op,  H ))).
+mpred_op(~(_,Op),  H ):- !, show_call(why, \+ (mpred_op(Op,  H ))).
 mpred_op(change(assert,Op),H):-!,must(mpred_modify(change(assert,Op),H)),!.
 mpred_op(change(retract,Op),H):-!,must(mpred_modify(change(retract,Op),H)),!.
 mpred_op(query(t,Ireq),  H ):-!, mpred_op(Ireq,H).
@@ -486,13 +500,22 @@ naf(Goal):- (\+ call_u(Goal)).
 %
 is_callable(C):-current_predicate(_,C),!.
 
+:- module_transparent( (gconsequent_arg)/3).
+consequent_arg(N,P,E):-get_consequent(P,PP),!,arg(N,PP,E).
+
+:- module_transparent( (get_consequent)/2).
+get_consequent((_:P),PP):-compound(P),!,get_consequent(P,PP).
+get_consequent((P:-_),PP):-compound(P),!,get_consequent(P,PP).
+get_consequent(~ P,PP):-compound(P),!,get_consequent(P,PP).
+get_consequent(\+ P,PP):-compound(P),!,get_consequent(P,PP).
+get_consequent(P,P).
 
 
 :- include('mpred_header.pi').
 :- style_check(+singleton).
 
 % TODO READD
-%:- foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
+%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
 %     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),
 
 
@@ -541,7 +564,7 @@ check_real_context_module:- sanity((context_module(M1),defaultAssertMt(M2),must(
 %
 % Mreq.
 %
-mreq(G):- if_defined(G,fail).
+mreq(G):- if_defined(call_u(G),fail).
 
 % ======================= mpred_file('pfccore').	% core of Pfc.
 
@@ -707,21 +730,21 @@ attvar_op(Op,Data):-
    attvar_op(Op,Data0).
 */
 :- module_transparent(attvar_op/2).
-attvar_op(Op,Data):-
-   cnotrace((strip_module(Op,M,OpA), sanity((atom(OpA))),
-   defaultAssertMt(ABOX),
+attvar_op(Op,MData):-
+   cnotrace((strip_module(Op,_,OpA), sanity((atom(OpA))),
+   fix_mp(clause(assert,OpA),MData,M,Data),
    add_side_effect(OpA,M:Data),
    deserialize_attvars(Data,Data0))),
    (==(Data,Data0)->
      physical_side_effect(call(M:OpA,M:Data0));
 
-   ((atom_concat(assert,_,OpA) -> physical_side_effect(call(M:OpA,M:Data0)));
+   ((atom_concat(assert,_,OpA) -> physical_side_effect(M:call(M:OpA,M:Data0)));
    ((
     % nop((expand_to_hb(Data0,H,B),split_attrs(B,BA,G))),
     trace, 
-    physical_side_effect(call(ABOX:Op,Data0))
-
+    physical_side_effect(M:call(M:OpA,M:Data0))
     )))).
+
 
 
 %% erase_w_attvars( +Data0, ?Ref) is semidet.
@@ -917,12 +940,12 @@ all_different_head_vals(HB):-
   
 
 all_different_head_vals_2(_H,[]):-!.
-all_different_head_vals_2(H,[A,R|EST]):-arg(_,H,E1),E1 ==A,dif(A,E2),arg(_,H,E2),\+ contains_var(A,E2),all_different_vals(dif_matrix,[A,E2,R|EST]),!.
+all_different_head_vals_2(H,[A,R|EST]):-consequent_arg(_,H,E1),E1 ==A,dif(A,E2),consequent_arg(_,H,E2),\+ contains_var(A,E2),all_different_vals(dif_matrix,[A,E2,R|EST]),!.
 all_different_head_vals_2(_H,[A,B|C]):-all_different_vals(dif_matrix,[A,B|C]),!.
 all_different_head_vals_2(HB,_):- \+ compound(HB),!.
-all_different_head_vals_2(H,[A]):-arg(_,H,E1),E1 ==A, H=..[_|ARGS], all_different_vals(dif_matrix,ARGS),!.
-all_different_head_vals_2(H,[A]):-arg(_,H,E1),E1 ==A,  arg(_,H,E2), A\==E2, \+ contains_var(A,E2), dif(A,E2),!.
-all_different_head_vals_2(H,[A]):-arg(_,H,E1),E1\==A, compound(E1), contains_var(A,E1), all_different_head_vals_2(E1,[A]),!.
+all_different_head_vals_2(H,[A]):-consequent_arg(_,H,E1),E1 ==A, H=..[_|ARGS], all_different_vals(dif_matrix,ARGS),!.
+all_different_head_vals_2(H,[A]):-consequent_arg(_,H,E1),E1 ==A,  consequent_arg(_,H,E2), A\==E2, \+ contains_var(A,E2), dif(A,E2),!.
+all_different_head_vals_2(H,[A]):-consequent_arg(_,H,E1),E1\==A, compound(E1), contains_var(A,E1), all_different_head_vals_2(E1,[A]),!.
 all_different_head_vals_2(_,_).
    	 
 
@@ -1081,14 +1104,16 @@ is_action_body(P):-cwc, has_body_atom(wac,P).
 % Has Body Atom.
 %
 has_body_atom(WAC,P):-cwc, call(
-   WAC==P -> true ; (is_ftCompound(P),arg(1,P,E),has_body_atom(WAC,E))),!.
+   WAC==P -> true ; (is_ftCompound(P),consequent_arg(1,P,E),has_body_atom(WAC,E))),!.
 
 /*
 has_body_atom(WAC,P,Rest):-cwc, call(WAC==P -> Rest = true ; (is_ftCompound(P),functor(P,F,A),is_atom_body_pfa(WAC,P,F,A,Rest))).
-is_atom_body_pfa(WAC,P,F,2,Rest):-arg(1,P,E),E==WAC,arg(2,P,Rest),!.
-is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
+is_atom_body_pfa(WAC,P,F,2,Rest):-consequent_arg(1,P,E),E==WAC,consequent_arg(2,P,Rest),!.
+is_atom_body_pfa(WAC,P,F,2,Rest):-consequent_arg(2,P,E),E==WAC,consequent_arg(1,P,Rest),!.
 */
 
+
+same_functors(Head1,Head2):-must_det(get_consequent_functor(Head1,F1,A1)),must_det(get_consequent_functor(Head2,F2,A2)),!,F1=F2,A1=A2.
 
 
 %% mpred_update_literal( +P, ?N, ?Q, ?R) is semidet.
@@ -1096,29 +1121,47 @@ is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
 % PFC Update Literal.
 %
 mpred_update_literal(P,N,Q,R):-
-    arg(N,P,UPDATE),call(replace_arg(P,N,OLD,Q)),
-    must(Q),update_value(OLD,UPDATE,NEW), 
+    consequent_arg(N,P,UPDATE),call(replace_arg(P,N,Q_SLOT,Q)),
+    must(call_u(Q)),update_value(Q_SLOT,UPDATE,NEW), 
     replace_arg(Q,N,NEW,R).
 
 
-%% update_single_valued_arg( +P, ?N) is semidet.
+spft(5,5,5).
+
+%% update_single_valued_arg(+Module, +P, ?N) is semidet. 
 %
 % Update Single Valued Argument.
 %
-update_single_valued_arg(P,N):-
- must_det_l((  
-  arg(N,P,UPDATE),
+:- module_transparent( (update_single_valued_arg)/3).
+
+update_single_valued_arg(M,M:Pred,N):-!,update_single_valued_arg(M,Pred,N).
+
+update_single_valued_arg(M,P,N):- 
+  consequent_arg(N,P,UPDATE),
+  is_relative(UPDATE),!,
   replace_arg(P,N,OLD,Q),
-  defaultAssertMt(M), 
-  get_source_ref1(U),
+  must_det_l((clause_u(Q),update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R))),!,
+  update_single_valued_arg(M,R,N).
+
+update_single_valued_arg(M,P,N):- 
+ call_u((must_det_l((
+  call_u(mtCycL(M)),
+  mpred_type_args \= M,
+  mpred_kb_ops \= M,
+  consequent_arg(N,P,UPDATE),
+  replace_arg(P,N,Q_SLOT,Q),
+  var(Q_SLOT),
+  same_functors(P,Q),
+  % get_source_ref1(U),
   must_det_l((
-     attvar_op(assert_if_new,M:spft(P,U,ax)),
-     (call_u(P)->true;(assertz_mu(P))),
+     % rtrace(attvar_op(assert_if_new,M:spft(P,U,ax))),
+     % (call_u(P)->true;(assertz_mu(P))),
+     assertz_mu(M,P),
      doall((
-          clause_u(Q,true,E),
-          UPDATE \== OLD,
-          erase_w_attvars(clause_u(Q,true,E),E),
-          mpred_unfwc1(Q))))))).
+          lookup_u(M:Q,E),
+          UPDATE \== Q_SLOT,
+          erase(E),
+          mpred_unfwc1(M:Q))))))))).
 
 % ======================= 
 % utils
@@ -1269,8 +1312,8 @@ if_missing_mask(Q,R,Test):-
 % If Missing Mask.
 %
 if_missing_mask(Q,N,R,Test):-
-  arg(N,Q,Was),
-  (nonvar(R)-> (which_missing_argnum(R,RN),arg(RN,R,NEW));replace_arg(Q,N,NEW,R)),!,
+  consequent_arg(N,Q,Was),
+  (nonvar(R)-> (which_missing_argnum(R,RN),consequent_arg(RN,R,NEW));replace_arg(Q,N,NEW,R)),!,
    Test=dif:dif(Was,NEW).
 
 /*
@@ -1278,9 +1321,9 @@ Old version
 if_missing_mask(Q,N,R,dif:dif(Was,NEW)):- 
  must((is_ftNonvar(Q),acyclic_term(Q),acyclic_term(R),functor(Q,F,A),functor(R,F,A))),
   (singleValuedInArg(F,N) -> 
-    (arg(N,Q,Was),replace_arg(Q,N,NEW,R));
-    ((arg(N,Q,Was),is_ftNonvar(Was)) -> replace_arg(Q,N,NEW,R);
-        (N=A,arg(N,Q,Was),replace_arg(Q,N,NEW,R)))).
+    (consequent_arg(N,Q,Was),replace_arg(Q,N,NEW,R));
+    ((consequent_arg(N,Q,Was),is_ftNonvar(Was)) -> replace_arg(Q,N,NEW,R);
+        (N=A,consequent_arg(N,Q,Was),replace_arg(Q,N,NEW,R)))).
 */
 
 
@@ -1292,7 +1335,7 @@ which_missing_argnum(Q,N):-
  must((acyclic_term(Q),is_ftCompound(Q),get_functor(Q,F,A))),
  F\=t,
   (singleValuedInArg(F,N) -> true;
-    ((arg(N,Q,Was),is_ftNonvar(Was)) -> true; N=A)).
+    ((consequent_arg(N,Q,Was),is_ftNonvar(Was)) -> true; N=A)).
 mpred_run_pause:- asserta(t_l:mpred_run_paused).
 mpred_run_resume:- retractall(t_l:mpred_run_paused).
 
@@ -1715,7 +1758,7 @@ mpred_bc_only(G):- !, call_u(mpred_bc_only0(G)).
 %
 % PFC Backchaining Only Primary Helper.
 %
-mpred_bc_only0(G):- mpred_negation(G,Pos),!, show_call(why,\+ mpred_bc_only(Pos)).
+mpred_bc_only0(G):- mpred_unnegate(G,Pos),!, show_call(why,\+ mpred_bc_only(Pos)).
 mpred_bc_only0(G):- loop_check(no_repeats(pfcBC_NoFacts(G))).
 mpred_bc_only0(G):- mpred_call_only_facts(G).
 
@@ -1745,7 +1788,7 @@ mpred_slow_search.
 %
 % Rule Backward.
 %
-ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(mpred_call_no_bc,call,call_u),F))).
+ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ consequent_arg(_,v(mpred_call_no_bc,call,call_u),F))).
 %ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
 
 %% ruleBackward0( +F, ?Condition) is semidet.
@@ -1852,17 +1895,17 @@ mpred_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),
 % :-debug.
 %isInstFn(A):-!,trace_or_throw(isInstFn(A)).
 
-%= mpred_negation(N,P) is true if N is a negated term and P is the term
+%= mpred_unnegate(N,P) is true if N is a negated term and P is the term
 %= with the negation operator stripped.
 
 /*
-%% mpred_negation( +P, ?P) is semidet.
+%% mpred_unnegate( +P, ?P) is semidet.
 %
 % PFC Negation.
 %
-mpred_negation((-P),P).
-% mpred_negation((~P),P).
-mpred_negation((\+(P)),P).
+mpred_unnegate((-P),P).
+% mpred_unnegate((~P),P).
+mpred_unnegate((\+(P)),P).
 */
 /*
 
@@ -1878,7 +1921,7 @@ mpred_negated_literal(P):-mpred_negated_literal(P,_).
 % PFC Negated Literal.
 %
 mpred_negated_literal(P,Q) :- is_ftNonvar(P),
-  mpred_negation(P,Q),
+  mpred_unnegate(P,Q),
   mpred_literal(Q).
 
 */
@@ -2301,7 +2344,7 @@ fwd_ok(if_missing(_,_)).
 fwd_ok(idForTest(_,_)).
 fwd_ok(clif(_)).
 fwd_ok(pfclog(_)).
-fwd_ok(X):-compound(X),arg(_,X,E),compound(E),functor(E,(:-),_),!.
+fwd_ok(X):-compound(X),consequent_arg(_,X,E),compound(E),functor(E,(:-),_),!.
 % fwd_ok(P):-must(ground(P)),!.
 
 
@@ -2323,7 +2366,7 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 :- style_check(+singleton).
 
 % TODO READD
-%:- foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
+%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
 %     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),)
 
 %% get
@@ -2336,7 +2379,7 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 %
 % Rule Backward.
 %
-ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(call_u,mpred_bc_only),F))).
+ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ consequent_arg(_,v(call_u,mpred_bc_only),F))).
 %ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
 
 %% ruleBackward0(+F, ?Condition) is semidet.
@@ -2355,32 +2398,25 @@ ruleBackward0(F,Condition):- call_u((  '<-'(F,Condition),\+ (is_true(Condition);
 %
 % Assert For User Code.
 %
-assert_mu(M:X):- !,functor(X,F,A),assert_mu(M,X,F,A).
-% assert_mu(arity(prologHybrid,0)):-trace_or_throw(assert_mu(arity(prologHybrid,0))).
-% assert_mu(X):- \+ (is_ftCompound(X)),!,asserta_mu(X,X,0).
-assert_mu(X):- functor(X,F,A),assert_mu(abox,X,F,A).
-assert_mu(A0):- strip_module(A0,_,A),defaultAssertMt(M),assert_i(M:A).
 
-asserta_mu(A0):- strip_module(A0,_,A), defaultAssertMt(M),asserta_i(M:A).
+assert_mu(MH):- fix_mp(clause(assert,assert_u),MH,M,H),get_consequent_functor(H,F,A),assert_mu(M,H,F,A).
+asserta_mu(MH):- fix_mp(clause(assert,assert_u),MH,M,H),asserta_mu(M,H).
+assertz_mu(MH):- fix_mp(clause(assert,assert_u),MH,M,H),assertz_mu(M,H).
 
-%% assertz_mu( +Pred) is semidet.
-%
-% Assertz For User Code.
-%
-assertz_mu(M:Pred):-!,assertz_mu(M,Pred).
-assertz_mu(Pred0):- strip_module(Pred0,_,Pred), defaultAssertMt(M),assertz_mu(M,Pred).
-assertz_mu(Pred):- assertz_mu(abox,Pred).
 
+:- dynamic(baseKB:singleValuedInArg/2).
 
 %% assert_mu(+Module, +Pred, ?Functor, ?Arity) is semidet.
 %
 % Assert For User Code.
 %
-assert_mu(_M,Pred,F,_):- fail,call_u(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(Pred,SV)),!.
-assert_mu(_M,Pred,F,A):- fail,call_u(prologSingleValued(F)),!,must(update_single_valued_arg(Pred,A)),!.
-% assert_mu(M,Pred,F,A):-must(isa(F,prologAssertAOrdered) -> asserta_mu(M,Pred) ; assertz_mu(M,Pred)).
-% assert_mu(M,Pred,F,A):-must(isa(F,prologOrdered)        -> assertz_mu(M,Pred) ; asserta_mu(M,Pred)).
-assert_mu(M,Pred,_,_):- assertz_mu(M,Pred).
+assert_mu(M,M:Pred,F,A):-!, assert_mu(M,Pred,F,A).
+assert_mu(M,Pred,F,_):- call_u(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(M,Pred,SV)),!.
+assert_mu(M,Pred,F,A):- a(prologSingleValued,F),!,must(update_single_valued_arg(M,Pred,A)),!.
+assert_mu(M,Pred,F,_):- a(prologOrdered,F) -> assertz_mu(M,Pred) ; asserta_mu(M,Pred).
+
+%assert_mu(M,Pred,F,_):- a(prologAssertAOrdered,F) -> asserta_mu(M,Pred) ; assertz_mu(M,Pred).
+%assert_mu(M,Pred,_,_):- assertz_mu(M,Pred).
 
 :-thread_local(t_l:side_effect_ok/0).
 
@@ -2389,12 +2425,23 @@ assert_mu(M,Pred,_,_):- assertz_mu(M,Pred).
 %
 % Assertz Module Unit.
 %
-assertz_mu(abox,X):-!,defaultAssertMt(M),!,assertz_mu(M,X).
-assertz_mu(M,X):- check_never_assert(M:X), clause_asserted_i(M:X),!.
+%assertz_mu(abox,X):-!,defaultAssertMt(M),!,assertz_mu(M,X).
+%assertz_mu(M,X):- check_never_assert(M:X), clause_asserted_u(M:X),!.
 % assertz_mu(M,X):- correct_module(M,X,T),T\==M,!,assertz_mu(T,X).
-assertz_mu(_,X):- must(defaultAssertMt(M)),!,must((expire_tabled_list(M:X),show_call(attvar_op(assertz_i,M:X)))).
-assertz_mu(M,X):- must((expire_tabled_list(M:X),show_call(attvar_op(assertz_i,M:X)))).
+% assertz_mu(_,X):- must(defaultAssertMt(M)),!,must((expire_tabled_list(M:X),show_call(attvar_op(assertz_i,M:X)))).
+assertz_mu(M,X):- strip_module(X,_,P), check_never_assert(M:P), 
+   (clause_asserted_u(M:P)-> true; must((expire_tabled_list(M:P),show_call(attvar_op(assertz_i,M:P))))).
 
+%% asserta_mu(+M, ?X) is semidet.
+%
+% Asserta Module Unit.
+%
+%asserta_mu(abox,X):-!,defaultAssertMt(M),!,asserta_mu(M,X).
+% asserta_mu(M,X):- correct_module(M,X,T),T\==M,!,asserta_mu(T,X).
+% asserta_mu(_,X):- must(defaultAssertMt(M)),!,must((expire_tabled_list(M:X),show_call(attvar_op(asserta_i,M:X)))).
+
+asserta_mu(M,X):- strip_module(X,_,P), check_never_assert(M:P), 
+   (clause_asserted_u(M:P)-> true; must((expire_tabled_list(M:P),show_call(attvar_op(asserta_i,M:P))))).
 
 
 
@@ -2403,7 +2450,7 @@ assertz_mu(M,X):- must((expire_tabled_list(M:X),show_call(attvar_op(assertz_i,M:
 % Retract For User Code.
 %
 % retract_mu(que(X,Y)):-!,show_failure(why,retract_eq_quitely_f(que(X,Y))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
-retract_mu(H0):- strip_module(H0,_,H),defaultAssertMt(M),show_if_debug(attvar_op(retract_i,M:H)),!,must((expire_tabled_list(H))).
+retract_mu(H0):- throw_depricated, strip_module(H0,_,H),defaultAssertMt(M),show_if_debug(attvar_op(retract_i,M:H)),!,must((expire_tabled_list(H))).
 retract_mu(X):- check_never_retract(X),fail.
 retract_mu(~(X)):-!,show_success(why,retract_eq_quitely_f(~(X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 retract_mu((X)):-!,show_success(why,retract_eq_quitely_f((X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
@@ -2411,7 +2458,6 @@ retract_mu(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R).
 retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 %retract_mu(~(X)):-must(is_ftNonvar(X)),!,retract_eq_quitely_f(~(X)),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 %retract_mu(hs(X)):-!,retract_eq_quitely_f(hs(X)),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
-
 
 
 
@@ -2526,7 +2572,7 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent( (map_first_arg)/2).
 :- module_transparent( (map_literals)/3).
 :- module_transparent( (map_literals)/2).
-:- module_transparent( (update_single_valued_arg)/2).
+:- module_transparent( (update_single_valued_arg)/3).
 :- module_transparent( (has_body_atom)/2).
 :- module_transparent( (is_action_body)/1).
 :- module_transparent( (is_bc_body)/1).
@@ -2611,7 +2657,7 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent(if_missing/1).
 
 
- :- meta_predicate update_single_valued_arg(0,*).
+ :- meta_predicate update_single_valued_arg(+,+,*).
  :- meta_predicate assert_mu(*,0,*,*).
  :- meta_predicate mpred_facts_and_universe(0).
  :- meta_predicate {0}.

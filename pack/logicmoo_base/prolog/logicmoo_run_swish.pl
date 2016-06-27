@@ -7,7 +7,7 @@
 
 :- volatile(swish_trace:installed/1).
 
-:- shared_multifile(mpred_online:semweb_startup).
+:- shared_multifile(mpred_online:semweb_startup/0).
 % :- '@'(ensure_loaded(logicmoo(util/logicmoo_util_bugger)),user).
 :- add_to_search_path(swish, '../pack/swish/').
 

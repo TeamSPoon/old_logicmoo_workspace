@@ -734,6 +734,11 @@ same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 %
 % Replace Argument.
 %
+replace_arg(C,A,_VAR,_CC):-sanity((is_ftCompound(C),integer(A))),fail.
+replace_arg((C:-B),A,VAR,(CC:-B)):-!,replace_arg(C,A,VAR,CC).
+replace_arg(~ (C),A,VAR,~(CC)):-!,replace_arg(C,A,VAR,CC).
+replace_arg( \+ (C),A,VAR,~(CC)):-!,replace_arg(C,A,VAR,CC).
+replace_arg(M:(C),A,VAR,M:(CC)):-!,replace_arg(C,A,VAR,CC).
 replace_arg(C,0,VAR,CC):-!, C=..[_|ARGS],CC=..[VAR|ARGS].
 replace_arg(C,1,VAR,CC):-!, C=..[F,_|ARGS],CC=..[F,VAR|ARGS].
 replace_arg(C,2,VAR,CC):-!, C=..[F,A,_|ARGS],CC=..[F,A,VAR|ARGS].

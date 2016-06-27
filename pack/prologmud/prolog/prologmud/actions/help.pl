@@ -8,12 +8,12 @@
 
 % :- register_module_type (mtCommand).
 
-isa(tHumanPlayer,ttAgentType).
+isa(tHumanControlled,ttAgentType).
 %genls(ttAgentType,tCol).
 
 :- kb_dynamic type_action_info/3.
 
-type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
+type_action_info(tHumanControlled,actHelp(isOptional(ftString,"")), "shows this help").
 
 
 :-export(get_all_templates/1).

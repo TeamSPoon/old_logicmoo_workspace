@@ -348,7 +348,7 @@ mpred_file_term_expansion0(Type,LoaderMod,I,O):-
   sanity((ground(Type:LoaderMod),nonvar(I),var(O))),
   quietly_must(get_source_ref1(mfl(MF,F,L))),!,
   % \+ mpred_prolog_only_file(F),
-  call_u(mtCycL(MT1)),
+  call_u(baseKB:mtCycL(MT1)),
   must((proper_source_mod([LoaderMod,MF,MT1],AM))),
   b_getval('$term',TermWas), TermWas == I,
   call_cleanup(
@@ -1970,7 +1970,7 @@ force_reload_mpred_file(World,MFileIn):-
 % Helper for Force Reloading of a Managed Predicate File.
 %
 force_reload_mpred_file2(WorldIn,MFileIn):- 
- must(call_u(mtCycL(WorldIn)->World=WorldIn;defaultAssertMt(World))),
+ must(call_u(baseKB:mtCycL(WorldIn)->World=WorldIn;defaultAssertMt(World))),
  strip_module(MFileIn,_MaybeNewModule,_),
  NewModule = World,
  with_source_module(NewModule,((

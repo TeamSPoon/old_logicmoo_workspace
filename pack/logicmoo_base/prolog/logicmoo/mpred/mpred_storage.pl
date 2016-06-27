@@ -914,7 +914,6 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 % db_assert_sv/3
 % ================================================
 
-
 /*
 update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
   (is_relative(UPDATE)->

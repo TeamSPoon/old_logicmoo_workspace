@@ -33,7 +33,7 @@
 
 :- (current_prolog_flag(xref,true)->true;
   (prolog_load_context(source,F),
-   (lmconf:mpred_is_impl_file(F)->true;assertz(lmconf:mpred_is_impl_file(F))),
+   (lmconf:mpred_is_impl_file(F)->true;call(call,assert,(lmconf:mpred_is_impl_file(F)))),
    initialization((lmconf:mpred_is_impl_file(F)->true;assertz(lmconf:mpred_is_impl_file(F)))))).
 
 % ===================================================================

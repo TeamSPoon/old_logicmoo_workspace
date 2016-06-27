@@ -249,8 +249,11 @@ mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):- call_u(calc_from_center_xyz(Regio
 :- kb_dynamic(predInterArgIsa/1).
 :- kb_dynamic(relationAllExists/3).
 
+singleValuedInArgDefault(localityOfObject, 2, isMissing).
 
-genls(tPlayer,tHominid).
+mudAtLoc(Who,xyzFn(Loc,_,_,_))==>localityOfObject(Who,Loc).
+
+genls(tAgent,tHominid).
 genls(tHumanBody,tBodyPart).
 
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).

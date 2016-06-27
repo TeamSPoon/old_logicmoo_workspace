@@ -17,6 +17,7 @@
          login_and_run/0,
          login_and_run/2,
          session_loop/2,
+         get_current_io/2,
          get_session_io/2,
          kill_naughty_threads/0,
          set_player_telnet_options/1,
@@ -100,7 +101,15 @@ service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
    'format'(Err,'~n~n~q~n~n',[service_client_call(Call, Id, Slave, In, Out, Host, Peer, Options)]),
    call(Call).
 
+
 get_session_io(In,Out):-
+  must(get_session_id(O)),
+  thread_self(Id),
+  lmcache:session_io(O,In,Out,Id),!.
+get_session_io(In,Out):-
+  get_current_io(In,Out).
+
+get_current_io(In,Out):-
    current_input(In),
    current_output(Out),
    setup_streams(In, Out),
@@ -113,18 +122,19 @@ player_connect_menu(In,Out,Wants,P):-
  must_det_l((
    get_session_id(O),
    get_session_io(In,Out),
-   fmt('~N~nHello ~q!~n',[O]),
+   fmt('~N~nHello session ~q!~n',[O]),
    setup_streams(In, Out),set_tty_control(true),
    foc_current_agent(Wants),
    foc_current_agent(P),
-   assert_isa(P,tHumanPlayer),
+   assert_isa(P,tHumanControlled),
    register_player_stream_local(P,In,Out),
    fmt('~N~nWelcome to the MUD ~w!~n',[P]),
+   fmt(Out,'~N~nThe stream ~w!~n',[Out]),
    colormsg([blink,fg(red)],"this is blinking red!"))),!.
 
 
 login_and_run:-
-   get_session_io(In,Out),!,
+   get_current_io(In,Out),!,
    login_and_run(In,Out).
 
 login_and_run(In,Out):-
@@ -140,11 +150,12 @@ goodbye_player:-
      deliver_event(P3,goodBye(P3)).
 
 run_session:-
-   get_session_io(In,Out),
+   get_current_io(In,Out),
    run_session(In,Out).
 
 run_session(In,Out):-  
-  must_det_l((get_session_id(O),
+  must_det_l((
+  get_session_id(O),
   get_session_io(In,Out),
   asserta(t_l:telnet_prefix([isSelfAgent,wants,to])),
   retractall(t_l:wants_logout(O)))),!,
@@ -173,6 +184,7 @@ register_player_stream_local(P,In,Out):-
    retractall(lmcache:session_io(_,_,_,Id)),
    retractall(lmcache:session_io(O,_,_,_)),
    asserta_new(lmcache:session_io(O,In,Out,Id)),
+   wdmsg(asserta_new(lmcache:session_io(O,In,Out,Id))),
    asserta_new(lmcache:session_agent(O,P)),
    asserta_new(lmcache:agent_session(P,O)), 
     (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),

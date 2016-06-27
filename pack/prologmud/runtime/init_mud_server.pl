@@ -138,7 +138,6 @@ pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
   
 
 mpred_argtypes(bordersOn(tRegion,tRegion)).
-mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 
 tRegion(iLivingRoom7).
 tRegion(iOfficeRoom7).
@@ -159,7 +158,7 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 :- rl_add_history( 'user:ensure_loaded(start_mud_server).' ).
 :- rl_add_history( 'login_and_run.' ).
 
-oinfo(O):- xlisting((O, - spft, - ( ==> ), - pt , - nt , - bt , - mdefault)).
+oinfo(O):- xlisting((O, - spft, - ( ==> ), - pt , - nt , - bt , - mdefault, - lmcache)).
 
 
 % :-  statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T), qsave_program(run_mud_server,[map('run_mud_server.sav'),global(G),trail(T),local(L)]).

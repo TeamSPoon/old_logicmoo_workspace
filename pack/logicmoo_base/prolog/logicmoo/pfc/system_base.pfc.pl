@@ -37,16 +37,25 @@
 
 :- '$set_source_module'(baseKB).
 
-
+:- asserta(baseKB:mtCycL(baseKB)).
 :- set_fileAssertMt(baseKB).
 
 :- dynamic(baseKB:mtCycL/1).
 :- dynamic(baseKB:mtExact/1).
 :- dynamic(baseKB:predicateConventionMt/2).
 
+/*
+:- asserta(mpred_kb_ops:spft(6,6,6)).
+:- asserta(baseKB:spft(7,7,7)).
+:- compile_predicates([mpred_kb_ops:spft/3]).
+:- compile_predicates([baseKB:spft/3]).
+*/
+:- listing(spft/3).
 baseKB:mtCycL(baseKB).
+:- mpred_run.
 %baseKB:mtExact(baseKB).
 
+:- nortrace.
 
 
 %:- rtrace.
@@ -140,7 +149,7 @@ arity('<=>',2).
 arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
 arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(Z,1))), arity(F,Z))).
 
-mtCycL(baseKB).
+% mtCycL(baseKB).
 
 tCol(ttModule).
 tSet(ttModule).
@@ -301,7 +310,7 @@ genlMt(Mt1,Mt2),mtProlog(Mt1),mtCycL(Mt2) ==>
   {trace_or_throw(oddly_genlMt(Mt1,Mt2))}.
 */
 
-baseKB:mtCycL(baseKB).
+% baseKB:mtCycL(baseKB).
 
 baseKB:predicateConventionMt(predicateConventionMt,baseKB).
 baseKB:predicateConventionMt(collectionConventionMt,baseKB).
@@ -436,10 +445,36 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 
 % :- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
 
-nondet.
 
 :- ain((mpred_database_term(F,_,_)==> ~ predicateConventionMt(F,baseKB))).
 
 % :- ain(((predicateConventionMt(F,abox),\+predicateConventionMt(F,baseKB)) ==> ~ predicateConventionMt(F,baseKB))).
+
+
+/*
+
+doRemoveMe ==> ~ removeMe(_,_).
+
+removeMe(1,2).
+removeMe(1,3).
+
+doRemoveMe.
+
+
+
+doRedelMe ==>  {redelMe(A,B)}, \+ redelMe(A,B).
+
+redelMe(1,2).
+redelMe(1,3).
+
+doRedelMe.
+
+:-listing(removeMe/2).
+:-listing(redelMe/2).
+
+:- break.
+*/
+
+nondet.
 
 :- set_prolog_flag(dialect_pfc,false).

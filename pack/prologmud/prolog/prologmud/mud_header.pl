@@ -35,7 +35,7 @@
 :- kb_dynamic   use_usable/4.
 :- kb_dynamic   verb_alias/2.
 :- kb_dynamic   vtActionTemplate/1.
-:- kb_dynamic   lmconf:mud_test/0.
+% :- kb_dynamic   lmconf:mud_test/0.
 :- kb_dynamic  lmconf:mud_test/1.
 :- kb_dynamic  lmconf:mud_test/2.
 :- kb_dynamic  lmconf:mud_test_local/0.
@@ -92,7 +92,7 @@
 % these do not get defined!?
 % :- kb_dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
-:- kb_dynamic(mpred_online:semweb_startup).
+% :- kb_dynamic(mpred_online:semweb_startup/0).
 % :- break.
 :- kb_dynamic(  tChannel/1).
 

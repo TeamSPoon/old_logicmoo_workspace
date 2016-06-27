@@ -235,11 +235,10 @@ relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) ==>
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-isa(iExplorer1,tHumanPlayer).
-isa(iExplorer2,tHumanPlayer).
-genls(tHumanPlayer,tHominid).
-genls(tHumanPlayer,tPlayer).
-genls(tPlayer,tAgent).
+isa(iExplorer1,tHumanControlled).
+isa(iExplorer2,tHumanControlled).
+genls(tHumanControlled,tHominid).
+genls(tHumanControlled,tAgent).
 
 isa(iExplorer1,tHominid).
 

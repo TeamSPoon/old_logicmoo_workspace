@@ -20,6 +20,8 @@
             findall_nodupes/3,
             get_where/1,
             get_where0/1,
+          memoize_on/3,
+          memoize_on/4,
             is_loop_checked/1,
             lco_goal_expansion/2,
             lex/0,
@@ -63,6 +65,8 @@
         loop_check_term(0, ?, 0),
         loop_check_term_key(0, ?, 0),        
         make_tabled_perm(0),
+        memoize_on(+,+,0),
+        memoize_on(+,+,+,0),
         no_loop_check(0),
         no_loop_check(0, 0),
         no_loop_check_term_key(0, ?, 0),
@@ -510,6 +514,12 @@ make_tabled_perm(Call):- must(really_can_table),must(outside_of_loop_check),
   asserta(lmcache:call_tabled_perm(Key,KList)),!,
   member(Vars,KList).
 
+memoize_on(M,(In->_),G):- \+ ground(In),retractall(lmcache:memoized_on(M,In,_)),!,G,!.
+% memoize_on(M,(In->Out),G):-make_key(In,Key),memoize_on(M,Key,Out,G).
+memoize_on(M,(In->Out),G):-memoize_on(M,In,Out,G),!.
+:- dynamic(lmcache:memoized_on/3).
+memoize_on(M,In,Out,_):- lmcache:memoized_on(M,In,Out),!.
+memoize_on(M,In,Out,G):- G,!,call(assert_if_new,lmcache:memoized_on(M,In,Out)),!.
 
 
 

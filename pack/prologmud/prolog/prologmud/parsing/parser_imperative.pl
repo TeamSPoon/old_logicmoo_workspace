@@ -46,7 +46,7 @@ get_agent_text_command_0(Agent,ListIn,AgentR,CMD):-
 % ===========================================================
 % PARSE command
 % ===========================================================
-type_action_info(tHumanPlayer,actParse(ftProlog,ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+type_action_info(tHumanControlled,actParse(ftProlog,ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
 agent_command(_Gent,actParse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
@@ -54,7 +54,7 @@ agent_command(_Gent,actParse(Type,StringM)):-
 % ===========================================================
 % CMDPARSE command
 % ===========================================================
-type_action_info(tHumanPlayer,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
+type_action_info(tHumanControlled,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
 
 agent_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt('==>'(parse_for(StringM) , [Term,LeftOver])).
 
@@ -64,7 +64,7 @@ agent_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,Left
 % ===========================================================
 % parsetempl command
 % ===========================================================
-type_action_info(tHumanPlayer,actParsetempl(ftListFn(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetempl who").
+type_action_info(tHumanControlled,actParsetempl(ftListFn(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetempl who").
 
 agent_text_command(Agent,[actParsetempl|List],Agent,actParsetempl(List)).
 

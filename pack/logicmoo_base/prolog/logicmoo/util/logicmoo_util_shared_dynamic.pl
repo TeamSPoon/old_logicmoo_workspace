@@ -177,7 +177,7 @@ system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),lmconf:wrap_shared(F,A,How
 
 really_safe_wrap(Type,I,O):- callable(I),
    prolog_load_context(module,M),
-   \+ find_and_call(mtCycL(M)),
+   \+ find_and_call(baseKB:mtCycL(M)),
    system_goal_expansion_safe_wrap(I,O)->I\=@=O,dmsg(really_safe_wrap(Type,I,O)).
 
 

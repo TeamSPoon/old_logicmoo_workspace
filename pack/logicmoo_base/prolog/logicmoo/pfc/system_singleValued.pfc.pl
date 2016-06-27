@@ -19,36 +19,66 @@ mpred_sv(Pred,Arity)==> prologSingleValued(Pred),arity(Pred,Arity),singleValuedI
 
 % prologSingleValued(Pred),arity(Pred,Arity) ==> hybrid_support(Pred,Arity).
 
-% prologSingleValued(Pred),arity(Pred,Arity), \+ singleValuedInArg(Pred,_) ==> singleValuedInArg(Pred,Arity).
-
-
 % mdefault(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg(Pred,Arity))).
-(((prologSingleValued(Pred),arity(Pred,Arity),{\+singleValuedInArg(Pred,_)})==> singleValuedInArg(Pred,Arity))).
-
+prologSingleValued(Pred),arity(Pred,Arity), \+ singleValuedInArg(Pred,_) ==> singleValuedInArg(Pred,Arity).
 
 ((singleValuedInArg(Pred,_))==>(prologSingleValued(Pred))).
 
 
-singleValuedInArg(singleValuedInArg,2).
+% singleValuedInArg(singleValuedInArg,2).
 
+% TODO might we say this?
+% Not really due to not every SingleValued pred have a cardinatity of 1 .. some might have no instances
+% ((singleValuedInArg(Pred,N)/ ( \+ singleValuedInArgDefault(Pred,N,_))) ==> singleValuedInArgDefault(Pred,N,isMissing)).
 
 
 prologHybrid(singleValuedInArgDefault, 3).
 prologHybrid(singleValuedInArgDefault(prologSingleValued,ftInt,ftTerm)).
 
-((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) ==> relationMostInstance(P,Most,V)).
+% This would been fun! singleValuedInArgDefault(singleValuedInArgDefault,3,isMissing).
+
+((somtimesBuggyFwdChaining==> ((
+  ((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) ==> relationMostInstance(P,Most,V)))))).
 
 (singleValuedInArgDefault(SingleValued,ArgN,S1)/ground(S1) ==> singleValuedInArg(SingleValued,ArgN)).
 
-{FtInt=2},singleValuedInArgDefault(PrologSingleValued,FtInt,FtTerm),arity(PrologSingleValued,FtInt),
-  argIsa(PrologSingleValued,1,Col)==>relationMostInstance(PrologSingleValued,Col,FtTerm).
+(somtimesBuggyFwdChaining==>
+ ({FtInt=2},singleValuedInArgDefault(PrologSingleValued,FtInt,FtTerm),arity(PrologSingleValued,FtInt),
+  argIsa(PrologSingleValued,1,Col)==>relationMostInstance(PrologSingleValued,Col,FtTerm))).
 
-((singleValuedInArgDefault(F, N, DEF)/is_ftNonvar(DEF), arity(F,A),
-   {functor(P,F,A),replace_arg(P,N,DEF,Q),replace_arg(Q,N,WAS,R)})
-       ==> mdefault( Q <- ({ground(P)},~R/nonvar(WAS)))).
+somtimesBuggyBackChaining ==> (((singleValuedInArgDefault(F, N, Q_SLOT)/is_ftNonvar(Q_SLOT), arity(F,A),
+   {functor(P,F,A),replace_arg(P,N,Q_SLOT,Q),replace_arg(Q,N,R_SLOT,R)})
+       ==> mdefault( Q <- ({ground(P)},~R/nonvar(R_SLOT))))).
+
+((singleValuedInArg(F, N), arity(F,A), % \+ singleValuedInArgDefault(F, N, Q_SLOT),
+   {functor(P,F,A),arg(N,P,P_SLOT),replace_arg(P,N,Q_SLOT,Q)})
+       ==> ( P ==> {dif:dif(Q_SLOT,P_SLOT), call_u(Q), ground(Q)}, \+ Q)).
 
 
-((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) <==> relationMostInstance(P,Most,V)).
+(((singleValuedInArgTest(F, N), arity(F,A), \+ singleValuedInArgDefault(F, N, Q_SLOT),
+   {functor(P,F,A),arg(N,P,P_SLOT),replace_arg(P,N,Q_SLOT,Q)})
+       ==> ( P ==> {dif:dif(Q_SLOT,P_SLOT), call_u(Q), ground(Q)}, \+ Q))).
+
+
+
+somtimesBuggy==>((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) <==> relationMostInstance(P,Most,V)).
+
+:- dynamic(someSV_tested/3).
+arity(someSV_tested,3).
+someSV_tested(a,b,1).
+someSV_tested(a,b,2).
+singleValuedInArg(someSV_tested,3).
+
+:- listing(someSV_tested/3).
+
+:- dynamic(someSV_testing/3).
+arity(someSV_testing,3).
+singleValuedInArg(someSV_testing,3).
+someSV_testing(a,b,1).
+someSV_testing(a,b,2).
+someSV_testing(a,c,3).
+
+:- listing(someSV_testing/3).
 
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).

@@ -633,7 +633,7 @@ decl_mpred_2(F,Prop):-ain_expanded(mpred_isa(F,Prop)).
 % Declare Managed Predicate.
 %
 decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),     
-      (\+ mtCycL(Mt)),
+      (\+ baseKB:mtCycL(Mt)),
       (\+ Mt == baseKB), 
       decl_mpred(F,predicateConventionMt(Mt)))).
 

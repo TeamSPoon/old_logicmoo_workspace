@@ -360,7 +360,6 @@ change(assert,z) asserts last if no =@=
 change( retract,one)  using =
 change( retract,all)  using =
 
-same_functors(Head1,Head2):-must_det(get_functor(Head1,F1,A1)),must_det(get_functor(Head2,F2,A2)),!,F1=F2,A1=A2.
 good_for_hybrid(H,F):- not(local_q_mpred_isa(F,_ANY_)),predicate_property(H,number_of_clauses(0)),predicate_property(H,dynamic).
 ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicate_property(PHead,dynamic)->true;(predicate_property(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
 

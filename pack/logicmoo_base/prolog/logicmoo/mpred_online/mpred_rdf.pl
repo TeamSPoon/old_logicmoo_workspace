@@ -22,7 +22,7 @@
 
 expire_rdf_caches :- forall(clause(expire_one_rdf_cache,Body),must(Body)).
 
-:- shared_multifile(mpred_online:semweb_startup).
+:- shared_multifile(mpred_online:semweb_startup/0).
 
 mpred_online:semweb_startup:- retractall((tlbugger:show_must_go_on)).
 mpred_online:semweb_startup:- expire_rdf_caches.

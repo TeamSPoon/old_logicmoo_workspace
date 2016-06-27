@@ -76,6 +76,7 @@ isa(iWorld7,tWorld).
 
 %ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
 
+genls(tAgent,tAgent).
 
 :- dynamic(tItem/1).
 
@@ -142,7 +143,7 @@ genls(tPartofObj,tItem).
 tSet(tSet).
 
 
-:- rtrace(ain(tSet(tPlayer))).
+:- rtrace(ain(tSet(tAgent))).
 
 
 % defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
@@ -152,8 +153,8 @@ tSet(tSet).
 %:-export(repl_writer(tAgent,ftTerm)).
 %:-export(repl_writer/2).
 %prologHybrid(typeProps(tCol,ftVoprop)).
-(dividesBetween(tAgent,tMale,tFemale)).
-dividesBetween(tAgent,tPlayer,tNpcPlayer).
+dividesBetween(tAgent,tMale,tFemale).
+dividesBetween(tAgent,tHumanControlled,tNpcPlayer).
 dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
@@ -229,7 +230,7 @@ dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
-dividesBetween(tAgent,tPlayer,tNpcPlayer).
+dividesBetween(tAgent,tAgent,tNpcPlayer).
 
 ((sometimesBuggy,genls(A,B)/ground(genls(A,B)))==>{call((call((trace,baseKB:(must(ain(baseKB:tCol(A))),must(ain(baseKB:tCol(B))))))))}).
 
@@ -283,7 +284,7 @@ tCol(vtVerb).
 
 % predIsFlag(tAgent(ftID),[predIsFlag]).
 % prologDynamic(createableSubclassType/2).
-% alt_forms1(none_AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),is_asserted(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
+% alt_forms1(none_AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),call_u(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
 % alt_forms1(none_AR,mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
 % argsIsa(mudFacing,ftTerm).
 % we need a way to call this: maxCapacity
@@ -376,7 +377,7 @@ prologSingleValued(spawn_rate(tCol,ftInt)).
 prologSingleValued(stat_total(tAgent,ftInt)).
 prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
 resultIsa(apathFn,tPathway).
-% '<==>'(isa(Whom,tNpcPlayer),whenAnd(isa(Whom,tPlayer),naf(isa(Whom,tHumanPlayer)))).
+% '<==>'(isa(Whom,tNpcPlayer),whenAnd(isa(Whom,tAgent),naf(isa(Whom,tHumanControlled)))).
 '<==>'(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 '<==>'(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 
@@ -514,8 +515,8 @@ defnSufficient(ftAction,is_vtActionTemplate).
 defnSufficient(ftAction,vtVerb).
 defnSufficient(ftTerm,vtValue).
 
-genls('FemaleAnimal',tPlayer).
-genls('MaleAnimal',tPlayer).
+genls('FemaleAnimal',tAgent).
+genls('MaleAnimal',tAgent).
 genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
 genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
 genls(isEach(tRegion,tAgent),tChannel).
@@ -546,14 +547,14 @@ genls(tEatAble,tItem).
 genls(tFunction,tRelation).
 genls(tFurniture,tObj).
 genls(tFurniture,tPartofObj).
-genls(tHumanPlayer,tPlayer).
+genls(tHumanControlled,tAgent).
 genls(tItem,tObj).
 genls(tItem,tSpatialThing).
 genls(tMonster,ttAgentGeneric).
-genls(tNpcPlayer,tPlayer).
+genls(tNpcPlayer,tAgent).
 genls(tObj,tSpatialThing).
 genls(tPathway,tDoor).
-genls(tPlayer,tAgent).
+genls(tAgent,tAgent).
 genls(tPred,tRelation).
 genls(tRegion,tSpatialThing).
 genls(ttObjectType,tCol).
@@ -635,7 +636,7 @@ prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
 % defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 dividesBetween(tAgent,tMale,tFemale).
-dividesBetween(tAgent,tPlayer,tNpcPlayer).
+dividesBetween(tAgent,tHumanControlled,tNpcPlayer).
 dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
@@ -657,17 +658,21 @@ genls(ttTypeByAction,completelyAssertedCollection).
 
 arity(bordersOn,2).
 
-bordersOn(R1,R2):-is_asserted(pathDirLeadsTo(R1,Dir,R2)),nop(Dir).
-bordersOn(R1,R2):-is_asserted(pathDirLeadsTo(R2,Dir,R1)),nop(Dir).
 
-ensure_some_pathBetween(R1,R2):- cwc,bordersOn(R1,R2),!.
-ensure_some_pathBetween(R1,R2):- cwc,random_path_dir(Dir), \+(is_asserted(pathDirLeadsTo(R1,Dir,_))),must(reverse_dir(Dir,Rev)),\+(is_asserted(pathDirLeadsTo(R2,Rev,_))),!, 
-   must((ain(pathDirLeadsTo(R1,Dir,R2)),ain(pathDirLeadsTo(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- cwc,dtrace,must((ain(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),ain(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
+% ensure_some_pathBetween(R1,R2):- cwc,must((ain(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),ain(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
 
-bordersOn(R1,R2)/ground(bordersOn(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion), 
-  {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
+bordersOn(R1,R2)/ground(bordersOn(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion),bordersOn(R2,R1).
 
+(bordersOn(R1,R2)/ground(bordersOn(R1,R2)), \+ pathDirLeadsTo(R1,_,R2), 
+  {random_path_dir(Dir),reverse_dir(Dir,Rev)}, 
+   {\+ pathDirLeadsTo(R1,Dir,_NotR2), 
+   \+ pathDirLeadsTo(R2,Rev,_NotR1)}) ==>
+  {ain(pathDirLeadsTo(R1,Dir,R2))}.
+
+pathDirLeadsTo(R1,Dir,R2)/reverse_dir(Dir,Rev) ==> pathDirLeadsTo(R2,Rev,R1).
+% pathDirLeadsTo(R1,_,R2) ==> bordersOn(R1,R2).
+
+singleValuedInArg(pathDirLeadsTo,2).
 
 % ==================================================
 % Classes of things
@@ -966,8 +971,6 @@ random_path_dir(Dir):-nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
 random_path_dir(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
 random_path_dir(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
 random_path_dir(Dir):- call(call,random_instance(vtDirection,Dir,true)).
-
-prologBuiltin(ensure_some_pathBetween(tRegion,tRegion)).
 
 prologBuiltin(onEachLoad/0).
 argsQuoted(onEachLoad).

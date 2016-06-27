@@ -13,7 +13,7 @@
 
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
-:- shared_multifile(mpred_online:semweb_startup).
+:- shared_multifile(mpred_online:semweb_startup/0).
 
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.

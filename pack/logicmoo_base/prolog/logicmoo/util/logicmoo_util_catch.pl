@@ -58,7 +58,6 @@
             ib_multi_transparent33/1,
             if_defined/1,
             if_defined/2,
-            if_defined/2,
             input_key/1,
             is_ftCompound/1,
             not_ftCompound/1,
@@ -145,9 +144,8 @@
 		catchvvnt(0, ?, 0),
 		catchv(0, ?, 0),
 		
-		if_defined(0),
-		if_defined(0, 0),
-		if_defined(0, 0),
+		if_defined(+),
+		if_defined(+, 0),
 		ddmsg_call(0),
 		on_x_fail(0),
 		on_x_log_throw(0),
@@ -155,7 +153,7 @@
 		
 		on_x_log_cont(0),
 		on_x_log_fail(0),
-		if_defined(0, 0),        
+		if_defined(+, 0),        
 
         must(0),
         must_det(0),
@@ -479,7 +477,7 @@ doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 quietly_must(G):- /*no_trace*/(must(G)).
 
 
-:- meta_predicate if_defined(0).
+:- meta_predicate if_defined(+).
 :- export(if_defined/1).
 
 %% if_defined( ?G) is semidet.
@@ -488,7 +486,7 @@ quietly_must(G):- /*no_trace*/(must(G)).
 %
 if_defined(Goal):- if_defined(Goal,((dmsg(warn_undefined(Goal))),!,fail)).
 
-:- meta_predicate if_defined(0,0).
+:- meta_predicate if_defined(+,0).
 :- export(if_defined/2).
 
 %% if_defined( ?Goal, :GoalElse) is semidet.

@@ -6,6 +6,7 @@
             with_output_to_pred/2,
             with_write_stream_pred/4,
             set_error_stream/1,
+            with_ioe/1,
             on_x_fail_priv/1,
             current_error/1
           ]).
@@ -13,12 +14,14 @@
         with_err_to_pred(:, 0),
         with_input_from_pred(:, 0),
         with_output_to_pred(:, 0),
+        with_ioe(0),
         on_x_fail_priv(0),
         with_write_stream_pred(:, -, 0, 0).
 :- module_transparent
         buffer_chars/1,
         read_received/1,
         some_test/0,
+        with_ioe/1,
         test1_0/1,
         test2/1.
 
@@ -82,6 +85,16 @@ on_x_fail_priv(Goal):- catch(Goal,_,fail).
 :- meta_predicate(tl_with_prolog_streams:stream_write(?,?)).
 
 :- meta_predicate(with_output_to_pred(1,0)).
+
+
+%% with_ioe( :GoalCMD) is semidet.
+%
+% Using Input/output.
+%
+with_ioe(CMD):-
+ with_dmsg_to_main((
+  current_input(IN),current_output(OUT),get_thread_current_error(Err),  
+  call_cleanup(set_prolog_IO(IN,OUT,Err),CMD,(set_input(IN),set_output(OUT),set_error_stream(Err))))).
 
 
 current_error(Err):-must((get_thread_current_error(Err); stream_property(Err,alias(current_error)); stream_property(Err,alias(user_error)))),!.
