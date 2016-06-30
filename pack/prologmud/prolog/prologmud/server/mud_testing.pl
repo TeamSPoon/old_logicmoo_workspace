@@ -215,8 +215,8 @@ lmconf:mud_test_local:-req1(cmdShowRoomGrid('Area1000')).
 
 
 % more tests even
-lmconf:mud_test_local :-do_agent_action("look").
-lmconf:mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
+lmconf:mud_test_local :- call_u(do_agent_action("look")).
+lmconf:mud_test_local :- forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 % ---------------------------------------------------------------------------------------------
 
@@ -273,12 +273,12 @@ now_run_local_tests_dbg :- doall(lmconf:mud_test_local).
 
 % nasty way i debug the parser
 % :-repeat, trace, do_agent_action('who'),fail.
-lmconf:mud_test_local :- do_agent_action('who').
+lmconf:mud_test_local :- call_u(do_agent_action('who')).
 
 % lmconf:mud_test_local :-do_agent_action("scansrc").
 
 % more tests even
-lmconf:mud_test_local :-do_agent_action("look").
+lmconf:mud_test_local :- call_u(do_agent_action("look")).
 lmconf:mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",

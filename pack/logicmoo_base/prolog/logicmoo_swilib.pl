@@ -180,7 +180,7 @@
 
 :- forall(filematch(swi(('library/*.pl')),M),
  ignore((
-   \+ (member(C,['/terms.pl','/backcomp.pl',rdf,pengi,win_men,swicli,'swicli.pl',swicffi,quintus,solution_sequences,metaterm,coind,drac,'INDEX',jpl,nb_set,yall,settings]), atom_contains(M,C)),
+   \+ (member(C,['/terms.pl','/backcomp.pl','/r.pl','/index.pl',rdf,pengi,win_men,swicli,'swicli.pl',swicffi,quintus,solution_sequences,metaterm,coind,drac,'INDEX',jpl,nb_set,yall,settings]), atom_contains(M,C)),
    \+ (member(C,[persistency,chr,rewrite,bdb,check,xpath,record]),atom_contains(M,C)),
    catch(system:use_module(M,except([op(_,_,_)])),E,wdmsg(E))))).
 

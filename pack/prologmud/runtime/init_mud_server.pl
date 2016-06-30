@@ -3,6 +3,9 @@
 
 */
 :- set_prolog_flag(dialect_pfc,false).
+:- set_prolog_stack(global, limit(16*10**9)).
+:- set_prolog_stack(local, limit(16*10**9)).
+:- set_prolog_stack(trail, limit(16*10**9)).
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
@@ -14,11 +17,20 @@
         lmconf:mud_test/2,
         lmconf:regression_test/0,
         lmconf:sanity_test/0,
-        lmconf:agent_call_command/2,
+        baseKB:agent_call_command/2,
         lmconf:type_action_info/3)).
 
 
-:- ensure_loaded(logicmoo_repl).
+:- system:ensure_loaded(setup_paths).
+:- system:ensure_loaded(logicmoo_repl).
+:- set_prolog_flag(dialect_pfc,false).
+
+:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
+%:- ensure_webserver(3020).
+%:- initialization(ensure_webserver(3020)).
+%:- initialization(ensure_webserver(3020),now).
+%:- initialization(ensure_webserver(3020),restore).
+
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).
@@ -38,6 +50,7 @@
 % [Debugging] Normarily this set as 'true' can interfere with debugging
 % :- set_prolog_flag(gc,true).
 % Yet turning it off we cant even startup without crashing
+% :- set_prolog_flag(gc,false).
 
 :- doall(printAll(current_prolog_flag(_N,_V))).
 
@@ -54,12 +67,6 @@
 % MUD SERVER CODE LOADS
 % ==============================
 
-:- set_prolog_flag(dialect_pfc,false).
-
-:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
-%:- initialization(ensure_webserver(3020)).
-%:- initialization(ensure_webserver(3020),now).
-%:- initialization(ensure_webserver(3020),restore).
 
 % [Required] load the mud system
 :- show_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_loader)))).
@@ -74,6 +81,8 @@
 
 :- file_begin(pfc).
 :- set_prolog_flag(dialect_pfc,true).
+
+
 
 :-assert_isa(iRR7,tRR).
 :-ain(genls(tRR,tRRP)).
@@ -121,11 +130,11 @@ pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObjec
 pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
-isa(iCommanderdata66,'tMonster').
+tMonster(iCommanderdata66).
+tExplorer(iCommanderdata66).
 mudDescription(iCommanderdata66,txtFormatFn("Very screy looking monster named ~w",[iCommanderdata66])).
 tAgent(iCommanderdata66).
 tHominid(iCommanderdata66).
-isa(iCommanderdata66,'tExplorer').
 wearsClothing(iCommanderdata66,'iBoots673').
 wearsClothing(iCommanderdata66,'iCommBadge674').
 wearsClothing(iCommanderdata66,'iGoldUniform675').
@@ -153,9 +162,9 @@ tRegion(iOfficeRoom7).
 % [Optionaly] Start the telent server % iCommanderdata66
 start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
-:- if_startup_script(initialization(start_telnet)).
+% :- if_startup_script(initialization(start_telnet)).
 :- rl_add_history( 'start_telnet.' ).
-:- rl_add_history( 'user:ensure_loaded(start_mud_server).' ).
+:- rl_add_history( 'user:ensure_loaded(run_mud_game).' ).
 :- rl_add_history( 'login_and_run.' ).
 
 oinfo(O):- xlisting((O, - spft, - ( ==> ), - pt , - nt , - bt , - mdefault, - lmcache)).

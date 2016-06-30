@@ -94,7 +94,9 @@ on_x_fail_priv(Goal):- catch(Goal,_,fail).
 with_ioe(CMD):-
  with_dmsg_to_main((
   current_input(IN),current_output(OUT),get_thread_current_error(Err),  
-  call_cleanup(set_prolog_IO(IN,OUT,Err),CMD,(set_input(IN),set_output(OUT),set_error_stream(Err))))).
+  setup_call_cleanup(set_prolog_IO(IN,OUT,Err),
+    call(CMD),
+    (set_input(IN),set_output(OUT),set_error_stream(Err))))).
 
 
 current_error(Err):-must((get_thread_current_error(Err); stream_property(Err,alias(current_error)); stream_property(Err,alias(user_error)))),!.

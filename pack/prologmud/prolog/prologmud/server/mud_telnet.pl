@@ -83,16 +83,15 @@ start_mud_telnet_4000:-start_mud_telnet(4000).
 start_mud_telnet(Port):- 
   must(telnet_server(Port, [allow(_ALL),call_pred(login_and_run_nodebug)])),!.
 
-:- volatile(main_thread_error_stream/1).
-:- dynamic(main_thread_error_stream/1).
+:- volatile(lmcache:main_thread_error_stream/1).
 
-save_error_stream:- main_thread_error_stream(_),!.
-save_error_stream:- ignore((thread_self(main),(quintus:current_stream(2, write, Err),asserta(main_thread_error_stream(Err))))).
+save_error_stream:- lmcache:main_thread_error_stream(_),!.
+save_error_stream:- ignore((thread_self(main),(quintus:current_stream(2, write, Err),asserta(lmcache:main_thread_error_stream(Err))))).
 :- initialization(save_error_stream,restore).
 :- save_error_stream.
 
 get_main_thread_error_stream(user_error):-!.
-get_main_thread_error_stream(ES):-main_thread_error_stream(ES),!.
+get_main_thread_error_stream(ES):-lmcache:main_thread_error_stream(ES),!.
 get_main_thread_error_stream(user_error).
 
 service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
@@ -286,6 +285,8 @@ telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignor
 % ===========================================================
 :- dynamic(baseKB:mudLastCommand/2).
 look_brief(Agent):- prop(Agent,mudLastCommand,X),nonvar(X),functor(X,actLook,_),!.
+
+look_brief(Agent):- !,call_u(look_as(Agent)),!.
 look_brief(Agent):- \+ prop(Agent,mudNeedsLook,vTrue),!.
 look_brief(Agent):- must(prop(Agent,mudNeedsLook,vTrue)),call_u(look_as(Agent)),!.
 

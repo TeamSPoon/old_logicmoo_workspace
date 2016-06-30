@@ -46,6 +46,7 @@ setup_rl_read_history_0:-
 
 % [Optionaly] Load the Logicmoo WWW System
 :- if(if_defined(lmconf:load_mud_www)).
+:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
 /*
 :- (if_file_exists(user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www)))).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).

@@ -500,7 +500,7 @@ naf(Goal):- (\+ call_u(Goal)).
 %
 is_callable(C):-current_predicate(_,C),!.
 
-:- module_transparent( (gconsequent_arg)/3).
+:- module_transparent( (consequent_arg)/3).
 consequent_arg(N,P,E):-get_consequent(P,PP),!,arg(N,PP,E).
 
 :- module_transparent( (get_consequent)/2).

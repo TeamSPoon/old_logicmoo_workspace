@@ -393,7 +393,7 @@ define_maybe_exact(system,PI):- !,must((defaultAssertMt(Mt),define_maybe_exact(M
 define_maybe_exact(M,PI):- % a(mtExact,M),!, 
    must_det_l((    functor(PI,F,A),
      M:multifile(M:F/A),
-     ain(baseKB:predicateConventionMt(F,M)),
+     once((M==baseKB->true;ain(baseKB:predicateConventionMt(F,M)))),
      decl_shared(M:PI),     
      sanity(\+is_static_predicate(M:PI)),
      maybe_define_if_not_static(M,PI))),!.

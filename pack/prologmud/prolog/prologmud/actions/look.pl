@@ -51,16 +51,16 @@ impl_coerce_hook([SDir,of],txtPrepOf,vDirFn(Dir)):-impl_coerce_hook(SDir,vtDirec
 ==> vtVerb(actLook).
 
 action_info(actLook, "generalized look in region").
-action_info(actLook(isOptionalStr("in"),isOptionalStr("here")), "generalized look in region").
+action_info(actLook(isOptionalStr('in'),isOptionalStr('here')), "generalized look in region").
 action_info(actLook(txtPrepOf,isOptionalStr("self")), "Look in a direction (TODO: look north of vHere)").
 action_info(actLook(isOptional(txtPrepSpatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
 %action_info(look(obj), "Look at a speficific item").
 %action_info(look_at(isOptional(call(visibleTo(vHere,value)),call(visibleTo(vHere,value)))), "Look at a speficific item").
 
 agent_call_command(Agent,actLook):- look_as(Agent),!.
-agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
-agent_call_command(Agent,actLook(_,"here")):- look_as(Agent),!.
-agent_call_command(Agent,actLook(DirS,"self")):- coerce(DirS,vtDirection,Dir),!,
+agent_call_command(Agent,actLook('here')):- look_as(Agent),!.
+agent_call_command(Agent,actLook(_,'here')):- look_as(Agent),!.
+agent_call_command(Agent,actLook(DirS,'self')):- coerce(DirS,vtDirection,Dir),!,
    view_dirs(Agent,[[Dir,vHere],[Dir,Dir],[Dir,Dir,vAdjacent]],Percepts),
    forall_member(P,Percepts,agent_call_command_now(Agent,actExamine(P))).
 agent_call_command(Agent,actLook(_Dir,SObj)):-

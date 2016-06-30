@@ -208,6 +208,7 @@ decl_shared(Var):- decl_shared(nop,Var),!.
 decl_shared(Plus,Var):-var(Var),!,trace_or_throw(var_decl_shared(Plus,Var)).
 decl_shared(Plus,baseKB:FA):-!,decl_shared(Plus,FA),!.
 decl_shared(Plus,abox:FA):-!,decl_shared(Plus,FA),!.
+
 decl_shared(Plus,(A,B)):-!,decl_shared(Plus,A),!,decl_shared(Plus,B),!.
 decl_shared(Plus,[A]):-!,decl_shared(Plus,A),!.
 decl_shared(Plus,[A|B]):-!,decl_shared(Plus,A),!,decl_shared(Plus,B),!.
@@ -219,7 +220,11 @@ decl_shared(Plus,F):-atom(F),!,decl_shared(Plus,F/_).
 decl_shared(Plus,M:F):-atom(F),!,decl_shared(Plus,M:F/_).
 
 decl_shared(Plus,M:F/A):- M==baseKB,!,decl_shared(Plus,F/A).
-decl_shared(Plus,M:F/A):-atom(F),!,
+
+decl_shared(Plus,M:F/A):- check_never_decl_shared(Plus,M,F,A),fail.
+decl_shared(Plus,F/A):- check_never_decl_shared(Plus,baseKB,F,A),fail.
+
+decl_shared(Plus,M:F/A):-must(atom(F)),!,
  asserta_if_new(lmconf:wrap_shared(F,A,M:ereq)),
  ignore((integer(A),
    baseKB:multifile(M:F/A),
@@ -227,7 +232,7 @@ decl_shared(Plus,M:F/A):-atom(F),!,
    baseKB:discontiguous(M:F/A),
    baseKB:public(M:F/A),
    on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
-   ain(baseKB:predicateConventionMt(F,M)),
+   once((M==baseKB->true;ain(baseKB:predicateConventionMt(F,M)))),
    functor(P,F,A),
       %once(on_f_throw( (M:F/A)\== (lmconf:loaded_external_kbs/1))),
       %once(on_f_throw( (M:F/A)\== (mpred_online:semweb_startup/0))),
@@ -256,6 +261,8 @@ decl_shared(Plus,F/A):-atom(F),!,
 
 decl_shared(Plus,M:P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared(Plus,M:F/A).
 decl_shared(Plus,P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared(Plus,F/A).
+
+check_never_decl_shared(Plus,baseKB,mudComfort,1).
 
 
 % loading_module 

@@ -22,7 +22,7 @@
 
 
 :-ain((bc_q(N) <- bc_p(N))).
-:- pp_DB.
+%:- rtrace(pp_DB).
 
 
 

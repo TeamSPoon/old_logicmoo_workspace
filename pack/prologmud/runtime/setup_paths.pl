@@ -54,6 +54,8 @@ pmrt_file_search_path(pack, '../../../pack').
 pmrt_file_search_path(cliopatria,pack('ClioPatria')). % :- current_prolog_flag(unix,true).
 pmrt_file_search_path(user, pack('ClioPatria/user')).
 pmrt_file_search_path(user, pack('swish')).
+pmrt_file_search_path(prologmud, library(prologmud)).
+
 
 pmrt_file_search_path(games, '../games').
 pmrt_file_search_path(library, LIB):- pmrt_file_search_path_library(LIB).

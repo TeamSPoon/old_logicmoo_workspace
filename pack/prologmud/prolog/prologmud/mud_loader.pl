@@ -122,10 +122,10 @@ parser_chat80_module(moo).
 
 :-export(prolog_repl/0).
 prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to resume to the mud!"),nl,
-  main_thread_error_stream(O0),set_prolog_IO(current_input,O0,O0),
+  must(lmcache:main_thread_error_stream(O0)),
+  set_prolog_IO(current_input,O0,O0),
   must(get_thread_current_error(O)),
-  with_ioe((set_prolog_IO(current_input,O,O),
-  call_u(break))))).
+  with_ioe((set_prolog_IO(current_input,O,O),call_u(break))))).
 
 %:- set_prolog_flag(gui,false).
 %:- set_prolog_flag(history,1000).
@@ -196,7 +196,7 @@ hard_work:-
 
 % [Required] load the mud PFCs
 :- set_prolog_flag(pfc_booted,false).
-:- show_entry(gripe_time(40,system:force_reload_mpred_file(prologmud(server/'mud_builtin.pfc')))).
+:- show_entry(gripe_time(40,system:force_reload_mpred_file(prologmud('mud_builtin.pfc')))).
 
 slow_work:- wno_tl( prevent_transform_moo_preds , within_user(at_start(hard_work))).
 

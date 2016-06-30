@@ -225,7 +225,9 @@
 :- meta_predicate show_edit_term(0,*,*).
 :- meta_predicate edit1term(0).
 
+:- meta_predicate with_main_wwwerror_to_output(0).
 
+with_main_wwwerror_to_output(G):-call(G).
 
 %% ensure_webserver( ?ARG1) is det.
 %
@@ -554,12 +556,12 @@ save_request_in_session(Request):-
 %
 % Handler Logicmoo Cyclone.
 %
-handler_logicmoo_cyclone(Request):- cnotrace(((is_goog_bot,!,
+handler_logicmoo_cyclone(Request):- notrace(((is_goog_bot,!,
   format('Content-type: text/html~n~n',[]),
   format('<!DOCTYPE html><html><head></head><body><pre>~q</pre></body></html>~n~n',[Request]),flush_output))),!.
 
 handler_logicmoo_cyclone(Request):-    
-  cnotrace(call(handler_logicmoo_cyclone_1,Request)),!.
+  notrace(call(handler_logicmoo_cyclone_1,Request)),!.
 
 
 
@@ -569,7 +571,7 @@ handler_logicmoo_cyclone(Request):-
 % handler logicmoo cyclone  Secondary Helper.
 %
 handler_logicmoo_cyclone_1(Request):-
- nodebugx( with_no_x((
+ notrace((nodebugx( with_no_x((
  on_x_log_fail((
    format('Content-type: text/html~n~n',[]),
    format('<!DOCTYPE html>',[]),
@@ -579,7 +581,7 @@ handler_logicmoo_cyclone_1(Request):-
       member(path(PATH),Request),
     directory_file_path(_,FCALL,PATH),
    once(get_param_req(call,Call);(current_predicate(FCALL/0),Call=FCALL);get_param_sess(call,Call,edit1term)),
-   cnotrace(Call),!,flush_output))))).
+   cnotrace(Call),!,flush_output))))))).
    
 
 
@@ -906,7 +908,7 @@ search4term:- must_det_l((
 %
 edit1term:-  
   get_param_req('ASK','ASK'),!,
-  with_main_error_to_output(
+  with_main_wwwerror_to_output(
    must_det_l((
    get_param_sess(term,String,""),
    cvt_param_to_term(String,Term,VNs),
@@ -916,7 +918,7 @@ edit1term:-
   
 edit1term:- 
   get_param_req('TELL','TELL'),!,
-  with_main_error_to_output(
+  with_main_wwwerror_to_output(
    must_det_l((
    get_param_sess(term,String,""),
    cvt_param_to_term(String,Term,VNs),
@@ -926,7 +928,7 @@ edit1term:-
   
 edit1term:- 
   get_param_req('RETRACT','RETRACT'),!,
-  with_main_error_to_output(
+  with_main_wwwerror_to_output(
    must_det_l((
    get_param_sess(term,String,""),
    cvt_param_to_term(String,Term,VNs),

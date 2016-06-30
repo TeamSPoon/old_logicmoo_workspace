@@ -1124,7 +1124,8 @@ dyn_end:-file_end(dyn).
 %
 % Enable Managed Predicate Expansion.
 %
-enable_mpred_expansion:- (( \+ t_l:disable_px) -> true ;
+enable_mpred_expansion:- set_prolog_flag(lm_expanders,true), set_prolog_flag(mpred_te,true),
+     (( \+ t_l:disable_px) -> true ;
                  (retractall(t_l:disable_px),
                  onEndOfFile(asserta_if_new(t_l:disable_px)))).
 
@@ -1135,7 +1136,9 @@ enable_mpred_expansion:- (( \+ t_l:disable_px) -> true ;
 %
 % Disable Managed Predicate Expansion.
 %
-disable_mpred_expansion:- (( t_l:disable_px) -> true ;
+disable_mpred_expansion:- 
+            set_prolog_flag(mpred_te,false),
+             (( t_l:disable_px) -> true ;
                  (asserta_if_new(t_l:disable_px),
                  onEndOfFile(retractall(t_l:disable_px)))).
 

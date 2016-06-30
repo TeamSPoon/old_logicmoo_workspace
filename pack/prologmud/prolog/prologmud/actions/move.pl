@@ -20,7 +20,8 @@
 % :- file_begin(mudcode).
 
 
-agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), to_case_breaks(DirSS,[t(DirS,_),t(Dist,digit)]),show_call(coerce(DirS,vtDirection,Dir)),OUT=actMove(Dist,Dir).
+agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), to_case_breaks(DirSS,[t(DirS,_),
+   t(Dist,digit)]),show_call(coerce(DirS,vtDirection,Dir)),OUT=actMove(Dist,Dir).
 agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(coerce(DirSS,vtDirection,Dir)),OUT=actMove(Dir).
 
 agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
@@ -56,7 +57,7 @@ move_command(Agent,DirS,DistS) :-
 % cant get anywhere since the map fails it
 move_command_1(Agent,Dir) :-
 	mudAtLoc(Agent,LOC),
-        not(from_dir_target(LOC,Dir,_)),!,
+         (from_dir_target(LOC,Dir,_)),!,
 		(add_cmdfailure(Agent,actMove)),
       throw(giveup(nopath(Agent,actMove))).
 

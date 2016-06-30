@@ -1,6 +1,6 @@
 % #!/usr/bin/env swipl
 %
-%  PFC is a language extension for prolog.. there is so much that can be done in this language extension to Prolog
+%  PFC is a11 language extension for prolog.. there is so much that can be done in this language extension to Prolog
 %
 % Dec 13, 2035
 % Douglas Miles
@@ -11,7 +11,7 @@
 :- module(fc_01,[]).
 
 :- set_prolog_flag(logicmoo_debug,true).
-:- use_module(library(logicmoo_base)).
+:- system:use_module(library(logicmoo_base)).
 
 %:- add_import_module(fc_01,baseKB,start).
 
@@ -25,31 +25,38 @@
 
 % :- autoload.
 
-:- abolish(a,0).
-:- abolish(b,0).
-:- dynamic((a/0,b/0)).
+:- abolish(a11,0).
+:- abolish(b11,0).
+:- dynamic((a11/0,b11/0)).
 
 :- debug(mpred).
 :- mpred_trace_exec.
 
-
 :- mpred_trace_msg(beginxxxxxxxxxxxxxxxxXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxxxxxxxxxxxxxxxxx_abc).
 
-:- dynamic(baseKB:a/0).
-:- dynamic(fc_01:a/0).
 
 /*
-:- mpred_ain((a ==> b)).
+:- dynamic(baseKB:a11/0).
+:- dynamic(fc_01:a11/0).
+:- mpred_ain((a11 ==> b11)).
 :- break.
-:- mpred_ain(a).
+:- mpred_ain(a11).
 */
+% :- enable_mpred_expansion.
 
-a ==> b.
-a.
+
+:- current_prolog_flag(lm_expanders,true).
+:- \+ current_prolog_flag(mpred_te,false).
+
+
+
+a11 ==> b11.
+a11.
+
 
 %:- pp_DB.
 
-:- mpred_test(a).
-:- mpred_test(b).
+:- mpred_test(a11).
+:- mpred_test(b11).
 
 

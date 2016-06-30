@@ -18,7 +18,7 @@ end_of_file.
 :- asserta(t_l:disable_px).
 
 :- multifile(lmconf:type_action_info/3).
-:- multifile(lmconf:agent_call_command/2).
+:- multifile(baseKB:agent_call_command/2).
 :- multifile(lmconf:mud_test/2).
 :- multifile(lmconf:sanity_test/0).
 :- multifile(lmconf:regression_test/0).

@@ -630,7 +630,9 @@ current_source_location0(module(M)):- '$current_typein_module'(M).
 % Current Generation Of Proof.
 %
 current_why(Why):- t_l:current_local_why(Why,_),!.
-current_why(mfl(M,F,L)):- source_module(M), current_source_file(F:L).
+current_why(mfl(M,F,L)):- current_source_file(F:L),var(L),F= module(M),!.
+current_why(mfl(M,F,L)):- source_module(M),mtCycL(M),current_source_file(F:L),!.
+current_why(mfl(M,F,L)):- defaultAssertMt(M),current_source_file(F:L),!.
 
 
 %% with_current_why( +Why, +:Prolog) is semidet.
@@ -649,8 +651,8 @@ with_current_why(Why,Prolog):- w_tl(t_l:current_local_why(Why,Prolog),Prolog).
 %
 % Source Module.
 %
-source_module(M):-nonvar(M),!,source_module(M0),!,M0=M.
-source_module(M):-'$set_source_module'(M,   M),!.
+source_module(M):-nonvar(M),!,source_module(M0),!,must(M0=M).
+source_module(M):-'$current_source_module'(M),!.
 source_module(M):-loading_module(M),!.
 
 :- thread_local(t_l:last_source_file/1).

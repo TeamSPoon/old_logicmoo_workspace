@@ -146,18 +146,18 @@ agent_call_command_now(Agent,CMD  ):- \+ where_atloc(Agent,_),!, agent_call_comm
 agent_call_command_now(Agent,CMD  ):- where_atloc(Agent,Where),
    % start event
    must(raise_location_event(Where,actNotice(reciever,begin(Agent,CMD)))),
-   (on_x_debug(agent_call_command_now_2(Agent,CMD)) ->
+   must(on_x_debug(agent_call_command_now_2(Agent,CMD)) ->
    % event done
      send_command_completed_message(Agent,Where,done,CMD);
    % event fail
      send_command_completed_message(Agent,Where,failed,CMD)),!.
 
-agent_call_command_now_2(Agent,CMD):- loop_check(agent_call_command_now_3(Agent,CMD),dmsg(looped(agent_call_command_now_2(Agent,CMD)))).
+agent_call_command_now_2(Agent,CMD):- loop_check((agent_call_command_now_3(Agent,CMD)),dmsg(looped(agent_call_command_now_2(Agent,CMD)))).
 agent_call_command_now_3(Agent,CMD):-
    with_agent(Agent,
      w_tl(t_l:side_effect_ok,
      w_tl(t_l:agent_current_action(Agent,CMD),
-  (agent_call_command(Agent,CMD)*->true;agent_call_command_all_fallback(Agent,CMD))))),
+  (on_f_debug(agent_call_command(Agent,CMD))*->true;agent_call_command_all_fallback(Agent,CMD))))),
   padd(Agent,mudLastCommand(CMD)).
 
 agent_call_command_all_fallback(Agent,CMD):- if_defined(agent_call_command_fallback(Agent,CMD)),!.

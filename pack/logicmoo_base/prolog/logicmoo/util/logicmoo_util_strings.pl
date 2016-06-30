@@ -684,7 +684,8 @@ capitalized(Type):- string_codes(Type,[S|_]),char_type(S,upper),must(char_type(S
 %
 % Converted To Case Breaks.
 %
-to_case_breaks(Text,New):- string_codes(Text,[C|Codes]), char_type_this(C,WillBe),!,to_case_breaks(Codes,WillBe,[C],WillBe,New).
+to_case_breaks(Text,New):- string_codes(Text,[C|Codes]), char_type_this(C,WillBe),!,
+  to_case_breaks(Codes,WillBe,[C],WillBe,New).
 
 
 %= 	 	 
@@ -716,7 +717,8 @@ ctype_switcher(white).
 % Breaked Codes.
 %
 breaked_codes(S,C0):-on_x_fail(write_to_codes(S,C)),!,C=C0.
-breaked_codes(S,C0):-catch(number_codes(S,C),_,string_codes(S,C)->true;(atom_codes(S,C)->true;string_equal_ci(S,C))),!,C=C0.
+breaked_codes(S,C0):-catch(number_codes(S,C),_,
+  string_codes(S,C)->true;(atom_codes(S,C)->true;string_equal_ci(S,C))),!,C=C0.
 
 
 %= 	 	 
