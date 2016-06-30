@@ -128,6 +128,7 @@ ensure_attr_setup(M):- atom(M),assert_if_new((M:attribute_goals(V,[put_attr(V,M,
 
 read_attvars:- read_attvars(true).
 read_attvars(TF):- set_prolog_flag(read_attvars,TF),
+  set_prolog_flag(assert_attvars,TF),
   prolog_load_context(module,M),
   install_attvar_expander(M).
 

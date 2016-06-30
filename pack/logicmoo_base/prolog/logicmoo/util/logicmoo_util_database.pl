@@ -677,7 +677,7 @@ clause_i(H,B):- clause_i(H,B,_).
 % clause_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 % clause_i(H,B,Ref):- system:clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
 
-clause_i(H0,B0,Ref):- \+ current_prolog_flag(assert_attvars,true),!, system:clause(H0,B0,Ref).
+clause_i(H0,B0,Ref):- \+ current_prolog_flag(assert_attvars,true) ,!, system:clause(H0,B0,Ref).
 
 clause_i(H,B,R):- nonvar(R),!, 
   dont_make_cyclic((must(system:clause(H0,BC,R)),must(split_attrs(BC,AV,B0)),!,must((AV,!,B=B0,H=H0)))).

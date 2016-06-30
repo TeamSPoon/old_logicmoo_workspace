@@ -514,7 +514,7 @@ attvar_op_fully(Why,MH):- full_transform(Why, MH,MHH),each_E(attvar_op(Why),MHH,
 
 throw_depricated:- trace_or_throw(throw_depricated).
 
-assert_u(MH):- throw_depricated, assert_u_no_dep(MH).
+assert_u(MH):- assert_u_no_dep(MH).
 assert_u_no_dep(MH):- fix_mp(clause(assert,assert_u),MH,M,H),
     attvar_op_fully(assert_i, M:H),expire_tabled_list(H).
 asserta_u(MH):- throw_depricated, fix_mp(clause(assert,asserta_u),MH,M,H),attvar_op_fully(asserta_i,M:H).

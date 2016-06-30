@@ -3,7 +3,8 @@
 :- module(attvar_01,[]).
 
 :- use_module(library(logicmoo_utils)).
-
+:- system:use_module(library(logicmoo_base)).
+:- set_prolog_flag(assert_attvars,true).
 
 :-export(demo_nb_linkval/1).
 demo_nb_linkval(T) :-
@@ -19,13 +20,15 @@ demo_nb_linkval(T) :-
 % :- nodebug(http(_)).
 :- debug(mpred).
 
-% :- begin_file(pl).
+:- file_begin(pfc).
 
 
 :- dynamic(sk_out/1).
 :- dynamic(sk_in/1).
 
 :- read_attvars(true).
+:- set_prolog_flag(read_attvars,true).
+ :- enable_mpred_expansion.
 
 sk_in(avar([vn='Ex',sk='SKF-666'])).
 
