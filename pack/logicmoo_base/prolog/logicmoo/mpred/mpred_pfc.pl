@@ -219,6 +219,7 @@ push_current_choice/1,
       with_fc_mode(+,0),
       bagof_or_nil(?,^,-).
 
+:- current_prolog_flag(unsafe_speedups,_)->true;set_prolog_flag(unsafe_speedups,true).
 :- meta_predicate mpred_retract_i_or_warn(+).
 :- meta_predicate mpred_retract_i_or_warn_0(+).
 :- meta_predicate mpred_retract_i_or_warn_1(+).
@@ -308,17 +309,18 @@ system:current_abox(M):-prolog_load_context(module,system:M).
 ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
 ensure_abox(user):- setup_module_ops(user),!,ensure_abox(baseKB),!.
 ensure_abox(M):- 
+ must_det_l((
    asserta(lmcache:has_pfc_database_preds(M)),
    assert_if_new(baseKB:mtCycL(M)),
    assert_if_new(M:current_abox(M)),
    setup_module_ops(M),
    set_prolog_flag(M:unknown,error),
    forall(mpred_database_term(F,A,_),
-       (M:multifile(M:F/A),
+       must_det_l(((M:multifile(M:F/A),
         M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         create_predicate_istAbove(M,F,A),        
-        M:module_transparent(M:F/A))),!.
+        M:module_transparent(M:F/A))))))),!.
 
 
 mnotrace(G):- (no_trace(G)),!.
@@ -764,7 +766,7 @@ mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
 
 ain_fast(P):- call_u((( get_source_ref(UU), ain_fast(P,UU)))).
 
-ain_fast(P,S):- maybe_updated_value(P,RP,OLD),!, subst(S,P,RP,RS),
+ain_fast(P,S):- maybe_updated_value(P,RP,OLD),subst(S,P,RP,RS),!,
  ain_fast(RP,RS),ignore(mpred_retract(OLD)).
 ain_fast(P,S):- 
   fwc1s_post1s(One,Two),
@@ -774,6 +776,7 @@ ain_fast(P,S):-
   mpred_run.
 
 
+%remove_negative_version(_P):- current_prolog_flag(unsafe_speedups,true),!.
 remove_negative_version(P) :- \+ mpred_non_neg_literal(P),!.
 remove_negative_version((H:-B)):- !,
   % TODO extract_predciates((H:-B),Preds),trust(Preds),
@@ -788,7 +791,7 @@ remove_negative_version(P):-
   must(mpred_ain(\+ (~(P)), S)))))),!.
 
      
-fwc1s_post1s(100000,200000):- fresh_mode,!.
+fwc1s_post1s(100,200):- fresh_mode,!.
 fwc1s_post1s(1,2):- current_prolog_flag(logicmoo_safe,true),!.
 fwc1s_post1s(1,2):- current_prolog_flag(pfc_booted,true),!.
 % fwc1s_post1s(10,20):- defaultAssertMt(Mt)->Mt==baseKB,!.
@@ -835,7 +838,7 @@ mpred_post(P, S):- fully_expand_now(post,P,P0),each_E(mpred_post1,P0,[S]).
 
 mpred_post1( P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post1( P0,   S).
 
-mpred_post1(Fact, _):- fail, ground(Fact),fwc1s_post1s(One,_Two),Three is One * 3, filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
+mpred_post1(Fact, _):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(One,_Two),Three is One * 3, filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
 
 mpred_post1(P,S):- gripe_time(0.6,mpred_post12(P,S)).
 
@@ -1525,6 +1528,8 @@ mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc==fwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 mpred_fwc1(support_hilog(_,_)):-!.
 % mpred_fwc1(singleValuedInArg(_, _)):-!.
+% this line filters sequential (and secondary) dupes
+mpred_fwc1(Fact):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(_One,Two),Six is Two * 3,filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
 mpred_fwc1(Fact):- 
   dmsg(mpred_fwc1(Fact)),
   %ignore((mpred_non_neg_literal(Fact),remove_negative_version(Fact))),
