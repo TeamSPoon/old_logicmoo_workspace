@@ -58,7 +58,7 @@ tCol(tPred).
 tCol(tRelation).
 tCol(meta_argtypes).
 tCol(ttSpatialType).
-tCol(ttTypeType).
+tSet(ttTypeType).
 
 tCol(tWorld).
 tWorld(iWorld7).
@@ -70,6 +70,7 @@ tCol(ftProlog).
 %ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
 
 :- dynamic(tItem/1).
+:- dynamic(ttAgentType/1).
 
 typeGenls(ttAgentType,tAgent).
 typeGenls(ttExpressionTypeType,ttExpressionType).
@@ -78,18 +79,13 @@ typeGenls(ttObjectType,tObj).
 typeGenls(ttPredType,tPred).
 typeGenls(ttRegionType,tRegion).
 typeGenls(ttSpatialType,tSpatialThing).
+% :- break.
 
 genls(tSpatialThing,tTemporalThing).
 genls(ttSpatialType,ttTemporalType).
  
 ttUnverifiableType(ftDice).
 ttUnverifiableType(vtDirection).
-
-% Normal expansion
-(typeGenls(TypeType,Super) ==> (( isa(Type,TypeType)/nonvar(Type) ==> genls(Type,Super)))).
-
-% Maybe this is too broad?
-% For now yes (typeGenls(TypeType,Super), genls(Type,Super))  ==> isa(Type,TypeType).
 
 
 :- dynamic(disjointWith/2).
@@ -393,10 +389,11 @@ ttValueType(vtColor).
 
 ttValueType(VT)==>tInferInstanceFromArgType(VT).
 
-prologDynamic(verb_alias(ftString,vtVerb)).
+prologHybrid(verb_alias(ftString,vtVerb)).
 prologHybrid(typeHasGlyph(tCol,ftString)).
 prologHybrid(mudMaxHitPoints(tAgent,ftInt)).
 prologHybrid(mudStowing(tAgent,tItem)).
+
 :-dynamic((latitude/2, mudMoveDist/2, longitude/2)).
 prologHybrid(typeHasGlyph,2).
 prologHybrid(mudActAffect/3).
@@ -415,8 +412,12 @@ prologDynamic(mudMoveDist/2).
 meta_argtypes(mudMoveDist(tAgent,ftInt)).
 prologSingleValued(mudMoveDist,[predicateConventionMt(abox),query(call),argSingleValueDefault(2,1)]).
 prologDynamic(stat_total/2).
+
+:- dynamic(vtBasicDir/1).
+
 tCol(vtBasicDir).
-tCol(vtBasicDirPlusUpDown).
+:- rtrace(ain(tCol(vtBasicDirPlusUpDown))).
+% :- break.
 tCol(vtDirection).
 tCol(vtVerb).
 :- dynamic stat_total/2.
@@ -503,6 +504,16 @@ genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
 genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
 genls(isEach(tRegion,tAgent),tChannel).
 
+genls(tAgent,tObj).
+genls(tAgent,tSpatialThing).
+genls(tItem,tObj).
+genls(tItem,tSpatialThing).
+genls(tObj,tSpatialThing).
+genls(tPred,tRelation).
+genls(tRegion,tSpatialThing).
+genls(ttObjectType,tCol).
+genls(ttSpatialType,tCol).
+genls(tFunction,tRelation).
 tPred(meta_argtypes).
 meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
 meta_argtypes(apathFn(tRegion,vtDirection)).
@@ -519,33 +530,38 @@ genls(ttTypeByAction,tCol).
 
 genls(tAgent,tObj).
 genls(tAgent,tSpatialThing).
-genls(tCarryAble,tItem).
-genls(tChargeAble,tItem).
-genls(tContolDevice,tChargeAble).
-genls(tDoor,tFurniture).
-genls(tDoor,tItem).
-genls(tDrinkAble,tItem).
-genls(tEatAble,tItem).
-genls(tFunction,tRelation).
-genls(tFurniture,tObj).
-genls(tFurniture,tPartofObj).
-genls(tHumanControlled,tAgent).
 genls(tItem,tObj).
 genls(tItem,tSpatialThing).
-genls(tMonster,ttAgentGeneric).
-genls(tNpcPlayer,tAgent).
 genls(tObj,tSpatialThing).
-genls(tPathway,tDoor).
-genls(tAgent,tAgent).
 genls(tPred,tRelation).
 genls(tRegion,tSpatialThing).
 genls(ttObjectType,tCol).
 genls(ttSpatialType,tCol).
+genls(tFunction,tRelation).
+
+genls(tCarryAble,tItem).
+genls(tChargeAble,tItem).
+genls(tContolDevice,tChargeAble).
+
+tSet(tFurniture).
+
+genls(tDoor,tFurniture).
+genls(tDoor,tItem).
+genls(tDrinkAble,tItem).
+genls(tEatAble,tItem).
+genls(tFurniture,tObj).
+genls(tFurniture,tPartofObj).
+genls(tHumanControlled,tAgent).
+genls(tMonster,ttAgentGeneric).
+genls(tNpcPlayer,tAgent).
+genls(tPathway,tDoor).
 genls(tUseAble,tItem).
 genls(tWearAble,tItem).
 genls(vtBasicDir,vtBasicDirPlusUpDown).
 genls(vtBasicDirPlusUpDown,vtDirection).
 genls(vtDirection,tTypevalue).
+
+tSet(vtPosture).
 genls(vtPosture,vtVerb).
 
 
@@ -600,6 +616,7 @@ tChannel(iGossupChannel).
 ttTypeFacet(tChannel).
 :-ain_expanded(isa(tObj,ttTemporalType)).
 :-ain_expanded(isa(tRegion,ttTemporalType)).
+
 typeGenls(ttAgentType,tAgent).
 typeGenls(ttItemType,tItem).
 typeGenls(ttObjectType,tObj).
@@ -995,7 +1012,7 @@ genls(tRoom,tRegion).
 
 /*
 
- the CycL language extends Prolog's first order logic capabilities with some higher order logics.  
+ the CycL language extends Prolog''s first order logic capabilities with some higher order logics.  
  It also extrends prolog to show proofs.. one issue is the CycL language never signed up for cuts or other execution  orders.    
  PrologMUD extends the CycL language to allow preset program flow (unless a predicate is declared to not honor order of execution 
   (this is usually best!)).  PrologMUD  implements a new design of the cyc canonicalizer..   

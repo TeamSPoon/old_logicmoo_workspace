@@ -147,9 +147,18 @@ never_load_special(_Module:_Spec, Options) :- member(if(not_loaded),Options),mem
 %
 % Prolog Load File Loop Checked.
 %
+
+prolog_load_file_loop_checked(ModuleSpec, Options) :- 
+  filematch(ModuleSpec,F),
+  system:'$load_context_module'(F, Was, _),
+  strip_module(ModuleSpec,To,File),
+  To\==Was,
+  Was==user,
+  wdmsg(warn(loading_into_wrong_module(Was:File->To:File,Options))),!,
+  loop_check(load_files(Was:File,Options)),!.
 prolog_load_file_loop_checked(ModuleSpec, Options) :- never_load_special(ModuleSpec, Options),!,fail.
-prolog_load_file_loop_checked(ModuleSpec, Options) :- loop_check(show_success(prolog_load_file,
-  prolog_load_file_loop_checked_0(ModuleSpec, Options))).
+prolog_load_file_loop_checked(ModuleSpec, Options) :- 
+  loop_check(show_success(prolog_load_file,prolog_load_file_loop_checked_0(ModuleSpec, Options))).
 
 
 
@@ -302,15 +311,9 @@ load_file_some_type(M:File,Options):- call_from_module(M,must(load_files(M:File,
 %
 
 user:prolog_load_file(Module:Spec, Options):-
-  set_prolog_flag(dialect_pfc,false), fail.
-
-user:prolog_load_file(Module:Spec, Options):-
    \+ exists_source(Spec),
    \+ \+ (filematch(Module:Spec,O),exists_file(O)),
-  doall((filematch(Module:Spec,SpecO),
-   catch(prolog_load_file_loop_checked(Module:SpecO, Options),
-    E,
-     ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:SpecO, Options),throw(E)))))),!.
+  doall((filematch(Module:Spec,SpecO),load_files(Module:SpecO, Options))),!.
 
 
 user:prolog_load_file(Module:Spec, Options):- fail,

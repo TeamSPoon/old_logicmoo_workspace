@@ -80,8 +80,11 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
 
 :- dynamic(ttModule/1).
 :- dynamic(marker_supported/2).
-
 :- dynamic(pass2/0).
+:- dynamic(sometimesSlow/0).
+:- dynamic(sometimesBuggy/0).
+:- dynamic(sometimesUseless/0).
+
 
 (P/mpred_non_neg_literal(P) ==> { remove_negative_version(P) } ).
 
@@ -103,8 +106,6 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
 :- dynamic(genlsFwd/2).
 
 % prologHybrid(arity/2).
-
-:- ensure_abox(baseKB).
 
 :- begin_pfc.
 :- sanity(get_lang(pfc)).
@@ -194,11 +195,15 @@ argsQuoted(second_order).
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
-:- ain(((tPred(F),arity(F,A)/(is_ftNameArity(F,A),A>1), ~prologBuiltin(F)) ==> (~(tCol(F)),support_hilog(F,A)))).
+:- ain(((tPred(F),arity(F,A)/(is_ftNameArity(F,A),A>1), 
+      \+ prologBuiltin(F), 
+      sanity(\+ tCol(F))) ==> (~(tCol(F)),support_hilog(F,A)))).
 
 :- kb_dynamic(support_hilog/2).
 
-(((support_hilog(F,A)/(F\='$VAR',is_ftNameArity(F,A),\+ is_static_predicate(F/A), \+ prologDynamic(F)))) ==>
+(((support_hilog(F,A)
+  /(is_ftNameArity(F,A),
+    \+ is_static_predicate(F/A), \+ prologDynamic(F)))) ==>
    (hybrid_support(F,A), 
     {% functor(Head,F,A) ,Head=..[F|TTs], TT=..[t,F|TTs],
     %  (CL = (Head :- cwc, call(second_order(TT,CuttedCall)), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall)))
@@ -213,8 +218,8 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 :- dynamic(bt/2).
 bt(P,_)/nonvar(P) ==> (P:- mpred_bc_only(P)).
 
-((prologHybrid(F),arity(F,A)/is_ftNameArity(F,A))==>hybrid_support(F,A)).
-(hybrid_support(F,A)/is_ftNameArity(F,A))==>prologHybrid(F),arity(F,A).
+((sometimesUseless,prologHybrid(F),arity(F,A))==>hybrid_support(F,A)).
+(hybrid_support(F,A))==>prologHybrid(F),arity(F,A).
 
 ((mpred_mark(pfcRHS,F,A)/(A\=0)) ==> {kb_dynamic(F/A)}).
 % ((mpred_mark(_,F,A)/(A\=0)) ==> {shared_multifile(F/A)}).
@@ -233,36 +238,39 @@ bt(P,_)/nonvar(P) ==> (P:- mpred_bc_only(P)).
 
 pfcMustFC(F) ==> pfcControlled(F).
 
-% catching of misinterpreations
-/*
-type_checking, mpred_mark(pfcPosTrigger,F,A)==>{warn_if_static(F,A)}.
-type_checking, mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
-type_checking, mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
-*/
 
 
 pfcControlled(C)==>prologHybrid(C).
 
 :- dynamic(hybrid_support/2).
+:- dynamic(type_checking/1).
+
+/*
+% catching of misinterpreations
+type_checking, mpred_mark(pfcPosTrigger,F,A)==>{warn_if_static(F,A)}.
+type_checking, mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
+type_checking, mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
+*/
 
 %'==>'((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A), ==>(isa(F,S1))))).
 % ((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A),t(S1,F)))).
 ((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A),{ASSERT=..[S1,F]},ASSERT))).
 
-mpred_mark(pfcPosTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
-mpred_mark(pfcNegTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
-mpred_mark(pfcBcTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
-mpred_mark(pfcRHS,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
-mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>{functor(P,F,A),make_dynamic(P)}.
-:- ain((mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>{functor(P,F,A),kb_dynamic(P)})).
-:- ain((mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>{create_predicate_istAbove(abox,F,A)})).
+mpred_mark(pfcPosTrigger,F, A)/(\+ ground(F/A))==>{trace_or_throw(mpred_mark(pfcPosTrigger,F, A))}.
+mpred_mark(pfcPosTrigger,F, A)==>marker_supported(F,A).
+mpred_mark(pfcNegTrigger,F, A)==>marker_supported(F,A).
+mpred_mark(pfcBcTrigger,F, A)==>marker_supported(F,A).
+mpred_mark(pfcRHS,F, A)==>marker_supported(F,A).
+mpred_mark(pfcCreates,F, A)==>
+  {functor(P,F,A),make_dynamic(P),kb_dynamic(P),
+    create_predicate_istAbove(abox,F,A)},
+    marker_supported(F,A).
 
-mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
-mpred_mark(pfcCallCode,F, A)/((is_ftNameArity(F,A)), 
-  predicate_is_undefined_fa(F,A))==> marker_supported(F,A).
+mpred_mark(pfcCallCode,F, A)/predicate_is_undefined_fa(F,A)
+    ==> marker_supported(F,A).
 
 
-% (marker_supported(F,A)/is_ftNameArity(F,A))==>(prologHybrid(F),hybrid_support(F,A)).
+% (marker_supported(F,A))==>(prologHybrid(F),hybrid_support(F,A)).
 %mpred_mark(pfcPosTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).
 %mpred_mark(pfcNegTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A), afterRemoving(F,lambda(P,mpred_enqueue(~P,(m,m)))).
 

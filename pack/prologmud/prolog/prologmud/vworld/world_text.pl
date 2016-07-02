@@ -130,7 +130,6 @@ fix_grammar_0([Carry|EnglishG],[Carry|English]):-
 join_for_string(English,EnglishS):-on_x_fail(( flatten([English],EnglishF),list_to_atomics_list(EnglishF,EnglishA),atomics_to_string(EnglishA," ",EnglishS))),!.
 join_for_string(English,English).
 
-/*
 list_to_atomics_list(L,AL):-list_to_atomics_list0(L,AL),forall(member(E,AL),must(atomic(E))).
 
 list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
@@ -138,7 +137,7 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
    any_to_string(E,A),
    list_to_atomics_list0(EnglishF,EnglishA),!.
 list_to_atomics_list0([],[]):-!.
-*/
+
 
 eng_fully_expand(I,O):-loop_check(transitive(eng_fully_expand_ilc,I,O),I=O).
 eng_fully_expand_ilc(I,O):-copy_term(I,C),flatten([C],FC),eng_fully_expand_0(FC,O).

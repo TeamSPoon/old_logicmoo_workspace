@@ -198,7 +198,7 @@ hard_work:-
 :- set_prolog_flag(pfc_booted,false).
 :- show_entry(gripe_time(40,system:force_reload_mpred_file(prologmud('mud_builtin.pfc')))).
 
-slow_work:- wno_tl( prevent_transform_moo_preds , within_user(at_start(hard_work))).
+slow_work:- wno_tl( set_prolog_flag(lm_expanders,false) , within_user(at_start(hard_work))).
 
 thread_work:- thread_property(X, status(running)),X=loading_code,!.
 thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
@@ -266,7 +266,7 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 
 
 % [Optional] This loads boxer
-% :- at_start(w_tl(prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
+% :- at_start(w_tl(set_prolog_flag(lm_expanders,false),within_user(ignore(catch(start_boxer,_,true))))).
 
 % [Optional] Testing PTTP
 % :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.

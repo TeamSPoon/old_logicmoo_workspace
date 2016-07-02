@@ -1485,8 +1485,7 @@ need_speed:-fail.
 %
 % If Is A Release.
 
-is_release:- current_prolog_flag(logicmoo_debug,true),!,fail.
-is_release:- \+ (1 is random(10)).
+is_release:- notrace((\+ current_prolog_flag(logicmoo_debug,true), \+ (1 is random(10)))).
 
 
 

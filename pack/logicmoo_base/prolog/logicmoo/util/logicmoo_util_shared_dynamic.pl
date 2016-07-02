@@ -20,6 +20,7 @@
           system_goal_expansion_safe_wrap/2,
           ereq/1,
           dbreq/1,
+          clause_b/1,
           really_safe_wrap/3,
           warn_if_static/2]).
 
@@ -160,7 +161,10 @@ lmconf:wrap_shared(ttPredType,1,ereq).
 lmconf:wrap_shared(ttTemporalType,1,ereq).
 lmconf:wrap_shared(use_ideep_swi,0,ereq).
 
-lmconf:wrap_shared(F,A,ereq):- find_and_call(baseKB:hybrid_support(F,A)), \+ clause(lmconf:wrap_shared(F,A,_),true).
+lmconf:wrap_shared(F,A,ereq):- clause_b(hybrid_support(F,A)), \+ clause(lmconf:wrap_shared(F,A,_),true).
+
+clause_b(G):- clause(baseKB:G,Body),call(Body).
+
 
 %% system_goal_expansion_safe_wrap( :TermT, :TermARG2) is semidet.
 %
@@ -177,7 +181,7 @@ system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),lmconf:wrap_shared(F,A,How
 
 really_safe_wrap(Type,I,O):- callable(I),
    prolog_load_context(module,M),
-   \+ find_and_call(baseKB:mtCycL(M)),
+   \+ clause_b(mtCycL(M)),
    system_goal_expansion_safe_wrap(I,O)->I\=@=O,dmsg(really_safe_wrap(Type,I,O)).
 
 
@@ -262,7 +266,7 @@ decl_shared(Plus,F/A):-atom(F),!,
 decl_shared(Plus,M:P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared(Plus,M:F/A).
 decl_shared(Plus,P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared(Plus,F/A).
 
-check_never_decl_shared(Plus,baseKB,mudComfort,1).
+check_never_decl_shared(_Plus,baseKB,mudComfort,1).
 
 
 % loading_module 

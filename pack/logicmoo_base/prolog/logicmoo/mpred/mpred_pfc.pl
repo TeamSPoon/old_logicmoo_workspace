@@ -70,6 +70,7 @@
   with_no_mpred_breaks/1,
   mpred_remove1/2,
   check_never_assert/1,check_never_retract/1,
+  oinfo/1,
   why_was_true/1,
   mpred_fwc0/1,
   with_no_mpred_trace_exec/1,
@@ -763,7 +764,8 @@ mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
 
 ain_fast(P):- call_u((( get_source_ref(UU), ain_fast(P,UU)))).
 
-ain_fast(P,S):- maybe_updated_value(P,RP,OLD),!, subst(S,P,RP,RS), ain_fast(RP,RS),ignore(mpred_retract(OLD)).
+ain_fast(P,S):- maybe_updated_value(P,RP,OLD),!, subst(S,P,RP,RS),
+ ain_fast(RP,RS),ignore(mpred_retract(OLD)).
 ain_fast(P,S):- 
   fwc1s_post1s(One,Two),
   filter_buffer_trim('$last_mpred_fwc1s',One),
@@ -1191,9 +1193,9 @@ mpred_ain_trigger_reprop(PT,Support):-
   PT = pt(Trigger,Body),!,
   mpred_mark_as(Support,Trigger,pfcPosTrigger),
   mpred_trace_msg('~N~n\tAdding positive~n\t\ttrigger: ~p~n\t\tbody: ~p~n\t Support: ~p~n',[Trigger,Body,Support]),
-  must(\+ string(Support)),
-  must(\+ string(Trigger)),
-  must(\+ string(Body)),
+  sanity(\+ string(Support)),
+  sanity(\+ string(Trigger)),
+  sanity(\+ string(Body)),
   %  (debugging(foo)->trace;true),
   mpred_assert_w_support(PT,Support),
   copy_term(PT,Tcopy),
@@ -1445,7 +1447,7 @@ mpred_unfwc(F):-
 mpred_unfwc1(F):-
   mpred_unfwc_check_triggers(F),
   % is this really the right place for mpred_run<?
-  hotrace(mpred_run).
+  quietly(mpred_run).
 
 
 mpred_unfwc_check_triggers(F):- loop_check(mpred_unfwc_check_triggers0(F),
@@ -1518,7 +1520,7 @@ filter_buffer_n_test(Name,N,Fact):- filter_buffer_get_n(Name,FactS,N),
 %% mpred_fwc1(+P) is det.
 %
 % forward chains for a single fact.
-%
+%  Avoids loop while calling mpred_fwc1(P)
 mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc==fwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 mpred_fwc1(support_hilog(_,_)):-!.
@@ -1640,7 +1642,7 @@ mpred_eval_lhs_0((Test *-> Body),Support):-  % Noncutted ->
   mpred_call_no_bc(Test),
    mpred_eval_lhs_0(Body,Support).
 
-mpred_eval_lhs_0((Test -> Body),Support):-  % cutted ->
+mpred_eval_lhs_0((Test -> Body),Support):- !,  % cutted ->
   mpred_call_no_bc(Test) -> mpred_eval_lhs_0(Body,Support).
 
 mpred_eval_lhs_0(rhs(X),Support):- !,
@@ -2080,6 +2082,18 @@ mpred_positive_literal(X):-
   !.
 
 
+mpred_connective(Var):-var(Var),!,fail.
+mpred_connective(';').
+mpred_connective(',').
+mpred_connective('/').
+mpred_connective('|').
+mpred_connective(('==>')).
+mpred_connective(('<-')).
+mpred_connective('<==>').
+mpred_connective('-').
+% mpred_connective('~').
+mpred_connective(('\\+')).
+
 
 mpred_neg_connective('-').
 % mpred_neg_connective('~').
@@ -2201,12 +2215,13 @@ pos_2_neg(P,~(P)).
 %
 % PFC Mark Converted To.
 %
+% mpred_mark_as(_,_,_):- current_prolog_flag(unsafe_speedups,true),!.
 mpred_mark_as(_,P,_):- is_ftVar(P),!.
 mpred_mark_as(Sup,\+(P),Type):- !,mpred_mark_as(Sup,P,Type).
 mpred_mark_as(Sup,~(P),Type):- !,mpred_mark_as(Sup,P,Type).
 mpred_mark_as(Sup,-(P),Type):- !,mpred_mark_as(Sup,P,Type).
 mpred_mark_as(Sup,not(P),Type):- !,mpred_mark_as(Sup,P,Type).
-mpred_mark_as(Sup,[P|PL],Type):- is_list([P|PL]), !,must_maplist(mpred_mark_as_ml(Sup,Type),[P|PL]).
+mpred_mark_as(Sup,[P|PL],Type):- is_list(PL), !,must_maplist(mpred_mark_as_ml(Sup,Type),[P|PL]).
 mpred_mark_as(Sup,( P / CC ),Type):- !, mpred_mark_as(Sup,P,Type),mpred_mark_as(Sup,( CC ),pfcCallCodePreCond).
 mpred_mark_as(Sup,'{}'(  CC ), _Type):- mpred_mark_as(Sup,( CC ),pfcCallCodeBody).
 mpred_mark_as(Sup,( A , B), Type):- !, mpred_mark_as(Sup,A, Type),mpred_mark_as(Sup,B, Type).
@@ -2695,6 +2710,8 @@ mpred_is_silient :- mnotrace(( \+ t_l:mpred_debug_local, \+ clause_asserted_u(mp
 mpred_test(_):- (compiling; current_prolog_flag(xref,true)),!.
 mpred_test(G):- mpred_is_silient,!, with_no_mpred_trace_exec(must(mpred_test_fok(G))).
 mpred_test(G):- with_mpred_trace_exec(must(mpred_test_fok(G))).
+
+oinfo(O):- xlisting((O, - spft, - ( ==> ), - pt , - nt , - bt , - mdefault, - lmcache)).
 
 why_was_true(P):- mpred_why(P),!.
 why_was_true(P):- dmsg(justfied_true(P)),!.

@@ -16,7 +16,7 @@ asInvoked(Cmd,[L|Ist]):-atom(L),not(bad_functor(L)),!, Cmd=..[L|Ist].
 asInvoked(Cmd,[L|Ist]):-!,Cmd=..[asInvoked,L|Ist].
 asInvoked(Cmd,Cmd):-!.
 
-% :-decl_mpred_prolog(mudObjNearLoc(tObj,tObj)).
+prologBuiltin(mudObjNearLoc(tObj,tObj)).
 mudObjNearLoc(Whom,Where):-nonvar(Where),!,findall(Whom,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom,Set).
 mudObjNearLoc(Whom,Where):-nonvar(Whom),!,findall(Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Where,Set).
 mudObjNearLoc(Whom,Where):-findall(Whom+Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom+Where,Set).

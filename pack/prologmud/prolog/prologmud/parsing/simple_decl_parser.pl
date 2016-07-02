@@ -225,7 +225,11 @@ assert_text_now(Ctx,CtxISA,String):-
 
 :-dynamic(asserted_text/3).
 
-(describedTyped(ISA),isa(Ctx,ISA),mudDescription(Ctx,String)/ ( \+asserted_text(Ctx,String,_), \+assert_text(Ctx,String))) ==> mudDescriptionHarder(Ctx,String).
+tSet(describedTyped).
+describedTyped(tRegion).
+describedTyped(tObj).
+(describedTyped(Col),isa(Ctx,Col),mudDescription(Ctx,String)/ 
+  ( \+asserted_text(Ctx,String,_), \+assert_text(Ctx,String))) ==> mudDescriptionHarder(Ctx,String).
 
 :- export(to_icase_strs/2).
 to_icase_strs(WL,IC):-maplist(to_icase_str,WL,IC).

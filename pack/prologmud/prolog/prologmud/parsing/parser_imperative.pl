@@ -395,18 +395,15 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 
 
-:- ain('==>'(prologOnly(name_text_now(ftTerm,ftString)))).
+:- ain('==>'(prologBuiltin(name_text_now(ftTerm,ftString)))).
 
 name_text(Name,Text):- nonvar(Text),!,name_text_now(Name,TextS),equals_icase(Text,TextS),!.
 name_text(Name,Text):- var(Name),!,mudKeyword(Name,Text).
 name_text(Name,Text):- name_text_now(Name,Text).
 
-
+:- export(name_text_now_lc/2).
 name_text_now_lc(I,O):-nonvar(I),name_text_now(I,M),!,toLowercase(M,O).
 
-:-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
-:-ain(vtVerb(F)/name_text_now_lc(F,Txt)==>mudKeyword(F,Txt)).
-:-ain(tCol(F)/name_text_now_lc(F,Txt)==>mudKeyword(F,Txt)).
 
 :-dynamic(name_text_now/2).
 :-multifile(name_text_now/2).
@@ -426,6 +423,14 @@ name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),member(t(Text,_),Lis
 name_text_atomic(Name,Text):-i_name_lc(Name,TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
+tSet(ttKeyworded).
+completelyAssertedCollection(ttKeyworded).
+:-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
+:-ain((ttKeyworded(T),isa(F,T),{name_text_now_lc(F,Txt)}==>mudKeyword(F,Txt))).
+ttKeyworded(vtVerb).
+ttKeyworded(tCol).
+:-ain((vtVerb(F),{name_text_now_lc(F,Txt)}==>mudKeyword(F,Txt))).
+% :-ain(tCol(F)/name_text_now_lc(F,Txt)==>mudKeyword(F,Txt)).
 
 impl_coerce_hook(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),

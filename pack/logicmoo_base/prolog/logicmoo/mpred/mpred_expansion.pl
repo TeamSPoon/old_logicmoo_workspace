@@ -129,6 +129,7 @@
             is_relation_type/1,
             is_stripped_module/1,
             is_unit/1,
+			is_unit_like/1,
             is_unit_functor/1,
             listToE/2,
             map_f/2,
@@ -759,11 +760,12 @@ additiveOp((/)).
 %
 % If Is A Unit.
 %
-is_unit(A):- atomic(A),!.
-is_unit(C):- mpred_get_attr(C,sk,_),!.
-is_unit(C):- var(C),!,fail.
-is_unit(C):- \+ compound(C),!.
-is_unit(C):- C\='VAR'(_),C\='$VAR'(_),C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F).
+is_unit(A):-notrace(is_unit_like(A)).
+is_unit_like(A):- atomic(A),!.
+is_unit_like(C):- mpred_get_attr(C,sk,_),!.
+is_unit_like(C):- var(C),!,fail.
+is_unit_like(C):- \+ compound(C),!.
+is_unit_like(C):- C\='VAR'(_),C\='$VAR'(_),C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F).
 
 
 

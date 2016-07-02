@@ -237,7 +237,7 @@ valueReset(charge,max_charge).
 
 */
 
-
+tCol(tTable).
 relationMostInstance(mudColor, tTable, vWhite).
 
 %typeProps(Type,Props),isa(Obj,Type),{flatten([Props],VoProps)} ==> props(Obj,VoProps).

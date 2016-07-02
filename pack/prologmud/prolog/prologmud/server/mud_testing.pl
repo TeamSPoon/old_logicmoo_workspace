@@ -226,7 +226,7 @@ lmconf:mud_test_local :- forall(localityOfObject(O,L),dmsg(localityOfObject(O,L)
 % :-decl_mpred_prolog(check_consistent(ftTerm,ftInt)).
 :-decl_mpred_prolog(is_instance_consistent(ftTerm,ftInt)).
 :-decl_mpred_prolog(bad_instance(ftTerm,ftTerm)).
-:-decl_mpred_prolog(is_checking_instance(ftTerm)).
+% :-decl_mpred_prolog(t_l:is_checking_instance(ftTerm)).
 
 check_consistent(Obj,Scope):-var(Scope),!,check_consistent(Obj,0).
 check_consistent(Obj,Scope):-is_instance_consistent(Obj,Was),!,Was>=Scope.

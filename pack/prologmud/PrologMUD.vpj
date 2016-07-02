@@ -28,12 +28,36 @@
 	<CustomFolders>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
+		<Folder Name="../../">
+			<F N="../../.gitattributes"/>
+			<F N="../../.gitignore"/>
+			<F N="../../.gitmodules"/>
+			<F N="../../.hgignore"/>
+			<F N="../../LICENSE"/>
+			<F N="../../LogicMOO.vpw"/>
+			<F N="../../pack.pl"/>
+			<F N="../../prologmud.pep"/>
+			<F N="../../README.md"/>
+			<F N="../../StartMUDServer.bat"/>
+			<F N="../../startMUDServer.sh"/>
+		</Folder>
 		<Folder Name="../games">
 			<F
 				N="../games/*.*"
 				Recurse="1"
 				Refilter="0"
 				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
+		</Folder>
+		<Folder Name="../jllykifsh">
+			<Folder Name="prolog">
+				<F N="../jllykifsh/prolog/script_ontology.pfc.pl"/>
+			</Folder>
+			<F
+				N="../jllykifsh/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
+			<F N="../jllykifsh/pack.pl"/>
 		</Folder>
 		<Folder Name="../logicmoo_base">
 			<F
@@ -58,26 +82,6 @@
 				Refilter="0"
 				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
 		</Folder>
-		<Folder Name="t">
-			<F
-				N="t/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes="git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
-		</Folder>
-		<Folder Name="../../">
-			<F N="../../.gitattributes"/>
-			<F N="../../.gitignore"/>
-			<F N="../../.gitmodules"/>
-			<F N="../../.hgignore"/>
-			<F N="../../LICENSE"/>
-			<F N="../../LogicMOO.vpw"/>
-			<F N="../../pack.pl"/>
-			<F N="../../prologmud.pep"/>
-			<F N="../../README.md"/>
-			<F N="../../StartMUDServer.bat"/>
-			<F N="../../startMUDServer.sh"/>
-		</Folder>
 		<Folder Name="../prologmud">
 			<Folder Name="games">
 				<F
@@ -94,6 +98,13 @@
 				Refilter="0"
 				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
 			<F N="runtime/README.md"/>
+		</Folder>
+		<Folder Name="t">
+			<F
+				N="t/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes="git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
 		</Folder>
 	</Files>
 </Project>

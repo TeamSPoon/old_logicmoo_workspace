@@ -101,8 +101,6 @@
 
 user_m_check(_Out).
 
-clause_b(G):- clause(baseKB:G,Body),call(Body).
-
 :- meta_predicate make_shared_multifile(+,+,+).
 :- meta_predicate make_shared_multifile(*,*,*,*).
 
@@ -122,7 +120,7 @@ add_abox_module(ABox):- must(atom(ABox)),
 :- dynamic(baseKB:mtNoPrologCode/1).
 baseKB:mtNoPrologCode(mpred_userkb).
 
-baseKB:mtProlog(Mt):- var(Mt),!,current_module(Mt),clause_b(mtProlog(Mt)).
+baseKB:mtProlog(Mt):- var(Mt),!,current_module(Mt),\+ clause_b(mtCycL(Mt)).
 baseKB:mtProlog(Mt):- \+ atom(Mt),!,fail.
 baseKB:mtProlog(Mt):- \+ current_module(Mt),!,fail.
 baseKB:mtProlog(Mt):- clause_b(mtCycL(Mt)),!,fail.
@@ -321,7 +319,7 @@ get_current_default_tbox(baseKB).
 set_defaultAssertMt(ABox):- 
   sanity(mtCanAssert(ABox)),
   must_det_l((
-    ensure_abox(ABox),
+	nop(ensure_abox(ABox)),
     get_current_default_tbox(TBox),
     asserta_new(TBox:mtCycL(ABox)),
     asserta_new(ABox:defaultTBoxMt(TBox)),
@@ -655,10 +653,13 @@ uses_predicate(SM,CallerMt,F,A,R):-
 %
 % Ensure istAbove/2 stub is present in ChildDefMt.
 %
-
+create_predicate_istAbove(Nonvar,F,A):- sanity(ground(create_predicate_istAbove(Nonvar,F,A))),fail.
+% TODO unsuspect the next line (nothing needs to see above baseKB)
+create_predicate_istAbove(baseKB,F,A):- !,make_as_dynamic(create_predicate,baseKB,F,A),
+      ignore((( \+ (defaultAssertMt(CallerMt)),CallerMt\==baseKB,create_predicate_istAbove(CallerMt,F,A) ))).
 create_predicate_istAbove(abox,F,A):-  must(defaultAssertMt(CallerMt)),sanity(CallerMt\=abox),!,create_predicate_istAbove(CallerMt,F,A).
+create_predicate_istAbove(CallerMt,F,A):- clause_b(mtProlog(CallerMt)),!,wdmsg(warn(create_predicate_istAbove(CallerMt,F,A))).
 create_predicate_istAbove(CallerMt,F,A):-   
-   show_failure(\+ find_and_call(baseKB:mtProlog(CallerMt))),!,
    make_as_dynamic(create_predicate_istAbove,CallerMt,F,A),
    functor(Goal,F,A),
    assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
@@ -680,7 +681,9 @@ retry_undefined(Mt, F, A):-  clause_b(mtCycLBroad(Mt)), baseKB_hybrid_support(F,
    make_as_dynamic(mtCycLBroad(Mt),Mt,F,A).
 
 % child-like Mt
-retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), find_and_call(baseKB:mtGlobal(CallerMt)),
+retry_undefined(CallerMt,F,A):- baseKB_hybrid_support(F,A), 
+   clause_b(mtGlobal(CallerMt)),
+   % find_and_call(baseKB:mtGlobal(CallerMt)),
    create_predicate_istAbove(CallerMt,F,A).
 
 % import built-ins ?
