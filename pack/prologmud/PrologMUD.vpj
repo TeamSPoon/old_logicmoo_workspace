@@ -55,8 +55,7 @@
 			<F
 				N="../jllykifsh/*.*"
 				Recurse="1"
-				Refilter="0"
-				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
+				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/;.svn/"/>
 			<F N="../jllykifsh/pack.pl"/>
 		</Folder>
 		<Folder Name="../logicmoo_base">

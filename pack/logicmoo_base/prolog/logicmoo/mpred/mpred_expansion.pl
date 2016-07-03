@@ -279,7 +279,8 @@ disabled a(T,I):- rdf_x(I,rdf:type,T).
 % A.
 %
 :- meta_predicate a(+,?).
-a(C,I):- quietly((atom(C),G=..[C,I], no_repeats_old(clause_true(G)))).
+% WANT (but will loop) a(C,I):- !, quietly((atom(C),G=..[C,I], no_repeats_old(call_u(G)))).
+a(C,I):- quietly((atom(C),G=..[C,I], no_repeats_old(lookup_u(G)))).
 
 
 %=  :- was_export(alt_calls/1).
@@ -314,13 +315,30 @@ alt_calls(ireq).
 %
 show_doall(Call):- doall(show_call(why,Call)).
 
-cheaply_u(P):- strip_module(P,_,C),P\==C,!,cheaply_u(C).
-cheaply_u(G):- loop_check(cheaply_u_ilc(G),loop_check_term(cheaply_u_ilc(G),ilc2(G),dump_break)).
 
-cheaply_u_ilc(P):- strip_module(P,_,C),P\==C,!,cheaply_u_ilc(C).
+/*
+Name               Meaning                            
+
+speed              speed of the runtime code
+safety             run-time error checking            
+
+correct         run-time error correction            
+
+compilation-speed  speed of the compilation process   
+debug              ease of debugging     
+
+
+cheaply_u(G):- quickly(quietly(Goal)).
+
+*/
+
+cheaply_u(G):- need_speed,!, (ground(G)->(quietly(baseKB:G)),!);quietly(lookup_u(G))).
+cheaply_u(G):- loop_check(cheaply_u_ilc(G),loop_check_term(cheaply_u_ilc(G),ilc2(G),fail)).
+
 cheaply_u_ilc(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
 cheaply_u_ilc(call(ereq,G)):- !,cheaply_u_ilc(G).
-cheaply_u_ilc(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
+cheaply_u_ilc(G):- predicate_property(G,number_of_rules(N)),N=0,!,lookup_u(G).
+cheaply_u_ilc(G):- strip_module(G,_,C),G\==C,!,cheaply_u_ilc(C).
 cheaply_u_ilc(G):- call_u(G).
 
 %= 	 	 

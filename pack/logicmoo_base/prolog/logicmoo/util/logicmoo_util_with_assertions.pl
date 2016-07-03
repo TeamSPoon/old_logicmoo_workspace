@@ -166,7 +166,7 @@ to_thread_head_1m(Head,tlbugger,tlbugger:Head,Head):-check_thread_local_1m(tlbug
 %
 % Check Thread Local 1m.
 %
-check_thread_local_1m(_):- is_release,!.
+check_thread_local_1m(_):- skipWrapper,!.
 check_thread_local_1m(t_l:_):-!.
 check_thread_local_1m((H:-_)):-!,check_thread_local_1m(H).
 check_thread_local_1m(tlbugger:_):-!.

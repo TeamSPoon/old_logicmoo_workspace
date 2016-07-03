@@ -234,6 +234,7 @@
         show_new_src_location/2,
         show_source_location/0,
         skipWrapper/0,
+        skipWrapper0/0,
         strip_arity/3,
         strip_f_module/2,
         get_thread_current_error/1,
@@ -263,6 +264,9 @@
 
 */
 
+:- thread_local( tlbugger:old_no_repeats/0).
+:- thread_local( tlbugger:skip_bugger/0).
+:- thread_local( tlbugger:dont_skip_bugger/0).
 
 % = :- meta_predicate(catchvvnt(0,?,0)).
 
@@ -1286,9 +1290,6 @@ on_x_log_cont(Goal):- catchv((Goal*->true;ddmsg(failed_on_x_log_cont(Goal))),E,d
 %
 errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 
-% false = use this wrapper, true = code is good and avoid using this wrapper
-:- export(skipWrapper/0).
-
 :- thread_local(tlbugger:rtracing/0).
 
 %skipWrapper:-!,fail.
@@ -1299,18 +1300,21 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 %
 % Skip Wrapper.
 %
-skipWrapper:- tracing, \+ tlbugger:rtracing,!.
-skipWrapper:- tlbugger:dont_skip_bugger,!,fail.
-skipWrapper:- is_release,!.
-skipWrapper:- tlbugger:skip_bugger,!.
-%skipWrapper:- 0 is random(5),!.
-%skipWrapper:- tlbugger:skipMust,!.
 
+% false = use this wrapper, true = code is good and avoid using this wrapper
+:- export(skipWrapper/0).
+skipWrapper:- notrace(skipWrapper0).
+:- export(skipWrapper0/0).
+skipWrapper0:- current_prolog_flag(unsafe_speedups,true).
+% skipWrapper:- tracing,!.
+skipWrapper0:- tracing, \+ tlbugger:rtracing,!.
+skipWrapper0:- tlbugger:dont_skip_bugger,!,fail.
+skipWrapper0:- tlbugger:skip_bugger,!.
+skipWrapper0:- is_release,!.
+%skipWrapper0:- 1 is random(5),!.
+%skipWrapper0:- tlbugger:skipMust,!.
 
-:- thread_local( tlbugger:old_no_repeats/0).
-:- thread_local( tlbugger:skip_bugger/0).
-:- thread_local( tlbugger:dont_skip_bugger/0).
-%:-thread_local( tlbugger:bugger_prolog_flag/2).
+:- '$hide'(skipWrapper/0).
 
 %MAIN tlbugger:skip_bugger.
 
@@ -1401,7 +1405,7 @@ det_lm(M,Goal):-M:Goal,!.
 %
 % Must Be Successfull (list Version).
 %
-must_l(Goal):- is_release,!,call(Goal).
+must_l(Goal):- skipWrapper,!,call(Goal).
 must_l(Goal):-var(Goal),trace_or_throw(var_must_l(Goal)),!.
 must_l((A,!,B)):-!,must(A),!,must_l(B).
 must_l((A,B)):-!,must((A,deterministic(Det),true,(Det==true->(!,must_l(B));B))).
@@ -1424,7 +1428,9 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; must(Goal)),!.
 
 
 :- meta_predicate(hide_trace(0)).
-hide_trace(G):- is_release,!,call(G).
+
+hide_trace(G):- \+ tracing,!,call(G).
+% hide_trace(G):- skipWrapper,!,call(G).
 hide_trace(G):- 
  restore_trace((
    hotrace(
@@ -1439,10 +1445,8 @@ hide_trace(G):-
 on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
 
 :- meta_predicate quietly(0).
-quietly(G):- is_release,!,call(G).
-quietly(G):- !, on_x_f((G),
-                     setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),
-                     fail).
+quietly(G):- skipWrapper,!,call(G).
+% quietly(G):- !, on_x_f((G),setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),fail).
 quietly(G):- on_x_f(hide_trace(G),
                      setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),
                      fail).
@@ -1478,12 +1482,13 @@ unsafe_safe(_,O):- \+ allow_unsafe_code, !, call(O).
 unsafe_safe(N,O):- on_diff_throw(N,O).
 
 :- export(need_speed/0).
-need_speed:-fail.
+need_speed:-current_prolog_flag(unsafe_speedups,true).
 
 :- export(is_release/0).
 %% is_release is semidet.
 %
 % If Is A Release.
+
 
 is_release:- notrace((\+ current_prolog_flag(logicmoo_debug,true), \+ (1 is random(10)))).
 
@@ -1548,8 +1553,8 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
-% must(Goal):-  notrace(is_release),!,call(Goal).
-must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),MGoal.
+must(Goal):-  notrace(skipWrapper),!,(Goal*->true;trace_or_throw(failed(Goal))).
+must(Goal):-  notrace((sanity(must_be(nonvar,Goal)),get_must(Goal,MGoal),!)),call(MGoal).
 
 
 %= 	 	 
@@ -1558,10 +1563,10 @@ must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),MGoal.
 %
 % Get Must Be Successfull.
 %
-get_must(hotrace(Goal),CGoal):-  fail, !,get_must(Goal,CGoal).
-get_must(M:hotrace(Goal),CGoal):- !,get_must(M:Goal,CGoal).
-% get_must(hotrace(Goal),CGoal):- !,get_must((hotrace(Goal)*->true;Goal),CGoal).
-% get_must(Goal,CGoal):-  (is_release;tlbugger:skipMust),!,CGoal = Goal.
+%get_must(hotrace(Goal),CGoal):-  fail, !,get_must(Goal,CGoal).
+get_must(M:Goal,M:CGoal):- !,get_must(Goal,CGoal).
+get_must(hotrace(Goal),CGoal):- !,get_must((hotrace(Goal)*->true;Goal),CGoal).
+get_must(Goal,CGoal):-  (tlbugger:skipMust;skipWrapper),!,CGoal = Goal.
 get_must(Goal,CGoal):- fail, skipWrapper,!, CGoal = (Goal *-> true ;
    ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
 get_must(Goal,CGoal):-  fail, tlbugger:show_must_go_on,!,

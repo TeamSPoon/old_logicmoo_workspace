@@ -285,14 +285,14 @@ loop_check_just(G):-loop_check(G,ignore(arg(1,G,[]))).
 % Show Predicate Info.
 %
 show_pred_info(PI):-
+   ((
        pi_to_head_l(PI,Head),      
        doall(show_call(why,call_u(isa(Head,_)))),
         functor(Head,F,_),
         doall(show_call(why,call_u(isa(F,_)))),
-        trace,
        ((current_predicate(_,M:Head), (\+ predicate_property(M:Head,imported_from(_))))
           -> show_pred_info_0(M:Head); 
-             wdmsg(cannot_show_pred_info(M:Head))),!.
+             wdmsg(cannot_show_pred_info(M:Head))))),!.
 
 
 %= 	 	 

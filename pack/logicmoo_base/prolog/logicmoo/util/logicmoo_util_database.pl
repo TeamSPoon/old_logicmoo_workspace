@@ -651,7 +651,7 @@ remove_term_attr_type(Term,Mod):- cnotrace((term_attvars(Term,AVs),maplist(del_a
 
 :- op(700,xfx,'=@=').
 
-dont_make_cyclic(G):-is_release,!,call(G).
+dont_make_cyclic(G):-skipWrapper,!,call(G).
 dont_make_cyclic(G):-cyclic_break(G),!,G,cyclic_break(G).
 
 
@@ -738,16 +738,23 @@ retractall_i(H):-expand_to_hb(H,HH,_),forall(clause_i(HH,_,Ref),erase(Ref)).
 %
 % Clause True.
 %
-clause_true(G):- strip_module(G,M,P),!,
-  (M2=M;(current_module(M2),M2\=M)),
-    system:clause(M2:P,B,Ref),
-    (clause_property(Ref,module(M22));M22=M2),!,
-     call(M22:B).
+clause_true(G):- !, clause_b(G).
+
 clause_true(M:G):-!,system:clause(M:G,true)*->true;(current_module(M2),system:clause(M2:G,true)).
 clause_true(G):- cnotrace((current_module(M), \+ \+  system:clause(M:G,_,_))),!, system:clause(M:G,true).
 %clause_true(M:G):- predicate_property(M:G,number_of_clauses(_)),!,system:clause(M:G,true).
 %clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).
 %clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).
+
+clause_true_anywhere(G):- strip_module(G,M,S),!,
+  functor(S,F,A),
+  functor(P,F,A),
+  ((M2=M; M2=baseKB ;(current_module(M2),M2\=M)),
+    current_predicate(M2:P)),!,
+    system:clause(M2:S,B,Ref),
+     (B==true->! ;
+    (clause_property(Ref,module(M22));M22=M2),!,call(M22:B)).
+
 
 :-export(retract_eq/1).
 

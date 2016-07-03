@@ -2060,8 +2060,8 @@ should_call_for_facts(H):- get_functor(H,F,A),call_u(should_call_for_facts(H,F,A
 %
 should_call_for_facts(_,F,_):- a(prologSideEffects,F),!,fail.
 should_call_for_facts(H,_,_):- modulize_head(H,HH), \+ predicate_property(HH,number_of_clauses(_)),!.
-should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcRHS,F,A)),!,fail.
-should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcMustFC,F,A)),!,fail.
+should_call_for_facts(_,F,A):- clause_b(mpred_mark(pfcRHS,F,A)),!,fail.
+should_call_for_facts(_,F,A):- clause_b(mpred_mark(pfcMustFC,F,A)),!,fail.
 should_call_for_facts(_,F,_):- a(prologDynamic,F),!.
 should_call_for_facts(_,F,_):- \+ a(pfcControlled,F),!.
 
@@ -2201,7 +2201,7 @@ pred_u1(P):-a(prologDynamic,F),arity(F,A),functor(P,F,A).
 % Predicate For User Code Extended Helper.
 %
 pred_u2(P):-support_hilog(F,A),functor(P,F,A),has_db_clauses(P).
-pred_u2(P):-clause_true(arity(F,A)),functor(P,F,A),has_db_clauses(P).
+pred_u2(P):- clause_b(arity(F,A)),functor(P,F,A),has_db_clauses(P).
 
 
 

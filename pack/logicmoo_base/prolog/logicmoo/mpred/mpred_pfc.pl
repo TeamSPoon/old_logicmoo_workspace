@@ -227,6 +227,7 @@ push_current_choice/1,
 
 :- module_transparent lookup_u/1,lookup_u/2,mpred_unfwc_check_triggers0/1,mpred_unfwc1/1,mpred_why1/1,mpred_blast/1.
 
+
 system:must_notrace_pfc(G):- must(quietly(G)).
 
 /*
@@ -316,7 +317,8 @@ ensure_abox(M):-
    setup_module_ops(M),
    set_prolog_flag(M:unknown,error),
    forall(mpred_database_term(F,A,_),
-       must_det_l(((M:multifile(M:F/A),
+       must_det_l(((
+        M:multifile(M:F/A),
         M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         create_predicate_istAbove(M,F,A),        
@@ -328,10 +330,9 @@ mnotrace(G):- (no_trace(G)),!.
 % =================================================
 % ==============  UTILS BEGIN        ==============
 % =================================================
+copy_term_vn(A,A):- current_prolog_flag(unsafe_speedups,true),!.
 copy_term_vn(B,A):- ground(B),!,A=B.
 copy_term_vn(B,A):- !,copy_term(B,A).
-
-% copy_term_vn(A,A):-!.
 copy_term_vn(B,A):- need_speed,!,copy_term(B,A).
 copy_term_vn(B,A):- get_varname_list(Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),set_varname_list(Vs3),!.
 copy_term_vn(B,A):- nb_current('$old_variable_names',Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),b_setval('$old_variable_names',Vs3),!.
@@ -776,7 +777,7 @@ ain_fast(P,S):-
   mpred_run.
 
 
-%remove_negative_version(_P):- current_prolog_flag(unsafe_speedups,true),!.
+remove_negative_version(_P):- current_prolog_flag(unsafe_speedups,true),!.
 remove_negative_version(P) :- \+ mpred_non_neg_literal(P),!.
 remove_negative_version((H:-B)):- !,
   % TODO extract_predciates((H:-B),Preds),trust(Preds),
@@ -1531,7 +1532,7 @@ mpred_fwc1(support_hilog(_,_)):-!.
 % this line filters sequential (and secondary) dupes
 mpred_fwc1(Fact):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(_One,Two),Six is Two * 3,filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
 mpred_fwc1(Fact):- 
-  dmsg(mpred_fwc1(Fact)),
+  sanity(writeln(mpred_fwc1(Fact))),
   %ignore((mpred_non_neg_literal(Fact),remove_negative_version(Fact))),
   mpred_do_rule(Fact),
   copy_term_vn(Fact,F),
@@ -2220,7 +2221,7 @@ pos_2_neg(P,~(P)).
 %
 % PFC Mark Converted To.
 %
-% mpred_mark_as(_,_,_):- current_prolog_flag(unsafe_speedups,true),!.
+mpred_mark_as(_,_,_):- current_prolog_flag(unsafe_speedups,true),!.
 mpred_mark_as(_,P,_):- is_ftVar(P),!.
 mpred_mark_as(Sup,\+(P),Type):- !,mpred_mark_as(Sup,P,Type).
 mpred_mark_as(Sup,~(P),Type):- !,mpred_mark_as(Sup,P,Type).

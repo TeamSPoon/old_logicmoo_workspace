@@ -286,7 +286,7 @@ restore_trace(Goal):-
 
 % rtrace(Goal):- wdmsg(rtrace(Goal)),!, restore_trace(setup_call_cleanup_each(rtrace,(trace,Goal),nortrace)).
 
-
+rtrace(Goal):- notrace(skipWrapper;tlbugger:rtracing),!,Goal.
 rtrace(Goal):- 
   ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
    '$leash'(OldL, OldL),'$visible'(OldV, OldV),

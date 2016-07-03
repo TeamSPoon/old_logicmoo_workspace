@@ -328,6 +328,8 @@ not_simple_code :- \+ simple_code.
 type_error_checking:-false.
 % slow_sanity(A):-nop(A).
 :- meta_predicate xtreme_debug(0).
+
+xtreme_debug(_):- skipWrapper,!.
 xtreme_debug(P):- is_release,!,nop(P).
 xtreme_debug(P):- not_is_release, sanity(P).
 xtreme_debug(_).
