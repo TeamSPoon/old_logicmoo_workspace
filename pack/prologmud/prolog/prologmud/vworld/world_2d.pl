@@ -318,6 +318,10 @@ prologHybrid(mudInsideOf(tObj,tObj)).
 fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
 fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 
+((localityOfObject(apathFn(LivingRoom,Dir),LivingRoom),
+   \+ pathDirLeadsTo(LivingRoom, Dir, OfficeRoom) ==>
+     \+ localityOfObject(apathFn(LivingRoom,Dir),LivingRoom))).
+
 %  suggest a deducable fact that is probably true but not already asserted
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).

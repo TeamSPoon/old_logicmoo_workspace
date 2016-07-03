@@ -332,7 +332,7 @@ cheaply_u(G):- quickly(quietly(Goal)).
 
 */
 
-cheaply_u(G):- need_speed,!, (ground(G)->(quietly(baseKB:G)),!);quietly(lookup_u(G))).
+cheaply_u(G):- need_speed,!, (ground(G)->(quietly(baseKB:G),!);quietly(lookup_u(G))).
 cheaply_u(G):- loop_check(cheaply_u_ilc(G),loop_check_term(cheaply_u_ilc(G),ilc2(G),fail)).
 
 cheaply_u_ilc(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
@@ -982,7 +982,7 @@ db_expand_0(Op,Sent,SentO):- arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F
 
 db_expand_0(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
 
-db_expand_0(Op,t(Sent),SentO):- is_ftNonvar(Sent),fully_expand_head(Op,Sent,SentO).
+db_expand_0(Op,t(Sent),SentO):- is_ftNonvar(Sent),!,fully_expand_head(Op,Sent,SentO).
 db_expand_0(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
 %==SKIPPED==%  db_expand_0(_ ,NC,NC):- as_is_term(NC),!.
 
@@ -1486,9 +1486,11 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 %
 % Converted To Managed Predicate Form.
 %
+
+% into_mpred_form(Var,MPRED):- is_ftVar(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
 into_mpred_form(V,VO):- (not_ftCompound(V)),!,VO=V.
 into_mpred_form(M:X,M:O):- atom(M),!,into_mpred_form(X,O),!.
-into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentM),into_mpred_form(SentM,SentO).
+into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentM),!,into_mpred_form(SentM,SentO).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H,B),(HH,BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
@@ -1500,13 +1502,11 @@ into_mpred_form(t(P,A,B),O):-atom(P),!,O=..[P,A,B].
 into_mpred_form(t(P,A,B,C),O):-atom(P),!,O=..[P,A,B,C].
 into_mpred_form(IN,OUT):- 
    IN=..[F|Args],
-   must_maplist(into_mpred_form,Args,ArgsO),
+   must_maplist(into_mpred_form,Args,ArgsO),!,
    map_f(F,FO),OUT=..[FO|ArgsO].
 
-into_mpred_form(Var,MPRED):- is_ftVar(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
 
-
-into_mpred_form(I,O):- /*hotrace*/(loop_check(into_mpred_form_ilc(I,O),O=I)). % trace_or_throw(into_mpred_form(I,O).
+% into_mpred_form(I,O):- /*hotrace*/(loop_check(into_mpred_form_ilc(I,O),O=I)). % trace_or_throw(into_mpred_form(I,O).
 
 %:- mpred_trace_nochilds(into_mpred_form/2).
 

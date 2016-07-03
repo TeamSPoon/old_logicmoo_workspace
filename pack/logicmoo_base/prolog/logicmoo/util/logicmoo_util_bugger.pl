@@ -2001,13 +2001,10 @@ real_builtin_predicate(G):- predicate_property(G,foreign),!.
 real_builtin_predicate(G):- \+ predicate_property(G,defined),!,fail.
 %real_builtin_predicate(G):- predicate_property(G,imported_from(W))-> W==system,!.
 %real_builtin_predicate(G):- strip_module(G,_,GS),predicate_property(system:GS,BI),BI==built_in,!.
-real_builtin_predicate(G):- 
+real_builtin_predicate(G):-    \+ predicate_property(G,dynamic),
    predicate_property(G,BI),BI==built_in,
-   \+ predicate_property(G,dynamic),
-   functor(G,F,_),!,
-   (if_defined(defaultTBoxMt(call_u(M)),fail),
-   (if_defined(M:mpred_isa(F,prologHybrid),fail);
-     if_defined(baseKB:mpred_isa(F,prologHybrid),fail))),
+   get_functor(G,F),
+   (if_defined(mpred_isa(F,prologBuiltin),fail);if_defined(baseKB:mpred_isa(F,prologBuiltin),fail)),
    !.
 
 

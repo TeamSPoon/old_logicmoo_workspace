@@ -173,6 +173,8 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 :- write('\n?- user:ensure_loaded(run_mud_game). % to begin loading mud worlds').
 % :- user:ensure_loaded(start_mud_server).
 
+:- set_prolog_flag(logicmoo_debug,true).
+
 
 end_of_file.
 

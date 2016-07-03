@@ -102,8 +102,8 @@ run_mud_test(Name,Test):-
 % define tests locally
 
 
-:- mpred_trace_exec.
-:- set_prolog_flag(logicmoo_debug,true).
+%:- mpred_trace_exec.
+%:- set_prolog_flag(logicmoo_debug,true).
 
 lmconf:mud_test(test_fwc_1,
   (on_x_debug(ain(tAgent(iExplorer1))),

@@ -1303,7 +1303,7 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 
 % false = use this wrapper, true = code is good and avoid using this wrapper
 :- export(skipWrapper/0).
-skipWrapper:- notrace(skipWrapper0).
+skipWrapper:- notrace((skipWrapper0, \+ current_prolog_flag(logicmoo_debug,true))).
 :- export(skipWrapper0/0).
 skipWrapper0:- current_prolog_flag(unsafe_speedups,true).
 % skipWrapper:- tracing,!.
