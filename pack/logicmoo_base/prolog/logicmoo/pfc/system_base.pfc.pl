@@ -86,7 +86,7 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
 :- dynamic(sometimesUseless/0).
 
 
-(P/mpred_non_neg_literal(P) ==> { remove_negative_version(P) } ).
+% NEVER (P/mpred_non_neg_literal(P) ==> { remove_negative_version(P) } ).
 
 :- dynamic(mpred_mark_C/1).
 
@@ -261,6 +261,7 @@ mpred_mark(pfcPosTrigger,F, A)==>marker_supported(F,A).
 mpred_mark(pfcNegTrigger,F, A)==>marker_supported(F,A).
 mpred_mark(pfcBcTrigger,F, A)==>marker_supported(F,A).
 mpred_mark(pfcRHS,F, A)==>marker_supported(F,A).
+mpred_mark(pfcLHS,F, A)==>arity(F,A),prologMacroHead(F).
 mpred_mark(pfcCreates,F, A)==>
   {functor(P,F,A),make_dynamic(P),kb_dynamic(P),
     create_predicate_istAbove(abox,F,A)},
@@ -269,6 +270,9 @@ mpred_mark(pfcCreates,F, A)==>
 mpred_mark(pfcCallCode,F, A)/predicate_is_undefined_fa(F,A)
     ==> marker_supported(F,A).
 
+
+tCol(P)==>prologMacroHead(P).
+prologMacroHead(prologMacroHead).
 
 % (marker_supported(F,A))==>(prologHybrid(F),hybrid_support(F,A)).
 %mpred_mark(pfcPosTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).

@@ -58,8 +58,12 @@
             safe_univ/2,
             safe_univ0/2,
             clausify_attributes/2,
+            clausify_attributes4/4,
             my_module_sensitive_code/1
           ]).
+
+:- meta_predicate clause_asserted_i(:).
+
 :- meta_predicate
         ain(:),
         ain0(:),
@@ -99,6 +103,8 @@
         dont_make_cyclic/1,
         is_visible_module/1,
         clause_asserted/3,
+        clausify_attributes/2,
+        clausify_attributes4/4,
         erase_safe/2,
         current_modules_from/2,
         find_and_call/1,
@@ -111,7 +117,67 @@
         safe_univ0/2.
 
 
+:- module_transparent
+         ain/1,
+            ain0/1,
+            aina/1,
+            ainz/1,
 
+            if_flag_true/2,
+            current_modules_from/2,
+            attributes_equal/3,
+
+            attr_bind/2,attr_bind/1,
+            split_attrs/3,
+            dont_make_cyclic/1,
+
+            variant_i/2,av_comp/2,
+            is_visible_module/1,
+            hb_to_clause/3,
+            paina/1,pain/1,painz/1,
+            modulize_head/2,
+            remove_term_attr_type/2,
+            ainz_clause/1,ainz_clause/2,
+            simple_var/1,
+            append_term/3,
+            expand_to_hb/3,
+            assert_if_new/1,
+            asserta_if_new/1,
+            asserta_new/1,
+            assertz_if_new/1,
+            assertz_new/1,
+            assert_setting/1,
+            assert_setting_if_missing/1,
+            call_provider/1,
+            call_provider/2,
+            clause_true/1,
+            modulize_head_fb/4,
+            unify_bodies/2,
+            attr_bind/1,
+            clause_asserted/1,clause_asserted/2,clause_asserted/3,
+            clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,
+            clause_i/1,clause_i/2,clause_i/3,
+            assert_i/1,asserta_i/1,assertz_i/1,
+            retract_i/1,retractall_i/1,
+
+
+            clause_safe/2,
+            debugCallWhy/2,
+            erase_safe/2,
+            eraseall/2,
+            find_and_call/1,
+            somehow_callable/1,
+            find_and_call/3,
+            std_provider/3,
+            mpred_mop/3,
+            mpred_op_prolog/2,
+            mpred_split_op_data/3,
+            retract_eq/1,
+            safe_univ/2,
+            safe_univ0/2,
+            clausify_attributes/2,
+            clausify_attributes4/4,
+            my_module_sensitive_code/1.
 :- if(false).
 :- else.
 :- include('logicmoo_util_header.pi').
@@ -490,13 +556,14 @@ expand_to_hb( H,  H,  true).
 
 clausify_attributes(V,V):- \+ current_prolog_flag(assert_attvars,true),!.
 clausify_attributes(V,V):- \+ compound(V),!.
+clausify_attributes(:-(V),:-(V)):-!.
 clausify_attributes(M:Data,M:THIS):- !,clausify_attributes(Data,THIS).
 clausify_attributes([H|T],[HH|TT]):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
-clausify_attributes((H,T),(HH,TT)):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
-clausify_attributes(Data,THIS):- copy_term(Data,DataC,Attribs),expand_to_hb(DataC,H,B),clausify_attributes(H,B,Attribs,THIS).
+%clausify_attributes((H,T),(HH,TT)):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
+clausify_attributes(Data,THIS):- copy_term(Data,DataC,Attribs),expand_to_hb(DataC,H,B),clausify_attributes4(H,B,Attribs,THIS).
 
-clausify_attributes(H,B,[],(H:-B)):-!.
-clausify_attributes(H,B,Extra,(H:-attr_bind(Extra,B))).
+clausify_attributes4(H,B,[],(H:-B)):-!.
+clausify_attributes4(H,B,Extra,(H:-attr_bind(Extra,B))).
 
 
 
@@ -618,14 +685,17 @@ modulize_head_fb(From,H,Fallback,M:H):-
 % PFC Clause For User Interface.
 %
 clause_asserted_i(Head):- 
+  \+ \+ ((
   % fully_expand_now_wte(assert,Head,HeadC),
   copy_term(Head,HC),
-  copy_term_nat(Head,Head_copy),  
+  copy_term_nat(Head,Head_copy),
   % find a unit system:clause identical to Head by finding one which unifies,
   clause_i(Head_copy),
   % and then checking to see if it is identical
+  term_attvars(Head:Head_copy:HC,Vars),maplist(del_attr_type(vn),Vars),
   =@=(Head,HC),
-  variant(Head,Head_copy),!.
+  variant(Head,Head_copy))),!.
+
 
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
 clause_asserted_i(MH,B,R):- ground(MH:B),!,system:clause(MH,B,R),system:clause(MHR,BR,R),ground(MHR:BR).

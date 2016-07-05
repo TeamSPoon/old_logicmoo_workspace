@@ -1126,7 +1126,7 @@ mpred_update_literal(P,N,Q,R):-
     replace_arg(Q,N,NEW,R).
 
 
-spft(5,5,5).
+% spft(5,5,5).
 
 %% update_single_valued_arg(+Module, +P, ?N) is semidet. 
 %
@@ -1139,6 +1139,7 @@ update_single_valued_arg(M,M:Pred,N):-!,update_single_valued_arg(M,Pred,N).
 update_single_valued_arg(M,P,N):- 
   consequent_arg(N,P,UPDATE),
   is_relative(UPDATE),!,
+  dtrace,
   replace_arg(P,N,OLD,Q),
   must_det_l((clause_u(Q),update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R))),!,
   update_single_valued_arg(M,R,N).
@@ -2410,7 +2411,8 @@ assertz_mu(MH):- fix_mp(clause(assert,assert_u),MH,M,H),assertz_mu(M,H).
 %
 % Assert For User Code.
 %
-assert_mu(M,M:Pred,F,A):-!, assert_mu(M,Pred,F,A).
+assert_mu(M,M2:Pred,F,A):- M == M2,!, assert_mu(M,Pred,F,A).
+assert_mu(M,_:Pred,F,A):- dtrace,sanity(\+ is_ftVar(Pred)),!, assert_mu(M,Pred,F,A).
 assert_mu(M,Pred,F,_):- call_u(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(M,Pred,SV)),!.
 assert_mu(M,Pred,F,A):- a(prologSingleValued,F),!,must(update_single_valued_arg(M,Pred,A)),!.
 assert_mu(M,Pred,F,_):- a(prologOrdered,F) -> assertz_mu(M,Pred) ; asserta_mu(M,Pred).
@@ -2658,7 +2660,7 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 
 
  :- meta_predicate update_single_valued_arg(+,+,*).
- :- meta_predicate assert_mu(*,0,*,*).
+ :- meta_predicate assert_mu(*,+,*,*).
  :- meta_predicate mpred_facts_and_universe(0).
  :- meta_predicate {0}.
  :- meta_predicate repropagate_2(0).

@@ -730,6 +730,7 @@ is_code_body(P):- cnotrace(cwc==P ; (compound(P),arg(1,P,E),is_code_body(E))),!.
 %
 get_file_type(File,Type):-var(File),!,quietly_must(loading_source_file(File)),get_file_type(File,Type).
 get_file_type(File,Type):-lmcache:mpred_directive_value(File,language,Type).
+get_file_type(File,pfc):-file_name_extension(_,'.pfc.pl',File).
 get_file_type(File,Type):-file_name_extension(_,Type,File).
 
 
@@ -1166,7 +1167,7 @@ simplify_language_name(W,W).
 % File Begin.
 %
 file_begin(WIn):- 
- must_det_l((
+ must_det_l((   
    simplify_language_name(WIn,W),
    set_lang(W),
    set_file_lang(W),   
@@ -1185,6 +1186,7 @@ set_file_lang(W):-
    forall((prolog_load_context(file,Source);which_file(Source);prolog_load_context(source,Source)),
    ignore((  % \+ lmcache:mpred_directive_value(Source,language,W),
    decache_file_type(Source),
+
    wdmsg(lmcache:mpred_directive_value(Source,language,W)),
    (Source = '/root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/pfc/system_common.pfc.pl'-> must(W=pfc);true),
    assert_until_eof(Source,lmcache:mpred_directive_value(Source,language,W))))),

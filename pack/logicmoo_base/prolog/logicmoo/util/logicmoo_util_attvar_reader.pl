@@ -20,6 +20,7 @@
           mpred_get_attrs/2,
           mpred_put_attrs/2,
           install_attvar_expander/1,
+          system_expanded_attvars/4,
           is_term_expanding_in_file/1,
           system_expanded_attvars/2]).
 
@@ -34,9 +35,13 @@
           mpred_put_attrs/2,
           read_attvars/1,read_attvars/0,          
           install_attvar_expander/1,
+          system_expanded_attvars/4,
           is_term_expanding_in_file/1,
           system_expanded_attvars/2)).
 
+
+:- dynamic(lmcache:use_attvar_expander/1).
+:- dynamic(lmcache:never_use_attvar_expander/1).
 
 :- use_module(logicmoo_util_dmsg).
 
@@ -102,9 +107,11 @@ deserialize_attvars(Vs, V,O):- nonvar(O),!,must(deserialize_attvars(Vs, V,M)),!,
 deserialize_attvars(Vs, V,O):- var(V), get_attr(V,vn,N),set_in_vd(Vs,N=V),!,V=O.
 deserialize_attvars(Vs, V,O):- var(V), member(N=VV,Vs),VV==V,put_attr(V,vn,N),!,V=O.
 deserialize_attvars(_ ,IO,IO):- \+ compound(IO),!.
-deserialize_attvars(_ ,(H:-BI),O):- 
+
+deserialize_attvars(_ ,(H:-BI),O):- fail,
   split_attrs(BI,AV,BO),AV\==true,AV\=bad:_,term_attvars((H:-BO),[]),
    must(call(AV)),!,(BO==true->(O=H);O=(H:-BO)).
+
 deserialize_attvars(Vs,avar(S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ensure_named(Vs,V,_).
 deserialize_attvars(_ ,avar(V,_),V):- nonvar(V),!.
 deserialize_attvars(Vs,avar(V,S),V):- var(V),nonvar(S),!, show_call(put_dyn_attrs(V,S)),ensure_named(Vs,V,_N).
@@ -114,7 +121,7 @@ deserialize_attvars(Vs,C,A):- compound_name_arguments(C,F,Args),maplist(deserial
 
 :- meta_predicate put_dyn_attrs(*,?).
 put_dyn_attrs(V,S):- var(S),!,trace_or_throw(bad_put_dyn_attrs(V,S)),!.
-put_dyn_attrs(V,S):- S= att(_,_,_),!, put_attrs(V,S).
+put_dyn_attrs(V,S):-S=att(_,_,_), !, put_attrs(V,S).
 put_dyn_attrs(V,M:AV):- atom(M),!, M:put_dyn_attrs(V,AV).
 put_dyn_attrs(V,M=AV):- atom(M),!, ensure_attr_setup(M),!, must(put_attr(V,M,AV)).
 put_dyn_attrs(_V,[]):- !.
@@ -127,7 +134,8 @@ ensure_attr_setup(M):- atom(M),assert_if_new((M:attribute_goals(V,[put_attr(V,M,
 
 
 read_attvars:- read_attvars(true).
-read_attvars(TF):- set_prolog_flag(read_attvars,TF),
+read_attvars(TF):- 
+  set_prolog_flag(read_attvars,TF),
   set_prolog_flag(assert_attvars,TF),
   prolog_load_context(module,M),
   install_attvar_expander(M).
@@ -136,20 +144,44 @@ is_term_expanding_in_file(I):- var(I),!,fail.
 is_term_expanding_in_file(_:-_):-!.
 is_term_expanding_in_file(I):- source_file(_,_),nb_current('$term',CT),CT==I.
 
-install_attvar_expander(M):-
-  multifile(M:term_expansion/2),
-  dynamic(M:term_expansion/2),
-  asserta_if_new((
-   M:term_expansion(I,CO):- 
-   ((current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), 
-   notrace((system_expanded_attvars(I,O),
-   (is_term_expanding_in_file(I)->clausify_attributes(O,CO);=(O,CO)),wdmsg(xform(I --> CO)))))))),
+system_expanded_attvars(M:goal,_P,I,O):-
+     \+ is_term_expanding_in_file(I),
+    \+ lmcache:never_use_attvar_expander(M),
+    prolog_load_context(module,LC),
+    \+ lmcache:never_use_attvar_expander(LC),
+    current_prolog_flag(read_attvars,true), 
+    \+ current_prolog_flag(xref,true), 
+     system_expanded_attvars(I,O),
+     wdmsg(goal_xform(I --> O)).
 
-   system:multifile(system:goal_expansion/2),
-   system:dynamic(system:goal_expansion/2),
-   asserta_if_new((system:goal_expansion(I,O):- 
-    notrace((current_prolog_flag(read_attvars,true), 
-     \+ current_prolog_flag(xref,true), system_expanded_attvars(I,O))))).
+system_expanded_attvars(M:term,_P,I,CO):- 
+   is_term_expanding_in_file(I),
+    \+ lmcache:never_use_attvar_expander(M),
+    prolog_load_context(module,LC),
+    \+ lmcache:never_use_attvar_expander(LC),
+    current_prolog_flag(read_attvars,true), 
+    \+ current_prolog_flag(xref,true), 
+   system_expanded_attvars(I,O),
+   clausify_attributes(O,CO),
+   wdmsg(term_xform(I --> CO)),
+   b_setval('$term',CO).
+
+install_attvar_expander(M):-
+  asserta(lmcache:use_attvar_expander(M)),
+  system:multifile(M:term_expansion/4),
+  system:module_transparent(M:term_expansion/4),
+  system:dynamic(M:term_expansion/4),
+  asserta_if_new(((M:term_expansion(I,P,O,P):- system_expanded_attvars(M:term,P,I,O)))),
+  system:multifile(M:goal_expansion/4),
+  system:module_transparent(M:goal_expansion/4),
+  system:dynamic(M:goal_expansion/4),
+  asserta_if_new(((M:goal_expansion(I,P,O,P):- system_expanded_attvars(M:goal,P,I,O)))).
+
+uninstall_attvar_expander(M):-
+  ignore(retract(lmcache:use_attvar_expander(M))),
+  ignore(retract((M:goal_expansion(I,P,O,P):- system_expanded_attvars(M:goal,P,I,O)))),
+  ignore(retract((M:term_expansion(I,P,O,P):- system_expanded_attvars(M:term,P,I,O)))).
+
 
 
 
@@ -192,8 +224,9 @@ system_expanded_attvars(I,O):- (var(I);compound(I)),!,loop_check((deserialize_at
 
 :- retract(restore_attvar_reader(Was)),set_prolog_flag(read_attvars,Was).
 
-end_of_file.
 
+end_of_file.
+/*
 
 % % :- '$set_source_module'( system).
 
@@ -232,7 +265,7 @@ end_of_file.
 	       '$compile_term'(C, _Layout, File)).
 '$store_aux_clauses'(Clause, File) :-
 	'$compile_term'(Clause, _Layout, File).
-
+*/
 /*
    compile_predicates(['$expand_goal'/2, '$expand_term'/4]),!.
 :-   

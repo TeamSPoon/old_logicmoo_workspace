@@ -7,11 +7,15 @@
 
 
 :- module(sanity,[]).
+/*
+:- rtrace.
+:- set_prolog_flag(retry_undefined,false).
+:- set_prolog_flag(gc,true),garbage_collect.
 
-:- make.
+% :- make.
 :- set_prolog_flag(retry_undefined,true).
-
-:- use_module(library(logicmoo_base)).
+*/
+:- system:use_module(library(logicmoo_base)).
 
 :- must(context_module(sanity)).
 

@@ -272,6 +272,7 @@ defaultAssertMt(ABox):- fileAssertMt(ABox).
 %
 % not just user modules
 fileAssertMt(ABox):- nonvar(ABox), fileAssertMt(ABoxVar),!,ABox=@=ABoxVar.
+fileAssertMt(Module):- loading_source_file(File),get_file_type(File,pfc),prolog_load_context(module,Module),Module\==user.
 fileAssertMt(ABox):- 
   (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);'$current_typein_module'(ABox)),mtCanAssert(ABox)))),!.
@@ -286,6 +287,9 @@ fileAssertMt(baseKB).
 mtCanAssert(baseKB).
 mtCanAssert(user):- !,fail.
 mtCanAssert(abox):- !,dumpST,fail.
+mtCanAssert(Module):- clause_b(mtCycL(Module)).
+mtCanAssert(Module):- loading_source_file(File),get_file_type(File,pfc),prolog_load_context(module,Module).
+mtCanAssert(Module):- clause_b(mtExact(Module)).
 mtCanAssert(ABox):- clause_b(mtProlog(ABox)),!,fail.
 mtCanAssert(_).
 
@@ -319,7 +323,7 @@ get_current_default_tbox(baseKB).
 set_defaultAssertMt(ABox):- 
   sanity(mtCanAssert(ABox)),
   must_det_l((
-	nop(ensure_abox(ABox)),
+    ensure_abox(ABox),
     get_current_default_tbox(TBox),
     asserta_new(TBox:mtCycL(ABox)),
     asserta_new(ABox:defaultTBoxMt(TBox)),

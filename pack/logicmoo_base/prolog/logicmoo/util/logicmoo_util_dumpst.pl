@@ -548,7 +548,8 @@ dumptrace(G):- non_user_console,!,trace_or_throw(non_user_console_dumptrace(G)).
 dumptrace(G):-
   w_tl(set_prolog_flag(gui_tracer, false),
    w_tl(set_prolog_flag(gui, false),
-     dumptrace0(G))).
+    w_tl(set_prolog_flag(retry_undefined, false),
+     dumptrace0(G)))).
 
 dumptrace0(G):- cnotrace((tracing,cnotrace,wdmsg(tracing_dumptrace(G)))),break.
 dumptrace0(G):- 

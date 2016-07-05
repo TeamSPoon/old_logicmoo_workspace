@@ -7,25 +7,34 @@
 
 :- module(sanity_attvar_06 ,[]).
 
-:- use_module(library(logicmoo_base)).
+:- system:use_module(library(logicmoo_base)).
+:- set_prolog_flag(assert_attvars,true).
+
+:- fileAssertMt(Mt),wdmsg(fileAssertMt(Mt)).
 
 :- debug(_).
 :- nodebug(http(_)).
 :- debug(mpred).
 :- mpred_trace_exec.
+
 :- begin_pfc.
 
 :- dynamic(sk_out/1).
 :- dynamic(sk_in/1).
-
+:- set_prolog_flag(logicmoo_debug,true).
 
 % :- process_this_script.
 
+sk_in(Ex)==>sk_out(Ex).
+%sk_in(foo).
+%:-ain(sk_in(bar):- wdmsg(writeq(9))).
+
 :- read_attvars(true).
 
-sk_in(Ex)==>sk_out(Ex).
-sk_in(avar([vn='ExIn',sk='SKF-666'])).
+:- mpred_trace(sk_in/1).
+:- mpred_trace_exec.
 
+sk_in(avar([vn='ExIn',sk='SKF-666'])).
 
 :- must((sk_out(FOUND),get_attr(FOUND,sk,What),What='SKF-666')),dmsg(fOUND=FOUND).
 

@@ -860,7 +860,7 @@ dmsg(V):- w_tl(set_prolog_flag(retry_undefined,false), if_defined(dmsg0(V),logic
 %
 % (debug)message.
 %
-dmsg(F,A):- if_defined(dmsg0(F,A),logicmoo_util_catch:ddmsg(F,A)).
+dmsg(F,A):- w_tl(set_prolog_flag(retry_undefined, false),if_defined(dmsg0(F,A),logicmoo_util_catch:ddmsg(F,A))).
 
 
 

@@ -561,26 +561,21 @@ in_dialect_pfc:-
   (source_location(F,_W),( atom_concat(_,'.pfc.pl',F);atom_concat(_,'.plmoo',F);atom_concat(_,'.pfc',F)))),!.
 
 fully_expand(Op,Sent,SentO):-
- gripe_time(0.2,((
-  must(once((/*hotrace*/((cyclic_break((Sent)),
-     must(/*hotrace*/((deserialize_attvars(Sent,SentI)))),
-     w_tl_e(t_l:no_kif_var_coroutines(true),(((fully_expand_now(Op,SentI,SentO))))),
-     cyclic_break((SentO)))))))))).
+ % must(/*hotrace*/( / nop(deserialize_attvars(Sent,SentI)))),
+ gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,Sent,SentO))).
 
 %% fully_expand_now( ++Op, ^Sent, --SentO) is det.
 %
 % Fully Expand Now.
 
 fully_expand_now(Op,Sent,SentO):- 
- ((
- copy_term(Sent,NoVary),
- cyclic_break((NoVary)),
- must((dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause_now(Op,Sent,BO))),!,
+ must((dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause_now(Op,Sent,SentO))))))),!.
+ /*
     SentO=BO,
-    must(Sent=@=NoVary),
+    sanity(Sent=@=NoVary),
    ignore(((fail,cnotrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
     (Sent \=@= lmconf:SentO), dmsg(fully_expand_now(Op,(Sent --> SentO)))))))))))))),!.
-
+*/
      
 :- decl_shared(mtExact/1).
 

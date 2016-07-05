@@ -26,6 +26,13 @@
 	<CustomFolders>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
+               <Folder Name="jllykifsh">
+                        <F
+                                N="jllykifsh/*.*"
+                                Recurse="1"
+                                Refilter="1"
+                                Excludes=".git/;*.*~;*~/i;.svn/"/>
+                </Folder>
 		<Folder Name="ClioPatria">
 			<F
 				N="ClioPatria/*.*"
