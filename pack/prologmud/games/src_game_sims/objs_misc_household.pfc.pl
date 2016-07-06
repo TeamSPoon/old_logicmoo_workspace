@@ -19,5 +19,5 @@
 
 :- file_begin(pfc).
 
-:- declare_load_dbase('../src_game_nani/**/*.plmoo').
+:- declare_load_dbase('../src_game_nani/**/*.pfc.pl').
 

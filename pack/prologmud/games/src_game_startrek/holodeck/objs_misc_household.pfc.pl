@@ -12,4 +12,4 @@
 % ===============================================================================================
 */
 
-% :- declare_load_dbase('../games/src_game_nani/**/*.plmoo').
+% :- declare_load_dbase('../games/src_game_nani/**/*.pfc.pl').

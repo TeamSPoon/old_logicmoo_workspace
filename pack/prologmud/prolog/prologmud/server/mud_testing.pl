@@ -165,7 +165,7 @@ mud_test_level2(drop_take,
 %:- at_start(start_servers)
 
 % [Optionaly] Add some game content
-:- if_flag_true(was_runs_tests_pl, declare_load_dbase(logicmoo('rooms/startrek.all.plmoo'))).
+:- if_flag_true(was_runs_tests_pl, declare_load_dbase(logicmoo('rooms/startrek.all.pfc.pl'))).
 
 lmconf:mud_test_local:-
    test_name("tests to see if we have: player1"),

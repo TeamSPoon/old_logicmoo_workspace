@@ -102,7 +102,7 @@ now_try_game_dir(Else):-
   ((exists_directory(GAMEDIR) -> 
     with_all_dmsg(( 
       % forall(enumerate_files(game('**/*.pl'),X),system:ensure_loaded(X)),
-      forall(no_repeats_old(X,enumerate_files(game('**/*.plmoo'),X)),declare_load_dbase(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).
+      forall(no_repeats_old(X,enumerate_files(game('**/*.pfc.pl'),X)),declare_load_dbase(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).
 
 
 :-context_module(CM),assert(loading_from_cm(CM)).
@@ -228,7 +228,7 @@ debug_repl_w_cyc(Module,CallFirst):- !,
           wno_tl(t_l:useOnlyExternalDBs,
             w_tl(lmconf:use_cyc_database,
                ((decl_type(person),          
-                ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.plmoo')),
+                ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.pfc.pl')),
                 module(Module),
                 show_call(CallFirst), 
                 prolog_repl)))).
@@ -237,7 +237,7 @@ debug_repl_wo_cyc(Module,CallFirst):- !,
           w_tl(t_l:useOnlyExternalDBs,
             wno_tl(lmconf:use_cyc_database,
                ((decl_type(person),          
-                ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.plmoo')),
+                ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.pfc.pl')),
                 module(Module),
                 show_call(CallFirst), 
                 prolog_repl)))).
@@ -565,7 +565,7 @@ download_and_install_el:-
 
 % :- show_entry(ensure_mpred_file_loaded(prologmud(server/builtin))).
 % :- must(rescan_pfc).
-:- show_entry(forall(filematch('*/*.plmoo', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X)))).
+:- show_entry(forall(filematch('*/*.pfc.pl', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X)))).
 
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
@@ -575,10 +575,10 @@ download_and_install_el:-
 % Load the map file appropriate for the world being used.
 % Load the mud files appropriate for the mobs being used.
 
-:- show_entry(forall(filematch(prologmud('*/?*.plmoo'), X),dmsg(X))).
-:- show_entry(ensure_mpred_file_loaded(prologmud('*/?*.plmoo'))).
-:- show_entry(forall(filematch(prologmud('*/*/?*.plmoo'), X),dmsg(X))).
-%:- show_entry(ensure_mpred_file_loaded(prologmud('*/*/?*.plmoo'))).
+:- show_entry(forall(filematch(prologmud('*/?*.pfc.pl'), X),dmsg(X))).
+:- show_entry(ensure_mpred_file_loaded(prologmud('*/?*.pfc.pl'))).
+:- show_entry(forall(filematch(prologmud('*/*/?*.pfc.pl'), X),dmsg(X))).
+%:- show_entry(ensure_mpred_file_loaded(prologmud('*/*/?*.pfc.pl'))).
 
 % puts world into running state
 % :- must(old_setup).

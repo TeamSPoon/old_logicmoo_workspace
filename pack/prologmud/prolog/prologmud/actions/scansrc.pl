@@ -65,7 +65,7 @@ actScansrc :-
    % autoload,
    % include_moo_files_not_included('../src_incoming/*/*/?*.pl'),
    % make,
-   % include_moo_files_not_included('../src_incoming/*/?*.plmoo'),
+   % include_moo_files_not_included('../src_incoming/*/?*.pfc.pl'),
    rescandb,
    !)). 
 
