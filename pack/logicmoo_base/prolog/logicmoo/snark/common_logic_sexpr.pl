@@ -75,20 +75,28 @@ clip_qm(A,AO):-clip_us(A,AO).
 %
 % S-expression Sterm Converted To Pterm.
 %
+sexpr_sterm_to_pterm(VAR,'$VAR'(V)):- atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
+sexpr_sterm_to_pterm(VAR,kw((V))):- atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
 sexpr_sterm_to_pterm([S,Vars|TERM],PTERM):- nonvar(S),is_quantifier(S),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[S,Vars|PLIST])),!.
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['=>'|PLIST])),!.
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('<=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['<=>'|PLIST])),!.
-sexpr_sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
-sexpr_sterm_to_pterm(VAR,kw((V))):-atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
 sexpr_sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (number(S); \+ is_list(TERM) ; (atom(S),fail,atom_concat(_,'Fn',S))),sexpr_sterm_to_pterm_list([S|TERM],PTERM),!.            
-sexpr_sterm_to_pterm([VAR],VAR):-is_ftVar(VAR),!.
-sexpr_sterm_to_pterm([S],Y):-nonvar(S),sexpr_sterm_to_pterm(S,Y),!.
 sexpr_sterm_to_pterm([S|TERM],dot_holds(PTERM)):- not(is_list(TERM)),sexpr_sterm_to_pterm_list([S|TERM],(PTERM)),!.
-sexpr_sterm_to_pterm([S|TERM],PTERM):-is_ftVar(S), sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[holds,S|PLIST],!.
-sexpr_sterm_to_pterm([S|TERM],PTERM):- atomic(S),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[S|PLIST],!.
+sexpr_sterm_to_pterm([S],O):-is_ftVar(S),sexpr_sterm_to_pterm(S,Y),!,s_univ(O,[Y]),!.
+sexpr_sterm_to_pterm([S],O):-nonvar(S),sexpr_sterm_to_pterm(S,Y),!,s_univ(O,[Y]),!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):-is_ftVar(S), sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[t,S|PLIST]),!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):- atom(S),sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[S|PLIST]),!.
 sexpr_sterm_to_pterm(VAR,VAR).
 
+s_univ(P,[F|ARGS]):- atom(F),is_list(ARGS),length(ARGS,A),l_arity(F,A),P=..[F|ARGS].
+s_univ(P,S):-P=S.
+
+l_arity(F,A):- clause_b(arity(F,A)).
+l_arity(function,1).
+l_arity(quote,1).
+l_arity('$BQ',1).
+l_arity(_,1).
 
 %% sexpr_sterm_to_pterm_list( ?VAR, ?VAR) is semidet.
 %
@@ -256,6 +264,7 @@ sexpr('$CHAR'(C))                 --> "#\\", rsymbol(C), !, swhite.
 sexpr('$STR'(S))                 --> """", !, sexpr_string(S), swhite.
 sexpr(['$SYM'(quote),E])              --> "'", !, swhite, sexpr(E).
 sexpr(['$SYM'(backquote),E])         --> "`", !, swhite, sexpr(E).
+sexpr(['$SYM'(function),E])                 --> "#\'", sexpr(E), !, swhite.
 sexpr(['$BQ-COMMA-ELIPSE',E]) --> ",@", !, swhite, sexpr(E).
 sexpr('$COMMA'(E))            --> ",", !, swhite, sexpr(E).
 sexpr('$SYM'(E))                      --> sym_or_num(E),!, swhite.
@@ -373,6 +382,7 @@ to_untyped(S,O):- atom(S),catch(atom_number(S,O),_,fail),!.
 to_untyped(Atom,Atom):- \+ compound(Atom),!.
 to_untyped('$BQ'(VarName),'$BQ'(VarName)):-!.
 to_untyped('$SYM'(S),O):-nonvar(S),!,to_untyped(S,O),!.
+to_untyped('$SYM'('$SYM'(S)),O):-nonvar(S),!,to_untyped(S,O),!.
 to_untyped('$CHAR'(S),'$CHAR'(S)):-!.
 to_untyped('$COMMA'(S),'$COMMA'(O)):-to_untyped(S,O),!.
 to_untyped('$VECT'(S),'$VECT'(O)):-to_untyped(S,O),!.
@@ -385,8 +395,8 @@ to_untyped(['$SYM'(S)|Rest],Out):-is_list(Rest),maplist(to_untyped,[S|Rest],[F|M
           to_untyped(Out,OOut).
 to_untyped([H|T],Forms):-is_list([H|T]),must(text_to_string_safe([H|T],Forms);maplist(to_untyped,[H|T],Forms)).
 to_untyped([H|T],[HH|TT]):-!,must_det_l((to_untyped(H,HH),to_untyped(T,TT))).
-to_untyped(ExprI,ExprO):- ExprI=..Expr,
-  maplist(to_untyped,Expr,[HH|TT]),(atom(HH)-> ExprO=..[HH|TT] ; ExprO=[HH|TT]).
+to_untyped(ExprI,ExprO):- must(ExprI=..Expr),
+  must_maplist(to_untyped,Expr,[HH|TT]),(atom(HH)-> ExprO=..[HH|TT] ; ExprO=[HH|TT]).
 % to_untyped(Expr,Forms):-compile_all(Expr,Forms),!.
 
 

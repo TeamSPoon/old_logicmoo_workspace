@@ -167,6 +167,7 @@ lmconf:logicmoo_scan_autoloads:-false.
 % :- system:use_module(library('logicmoo/util/logicmoo_util_supp.pl')).
 */
 
+:- forall(current_module(M),assert_if_new(baseKb:mtProlog(M))).
 :- set_prolog_flag(lm_expanders,true).
 
 

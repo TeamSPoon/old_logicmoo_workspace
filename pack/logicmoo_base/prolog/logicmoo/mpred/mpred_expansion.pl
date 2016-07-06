@@ -153,7 +153,7 @@
             translateOneArg/8,
             was_isa_syntax/3,
           mpred_expansion_file/0,
-          
+          expand_kif_string/2,
          temp_comp/4,
          get_ruleRewrite/2,
          expand_kif_string_or_fail/3,
@@ -608,12 +608,18 @@ expand_isEach_or_fail(Sent,SentO):-
 %% expand_kif_string_or_fail( ++Op, ++Sent, --SentO) is semidet.
 %
 % Expand if String of KIF.
-expand_kif_string_or_fail(Why,I,O):- string(I), atom_contains(I,'('),
-  input_to_forms(string(I),Wff,Vs)->
-  put_variable_names(Vs)->
-  must(sexpr_sterm_to_pterm(Wff,PTerm))->
-  PTerm\=@=I -> 
-  fully_expand_now(Why,PTerm,O).
+expand_kif_string_or_fail(_Why,I,O):- string(I), % atom_contains(I,'('),
+   input_to_forms(string(I),Wff,Vs)->
+   put_variable_names(Vs) ->
+   must(sexpr_sterm_to_pterm(Wff,PTerm))->
+   PTerm\=@=I -> 
+   O=PTerm.
+
+
+expand_kif_string(I,O):- any_to_string(I,S),
+  input_to_forms(string(S),O,Vs)->
+  put_variable_names(Vs).
+  
 
 
 %% fully_expand_clause( ++Op, :TermSent, -- SentO) is det.
@@ -709,6 +715,7 @@ recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..
 as_is_term(NC):- cyclic_break(NC), var(NC),!.
 as_is_term(A):-atomic(A),!.
 as_is_term('$VAR'(_)).
+as_is_term(PARSE):-is_parse_type(PARSE),!,fail.
 as_is_term('$was_imported_kb_content$'(_,_)):-dtrace.
 as_is_term('wid'(_,_,_)).
 as_is_term('call'(_)).
@@ -817,6 +824,9 @@ mpred_expand_rule(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),
    mpred_database_term(F,A,_),
    PfcRule=[F|Args],maplist(fully_expand_goal(assert),Args,ArgsO),!,Out=..[F|ArgsO].
 
+is_parse_type(Var):-var(Var),!,fail.
+is_parse_type('kif'(NV)):-nonvar(NV).
+is_parse_type('pkif'(NV)):-nonvar(NV).
 
 %% db_expand_final( +Op, +TermNC, ?NC) is semidet.
 %
@@ -824,6 +834,7 @@ mpred_expand_rule(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),
 %
 % db_expand_final(Op,Sent,Sent):- Sent=..[_,A],atom(A),!.
 db_expand_final(_ ,NC,NC):-as_is_term(NC),!.
+db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),(not_ftCompound(T)),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
 db_expand_final(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_final(Op,Sent,SentO).
@@ -962,6 +973,10 @@ temp_comp(H,B,PRED,OUT):- nonvar(H),term_variables(B,Vs1),Vs1\==[], term_attvars
 % :- meta_predicate(term_expansion(':'(:-),(:-))).
 % :- mode(term_expansion(+,--)).
 db_expand_0(Op,Sent,SentO):- sanity(is_ftNonvar(Op)),sanity(var(SentO)),var(Sent),!,Sent=SentO.
+db_expand_0(Op,pkif(SentI),SentO):- nonvar(SentI),!,must((any_to_string(SentI,Sent),must(expand_kif_string_or_fail(Op,Sent,SentM)),SentM\=@=Sent,!,
+  fully_expand_clause_now(Op,SentM,SentO))).
+db_expand_0(_Op,kif(Sent),SentO):- nonvar(Sent),!, must(expand_kif_string(Sent,SentO)).
+
 db_expand_0(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause_now(Op,SentM,SentO).
 db_expand_0(Op,M:Sent,SentO):- is_stripped_module(M),!,db_expand_0(Op,Sent,SentO).
 db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.

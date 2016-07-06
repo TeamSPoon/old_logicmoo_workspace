@@ -531,7 +531,7 @@ make_as_dynamic(Reason,Mt,F,A):-
    dynamic(Mt:F/A),
    module_transparent(Mt:F/A),
    public(Mt:F/A),
-   on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
+   on_f_throw( (Mt:F/A)\== (baseKB:loaded_external_kbs/1)),
    functor(Goal,F,A),
    assert_if_new(( Mt:Goal :- (fail,infoF(Reason)))))).
 
@@ -620,15 +620,15 @@ uses_predicate(_,_,_,_,error):-prolog_current_frame(F),
 uses_predicate(CallerMt,CallerMt,predicateConventionMt,2,retry):-
   create_predicate_istAbove(CallerMt,predicateConventionMt,2),!.
   
-uses_predicate(CallerMt,baseKB,predicateConventionMt,2,retry):-
+uses_predicate(_CallerMt,baseKB,predicateConventionMt,2,retry):-
   create_predicate_istAbove(baseKB,predicateConventionMt,2).
   
 
-uses_predicate(CallerMt, baseKB, F, A,retry):-
+uses_predicate(_CallerMt, baseKB, F, A,retry):-
   create_predicate_istAbove(baseKB,F,A),
    nop(system:import(baseKB:F/A)),!.
 
-uses_predicate(System, BaseKB, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),!,
+uses_predicate(System, BaseKB, F,A, retry):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),!,
    create_predicate_istAbove(BaseKB,F,A),
     nop(system:import(BaseKB:F/A)),!.
 

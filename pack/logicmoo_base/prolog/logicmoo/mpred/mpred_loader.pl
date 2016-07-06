@@ -1822,12 +1822,12 @@ end_module_type(CM,Type):-retractall(lmconf:registered_module_type(CM,Type)).
 
 ensure_mpred_file_loaded(M:F0,List):-!,
   must_locate_file(M:F0,F),  % scope_settings  expand(true),register(false),
-  % 'format'(user_output /*e*/,'%  ~q + ~q -> ~q.~n',[M,F0,F]),
+  % 'format'(user_error /*e*/,'%  ~q + ~q -> ~q.~n',[M,F0,F]),
   load_files([F],[if(not_loaded), must_be_module(true)|List]).
    %load_files(F,[redefine_module(false),if(not_loaded),silent(false),exported(true),must_be_module(true)|List]).   
 ensure_mpred_file_loaded(M:F0,List):-
   must_locate_file(M:F0,F),  % scope_settings
-  'format'(user_output /*e*/,'% load_mpred_file_M ~q.~n',[M=must_locate_file(F0,F)]),
+  'format'(user_error /*e*/,'% load_mpred_file_M ~q.~n',[M=must_locate_file(F0,F)]),
    load_files([F],[redefine_module(false),module(M),expand(true),if(not_loaded),exported(true),register(false),silent(false),must_be_module(true)|List]).
 
 ******/

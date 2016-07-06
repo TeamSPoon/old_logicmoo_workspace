@@ -23,13 +23,14 @@
 
 :- system:ensure_loaded(setup_paths).
 :- system:ensure_loaded(logicmoo_repl).
+:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
+:- use_listing_vars.
 :- set_prolog_flag(dialect_pfc,false).
 
-:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
-%:- ensure_webserver(3020).
-%:- initialization(ensure_webserver(3020)).
-%:- initialization(ensure_webserver(3020),now).
-%:- initialization(ensure_webserver(3020),restore).
+:- ensure_webserver(3020).
+:- initialization(ensure_webserver(3020)).
+:- initialization(ensure_webserver(3020),now).
+:- initialization(ensure_webserver(3020),restore).
 
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System

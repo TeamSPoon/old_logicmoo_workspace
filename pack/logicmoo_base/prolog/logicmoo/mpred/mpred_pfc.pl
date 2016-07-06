@@ -1557,7 +1557,7 @@ mpred_fwc1(Fact):-
 %  a rule.
 
 % mpred_do_rule((H:-attr_bind(B,_))):- get_functor(H,F,A),lookup_u(mpred_mark(pfcLHS,F,A)), sanity(nonvar(B)), repropagate(H),!. 
-mpred_do_rule((H:-B)):- var(H),sanity(nonvar(B)),forall(call_u(B),mpred_ain(H),!.
+mpred_do_rule((H:-B)):- var(H),sanity(nonvar(B)),forall(call_u(B),mpred_ain(H)),!.
 mpred_do_rule((H:-B)):- get_functor(H,F,A),lookup_u(mpred_mark(pfcLHS,F,A)), sanity(nonvar(B)),forall(call_u(B),mpred_fwc(H)),!.
 %   !,trace,ignore((lookup_u(H),mpred_fwc1(H),fail)).
 

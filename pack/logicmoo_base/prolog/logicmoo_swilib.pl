@@ -50,6 +50,7 @@
 :- system:use_module(library(help_message)).
 :- system:use_module(library(toolbar)).
 :- system:use_module(library(plot/plotter)).
+
 :- system:use_module(library(imageops)).
 :- system:use_module(library(pce_float_item)).
 
@@ -222,6 +223,7 @@
 :- system:use_module(library(http/http_server_files)).
 :- system:use_module(library(http/http_wrapper)).
 
+:- autoload.
 
 :- M=pldoc_process,ignore((module_property(M,file(S)),
    source_file(PI,S),

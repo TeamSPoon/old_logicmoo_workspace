@@ -196,9 +196,10 @@ grab_body((A,B),AB):-grab_body(A,AA),grab_body(B,BB),conjoin_pttp(AA,BB,AB).
 grab_body(_,true).
 
 :- was_export(portray_clause_0/1).
-portray_clause_0(  Cmp ):- compound(Cmp),call(=,Cmp,(AA:-BB)),!, renumbervars_prev((AA:-BB) ,(A:-B) ),call(=,NV,(A:-B)),portray_clause(user_output,NV,[numbervars(true)]).
-portray_clause_0( (A;B)):-writeq((A;B)),nl,!.
-portray_clause_0(  AB  ):- portray_clause(user_output,(AB),[numbervars(true)]).
+portray_clause_0(  Cmp ):- compound(Cmp),call(=,Cmp,(AA:-BB)),!, renumbervars_prev((AA:-BB) ,(A:-B) ),call(=,NV,(A:-B)),
+  current_output(Out),portray_clause(Out,NV,[numbervars(true)]).
+portray_clause_0( (A;B)):- writeq((A;B)),nl,!.
+portray_clause_0(  AB  ):- current_output(Out),portray_clause(Out,(AB),[numbervars(true)]).
 
 
 
