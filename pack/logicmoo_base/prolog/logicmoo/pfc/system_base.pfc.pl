@@ -433,7 +433,7 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 :- dynamic(baseKB:isRegisteredCycPred/3).
 
 /*
-:- ((rtrace, trace)).
+:- ((rtrace, dtrace)).
 
 (({fail,current_module(Mt),
    predicate_property(Mt:P,defined), 
@@ -484,7 +484,7 @@ doRedelMe.
 :-listing(removeMe/2).
 :-listing(redelMe/2).
 
-:- break.
+:- dbreak.
 */
 
 nondet.

@@ -635,7 +635,7 @@ fully_expand_clause(_,(:-(Sent)),(:-(Sent))):-!.
 
 
 fully_expand_clause(Op,Sent,SentO):- is_list(Sent),!,must_maplist(fully_expand_clause(Op),Sent,SentO).
-fully_expand_clause(Op,(B,H),Out):- !,fully_expand_clause(Op,H,HH),fully_expand_clause(Op,B,BB),!,must(Out=(BB,HH)).
+fully_expand_clause(Op,(B,H),Out):- !,must((fully_expand_clause(Op,H,HH),fully_expand_clause(Op,B,BB))),!,must(Out=(BB,HH)).
 fully_expand_clause(Op,':-'(Sent),Out):-!,fully_expand_goal(Op,Sent,SentO),!,must(Out=':-'(SentO)).
 
 fully_expand_clause(_,Sent,SentO):- t_l:infSkipFullExpand,!,must(Sent=SentO).
@@ -1085,7 +1085,7 @@ db_expand_0(Op,ClassTemplate,(isa(TypePropsIsa,Type),(isa(NewInst,Type)=>OUT))):
 /*
 
 % tRegion_template(tLivingRoom,.....).
-db_expand_0(Op,typeProps(C,Props),(isa(I,C)=>OOUT)):- (is_ftNonvar(C);is_ftNonvar(Props)), expand_props(Prefix,Op,props(I,Props),OUT),trace,list_to_conjuncts(OUT,OUTC),conjuncts_to_list(OUTC,OUTL),
+db_expand_0(Op,typeProps(C,Props),(isa(I,C)=>OOUT)):- (is_ftNonvar(C);is_ftNonvar(Props)), expand_props(Prefix,Op,props(I,Props),OUT),dtrace,list_to_conjuncts(OUT,OUTC),conjuncts_to_list(OUTC,OUTL),
    ISEACH=..[isEach|OUTL],
   db_expand_0(Op,mdefault(ISEACH),OOUT).
 
@@ -1163,7 +1163,7 @@ replaced_module(_,tbox,TBox):-get_current_default_tbox(TBox).
 
 
 maybe_prepend_mt(MT,I,O):- t_l:current_defaultAssertMt(ABOX)->ABOX==MT,!,maybe_prepend_mt(abox,I,O).
-maybe_prepend_mt(abox,H,HH):-nonvar(HH),trace,maybe_prepend_mt(abox,H,HHH),must(HHH=HH),!.
+maybe_prepend_mt(abox,H,HH):-nonvar(HH),dtrace,maybe_prepend_mt(abox,H,HHH),must(HHH=HH),!.
 maybe_prepend_mt(abox,H,HH):-var(H),must(HH=H),!.
 maybe_prepend_mt(_,CL,CL):- compound(CL),CL=(_,_),!.
 maybe_prepend_mt(_,H,HH):-predicateSystemCode(H,HH),!.

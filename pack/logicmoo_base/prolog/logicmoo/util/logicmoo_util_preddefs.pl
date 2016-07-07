@@ -150,7 +150,7 @@ call_from_module(NewModule,Goal):-
 
 
 
-dump_break:- prolog_stack:backtrace(8000),dtrace. % system:break.
+dump_break:- prolog_stack:backtrace(8000),dtrace. % system:dbreak.
 
 
 :- meta_predicate only_3rd(1,*,*,*).
@@ -224,7 +224,7 @@ with_pi_selected(CallerMt,PredMt, P ,Pred3):-  functor_safe(P,F,A), with_pi_stub
 % Must Be Successfull Predicate Indicator.
 %
 must_pi(X):-X,!.
-must_pi(X):-trace,X,!.
+must_pi(X):-dtrace,X,!.
 
 :- export(with_pi_stub/5).
 % = :- meta_predicate(with_pi_stub(+,+,+,+,0)).
@@ -713,8 +713,8 @@ get_module_of_4(P,F,A,PredMt):- trace_or_throw((get_module_of_4(P,F,A,PredMt))).
 
 /*
 get_module_of_4(_P,F,A,PredMt):- current_predicate(F0/A0),F0=F,A0=A,!,defaultAssertMt(PredMt).
-get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
-get_module_of_4(P,F,A,PredMt):- trace, debugCall(get_module_of_4(P,F,A,PredMt)).
+get_module_of_4(_P,F,A,_M):-dtrace, isCycPredArity(F,A),!,fail.
+get_module_of_4(P,F,A,PredMt):- dtrace, debugCall(get_module_of_4(P,F,A,PredMt)).
 */
 
 :- meta_predicate get_module_of(0,-).

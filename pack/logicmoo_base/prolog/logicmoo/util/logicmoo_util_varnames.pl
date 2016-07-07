@@ -772,7 +772,7 @@ try_get_body_vars(_).
 :- meta_predicate set_varname(:,*,*).
 :- meta_predicate set_varname(:,*).
 
-set_varname(How,B):-var(B),writeq(set_varname(How,B)),nl,trace,trace_or_throw(var_assign_varname_vars(How,B)).
+set_varname(How,B):-var(B),writeq(set_varname(How,B)),nl,dtrace,trace_or_throw(var_assign_varname_vars(How,B)).
 set_varname(How,N=V):-must(set_varname(How,N,V)),!.
 
 %set_varname(How,N,V):-var(V),var(N),!,V=N.
@@ -1130,7 +1130,7 @@ source_variables([]).
 check_varnames(Vs):-var(Vs),!.
 check_varnames([]):-!.
 check_varnames([N=V|Vs]):-atom(N),var(V),!,check_varnames(Vs).
-check_varnames(Term):- contains_badvarnames(Term),!,dumpST0,trace,nortrace,trace,!,dtrace(contains_badvarnames(Term)).
+check_varnames(Term):- contains_badvarnames(Term),!,dumpST0,dtrace,nortrace,dtrace,!,dtrace(contains_badvarnames(Term)).
 check_varnames(_).
 
 :-meta_predicate(snumbervars4(0,?,?,?)).
@@ -1356,7 +1356,7 @@ print_numbervars_maybe(H):-(compound(H);var(H)), copy_term(H,HC), \+ \+ ((get_cl
 %
 print_numbervars_1(H):- loop_check(print_numbervars_2(H),format('~N~q.~n',[H])).
 
-% print_numbervars_2(H):- trace,lmconf:portray_one_line_hook(H),!.
+% print_numbervars_2(H):- dtrace,lmconf:portray_one_line_hook(H),!.
 
 %= 	 	 
 

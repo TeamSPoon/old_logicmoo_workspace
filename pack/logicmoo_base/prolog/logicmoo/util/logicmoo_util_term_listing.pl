@@ -1147,7 +1147,7 @@ scansrc_list_undefined(A):- real_list_undefined(A).
 %
 real_list_undefined(A):- 
  merge_options(A, [module_class([user])], B),
-        prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
+        prolog_walk_code([undefined(dtrace), on_trace(found_undef)|B]),
         findall(C-D, retract(undef(C, D)), E),
         (   E==[]
         ->  true

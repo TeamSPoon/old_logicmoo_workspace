@@ -433,7 +433,7 @@ unnumbervars_and_save(X,YO):-
  mustvv((source_variables_l(Vs),
    with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
    mustvv(atom_to_term(A,Y,NewVs)),
-   (NewVs==[]-> YO=X ; (length(TV,TVL),length(NewVs,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVs),Y=X)))).
+   (NewVs==[]-> YO=X ; (length(TV,TVL),length(NewVs,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (dtrace,add_newvars(NewVs),Y=X)))).
 
 
 :- export(unnumbervars_and_save/2).
@@ -482,7 +482,7 @@ unnumbervars_and_copy(X,YO):-
  mustvv((source_variables(Vs),
    with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
    mustvv(atom_to_term(A,Y,NewVs)),
-   (NewVs==[]-> YO=X ; (length(TV,TVL),length(NewVs,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVs),Y=X)))).
+   (NewVs==[]-> YO=X ; (length(TV,TVL),length(NewVs,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (dtrace,add_newvars(NewVs),Y=X)))).
 */
 
 %add_newvars(_):-!.

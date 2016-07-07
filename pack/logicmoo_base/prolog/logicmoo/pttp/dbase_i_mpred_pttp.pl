@@ -53,7 +53,7 @@ pred_subst(_Pred ,P,       _, _,       P     ).
 % -- CODEBLOCK
 :- was_export(must/1).
 :- meta_predicate(must(0)).
-must(Call):-(repeat, (catch(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),trace,Call)),!).
+must(Call):-(repeat, (catch(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),dtrace,Call)),!).
 
 */
 
@@ -312,7 +312,7 @@ get_int_query(int_query).
 :- was_export(pttp_query/1).
 pttp_query(X) :- must_pttp_id(ID),pttp_query_wid(ID,X).
 :- was_export(pttp_query_wid/2).
-pttp_query_wid(ID, Y):- trace,pttp_tell_wid(ID,(query:-Y)), pttp_test_prove(ID,query),!.
+pttp_query_wid(ID, Y):- dtrace,pttp_tell_wid(ID,(query:-Y)), pttp_test_prove(ID,query),!.
 
 /*
  A thread local safe way to do it
@@ -374,7 +374,7 @@ pttp_assert_int_wid04(ID,Y,F,A):- wid(_,_,Y),!,ainz_pttp(wid(ID,F/A,Y)),!.
 pttp_assert_int_wid04(ID,Y,F,A):- ainz_pttp(wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
 /*
 pttp_assert_int_wid04(ID,Y,F,A):- 
-   is_static_predicate_pttp(Y,Why)-> (trace,wdmsg(warn(error(is_static_predicate_pttp(Y,Why))))); 
+   is_static_predicate_pttp(Y,Why)-> (dtrace,wdmsg(warn(error(is_static_predicate_pttp(Y,Why))))); 
     must(show_failure(why,assertz_unumbered(Y)),
     must((not(internal_functor(F))-> add_functor(external,F/A); (ainz_pttp(wid(ID,F/A,Y)),add_functor(internal,F/A)))))
 */

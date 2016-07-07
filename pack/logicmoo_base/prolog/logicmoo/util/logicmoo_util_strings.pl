@@ -1268,7 +1268,7 @@ must_assign(From=To):-must_assign(From,To).
 %
 must_assign(From,To):-To=From,!.
 must_assign(From,To):- tlbugger:skipMust,!,ignore(To=From),!.
-must_assign(From,To):-dmsg(From),dmsg(=),dmsg(From),dmsg(must_assign),!,trace,To=From.
+must_assign(From,To):-dmsg(From),dmsg(=),dmsg(From),dmsg(must_assign),!,dtrace,To=From.
 
 
 	 	 
@@ -1285,7 +1285,7 @@ map_tree_to_list(Pred,IN,Output):-atom(IN),!,must((atomSplit(IN,MID),!,map_tree_
 map_tree_to_list(Pred,IN,Output):-
  must((compound(IN), IN=..INP, append(Left,[Last],INP), map_tree_to_list(Pred,Last,UT),!,
   append(Left,[UT],OUTP),!, OUT =.. OUTP)),must_assign([OUT],Output).
-map_tree_to_list(_,IN,IN):-trace,must_assign([IN],IN).
+map_tree_to_list(_,IN,IN):- dtrace,must_assign([IN],IN).
 
 
 %= 	 	 

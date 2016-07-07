@@ -431,8 +431,8 @@ never_declare(_:declared(FA),Why):-nonvar(FA),never_declare(declared(FA),Why).
 % never_assert_u(pt(_,Pre,Post),head_singletons(Pre,Post)):- cwc, head_singletons(Pre,Post).
 never_assert_u(Rule,is_var(Rule)):- cwc, is_ftVar(Rule),!.
 never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred_rule_hb(Rule,Post,Pre)), head_singletons(Pre,Post).
-never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
-% never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, trace, cwc,!.
+never_assert_u(A,B):-never_assert_u0(A,B),dtrace,never_assert_u0(A,B).
+% never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, dtrace, cwc,!.
 
 never_assert_u(A,B):-ground(A),never_declare(A,B).
 
@@ -442,7 +442,7 @@ never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
 /*
 never_assert_u(pt(_,
        singleValuedInArg(A, _),
-       (trace->rhs([{trace}, prologSingleValued(B)]))),singletons):- trace,A\=B,trace.
+       (dtrace->rhs([{dtrace}, prologSingleValued(B)]))),singletons):- dtrace,A\=B,dtrace.
 */
 
 on_modules_changed:-!.
@@ -469,15 +469,15 @@ never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
 
 
 %:- rtrace.
-%:- trace.
+%:- dtrace.
 %:- ignore(delete_import_module(baseKB,user)).
 %:- add_import_module(baseKB,lmcode,start).
 %:- nortrace.
 %:- cnotrace.
 
 
-%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).
-%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).
+%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(dtrace->rhs([{dtrace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{dtrace}==>{dtrace},prologSingleValued(Pred),ax)),UN).
+%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(dtrace->rhs([{dtrace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{dtrace}==>{dtrace},prologSingleValued(Pred),ax)),UN).
 
 
 %:- maybe_add_import_module(tbox,basePFC,end).

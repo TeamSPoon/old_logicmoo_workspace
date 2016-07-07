@@ -12,6 +12,13 @@
 %
 */
 
+:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+:- endif.
+% :- module(mud_loader,[]).
+% restore entry state
+:- reset_modules.
+
+
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
@@ -646,7 +653,6 @@ lundef :- A = [],
 
 %:-mred_untrace.
 %:-mred_no_spy_all.
-
+:- reset_modules.
 :- set_prolog_flag(pfc_booted,true).
-
 :- set_prolog_flag(assert_attvars,true).

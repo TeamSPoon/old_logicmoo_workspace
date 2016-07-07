@@ -129,13 +129,13 @@ env_mpred_op(OP_P):- OP_P=..[OP,P],env_mpred_op(OP,P).
 :- module_transparent(env_mpred_op/2).
 :- meta_predicate env_mpred_op(1,:).
 env_mpred_op(OP,P):- var(OP),!,P.
-%TODO env_mpred_op(OP,P):- prop_mpred(P,_,_),!,forall(prop_mpred(P,F,A),(nop(trace),env_mpred_op(OP,F/A) )).
-%TODO env_mpred_op(OP,F):- prop_mpred(_,F,_),!,forall(prop_mpred(_,F,A),(nop(trace),env_mpred_op(OP,F/A) )).
+%TODO env_mpred_op(OP,P):- prop_mpred(P,_,_),!,forall(prop_mpred(P,F,A),(nop(dtrace),env_mpred_op(OP,F/A) )).
+%TODO env_mpred_op(OP,F):- prop_mpred(_,F,_),!,forall(prop_mpred(_,F,A),(nop(dtrace),env_mpred_op(OP,F/A) )).
 env_mpred_op(OP,F/A):-integer(A),atom(F),!,functor(P,F,A),!,env_mpred_op(OP,P).
 env_mpred_op(OP,P):- t_l:push_env_ctx, do_prefix_arg(P, ZZ, PP, _Type),P\==PP,!,get_env_ctx(ZZ),call(OP,/*ocluser*/ocl:PP).
 env_mpred_op(OP,P):- functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_mpred_op(ENV,OP,P).
 env_mpred_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(why,/*ocluser*/ocl:CALL).
-env_mpred_op(OP,P):- trace,trace_or_throw(unk_env_mpred_op(OP,P)).
+env_mpred_op(OP,P):- dtrace,trace_or_throw(unk_env_mpred_op(OP,P)).
 
 env_shadow(OP,P):-lmconf:call(OP,P).
 
@@ -227,7 +227,7 @@ decl_env_mepred_real(Prop,Pred,F,A):-
   lmconf:export(/*ocluser*/ocl:F/A),
   if_defined(decl_mpred(Pred,Prop),ain(baseKB:box_prop(F,Prop))),
   ain(isa_kb:box_prop(Prop)), ain(get_mp_arity(F,A)),ain(arity(F,A)),!,
-  trace,ain(prop_mpred(Prop,F,A)).
+  dtrace,ain(prop_mpred(Prop,F,A)).
 
 
 env_learn_pred(_,_):-nb_getval(disabled_env_learn_pred,true),!.
@@ -249,7 +249,7 @@ lg_op2(_,OP,OP).
 :- meta_predicate env_shadow(1,?).
 
 env_mpred_op(_,_,[]):-!.
-env_mpred_op(ENV,OP,F/A):- trace,var(A),!, forall(prop_mpred(ENV,F,A),((functor(P,F,A),env_mpred_op(ENV,OP,P)))).
+env_mpred_op(ENV,OP,F/A):- dtrace,var(A),!, forall(prop_mpred(ENV,F,A),((functor(P,F,A),env_mpred_op(ENV,OP,P)))).
 env_mpred_op(ENV,retractall,F/A):-functor(P,F,A),!,env_mpred_op(ENV,retractall,P).
 % env_mpred_op(ENV,OP,Dom):- isa_kb:box_prop(Dom),!,forall(prop_mpred(Dom,F,A),env_mpred_op(ENV,OP,F/A)).
 % env_mpred_op(ENV,OP,F/A):-!, functor(P,F,A), (((get_mpred_stubType(F,A,LG2),LG2\==ENV)  -> env_mpred_op(LG2,OP,P) ; env_mpred_op(ENV,OP,P) )).
@@ -267,11 +267,11 @@ env_mpred_op_1(in_pred(DB),OP,P):-!, DBPRED=..[DB,P], call(OP,DBPRED).
 env_mpred_op_1(with_pred(Pred),OP,P):-!, call(Pred,OP,P).
 % env_mpred_op_1(ENV,OP,P):- dmsg(env_mpred_op_1(ENV,OP,P)),fail.
 env_mpred_op_1(ENV,OP,P):- lg_op2(ENV,OP,OP2),!,call(OP2,P).
-% env_mpred_op_1(ENV,OP,P):- throw(trace),simplest(ENV),!,call(OP,P).
+% env_mpred_op_1(ENV,OP,P):- throw(dtrace),simplest(ENV),!,call(OP,P).
 env_mpred_op_1(stubType(ENV),OP,P):-!,env_mpred_op(ENV,OP,P).
 % !,env_mpred_op_1(in_dyn(DB),OP,P).
 env_mpred_op_1(_,OP,P):-!,env_mpred_op_1(in_dyn(db),OP,P).
-env_mpred_op_1(_,_,_):-trace,fail.
+env_mpred_op_1(_,_,_):-dtrace,fail.
 env_mpred_op_1(l,OP,P):-!,call(OP,/*ocluser*/ocl:P).
 env_mpred_op_1(g,OP,P):-!,call(OP,/*ocluser*/ocl:P).
 env_mpred_op_1(l,OP,P):-!,env_mpred_op_1(dyn,OP,P).
@@ -425,7 +425,7 @@ user:term_expansion(A,B):- nonvar(A), A\==end_of_file, inside_file_bb(ocl),
 
 /*
 
-env_mpred_op(ENV,OP_P):- throw(trace),simplest(ENV),!,OP_P.
+env_mpred_op(ENV,OP_P):- throw(dtrace),simplest(ENV),!,OP_P.
 env_mpred_op(ENV,call(P)):-env_mpred_op(ENV,call,P).
 env_mpred_op(ENV,assert(P)):-env_mpred_op(ENV,assert,P).
 env_mpred_op(ENV,asserta(P)):-env_mpred_op(ENV,asserta,P).

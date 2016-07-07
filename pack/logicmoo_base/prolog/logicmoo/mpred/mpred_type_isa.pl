@@ -338,7 +338,7 @@ was_isa0(isa(I,C),I,C):-!.
 was_isa0(is_typef(_),_,_):-!,fail.
 was_isa0(hotrace(_),_,_):-!,fail.
 was_isa0(call(_),_,_):-!,fail.
-was_isa0(trace(_),_,_):-!,fail.
+was_isa0(dtrace(_),_,_):-!,fail.
 was_isa0(not(_),_,_):-!,fail.
 % was_isa0(a(tCol,I),I,tCol).
 was_isa0(ttNotTemporalType(I),I,ttNotTemporalType).
@@ -817,7 +817,7 @@ isa_asserted_0(I,T):-is_known_trew(isa(I,T)).
 isa_asserted_0(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),arity(F,1).
 %isa_asserted_0([I],T):-nonvar(I),!,isa_asserted_0(I,T).
 
-isa_asserted_0(isInstFn(I),T):-nonvar(I),trace,!,T=I.
+isa_asserted_0(isInstFn(I),T):-nonvar(I),dtrace,!,T=I.
 isa_asserted_0(aRelatedFn(T,_),I):-nonvar(T),!,T=I.
 isa_asserted_0(aRelatedFn(T,_,_),I):-nonvar(T),!,T=I.
 isa_asserted_0(I,T):- ((t_l:useOnlyExternalDBs,!);lmconf:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
@@ -826,7 +826,7 @@ isa_asserted_0(I,T):- atom(I),isa_from_morphology(I,T).
 isa_asserted_0(I,T):- (atom(I);atom(T)),type_isa(I,T).
 isa_asserted_0(I,T):- atom(I), I = ttTypeByAction, T=ttTypeByAction,!,fail.
 isa_asserted_0(I,T):- nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
-% isa_asserted_0(I,T):- HEAD= isa(I, T),ruleBackward(HEAD,BODY),trace,call_mpred_body(HEAD,BODY).
+% isa_asserted_0(I,T):- HEAD= isa(I, T),ruleBackward(HEAD,BODY),dtrace,call_mpred_body(HEAD,BODY).
 
 isa_asserted_0(I,T):- is_ftVar(T),!,tCol_gen(T),call_u(isa(I,T)).
 isa_asserted_0(I,T):- atom(T),current_predicate(T,_:G),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);on_x_cont(G)).

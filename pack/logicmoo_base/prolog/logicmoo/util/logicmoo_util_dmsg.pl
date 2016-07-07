@@ -628,7 +628,7 @@ setLogLevel(M,L):-retractall(logLevel(M,_)),(nonvar(L)->asserta(logLevel(M,L));t
 logLevel(debug,ERR):-get_thread_current_error(ERR).
 logLevel(error,ERR):-get_thread_current_error(ERR).
 logLevel(private,none).
-logLevel(S,Z):-current_stream(_X,write,Z),trace,stream_property(Z,alias(S)).
+logLevel(S,Z):-current_stream(_X,write,Z),dtrace,stream_property(Z,alias(S)).
 
 
 %= 	 	 
@@ -949,7 +949,7 @@ dmsg000(V):-
 dmsg1(V):- tlbugger:is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg1(VV)).
 dmsg1(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 dmsg1(V):- var(V),!,dmsg1(warn(dmsg_var(V))).
-dmsg1(NC):- cyclic_term(NC),!,trace,format_to_error('~N% ~q~n',[dmsg_cyclic_term_1]).
+dmsg1(NC):- cyclic_term(NC),!,dtrace,format_to_error('~N% ~q~n',[dmsg_cyclic_term_1]).
 dmsg1(NC):- tlbugger:skipDMsg,!,loop_check_early(dmsg2(NC),format_to_error('~N% ~q~n',[skipDMsg])).
 dmsg1(V):- w_tl(tlbugger:skipDMsg,((once(dmsg2(V)), ignore((tlbugger:dmsg_hook(V),fail))))).
 

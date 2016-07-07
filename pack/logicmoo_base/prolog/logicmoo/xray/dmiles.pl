@@ -402,7 +402,7 @@ builtin(true,0).
 builtin(false,0).
 builtin(fail,0).
 builtin(succeed,0).
-builtin(trace,0).
+builtin(dtrace,0).
 builtin(atom,1).
 builtin(integer,1).
 builtin(number,1).
@@ -1274,7 +1274,7 @@ dont_trace_search :-                    % disables prove progress reports
 dont_trace_search :-
         assert(trace_search_progress_pred(nop)).
 
-:- trace_search.                        % default is to trace searching
+:- trace_search.                        % default is to dtrace searching
 
 
 :- was_dynamic(use_sound_unification/1).

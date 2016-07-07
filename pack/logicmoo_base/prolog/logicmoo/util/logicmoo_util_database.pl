@@ -283,7 +283,7 @@ find_and_call(_,_,C:G):-current_predicate(_,C:G),!,find_and_call(C,G).
 find_and_call(_,C,  G):-current_predicate(_,C:G),!,find_and_call(C,G).
 find_and_call(C,_,  G):-current_predicate(_,C:G),!,find_and_call(C,G).
 find_and_call(_,_,  G):-current_predicate(_,C:G),!,find_and_call(C,G).
-find_and_call(C,M,  G):-trace,C:on_x_rtrace(M:G).
+find_and_call(C,M,  G):-dtrace,C:on_x_rtrace(M:G).
 
 
 
@@ -333,13 +333,13 @@ mpred_op_prolog(pain,N):- !,(cnotrace(clause_asserted(N))->true;mpred_op_prolog0
 mpred_op_prolog(aina,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(system:asserta,N)).
 mpred_op_prolog(ainz,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(system:assertz,N)).
 mpred_op_prolog(ain,N):-  !,(clause_asserted(N)->true;mpred_op_prolog0(assert,N)).
-% mpred_op_prolog(OP,M:Term):- unnumbervars(Term,Unumbered),Term \=@= Unumbered,!,trace,mpred_mop(M,OP,Unumbered).
-mpred_op_prolog(OP,M:Term):-  trace,!,mpred_mop(M, OP,Term).
+% mpred_op_prolog(OP,M:Term):- unnumbervars(Term,Unumbered),Term \=@= Unumbered,!,dtrace,mpred_mop(M,OP,Unumbered).
+mpred_op_prolog(OP,M:Term):-  dtrace,!,mpred_mop(M, OP,Term).
 mpred_op_prolog(OP,M:Term):- 
   copy_term(Term, Copy, Gs),
   (Gs==[] -> mpred_mop(M,OP,Term);
     show_call(why,(
-      expand_to_hb(Copy,H,B),conjoin(maplist(call,Gs),B,NB),trace,mpred_mop(M,OP,(H:-NB))))).
+      expand_to_hb(Copy,H,B),conjoin(maplist(call,Gs),B,NB),dtrace,mpred_mop(M,OP,(H:-NB))))).
   
 
 %= 	 	 
@@ -706,7 +706,7 @@ variant_i(A,B):- A=@=B,!.
 variant_i(A,B):- copy_term_nat(A:B,AA:BB), \+(AA=@=BB),!,fail.
 variant_i(A,B):- term_variables(A,AV),AV\==[], 
    term_variables(B,BV),
-   (maplist(av_comp,AV,BV)->!;(trace,maplist(av_comp,AV,BV))).
+   (maplist(av_comp,AV,BV)->!;(dtrace,maplist(av_comp,AV,BV))).
 
 av_comp(A,B):-mpred_get_attrs(A,AA),mpred_get_attrs(B,BB),AA=@=BB,!.
 av_comp(A,B):-mpred_get_attrs(A,attr(_,_,AB)),!,AB\==[],mpred_get_attrs(B,attr(_,_,AB)).

@@ -18,11 +18,11 @@ started_mud_server.
 % ==============================
 
 % [Manditory] This loads the game and initializes so test can be ran
-:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
+:- declare_load_dbase('../games/src_game_nani/a_nani_household.pfc.pl').
 
 % [Optional] the following game files though can be loaded separate instead
-:- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
-:- declare_load_dbase('../games/src_game_nani/?*.plmoo').
+:- declare_load_dbase('../games/src_game_nani/objs_misc_household.pfc.pl').
+:- declare_load_dbase('../games/src_game_nani/?*.pfc.pl').
 
 % [Optional] the following worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       

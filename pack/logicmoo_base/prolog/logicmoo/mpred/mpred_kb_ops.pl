@@ -741,7 +741,7 @@ attvar_op(Op,MData):-
    ((atom_concat(assert,_,OpA) -> physical_side_effect(M:call(M:OpA,M:Data0)));
    ((
     % nop((expand_to_hb(Data0,H,B),split_attrs(B,BA,G))),
-    trace, 
+    dtrace, 
     physical_side_effect(M:call(M:OpA,M:Data0))
     )))).
 
@@ -2117,7 +2117,7 @@ is_resolved(C):- Why= is_resolved, mpred_call_only_facts(Why,~(C)),\+mpred_call_
 %
 % PFC Prove Negated.
 %
-mpred_prove_neg(G):-nop(trace), \+ mpred_bc_only(G), \+ mpred_fact(G).
+mpred_prove_neg(G):-nop(dtrace), \+ mpred_bc_only(G), \+ mpred_fact(G).
 
 
 %% pred_head( :PRED1Type, ?P) is semidet.

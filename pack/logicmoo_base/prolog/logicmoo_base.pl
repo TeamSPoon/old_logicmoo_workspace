@@ -177,7 +177,7 @@ user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_unde
 :- set_prolog_flag(lmcode:unknown,error).
 :- set_prolog_flag(baseKB:unknown,warning).
 %:- rtrace((mpred_at_box:defaultAssertMt(G40331),rtrace(set_prolog_flag(G40331:unknown,warning)))).
-%:- break.
+%:- dbreak.
 :- must(set_prolog_flag(abox:unknown,warning)).
 :- w_tl(t_l:side_effect_ok,doall(call_no_cuts(lmconf:module_local_init(abox,baseKB)))).
 % :- forall(lmconf:sanity_check,true).

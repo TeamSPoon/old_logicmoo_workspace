@@ -300,6 +300,9 @@
         tryCatchIgnore(0),
         will_debug_else_throw(0, 0),
         with_no_term_expansions(0),
+        hideTraceMFA(+,+,+,+),
+        hideTraceMFAT(+,+,+,+),
+        doHideTrace(+,+,+,+),
         with_skip_bugger(0).
 
  :- meta_predicate do_ref_job(0,*).
@@ -709,7 +712,7 @@ define_if_missing(system:atomics_to_string/2, [
 %
 % New A2s.
 %
-new_a2s(List, Separator, String):-catchv(new_a2s0(List, Separator, String),_,((trace,new_a2s0(List, Separator, String)))).
+new_a2s(List, Separator, String):-catchv(new_a2s0(List, Separator, String),_,((dtrace,new_a2s0(List, Separator, String)))).
 
 %= 	 	 
 
@@ -1165,7 +1168,7 @@ call_skipping_n_clauses(N,H):-
 
 % =========================================================================
 % cli_ntrace(+Call) is nondet.
-% use call/1 with trace turned off
+% use call/1 with dtrace turned off
 
 %= 	 	 
 
@@ -1173,7 +1176,7 @@ call_skipping_n_clauses(N,H):-
 %
 % Cli N Trace.
 %
-cli_ntrace(X):- tracing -> w_tl( tlbugger:wastracing,call_cleanup((cnotrace,call(X)),trace)) ; call(X).
+cli_ntrace(X):- tracing -> w_tl( tlbugger:wastracing,call_cleanup((cnotrace,call(X)),dtrace)) ; call(X).
 
 %= 	 	 
 
@@ -1181,7 +1184,7 @@ cli_ntrace(X):- tracing -> w_tl( tlbugger:wastracing,call_cleanup((cnotrace,call
 %
 % Traceok.
 %
-traceok(X):-  tlbugger:wastracing -> call_cleanup((trace,call(X)),cnotrace) ; call(X).
+traceok(X):-  tlbugger:wastracing -> call_cleanup((dtrace,call(X)),cnotrace) ; call(X).
 
 % :- mpred_trace_none(tlbugger:skip_bugger).
 % :- mpred_trace_none(skipWrapper).
@@ -1503,7 +1506,7 @@ hideRest:- fail, buggerDir(BuggerDir),
 %
 % Hide Rest.
 %
-hideRest:- functor_source_file(system,_P,F,A,_File),hideTraceMFA(system,F,A,-all), fail.
+hideRest:- functor_source_file(system,_P,F,A,_File),hideTraceMFA(system,F,A, - all), fail.
 hideRest.
 
 % = %= :- meta_predicate (hideTrace(:,-)).
@@ -1549,7 +1552,7 @@ predicate_module(_P,user):-!. %strip_module(P,M,_F),!.
 % hide  Trace.
 %
 hideTrace(_:A, _) :-
-    var(A), !, trace, fail,
+    var(A), !, dtrace, fail,
     throw(error(instantiation_error, _)).
 hideTrace(_:[], _) :- !.
 hideTrace(A:[B|D], C) :- !,
@@ -1567,7 +1570,7 @@ hideTrace(MA,T):-hideTraceMP(_,MA,T),!.
 % hide  Trace Module Pred.
 %
 hideTraceMP(M,F/A,T):-!,hideTraceMFA(M,F,A,T),!.
-hideTraceMP(M,P,T):-functor_safe(P,F,0),trace,hideTraceMFA(M,F,_A,T),!.
+hideTraceMP(M,P,T):-functor_safe(P,F,0),dtrace,hideTraceMFA(M,F,_A,T),!.
 hideTraceMP(M,P,T):-functor_safe(P,F,A),hideTraceMFA(M,F,A,T),!.
 
 
@@ -1622,7 +1625,7 @@ doHideTrace(M,F,A,[hide|T]):- tryHide(M:F/A),!,doHideTrace(M,F,A,T),!.
 doHideTrace(M,F,A,[-all]):- mpred_trace_less(M:F/A),fail.
 doHideTrace(M,F,A,ATTRIB):- ( \+ is_list(ATTRIB)),!,doHideTrace(M,F,A,[ATTRIB]).
 doHideTrace(M,F,A,ATTRIB):- tryHide(M:F/A),!,
-  tryCatchIgnore(trace(M:F/A,ATTRIB)),!.
+  tryCatchIgnore(dtrace(M:F/A,ATTRIB)),!.
 
 
 
@@ -1632,7 +1635,7 @@ doHideTrace(M,F,A,ATTRIB):- tryHide(M:F/A),!,
 %
 % Class Trace.
 %
-ctrace:-willTrace->trace;cnotrace.
+ctrace:-willTrace->dtrace;cnotrace.
 
 
 %= 	 	 
@@ -1734,7 +1737,7 @@ fresh_line(_).
 %
 ifThen(When,Do):-When->Do;true.
 
-% :- current_predicate(F/N),trace(F/N, -all),fail.
+% :- current_predicate(F/N),dtrace(F/N, -all),fail.
 /*
 traceAll:- current_predicate(F/N),
   functor_safe(P,F,N),
@@ -1781,7 +1784,7 @@ prolog_must(Call):-must(Call).
 %
 % Gmust.
 %
-gmust(True,Call):-catchv((Call,(True->true;throw(retry(gmust(True,Call))))),retry(gmust(True,_)),(trace,Call,True)).
+gmust(True,Call):-catchv((Call,(True->true;throw(retry(gmust(True,Call))))),retry(gmust(True,_)),(dtrace,Call,True)).
 
 % must is used declaring the predicate must suceeed
 
@@ -1802,7 +1805,7 @@ on_f_throw(Call):-one_must(Call,throw(on_f_throw(Call))).
 %
 on_x_cont(CX):-ignore(catchv(CX,_,true)).
 
-% pause_trace(_):- hotrace(((debug,visible(+all),thread_leash(+exception),thread_leash(+call)))),trace.
+% pause_trace(_):- hotrace(((debug,visible(+all),thread_leash(+exception),thread_leash(+call)))),dtrace.
 
 %debugCall(Goal):-hotrace,dmsg(debugCall(Goal)),dumpST, pause_trace(errored(Goal)),ggtrace,Goal.
 %debugCallF(Goal):-hotrace,dmsg(debugCallF(Goal)),dumpST, pause_trace(failed(Goal)),gftrace,Goal.
@@ -1918,7 +1921,7 @@ on_f_log_ignore(Goal):-ignore(logOnFailure0(on_x_log_throw(Goal))).
 %on_f_debug(Goal):-ctrace,Goal.
 %on_f_debug(Goal):-catchv(Goal,E,(writeFailureLog(E,Goal),throw(E))).
 %on_f_throw/1 is like Java/C's assert/1
-%debugOnFailure1(Module,Goal):-trace,on_f_debug(Module:Goal),!.
+%debugOnFailure1(Module,Goal):-dtrace,on_f_debug(Module:Goal),!.
 %debugOnFailure1(arg_domains,Goal):-!,on_f_log_fail(Goal),!.
 
 
@@ -1932,7 +1935,7 @@ beenCaught(must(Goal)):- !, beenCaught(Goal).
 beenCaught((A,B)):- !,beenCaught(A),beenCaught(B).
 beenCaught(Goal):- fail, predicate_property(Goal,number_of_clauses(_Count)), clause(Goal,(_A,_B)),!,clause(Goal,Body),beenCaught(Body).
 beenCaught(Goal):- catchv(once(Goal),E,(dmsg(caugth(Goal,E)),beenCaught(Goal))),!.
-beenCaught(Goal):- traceAll,dmsg(tracing(Goal)),debug,trace,Goal.
+beenCaught(Goal):- traceAll,dmsg(tracing(Goal)),debug,dtrace,Goal.
 
 
 % = %= :- meta_predicate (with_no_term_expansions(0)).
@@ -2101,7 +2104,7 @@ bin_ecall(F,A,asis,true):-member(F/A,[('must')/1]).
 %
 % Using Each.
 %
-with_each(_,_,Call):-var(Call),!,trace,randomVars(Call).
+with_each(_,_,Call):-var(Call),!,dtrace,randomVars(Call).
 % with_each(BDepth,Wrapper,M:Call):- fail,!, '@'( with_each(BDepth,Wrapper,Call), M).
 
 with_each(_,_,Call):-skipWrapper,!,Call.
@@ -2195,7 +2198,7 @@ prolog_must_l(H):-must(H).
 %
 % Programmer Error.
 %
-programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVars(E),!,throw(E).
+programmer_error(E):-dtrace, randomVars(E),dmsg('~q~n',[error(E)]),dtrace,randomVars(E),!,throw(E).
 
 
 
@@ -2296,7 +2299,7 @@ randomVars(Term):- random(R), StartR is round('*'(R,1000000)), !,
 %
 % Prolog Must Be Successfull Not.
 %
-prolog_must_not(Call):-Call,!,trace,!,programmer_error(prolog_must_not(Call)).
+prolog_must_not(Call):-Call,!,dtrace,!,programmer_error(prolog_must_not(Call)).
 prolog_must_not(_Call):-!.
 
 % %retractall(E):- retractall(E),functor_safe(E,File,A),dynamic(File/A),!.
@@ -2658,7 +2661,7 @@ listify(OUT,[OUT]).
 %  Trace if.
 %
 traceIf(_Call):-!.
-traceIf(Call):-ignore((Call,trace)).
+traceIf(Call):-ignore((Call,dtrace)).
 
 %getWordTokens(WORDS,TOKENS):-concat_atom(TOKENS,' ',WORDS).
 is_string(S):- string(S).
@@ -2746,7 +2749,7 @@ asserta_if_ground(_).
 %
 % Default Dump Trace.
 %
-default_dumptrace(trace).
+default_dumptrace(dtrace).
 
 :- thread_local(is_pushed_def/3).
 
@@ -2780,7 +2783,7 @@ pop_def(Pred):-must((get_functor(Pred,F,A),prolog_load_context(file,CurrentFile)
 %
 % Show And Do.
 %
-show_and_do(C):-wdmsg(show_and_do(C)),!,trace,C.
+show_and_do(C):-wdmsg(show_and_do(C)),!,dtrace,C.
 
 
 
@@ -2980,7 +2983,7 @@ prolog_stack:stack_guard(none).
 %:-mpred_trace_less(visible/1).
 % :- mpred_trace_less(cnotrace/0).
 % :- mpred_trace_less(hotrace/1).
-% :- mpred_trace_less(trace/0).
+% :- mpred_trace_less(dtrace/0).
 % :-'$set_predicate_attribute'(!, trace, 1).
 
 % :-hideTrace.

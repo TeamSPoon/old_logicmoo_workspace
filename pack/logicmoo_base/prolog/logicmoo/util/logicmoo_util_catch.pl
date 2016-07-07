@@ -254,12 +254,12 @@
 
    Tracer modes:
 
-   quietly/1 - turn off tracer if already on but still trace on failure
-   must/1 - trace on failure
+   quietly/1 - turn off tracer if already on but still dtrace on failure
+   must/1 - dtrace on failure
    rtrace/1 - non interactive debug
    sanity/1 - run in quietly/1 when problems were detected previously otherwise skippable slow_sanity/1+hide_trace/1
    assertion/1 - throw on failure
-   hide_trace/1 - hide trace temporarily
+   hide_trace/1 - hide dtrace temporarily
    slow_sanity/1 - skip unless in developer mode
 
 */
@@ -719,7 +719,7 @@ source_variables_l(AllS):-
 %
 show_source_location:- source_location(F,L),!,show_new_src_location(F:L),!.
 show_source_location:- current_source_file(FL),sanity(nonvar(FL)),!,show_new_src_location(FL),!.
-show_source_location:- dumpST,trace.
+show_source_location:- dumpST,dtrace.
 
 
 % % :- use_module(logicmoo_util_database).
@@ -849,7 +849,7 @@ bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 %
 % Warn Bad Functor.
 %
-warn_bad_functor(L):-ignore((hotrace(bad_functor(L)),!,trace,nop(ddmsg(bad_functor(L))))).
+warn_bad_functor(L):-ignore((hotrace(bad_functor(L)),!,dtrace,nop(ddmsg(bad_functor(L))))).
 
 :- export(strip_f_module/2).
 
@@ -917,7 +917,7 @@ catchv(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (th
 %
 functor_catch(P,F,A):- catchv(functor(P,F,A),_,compound_name_arity(P,F,A)).
 % functor_catch(F,F,0):-atomic(F),!.
-% functor_catch(P,F,A):-catchv(compound_name_arity(P,F,A),E,(trace,ddmsg(E:functor(P,F,A)),trace)).
+% functor_catch(P,F,A):-catchv(compound_name_arity(P,F,A),E,(dtrace,ddmsg(E:functor(P,F,A)),dtrace)).
 
 
 :- export(functor_safe/3).
@@ -1007,7 +1007,7 @@ block(Name, Goal) :-  block(Name, Goal, Var),  (   Var == !  ->  !  ;   true  ).
 %
 % Throw No Lib.
 %
-throwNoLib:- trace,absolute_file_name('.',Here), buggerFile(BuggerFile), listing(user:library_directory), trace_or_throw(error(existence_error(url, BuggerFile), context(_, status(404, [BuggerFile, from( Here) ])))).
+throwNoLib:- dtrace,absolute_file_name('.',Here), buggerFile(BuggerFile), listing(user:library_directory), trace_or_throw(error(existence_error(url, BuggerFile), context(_, status(404, [BuggerFile, from( Here) ])))).
 
 :- dynamic(buggerDir/1).
 :- abolish(buggerDir/1),prolog_load_context(directory,D),asserta(buggerDir(D)).
@@ -1215,7 +1215,7 @@ for obvious reasons.
 %
 trace_or_throw(E):- non_user_console,hotrace((thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),!,throw(abort),
                     thread_exit(trace_or_throw(E)))).
-trace_or_throw(E):- wdmsg(E),dtrace((trace,throw(E))).
+trace_or_throw(E):- wdmsg(E),dtrace((dtrace,throw(E))).
 
  %:-interactor.
 
@@ -1303,7 +1303,8 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 
 % false = use this wrapper, true = code is good and avoid using this wrapper
 :- export(skipWrapper/0).
-skipWrapper:- notrace((skipWrapper0, \+ current_prolog_flag(logicmoo_debug,true))).
+
+skipWrapper:- notrace((fail,skipWrapper0, \+ current_prolog_flag(logicmoo_debug,true))).
 :- export(skipWrapper0/0).
 skipWrapper0:- current_prolog_flag(unsafe_speedups,true).
 % skipWrapper:- tracing,!.
@@ -1377,7 +1378,7 @@ must_det_l(MGoal):- strip_module(MGoal,M,Goal),!, must_det_lm(M,Goal).
 %
 % Must Be Successfull Deterministic Lm.
 %
-must_det_lm(M,Goal):-var(Goal),trace,trace_or_throw(var_must_det_l(M:Goal)),!.
+must_det_lm(M,Goal):-var(Goal),dtrace,trace_or_throw(var_must_det_l(M:Goal)),!.
 must_det_lm(M,[Goal]):-!,must_det_lm(M,Goal).
 must_det_lm(M,[Goal|List]):-!,must(M:Goal),!,must_det_lm(M,List).
 must_det_lm(M,Goal):-tlbugger:skip_bugger,!,M:Goal.
@@ -1471,7 +1472,7 @@ sanity(_):- notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
 sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
-sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:break).
+sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:dbreak).
 
 compare_results(N+NVs,O+OVs):-
    NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).
@@ -1545,7 +1546,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 :- set_prolog_flag(debugger_show_context,true).
 
 :- meta_predicate(must(0)).
-%must(Call):-(repeat, (catchv(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),trace,Call)),!).
+%must(Call):-(repeat, (catchv(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),dtrace,Call)),!).
 
 %= 	 	 
 
@@ -1568,19 +1569,19 @@ get_must(M:Goal,M:CGoal):- !,get_must(Goal,CGoal).
 get_must(hotrace(Goal),CGoal):- !,get_must((hotrace(Goal)*->true;Goal),CGoal).
 get_must(Goal,CGoal):-  (tlbugger:skipMust;skipWrapper),!,CGoal = Goal.
 get_must(Goal,CGoal):- fail, skipWrapper,!, CGoal = (Goal *-> true ;
-   ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
+   ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,dtrace,Goal))).
 get_must(Goal,CGoal):-  fail, tlbugger:show_must_go_on,!,
  CGoal = ((catchv(Goal,E,
      hotrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
             *-> true ; hotrace((dumpST,wdmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
 
 %get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
-%get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(hotrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
+%get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(hotrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),dtrace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),dtrace,Goal))).
 get_must(Goal,CGoal):-    
    (CGoal = (catchv(Goal,E,
      (dumpST,ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),
-         ignore_each((rtrace(Goal),nortrace,trace,dtrace(Goal),badfood(Goal)))))
-         *-> true ; (dumpST,ignore_each(((trace,dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).
+         ignore_each((rtrace(Goal),nortrace,dtrace,dtrace(Goal),badfood(Goal)))))
+         *-> true ; (dumpST,ignore_each(((dtrace,dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).
 
 :- save_streams.
 :- initialization(save_streams).

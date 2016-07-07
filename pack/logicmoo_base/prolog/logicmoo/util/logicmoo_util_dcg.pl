@@ -152,7 +152,7 @@ theText([]) --> [].
 
 %theText([S|Text],[S0|TextData],More):- member([txt,S0|TextData],Data),equals_text(S,S0),append(Text,More,TextData).
 
-%  trace, do_dcgTest_startsWith("this is text", logicmoo_util_dcg:dcgStartsWith1(theText(["this"])), true) .
+%  dtrace, do_dcgTest_startsWith("this is text", logicmoo_util_dcg:dcgStartsWith1(theText(["this"])), true) .
 
 % Looser text test?
 theText0(_,W,_):- W==[],!,fail.

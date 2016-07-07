@@ -27,7 +27,7 @@
             edit1term/0,
             edit1term/1,
             ensure_webserver/1,
-            
+            get_print_mode/1,               
             ensure_webserver/0,
             find_cl_ref/2,
             find_ref/2,
@@ -45,8 +45,7 @@
             get_request_vars/1,
             handler_logicmoo_cyclone/1,
             head_functor_sort/3,
-            hmust/1,
-            hmust_l/1,
+            must_run/1,
             human_language/1,
             i2tml_hbr/3,
             if_html/2,
@@ -56,7 +55,6 @@
             is_cgi_stream/0,
             is_context/2,
             is_goog_bot/0,
-            last_item_offered/1,
             'list clauses'/4,
             'list magic'/2,
             'list magic'/3,
@@ -116,7 +114,7 @@
             show_clause_ref/1,
             show_clause_ref_now/1,
             show_edit_term/3,
-            show_http_session/0,
+               show_http_session/0,
             show_iframe/1,
             show_iframe/3,
             show_pcall_footer/0,
@@ -131,6 +129,7 @@
             url_encode/2,
             url_encode_term/3,
             with_search_filters/1,
+            with_search_filters0/1,
             write_VAR/4,
             write_args/5,
             write_as_url_encoded/2,
@@ -146,9 +145,7 @@
             write_tail/2,
             write_term_to_atom_one/2,
             write_variable/1,
-          lmconf:shared_hide_data/1,
-          mpred_www:http_last_request/1,
-          mpred_www:last_item_offered/1,
+          
           mpred_www_file/0
             /*
             http:location/3,
@@ -160,23 +157,24 @@
             user:file_search_path/2
             */
           ]).
- :- meta_predicate % cmt :-
+
+ :- meta_predicate 
         edit1term(0),
         handler_logicmoo_cyclone(+),
-        hmust(0),
-        hmust_l(0),
+        must_run(0),
         if_html(?, 0),
         return_to_pos(0),
         show_edit_term(0, ?, ?),
         show_edit_term0(0, ?, ?),
         show_edit_term1(0, ?, ?),
-        with_search_filters(0).
+        with_search_filters(0),
+        with_search_filters0(0).
 :- (multifile http:location/3, http_dispatch:handler/4, http_log:log_stream/2, http_session:session_data/2, http_session:urandom_handle/1, lmconf:shared_hide_data/1, system:'$init_goal'/3, user:file_search_path/2).
-:- (module_transparent edit1term/1, hmust/1, hmust_l/1, if_html/2, return_to_pos/1, show_edit_term/3, show_edit_term0/3, show_edit_term1/3, with_search_filters/1).
+:- (module_transparent edit1term/1, must_run/1, if_html/2, return_to_pos/1, show_edit_term/3, show_edit_term0/3, show_edit_term1/3, with_search_filters/1).
 :- (volatile http_log:log_stream/2, http_session:session_data/2, http_session:urandom_handle/1).
 :- export((current_form_var0/1, get_http_session0/1,  is_context0/1, make_quotable_0/2, pp_i2tml_0/1, pp_i2tml_1/1, put_string0/1, put_string0/2, sanity_test_000/0, show_edit_term0/3, show_edit_term1/3, show_select1/2, show_select2/3)).
-:- multifile((last_item_offered/1, http:location/3, http_dispatch:handler/4, http_session:session_data/2, http_session:urandom_handle/1,
-   mpred_www:foobar/1, mpred_www:http_last_request/1, mpred_www:last_item_offered/1, system:'$init_goal'/3, user:file_search_path/2)).
+:- multifile((lmcache:last_item_offered/1, http:location/3, http_dispatch:handler/4, http_session:session_data/2, http_session:urandom_handle/1,
+   foobar/1, lmcache:last_http_request/1, lmcache:last_item_offered/1, system:'$init_goal'/3, user:file_search_path/2)).
 
 %:- include(logicmoo(mpred/'mpred_header.pi')).
 :- system:use_module(library(logicmoo_utils)).
@@ -217,8 +215,8 @@
 
 :- nb_setval(pldoc_options,[ prefer(manual) ]).
 
-:- meta_predicate hmust(0).
-:- meta_predicate hmust_l(0).
+:- meta_predicate must_run(0).
+:- meta_predicate must_run(0).
 :- meta_predicate with_search_filters(0).
 :- meta_predicate return_to_pos(0).
 :- meta_predicate show_edit_term1(0,*,*).
@@ -226,9 +224,9 @@
 :- meta_predicate show_edit_term(0,*,*).
 :- meta_predicate edit1term(0).
 
-:- meta_predicate with_main_wwwerror_to_output(0).
+:- meta_predicate www_main_error_to_out(0).
 
-with_main_wwwerror_to_output(G):-call(G).
+www_main_error_to_out(G):- with_main_error_to_output(G).
 
 %% ensure_webserver( ?ARG1) is det.
 %
@@ -257,22 +255,6 @@ ensure_webserver:- ensure_webserver(3020).
 
 
 
-
-%% hmust( :GoalARG1) is det.
-%
-% Hmust.
-%
-hmust(G):-G *-> true ; throw(failed_hmust(G)).
-
-
-
-%% hmust_l( :GoalARG1) is det.
-%
-% Hmust (list Version).
-%
-hmust_l(G):-is_list(G),!,maplist(hmust,G).
-hmust_l((G1,G2)):- !,hmust_l(G1),hmust_l(G2).
-hmust_l(G):-hmust(G).
 
 
 :- dynamic user:file_search_path/2.
@@ -383,8 +365,8 @@ make_quotable(String,SObj):-format(string(SUnq),'~q',[String]),make_quotable_0(S
 save_in_session(NV):- \+ compound(NV),!.
 save_in_session(NV):-is_list(NV),!,must_maplist(save_in_session,NV),!.
 save_in_session(search([X=Y|R])):-nonvar(Y),is_list([X=Y|R]),once(save_in_session([X=Y|R])),!.
-save_in_session(NV):-NV=..[N,V],!,hmust(save_in_session(N,V)),!.
-save_in_session(N=V):- hmust(save_in_session(N,V)),!.
+save_in_session(NV):-NV=..[N,V],!,must_run(save_in_session(N,V)),!.
+save_in_session(N=V):- must_run(save_in_session(N,V)),!.
 save_in_session(NV):- dmsg(not_save_in_session(NV)),!.
 
 :- export(save_in_session/2).
@@ -420,7 +402,7 @@ save_in_session(S,N,V):- dmsg(not_save_in_session(S,N,V)),!.
 %
 % Show Http Session.
 %
-show_http_session:-hmust(get_http_session(S)),listing(http_session:session_data(S,_NV)).
+show_http_session:-must_run(get_http_session(S)),listing(http_session:session_data(S,_NV)).
   
 
 
@@ -487,11 +469,11 @@ reset_assertion_display:-
 %
 % Get Param Sess.
 %
-get_param_sess(N,V):- must(param_default_value(N,D)),!,get_param_sess(N,V,D),!.
+get_param_sess(N,V):- must_run(param_default_value(N,D)),!,get_param_sess(N,V,D),!.
 
-:- dynamic(http_last_request/1).
-:- volatile(mpred_www:http_last_request/1).
-:- volatile(mpred_www:last_item_offered/1).
+:- dynamic(lmcache:last_http_request/1).
+:- volatile(lmcache:last_http_request/1).
+:- volatile(lmcache:last_item_offered/1).
 
 
 
@@ -499,8 +481,8 @@ get_param_sess(N,V):- must(param_default_value(N,D)),!,get_param_sess(N,V,D),!.
 %
 % Get Http Current Request.
 %
-get_http_current_request(B):- httpd_wrapper:http_current_request(B), !,ignore((retractall(http_last_request(_)),asserta(http_last_request(B)))).
-get_http_current_request(B):- http_last_request(B),!.
+get_http_current_request(B):- httpd_wrapper:http_current_request(B), !,ignore((retractall(lmcache:last_http_request(_)),asserta(lmcache:last_http_request(B)))).
+get_http_current_request(B):- lmcache:last_http_request(B),!.
 get_http_current_request([]).
 
 
@@ -564,25 +546,25 @@ save_request_in_session(Request):-
 %
 handler_logicmoo_cyclone(Request):- fail, notrace(((is_goog_bot,!,
   format('Content-type: text/html~n~n',[]),
-  format('<!DOCTYPE html><html><head></head><body><pre>~q</pre></body></html>~n~n',[Request]),flush_output))),!.
+  format('<!DOCTYPE html><html><head></head><body><pre>~q</pre></body></html>~n~n',[Request]),flush_output_safe))),!.
 handler_logicmoo_cyclone(Request):-
  ignore((
  /*nodebugx*/once((
  /*with_no_x*/once((
  /*on_x_log_fail*/once((
-   must_run_each((
+   must_run((
    current_input(In),current_output(Out),current_error(Err),
    thread_self(ID),
    asserta(lmcahce:current_ioet(In,Out,Err,ID)),
    format('Content-type: text/html~n~n',[]),
    format('<!DOCTYPE html>',[]),
-   flush_output,
-      must(save_request_in_session(Request)),
+   flush_output_safe,
+      must_run(save_request_in_session(Request)),
     % member(request_uri(URI),Request),
       member(path(PATH),Request),
     directory_file_path(_,FCALL,PATH),
    once(get_param_req(call,Call);(current_predicate(FCALL/0),Call=FCALL);get_param_sess(call,Call,edit1term)),
-   must_run_each(Call))))))))))),!.
+   must_run(Call))))))))))),!.
    
 
 
@@ -593,7 +575,7 @@ handler_logicmoo_cyclone(Request):-
 % Write Begin Html.
 %
 write_begin_html(B,BASE,URI):-  
-  hmust_l((
+  must_run((
       % sformat(BASE,'~w~@',[B,get_request_vars('_n_~w_v0_~w_vZ')]),
       BASE = B,
       format('<html><head><style type="text/css">
@@ -612,15 +594,15 @@ body {
 }
         input[type="checkbox"] {width:10px; height:10px; }</style>',
         []),            
-      hmust((get_http_current_request(Request))),
-      hmust_l(member(request_uri(URI),Request)->true;URI=''),
+      must_run((get_http_current_request(Request))),
+      must_run(member(request_uri(URI),Request)->true;URI=''),
       % ((URI\==''->format('<meta http-equiv="refresh" content="300;~w">',[URI]);true)),
-      % hmust_l((BASE\='' -> format('<base href="~w" target="_parent"/>',[BASE]);true)),
+      % must_run((BASE\='' -> format('<base href="~w" target="_parent"/>',[BASE]);true)),
       ignore(URI=''),
       ignore(BASE=''),
      format('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>',[]),
      format('<title>~w for ~w</title></head>',[BASE,URI]),
-     format('<body class="yui-skin-sam">',[]),flush_output)),!.
+     format('<body class="yui-skin-sam">',[]),flush_output_safe)),!.
    
 
 
@@ -630,7 +612,7 @@ body {
 %
 % Write End Html.
 %
-write_end_html:- flush_output,format('</body></html>~n~n',[]),flush_output,!.
+write_end_html:- flush_output_safe,format('</body></html>~n~n',[]),flush_output_safe,!.
 
 % logicmoo_html_needs_debug.
 
@@ -845,7 +827,7 @@ param_matches(A,B):-A=B,!.
 show_select2(Name,Pred,Options):-
   
     Call=..[Pred,ID,Value],
-    must(param_default_value(Name,D);param_default_value(Pred,D)),!,
+    must_run(param_default_value(Name,D);param_default_value(Pred,D)),!,
     get_param_sess(Name,UValue,D),
     format('<select name="~w">',[Name]),
     forall(Call,
@@ -893,7 +875,7 @@ as_ftVars(_).
 %
 % Search4term.
 %
-search4term:- must_run_each((
+search4term:- must_run((
   maybe_scan_for_varnames,
   get_param_sess(term,Term,"tHumanHead"),
   get_param_sess(find,SObj,Term),
@@ -909,8 +891,8 @@ search4term:- must_run_each((
 %
 edit1term:-  
   get_param_req('ASK','ASK'),!,
-  with_main_wwwerror_to_output(
-   must_run_each((
+  www_main_error_to_out(
+   must_run((
    get_param_sess(term,String,""),
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
@@ -919,8 +901,8 @@ edit1term:-
   
 edit1term:- 
   get_param_req('TELL','TELL'),!,
-  with_main_wwwerror_to_output(
-   must_run_each((
+  www_main_error_to_out(
+   must_run((
    get_param_sess(term,String,""),
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
@@ -929,8 +911,8 @@ edit1term:-
   
 edit1term:- 
   get_param_req('RETRACT','RETRACT'),!,
-  with_main_wwwerror_to_output(
-   must_run_each((
+  www_main_error_to_out(
+   must_run((
    get_param_sess(term,String,""),
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
@@ -938,7 +920,7 @@ edit1term:-
    call_for_terms(forall(mpred_withdraw(Term),pp_item_html('Retract',':-'(VNs,Term))))))),!.
   
 edit1term:- 
- must_run_each((
+ must_run((
              reset_assertion_display,
              get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),
                 save_in_session(find,Word),
@@ -953,7 +935,7 @@ edit1term:-
 % Edit1term.
 %
 edit1term(Call):-
- must_run_each((
+ must_run((
              reset_assertion_display,
              get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),save_in_session(find,Word),
    show_edit_term(Call,String,SWord))),!.
@@ -986,7 +968,7 @@ show_edit_term0(Call,String,SWord):-show_edit_term1(Call,String,SWord).
 %
 % Do Guitracer.
 %
-do_guitracer:- guitracer,trace.
+do_guitracer:- guitracer,dtrace.
 
 
 
@@ -1058,9 +1040,9 @@ format('
     show_select1('humanLang',human_language),
     URL,
     show_select2(olang,logic_lang_name,[])]),!,   
-   format('<pre>',[]),
+    format('<pre>',[]),
     on_x_rtrace(Call),!,
-   format('</pre>',[]),
+    format('</pre>',[]),
    write_end_html,!.
 
 
@@ -1156,6 +1138,7 @@ search_filter_name_comment(showFilenames,'Filenames','0').
 search_filter_name_comment(wholePreds,'Whole Preds','0').
 search_filter_name_comment(skipVarnames,'Skip Varnames','0').
 search_filter_name_comment(hideClauseInfo,'Skip ClauseInfo','1').
+search_filter_name_comment(hideXRef,'Skip XREF','1').
 search_filter_name_comment(showAll,'Show All','0').
   
 
@@ -1248,9 +1231,19 @@ get_request_vars(Format):- ignore(Exclude=[term,find,session_data,call,user_agen
    forall(member(N=V,NVs),format(Format,[N,V])).
 
 
-must_run_each((A,B)):-!, must_run_each(A),!,must_run_each(B),!.
-must_run_each(List):- is_list(List),!,must_maplist(must_run_each,List),!.
-must_run_each(G):- flush_output,must(G),flush_output,!.
+%% must_run( :GoalARG1) is det.
+%
+% Hmust (list Version).
+%
+must_run(G):-is_list(G),!,maplist(must_run,G),!.
+must_run((G1,G2)):- !,must_run(G1),!,must_run(G2),!.
+% must_run([G1|G2]):- !,must_run(G1),!,must_run(G2),!.
+must_run(List):-  is_list(List),!,must_maplist(must_run,List),!.
+must_run(Goal):- flush_output_safe,
+   (catch(Goal,  Error,   wdmsg(assertion_failed(Error, Goal)))
+    *-> flush_output_safe ; wdmsg(assertion_failed(fail, Goal))).
+
+
 
 
 %% call_for_terms( ?ARG1) is det.
@@ -1258,40 +1251,45 @@ must_run_each(G):- flush_output,must(G),flush_output,!.
 % Call For Terms.
 %
 call_for_terms(Call):- 
-   must_run_each(
-    [
+   must_run((
       get_param_sess(term,Term,"tHumanHead"),
       get_param_sess(find,SObj,Term),
       cvt_param_to_term(SObj,Obj),
         write_begin_html('search4term',Base,_),
         show_search_form(Obj,Base),
-        format('<pre>',[]),
+        format('<pre>',[]),        
         w_tl(t_l:print_mode(html),with_search_filters(catch(ignore(Call),E,dmsg(E)))),
-        format('</pre>',[]),flush_output,
+        format('</pre>',[]),
         show_pcall_footer,
-        write_end_html]),!.
+        write_end_html)),!.
 
 :- thread_local(t_l:tl_hide_data/1).
 
 show_search_form(Obj,Base):-
-   must_run_each(
-    [
+   must_run(
+    (
         format('<form action="search4term" target="_self"><font size="-3"> Apply ',[]),
         action_menu_applied('action_below',"Checked or Clicked","&nbsp;below&nbsp;"),
         format('&nbsp;&nbsp;&nbsp;find = <input id="find" type="text" name="find" value="~q">~@  Base = ~w</font> <a href="edit1term" target="_top">edit1term</a> <hr/></form>~n~@',
-            [Obj,show_search_filters('&nbsp;&nbsp;'),Base,add_form_script])]),  !.
+            [Obj,show_search_filters('&nbsp;&nbsp;'),Base,add_form_script]))),  !.
 
 
 %% with_search_filters( :GoalARG1) is det.
 %
 % Using Search Filters.
 %
+
+
 with_search_filters(C):-
+  retractall(t_l:tl_hide_data(_)),
+  with_search_filters0(C),!.
+
+with_search_filters0(C):-
    search_filter_name_comment(FILTER,_,_),
    session_checked(FILTER), 
    \+ t_l:tl_hide_data(FILTER),!,
-    w_tl(t_l:tl_hide_data(FILTER),with_search_filters(C)).
-with_search_filters(C):-call(C).
+    w_tl(t_l:tl_hide_data(FILTER),with_search_filters0(C)).
+with_search_filters0(C):-call(C).
 
 
 
@@ -1302,15 +1300,15 @@ with_search_filters(C):-call(C).
 % Make Page Pretext Obj.
 %
 
-% make_page_pretext_obj(Obj):- atom(Obj),atom_to_term(Obj,Term,Bindings),nonvar(Term),Term\=@=Obj,!,hmust(make_page_pretext_obj(Term)).
+% make_page_pretext_obj(Obj):- atom(Obj),atom_to_term(Obj,Term,Bindings),nonvar(Term),Term\=@=Obj,!,must_run(make_page_pretext_obj(Term)).
 
 make_page_pretext_obj(Obj):- 
- must_run_each((
+ must_run((
   % catch(mmake,_,true),
-  % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((this_listing(M:F/A),flush_output)))),
-  % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((reply_object_sub_page(M:F/A),flush_output)))),
+  % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((this_listing(M:F/A),flush_output_safe)))),
+  % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((reply_object_sub_page(M:F/A),flush_output_safe)))),
   % ignore((fail,catch(mpred_listing(Pred),_,true))),
-  call_with_time_limit(300,ignore(catch(xlisting_inner(i2tml_hbr,Obj,[]),E,wdmsg(E)))),
+  notrace(call_with_time_limit(300,ignore(catch(xlisting_inner(i2tml_hbr,Obj,[]),E,wdmsg(E))))),
   pp_i2tml_saved_done(Obj))),!.
 
 make_page_pretext_obj(Obj):- writeq(make_page_pretext_obj(Obj)),!.
@@ -1364,7 +1362,7 @@ object_sub_page(Obj, Options) -->
 %
 % Return Converted To Pos.
 %
-return_to_pos(Call):- current_line_position(LP),Call,!, must(set_line_pos(LP)).
+return_to_pos(Call):- current_line_position(LP),Call,!, must_run(set_line_pos(LP)).
 
 
 
@@ -1595,7 +1593,7 @@ term_to_pretty_string(H,HS):-
 %
 % Fmtimg.
 %
-fmtimg(N,Alt):- t_l:print_mode(html),!,
+fmtimg(N,Alt):- get_print_mode(html),!,
  make_quotable(Alt,AltQ),
  url_encode(Alt,AltS),
  format('~N<a href="?call=edit1term&term= ~w" target="_parent"><img src="/pixmaps/~w.gif" alt="~w" title="~w"><a>',[AltS,N,AltQ,AltQ]).
@@ -1609,7 +1607,7 @@ fmtimg(_,_).
 %
 % Indent Nbsp.
 %
-indent_nbsp(X):-t_l:print_mode(html),forall(between(0,X,_),format('&nbsp;')),!.
+indent_nbsp(X):-get_print_mode(html),forall(between(0,X,_),format('&nbsp;')),!.
 indent_nbsp(X):-forall(between(0,X,_),format('~t',[])),!.
 
 
@@ -1646,6 +1644,7 @@ indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   '
 % Hook To [logicmoo_util_term_listing:shared_hide_data/1] For Module Mpred_www.
 % Shared Hide Data.
 %
+lmconf:shared_hide_data(M:F/A):-nonvar(M),!,lmconf:shared_hide_data(F/A).
 lmconf:shared_hide_data('$si$':'$was_imported_kb_content$'/2):- !,listing_filter(hideMeta).
 lmconf:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
 lmconf:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
@@ -1661,7 +1660,12 @@ lmconf:shared_hide_data((_:-
         ;   CALL
         ))):- CALL=@=call(G19865).
 
+
+lmconf:shared_hide_data(saved_request/_):- !.
+lmconf:shared_hide_data(session_data/_):- !.
 lmconf:shared_hide_data(mpred_mark/3):- !,listing_filter(hideMeta).
+lmconf:shared_hide_data(last_item_offered/1):- !,listing_filter(hideMeta).
+lmconf:shared_hide_data(P0):- strip_module(P0,_,P), compound(P),functor(P,F,A),F\== (/) , !,lmconf:shared_hide_data(F/A).
 
 
 
@@ -1697,7 +1701,7 @@ this_listing(MFA):-listing(MFA).
 %
 % Pretty Print I2tml Saved Done.
 %
-pp_i2tml_saved_done(_Obj):-pp_now,!,flush_output.
+pp_i2tml_saved_done(_Obj):-pp_now,!,flush_output_safe.
 pp_i2tml_saved_done(Obj):-
   findall(H,retract(sortme_buffer(Obj,H)),List),predsort(head_functor_sort,List,Set),
   forall(member(S,Set),pp_i2tml(S)),!.
@@ -1757,7 +1761,7 @@ i2tml_hbr(H,B,_):- !,pp_i2tml_save_seen((H:-B)).
 %
 % Pretty Print I2tml Save Seen.
 %
-pp_i2tml_save_seen(HB):- pp_now, !,must(pp_i2tml(HB)),!.
+pp_i2tml_save_seen(HB):- pp_now, !,must_run(pp_i2tml(HB)),!.
 pp_i2tml_save_seen(HB):- assertz_if_new(sortme_buffer(_Obj,HB)),!.
 
 
@@ -1778,7 +1782,7 @@ pp_i2tml_save_seen(HB):- assertz_if_new(sortme_buffer(_Obj,HB)),!.
 %
 % Section Open.
 %
-section_open(Type):-  once(shown_subtype(Type)->true;((t_l:print_mode(html)->format('~n</pre><hr>~w<hr><pre>~n<font face="verdana,arial,sans-serif">',[Type]);(draw_line,format('% ~w~n~n',[Type]))),asserta(shown_subtype(Type)))),!.
+section_open(Type):-  once(shown_subtype(Type)->true;((get_print_mode(html)->format('~n</pre><hr>~w<hr><pre>~n<font face="verdana,arial,sans-serif">',[Type]);(draw_line,format('% ~w~n~n',[Type]))),asserta(shown_subtype(Type)))),!.
 
 
 
@@ -1786,10 +1790,11 @@ section_open(Type):-  once(shown_subtype(Type)->true;((t_l:print_mode(html)->for
 %
 % Section Close.
 %
-section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(t_l:print_mode(html)->format('</font>\n</pre><hr/><pre>',[]);draw_line));true.
+section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(get_print_mode(html)->format('</font>\n</pre><hr/><pre>',[]);draw_line));true.
 
 
-
+get_print_mode(Text):-thread_self(main),!,Text=text.
+get_print_mode(html).
 
 
 %% pp_item_html( ?ARG1, ?ARG2) is det.
@@ -1801,18 +1806,18 @@ pp_item_html(Type,done):-!,section_close(Type),!.
 pp_item_html(_,H):-shown_clause(H),!.
 pp_item_html(_,P):- (listing_filter(P); (compound(P),functor(P,F,A),(listing_filter(F/A);listing_filter(F)))),!.
 
-pp_item_html(Type,H):- \+ t_l:print_mode(html), pp_item_html_now(Type,H),!.
+pp_item_html(Type,H):- \+ get_print_mode(html), pp_item_html_now(Type,H),!.
 pp_item_html(Type,H):- ignore((flag(matched_assertions,X,X),between(0,5000,X),pp_item_html_now(Type,H))).
 
-:- dynamic(last_item_offered/1).
+:- dynamic(lmcache:last_item_offered/1).
 
 
 
-%% last_item_offered( ?ARG1) is det.
+%% lmcache:last_item_offered( ?ARG1) is det.
 %
 % Last Item Offered.
 %
-last_item_offered(unknonw).
+lmcache:last_item_offered(unknonw).
 
 
 
@@ -1883,8 +1888,8 @@ pp_i2tml(Done):-Done==done,!.
 pp_i2tml(T):-var(T),format('~w',[T]),!.
 pp_i2tml(T):-string(T),format('"~w"',[T]).
 pp_i2tml(clause(H,B,Ref)):- !, w_tl(t_l:current_clause_ref(Ref),pp_i2tml_v((H:-B))).
-pp_i2tml(HB):- find_ref(HB,Ref),!, must(w_tl(t_l:current_clause_ref(Ref),pp_i2tml_v((HB)))).
-pp_i2tml(HB):- w_tl(t_l:current_clause_ref(none),must(pp_i2tml_v((HB)))).
+pp_i2tml(HB):- find_ref(HB,Ref),!, must_run(w_tl(t_l:current_clause_ref(Ref),pp_i2tml_v((HB)))).
+pp_i2tml(HB):- w_tl(t_l:current_clause_ref(none),must_run(pp_i2tml_v((HB)))).
 
 
 
@@ -1957,7 +1962,7 @@ pp_i2tml_0(HB):-pp_i2tml_1(HB).
 %
 % If Html.
 %
-if_html(F,A):-t_l:print_mode(html),!,format(F,[A]).
+if_html(F,A):-get_print_mode(html),!,format(F,[A]).
 if_html(_,A):-A.
 
 
@@ -1968,14 +1973,14 @@ if_html(_,A):-A.
 % Pretty Print i2tml  Secondary Helper.
 %
 pp_i2tml_1(H):- 
- once(((last_item_offered(Was);Was=foobar),get_functor(Was,F1,_A1),get_functor(H,F2,_A2),
-   retractall(last_item_offered(Was)),asserta(last_item_offered(H)),
-    ((F1 \== F2 -> if_html('~N<hr/>',true);true)))),flush_output,fail.
+ once(((lmcache:last_item_offered(Was);Was=foobar),get_functor(Was,F1,_A1),get_functor(H,F2,_A2),
+   retractall(lmcache:last_item_offered(Was)),asserta(lmcache:last_item_offered(H)),
+    ((F1 \== F2 -> if_html('~N<hr/>',true);true)))),flush_output_safe,fail.
 
 pp_i2tml_1(_H):- t_l:current_clause_ref(Ref),
     if_html('<font size="1">~@</font>',show_clause_ref(Ref)),fail.
 
-pp_i2tml_1(H):- t_l:print_mode(html), 
+pp_i2tml_1(H):- get_print_mode(html), 
   term_to_pretty_string(H,ALT)->
    functor_to_color(H,FC)->fmtimg(FC,ALT)->
     format('<input type="checkbox" name="assertion[]" value="~w">',[ALT]),fail.
@@ -2063,7 +2068,7 @@ functor_to_color(G,_,_,'cyc-logo-3-t'):-predicate_property(G,built_in).
 %
 % Write Atom Link.
 %
-write_atom_link(A):-must(write_atom_link(A,A)).
+write_atom_link(A):-must_run(write_atom_link(A,A)).
 :- export(write_atom_link/2).
 
 
@@ -2072,7 +2077,7 @@ write_atom_link(A):-must(write_atom_link(A,A)).
 %
 % Write Atom Link.
 %
-write_atom_link(L,N):-must_run_each((write_atom_link(atom(W),L,N),format('~w',[W]))),!.
+write_atom_link(L,N):-must_run((write_atom_link(atom(W),L,N),format('~w',[W]))),!.
 
 % pred_href(Name/Arity, Module, HREF) :-
 
@@ -2085,10 +2090,10 @@ write_atom_link(L,N):-must_run_each((write_atom_link(atom(W),L,N),format('~w',[W
 write_atom_link(W,A/_,N):-atom(A),!,write_atom_link(W,A,N).
 write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N).
 %write_atom_link(W,_,N):- thread_self(main),!,write_term_to_atom_one(W,N),!.
-write_atom_link(W,_,N):- must(nonvar(W)),\+ t_l:print_mode(html),write_term_to_atom_one(W,N),!.
+write_atom_link(W,_,N):- must_run(nonvar(W)),\+ get_print_mode(html),write_term_to_atom_one(W,N),!.
 write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),
    url_encode(AQ,URL),
-   format(W,'<a href="?f= ~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
+   format(W,'<a href="?f=~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
 
 
 
@@ -2291,7 +2296,7 @@ put_string0([H|T]) :-
 %
 % Put String.
 %
-put_string(A,B):- t_l:print_mode(html),!,
+put_string(A,B):- get_print_mode(html),!,
   with_output_to(atom(S),put_string0(A,B)),
   url_iri(URL,S),format('<a href="?f= ~w">~w</a>',[URL,S]).
 
@@ -2854,7 +2859,7 @@ lmconf:my_portray(A) :-
         format('__~w#~w', [F, G]).
 lmconf:my_portray(A) :- atom(A),!,lmconf:write_atom_link(A,A).
 lmconf:my_portray(A) :- \+compound(A),fail.
-%lmconf:my_portray(P):- hmust((return_to_pos(rok_portray_clause(P)),!)).
+%lmconf:my_portray(P):- must_run((return_to_pos(rok_portray_clause(P)),!)).
 */
 
 

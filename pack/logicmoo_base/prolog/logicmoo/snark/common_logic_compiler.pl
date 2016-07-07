@@ -472,7 +472,7 @@ nnf(KB,exists(TypedX,NNF),FreeV,FmlO,Paths):- get_quantifier_isa(TypedX,X,Col),
 
 
 % ==== quantifiers ========
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,trace,nnf(KB,Fml,FreeV,NNF,Paths).
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,dtrace,nnf(KB,Fml,FreeV,NNF,Paths).
 
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(in_nnf),!,
  must_det_l((

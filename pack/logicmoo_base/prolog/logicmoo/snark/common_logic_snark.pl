@@ -216,7 +216,7 @@ kif_hook(forall(_,_)).
 kif_hook(exists(_,_)).
 kif_hook(if(_,_)).
 kif_hook(iff(_,_)).
-% uncommenting these next 3 lines may break sanity_birdt test
+% uncommenting these next 3 lines may dbreak sanity_birdt test
 kif_hook( ~(H)):- !,nonvar(H),!,kif_hook(H).
 kif_hook( \+ H):- !,nonvar(H),!,kif_hook(H).
 kif_hook( not(H)):- !,nonvar(H),!,kif_hook(H).
@@ -245,7 +245,7 @@ is_prolog_entailed(UCL):-clause_asserted(UCL),!.
 is_prolog_entailed(UCL):-clause_asserted_i(UCL),!.
 is_prolog_entailed(UCL):-show_failure(clause_asserted_u(UCL)),!.
 is_prolog_entailed(UCL):-clause(UCL,B),split_attrs(B,A,BB),must(A),BB.
-is_prolog_entailed(UCL):-clause(UCL,B,Ref),(B\==true->must(B);(trace,clause(HH,BB,Ref),dmsg(BB:-(UCL,HH)))),!.
+is_prolog_entailed(UCL):-clause(UCL,B,Ref),(B\==true->must(B);(dtrace,clause(HH,BB,Ref),dmsg(BB:-(UCL,HH)))),!.
 is_prolog_entailed(UCL):- wdmsg(warn(not_is_prolog_entailed(UCL))),!.
 
 
@@ -808,7 +808,7 @@ unnumbervars_with_names(Term,CTerm):-
    source_variables_l(NamedVars),
    copy_term(Term:NamedVars,CTerm:CNamedVars),
    term_variables(CTerm,Vars),
-   call((trace,get_var_names(Vars,CNamedVars,Names))),
+   call((dtrace,get_var_names(Vars,CNamedVars,Names))),
    b_implode_varnames0(Names),
   % numbervars(CTerm,91,_,[attvar(skip),singletons(false)]),
    append(CNamedVars,NamedVars,NewCNamedVars),
@@ -1208,7 +1208,7 @@ clauses_to_boxlog_1(KB, Why,In,Prolog):- clauses_to_boxlog_2(KB,Why,In,PrologM),
 % clauses Converted To Datalog  Extended Helper.
 %
 clauses_to_boxlog_2(KB, Why,In,Prolog):- is_list(In),!,must_maplist(clauses_to_boxlog_1(KB,Why),In,Prolog).
-clauses_to_boxlog_2(KB, Why,cl([],BodyIn),  Prolog):- !, (is_lit_atom(BodyIn) -> clauses_to_boxlog_1(KB,Why,cl([inconsistentKB(KB)],BodyIn),Prolog);  (trace,kif_to_boxlog( ~(BodyIn),KB,Why,Prolog))).
+clauses_to_boxlog_2(KB, Why,cl([],BodyIn),  Prolog):- !, (is_lit_atom(BodyIn) -> clauses_to_boxlog_1(KB,Why,cl([inconsistentKB(KB)],BodyIn),Prolog);  (dtrace,kif_to_boxlog( ~(BodyIn),KB,Why,Prolog))).
 clauses_to_boxlog_2(KB, Why,cl([HeadIn],[]),Prolog):- !, (is_lit_atom(HeadIn) -> Prolog=HeadIn ; (kif_to_boxlog(HeadIn,KB,Why,Prolog))).
 clauses_to_boxlog_2(KB,_Why,cl([HeadIn],BodyIn),(HeadIn:- BodyOut)):-!, must_maplist(logical_pos(KB),BodyIn,Body), list_to_conjuncts(Body,BodyOut),!.
 
@@ -1229,7 +1229,7 @@ clauses_to_boxlog_2(_KB,_Why,(H:-B),(H:-B)):- !.
 clauses_to_boxlog_5(KB, Why,In,Prolog):- is_list(In),!,must_maplist(clauses_to_boxlog_5(KB,Why),In,Prolog).
 clauses_to_boxlog_5(_KB,_Why,(H:-B),(H:-B)):-!.
 clauses_to_boxlog_5(_KB,_Why,cl([HeadIn],[]),HeadIn):-!.
-clauses_to_boxlog_5(_KB,_Why,In,Prolog):-trace,In=Prolog.
+clauses_to_boxlog_5(_KB,_Why,In,Prolog):-dtrace,In=Prolog.
 
 
 %= 	 	 

@@ -2,6 +2,12 @@
 /** <module> MUD server startup script in SWI-Prolog
 
 */
+:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+:- endif.
+% :- module(init_mud_server,[]).
+% restore entry state
+:- reset_modules.
+
 :- set_prolog_flag(dialect_pfc,false).
 :- set_prolog_stack(global, limit(16*10**9)).
 :- set_prolog_stack(local, limit(16*10**9)).
@@ -23,19 +29,23 @@
 
 :- system:ensure_loaded(setup_paths).
 :- system:ensure_loaded(logicmoo_repl).
-:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
+:- set_fileAssertMt(baseKB).
+:- set_defaultAssertMt(baseKB).
 :- use_listing_vars.
 :- set_prolog_flag(dialect_pfc,false).
+
 
 :- ensure_webserver(3020).
 :- initialization(ensure_webserver(3020)).
 :- initialization(ensure_webserver(3020),now).
 :- initialization(ensure_webserver(3020),restore).
 
+:- break.
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).
 
+:- break.
 
 % [Mostly Required] Load the Logicmoo Plan Generator System
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
@@ -68,10 +78,10 @@
 % MUD SERVER CODE LOADS
 % ==============================
 
-
+:- push_modules.
 % [Required] load the mud system
-:- show_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_loader)))).
-
+:- show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader)))).
+:- reset_modules.
 
 :- set_prolog_flag(logicmoo_debug,true).
 
@@ -79,6 +89,7 @@
 % ==============================
 % MUD SERVER CODE STARTS
 % ==============================
+:- set_fileAssertMt(baseKB).
 
 :- file_begin(pfc).
 :- set_prolog_flag(dialect_pfc,true).

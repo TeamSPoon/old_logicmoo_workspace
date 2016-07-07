@@ -34,7 +34,7 @@ builtin(!,0).
 builtin(true,0).
 builtin(fail,0).
 builtin(succeed,0).
-builtin(trace,0).
+builtin(dtrace,0).
 builtin(atom,1).
 builtin(integer,1).
 builtin(number,1).

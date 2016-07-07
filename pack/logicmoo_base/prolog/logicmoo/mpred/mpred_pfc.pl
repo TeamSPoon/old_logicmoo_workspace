@@ -396,7 +396,7 @@ get_source_ref10(mfl(M,F,L)):- defaultAssertMt(M), current_source_file(F:L).
 get_source_ref10(mfl(M,F,_L)):- defaultAssertMt(M), current_source_file(F).
 get_source_ref10(mfl(M,_F,_L)):- defaultAssertMt(M).
 %get_source_ref10(M):- (defaultAssertMt(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
-get_source_ref10(M):- fail,trace, 
+get_source_ref10(M):- fail,dtrace, 
  ((defaultAssertMt(M) -> !;
  (atom(M)->(module_property(M,class(_)),!);
     mpred_error(no_source_ref(M))))).
@@ -418,7 +418,7 @@ to_real_mt(_Why,BOX,BOX).
 %
 % Ensure modules are correct when asserting/calling information into the correct MTs
 %
-%fix_mp(Why,I,UO):- compound(UO),trace,UO=(U:O),!,quietly_must(fix_mp(Why,I,U,O)).
+%fix_mp(Why,I,UO):- compound(UO),dtrace,UO=(U:O),!,quietly_must(fix_mp(Why,I,U,O)).
 fix_mp(Why,I,UO):- quietly_must(fix_mp(Why,I,U,O)),maybe_prepend_mt(U,O,UO).
 
 
@@ -1010,7 +1010,7 @@ mpred_post_update4(unique,P,S,simular(_)):-!,
   mpred_enqueue(P,S).
   
 
-mpred_post_update4(Was,P,S,What):-dmsg(mpred_post_update4(Was,P,S,What)),trace,fail.
+mpred_post_update4(Was,P,S,What):-dmsg(mpred_post_update4(Was,P,S,What)),dtrace,fail.
 
 mpred_post_update4(Was,P,S,What):-!,trace_or_throw(mpred_post_update4(Was,P,S,What)).
 
@@ -1023,11 +1023,11 @@ assert_u_confirmed_was_missing(P):- once((get_consequent_functor(P,F,_),get_func
 */
 assert_u_confirmed_was_missing(P):-
  \+ \+ must(assert_mu(P)),!.
- % sanity( (\+ clause_asserted_u(P)) -> (rtrace(assert_mu(P)),break) ; true),!.
+ % sanity( (\+ clause_asserted_u(P)) -> (rtrace(assert_mu(P)),dbreak) ; true),!.
 
 assert_u_confirmed_was_missing(P):- 
  copy_term_vn(P,PP),
- trace,must(assert_u_no_dep(P)),!,
+ dtrace,must(assert_u_no_dep(P)),!,
 (nonvar(PP) -> true ; must((P=@=PP,clause_asserted_u(PP),P=@=PP))),!.
 
 
@@ -1210,7 +1210,7 @@ mpred_ain_trigger_reprop(PT,Support):-
   sanity(\+ string(Support)),
   sanity(\+ string(Trigger)),
   sanity(\+ string(Body)),
-  %  (debugging(foo)->trace;true),
+  %  (debugging(foo)->dtrace;true),
   mpred_assert_w_support(PT,Support),
   copy_term(PT,Tcopy),
   mpred_call_no_bc(Trigger),
@@ -1255,7 +1255,7 @@ mpred_bt_pt_combine(_,_,_):- !.
 % 
 
 mpred_ain_actiontrace(Action,Support):- 
-  % adds an action trace and it''s support.
+  % adds an action dtrace and it''s support.
   mpred_add_support(actn(Action),Support).
 
 mpred_undo_action(actn(A)):-
@@ -1398,13 +1398,13 @@ mpred_remove_supports_quietly(_).
 %
 % - a positive or negative trigger.
 % - an action by finding a method and successfully executing it.
-% - or a random fact, printing out the trace, if relevant.
+% - or a random fact, printing out the dtrace, if relevant.
 %
 
 mpred_undo(X):- mpred_undo1(X),!.
 % maybe still un-forward chain?
 mpred_undo(Fact):-
-  % undo a random fact, printing out the trace, if relevant.  
+  % undo a random fact, printing out the dtrace, if relevant.  
   show_call(mpred_unfwc(Fact)).
 % mpred_undo(X):- doall(mpred_undo1(X)).
 
@@ -1438,7 +1438,7 @@ mpred_undo1(nt(Head,Condition,Body)):-
      ; mpred_warn("Trigger not found to undo: ~p",[nt(Head,Condition,Body)])).
 
 mpred_undo1(Fact):-
-  % undo a random fact, printing out the trace, if relevant.
+  % undo a random fact, printing out the dtrace, if relevant.
   retract_u(Fact),
   mpred_trace_op(rem,Fact),
   mpred_unfwc(Fact).
@@ -1559,7 +1559,7 @@ mpred_fwc1(Fact):-
 % mpred_do_rule((H:-attr_bind(B,_))):- get_functor(H,F,A),lookup_u(mpred_mark(pfcLHS,F,A)), sanity(nonvar(B)), repropagate(H),!. 
 mpred_do_rule((H:-B)):- var(H),sanity(nonvar(B)),forall(call_u(B),mpred_ain(H)),!.
 mpred_do_rule((H:-B)):- get_functor(H,F,A),lookup_u(mpred_mark(pfcLHS,F,A)), sanity(nonvar(B)),forall(call_u(B),mpred_fwc(H)),!.
-%   !,trace,ignore((lookup_u(H),mpred_fwc1(H),fail)).
+%   !,dtrace,ignore((lookup_u(H),mpred_fwc1(H),fail)).
 
 % mpred_do_rule((H:-B)):- !,ignore((call_u(B),mpred_fwc1(H),fail)).
 
@@ -1817,7 +1817,7 @@ mpred_BC_CACHE0(_,P):-
 
 
 % I''d like to remove this soon
-mpred_call_no_bc(P):- var(P),!,fail,trace,  mpred_fact(P).
+mpred_call_no_bc(P):- var(P),!,fail,dtrace,  mpred_fact(P).
 mpred_call_no_bc(baseKB:true):-!.
 mpred_call_no_bc(_):- sanity(stack_check),fail.
 
@@ -2261,7 +2261,7 @@ mpred_mark_as(Sup,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup,P,F,A,
 % PFC Mark Functor-arity Converted To.
 %
 
-% mpred_mark_fa_as(_Sup,_P,'\=',2,_):- trace.
+% mpred_mark_fa_as(_Sup,_P,'\=',2,_):- dtrace.
 mpred_mark_fa_as(_Sup,_P,_,_,Type):- Type \== pfcLHS, current_prolog_flag(unsafe_speedups,true),!.
 mpred_mark_fa_as(_Sup,_P,isa,_,_):- !.
 mpred_mark_fa_as(_Sup,_P,_,_,pfcCallCodeBody):- !.
@@ -2572,7 +2572,7 @@ mpred_facts(P,C,L):- setof(P,mpred_fact(P,C),L).
 %
 % Brake.
 %
-brake(X):-  X, break.
+brake(X):-  X, dbreak.
 
 
 % 
@@ -2605,7 +2605,7 @@ mpred_trace_maybe_break(Add,P0,_ZS):-
    (
   \+ call_u(mpred_is_spying_pred(P,Add)) -> true;
    (wdmsg("~NBreaking on ~p(~p)",[Add,P]),
-    break)).
+    dbreak)).
    
 
 
@@ -2671,7 +2671,7 @@ log_failure_red:- cnotrace(doall((between(1,3,_),wdmsg(color(red,"%%%%%%%%%%%%%%
 
 maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(mpred)->dtrace(dmsg(Info));(dmsg(Info)))).
 
-% if the correct flag is set, trace exection of Pfc
+% if the correct flag is set, dtrace exection of Pfc
 mpred_trace_msg(Info):- not_not_ignore_mnotrace(((((clause_asserted_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)))).
 mpred_trace_msg(Format,Args):- not_not_ignore_mnotrace((((clause_asserted_u(mpred_is_tracing_exec);tracing)-> wdmsg(Format,Args)))),!.
 % mpred_trace_msg(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_trace_msg(Info))))).

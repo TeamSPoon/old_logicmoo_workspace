@@ -596,7 +596,7 @@ argIsa_call_7(Prop,N1,Type):- argIsa_call_9(Prop,N1,Type).
 %
 argIsa_call_9(_,_,Type):- argisa_nodebug,!,genls(ftTerm,Type).
 argIsa_call_9(Prop,N1,Type):- arity(Prop,Arity),dmsg(todo(define(argIsa_known_a(Prop,N1,'_TYPE')))),number(Arity),number(N1),must(N1=<Arity),Type=argIsaFn(Prop,N1),!.
-argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known_b(Prop,N1,'_TYPE')))),trace,Type=argIsaFn(Prop,N1),!.
+argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known_b(Prop,N1,'_TYPE')))),dtrace,Type=argIsaFn(Prop,N1),!.
 argIsa_call_9(_,_,ftTerm).
 
 

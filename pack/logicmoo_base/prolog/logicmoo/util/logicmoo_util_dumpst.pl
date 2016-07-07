@@ -77,8 +77,8 @@ dump_st:- prolog_current_frame(Frame),dumpST0(Frame,10).
 %
 % Dump S True Stucture Primary Helper.
 %
-dumpST0:- break, 
-   prolog_current_frame(Frame),(tracing->cnotrace((CU=trace,cnotrace));CU=true),dumpST0(Frame,800),!,CU.
+dumpST0:- dbreak, 
+   prolog_current_frame(Frame),(tracing->cnotrace((CU=dtrace,cnotrace));CU=true),dumpST0(Frame,800),!,CU.
 
 %= 	 	 
 
@@ -99,8 +99,8 @@ dumpST0(Frame,MaxDepth):- ignore(MaxDepth=5000),Term = dumpST(MaxDepth),
    (var(Frame)->once(nb_current('$dump_frame',Frame);prolog_current_frame(Frame));true),
    ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(13)]),
     format(user_error, '% dumpST ~p', [Term]), nl(user_error),
-    attach_console,trace,
-    break,
+    attach_console,dtrace,
+    dbreak,
 
     print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]), nl(user_error), fail)),!.
 
@@ -474,14 +474,14 @@ end_dump(GG):-compound(GG),functor(GG,F,_),atom_concat(dump,_,F).
 % dtrace/0/1/2
 % =====================
 
-
+system:dtrace:- wdmsg("DUMP_TRACE/0"), (thread_self(main)->dtrace(system:trace);true).
 %= 	 	 
 
 %% dtrace is semidet.
 %
 % (debug) Trace.
 %
-dtrace:- wdmsg("DUMP_TRACE_BREAK/0"), dtrace(system:break).
+system:dbreak:- wdmsg("DUMP_BREAK/0"), (thread_self(main)->dtrace(system:break);true).
 
 :- thread_local(tlbugger:has_auto_trace/1).
 :-meta_predicate(dtrace(0)).
@@ -493,7 +493,7 @@ dtrace:- wdmsg("DUMP_TRACE_BREAK/0"), dtrace(system:break).
 % (debug) Trace.
 %
 
-dtrace(G):- strip_module(G,_,break),\+ thread_self(main),!.
+dtrace(G):- strip_module(G,_,dbreak),\+ thread_self(main),!.
 dtrace(G):- tlbugger:has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
 dtrace(G):- cnotrace((tracing,cnotrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(cnotrace,restore_trace((leash(+all),dumptrace(G))),trace).
 
@@ -544,14 +544,16 @@ with_source_module(G):-
 %
 % Dump Trace.
 %
-dumptrace(G):- non_user_console,!,trace_or_throw(non_user_console_dumptrace(G)).
+dumptrace(_):- \+ thread_self(main),!.
+dumptrace(_):- non_user_console,!.
+% dumptrace(G):- non_user_console,!,trace_or_throw(non_user_console_dumptrace(G)).
 dumptrace(G):-
   w_tl(set_prolog_flag(gui_tracer, false),
    w_tl(set_prolog_flag(gui, false),
     w_tl(set_prolog_flag(retry_undefined, false),
      dumptrace0(G)))).
 
-dumptrace0(G):- cnotrace((tracing,cnotrace,wdmsg(tracing_dumptrace(G)))),break.
+dumptrace0(G):- cnotrace((tracing,cnotrace,wdmsg(tracing_dumptrace(G)))),dbreak.
 dumptrace0(G):- 
   ignore((debug,
     catch(attach_console,_,true),
@@ -585,7 +587,7 @@ dumptrace(G,0's):-!,hotrace(ggtrace),!,(hotrace(G)*->true;true).
 dumptrace(G,0'S):-!, wdmsg(skipping(G)),!.
 dumptrace(G,0'x):-!, wdmsg(skipping(G)),!.
 dumptrace(G,0'i):-!,hotrace(ggtrace),!,ignore(G).
-dumptrace(_,0'b):-!,debug,break,!,fail.
+dumptrace(_,0'b):-!,debug,dbreak,!,fail.
 dumptrace(_,0'a):-!,abort,!,fail.
 dumptrace(_,0'x):-!,must((lex,ex)),!,fail.
 dumptrace(_,0'e):-!,halt(1),!.

@@ -1225,7 +1225,7 @@ pttp_builtin(true,0).
 pttp_builtin(false,0).
 pttp_builtin(fail,0).
 pttp_builtin(succeed,0).
-pttp_builtin(trace,0).
+pttp_builtin(dtrace,0).
 pttp_builtin(atom,1).
 pttp_builtin(integer,1).
 pttp_builtin(number,1).

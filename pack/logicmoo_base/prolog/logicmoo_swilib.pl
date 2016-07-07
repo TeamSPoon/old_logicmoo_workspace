@@ -223,11 +223,15 @@
 :- system:use_module(library(http/http_server_files)).
 :- system:use_module(library(http/http_wrapper)).
 
-:- autoload.
+/*
 
 :- M=pldoc_process,ignore((module_property(M,file(S)),
    source_file(PI,S),
    \+ ((predicate_property(M:PI,imported_from(U)),U\==M)),
    functor(PI,F,A),import(F/A),fail)).
+*/
 
+:- reset_modules.
+
+:- autoload.
 

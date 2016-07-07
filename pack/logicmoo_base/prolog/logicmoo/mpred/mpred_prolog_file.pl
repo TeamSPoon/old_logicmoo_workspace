@@ -168,7 +168,7 @@ prolog_load_file_loop_checked(ModuleSpec, Options) :-
 % prolog load file loop checked  Primary Helper.
 %
 prolog_load_file_loop_checked_0(ModuleSpec, Options) :- current_predicate(_,_:exists_file_safe(_)),
-   catch(prolog_load_file_nlc_pre(ModuleSpec, Options),E,(nop((trace,prolog_load_file_nlc(ModuleSpec, Options))),throw(E))).
+   catch(prolog_load_file_nlc_pre(ModuleSpec, Options),E,(nop((dtrace,prolog_load_file_nlc(ModuleSpec, Options))),throw(E))).
 
 
 prolog_load_file_nlc_pre(Module:Spec, Options) :- 
@@ -320,7 +320,7 @@ user:prolog_load_file(Module:Spec, Options):- fail,
   Spec \== 'MKINDEX.pl',
    catch(prolog_load_file_loop_checked(Module:Spec, Options),
     E,
-     ((wdmsg(E),trace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))),!.
+     ((wdmsg(E),dtrace,prolog_load_file_loop_checked(Module:Spec, Options),throw(E)))),!.
 %user:prolog_load_file(_,_):- get_lang(pl),!,fail.
 %user:prolog_load_file(_,_):- set_file_lang(pl),set_lang(pl),fail.
    

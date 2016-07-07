@@ -489,7 +489,7 @@ write_modules:- forall(lmconf:mpred_is_impl_file(F),(export_file_preds(F),list_f
 export_file_preds(NotUser,S,_,P,F,A):-current_predicate(logicmoo_varnames:F/A),!.
 export_file_preds(NotUser,S,system,P,F,A):-current_predicate(system:F/A),!.
 export_file_preds(NotUser,S,user,P,F,A):-current_predicate(system:F/A),!.
-export_file_preds(NotUser,S,M,P,F,A):- M==user,!,trace,show_call(why,export_file_preds(NotUser,S,NotUser,P,F,A)).
+export_file_preds(NotUser,S,M,P,F,A):- M==user,!,dtrace,show_call(why,export_file_preds(NotUser,S,NotUser,P,F,A)).
 export_file_preds(NotUser,S,M,P,F,A):- predicate_decl_module(P,RM),RM\==M,!,export_file_preds(NotUser,S,RM,P,F,A).
 %export_file_preds(NotUser,S,M,P,F,A):- \+ helper_name(F), export(M:F/A), fail.
 export_file_preds(NotUser,S,M,P,F,A):- M:export(M:F/A), fail. % export anyways
@@ -625,7 +625,7 @@ autodoc_stream(LineByLineStream,File,In):-
 	  catch((           
             stream_property(In,position(Pos)),
             read_once(In, Term, Expanded, Vs,TermPos)),
-		E,(call((nop(set_stream_position(In,Pos)),dmsg(E),cnotrace,trace,rtrace(read_once(In, Term, Expanded, Vs,TermPos)))),fail)),
+		E,(call((nop(set_stream_position(In,Pos)),dmsg(E),cnotrace,dtrace,rtrace(read_once(In, Term, Expanded, Vs,TermPos)))),fail)),
           stream_position_data(line_count, TermPos, Start),
           line_count(In,End),
 	(   Term == end_of_file
@@ -1101,7 +1101,7 @@ make_l_summary(A,I,O):- must(loop_check(make_l_summary_lc(A,I,O),O=I)),!.
 make_l_summary_lc(_Args,[],[]).
 make_l_summary_lc(Args,H,[HL,'Primary Helper']):- atom(H),atom_concat(L,'0',H),make_l_summary(Args,L,HL),!.
 make_l_summary_lc(Args,H,[HL,'Secondary Helper']):- atom(H),atom_concat(L,'1',H),make_l_summary(Args,L,HL),!.
-make_l_summary_lc(Args,H,[HL,'Trace']):- atom(H),atom_concat(L,'trace',H),make_l_summary(Args,L,HL),!.
+make_l_summary_lc(Args,H,[HL,'Trace']):- atom(H),atom_concat(L,'dtrace',H),make_l_summary(Args,L,HL),!.
 make_l_summary_lc(Args,H,[HL,'Types']):- atom(H),atom_concat(L,'types',H),make_l_summary(Args,L,HL),!.
 make_l_summary_lc(Args,H,[HL,'(isa/2)']):- atom(H),atom_concat(L,'isa',H),make_l_summary(Args,L,HL),!.
 make_l_summary_lc(Args,H,[HL,'Extended Helper']):- atom(H),atom_concat(L,'2',H),make_l_summary(Args,L,HL),!.

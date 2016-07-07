@@ -32,7 +32,7 @@
       gftrace/1,
       grtrace/1,
       ggtrace/1,
-      rtrace/1,  % trace why choice points are left over
+      rtrace/1,  % dtrace why choice points are left over
       ftrace/1, % tells why a call didn't succeed once
       restore_trace/1,
       on_x_rtrace/1,
@@ -257,7 +257,7 @@ get_tracer(Reset):-
     '$leash'(OldL, OldL),'$visible'(OldV, OldV),
      (current_prolog_flag(debug,true)->WasDebug=true;WasDebug=false),
      (tlbugger:rtracing->CC2=rtrace;CC2= nortrace),
-     (tracing -> CC = trace ; CC = hotrace),!.
+     (tracing -> CC = dtrace ; CC = hotrace),!.
 
     
 
@@ -366,7 +366,7 @@ ftrace(Goal):- restore_trace((
 %
 % Fixho Trace.
 %
-fixhotrace(X):- tracing -> setup_call_cleanup_each(hotrace,X,hotrace(trace)) ; call(X).
+fixhotrace(X):- tracing -> setup_call_cleanup_each(hotrace,X,hotrace(dtrace)) ; call(X).
 % :- mpred_trace_none(fixhotrace(0)).
 
 

@@ -309,8 +309,8 @@ mtCanAssert(_).
 makeConstant(_Mt).
 
 
-%:- (system:trace, rtrace, trace,cls ).
-%:- (break,cnotrace,nortrace).
+%:- (system:dtrace, rtrace, dtrace,cls ).
+%:- (dbreak,cnotrace,nortrace).
 
 
 get_current_default_tbox(TBox):- defaultAssertMt(ABox),clause(ABox:defaultTBoxMt(TBox),B),B,!.
@@ -518,6 +518,7 @@ add_import_predicate(Mt,Goal,OtherMt):- fail,
        context(system:add_import_module/3,'would create a cycle')),fail),
    must(predicate_property(Mt:Goal,imported_from(OtherMt))),!.
 
+
 add_import_predicate(Mt,Goal,OtherMt):- catch(Mt:import(OtherMt:Goal),_,fail),!.
 add_import_predicate(Mt,Goal,OtherMt):- 
    functor(Goal,F,A),
@@ -601,13 +602,13 @@ uses_predicate(_,CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),dis
 uses_predicate(BaseKB,System, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),!,
    must(uses_predicate(System,BaseKB,F,A,R)),!.
 
-uses_predicate(_,_, (:-), 1, error) :- !,dumpST,break.
-uses_predicate(_,_, (:-), _, error) :- !,dumpST,break.
-uses_predicate(_,_, (/), _, error) :- !,dumpST,break.
-uses_predicate(_,_, (//), _, error) :- !,dumpST,break.
-uses_predicate(_,_, (:), _, error) :- !,dumpST,break.
-% uses_predicate(SM,_, '>>',  4, error) :- !,dumpST,break.
-uses_predicate(_,_, '[|]', _, error) :- !,dumpST,break.
+uses_predicate(_,_, (:-), 1, error) :- !,dumpST,dbreak.
+uses_predicate(_,_, (:-), _, error) :- !,dumpST,dbreak.
+uses_predicate(_,_, (/), _, error) :- !,dumpST,dbreak.
+uses_predicate(_,_, (//), _, error) :- !,dumpST,dbreak.
+uses_predicate(_,_, (:), _, error) :- !,dumpST,dbreak.
+% uses_predicate(SM,_, '>>',  4, error) :- !,dumpST,dbreak.
+uses_predicate(_,_, '[|]', _, error) :- !,dumpST,dbreak.
 uses_predicate(User, User, module, 2, error):-!.
 
 % make sure we ignore calls to predicate_property/2  (or thus '$define_predicate'/1)
@@ -635,7 +636,7 @@ uses_predicate(System, BaseKB, F,A, retry):-  System\==BaseKB, call_u(mtCycL(Bas
 % keeps from calling this more than once
 uses_predicate(SM,M,F,A,error):- 
   lmcache:tried_to_retry_undefined(SM,M,F,A),!,
-  wdmsg(unused_predicate(SM,M,F,A)),backtrace(800),break.
+  wdmsg(unused_predicate(SM,M,F,A)),backtrace(800),dbreak.
 
 uses_predicate(SM,CallerMt,F,A,_):-
    wdmsg(uses_predicate(SM,CallerMt,F,A)),
@@ -659,10 +660,13 @@ uses_predicate(SM,CallerMt,F,A,R):-
 %
 create_predicate_istAbove(Nonvar,F,A):- sanity(ground(create_predicate_istAbove(Nonvar,F,A))),fail.
 % TODO unsuspect the next line (nothing needs to see above baseKB)
+
+
 create_predicate_istAbove(baseKB,F,A):- !,make_as_dynamic(create_predicate,baseKB,F,A),
       ignore((( \+ (defaultAssertMt(CallerMt)),CallerMt\==baseKB,create_predicate_istAbove(CallerMt,F,A) ))).
 create_predicate_istAbove(abox,F,A):-  must(defaultAssertMt(CallerMt)),sanity(CallerMt\=abox),!,create_predicate_istAbove(CallerMt,F,A).
-create_predicate_istAbove(CallerMt,F,A):- clause_b(mtProlog(CallerMt)),!,wdmsg(warn(create_predicate_istAbove(CallerMt,F,A))).
+% create_predicate_istAbove(pce_help_messages, do_and_undo, 2):-dtrace.
+create_predicate_istAbove(CallerMt,F,A):- clause_b(mtProlog(CallerMt)),!,wdmsg(warn(create_predicate_istAbove(CallerMt,F,A))),dtrace.
 create_predicate_istAbove(CallerMt,F,A):-   
    make_as_dynamic(create_predicate_istAbove,CallerMt,F,A),
    functor(Goal,F,A),

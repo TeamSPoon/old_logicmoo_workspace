@@ -63,6 +63,7 @@
 :- system:use_module(library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
 
 :- system:use_module(library(logicmoo_swilib)).
+:- forall((current_module(M),M\==baseKB),assert_if_new(baseKB:mtProlog(M))).
 
 % ======================================================
 % Add Extra file_search_paths
@@ -119,7 +120,7 @@ lmconf:logicmoo_pre_release.
 
 :- if(current_prolog_flag(gui,true)).
 % :- guitracer.
-% :- cnotrace(trace).
+% :- cnotrace(dtrace).
 :- cnotrace.
 :- endif.
 
@@ -167,7 +168,6 @@ lmconf:logicmoo_scan_autoloads:-false.
 % :- system:use_module(library('logicmoo/util/logicmoo_util_supp.pl')).
 */
 
-:- forall(current_module(M),assert_if_new(baseKb:mtProlog(M))).
 :- set_prolog_flag(lm_expanders,true).
-
+:- reset_modules.
 

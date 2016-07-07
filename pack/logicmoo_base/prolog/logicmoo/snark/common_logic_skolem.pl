@@ -65,7 +65,7 @@ annote(Dom,X,Form2,Form2):- mpred_put_attr(X,Dom,Form2).
 %	True if Sk has been assigned Form or is a Free variable.
 
 sk_form(Sk, Form) :- mpred_get_attr(Sk, sk, Form),!.
-sk_form(Var,Form):- var(Var),!,gensym(sk_other_,Form), trace, mpred_put_attr(Var, sk, Form).
+sk_form(Var,Form):- var(Var),!,gensym(sk_other_,Form), dtrace, mpred_put_attr(Var, sk, Form).
 sk_form(sk(Value),Value):-!.
 
 push_cond(X,Form):- annote(cond,X,Form,_Merged).

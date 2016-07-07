@@ -269,9 +269,9 @@ genls(tHumanBody,tBodyPart).
 
 pass4,relationAllExists(mudSubPart,tHominid,tHumanBody).
 
-:- break,read(_),read(_).
+:- dbreak,read(_),read(_).
 
-:- break,read(_),read(_),dmsg("SDFDFSDFSDFSDFSDFSDDDDDDDDDDDDDDDDDDDD-------------------------------------").
+:- dbreak,read(_),read(_),dmsg("SDFDFSDFSDFSDFSDFSDDDDDDDDDDDDDDDDDDDD-------------------------------------").
 
 
 

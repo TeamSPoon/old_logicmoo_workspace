@@ -76,7 +76,7 @@ test_and_decrement_search_cost(DepthIn,Cost,Depth1):- DepthIn >= Cost , Depth1 i
 %%% ****if* PTTP/add_features
 %%% SOURCE
 
-add_features(In,Out):- is_ftVar(In),!,trace,Out=In.
+add_features(In,Out):- is_ftVar(In),!,dtrace,Out=In.
 add_features(true,true):- !.
 add_features((Head :- Body),NewHeadBody):- 
    must_det_l((
@@ -256,7 +256,7 @@ add_args(INFO,(A ; B),PosGoal,GoalAtom,HeadArgs,
 		         DepthB,DepthOut,
 			 ProofIn,ProofOut,
 			 B2,New),
-   % trace,
+   % dtrace,
                 search_cost(A,HeadArgs,CostA),
 		search_cost(B,HeadArgs,CostB),
 		(CostA < CostB ->
@@ -354,7 +354,7 @@ search_cost(Body,HeadArgs,N) :-
 %%% SOURCE
 search(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut):-search0(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut).
 
-search0(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut):- % trace,
+search0(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut):- % dtrace,
         search1(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut).
 
 search1(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn,_DepthOut) :-
@@ -364,7 +364,7 @@ search1(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn,_DepthOut) :-
 search1(Goal,_Max,Min,_Inc,PrevInc,DepthIn,DepthOut) :-
         write_search_progress(Min),
 	DepthIn = Min,
-	catchv(call(Goal),E,(wdmsg(E=Goal),trace)),
+	catchv(call(Goal),E,(wdmsg(E=Goal),dtrace)),
 	DepthOut < PrevInc.	% fail if solution found previously
 search1(Goal,Max,Min,Inc,_PrevInc,DepthIn,DepthOut) :-
 	Min1 is Min + Inc,

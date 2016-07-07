@@ -135,7 +135,7 @@ lemmatize_dynamically_procedure(Result) :-
 	conjoin(Rule01,Rule2,Result).
 lemmatize_dynamically_procedure(Rule) :-
 	Head = lemmatize_dynamically(_,_,_),
-	Body = (write(lemmatize_dynamically*not_in_charge),nl,trace,fail),
+	Body = (write(lemmatize_dynamically*not_in_charge),nl,dtrace,fail),
 	Rule = (Head :- Body).
 
 lemmatize_statically_procedure(Result) :-
@@ -155,7 +155,7 @@ lemmatize_statically_procedure(Result) :-
 	Result = (Rule0,Rule1).
 lemmatize_statically_procedure(Rule) :-
 	Head = lemmatize_statically(_,_,_),
-	Body = (write(lemmatize_statically*not_in_charge),nl,trace,fail),
+	Body = (write(lemmatize_statically*not_in_charge),nl,dtrace,fail),
 	Rule = (Head :- Body).
 
 default_assumptions_procedure(Result) :-
@@ -190,7 +190,7 @@ default_assumptions_procedure(Result) :-
 	conjoin(Rule0123,Rule4,Result).
 default_assumptions_procedure(Rule) :- 
 	Head = default_assumptions(_,_,_),
-	Body = (write(default_assumptions*not_in_charge),nl,trace,fail),
+	Body = (write(default_assumptions*not_in_charge),nl,dtrace,fail),
 	Rule = (Head :- Body).
 
 %%% Compilation of run-time procedures for lemma handling

@@ -24,7 +24,7 @@
            %is_undefaulted/1,
 
           current_op_alias/2,
-            
+            show_load_call/1,
             add_term/2,
             assert_kif/1,
             % system:import_module_to_user/1,
@@ -268,7 +268,7 @@
 % Managed Predicate Loader Module Transparent.
 %
 mpred_loader_module_transparent(F/A):-!,mpred_loader_module_transparent(F/A).
-mpred_loader_module_transparent(M:F/A):-!, M:module_transparent(M:F/A),trace, system:import(M:F/A).
+mpred_loader_module_transparent(M:F/A):-!, M:module_transparent(M:F/A),dtrace, system:import(M:F/A).
 mpred_loader_module_transparent(F/A):-!, module_transparent(F/A).
 
 % :- module_property(mpred_loader, exports(List)),maplist(mpred_loader_module_transparent,List).
@@ -452,7 +452,7 @@ add_from_file(Term):-
 %
 % My Debug Whenever Error.
 %
-myDebugOnError(Term):-catch(once(quietly_must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),dumpST,trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace,Term)).
+myDebugOnError(Term):-catch(once(quietly_must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),dumpST,dtrace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),dtrace,Term)).
          
 
 
@@ -483,7 +483,7 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 %
 % E Trace.
 %
-etrace:-leash(+all),leash(+exception),trace.
+etrace:-leash(+all),leash(+exception),dtrace.
 
 
 :- thread_local(t_l:on_eof/2).
@@ -976,7 +976,7 @@ mpred_implode_varnames([N=V|Vs]):-V='$VAR'(N),mpred_implode_varnames(Vs),!.
 
 % mudKeyword("happy","happy") -> mudKeyword(vHappy,"happy").
 
-% quietly_must skip already loaded modules (we remember these so make/0 doesnt break)
+% quietly_must skip already loaded modules (we remember these so make/0 doesnt dbreak)
 
 
 
@@ -1867,8 +1867,8 @@ load_mpred_files :- forall(lmconf:registered_mpred_file(File),ensure_mpred_file_
 
 
 % =======================================================
-% :- meta_predicate show_load_call(0).
-% show_load_call(C):- logOnFailure(on_x_rtrace(show_call(why,C))).
+:- meta_predicate show_load_call(0).
+show_load_call(C):- must(on_x_rtrace(show_call(why,C))).
 
 
 

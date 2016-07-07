@@ -119,7 +119,7 @@ prologHybrid(genls/2).
 %(~(P)/mpred_non_neg_literal(P), P) ==> conflict(~(P)).
 %(P/mpred_non_neg_literal(P), ~(P)) ==> conflict(P).
 
-%:- rtrace,trace.
+%:- rtrace,dtrace.
 ==>(prologBuiltin(mpred_select/2)).
 % :- nortrace,cnotrace.
 
@@ -401,7 +401,7 @@ pfcControlled(argIsa).
 ==>tSet(tSet).
 %:- notrace.
 %:- nortrace.
-% :- break.
+% :- dbreak.
 % (tSet(C)/atom(C) ==> ({Head=..[C,I]}, (isa(I,C)/ground(I:C)==>Head))).
 
 ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1), call(BHead=baseKB:Head),
@@ -828,7 +828,7 @@ argIsa(Prop,N,Type),{number(N)},ttExpressionType(Type) ==> argQuotedIsa(Prop,N,T
 
 /*
 :- rtrace.
-:- debug,trace,(kb_dynamic((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
+:- debug,dtrace,(kb_dynamic((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
     isa/2,  genls/2, pddlSomethingIsa/2, 
     resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, 
     ttExpressionType/1, typeProps/2))).

@@ -46,7 +46,7 @@ nop(_).
 
 :- module_transparent(must_or_die/1).
 :- '$hide'(must_or_die/1).
-% must_or_die(Goal):- (catch(Goal,E,(writeq(e_xxXXXXXX_xxxxxxxx_failed_must_or_die(E)),nl,fail)) *-> true ; (trace,Goal*->true;throw(failed_must_or_die(Goal)))).
+% must_or_die(Goal):- (catch(Goal,E,(writeq(e_xxXXXXXX_xxxxxxxx_failed_must_or_die(E)),nl,fail)) *-> true ; (dtrace,Goal*->true;throw(failed_must_or_die(Goal)))).
 must_or_die(Goal):- (Goal *-> true ; throw(failed_must_or_die(Goal))).
 
 :- module_transparent(must_atomic/1).
@@ -60,7 +60,8 @@ must_notrace(Goal):- no_trace(must_or_die(Goal)).
 :- module_transparent(no_trace/1).
 :- '$hide'(no_trace/1).
 no_trace(G):- notrace((tracing,notrace))->
-   setup_call_cleanup_each(notrace(notrace),G,notrace(trace)); G.
+   setup_call_cleanup_each(notrace(notrace),G,notrace(trace)); 
+   setup_call_cleanup_each(notrace(notrace),G,notrace(notrace)).
 
 :- module_transparent(call_cleanup_each/2).
 :- '$hide'(call_cleanup_each/2).

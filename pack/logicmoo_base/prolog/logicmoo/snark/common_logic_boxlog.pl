@@ -177,7 +177,7 @@ is_unit(A,B,C,D,E,F,G,H):-is_unit(A,B,C,D),is_unit(E,F,G,H).
 is_unit(A,B,C,D,E,F,G,H,I):-is_unit(A,B,C,D),is_unit(E,F,G,H,I).
 is_unit(A,B,C,D,E,F,G,H,I,J):-is_unit(A,B,C,D),is_unit(E,F,G,H,I,J).
 
-% might trace down when it is ~
+% might dtrace down when it is ~
 % vg(G):-var(G),!,fail.
 
 %= 	 	 

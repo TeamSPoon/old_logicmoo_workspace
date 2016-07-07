@@ -1,5 +1,8 @@
-
+:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+:- endif.
 :- module(logicmoo_run_pldoc,[]).
+% restore entry state
+:- reset_modules.
 
 :- use_module(library(settings)).
 
@@ -376,5 +379,6 @@ when_debugging(_,_).
 :-  call(with_mfa_of( (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
 :- retractall(t_l:disable_px).
 
+:- reset_modules.
 
 :- list_undefined.

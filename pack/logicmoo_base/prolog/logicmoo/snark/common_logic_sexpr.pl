@@ -474,7 +474,7 @@ svar(Var,Var):-var(Var),!.
 % Svar Fixvarname.
 %
 svar_fixvarname(SVARIN,UP):- compound(SVARIN),!, SVARIN = '?'(SVAR),!,atom(SVAR), svar_fixvarname(SVAR,UP).
-svar_fixvarname(SVAR,UP):- \+ atom(SVAR),trace,UP=SVAR.
+svar_fixvarname(SVAR,UP):- \+ atom(SVAR),dtrace,UP=SVAR.
 svar_fixvarname(SVAR,UP):- atom(SVAR)->(ok_varname(SVAR),fix_varcase(SVAR,UP),must(ok_varname(UP)));UP=SVAR.
 
 

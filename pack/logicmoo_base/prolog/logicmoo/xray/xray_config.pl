@@ -85,7 +85,7 @@ pttp_configuration :-
 	nl,dmsg('PTTP CONFIGURATION:'),nl,
         %(count_inferences_pred(true) ->dmsg('PTTP counts no inferences.');dmsg('PTTP counts inferences!')),
         dcall_value(count_inferences_pred(_)),
-        %(trace_search_progress_pred(nop) ->msg('PTTP does not trace search progress.');dmsg('PTTP traces search progress!')),
+        %(trace_search_progress_pred(nop) ->msg('PTTP does not dtrace search progress.');dmsg('PTTP traces search progress!')),
         dcall_value(trace_search_progress_pred(_)),        
         %(compile_proof_printing ->dmsg('PTTP compiles proof printing!');dmsg('PTTP does not compile proof printing.')),
         dcall_value(compile_proof_printing),
