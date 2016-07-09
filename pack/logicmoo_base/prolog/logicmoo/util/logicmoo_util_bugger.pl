@@ -119,7 +119,6 @@
             new_a2s/3,
             new_a2s0/3,
             nodebugx/1,
-            non_user_console/0,
             nth_frame/3,
             nth_frame_attribute/5,
             nth_goal/2,
@@ -377,7 +376,6 @@
         must_each0/1,
         new_a2s/3,
         new_a2s0/3,
-        non_user_console/0,
         nth_frame/3,
         nth_frame_attribute/5,
         nth_goal/2,
@@ -1428,15 +1426,6 @@ set_yes_debug_thread:-
 %
 isConsole :- telling(user).
 isConsole :- current_output(X),!,stream_property(X,alias(user_output)).
-
-
-%= 	 	 
-
-%% non_user_console is semidet.
-%
-% Not User Console.
-%
-non_user_console:-thread_self(Self),Self\=main,current_input(In),stream_property(In,tty(TF)),TF\==true,!,set_stream(In,close_on_exec(true)).
 
 
 

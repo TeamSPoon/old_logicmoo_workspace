@@ -415,7 +415,7 @@ Proof end.
 :- system:ensure_loaded(prologmud(server/mud_irc)).
 :- system:ensure_loaded(prologmud(vworld/world)).
 
-:- system:ensure_loaded(prologmud(server/mud_testing)).
+:- lmconf:ensure_loaded(prologmud(server/mud_testing)).
 
 
 /*
@@ -510,10 +510,8 @@ download_and_install_el:-
 
 % :- asserta(lmcache:loaded_external_kbs(mud)),show_call(kbp_to_mpred_t).
 
-:- baseKB:ensure_loaded(prologmud(vworld/world_agent)).
 :- ensure_loaded(prologmud(parsing/parser_imperative)).
 :- ensure_loaded(prologmud(parsing/simple_decl_parser)). 
-:- system:ensure_loaded(prologmud(vworld/world)).
 :- dynamic(baseKB:mudStowing/2).
 
 /*

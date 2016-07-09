@@ -2415,6 +2415,8 @@ assert_mu(M,M2:Pred,F,A):- M == M2,!, assert_mu(M,Pred,F,A).
 assert_mu(M,_:Pred,F,A):- dtrace,sanity(\+ is_ftVar(Pred)),!, assert_mu(M,Pred,F,A).
 assert_mu(M,Pred,F,_):- call_u(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(M,Pred,SV)),!.
 assert_mu(M,Pred,F,A):- a(prologSingleValued,F),!,must(update_single_valued_arg(M,Pred,A)),!.
+assert_mu(M,Pred,_,_):- !, assertz_mu(M,Pred).
+assert_mu(M,Pred,_,1):- assertz_mu(M,Pred),!.
 assert_mu(M,Pred,F,_):- a(prologOrdered,F) -> assertz_mu(M,Pred) ; asserta_mu(M,Pred).
 
 %assert_mu(M,Pred,F,_):- a(prologAssertAOrdered,F) -> asserta_mu(M,Pred) ; assertz_mu(M,Pred).

@@ -1,6 +1,6 @@
 /* 
 % ===================================================================
-% File 'mpred_cyc_kb_tinykb.pl'
+% File 'logicmoo_i_cyc_kb_tinykb.pfc'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -20,17 +20,17 @@
 :- module(plarkc_cyc_kb_tinykb,[]).
 :- endif.
 
-:- was_dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
-:- was_dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
-:- was_dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
-:- was_dynamic(assertedTinyKB_implies_first/4).
-:- was_dynamic(assertedTinyKB_not_first/3).
-:- was_dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
-:- was_dynamic user:term_expansion/2.
+:- dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
+:- dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
+:- dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
+:- dynamic(assertedTinyKB_implies_first/4).
+:- dynamic(assertedTinyKB_not_first/3).
+:- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
+:- dynamic user:term_expansion/2.
 :- multifile user:term_expansion/2.
 
-:- was_dynamic(assertedTinyKB_not/3).
-:- was_dynamic(assertedTinyKB_implies/4).
+:- dynamic(assertedTinyKB_not/3).
+:- dynamic(assertedTinyKB_implies/4).
 :- style_check(-singleton).
 :- style_check(-discontiguous).
 % :-style_check(-atom).

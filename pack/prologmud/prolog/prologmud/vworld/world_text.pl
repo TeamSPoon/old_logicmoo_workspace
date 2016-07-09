@@ -65,7 +65,7 @@ mudTermAnglify(Head,EnglishO):- compound(Head),
    term_anglify_args(Head,F,1,ARGS,Info,English),eng_fully_expand(English,EnglishO),!.
 
 
-term_anglify_args(Head,F,A,ARGS,predArgMulti(Which),English):- !,replace_nth_arglist(ARGS,Which,_OldVar,NewVar,NEWARGS),!,
+term_anglify_args(Head,F,A,ARGS,predArgMulti(Which),English):- !,replace_nth_arglist(ARGS,Which,NewVar,NEWARGS),!,
    NewHead=..[F|NEWARGS], findall(NewVar,req1(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=ftListFn(SetNewVar),
    term_anglify_args(Head,F,A,NewHead,prologSingleValued,English).
 
@@ -142,14 +142,14 @@ list_to_atomics_list0([],[]):-!.
 eng_fully_expand(I,O):-loop_check(transitive(eng_fully_expand_ilc,I,O),I=O).
 eng_fully_expand_ilc(I,O):-copy_term(I,C),flatten([C],FC),eng_fully_expand_0(FC,O).
 
-eng_fully_expand_0(FC,O):-catch(eng_fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error_m(E,eng_fully_expand_1(FC,O)))),fail)),!.
+eng_fully_expand_0(FC,O):-catch(eng_fully_expand_1(FC,O),E,(dtrace,dmsg(exact_message(error_m(E,eng_fully_expand_1(FC,O)))),fail)),!.
 %eng_fully_expand_0(FC,O):-catch((trace,eng_fully_expand_1(FC,O)),_,fail).
 
 eng_fully_expand_1(A,B):-loop_check(eng_fully_expand_1_ilc(A,B),A=B).
 
 eng_fully_expand_1_ilc(Var,Var):-var(Var),!.
 eng_fully_expand_1_ilc([],[]):-!.
-% eng_fully_expand_1(StringIsError,_Out):-string(StringIsError),!,trace,fail.
+% eng_fully_expand_1(StringIsError,_Out):-string(StringIsError),!,dtrace,fail.
 eng_fully_expand_1_ilc([T|TT],FTAO):-local_term_anglify_first([T|TT],TA),flatten([TA],FTA),eng_fully_expand_1(FTA,FTAO),!.
 eng_fully_expand_1_ilc([T|Term],Out):-!,
    eng_fully_expand_2(T,E),

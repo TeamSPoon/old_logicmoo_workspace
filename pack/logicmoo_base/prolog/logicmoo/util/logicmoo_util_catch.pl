@@ -48,6 +48,7 @@
             ddmsg_call/1,            
             det_lm/2,
             dif_safe/2,
+            dumpST_error/1,
             errx/0,
             on_x_fail/1,
             format_to_error/2,
@@ -123,11 +124,20 @@
             with_main_io/1,
             with_preds/6,
             without_must/1,
+            non_user_console/0,
             y_must/2
 
 
           ]).
 
+
+
+
+%% non_user_console is semidet.
+%
+% Not User Console.
+%
+non_user_console:-thread_self(Self),Self\=main,current_input(In),stream_property(In,tty(TF)),TF\==true. %,!,set_stream(In,close_on_exec(true)).
 
 
 :- if(\+ current_predicate(system:nop/1)).
@@ -917,7 +927,7 @@ catchv(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (th
 %
 functor_catch(P,F,A):- catchv(functor(P,F,A),_,compound_name_arity(P,F,A)).
 % functor_catch(F,F,0):-atomic(F),!.
-% functor_catch(P,F,A):-catchv(compound_name_arity(P,F,A),E,(dtrace,ddmsg(E:functor(P,F,A)),dtrace)).
+% functor_catch(P,F,A):-catchv(compound_name_arity(P,F,A),E,(ddmsg(E:functor(P,F,A)),dtrace)).
 
 
 :- export(functor_safe/3).
@@ -1274,7 +1284,7 @@ on_x_log_throw(Goal):- catchv(Goal,E,(ddmsg(on_x_log_throw(E,Goal)),throw(E))).
 %
 % If there If Is A an exception in  :Goal goal then log cont.
 %
-on_x_log_cont(Goal):- catchv((Goal*->true;ddmsg(failed_on_x_log_cont(Goal))),E,ddmsg(E:Goal)).
+on_x_log_cont(Goal):- catchv( (Goal*->true;ddmsg(failed_on_x_log_cont(Goal))),E,ddmsg(E:Goal)).
 
 :- thread_local( tlbugger:skipMust/0).
 %MAIN tlbugger:skipMust.
@@ -1378,7 +1388,7 @@ must_det_l(MGoal):- strip_module(MGoal,M,Goal),!, must_det_lm(M,Goal).
 %
 % Must Be Successfull Deterministic Lm.
 %
-must_det_lm(M,Goal):-var(Goal),dtrace,trace_or_throw(var_must_det_l(M:Goal)),!.
+must_det_lm(M,Goal):-var(Goal),trace_or_throw(var_must_det_l(M:Goal)),!.
 must_det_lm(M,[Goal]):-!,must_det_lm(M,Goal).
 must_det_lm(M,[Goal|List]):-!,must(M:Goal),!,must_det_lm(M,List).
 must_det_lm(M,Goal):-tlbugger:skip_bugger,!,M:Goal.
@@ -1468,6 +1478,7 @@ is_recompile:-fail.
 %
 % Optional Sanity Checking.
 %
+sanity(Goal):- \+ tracing, 1 is random(3),!, must(Goal),!.
 sanity(_):- notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
 sanity(Goal):- quietly(Goal),!.
@@ -1554,9 +1565,9 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
-must(Goal):-  notrace(skipWrapper),!,(Goal*->true;trace_or_throw(failed(Goal))).
-must(Goal):-  notrace((sanity(must_be(nonvar,Goal)),get_must(Goal,MGoal),!)),call(MGoal).
+must(Goal):-  notrace((get_must(Goal,MGoal),!)),call(MGoal).
 
+dumpST_error(Msg):- notrace((ddmsg(error,Msg),dumpST,ddmsg(error,Msg))).
 
 %= 	 	 
 
@@ -1565,23 +1576,24 @@ must(Goal):-  notrace((sanity(must_be(nonvar,Goal)),get_must(Goal,MGoal),!)),cal
 % Get Must Be Successfull.
 %
 %get_must(hotrace(Goal),CGoal):-  fail, !,get_must(Goal,CGoal).
-get_must(M:Goal,M:CGoal):- !,get_must(Goal,CGoal).
+get_must(M:Goal,M:CGoal):- must_be(nonvar,Goal), !,get_must(Goal,CGoal).
 get_must(hotrace(Goal),CGoal):- !,get_must((hotrace(Goal)*->true;Goal),CGoal).
-get_must(Goal,CGoal):-  (tlbugger:skipMust;skipWrapper),!,CGoal = Goal.
-get_must(Goal,CGoal):- fail, skipWrapper,!, CGoal = (Goal *-> true ;
-   ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,dtrace,Goal))).
-get_must(Goal,CGoal):-  fail, tlbugger:show_must_go_on,!,
+get_must(Goal,CGoal):-  (tlbugger:show_must_go_on; non_user_console),!,
  CGoal = ((catchv(Goal,E,
-     hotrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
-            *-> true ; hotrace((dumpST,wdmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
+     notrace(((dumpST_error(sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal)),ignore(rtrace(Goal)),badfood(Goal)))))
+            *-> true ; 
+              notrace(dumpST_error(sHOW_MUST_go_on_failed_F__A__I__L_(Goal))),ignore(rtrace(Goal)),badfood(Goal))).
 
-%get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
-%get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(hotrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),dtrace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),dtrace,Goal))).
+get_must(Goal,CGoal):-  (tlbugger:skipMust;skipWrapper),!,CGoal = Goal.
+get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
+% get_must(Goal,CGoal):- !, CGoal = (Goal *-> true ; ((dumpST_error(failed_FFFFFFF(must(Goal))),dtrace(Goal)))).
+
+%get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),dtrace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),dtrace,Goal))).
 get_must(Goal,CGoal):-    
    (CGoal = (catchv(Goal,E,
-     (dumpST,ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),
-         ignore_each((rtrace(Goal),nortrace,dtrace,dtrace(Goal),badfood(Goal)))))
-         *-> true ; (dumpST,ignore_each(((dtrace,dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).
+     ignore_each(((dumpST_error(must_xI_(E,Goal)), %set_prolog_flag(debug_on_error,true),
+         rtrace(Goal),nortrace,dtrace(Goal),badfood(Goal)))))
+         *-> true ; (dumpST,ignore_each(((dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).
 
 :- save_streams.
 :- initialization(save_streams).

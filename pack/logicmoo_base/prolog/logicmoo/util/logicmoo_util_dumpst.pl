@@ -41,14 +41,12 @@
   dtrace(*,0).
 
 
-
-
 :- set_prolog_flag(backtrace_depth,      200).
 :- set_prolog_flag(backtrace_goal_depth, 20).
 :- set_prolog_flag(backtrace_show_lines, true).
 
 :- module_transparent
-            getPFA/3,getPFA1/3,getPFA2/3,get_m_opt/4,fdmsg/1,fdmsg1/1,
+          getPFA/3,getPFA1/3,getPFA2/3,get_m_opt/4,fdmsg/1,fdmsg1/1,
           neg1_numbervars/3,clauseST/2,
           dtrace/0,dtrace/1,dtrace/2,
           dumptrace/1,dumptrace/2,
@@ -474,7 +472,7 @@ end_dump(GG):-compound(GG),functor(GG,F,_),atom_concat(dump,_,F).
 % dtrace/0/1/2
 % =====================
 
-system:dtrace:- wdmsg("DUMP_TRACE/0"), (thread_self(main)->dtrace(system:trace);true).
+system:dtrace:- wdmsg("DUMP_TRACE/0"), (thread_self(main)->dtrace(system:trace);(dumpST(30),abort)).
 %= 	 	 
 
 %% dtrace is semidet.
@@ -533,6 +531,7 @@ with_source_module(G):-
   scce_orig('$set_typein_module'(M),G,'$set_typein_module'(WM)).
    
 
+
 % =====================
 % dumptrace/1/2
 % =====================
@@ -544,28 +543,22 @@ with_source_module(G):-
 %
 % Dump Trace.
 %
-dumptrace(_):- \+ thread_self(main),!.
-dumptrace(_):- non_user_console,!.
-% dumptrace(G):- non_user_console,!,trace_or_throw(non_user_console_dumptrace(G)).
+dumptrace(G):- non_user_console,!,dumpST_error(non_user_console+dumptrace(G)),abort,fail.
 dumptrace(G):-
   w_tl(set_prolog_flag(gui_tracer, false),
    w_tl(set_prolog_flag(gui, false),
     w_tl(set_prolog_flag(retry_undefined, false),
      dumptrace0(G)))).
 
-dumptrace0(G):- cnotrace((tracing,cnotrace,wdmsg(tracing_dumptrace(G)))),dbreak.
-dumptrace0(G):- 
-  ignore((debug,
-    catch(attach_console,_,true),
-    leash(+exception),visible(+exception))),
-    (repeat,
-      (tracing -> (!,fail) ; true)),    
+dumptrace0(G):- notrace((tracing,notrace,wdmsg(tracing_dumptrace(G)))),!, (dumptrace0(G) -> trace ; (trace,fail)).
+dumptrace0(G):-   
+  catch(attach_console,_,true),
+    repeat, 
+    (tracing -> (!,fail) ; true),
     to_wmsg(G,WG),
     fmt(in_dumptrace(G)),
     wdmsg(WG),
-    show_failure(why,get_single_char(C)),
-    leash(+exception),visible(+exception),
-    with_all_dmsg(with_source_module(dumptrace(G,C))),!.
+    (get_single_char(C)->with_all_dmsg(dumptrace(G,C));throw(cant_get_single_char(!))).
 
 :-meta_predicate(dumptrace(0,+)).
 
@@ -587,7 +580,7 @@ dumptrace(G,0's):-!,hotrace(ggtrace),!,(hotrace(G)*->true;true).
 dumptrace(G,0'S):-!, wdmsg(skipping(G)),!.
 dumptrace(G,0'x):-!, wdmsg(skipping(G)),!.
 dumptrace(G,0'i):-!,hotrace(ggtrace),!,ignore(G).
-dumptrace(_,0'b):-!,debug,dbreak,!,fail.
+dumptrace(_,0'b):-!,debug,break,!,fail.
 dumptrace(_,0'a):-!,abort,!,fail.
 dumptrace(_,0'x):-!,must((lex,ex)),!,fail.
 dumptrace(_,0'e):-!,halt(1),!.

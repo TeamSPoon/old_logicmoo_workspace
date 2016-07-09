@@ -28,24 +28,23 @@
 
 
 :- system:ensure_loaded(setup_paths).
+%:- system:ensure_loaded(library(logicmoo_utils)).
+%:- use_listing_vars.
+% :- [run].
 :- system:ensure_loaded(logicmoo_repl).
-:- set_fileAssertMt(baseKB).
-:- set_defaultAssertMt(baseKB).
-:- use_listing_vars.
-:- set_prolog_flag(dialect_pfc,false).
-
-
 :- ensure_webserver(3020).
 :- initialization(ensure_webserver(3020)).
 :- initialization(ensure_webserver(3020),now).
 :- initialization(ensure_webserver(3020),restore).
 
-:- break.
+:- set_fileAssertMt(baseKB).
+:- set_defaultAssertMt(baseKB).
+:- set_prolog_flag(dialect_pfc,false).
+
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).
 
-:- break.
 
 % [Mostly Required] Load the Logicmoo Plan Generator System
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
@@ -92,16 +91,18 @@
 :- set_fileAssertMt(baseKB).
 
 :- file_begin(pfc).
+
+:- set_prolog_flag(dialect_pfc,false).
+
+
+
 :- set_prolog_flag(dialect_pfc,true).
-
-
+:- set_prolog_flag(logicmoo_debug,true).
 
 :-assert_isa(iRR7,tRR).
 :-ain(genls(tRR,tRRP)).
 :-must( isa(iRR7,tRRP) ).
-% :-must( tRRP(iRR7) ).
-
-%:- break.
+:-must( tRRP(iRR7) ).
 
 
 % [Optional] Creates or suppliments a world
@@ -135,7 +136,6 @@ wearsClothing(iExplorer7,'iCommBadge774').
 wearsClothing(iExplorer7,'iGoldUniform775').
 mudStowing(iExplorer7,'iPhaser776').
 
-:- set_prolog_flag(dialect_pfc,true).
 
 pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
@@ -171,6 +171,11 @@ tRegion(iOfficeRoom7).
 
 :- file_begin(pl).
 
+
+:- ensure_loaded(logicmoo(logicmoo_engine)).
+:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
+
+
 % [Optionaly] Start the telent server % iCommanderdata66
 start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
@@ -184,8 +189,6 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
 :- write('\n?- user:ensure_loaded(run_mud_game). % to begin loading mud worlds').
 % :- user:ensure_loaded(start_mud_server).
-
-:- set_prolog_flag(logicmoo_debug,true).
 
 
 end_of_file.

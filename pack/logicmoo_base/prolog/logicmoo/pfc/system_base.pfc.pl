@@ -334,6 +334,7 @@ predicateConventionMt(regression_test,lmconf).
 
 baseKB:collectionConventionMt(tMicrotheory,baseKB).
 collectionConventionMt(mtCycL,baseKB).
+collectionConventionMt(mtExact,baseKB).
 collectionConventionMt(Col,Where) ==> predicateConventionMt(Col,Where).
 
 % mtExact(Mt)==>{kb_dynamic(Mt)}.
@@ -401,17 +402,24 @@ mtCore(inferencePCS).
 genls(mtCore,tMicrotheory).
 
 
-mtCycL(O)==>{call(ensure_abox(O))},~mtProlog(O).
+mtCycL(O)==>({call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
 
 
 :- dynamic(nondet/0).
 
+/*
+% These rules break the loader 
+% to test 
+% swipl -f sanity_base/mt_01.pl
+% whereas this would work: 
+% swiplb -f sanity_base/mt_01.pl
+
+*/
 {module_property(Mt,class(user)),
    (atom_concat('common_logic_',_,Mt);atom_concat('logicmoo_util_',_,Mt);atom_concat('mpred_',_,Mt))} 
     ==>  mtProlog(Mt).
 {module_property(Mt,class(library))} ==> mtProlog(Mt).
 {module_property(Mt,class(system))} ==> mtProlog(Mt).
-% TODO the above is secretly the next line (confirm fixered)
 
 
 

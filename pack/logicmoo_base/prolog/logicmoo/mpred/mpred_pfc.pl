@@ -315,6 +315,7 @@ ensure_abox(M):-
  must_det_l((
    asserta(lmcache:has_pfc_database_preds(M)),
    assert_if_new(baseKB:mtCycL(M)),
+   retractall(baseKB:mtProlog(M)),
    assert_if_new(M:current_abox(M)),
    setup_module_ops(M),
    set_prolog_flag(M:unknown,error),
@@ -2409,9 +2410,9 @@ mpred_assertz_w_support(P,Support):-
 clause_asserted_call(H,B):-clause_asserted(H,B).
 
 
-clause_asserted_u(MH):- must(nonvar(MH)), sanity((nonvar(MH), \+ is_static_predicate(MH))),fail.
+clause_asserted_u(MH):- sanity((nonvar(MH), ignore(show_failure(\+ is_static_predicate(MH))))),fail.
 %clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
-clause_asserted_u((MH:-B)):- !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,clause_asserted_i((M:H :-B )).
+clause_asserted_u((MH:-B)):- must(nonvar(MH)), !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,clause_asserted_i((M:H :-B )).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_i(M:H).
 
 

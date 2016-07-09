@@ -334,7 +334,7 @@ dont_term_expansion(Type,I):-
 % mpred_file_term_expansion(_,_,_,_):- \+ current_predicate(_,_:mpred_loader_file),!,fail.
 mpred_file_term_expansion(_,_,I,_):- is_directive_form(I),!,fail.
 mpred_file_term_expansion(_,_,I,_):- is_ftVar(I),!,fail.
-mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !, Type = term, DefMod = user, 
+mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !, Type = term, DefMod = user,             
             do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
 mpred_file_term_expansion(_,_,_,_):- get_lang(pl),!,fail.
 % mpred_file_term_expansion(Type,LoaderMod,(I:-B),OO):-B==true,!,mpred_file_term_expansion(Type,LoaderMod,I,OO).
@@ -1074,8 +1074,6 @@ pfc_dcg:- file_begin(pfc), op(400,yfx,('\\\\')),op(1200,xfx,('-->>')),op(1200,xf
 :- dynamic(always_expand_on_thread/1).
 :- thread_local is_compiling_clause/0.
 
-
-
 %% is_compiling is det.
 %
 % If Is A Compiling.
@@ -1086,7 +1084,48 @@ is_compiling:-is_compiling_clause;compiling.
 :- style_check(-discontiguous).
 
 
+unload_this_file(File):- 
+   ignore((
+   source_file(M:P,File),
+   copy_term(P,PP),
+   clause(M:P,_,Ref),
+   clause_property(Ref,file(File)),
+   erase(Ref),
+   \+ clause(M:PP,_,_),
+   abolish(M:PP),fail)),
+   unload_file(File).
 
+
+:- export(clause_count/2).
+:- module_transparent(clause_count/2).
+
+clause_count(Mask,N):- 
+     flag(clause_count,_,0),
+      ignore((current_module(M),clause(M:Mask,_,Ref),
+         (clause_property(Ref,module(MW))->M==MW;true),
+         flag(clause_count,X,X+1),fail)),flag(clause_count,N,0).
+
+check_clause_counts:- forall(checked_clause_count(Mask),check_clause_count(Mask)).
+
+:- dynamic(checked_clause_count/2).
+
+checked_clause_count(isa(_,_)).
+checked_clause_count(arity(_,_)).
+checked_clause_count(tCol(_)).
+checked_clause_count(resultIsa(_,_)).
+checked_clause_count(genls(_,_)).
+checked_clause_count((_ ==> _)).
+checked_clause_count((_ <==> _)).
+checked_clause_count(spft(_,_,ax)).
+
+:- dynamic(lmcache:last_clause_count/2).
+
+check_clause_count(Mask):- clause_count(Mask,N),
+    (retract(lmcache:last_clause_count(Mask,Was)) -> true ; Was=0),
+     assert(lmcache:last_clause_count(Mask,N)),
+     Diff is N - Was , 
+     (Diff==0 -> true;
+     (Diff<0 -> throw(bad_count(Mask,(Was --> N))) ; dmsg(good_count(Mask,(Was --> N))))).
 
 %% begin_pfc is det.
 %
@@ -2276,4 +2315,4 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 
 mpred_loader_file.
-
+system:term_expansion(end_of_file,_):-must(check_clause_counts),fail.

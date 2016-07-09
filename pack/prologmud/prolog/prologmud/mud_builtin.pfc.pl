@@ -21,6 +21,7 @@
 % Douglas Miles
 */
 
+
 :- assert_until_eof(infSupertypeName).
 :- onEndOfFile(dmsg(infSupertypeName)).
 
@@ -46,6 +47,7 @@ predicateConventionMt(agent_call_command,lmconf).
 :- op(1150,xfx,('::::')).
 
 :- dynamic(mudTermAnglify/2).
+:- discontiguous(mudTermAnglify/2).
 
 tCol(meta_argtypes).
 tCol(functorDeclares).
@@ -121,7 +123,7 @@ genls(tPartofObj,tItem).
 
 tSet(tSet).
 
-:- rtrace(ain(tSet(tAgent))).
+:- must(ain(tSet(tAgent))).
 
 
 % defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
@@ -168,7 +170,7 @@ isa(tRelation,ttAbstractType).
 genlPreds(genls,equals).
 % genls(A, B):- tCol(A),{A=B}.
 
-% rtrace(Goal):- Goal. % (no_trace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
+% must(Goal):- Goal. % (no_trace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 
@@ -194,14 +196,14 @@ genls(completelyAssertedCollection,tCol).
 completelyAssertedCollection(tItem).
 completelyAssertedCollection(tRegion).
 completelyAssertedCollection(tObj).
-% :-rtrace.
+% :-must.
 completelyAssertedCollection(tAgent).
 completelyAssertedCollection(tCarryAble).
 completelyAssertedCollection(vtVerb).
 % :-rnotrace.
 
 tSet(ttTypeByAction).
-:-rtrace(ain(tCol(ttTypeByAction))).
+:-must(ain(tCol(ttTypeByAction))).
 
 genls(ttTypeByAction,completelyAssertedCollection).
 
@@ -416,7 +418,7 @@ prologDynamic(stat_total/2).
 :- dynamic(vtBasicDir/1).
 
 tCol(vtBasicDir).
-:- rtrace(ain(tCol(vtBasicDirPlusUpDown))).
+:- must(ain(tCol(vtBasicDirPlusUpDown))).
 % :- break.
 tCol(vtDirection).
 tCol(vtVerb).
@@ -1059,6 +1061,6 @@ O = [
 :- set_prolog_flag(dialect_pfc,false).
 
 
-% :- time(rtrace(ain_expanded(prologSingleValued(mudFacing666(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid)))).
+% :- time(must(ain_expanded(prologSingleValued(mudFacing666(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid)))).
 
 % :- profile((ain_expanded(prologSingleValued(mudFacing666(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid)))).

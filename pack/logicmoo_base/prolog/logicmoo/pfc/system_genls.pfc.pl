@@ -34,7 +34,7 @@ nearestGenls(C1,C2)==>
 
 % (genls(C,SC)==>(tCol(SC),tCol(C),{repropagate(SC)})).
 
-:- must(rtrace(get_lang(pfc))).
+:- sanity(get_lang(pfc)).
 
 ((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) ==> ({dif(Sub, Super)}, isa(I,Super))).
 

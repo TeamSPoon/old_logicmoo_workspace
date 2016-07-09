@@ -1,5 +1,19 @@
-/*  Saved settings
-    Date: Tue Apr 08 01:32:26 2014
+﻿/*  Saved settings
+    Date: Thu Jul  7 18:50:42 2016
 */
 
 
+%	Set to true to allow users to self register
+setting(cliopatria:enable_self_register, true).
+
+%	Version of jquery served by the html resource "jquery"
+setting(jquery:version, '2.2.0.min').
+
+%	Keep information to support source-level debugging
+setting(pengine_sandbox:debug_info, true).
+
+%	Keep information to support source-level debugging
+setting(swish:debug_info, true).
+
+%	Keep information to support source-level debugging
+setting(trill_on_swish:debug_info, true).

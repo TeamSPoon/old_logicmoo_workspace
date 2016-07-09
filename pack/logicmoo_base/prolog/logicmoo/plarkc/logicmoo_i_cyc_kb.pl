@@ -38,8 +38,8 @@
             cyc_to_mpred_sent_idiom_2/3,
             cyc_to_plarkc/2,
             expT/1,
-            isCycAvailable_known/0,
-            isCycUnavailable_known/1,
+            lmcache:isCycAvailable_known/0,
+            lmcache:isCycUnavailable_known/1,
             isF/1,
             isFT/1,
             isPT/1,
@@ -64,7 +64,7 @@
             maybe_ruleRewrite/2,
             mpred_postpend_type/2,
             mpred_prepend_type/2,
-            mpred_to_cyc/2,
+            baseKB:mpred_to_cyc/2,
             mwkb1/0,
             needs_canoncalization/1,
             needs_indexing/1,
@@ -90,11 +90,34 @@
             wkb2/0,
             wkbe/0
           ]).
-:- shared_multifile   
+
+:- op(500,fx,'~').
+:- op(1050,xfx,('==>')).
+:- op(1050,xfx,'<==>').
+:- op(1050,xfx,('<-')).
+:- op(1100,fx,('==>')).
+:- op(1150,xfx,('::::')).
+:- 
+ system:((
+ op(1199,fx,('==>')), 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'))).
+
+:- shared_multifile((   
         argGenl/3,
         argIsa/3,
-        argQuotedIsa/3.
-:- was_dynamic
+        argQuotedIsa/3)).
+
+:- dynamic((
   
         
         addTiny_added/1,
@@ -103,24 +126,24 @@
         argQuotedIsa/3,
         cycPrepending/2,
         cyc_to_plarkc/2,
-        isCycAvailable_known/0,
-        isCycUnavailable_known/1,
-        mpred_to_cyc/2,
-        vtUnreifiableFunction/1.
+        lmcache:isCycUnavailable_known/1,
+        baseKB:mpred_to_cyc/2,
+        vtUnreifiableFunction/1)).
 
+:- volatile(lmcache:isCycAvailable_known/0).
 
 isa_db(I,C):-clause(isa(I,C),true).
 
 
-:- was_dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
-:- was_dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
-:- was_dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
-:- was_dynamic(assertedTinyKB_implies_first/4).
-:- was_dynamic(assertedTinyKB_not_first/3).
-:- was_dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
+:- dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
+:- dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
+:- dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
+:- dynamic(assertedTinyKB_implies_first/4).
+:- dynamic(assertedTinyKB_not_first/3).
+:- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
 
 
-:- was_dynamic(cycPrepending/2).
+:- dynamic(cycPrepending/2).
 cycPrepending(ft,'AssertedAssertion').
 cycPrepending(ft,'Assertion').
 cycPrepending(ft,'Atom').
@@ -221,7 +244,7 @@ cycPrepending(pt,A):-atom(A),atom_contains(A,'Predicate').
 
 
 
-:- was_dynamic cyc_to_plarkc/2.
+:- dynamic(cyc_to_plarkc/2).
 
 
 cyc_to_plarkc('between', cycBetween).
@@ -248,109 +271,109 @@ cyc_to_plarkc('dot_holds', 't').
 
 
 
-:- was_dynamic(mpred_to_cyc/2).
+:- dynamic(baseKB:mpred_to_cyc/2).
 
-mpred_to_cyc(P,C):- cyc_to_plarkc(C,P),!.
-mpred_to_cyc(ftInt,'Integer').
-mpred_to_cyc(ftSentence,'CycLFormulaicSentence').
-mpred_to_cyc(ftSentence,'FormulaicSentence').
-% mpred_to_cyc(ftNonAtomicTerm,'CycLGenericRelationFormula').
+baseKB:mpred_to_cyc(P,C):- cyc_to_plarkc(C,P),!.
+baseKB:mpred_to_cyc(ftInt,'Integer').
+baseKB:mpred_to_cyc(ftSentence,'CycLFormulaicSentence').
+baseKB:mpred_to_cyc(ftSentence,'FormulaicSentence').
+% baseKB:mpred_to_cyc(ftNonAtomicTerm,'CycLGenericRelationFormula').
 
-mpred_to_cyc(ftSentence,'SubLFormulaicSentence').
-mpred_to_cyc(ftSentence,'icSentenceSentence').
-mpred_to_cyc(ftVar,'CycLVariable').
-mpred_to_cyc(ftVar,'Variable').
+baseKB:mpred_to_cyc(ftSentence,'SubLFormulaicSentence').
+baseKB:mpred_to_cyc(ftSentence,'icSentenceSentence').
+baseKB:mpred_to_cyc(ftVar,'CycLVariable').
+baseKB:mpred_to_cyc(ftVar,'Variable').
 
-mpred_to_cyc(ttExpressionType,'CycLExpressionType').
-mpred_to_cyc(ttExpressionType,'ExpressionType').
+baseKB:mpred_to_cyc(ttExpressionType,'CycLExpressionType').
+baseKB:mpred_to_cyc(ttExpressionType,'ExpressionType').
 
-mpred_to_cyc(tAgent,'Agent-Generic').
-mpred_to_cyc(tCol,'Collection').
-mpred_to_cyc(tFunction,'Function-Denotational').
-mpred_to_cyc(tHumanCyclist, 'HumanCyclist').
-mpred_to_cyc(tKnowledgeBase, 'KnowledgeBase').
-mpred_to_cyc(tMicrotheory, 'Microtheory').
-mpred_to_cyc(tPred,'Predicate').
-mpred_to_cyc(tProblemStore, 'CycProblemStore').
-mpred_to_cyc(tRuleTemplate, 'RuleTemplate').
-mpred_to_cyc(tThing, 'Thing').
-mpred_to_cyc(tIndividual, 'Individual').
+baseKB:mpred_to_cyc(tAgent,'Agent-Generic').
+baseKB:mpred_to_cyc(tCol,'Collection').
+baseKB:mpred_to_cyc(tFunction,'Function-Denotational').
+baseKB:mpred_to_cyc(tHumanCyclist, 'HumanCyclist').
+baseKB:mpred_to_cyc(tKnowledgeBase, 'KnowledgeBase').
+baseKB:mpred_to_cyc(tMicrotheory, 'Microtheory').
+baseKB:mpred_to_cyc(tPred,'Predicate').
+baseKB:mpred_to_cyc(tProblemStore, 'CycProblemStore').
+baseKB:mpred_to_cyc(tRuleTemplate, 'RuleTemplate').
+baseKB:mpred_to_cyc(tThing, 'Thing').
+baseKB:mpred_to_cyc(tIndividual, 'Individual').
 
-mpred_to_cyc(vtDayOfWeekType, 'DayOfWeekType').
-mpred_to_cyc(vtMonthOfYearType, 'MonthOfYearType').
-mpred_to_cyc(vtFormat, 'Format').
-mpred_to_cyc(vtInferenceProblemLinkStatus, 'CycInferenceProblemLinkStatus').
-mpred_to_cyc(vtHLTruthValue, 'CycHLTruthValue').
-mpred_to_cyc(vtProvabilityStatus, 'CycProvabilityStatus').
-mpred_to_cyc(vtTruthValue, 'TruthValue').
-mpred_to_cyc(vtCanonicalizerDirective, 'CanonicalizerDirective').
+baseKB:mpred_to_cyc(vtDayOfWeekType, 'DayOfWeekType').
+baseKB:mpred_to_cyc(vtMonthOfYearType, 'MonthOfYearType').
+baseKB:mpred_to_cyc(vtFormat, 'Format').
+baseKB:mpred_to_cyc(vtInferenceProblemLinkStatus, 'CycInferenceProblemLinkStatus').
+baseKB:mpred_to_cyc(vtHLTruthValue, 'CycHLTruthValue').
+baseKB:mpred_to_cyc(vtProvabilityStatus, 'CycProvabilityStatus').
+baseKB:mpred_to_cyc(vtTruthValue, 'TruthValue').
+baseKB:mpred_to_cyc(vtCanonicalizerDirective, 'CanonicalizerDirective').
 
-mpred_to_cyc(aCollectionSubsetFn,'CollectionSubsetFn').
-mpred_to_cyc(vTrue, 'True').
-mpred_to_cyc(vFalse, 'False').
-mpred_to_cyc(vGuest, 'Guest').
-mpred_to_cyc(vAdministrator, 'CycAdministrator').
+baseKB:mpred_to_cyc(aCollectionSubsetFn,'CollectionSubsetFn').
+baseKB:mpred_to_cyc(vTrue, 'True').
+baseKB:mpred_to_cyc(vFalse, 'False').
+baseKB:mpred_to_cyc(vGuest, 'Guest').
+baseKB:mpred_to_cyc(vAdministrator, 'CycAdministrator').
 
-mpred_to_cyc(vIntervalEntry, 'IntervalEntry').
-mpred_to_cyc(vSingleEntry, 'SingleEntry').
-
-
-mpred_to_cyc(ftAtomicTerm, 'CycLClosedAtomicTerm').
-mpred_to_cyc(vSetTheFormat, 'SetTheFormat').
-
-mpred_to_cyc(vAssertedFalseDefault, 'AssertedFalseDefault').
-mpred_to_cyc(vAssertedFalseMonotonic, 'AssertedFalseMonotonic').
-mpred_to_cyc(vAssertedTrueDefault, 'AssertedTrueDefault').
-mpred_to_cyc(vAssertedTrueMonotonic, 'AssertedTrueMonotonic').
-mpred_to_cyc(vMonotonicallyFalse, 'MonotonicallyFalse').
-mpred_to_cyc(vMonotonicallyTrue, 'MonotonicallyTrue').
-mpred_to_cyc(vDefaultFalse, 'DefaultFalse').
-mpred_to_cyc(vDefaultTrue, 'DefaultTrue').
-
-mpred_to_cyc('vGood-ProblemProvabilityStatus', 'Good-ProblemProvabilityStatus').
-mpred_to_cyc('vNeutral-ProblemProvabilityStatus', 'Neutral-ProblemProvabilityStatus').
-mpred_to_cyc('vNoGood-ProblemProvabilityStatus', 'NoGood-ProblemProvabilityStatus').
-mpred_to_cyc('vUnknown-HLTruthValue', 'Unknown-HLTruthValue').
-mpred_to_cyc('vExistentialQuantifier-Bounded', 'ExistentialQuantifier-Bounded').
-mpred_to_cyc(vAllowGenericArgVariables, 'AllowGenericArgVariables').
-mpred_to_cyc(vAllowKeywordVariables, 'AllowKeywordVariables').
-mpred_to_cyc(vRelaxArgTypeConstraintsForVariables, 'RelaxArgTypeConstraintsForVariables').
-mpred_to_cyc(vLeaveSomeTermsAtEL, 'LeaveSomeTermsAtEL').
-mpred_to_cyc(vLeaveSomeTermsAtELAndAllowKeywordVariables, 'LeaveSomeTermsAtELAndAllowKeywordVariables').
-mpred_to_cyc(vLeaveVariablesAtEL, 'LeaveVariablesAtEL').
-mpred_to_cyc(vDontReOrderCommutativeTerms, 'DontReOrderCommutativeTerms').
-
-mpred_to_cyc(vReformulationBackwardDirection, 'ReformulationBackwardDirection').
-mpred_to_cyc(vReformulationForwardDirection, 'ReformulationForwardDirection').
-mpred_to_cyc(vReformulationNeitherDirection, 'ReformulationNeitherDirection').
-mpred_to_cyc(ftSentenceAssertible, 'CycLSentence-ClosedPredicate').
-mpred_to_cyc(ftNonAtomicTerm, 'CycLNonAtomicTerm-ClosedFunctor').
+baseKB:mpred_to_cyc(vIntervalEntry, 'IntervalEntry').
+baseKB:mpred_to_cyc(vSingleEntry, 'SingleEntry').
 
 
-mpred_to_cyc(vApril, 'April').
-mpred_to_cyc(vAugust, 'August').
-mpred_to_cyc(vDecember, 'December').
-mpred_to_cyc(vFebruary, 'February').
-mpred_to_cyc(vJanuary, 'January').
-mpred_to_cyc(vJuly, 'July').
-mpred_to_cyc(vJune, 'June').
-mpred_to_cyc(vMarch, 'March').
-mpred_to_cyc(vMay, 'May').
-mpred_to_cyc(vNovember, 'November').
-mpred_to_cyc(vOctober, 'October').
-mpred_to_cyc(vSeptember, 'September').
+baseKB:mpred_to_cyc(ftAtomicTerm, 'CycLClosedAtomicTerm').
+baseKB:mpred_to_cyc(vSetTheFormat, 'SetTheFormat').
 
-mpred_to_cyc(vSunday, 'Sunday').
-mpred_to_cyc(vMonday, 'Monday').
-mpred_to_cyc(vTuesday, 'Tuesday').
-mpred_to_cyc(vWednesday, 'Wednesday').
-mpred_to_cyc(vThursday, 'Thursday').
-mpred_to_cyc(vFriday, 'Friday').
-mpred_to_cyc(vSaturday, 'Saturday').
+baseKB:mpred_to_cyc(vAssertedFalseDefault, 'AssertedFalseDefault').
+baseKB:mpred_to_cyc(vAssertedFalseMonotonic, 'AssertedFalseMonotonic').
+baseKB:mpred_to_cyc(vAssertedTrueDefault, 'AssertedTrueDefault').
+baseKB:mpred_to_cyc(vAssertedTrueMonotonic, 'AssertedTrueMonotonic').
+baseKB:mpred_to_cyc(vMonotonicallyFalse, 'MonotonicallyFalse').
+baseKB:mpred_to_cyc(vMonotonicallyTrue, 'MonotonicallyTrue').
+baseKB:mpred_to_cyc(vDefaultFalse, 'DefaultFalse').
+baseKB:mpred_to_cyc(vDefaultTrue, 'DefaultTrue').
+
+baseKB:mpred_to_cyc('vGood-ProblemProvabilityStatus', 'Good-ProblemProvabilityStatus').
+baseKB:mpred_to_cyc('vNeutral-ProblemProvabilityStatus', 'Neutral-ProblemProvabilityStatus').
+baseKB:mpred_to_cyc('vNoGood-ProblemProvabilityStatus', 'NoGood-ProblemProvabilityStatus').
+baseKB:mpred_to_cyc('vUnknown-HLTruthValue', 'Unknown-HLTruthValue').
+baseKB:mpred_to_cyc('vExistentialQuantifier-Bounded', 'ExistentialQuantifier-Bounded').
+baseKB:mpred_to_cyc(vAllowGenericArgVariables, 'AllowGenericArgVariables').
+baseKB:mpred_to_cyc(vAllowKeywordVariables, 'AllowKeywordVariables').
+baseKB:mpred_to_cyc(vRelaxArgTypeConstraintsForVariables, 'RelaxArgTypeConstraintsForVariables').
+baseKB:mpred_to_cyc(vLeaveSomeTermsAtEL, 'LeaveSomeTermsAtEL').
+baseKB:mpred_to_cyc(vLeaveSomeTermsAtELAndAllowKeywordVariables, 'LeaveSomeTermsAtELAndAllowKeywordVariables').
+baseKB:mpred_to_cyc(vLeaveVariablesAtEL, 'LeaveVariablesAtEL').
+baseKB:mpred_to_cyc(vDontReOrderCommutativeTerms, 'DontReOrderCommutativeTerms').
+
+baseKB:mpred_to_cyc(vReformulationBackwardDirection, 'ReformulationBackwardDirection').
+baseKB:mpred_to_cyc(vReformulationForwardDirection, 'ReformulationForwardDirection').
+baseKB:mpred_to_cyc(vReformulationNeitherDirection, 'ReformulationNeitherDirection').
+baseKB:mpred_to_cyc(ftSentenceAssertible, 'CycLSentence-ClosedPredicate').
+baseKB:mpred_to_cyc(ftNonAtomicTerm, 'CycLNonAtomicTerm-ClosedFunctor').
+
+
+baseKB:mpred_to_cyc(vApril, 'April').
+baseKB:mpred_to_cyc(vAugust, 'August').
+baseKB:mpred_to_cyc(vDecember, 'December').
+baseKB:mpred_to_cyc(vFebruary, 'February').
+baseKB:mpred_to_cyc(vJanuary, 'January').
+baseKB:mpred_to_cyc(vJuly, 'July').
+baseKB:mpred_to_cyc(vJune, 'June').
+baseKB:mpred_to_cyc(vMarch, 'March').
+baseKB:mpred_to_cyc(vMay, 'May').
+baseKB:mpred_to_cyc(vNovember, 'November').
+baseKB:mpred_to_cyc(vOctober, 'October').
+baseKB:mpred_to_cyc(vSeptember, 'September').
+
+baseKB:mpred_to_cyc(vSunday, 'Sunday').
+baseKB:mpred_to_cyc(vMonday, 'Monday').
+baseKB:mpred_to_cyc(vTuesday, 'Tuesday').
+baseKB:mpred_to_cyc(vWednesday, 'Wednesday').
+baseKB:mpred_to_cyc(vThursday, 'Thursday').
+baseKB:mpred_to_cyc(vFriday, 'Friday').
+baseKB:mpred_to_cyc(vSaturday, 'Saturday').
 
 
 
-:- forall(cycPrepending(AT,A),((atom_concat(AT,A,FT),asserta(mpred_to_cyc(FT,A))))).
+:- forall(cycPrepending(AT,A),((atom_concat(AT,A,FT),asserta(baseKB:mpred_to_cyc(FT,A))))).
 
 
 notFormatType(tThing).
@@ -386,11 +409,12 @@ isRT(X):- atom_concat(_,'Relation',X).
 isRT(X):- tinyKB1(genls(X,'tRelation')).
 isRT(X):- tinyKB1(genls(X,'tFunction')).
 
+:-dynamic(tinyKB0/1).
 
 maybe_ruleRewrite(I,O):-ruleRewrite(I,O),!.
 maybe_ruleRewrite(IO,IO).
 
-:- was_dynamic(cyc_to_plarkc/2).
+:- dynamic(cyc_to_plarkc/2).
 
 mwkb1:- tell(fooooo0),
       ignore(( tinyKB(D), maybe_ruleRewrite(D,E),format('~q.~n',[tinyKB0(E)]),attvar_op(asserta_if_new,tinyKB0(E)),fail)),
@@ -399,11 +423,12 @@ ltkb1:-
  must_det_l(( mwkb1,tell(fooooo9),
       ignore(( tinyKB(D), maybe_ruleRewrite(D,E),once(cyc_to_clif(E,KB)),format('~q.~n',[tinyK8(KB)]),assertz_if_new(tinyK8(KB)),fail)),
       listing(cyc_to_plarkc/2),
-      listing(mpred_to_cyc/2),
+      listing(baseKB:mpred_to_cyc/2),
       told,
       retractall(tinyKB0(comment(_,_))))).
 
-ltkb2:- doall((filematch(logicmoo('plarkc/mpred_cyc_kb_tinykb.pl'),F),must(source_file(X,F)),predicate_property(X,dynamic),retract(X:-_))).
+ltkb2:- doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pfc'),F),must(source_file(X,F)),
+  predicate_property(X,dynamic),retract(X:-_))).
 
 
 mpred_prepend_type(X,_):- \+ atom(X),!,fail.
@@ -458,7 +483,7 @@ wkb2:- tell(fooooo2),
 %cyc_to_mpred_idiom(different,dif).
 cyc_to_mpred_idiom(X,X):- \+ atom(X),!,fail.
 cyc_to_mpred_idiom(C,P):-cyc_to_plarkc(C,P),!.
-cyc_to_mpred_idiom(M,P):-mpred_to_cyc(P,M),!.
+cyc_to_mpred_idiom(M,P):-baseKB:mpred_to_cyc(P,M),!.
 cyc_to_mpred_idiom(equiv,(<=>)).
 cyc_to_mpred_idiom(implies,(=>)). 
 cyc_to_mpred_idiom(not,(~)).
@@ -469,9 +494,9 @@ cyc_to_mpred_idiom(C,PM):- atom(C),
    (mpred_prepend_type(C,PT)->(atom_concat(PT,_,M)-> P=M; (atom_concat(PT,M,P)));P=M),
    (mpred_postpend_type(C,PPT)->(atom_concat(_,PPT,P)-> PM=P; (atom_concat(P,PPT,PM)));PM=P),
    asserta(cyc_to_plarkc(C,PM)),
-   asserta(mpred_to_cyc(PM,C)),!.
+   asserta(baseKB:mpred_to_cyc(PM,C)),!.
 
-cyc_to_mpred_idiom1(C,P):-nonvar(C),mpred_to_cyc(P,C),!.
+cyc_to_mpred_idiom1(C,P):-nonvar(C),baseKB:mpred_to_cyc(P,C),!.
 cyc_to_mpred_idiom1('CycLTerm','CycLExpression').
 cyc_to_mpred_idiom1(C,P):-atom_concatM('CycLSentence-',Type,C),!,atom_concat('Sentence',Type,P).
 cyc_to_mpred_idiom1(C,P):-atom_concatM('Expression-',Type,C),!,atom_concat('Expression',Type,P).
@@ -541,11 +566,11 @@ cyc_to_clif(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
 
 
 /*
-:- was_dynamic(argIsa/3).
+:- dynamic(argIsa/3).
 :- shared_multifile(argIsa/3).
-:- was_dynamic(argGenl/3).
+:- dynamic(argGenl/3).
 :- shared_multifile(argGenl/3).
-:- was_dynamic(argQuotedIsa/3).
+:- dynamic(argQuotedIsa/3).
 :- shared_multifile(argQuotedIsa/3).
 isa(I,C):-exactlyAssertedEL(isa,I,C,_,_).
 genls(I,C):-exactlyAssertedEL(genls,I,C,_,_).
@@ -644,7 +669,7 @@ needs_indexing(V):-compound(V),arg(_,V,A),not(is_simple_arg(A)),!,fail.
 is_simple_arg(A):-not(compound(A)),!.
 is_simple_arg(A):-functor(A,Simple,_),tEscapeFunction(Simple).
 
-:- was_dynamic(vtUnreifiableFunction/1).
+:- dynamic(vtUnreifiableFunction/1).
 'tEscapeFunction'('TINYKB-ASSERTION').
 'tEscapeFunction'('aQuoteFn').
 'tEscapeFunction'(X):- 'vtUnreifiableFunction'(X).
@@ -661,7 +686,7 @@ is_better_backchained(V):-unnumbervars(V,FOO),(((each_subterm(FOO,SubTerm),nonva
 as_cycl(VP,VE):-subst(VP,('-'),(~),V0),subst(V0,('v'),(or),V1),subst(V1,('exists'),(thereExists),V2),subst(V2,('&'),(and),VE),!.
 
 
-:- was_dynamic(addTiny_added/1).
+:- dynamic(addTiny_added/1).
 addCycL(V):-addTiny_added(V),!.
 addCycL(V):-into_mpred_form(V,M),V\=@=M,!,addCycL(M),!.
 addCycL(V):-defunctionalize('implies',V,VE),V\=@=VE,!,addCycL(VE).
@@ -687,7 +712,7 @@ addCycL1(V):-asserta(addTiny_added(V)),unnumbervars(V,VE),must(nop(remQueuedTiny
 
 sent_to_conseq(CycLIn,Consequent):- into_mpred_form(CycLIn,CycL), ignore((tiny_support(CycL,_MT,CALL),retract(CALL))),must(cycLToMpred(CycL,Consequent)),!.
 
-:- was_dynamic(addTiny_added/1).
+:- dynamic(addTiny_added/1).
 
 cycLToMpred(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred(M,CP),!.
 cycLToMpred(V,CP):-cyc_to_clif(V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
@@ -698,7 +723,7 @@ cycLToMpred(V,CP):-cycLToMpred0(V,CP),!.
 
 cycLToMpred0(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred0(M,CP),!.
 cycLToMpred0(V,CP):-cyc_to_clif(V,VE),V\=@=VE,!,cycLToMpred0(VE,CP).
-cycLToMpred0((TRUE=>V),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
+cycLToMpred0((TRUE => V),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
 cycLToMpred0((V <=> TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
 cycLToMpred0((V :- TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
 cycLToMpred0((V :- A),CP):- show_call(why,cycLToMpred0((A => V),CP)).
@@ -754,28 +779,33 @@ make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(M
 %
 % ============================================
 
-:- was_dynamic(isCycUnavailable_known/1).
-:- was_dynamic(isCycAvailable_known/0).
+:- dynamic(lmcache:isCycUnavailable_known/1).
+:- dynamic(lmcache:isCycAvailable_known/0).
 
 /*
 :- was_export(isCycAvailable/0).
-isCycAvailable:-isCycUnavailable_known(_),!,fail.
-isCycAvailable:-isCycAvailable_known,!.
+isCycAvailable:-lmcache:isCycUnavailable_known(_),!,fail.
+isCycAvailable:-lmcache:isCycAvailable_known,!.
 isCycAvailable:-checkCycAvailablity,isCycAvailable.
 
 :- was_export(isCycUnavailable/0).
-isCycUnavailable:-isCycUnavailable_known(_),!.
-isCycUnavailable:-isCycAvailable_known,!,fail.
+isCycUnavailable:-lmcache:isCycUnavailable_known(_),!.
+isCycUnavailable:-lmcache:isCycAvailable_known,!,fail.
 isCycUnavailable:-checkCycAvailablity,isCycUnavailable.
 
 :- was_export(checkCycAvailablity/0).
-checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
-checkCycAvailablity:- catchv((current_predicate(invokeSubL/2),ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
+checkCycAvailablity:- (lmcache:isCycAvailable_known;lmcache:isCycUnavailable_known(_)),!.
+checkCycAvailablity:- catchv((current_predicate(invokeSubL/2),ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(lmcache:isCycAvailable_known);assert_if_new(lmcache:isCycUnavailable_known(R)))),E,assert_if_new(lmcache:isCycUnavailable_known(E))),!.
 */
 % :- dmsg("Loading tinyKB should take under a minute 666").
 
 % :-must((asserta((user:term_expansion(A,B):-cyc_to_clif_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
-:- gripe_time(60,lmconf:qcompile(logicmoo(plarkc/mpred_cyc_kb_tinykb))).
+% :- gripe_time(60,qcompile(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'))).
+:- disable_mpred_expansion.
+:- (include(logicmoo(plarkc/'logicmoo_i_cyc_kb_preds.pfc'))).
+:- (include(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'))).
+:- enable_mpred_expansion.
+:- gripe_time(60,ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_xform.pfc'))).
 %:-must(forall(retract(at_eof_action(CALL)),must(CALL))).
 
 

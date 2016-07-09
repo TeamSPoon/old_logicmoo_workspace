@@ -12,7 +12,7 @@
 
 :- include(prologmud(mud_header)).
 /*
-:-swi_module(modr, [ agent_call_unparsed/1, agent_call_unparsed/2,  agent_call_command_now/2 ]).
+:-swi_module(world_agent, [ agent_call_unparsed/1, agent_call_unparsed/2,  agent_call_command_now/2 ]).
 
 
 tAgent - Players and Bot Bodies

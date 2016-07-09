@@ -346,6 +346,8 @@ kb_dynamic(F,Other):-
 
 
 no_need_to_import(lmconf).
+no_need_to_import(lmcache).
+no_need_to_import(t_l).
 no_need_to_import(system).
 no_need_to_import(baseKB).
 

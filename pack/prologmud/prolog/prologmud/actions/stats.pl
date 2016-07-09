@@ -1,5 +1,5 @@
 % :-swi_module(user). 
-:-swi_module(modStats, []).
+:- module(modStats, []).
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % health(Agent,Dam) = damage

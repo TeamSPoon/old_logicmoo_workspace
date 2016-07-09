@@ -286,8 +286,8 @@ ensure_webserver:- ensure_webserver(3020).
 
 %:- thread_property(_,alias('http@3020'))->true; http_server(http_dispatch, [port(3020)]).
 
-register_logicmoo_browser:- http_handler('/logicmoo/', handler_logicmoo_cyclone, [chunked,prefix]),
-  http_handler('/logicmoo_nc/', handler_logicmoo_cyclone, [prefix]).
+register_logicmoo_browser:- http_handler('/logicmoo/', handler_logicmoo_cyclone, [prefix]), % chunked
+  http_handler('/logicmoo_nc/', handler_logicmoo_cyclone, [prefix,chunked]).
 
 
 :- initialization(register_logicmoo_browser). %  % 
@@ -549,13 +549,13 @@ handler_logicmoo_cyclone(Request):- fail, notrace(((is_goog_bot,!,
   format('<!DOCTYPE html><html><head></head><body><pre>~q</pre></body></html>~n~n',[Request]),flush_output_safe))),!.
 handler_logicmoo_cyclone(Request):-
  ignore((
- /*nodebugx*/once((
- /*with_no_x*/once((
- /*on_x_log_fail*/once((
-   must_run((
-   current_input(In),current_output(Out),current_error(Err),
+ nodebugx((
+  w_tl(set_prolog_flag(retry_undefined,false),
+    with_no_x(( 
+     must_run((
+      current_input(In),current_output(Out),current_error(Err),
    thread_self(ID),
-   asserta(lmcahce:current_ioet(In,Out,Err,ID)),
+   asserta(lmcache:current_ioet(In,Out,Err,ID)),
    format('Content-type: text/html~n~n',[]),
    format('<!DOCTYPE html>',[]),
    flush_output_safe,
@@ -564,7 +564,7 @@ handler_logicmoo_cyclone(Request):-
       member(path(PATH),Request),
     directory_file_path(_,FCALL,PATH),
    once(get_param_req(call,Call);(current_predicate(FCALL/0),Call=FCALL);get_param_sess(call,Call,edit1term)),
-   must_run(Call))))))))))),!.
+   must_run(Call)))))))))),!.
    
 
 
@@ -1240,7 +1240,7 @@ must_run((G1,G2)):- !,must_run(G1),!,must_run(G2),!.
 % must_run([G1|G2]):- !,must_run(G1),!,must_run(G2),!.
 must_run(List):-  is_list(List),!,must_maplist(must_run,List),!.
 must_run(Goal):- flush_output_safe,
-   (catch(Goal,  Error,   wdmsg(assertion_failed(Error, Goal)))
+   (Goal
     *-> flush_output_safe ; wdmsg(assertion_failed(fail, Goal))).
 
 

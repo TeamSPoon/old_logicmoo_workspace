@@ -209,7 +209,7 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
          
          defaultAssertMt/1,
          set_defaultAssertMt/1,
-         
+         with_no_retry_undefined/1,
          which_file/1,
          fileAssertMt/1,
          set_fileAssertMt/1,
@@ -322,15 +322,17 @@ get_current_default_tbox(baseKB).
 %
 set_defaultAssertMt(ABox):- 
   sanity(mtCanAssert(ABox)),
-  must_det_l((
-    ensure_abox(ABox),
+  with_no_retry_undefined(must_det_l((
     get_current_default_tbox(TBox),
     asserta_new(TBox:mtCycL(ABox)),
+    retractall(TBox:mtProlog(ABox)),
     asserta_new(ABox:defaultTBoxMt(TBox)),
     assert_setting(t_l:current_defaultAssertMt(ABox)),
+    ensure_abox(ABox),
     '$set_source_module'(ABox),
     '$set_typein_module'(ABox),
-    nop(inherit_into_module(ABox,TBox)))).
+    nop(inherit_into_module(ABox,TBox))))),
+  ain(baseKB:mtCycL(ABox)).
 
 :- '$hide'(set_defaultAssertMt(_)).
 
@@ -339,12 +341,12 @@ set_defaultAssertMt(ABox):-
 % Sets the File''s Module.
 %
 set_fileAssertMt(ABox):- 
+ '$current_typein_module'(CM),
+ '$current_source_module'(SM),
  sanity(mtCanAssert(ABox)),
- must_det_l((
+ with_no_retry_undefined(must_det_l((
    fileAssertMt(Was),
    % get_current_default_tbox(TBox),
-   '$current_typein_module'(CM),
-   '$current_source_module'(SM),
 
    set_defaultAssertMt(ABox),
    which_file(File),
@@ -354,7 +356,7 @@ set_fileAssertMt(ABox):-
 
    onEndOfFile(set_defaultAssertMt(Was)),
    onEndOfFile('$set_source_module'(SM)),
-   onEndOfFile('$set_typein_module'(CM)))).
+   onEndOfFile('$set_typein_module'(CM))))).
 
 
 
@@ -607,6 +609,7 @@ uses_predicate(_,_, (:-), _, error) :- !,dumpST,dbreak.
 uses_predicate(_,_, (/), _, error) :- !,dumpST,dbreak.
 uses_predicate(_,_, (//), _, error) :- !,dumpST,dbreak.
 uses_predicate(_,_, (:), _, error) :- !,dumpST,dbreak.
+uses_predicate(_,myMt,mtExact,1, retry):- myMt:import(baseKB:mtExact/1),!.
 % uses_predicate(SM,_, '>>',  4, error) :- !,dumpST,dbreak.
 uses_predicate(_,_, '[|]', _, error) :- !,dumpST,dbreak.
 uses_predicate(User, User, module, 2, error):-!.
@@ -665,14 +668,16 @@ create_predicate_istAbove(Nonvar,F,A):- sanity(ground(create_predicate_istAbove(
 create_predicate_istAbove(baseKB,F,A):- !,make_as_dynamic(create_predicate,baseKB,F,A),
       ignore((( \+ (defaultAssertMt(CallerMt)),CallerMt\==baseKB,create_predicate_istAbove(CallerMt,F,A) ))).
 create_predicate_istAbove(abox,F,A):-  must(defaultAssertMt(CallerMt)),sanity(CallerMt\=abox),!,create_predicate_istAbove(CallerMt,F,A).
-% create_predicate_istAbove(pce_help_messages, do_and_undo, 2):-dtrace.
-create_predicate_istAbove(CallerMt,F,A):- clause_b(mtProlog(CallerMt)),!,wdmsg(warn(create_predicate_istAbove(CallerMt,F,A))),dtrace.
+%create_predicate_istAbove(_, do_and_undo, 2):-dtrace.
+create_predicate_istAbove(CallerMt,F,A):- clause_b(mtProlog(CallerMt)), must(\+ clause_b(mtCycL(CallerMt))) ,!,wdmsg(warn(create_predicate_istAbove_mtProlog(CallerMt,F,A))),dtrace.
 create_predicate_istAbove(CallerMt,F,A):-   
    make_as_dynamic(create_predicate_istAbove,CallerMt,F,A),
    functor(Goal,F,A),
    assert_if_new(( CallerMt:Goal :- istAbove(CallerMt,Goal))).
 
 
+
+with_no_retry_undefined(Goal):- w_tl(set_prolog_flag(retry_undefined,false),Goal).
 
 
 % Every module has it''s own

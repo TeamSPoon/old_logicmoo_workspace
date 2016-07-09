@@ -11,7 +11,7 @@
 */
 
 % :-swi_module(user). 
-:-swi_module(modAttack, []).
+:-module(modAttack, []).
 
 :- include(prologmud(mud_header)).
 

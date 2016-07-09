@@ -13,7 +13,7 @@
 %
 */
 
-%:-swi_module(world, [
+:-swi_module(world, []).
 :-export((
         a_unparsed/2,
        % call_agent_action/2,
@@ -64,7 +64,6 @@
          growth/0,
          isaOrSame/2,
          current_agent_or_var/1)).
- % ]).
 
 
 :-discontiguous create_instance_0/3.
@@ -82,14 +81,14 @@
 :- include(prologmud(mud_header)).
 % :- register_module_type (utility).
 
-:- ensure_loaded(world_2d).
-:- ensure_loaded(world_text).
-:- ensure_loaded(world_text_output).
-:- ensure_loaded(world_effects).
-:- ensure_loaded(world_events).
-:- ensure_loaded(world_agent).
-:- ensure_loaded(world_npc).
-:- if_file_exists(ensure_loaded(logicmoo('vworld/world_spawning.pl'))).
+:- include(world_2d).
+:- include(world_text).
+:- include(world_text_output).
+:- include(world_effects).
+:- include(world_events).
+:- include(world_agent).
+:- include(world_npc).
+:- if_file_exists(include(logicmoo('vworld/world_spawning.pl'))).
 
 :-export(isaOrSame/2).
 isaOrSame(A,B):-A==B,!.
@@ -97,8 +96,11 @@ isaOrSame(A,B):-isa(A,B).
 
 intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
 % is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req1(CALL).
+
 obj_memb(E,L):-is_list(L)->member(E,L);E=L.
+
 isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
+
 prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
 
 
@@ -271,7 +273,10 @@ leash(+call),trace,
    put_in_world(P),   
    add_missing_instance_defaults(P)]). 
 
-create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dmsg(assumed_To_HAVE_creted_isnance(What,Type,Props))),!.
+% in 1999, when i went to Teknowledge/Cycorp i learned that we hadnt yet created AI yet dispite .. but i did discover that we *can* create AI if somone would invest time and money
+
+
+create_instance_0(What,Type,Props):- leash(+call),trace_or_throw(dmsg(assumed_To_HAVE_creted_isnance(What,Type,Props))),!.
 
 %ttSpatialType(col).
 

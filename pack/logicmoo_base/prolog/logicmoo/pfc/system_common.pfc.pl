@@ -383,7 +383,7 @@ pfcControlled(argIsa).
 %typeProps(tCoffeeCup,[mudColor(vBlack),mudColor(isEach(vBrown,vBlack)),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
 %props(iCoffeeCup7,[mudColor(vBlack),mudColor(isEach(vBrown,vBlack)),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
 
-:- must(rtrace(get_lang(pfc))).
+:- sanity(get_lang(pfc)).
 
 :- must(ain((tSet(C)==>
  ( {atom(C), functor(Head,C,1), call(BHead=baseKB:Head),

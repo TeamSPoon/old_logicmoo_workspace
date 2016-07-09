@@ -41,9 +41,7 @@ vtColor(vRed).
 
 ttValueType(vtColor).
 
-:- ain_expanded('==>'((isa(X,ttValueType)/(X\==vtValue)),(genls(X,vtValue),completelyAssertedCollection(X)))).
-
-:- rtrace.
+'==>'((isa(X,ttValueType)/(X\==vtValue)),(genls(X,vtValue),completelyAssertedCollection(X))).
 
 completelyAssertedCollection(vtValue).
 
@@ -215,7 +213,7 @@ assert_text(Ctx,CtxISA,String):-
     w_tl(parserVars(context,Ctx,CtxISA),assert_text_now(Ctx,CtxISA,String)).
 
 assert_text_now(Ctx,CtxISA,String):-   
- logOnFailureIgnore(( 
+ on_f_log_ignore(( 
   % parse the string to attributed text
  to_word_list(String,WL),!,to_icase_strs(WL,IC),!,   
    ((phrase(translation_dbg_on_fail(Ctx,CtxISA,Prolog),IC),
@@ -324,8 +322,9 @@ tSmall(X) <==> mudSize(X,vSmall).
 
 % set of green things in the world
 tSet(tGreen).
-:- trace.
 tGreen(X) <==> mudColor(X,vGreen).
+
+
 
 %:-assertz_if_new(parserTest(iWorld7,"All green books are small.", (tGreen(X),tBook(X))==>tSmall(X))).
 %:-assertz_if_new(parserTest(iWorld7,"Most green books are small.", pfc_default((tGreen(X),tBook(X))==>tSmall(X)))).

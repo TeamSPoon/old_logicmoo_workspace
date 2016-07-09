@@ -173,7 +173,7 @@ save_fmt_e(O,isa(A)):-!,must(save_fmt_e(O,A)).
 save_fmt_e(O,t(A,_)):-!,must(save_fmt_e(O,A)).
 save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStub(_),cycPlus2(_),predStub(_),predicateConventionMt(_),arity(_),
 %save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
-save_fmt_e(O,E):- member_eq(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
+save_fmt_e(O,E):- member_eq0(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 
 save_fmt_a(P,A):-loop_check(save_fmt_a_0(P,A),true),!.
 
