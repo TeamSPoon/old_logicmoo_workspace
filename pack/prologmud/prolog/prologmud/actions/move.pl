@@ -57,7 +57,7 @@ move_command(Agent,DirS,DistS) :-
 % cant get anywhere since the map fails it
 move_command_1(Agent,Dir) :-
 	mudAtLoc(Agent,LOC),
-         (from_dir_target(LOC,Dir,_)),!,
+         \+ (from_dir_target(LOC,Dir,_)),!,
 		(add_cmdfailure(Agent,actMove)),
       throw(giveup(nopath(Agent,actMove))).
 

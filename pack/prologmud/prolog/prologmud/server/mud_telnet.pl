@@ -23,7 +23,8 @@
          set_player_telnet_options/1,
          register_player_stream_local/3,
          fmtevent/2,
-         login_and_run_nodebug/0
+         login_and_run_nodebug/0,
+         on_telnet_restore/0
       ]).
 
 :- add_import_module(mud_telnet,baseKB,end).
@@ -594,10 +595,15 @@ call_pred(Call, Options) :-
 	;   Call = prolog
 	).
 
-:- add_import_module(mud_telnet,baseKB,end).
-
-:-assert_if_new(( lmconf:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
-      foreach(no_repeats(world:get_agent_sessions(A,O)),
+on_telnet_restore :- 
+      add_import_module(mud_telnet,baseKB,end),
+      assert_if_new(( lmconf:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
+        foreach(no_repeats(find_and_call(get_agent_sessions(A,O))),
          foreach(no_repeats(lmcache:session_io(O,_In,Out,_Id)),
           fmtevent(Out,NewEvent))))).
+
+
+:- initialization(on_telnet_restore).
+:- initialization(on_telnet_restore,now).
+:- initialization(on_telnet_restore,restore).
 

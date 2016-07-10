@@ -20,6 +20,7 @@
           system_goal_expansion_safe_wrap/2,
           ereq/1,
           dbreq/1,
+          swc/0,
           clause_b/1,
           really_safe_wrap/3,
           warn_if_static/2]).
@@ -282,7 +283,10 @@ check_never_decl_shared(_Plus,baseKB,mudComfort,1).
 :- dynamic system:sub_body_expansion/2.
 :- multifile system:sub_body_expansion/2.
 
+swc.
+
 system:sub_call_expansion(I,O):-really_safe_wrap(ce,I,O).
-system:sub_body_expansion(I,O):-really_safe_wrap(be,I,O).
-system:goal_expansion(I,P,O,P):-really_safe_wrap(ge,I,O).
+%system:sub_body_expansion(I,O):-really_safe_wrap(be,I,O).
+system:body_expansion(I,O):- O\== true, O\=(swc,_),really_safe_wrap(be,I,O).
+%system:goal_expansion(I,P,O,P):-really_safe_wrap(ge,I,O).
 

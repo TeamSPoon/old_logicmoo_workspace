@@ -1748,9 +1748,9 @@ mpred_call_with_no_triggers_uncaugth(Clause) :-  strip_module(Clause,_,F),
 % PFC Backchaining Only.
 %
 
-mpred_bc_only(G):- !,defaultAssertMt(W), mpred_BC_w_cache(W,G).
-mpred_bc_only(M:G):- !, with_umt(M,mpred_bc_only0(G)).
-mpred_bc_only(G):- !, call_u(mpred_bc_only0(G)).
+%mpred_bc_only(G):- !,defaultAssertMt(W), loop_check(mpred_BC_w_cache(W,G)).
+%mpred_bc_only(M:G):- !, loop_check(with_umt(M,mpred_bc_only0(G))).
+mpred_bc_only(G):- no_repeats(loop_check(mpred_bc_only0(G))).
 
 
 % % :- '$set_source_module'(mpred_kb_ops).
@@ -1760,8 +1760,8 @@ mpred_bc_only(G):- !, call_u(mpred_bc_only0(G)).
 % PFC Backchaining Only Primary Helper.
 %
 mpred_bc_only0(G):- mpred_unnegate(G,Pos),!, show_call(why,\+ mpred_bc_only(Pos)).
-mpred_bc_only0(G):- loop_check(no_repeats(pfcBC_NoFacts(G))).
-mpred_bc_only0(G):- mpred_call_only_facts(G).
+mpred_bc_only0(G):- pfcBC_NoFacts(G).
+% mpred_bc_only0(G):- mpred_call_only_facts(G).
 
 %%
 %= pfcBC_NoFacts(F) is true iff F is a fact available for backward chaining ONLY.

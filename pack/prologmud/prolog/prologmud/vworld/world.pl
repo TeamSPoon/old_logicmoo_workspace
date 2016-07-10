@@ -17,6 +17,7 @@
 :-export((
         a_unparsed/2,
        % call_agent_action/2,
+       get_agent_sessions/2,
             %mud_isa/2,
             isa_any/2,
             put_in_world/1,

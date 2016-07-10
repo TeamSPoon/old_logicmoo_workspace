@@ -492,7 +492,8 @@ parseForTypes([TYPE|TYPES], [B|E], [C|C1], G) :- ground(TYPE:C),
 parseForTypes([isOptional(_, W)|TYPEARGS], [W|GOODARGS], A, A):- parseForTypes(TYPEARGS,GOODARGS,A,A).
 
 
-parseIsa_Call(FT, BO, CIn, D):-ground(FT:CIn), list_tail(CIn,D), to_word_list(CIn,C),!, parseIsa(FT, B, C, D),to_arg_value(B,BO).
+parseIsa_Call(FT, BO, CIn, D):- once((ground(FT:CIn), list_tail(CIn,D), to_word_list(CIn,C))),
+   parseIsa(FT, B, C, D),to_arg_value(B,BO).
 
 
 % this parseIsa(T)-->parseIsa(T,_).

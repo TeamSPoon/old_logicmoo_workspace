@@ -1442,6 +1442,7 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; must(Goal)),!.
 
 hide_trace(G):- \+ tracing,!,call(G).
 % hide_trace(G):- skipWrapper,!,call(G).
+hide_trace(G):- !,call(G).
 hide_trace(G):- 
  restore_trace((
    hotrace(

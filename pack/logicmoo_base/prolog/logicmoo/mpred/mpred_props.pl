@@ -178,7 +178,7 @@ decl_mpred_mfa(M,FF,A):-
 % Declare Managed Predicate Hybrid.
 %
 
-decl_mpred_prolog(A):-not(compound(A)),!,ain00(prologBuiltin(A)).
+decl_mpred_prolog(A):- \+ compound(A),!,ain00(prologBuiltin(A)).
 decl_mpred_prolog(A):-!,ain_expanded(prologBuiltin(A)).
 
 % ain(love(isEach(a/1,b/2,c/1,d),mother)).
@@ -494,16 +494,17 @@ ensure_arity(F,A):- one_must(arity_no_bc(F,A),one_must((current_predicate(F/A),
 %
 % Assert Arity.
 %
-assert_arity(F,A):-not(atom(F)),trace_or_throw(assert_arity(F,A)).
-assert_arity(F,A):-not(integer(A)),trace_or_throw(assert_arity(F,A)).
-assert_arity(typeProps,0):- trace_or_throw(assert_arity(typeProps,0)).
-assert_arity(argsIsa,2):- trace_or_throw(assert_arity_argsIsa(error,2)).
-assert_arity(prologDynamic,2):- trace_or_throw(assert_arity_argsIsa(prologDynamic,2)).
-assert_arity(F,A):- must_det(good_pred_relation_name(F,A)),fail.
-assert_arity(F,A):- arity_no_bc(F,A),!.
+
+assert_arity(F,A):- sanity(\+ ((bad_arity(F,A), trace_or_throw(assert_arity(F,A))))), arity_no_bc(F,A),!.
 assert_arity(F,A):- arity_no_bc(F,AA), A\=AA,dmsg(assert_additional_arity(F,AA->A)),!,ain_fast(arity(F,A)).
 assert_arity(F,A):- ain_fast(arity(F,A)),!.
 
+bad_arity(F,_):- \+ atom(F).
+bad_arity(_,A):- \+ integer(A).
+bad_arity(typeProps,0).
+bad_arity(argsIsa,2).
+bad_arity(prologDynamic,2).
+bad_arity(F,A):- \+ good_pred_relation_name(F,A).
 
 
 %= 	 	 
@@ -512,7 +513,7 @@ assert_arity(F,A):- ain_fast(arity(F,A)),!.
 %
 % Good Predicate Relation Name.
 %
-good_pred_relation_name(F,A):-not(bad_pred_relation_name0(F,A)).
+good_pred_relation_name(F,A):- \+ bad_pred_relation_name0(F,A).
 
 
 %= 	 	 
@@ -521,7 +522,7 @@ good_pred_relation_name(F,A):-not(bad_pred_relation_name0(F,A)).
 %
 % Bad Predicate Relation Name Primary Helper.
 %
-bad_pred_relation_name0(V,_):-not(atom(V)),!.
+bad_pred_relation_name0(V,_):- \+ atom(V),!.
 bad_pred_relation_name0('[]',_).
 bad_pred_relation_name0('',_).
 bad_pred_relation_name0('!',_).

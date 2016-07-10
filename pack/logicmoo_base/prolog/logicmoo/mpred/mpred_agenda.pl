@@ -537,7 +537,7 @@ rescan_all.
 %
 % Ensure When Least One Region.
 %
-ensure_at_least_one_region:- (isa(_,tRegion)->true;ain(isa(iRegion1,tRegion))),!.
+ensure_at_least_one_region:- call_u(isa(_,tRegion)->true;ain(isa(iRegion1,tRegion))),!.
 
 % :-meta_predicate(finish_processing_dbase).
 

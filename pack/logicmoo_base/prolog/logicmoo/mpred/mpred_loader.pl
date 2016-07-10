@@ -1110,6 +1110,8 @@ check_clause_counts:- forall(checked_clause_count(Mask),check_clause_count(Mask)
 :- dynamic(checked_clause_count/2).
 
 checked_clause_count(isa(_,_)).
+checked_clause_count(t(_,_)).
+checked_clause_count(t(_,_,_)).
 checked_clause_count(arity(_,_)).
 checked_clause_count(tCol(_)).
 checked_clause_count(resultIsa(_,_)).
@@ -1120,7 +1122,7 @@ checked_clause_count(spft(_,_,ax)).
 
 :- dynamic(lmcache:last_clause_count/2).
 
-check_clause_count(Mask):- clause_count(Mask,N),
+check_clause_count(Mask):- swc, clause_count(Mask,N),
     (retract(lmcache:last_clause_count(Mask,Was)) -> true ; Was=0),
      assert(lmcache:last_clause_count(Mask,N)),
      Diff is N - Was , 

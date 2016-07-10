@@ -7,17 +7,23 @@
 % Dec 13, 2035
 %
 */
-:-swi_module(mud_testing,
+:-module(mud_testing,[]).
+
+/*
+:- maplist(export,
 	[run_mud_tests/0,
         run_mud_test/2,
         test_name/1,
         test_true/1,
         run_mud_test/1,
         test_false/1,
-        last_test_name/1,
+        
         test_call/1]).
+*/
 
-:- include(prologmud(mud_header)).
+% :- include(prologmud(mud_header)).
+
+:- dynamic(lmcache:last_test_name/1).
 
 :- thread_local was_test_name/1.
 :- multifile(lmconf:mud_regression_test/0).
@@ -55,12 +61,12 @@ agent_command(Agent,actTest(Obj)):-foc_current_agent(Agent),run_mud_test(Obj).
 
 
 test_name(String):-fmt(start_moo_test(mudNamed(String))),asserta(was_test_name(String)).
-last_test_name(String):- was_test_name(String),!.
-last_test_name(unknown).
+lmcache:last_test_name(String):- was_test_name(String),!.
+lmcache:last_test_name(unknown).
 
 test_result(Result):-test_result(Result,true).
 
-test_result(Result,SomeGoal):- last_test_name(String),fmt(Result:test_mini_result(Result:String,SomeGoal)).
+test_result(Result,SomeGoal):- lmcache:last_test_name(String),fmt(Result:test_mini_result(Result:String,SomeGoal)).
 
 from_here(_:SomeGoal):-!,functor(SomeGoal,F,_),atom_concat(actTest,_,F).
 from_here(SomeGoal):-!,functor(SomeGoal,F,_),atom_concat(actTest,_,F).
@@ -120,8 +126,6 @@ lmconf:mud_test(test_fwc_2,
    mpred_remove(mudFacing(iExplorer1,vSouth)),
    test_true(mudFacing(iExplorer1,vNorth)),
    test_false(mudFacing(iExplorer1,vSouth)))).
-
-:- mpred_notrace_exec.
 
 
 lmconf:mud_test(test_movedist,

@@ -183,7 +183,7 @@ if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Go
 
 start_boxer:-
    threads,
-   ensure_loaded(logicmoo(candc/parser_boxer)),
+   system:ensure_loaded(logicmoo(candc/parser_boxer)),
    % make,   
    at_start(prolog_repl).
 
@@ -195,15 +195,15 @@ hard_work:-
    with_no_mpred_expansions(wno_tl(op(200,fy,'@'),
    ((
  %  use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
-  % ensure_loaded(logicmoo(launchcliopatria)),
-  % ensure_loaded(logicmoo(testwebconsole)),
+  % system:ensure_loaded(logicmoo(launchcliopatria)),
+  % system:ensure_loaded(logicmoo(testwebconsole)),
   % kill_term_expansion, 
-   ensure_loaded(swish(logicmoo_run_swish))
+   system:ensure_loaded(swish(logicmoo_run_swish))
    )))),!.
 
 % [Required] load the mud PFCs
 :- set_prolog_flag(pfc_booted,false).
-:- show_entry(gripe_time(40,system:force_reload_mpred_file(prologmud('mud_builtin.pfc')))).
+:- show_entry(gripe_time(40,force_reload_mpred_file(prologmud('mud_builtin.pfc')))).
 
 slow_work:- wno_tl( set_prolog_flag(lm_expanders,false) , within_user(at_start(hard_work))).
 
@@ -415,7 +415,7 @@ Proof end.
 :- system:ensure_loaded(prologmud(server/mud_irc)).
 :- system:ensure_loaded(prologmud(vworld/world)).
 
-:- lmconf:ensure_loaded(prologmud(server/mud_testing)).
+:- system:ensure_loaded(prologmud(server/mud_testing)).
 
 
 /*
@@ -484,7 +484,7 @@ make_qlfs:-
 :- include_mpred_files('../src_asserts/pldata/?*.pl').
 
 */
-:-export(system:ensure_nl_loaded/1).
+:-export(ensure_nl_loaded/1).
 system:ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 
 % :- system:ensure_loaded(logicmoo(pldata/tiny_kb)).
@@ -510,8 +510,8 @@ download_and_install_el:-
 
 % :- asserta(lmcache:loaded_external_kbs(mud)),show_call(kbp_to_mpred_t).
 
-:- ensure_loaded(prologmud(parsing/parser_imperative)).
-:- ensure_loaded(prologmud(parsing/simple_decl_parser)). 
+:- system:ensure_loaded(prologmud(parsing/parser_imperative)).
+:- system:ensure_loaded(prologmud(parsing/simple_decl_parser)). 
 :- dynamic(baseKB:mudStowing/2).
 
 /*

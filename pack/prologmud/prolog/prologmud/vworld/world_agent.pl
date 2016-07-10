@@ -222,6 +222,7 @@ with_agent0(P,CALL):-
 
 has_tty(O):-no_repeats(O,lmcache:session_io(O,_,_,_)).
 
+:-export(get_agent_session/2).
 get_agent_session(P,O):-get_session_id(O),get_agent_sessions(P,O),!.
 get_agent_session(P,O):-get_agent_sessions(P,O),has_tty(O).
 :-export(get_agent_sessions/2).

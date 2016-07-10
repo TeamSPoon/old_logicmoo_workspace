@@ -493,7 +493,7 @@ system:dbreak:- wdmsg("DUMP_BREAK/0"), (thread_self(main)->dtrace(system:break);
 
 dtrace(G):- strip_module(G,_,dbreak),\+ thread_self(main),!.
 dtrace(G):- tlbugger:has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
-dtrace(G):- cnotrace((tracing,cnotrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(cnotrace,restore_trace((leash(+all),dumptrace(G))),trace).
+dtrace(G):- cnotrace((tracing,cnotrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dumptrace(G))),trace).
 
 dtrace(G):- cnotrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.

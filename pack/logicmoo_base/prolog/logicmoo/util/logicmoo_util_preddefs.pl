@@ -138,7 +138,7 @@ with_source_module(NewModule,Goal):-
 :- meta_predicate call_from_module(+,+).
 
 call_from_module(NewModule,Goal):- sanity((atom(NewModule),nonvar(Goal))),fail.
-call_from_module(NewModule,( H:-B ) ):- !, call_from_module(NewModule, clause_asserted_call(H,B) ).
+call_from_module(NewModule,( H:-B ) ):- !, sanity(nonvar(H)),call_from_module(NewModule, clause_asserted_call(H,B) ).
 call_from_module(NewModule,Goal):-
    '$current_typein_module'(OldModule),
    '$current_source_module'(OldSModule),

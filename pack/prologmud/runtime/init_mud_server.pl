@@ -128,14 +128,14 @@ tExplorer(iExplorer6).
 
 genls(tExplorer,tHominid).
 
-
+:- ain(localityOfObject(P,_)==>{put_in_world(P)}).
 
 tExplorer(iExplorer7).
 wearsClothing(iExplorer7,'iBoots773').
 wearsClothing(iExplorer7,'iCommBadge774').
 wearsClothing(iExplorer7,'iGoldUniform775').
 mudStowing(iExplorer7,'iPhaser776').
-
+:-onSpawn(localityOfObject(iExplorer7,tLivingRoom)).
 
 pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
@@ -156,6 +156,7 @@ pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWea
 pddlSomethingIsa('iCommBadge674',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
+:-onSpawn(localityOfObject(iCommanderdata66,tOfficeRoom)).
   
 
 mpred_argtypes(bordersOn(tRegion,tRegion)).
@@ -163,8 +164,6 @@ mpred_argtypes(bordersOn(tRegion,tRegion)).
 tRegion(iLivingRoom7).
 tRegion(iOfficeRoom7).
 
-:-onSpawn(localityOfObject(tExplorer,tLivingRoom)).
-:-onSpawn(localityOfObject(iCommanderdata66,tOfficeRoom)).
 :-onSpawn(bordersOn(tLivingRoom,tOfficeRoom)).
 
 :- set_prolog_flag(dialect_pfc,false).
@@ -190,6 +189,9 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 :- write('\n?- user:ensure_loaded(run_mud_game). % to begin loading mud worlds').
 % :- user:ensure_loaded(start_mud_server).
 
+lar:- login_and_run.
+
+:- lar.
 
 end_of_file.
 

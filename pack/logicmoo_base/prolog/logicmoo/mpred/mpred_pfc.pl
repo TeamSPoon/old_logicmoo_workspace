@@ -600,7 +600,7 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(Why,MH,M,H))),
 % Using User Microtheory.
 %
 
-with_umt(U,G):- t_l:current_defaultAssertMt(W)->W=U,!,call_from_module(U,G).
+with_umt(U,G):- stack_check(1000),t_l:current_defaultAssertMt(W)->W=U,!,call_from_module(U,G).
 with_umt(user,P):- !,with_umt(baseKB,P).
 with_umt(M,P):- 
   (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)),!,
@@ -732,7 +732,7 @@ mpred_ainz(G,S):-mpred_ain(G,S).
 %
 % PFC Aina.
 %
-mpred_aina(G):-mpred_ain(G).
+mpred_aina(G):- mpred_ain(G).
 mpred_aina(G,S):-mpred_ain(G,S).
 
 %%  mpred_ain(P,S) 
@@ -1784,7 +1784,10 @@ call_u(M:G):- var(M),!,trace_or_throw(var_call_u(M:G)).
 % call_u(M:G):- nonvar(M),var(G),!,with_umt(M,mpred_fact_mp(M,G)).
 call_u(G):- strip_module(G,M,P),
   (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)),!,
-   (var(P)->CP=mpred_fact_mp(M,P);CP=P),
+   (var(P)->CP=mpred_fact_mp(W,P);
+   % CP=mpred_BC_w_cache(W,P)
+   CP=P
+      ),
    with_umt(W, CP).
 
 
@@ -1795,15 +1798,17 @@ call_u(G):- strip_module(G,M,P),
     with_umt(W, mpred_BC_w_cache(W,P)).
 */
 
-mpred_BC_w_cache(W,P):- must(mpred_BC_CACHE(W,P)),!,loop_check(mpred_call_no_bc(P)).
+mpred_BC_w_cache(W,P):- must(mpred_BC_CACHE(W,P)),!,mpred_call_no_bc(P).
 
 mpred_BC_CACHE(M,P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(M,P0),true)).
 
 mpred_BC_CACHE0(_,P00):- var(P00),!.
 mpred_BC_CACHE0(M,must(P00)):-!,mpred_BC_CACHE0(M,P00).
 mpred_BC_CACHE0(M,P):- predicate_property(M:P,static),!.
+mpred_BC_CACHE0(M,P):- predicate_property(M:P,built_in),!.
 mpred_BC_CACHE0(_, :-(_,_)):-!.
 mpred_BC_CACHE0(_,bt(_,_)):-!.
+mpred_BC_CACHE0(_,clause(_,_)):-!.
 mpred_BC_CACHE0(_,spft(_,_,_)):-!.
 mpred_BC_CACHE0(_,P):- 
  ignore((
@@ -1818,11 +1823,9 @@ mpred_BC_CACHE0(_,P):-
 
 
 % I''d like to remove this soon
-mpred_call_no_bc(P):- var(P),!,fail,dtrace,  mpred_fact(P).
+mpred_call_no_bc(P0):- strip_module(P0,_,P), sanity(stack_check),var(P),!, mpred_fact(P).
 mpred_call_no_bc(baseKB:true):-!.
-mpred_call_no_bc(_):- sanity(stack_check),fail.
-
-mpred_call_no_bc(P):- loop_check(no_repeats(mpred_call_no_bc0(P))).
+mpred_call_no_bc(P):- no_repeats(loop_check(mpred_call_no_bc0(P),mpred_METACALL(call, P))).
 
 % mpred_call_no_bc0(P):- lookup_u(P).
 % mpred_call_no_bc0(P):-  defaultAssertMt(Mt), Mt:lookup_u(P).
@@ -1857,7 +1860,7 @@ mpred_METACALL(How, Cut, (C1*->C2)):-!,(mpred_METACALL(How, Cut, C1)*->mpred_MET
 mpred_METACALL(How, Cut, (C1,C2)):-!,mpred_METACALL(How, Cut, C1),mpred_METACALL(How, Cut, C2).
 mpred_METACALL(How, Cut, (C1;C2)):-!,(mpred_METACALL(How, Cut, C1);mpred_METACALL(How, Cut, C2)).
 %  check for system predicates first
-% mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call_u(P).
+% mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call(P).
 
 
 mpred_METACALL(How, Cut, M):- mpred_expansion:fixed_negations(M,O),!,mpred_METACALL(How, Cut, O).
@@ -1886,6 +1889,7 @@ mpred_METACALL(_How, _Cut, retract(X)):- !, mpred_remove(X).
 % TODO: test removal
 % mpred_METACALL(How, Cut, isa(H,B)):-!,isa_asserted(H,B).
 mpred_METACALL(_How, _Cut, (H:-B)):- clause_u((H:-B)).
+mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call(P).
 %mpred_METACALL(How, Cut, (H)):- is_static_pred(H),!,show_pred_info(H),dtrace(mpred_METACALL(How, Cut, (H))).
 mpred_METACALL( How,   Cut, P) :- fail, predicate_property(P,number_of_clauses(_)),!,
      clause_u(P,Condition),
