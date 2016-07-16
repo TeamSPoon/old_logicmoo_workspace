@@ -325,7 +325,6 @@ set_defaultAssertMt(ABox):-
   with_no_retry_undefined(must_det_l((
     get_current_default_tbox(TBox),
     asserta_new(TBox:mtCycL(ABox)),
-    retractall(TBox:mtProlog(ABox)),
     asserta_new(ABox:defaultTBoxMt(TBox)),
     assert_setting(t_l:current_defaultAssertMt(ABox)),
     ensure_abox(ABox),
@@ -605,6 +604,13 @@ uses_predicate(BaseKB,System, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),
    must(uses_predicate(System,BaseKB,F,A,R)),!.
 
 uses_predicate(_,_, (:-), 1, error) :- !,dumpST,dbreak.
+
+uses_predicate(user,user, isa, 2, retry) :- call(call,assert((user:isa(I,C):-call_u(isa(I,C))))),!.
+uses_predicate(user,user, tRRP, 1, retry) :- call(call,assert((user:tRRP(I):-call_u(isa(I,tRRP))))),!.
+uses_predicate(user,user, F, A, retry) :- clause_b(arity(F,A)),functor(P,F,A),
+   call(call,assert((user:P :- call_u(P)))),
+   user:compile_predicates([F/A]),!.
+
 uses_predicate(_,_, (:-), _, error) :- !,dumpST,dbreak.
 uses_predicate(_,_, (/), _, error) :- !,dumpST,dbreak.
 uses_predicate(_,_, (//), _, error) :- !,dumpST,dbreak.

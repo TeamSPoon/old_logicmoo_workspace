@@ -263,7 +263,7 @@ type_suffix('Able',ttTypeByAction).
 %
 type_prefix(vt,ttValueType).
 type_prefix(tt,ttTypeType).
-type_prefix(t,tCol).
+type_prefix(t,tSet).
 type_prefix(v,vtValue).
 type_prefix(i,ftID).
 type_prefix(pred,tPred).
@@ -325,7 +325,7 @@ to_isa_out(I,C,isa(I,C)).
 % new was  (isa/2).
 %
 new_was_isa:-fail.
-
+new_isa_genls:- fail.
 
 %= 	 	 
 
@@ -696,11 +696,13 @@ lmconf:module_local_init:- ain((isa(I,T):- cwc,isa_backchaing(I,T))).
 %
 isa_backchaing(I,T):- T==ftVar,!,is_ftVar(I).
 isa_backchaing(I,T):- nonvar(I),is_ftVar(I),!,T=ftVar.
+isa_backchaing(I,T):- new_isa_genls,call_u(isa(I,T)).
 isa_backchaing(_,T):- T==ftProlog,!.
 isa_backchaing(I,T):- I==T,I=ttTypeByAction,!,fail.
-
-
 isa_backchaing(I,T):- is_ftVar(I),is_ftVar(T),!,tCol_gen(T),nonvar(T),isa_backchaing(I,T).
+isa_backchaing(I,T):- new_isa_genls,!,fail.
+
+
 isa_backchaing(I,T):- call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing_0(I,T)))).
 
 
@@ -803,6 +805,9 @@ compound_isa(_,I,T):- cheaply_u(isa_asserted(I,T)).
 %
 %  (isa/2) asserted.
 %
+
+isa_asserted(I,C):- new_isa_genls,!, call_u(isa(I,C)).
+
 isa_asserted(I,C):- ((call_tabled(isa(I,C),no_repeats(loop_check(isa_asserted_0(I,C)))))).
 %isa_asserted(I,CC):-no_repeats((isa_asserted_0(I,C),genls(C,CC))).
 
@@ -829,7 +834,8 @@ isa_asserted_0(I,T):- nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
 % isa_asserted_0(I,T):- HEAD= isa(I, T),ruleBackward(HEAD,BODY),dtrace,call_mpred_body(HEAD,BODY).
 
 isa_asserted_0(I,T):- is_ftVar(T),!,tCol_gen(T),call_u(isa(I,T)).
-isa_asserted_0(I,T):- atom(T),current_predicate(T,_:G),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);on_x_cont(G)).
+isa_asserted_0(I,T):- atom(T),current_predicate(T,_:G),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);
+  on_x_fail(G)).
 isa_asserted_0(I,T):- nonvar(I),(  ((is_ftVar(T);chk_ft(T)),if_defined(term_is_ft(I,T)))*->true;type_deduced(I,T) ).
 isa_asserted_0(I,T):- is_ftCompound(I),is_non_unit(I),is_non_skolem(I),!,get_functor(I,F),compound_isa(F,I,T).
 isa_asserted_0(I,T):- nonvar(T),!,isa_asserted_1(I,T).
@@ -986,6 +992,7 @@ define_ft(Spec):- loop_check(define_ft_0(Spec),true).
 %
 define_ft_0(xyzFn):-!.
 define_ft_0(Spec):- a(ttExpressionType,Spec),!.
+define_ft_0(C):- new_isa_genls,!, ain(ttExpressionType(C)).
 define_ft_0(Spec):- a(tCol,Spec),dmsg(once(maybe_coierting_plain_type_to_formattype(Spec))),fail.
 define_ft_0(Spec):- hooked_asserta(isa(Spec,ttExpressionType)),(is_ftCompound(Spec)->hooked_asserta(isa(Spec,meta_argtypes));true).
 
@@ -1183,8 +1190,9 @@ lmconf:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_lmconf:mpred_provide_
 % assert  (isa/2).
 %
 assert_isa([I],T):-nonvar(I),!,assert_isa(I,T).
-assert_isa(I,T):-sanity(nonvar(I)),sanity(nonvar(T)),assert_isa_i(I,T),
-   must(sanity((must(call_u(isa(I,T)));sanity(isa_asserted(I,T))))).
+assert_isa(I,T):-sanity(nonvar(I)),sanity(nonvar(T)),call_u(assert_isa_i(I,T)),
+   sanity(call_u(isa(I,T))),
+   sanity(isa_asserted(I,T)).
 
 %assert_isa_i(I,T):- once(sanity(not(singletons_throw_else_fail(assert_isa(I,T))))),fail.
 
@@ -1197,6 +1205,7 @@ assert_isa(I,T):-sanity(nonvar(I)),sanity(nonvar(T)),assert_isa_i(I,T),
 assert_isa_i(_,ftTerm):-!.
 assert_isa_i(_,ftTerm(_)):-!.
 %assert_isa_i(I,PT):- nonvar(PT),a(ttPredType,PT),!,decl_mpred(I,PT),assert_hasInstance(PT,I).
+assert_isa_i(I,T):- new_isa_genls,!,ain(isa(I,T)).
 assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_ilc(I,T),loop_check(assert_hasInstance(T,I),dtrace(assert_isa_ilc(I,T))))).
 
 :- was_export(assert_isa_ilc/2).
@@ -1211,10 +1220,10 @@ assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_ilc(I,T),loop_check
 assert_isa_ilc(isKappaFn(_,_),_):-!.
 assert_isa_ilc(_I,T):- member(T,[ftString]),!.
 assert_isa_ilc(I,T):- is_list(I),!,maplist(assert_isa_reversed(T),I).
-assert_isa_ilc(I,T):- not(not(a(T,I))),!.
+assert_isa_ilc(I,T):- \+ \+ a(T,I),!.
 assert_isa_ilc(I,T):- hotrace(chk_ft(T)),(is_ftCompound(I)->dmsg(once(dont_assert_c_is_ft(I,T)));dmsg(once(dont_assert_is_ft(I,T)))),rtrace((chk_ft(T))).
 assert_isa_ilc(I,T):- once(decl_type(T)),!,G=..[T,I], ain_expanded(G),(not_mud_isa(I,T,Why)->throw(Why);true),!.
-assert_isa_ilc(I,T):- 
+assert_isa_ilc(I,T):-  expire_tabled_list(_),
   skipped_table_call(must((assert_isa_ilc_unchecked(I,T),!,show_failure(why,isa_backchaing(I,T))))).
   
 

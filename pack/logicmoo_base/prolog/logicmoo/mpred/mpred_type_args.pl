@@ -925,7 +925,7 @@ correctType0(_ ,A,ftAtom,AA):- any_to_atom(A,AA).
 correctType0(change(_,_),A,tCol,AA):- atom(A),deduced_is_tCol(A),must_equals(A,AA).
 correctType0(change(_,_),A,tCol,AA):- compound(A),deduced_is_tCol(A),must_equals(A,AA).
 correctType0(_ ,A,vtVerb,AA):- must_equals(A,AA).
-correctType0(_ ,A,Type,AA):- compound(A),not(is_list(A)),atom(Type),functor_safe(A,Type,_), must_equals(A,AA).
+correctType0(_ ,A,Type,AA):- compound(A),( \+ is_list(A)),atom(Type),functor_safe(A,Type,_), must_equals(A,AA).
 
 correctType0(_ ,A,Type,AA):- compound(Type),contains_var(Type,isThis),
    subst(Type,isThis,A,Call1),subst(Call1,value,AA,Call2),!,

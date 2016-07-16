@@ -53,7 +53,7 @@ stack_depth(Level):-hotrace((prolog_current_frame(Frame),prolog_frame_attribute(
 %
 % Stack Check.
 %
-stack_check:- sanity(stack_check(800)).
+stack_check:- sanity(stack_check(1600)).
 
 %= 	 	 
 

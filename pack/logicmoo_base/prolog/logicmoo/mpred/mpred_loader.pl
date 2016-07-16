@@ -22,6 +22,7 @@
           set_lang/1,
            simplify_language_name/2,
            %is_undefaulted/1,
+          must_map_preds/3,
 
           current_op_alias/2,
             show_load_call/1,
@@ -88,7 +89,8 @@
             force_reload_mpred_file/2,
             force_reload_mpred_file2/2,
             from_kif_string/2,
-            convert_if_kif_string/4,
+            convert_from_kif/2,
+            convert_if_kif_string/2,
             get_file_type/2,
             get_lang/1,
             get_lang0/1,
@@ -1127,7 +1129,7 @@ check_clause_count(Mask):- swc, clause_count(Mask,N),
      assert(lmcache:last_clause_count(Mask,N)),
      Diff is N - Was , 
      (Diff==0 -> true;
-     (Diff<0 -> throw(bad_count(Mask,(Was --> N))) ; dmsg(good_count(Mask,(Was --> N))))).
+     (Diff<0 -> trace_or_throw(bad_count(Mask,(Was --> N))) ; dmsg(good_count(Mask,(Was --> N))))).
 
 %% begin_pfc is det.
 %
@@ -1474,10 +1476,10 @@ expand_in_mpred_kb_module(I,OO):- quietly_must(expand_term_to_load_calls(I,O)),!
 %
 % Load File Term Converted To Command 0c.
 %
-expand_term_to_load_calls(I,OO):- convert_if_kif_string(I,_Wff,_Vs,O),!,
+expand_term_to_load_calls(I,OO):- convert_if_kif_string(I,O),!,
    quietly_must(expand_term_to_load_calls(O,OO)).
 
-expand_term_to_load_calls(PI,OO):- PI=..[P,I], convert_if_kif_string(I,_Wff,_Vs,O),!,
+expand_term_to_load_calls(PI,OO):- PI=..[P,I], convert_if_kif_string(I,O),!,
    quietly_must((PO=..[P,O], expand_term_to_load_calls(PO,OO))).
 
 expand_term_to_load_calls((H:-B),O):- B==true,!,quietly_must(expand_term_to_load_calls(H,O)).
@@ -2092,29 +2094,49 @@ is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),me
 
 
 
-%% convert_if_kif_string( ?I, ?Wff, ?Vs, ?O) is det.
+%% convert_if_kif_string( ?I, ?O) is det.
 %
 % Convert If Knowledge Interchange Format String.
 %
-convert_if_kif_string(I,Wff,Vs,O):-is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),put_variable_names(Vs),!,quietly_must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))).
+convert_if_kif_string(I, O):-is_kif_string(I),convert_from_kif(I,O),!, \+ is_list(O).
 
 
+convert_from_kif(I,O):- from_kif_string(I,Wff),quietly_must((sexpr_sterm_to_pterm(Wff,O))),!.
 
 
 %% from_kif_string( ?String, ?Forms) is det.
 %
 % Converted From Knowledge Interchange Format String.
 %
+from_kif_string(I,Wff) :- input_to_forms(I,Wff,Vs),put_variable_names(Vs),!.
 from_kif_string(String,Forms) :- quietly_must((codelist_to_forms(String,Forms);input_to_forms(string(String),Forms))),!.
+from_kif_string(Wff,Wff).
 
 
+:- module_transparent(must_map_preds/3).
+must_map_preds([],IO,IO):-!.
+must_map_preds([one(Pred)|ListOfPreds],IO,Out):- must(call(Pred,IO)),!,
+   must_map_preds(ListOfPreds,IO,Out).
+must_map_preds([Pred|ListOfPreds],In,Out):- must(call(Pred,In,Mid)),!,
+   must_map_preds(ListOfPreds,Mid,Out),!.
 
 
 %% assert_kif( ?String) is det.
 %
 % Assert Knowledge Interchange Format.
 %
-assert_kif(String):- from_kif_string(String,Forms),dmsg(warn(assert_kif(Forms))),!.
+assert_kif(D):-
+         must_det_l((must_map_preds([
+           convert_from_kif,
+           maybe_ruleRewrite,
+           cyc_to_clif,
+           unnumbervars_and_save,
+           sexpr_sterm_to_pterm,
+           fully_expand,
+           sexpr_sterm_to_pterm],D,CycLOut),
+
+         format('~q.~n',[(CycLOut)]),
+         baseKB:(ground(CycLOut)->ain((CycLOut));ain(tinyKB8(CycLOut))))).
 
 
 
@@ -2123,7 +2145,7 @@ assert_kif(String):- from_kif_string(String,Forms),dmsg(warn(assert_kif(Forms)))
 %
 % Assert Knowledge Interchange Format Dolce.
 %
-assert_kif_dolce(String):-from_kif_string(String,Forms),dmsg(warn(assert_kif_dolce(Forms))),!.
+assert_kif_dolce(String):-convert_from_kif(String,Forms),dmsg(warn(assert_kif_dolce(Forms))),!,ain(tinyKB8(Forms)).
 
 
 

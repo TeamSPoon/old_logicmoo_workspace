@@ -164,7 +164,7 @@ relationInstanceExists(Pred,VAL,D_COL) ==>
 (relationAllExists(Pred,I_COL,D_COL)==> 
   clif(all(I,exists(D,  t(Pred,I,D) & isa(I,I_COL) & isa(D,D_COL))))).
 
-(relationAllExists(Pred,I_COL,D_COL)==>
+((someTimesBuggy3rdOrder,relationAllExists(Pred,I_COL,D_COL))==>
  ({SK= skRelationAllExistsFn(Pred,VAL,D_COL), G1=..[Pred,VAL,Missing],G2=..[Pred,VAL,SK],ISA=..[D_COL,SK]},
   (isa(VAL,I_COL) ==> 
     ((((~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing))))) ==> (G2,ISA)))))).
@@ -235,9 +235,9 @@ relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) ==>
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-isa(iExplorer1,tHumanControlled).
-isa(iExplorer2,tHumanControlled).
-genls(tHumanControlled,tHominid).
+%isa(iExplorer1,tHumanControlled).
+%isa(iExplorer2,tHumanControlled).
+%genls(tHumanControlled,tHominid).
 genls(tHumanControlled,tAgent).
 
 isa(iExplorer1,tHominid).

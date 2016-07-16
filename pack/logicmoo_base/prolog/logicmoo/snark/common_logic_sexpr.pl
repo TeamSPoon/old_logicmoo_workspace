@@ -3,6 +3,7 @@
   codelist_to_forms/2,svar_fixvarname/2,input_to_forms/2,input_to_forms/3,
   sexpr_sterm_to_pterm_list/2,
   sexpr//1,
+  fixvars/4,
   to_untyped/2,ok_varname/1,svar_fixvarname/2,
   sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
 %:- endif.
@@ -27,7 +28,7 @@
 % % :- use_module(logicmoo(plarkc/mpred_cyc_api)).
 
 
-:- was_export(fixvars/4).
+:- export(fixvars/4).
 
 
 %= 	 	 
@@ -206,7 +207,9 @@ get_input_to_forms(In,FormsOut,Vars):-
     parse_sexpr(In, Forms0)->
     to_untyped(Forms0, Forms1)->
     extract_lvars(Forms1,FormsOut,Vars)-> true.
-
+get_input_to_forms(Forms,FormsOut,Vars):-
+    to_untyped(Forms, Forms1)->
+    extract_lvars(Forms1,FormsOut,Vars)-> true.
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

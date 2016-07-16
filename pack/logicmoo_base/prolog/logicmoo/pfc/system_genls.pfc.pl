@@ -36,6 +36,9 @@ nearestGenls(C1,C2)==>
 
 :- sanity(get_lang(pfc)).
 
+(genls(C,SC)/ground(genls(C,SC))==>(tCol(C),tCol(SC))).
+
+
 ((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) ==> ({dif(Sub, Super)}, isa(I,Super))).
 
 %(isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, 

@@ -1314,10 +1314,11 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 % false = use this wrapper, true = code is good and avoid using this wrapper
 :- export(skipWrapper/0).
 
-skipWrapper:- notrace((fail,skipWrapper0, \+ current_prolog_flag(logicmoo_debug,true))).
+skipWrapper:- notrace((skipWrapper0)).
 :- export(skipWrapper0/0).
-skipWrapper0:- current_prolog_flag(unsafe_speedups,true).
 % skipWrapper:- tracing,!.
+skipWrapper0:- current_prolog_flag(unsafe_speedups,true),!.
+skipWrapper0:- current_prolog_flag(logicmoo_debug,true),!.
 skipWrapper0:- tracing, \+ tlbugger:rtracing,!.
 skipWrapper0:- tlbugger:dont_skip_bugger,!,fail.
 skipWrapper0:- tlbugger:skip_bugger,!.
@@ -1479,9 +1480,12 @@ is_recompile:-fail.
 %
 % Optional Sanity Checking.
 %
+% sanity(Goal):- !, must(Goal),!.
+sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
 sanity(Goal):- \+ tracing, 1 is random(3),!, must(Goal),!.
 sanity(_):- notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
+sanity(_Goal):- \+ tracing, 1 is random(2),!.
 sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
 sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:dbreak).
@@ -1502,7 +1506,7 @@ need_speed:-current_prolog_flag(unsafe_speedups,true).
 %
 % If Is A Release.
 
-
+is_release:- current_prolog_flag(unsafe_speedups,true),!.
 is_release:- notrace((\+ current_prolog_flag(logicmoo_debug,true), \+ (1 is random(3)))).
 
 

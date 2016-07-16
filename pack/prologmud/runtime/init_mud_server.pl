@@ -12,6 +12,7 @@
 :- set_prolog_stack(global, limit(16*10**9)).
 :- set_prolog_stack(local, limit(16*10**9)).
 :- set_prolog_stack(trail, limit(16*10**9)).
+%:- set_prolog_flag(unsafe_speedups,true).
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
@@ -32,6 +33,15 @@
 %:- use_listing_vars.
 % :- [run].
 :- system:ensure_loaded(logicmoo_repl).
+
+:- set_prolog_flag(logicmoo_debug,true).
+:- set_prolog_flag(unsafe_speedups,false).
+
+:-assert_isa(iRR7,tRR).
+:-ain(genls(tRR,tRRP)).
+:-must( isa(iRR7,tRRP) ).
+:-must( tRRP(iRR7) ).
+
 :- ensure_webserver(3020).
 :- initialization(ensure_webserver(3020)).
 :- initialization(ensure_webserver(3020),now).
@@ -39,8 +49,14 @@
 
 :- set_fileAssertMt(baseKB).
 :- set_defaultAssertMt(baseKB).
+
 :- set_prolog_flag(dialect_pfc,false).
 
+:- file_begin(pl).
+:- ensure_loaded(logicmoo(logicmoo_engine)).
+:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
+
+% :- initialization(ltkb1,now).
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).
@@ -98,11 +114,7 @@
 
 :- set_prolog_flag(dialect_pfc,true).
 :- set_prolog_flag(logicmoo_debug,true).
-
-:-assert_isa(iRR7,tRR).
-:-ain(genls(tRR,tRRP)).
-:-must( isa(iRR7,tRRP) ).
-:-must( tRRP(iRR7) ).
+:- set_prolog_flag(unsafe_speedups,false).
 
 
 % [Optional] Creates or suppliments a world
@@ -169,8 +181,6 @@ tRegion(iOfficeRoom7).
 :- set_prolog_flag(dialect_pfc,false).
 
 :- file_begin(pl).
-
-
 :- ensure_loaded(logicmoo(logicmoo_engine)).
 :- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
@@ -191,7 +201,14 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
 lar:- login_and_run.
 
-:- lar.
+%:- set_prolog_flag(unsafe_speedups,true).
+isa(starTrek,mtCycL).
+% :- starTrek:force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
+:- set_prolog_flag(unsafe_speedups,false).
+
+:- make.
+:- initialization(lar).
+:- initialization(lar,restore).
 
 end_of_file.
 

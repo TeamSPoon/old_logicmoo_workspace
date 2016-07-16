@@ -793,6 +793,8 @@ nameStrings('Tricorder761',"a medical Tricorder").
 
  /* found 322 for nameStrings(_G1446,_G1447). */ 
 
+pddlDescription(Obj,List)==>{member(E,List)},mudDescription(Obj,E).
+
 /* Prediate:  pddlDescription/2 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
@@ -932,7 +934,7 @@ pddlDescription('iArea1004',["The Brig","You're in the dimly lit Brig","This is 
 ***************************************************
 ']).
 pddlDescription('iArea1008',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape","You see the holodeck's control panel beside the holodeck door, and it has some information on it"]).
-pddlDescription('iArea1006',["Transporter Room","You're in the Enterprise transporter room","A computer terminal is sitting near the southern wall, where the transporter chief can control the transporters","Eight vRound transport pads have been arranged in a circle, on a raised platform against the northern wall"]).
+pddlDescription('iArea1006',["Transporter Room","You're in the Enterprise transporter room","A computer terminal is sitting near the southern wall, where the transporter chief can control the transporters","Eight round transport pads have been arranged in a circle, on a raised platform against the northern wall"]).
 pddlDescription('iArea1042',["Transporter Beam","You find yourself in a transporter beam","All you can see is blue flashing light","It feels as though your body is racing around at high speeds","As you try to look down at your body, you realize that there's nothing there!"]).
 pddlDescription('iArea1007',["School","You step through the doors and find yourself in a large school room","Various tables and chairs are set up all around the room, and many paintings and drawings have been attached to the walls","Several computer consoles with a children's interface on them can be seen on the tables"]).
 pddlDescription('iArea1010',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can access the other decks on the Enterprise"]).
@@ -1793,4 +1795,6 @@ localityOfObject('Tricorder761','iArea1015').
 
 
 % 
+
+:- force_reload_mpred_file('**/*.pfc.pl').
 

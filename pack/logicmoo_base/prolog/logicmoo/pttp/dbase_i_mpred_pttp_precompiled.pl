@@ -18,6 +18,7 @@ subst1(HT,B,A,HHTT):- HT=..FARGS,subst1(FARGS,B,A,[FM|MARGS]),
    (atom(FM)->HHTT=..[FM|MARGS];univ_tl(FM,MARGS,HHTT)).
 
 univ_tl(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=..LeftSide, append(LeftSide,EList,ListE), CallE=..ListE.
+univ_tl(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=..LeftSide, append(LeftSide,EList,ListE), CallE=..ListE.
 
 
 

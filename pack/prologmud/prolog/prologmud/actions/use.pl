@@ -14,6 +14,7 @@
 
 meta_argtypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
+
 genls(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
 genls('FluidReservoir',tDrinkAble).
 genls(tWeapon,tWieldAble).
@@ -41,17 +42,6 @@ prologHybrid(genlPreds/2).
 genlPreds(wearsClothing,mudPossess).
 genlPreds(mudWielding,mudPossess).
 genlPreds(mudStowing,mudPossess).
-
-
-(genlPreds(C1,C2),arity(C1,2)) ==>
-  {P1 =.. [C1,X,Y],
-    P2 =.. [C2,X,Y]},
-  clif(P1 => P2).
-
-(genlPreds(C1,C2),arity(C1,3)) ==>
-  {P1 =.. [C1,X,Y,Z],
-    P2 =.. [C2,X,Y,Z]},
-  clif(P1 => P2).
 
 
 prologHybrid(mudKnowing(tAgent,ftTerm)).

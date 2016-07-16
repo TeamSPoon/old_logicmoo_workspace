@@ -8083,7 +8083,6 @@ exactlyAssertedEL_next(canonicalizerDirectiveForArg, trueRule, 2, 'LeaveSomeTerm
 exactlyAssertedEL_next(relationAll, assertedSentence, 'CycLAssertion', 'UniversalVocabularyMt', vStrMon).
 exactlyAssertedEL_next(relationAll, decontextualizedCollection, 'AtemporalNecessarilyEssentialCollectionType', 'UniversalVocabularyMt', vStrMon).
 exactlyAssertedEL_next(relationAll, minimizeExtent, 'BookkeepingPredicate', 'BaseKB', vStrDef).
-exactlyAssertedEL_next(relationAllExists, arity, tPred, 'PositiveInteger', 'BaseKB', vStrDef).
 exactlyAssertedEL_next(relationAllExists, constantID, 'CycLConstant', 'NonNegativeInteger', 'BaseKB', vStrMon).
 exactlyAssertedEL_next(relationAllExists, cycProblemStoreID, 'CycProblemStore', 'NonNegativeInteger', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_next(relationAllExists, cycProblemStoreInferences, 'CycProblemStore', 'CycInference', 'UniversalVocabularyMt', vStrDef).
@@ -9141,6 +9140,7 @@ assertedTinyKB_InCode(coExtensional, 'CycLExpression', 'CycLTerm', 'UniversalVoc
 assertedTinyKB_InCode(isa, '$VAR'('OBJ'), 'Thing', 'UniversalVocabularyMt', vStrMon).
 assertedTinyKB_InCode(implies, isa('Quote'('EscapeQuote'('$VAR'('X'))), '$VAR'('COL')), quotedIsa('$VAR'('X'), '$VAR'('COL')), 'BaseKB', vStrDef).
 assertedTinyKB_InCode(genls, 'List', 'List', 'UniversalVocabularyMt', vStrMon).
+assertedTinyKB_InCode(relationAllExists, arity, tPred, 'PositiveInteger', 'BaseKB', vStrDef).
 
 assertedTinyKB_NEVER(genls, 'CharacterString', 'List', 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_NEVER(coExtensional, 'List', 'List', 'UniversalVocabularyMt', vStrMon).

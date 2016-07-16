@@ -600,7 +600,8 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(Why,MH,M,H))),
 % Using User Microtheory.
 %
 
-with_umt(U,G):- stack_check(1000),t_l:current_defaultAssertMt(W)->W=U,!,call_from_module(U,G).
+with_umt(U,G):- sanity(stack_check(1000)), 
+  (t_l:current_defaultAssertMt(W)->W=U,!,call_from_module(U,G)).
 with_umt(user,P):- !,with_umt(baseKB,P).
 with_umt(M,P):- 
   (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)),!,
@@ -1780,8 +1781,8 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 
 call_u(G):- var(G),!,dtrace,defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,G)).
 call_u(M:G):- var(M),!,trace_or_throw(var_call_u(M:G)).
-% call_u(M:G):- clause_b(mtProlog(M)),!,predicate_property(M:G,defined),call(M:G).
-% call_u(M:G):- nonvar(M),var(G),!,with_umt(M,mpred_fact_mp(M,G)).
+call_u(M:G):- nonvar(M),var(G),!,sanity(mtCycL(M)),with_umt(M,mpred_fact_mp(M,G)).
+call_u(M:G):- clause_b(mtProlog(M)),predicate_property(M:G,defined),!,call(M:G).
 call_u(G):- strip_module(G,M,P),
   (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)),!,
    (var(P)->CP=mpred_fact_mp(W,P);

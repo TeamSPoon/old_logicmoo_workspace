@@ -104,7 +104,7 @@ cmdLook_proc_0(Agent,LOC):-
          mudGetPrecepts(Agent,value),         
          mudMoveDist(Agent,value),
          mudHeightOnObj(Agent,value),
-         mudLastCmdSuccess=wasSuccess(Agent,value)
+         mudLastCmdSuccess=wasSuccess(Agent,_What,value)
          |MORELOOK]),
     must(show_inventory(Agent,Agent)),!.
 

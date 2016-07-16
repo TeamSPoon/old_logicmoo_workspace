@@ -28,7 +28,7 @@ started_mud_server.
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
-:- add_game_dir('../games/src_game_startrek',prolog_repl).
+:- add_game_dir('../../games/src_game_startrek',prolog_repl).
 
 % ==============================
 % MUD GAME REPL 
@@ -59,6 +59,10 @@ Warning:        1-st clause of baseKB:pathBetween_call_0/3: 1-st clause of baseK
 Warning: baseKB:calc_from_center_xyz/6, which is referenced by
 Warning:        1-st clause of baseKB:mudExitAtLoc/3: 1-st clause of baseKB:mudExitAtLoc/3
 Warning: baseKB:current_agent/1, which is referenced by
+
+8778101023048894
+8778101080610149
+
 Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_telnet.pl:147:3: 1-st clause of baseKB:session_loop/2
 Warning: baseKB:deliver_event/2, which is referenced by
 Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/server/mud_telnet.pl:127:5: 1-st clause of baseKB:goodbye_player/0

@@ -113,7 +113,7 @@ lmconf:mpred_skipped_module(eggdrop).
 %system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
 
 base_clause_expansion(I,O):-  expand_kif_string_or_fail(pl_te,I,O),!.
-base_clause_expansion( :-(I), :-(O)):- !, expand_isEach_or_fail(I,O),!.
+base_clause_expansion( :-(I), O):- !, expand_isEach_or_fail(:-(I),O),!.
 base_clause_expansion(I,':-'(ain_expanded(I))):- in_dialect_pfc,!.
 base_clause_expansion(I,':-'(ain_expanded(I))):- get_consequent_functor(I,F,_),
    (call_u(hybrid_support(F,_));call_u(prologMacroHead(F))),!.

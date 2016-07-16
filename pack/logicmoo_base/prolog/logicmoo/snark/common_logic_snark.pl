@@ -964,7 +964,7 @@ kif_to_boxlog(WffIn,Why,Out):-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 % Knowledge Interchange Format Converted To Datalog.
 %
 kif_to_boxlog(I,KB,Why,Flattened):-
-  convert_if_kif_string( I, _Wff, _Vs, PTerm),
+  convert_if_kif_string( I, PTerm),
   kif_to_boxlog(PTerm,KB,Why,Flattened), !.
 
 % kif_to_boxlog(WffInIn,KB,Why,FlattenedO):-  as_dlog(WffInIn,WffIn),kif_to_boxlog_0(WffIn,KB,Why,FlattenedO),!.

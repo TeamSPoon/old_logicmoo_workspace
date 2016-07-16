@@ -68,7 +68,7 @@
             comparitiveOp/1,
             compound_all_open/1,
             conjoin_l/3,
-            try_expand_head_dif/3,
+            try_expand_head/3,
             db_expand_0/3,
             db_expand_chain/3,
             db_expand_final/3,
@@ -621,7 +621,6 @@ expand_kif_string(I,O):- any_to_string(I,S),
   put_variable_names(Vs).
   
 
-
 %% fully_expand_clause( ++Op, :TermSent, -- SentO) is det.
 %
 % Fully Expand Clause.
@@ -933,12 +932,10 @@ fully_expand_head(Why,Before,After):-
    into_mpred_form(Before1,Before2),
    must(
     loop_check_term(
-        transitive_lc(try_expand_head_dif(Why),Before2,After),
+        transitive_lc(try_expand_head(Why),Before2,After),
         fully_expand_head_loop(Why,Before), 
-        (wdmsg(loop_try_expand_head_dif(Why,Before)),Before2=After))),!.
+        Before2=After)),!.
 
-try_expand_head_dif(Why,Before,After):-try_expand_head(Why,Before,After)-> Before\=@=After,!.
-try_expand_head_dif(_,Before,Before).
 
 %db_expand_0(Op,Sent,SentO):- is_meta_functor(Sent,F,List),F\=t,!,must_maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
 %db_expand_0(_ ,NC,OUT):-mpred_expand(NC,OUT),NC\=@=OUT,!.
@@ -1004,6 +1001,17 @@ db_expand_0(_,I,O):- \+ compound(I),!,I=O.
 db_expand_0(Op,Sent,SentO):- transitive_lc(db_expand_chain(Op),Sent,SentO)-> SentO \=@= Sent.
 
 db_expand_0(Op,EL,O):- is_list(EL),!,must_maplist(db_expand_0(Op),EL,O).
+
+
+db_expand_0(_Op,P,PO):- 
+  compound(P),
+  P=..[ARE,FF,AA],
+  atom_concat('arg',REST,ARE),
+  member(E,['Genl','Isa','SometimesIsa','Format','QuotedIsa']),atom_concat(N,E,REST),
+  atom_number(N,NN),
+  atom_concat('arg',E,AE),
+  PO=..[AE,FF,NN,AA],!.
+
 
 db_expand_0(Op,(H:-B),OUT):- temp_comp(H,B,db_expand_0(Op),OUT).
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).

@@ -131,7 +131,8 @@ subst_except(HT,B,A,HHTT):- HT=..FARGS,subst_except(FARGS,B,A,[FM|MARGS]),
 %
 % Append Termlist.
 %
-append_termlist(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=..LeftSide, append(LeftSide,EList,ListE), CallE=..ListE.
+append_termlist(Call,EList,CallE):- var(Call),must(is_list(EList)),!,must((append([t,Call],EList,ListE), CallE=..ListE)).
+append_termlist(Call,EList,CallE):-must(is_list(EList)),!,must((Call=..LeftSide, append(LeftSide,EList,ListE), CallE=..ListE)).
 
 
 % ========================================

@@ -1,9 +1,9 @@
 % :-swi_module(user). 
-:-swi_module(modCreate, []).
+:-module(modCreate, []).
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % health(Agent,Dam) = damage
-% mudLastCmdSuccess(Agent,Suc) = checks success of last action (actually checks the cmdfailure predicate)
+% mudLastCmdSuccess(Agent,Action,Suc) = checks success of last action (actually checks the cmdfailure predicate)
 % score(Agent,Scr) = score
 % to do this.
 % Douglas Miles 2014

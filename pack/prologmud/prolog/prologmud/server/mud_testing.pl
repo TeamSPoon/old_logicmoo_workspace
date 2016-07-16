@@ -25,7 +25,7 @@
 
 :- dynamic(lmcache:last_test_name/1).
 
-:- thread_local was_test_name/1.
+:- thread_local t_l:was_test_name/1.
 :- multifile(lmconf:mud_regression_test/0).
 :- multifile(lmconf:mud_test_local/0).
 :- multifile(lmconf:mud_test_full/0).
@@ -46,6 +46,14 @@
 :- include(prologmud(mud_header)).
 % :- register_module_type (utility).
 
+:- add_import_module(lmconf,world,end).
+:- add_import_module(lmconf,baseKB,end).
+:- add_import_module(lmconf,mud_testing,end).
+:- add_import_module(lmconf,mud_telnet,end).
+:- add_import_module(mud_testing,mud_telnet,end).
+:- add_import_module(baseKB,lmcache,end).
+
+
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-
   forall(lmconf:mud_test(Name,Test),run_mud_test(Name,Test)).
@@ -60,8 +68,8 @@ action_info(actTest(ftTerm),"run tests containing term").
 agent_command(Agent,actTest(Obj)):-foc_current_agent(Agent),run_mud_test(Obj).
 
 
-test_name(String):-fmt(start_moo_test(mudNamed(String))),asserta(was_test_name(String)).
-lmcache:last_test_name(String):- was_test_name(String),!.
+test_name(String):-fmt(start_moo_test(mudNamed(String))),asserta(t_l:was_test_name(String)).
+lmcache:last_test_name(String):- t_l:was_test_name(String),!.
 lmcache:last_test_name(unknown).
 
 test_result(Result):-test_result(Result,true).
@@ -228,24 +236,24 @@ lmconf:mud_test_local :- forall(localityOfObject(O,L),dmsg(localityOfObject(O,L)
 
 :-ain_expanded(prologBuiltin(check_consistent(ftTerm,ftInt))).
 % :-decl_mpred_prolog(check_consistent(ftTerm,ftInt)).
-:-decl_mpred_prolog(is_instance_consistent(ftTerm,ftInt)).
+:-decl_mpred_prolog(lmcache:is_instance_consistent(ftTerm,ftInt)).
 :-decl_mpred_prolog(bad_instance(ftTerm,ftTerm)).
 % :-decl_mpred_prolog(t_l:is_checking_instance(ftTerm)).
 
 check_consistent(Obj,Scope):-var(Scope),!,check_consistent(Obj,0).
-check_consistent(Obj,Scope):-is_instance_consistent(Obj,Was),!,Was>=Scope.
+check_consistent(Obj,Scope):-call(call,lmcache:is_instance_consistent(Obj,Was)),!,Was>=Scope.
 check_consistent(Obj,_):- t_l:is_checking_instance(Obj),!.
 check_consistent(Obj,Scope):- w_tl(t_l:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
-check_consistent_0(Obj,Scope):- once((catch((doall(((clause(hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
+check_consistent_0(Obj,Scope):- once((catch((doall(((clause(hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(lmcache:is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
 check_consistent_0(Type,Scope):- once(tSet(Type)),
  catch((forall(isa(Obj,Type),check_consistent(Obj,Scope)),
-                                                   assert_if_new(is_instance_consistent(Type,Scope))),E,assert_if_new(bad_instance(Type,E))),fail.
+                                                   assert_if_new(lmcache:is_instance_consistent(Type,Scope))),E,assert_if_new(bad_instance(Type,E))),fail.
 
 hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg(checked_consistent(object_string(_,Obj,0-5,String))).
 % ---------------------------------------------------------------------------------------------
 lmconf:mud_test_local:-
   test_name("Tests our types to populate bad_instance/2 at level 5"),
-  retractall(is_instance_consistent(_,_)),
+  retractall(lmcache:is_instance_consistent(_,_)),
   retractall(bad_instance(_,_)),
   forall(genls(T,tSpatialThing),check_consistent(T,1000)),
   listing(bad_instance/2).

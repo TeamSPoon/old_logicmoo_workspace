@@ -109,7 +109,7 @@ now_try_game_dir(Else):-
   ((exists_directory(GAMEDIR) -> 
     with_all_dmsg(( 
       % forall(enumerate_files(game('**/*.pl'),X),system:ensure_loaded(X)),
-      forall(no_repeats_old(X,enumerate_files(game('**/*.pfc.pl'),X)),declare_load_dbase(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).
+      forall(no_repeats_old(X,enumerate_files(game('*.pfc.pl'),X)),declare_load_dbase(X)))); (wdmsg(missing(GAMEDIR)),Else)));  (wdmsg(no_game_dir),Else).
 
 
 :-context_module(CM),assert(loading_from_cm(CM)).
@@ -250,7 +250,7 @@ debug_repl_wo_cyc(Module,CallFirst):- !,
                 prolog_repl)))).
 
 %  bug.. swi does not maintain context_module(CM) outside
-%  of the current caller (so we have no idea what the real context module is!?!
+%  of the current caller (so we have no idea what the real context module is!?!)
 debug_repl_m(Module,CallFirst):- 
         context_module(CM),
           call_cleanup(
@@ -285,7 +285,7 @@ was_runs_tests_pl:-is_startup_file('run_tests.pl').
 % :- debug_e2c.
 
 
-:- ain((mud_test_local :- cwc,current_predicate(kellerStorage:kellerStorageTestSuite/0) -> kellerStorage:kellerStorageTestSuite ; true)).
+:- ain((mud_test_local :- cwc,if_defined(kellerStorage:kellerStorageTestSuite,true))).
 
 % :-curt80.
 
@@ -340,6 +340,7 @@ cmdresult(statistics,true)
 % :-proccess_command_line.
 
 /*
+If we ask, 'What is "Being"?', we keep within an understanding of the 'is', though we are unable to fix conceptionally what that 'is' signifies. We do not even know the horizon in terms of which that meaning is to be grasped and fixed. But irregardless we have this vague average understanding of Being is still a Fact.
 
 PTTP input formulas:
   1  firstOrder(motherOf,joe,sue).
