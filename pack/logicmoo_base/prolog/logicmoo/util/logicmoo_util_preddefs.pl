@@ -433,7 +433,7 @@ m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CallerMt,PredMt,PI):-functor(PI,F,A),CallerMt
 %
 m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt:PredMt:FA):- !, m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
 m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt:FA):- !, m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
-m_fa_to_m_p_fa(Decl_mpred_hybrid,FA):- defaultAssertMt(PredMt), m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
+m_fa_to_m_p_fa(Decl_mpred_hybrid,FA):- call(ereq,defaultAssertMt(PredMt)), m_m_fa_to_m_p_fa(Decl_mpred_hybrid,PredMt,PredMt,FA).
 
  
 :-module_transparent(only_3rd/4).
@@ -712,7 +712,7 @@ get_module_of_4(_P,F,A,PredMt):- current_predicate(M0:F0/A0),F0=F,A0=A,!,PredMt=
 get_module_of_4(P,F,A,PredMt):- trace_or_throw((get_module_of_4(P,F,A,PredMt))).
 
 /*
-get_module_of_4(_P,F,A,PredMt):- current_predicate(F0/A0),F0=F,A0=A,!,defaultAssertMt(PredMt).
+get_module_of_4(_P,F,A,PredMt):- current_predicate(F0/A0),F0=F,A0=A,!,call(ereq,defaultAssertMt(PredMt)).
 get_module_of_4(_P,F,A,_M):-dtrace, isCycPredArity(F,A),!,fail.
 get_module_of_4(P,F,A,PredMt):- dtrace, debugCall(get_module_of_4(P,F,A,PredMt)).
 */
