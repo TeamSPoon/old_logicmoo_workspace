@@ -9,6 +9,14 @@
 :- reset_modules.
 
 
+:- multifile
+        prolog:message//1,
+        prolog:message_hook/3.
+
+prolog:message(ignored_weak_import(Into, From:PI))--> { nonvar(Into),dtrace(ignored_weak_import(Into, From:PI)),fail}.
+prolog:message_hook(_,_,ignored_weak_import(Into, From:PI)):- nonvar(Into),dtrace(ignored_weak_import(Into, From:PI)),fail.
+
+ignored_weak_import(Into, From:PI):-wdmsg(ignored_weak_import(Into, From:PI)).
 
 :- set_prolog_flag(dialect_pfc,false).
 :- set_prolog_stack(global, limit(16*10**9)).
@@ -51,7 +59,7 @@
 
 %:- ensure_webserver(3020).
 :- initialization(ensure_webserver(3020)).
-%:- initialization(ensure_webserver(3020),now).
+:- initialization(ensure_webserver(3020),now).
 :- initialization(ensure_webserver(3020),restore).
 
 :- set_fileAssertMt(baseKB).
@@ -206,6 +214,8 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 % :- user:ensure_loaded(start_mud_server).
 
 lar:- login_and_run.
+
+:- initialization(ensure_webserver(3020),now).
 
 :- set_prolog_flag(unsafe_speedups,true).
 % isa(starTrek,mtCycL).

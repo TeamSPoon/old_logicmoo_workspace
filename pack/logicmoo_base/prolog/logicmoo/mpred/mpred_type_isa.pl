@@ -706,9 +706,8 @@ isa_backchaing(I,T):- nonvar(I),is_ftVar(I),!,T=ftVar.
 isa_backchaing(I,T):- new_isa_genls,call_u(isa(I,T)).
 isa_backchaing(_,T):- T==ftProlog,!.
 isa_backchaing(I,T):- I==T,I=ttTypeByAction,!,fail.
-isa_backchaing(I,T):- is_ftVar(T),!,tCol_gen(T),nonvar(T),isa_backchaing(I,T).
+isa_backchaing(I,T):- is_ftVar(I),is_ftVar(T),!,tCol_gen(T),nonvar(T),isa_backchaing(I,T).
 isa_backchaing(I,T):- new_isa_genls,!,fail.
-
 isa_backchaing(I,T):- call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing_0(I,T)))).
 
 
@@ -718,7 +717,7 @@ isa_backchaing(I,T):- call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing_
 %
 %  (isa/2) backchaing  Primary Helper.
 %
-isa_backchaing_0(I,T):- nonvar(T),is_ftVar(T),!,trace_or_throw(var_isa_backchaing(I,T)).
+isa_backchaing_0(I,T):-  nonvar(T),is_ftVar(T),!,trace_or_throw(var_isa_backchaing(I,T)).
 isa_backchaing_0(I,T):-  nonvar(T),cheaply_u(completelyAssertedCollection(T)),!,isa_asserted(I,T).
 isa_backchaing_0(I,T):-  nonvar(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
 isa_backchaing_0(I,T):-  is_ftVar(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).

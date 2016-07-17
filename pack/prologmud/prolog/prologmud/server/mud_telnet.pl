@@ -602,7 +602,8 @@ on_telnet_restore :-
         foreach(no_repeats(find_and_call(get_agent_sessions(A,O))),
          foreach(no_repeats(lmcache:session_io(O,_In,Out,_Id)),
           fmtevent(Out,NewEvent))))),
-      start_mud_telnet_4000.
+      start_mud_telnet_4000,
+      http_handler(hmud(.), serve_files_in_directory(hmud), [prefix]).
 
 
 :- initialization(on_telnet_restore).

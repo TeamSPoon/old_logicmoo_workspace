@@ -144,9 +144,9 @@ tCol(completelyAssertedCollection).
 % EASIER
 ~tCol(C) ==> ~completelyAssertedCollection(C).
 
-(tCol(C),\+ ttExpressionType(C)) ==> tSet(C).
+% (tCol(C),\+ ttExpressionType(C)) ==> tSet(C).
 
-((tCol(P),~ttExpressionType(P)) <==> tSet(P)).
+((tCol(P), \+ ttExpressionType(P)) <==> tSet(P)).
 
 (ttExpressionType(P) ==> ( ~ tSet(P), tCol(P))).
 

@@ -232,6 +232,7 @@ www_main_error_to_out(G):- with_main_error_to_output(G).
 %
 % Ensure Webserver.
 %
+ensure_webserver(Port) :- http_server_property(Port, _Property),!.
 ensure_webserver(Port) :- format(atom(A),'httpd@~w_1',[Port]),thread_property(_,alias(A)),!.
 ensure_webserver(Port) :- on_x_rtrace(catch((http_server(http_dispatch,[ port(Port), workers(16) ])),E,wdmsg(E))).
 
@@ -272,11 +273,8 @@ ensure_webserver:- ensure_webserver(3020).
 
 
 
-
-
-
 % WANT 
-:- initialization(doc_collect(true)).
+%:- initialization(doc_collect(true)).
 
 
 :- portray_text(false).  % or Enable portray of strings
@@ -284,9 +282,10 @@ ensure_webserver:- ensure_webserver(3020).
 
 :- thread_local(t_l:omit_full_stop).
 
-%:- thread_property(_,alias('http@3020'))->true; http_server(http_dispatch, [port(3020)]).
+% :- thread_property(_,alias('http@3020'))->true; http_server(http_dispatch, [port(3020)]).
 
-register_logicmoo_browser:- http_handler('/logicmoo/', handler_logicmoo_cyclone, [prefix]), % chunked
+register_logicmoo_browser:- 
+  http_handler('/logicmoo/', handler_logicmoo_cyclone, [prefix]), % chunked
   http_handler('/logicmoo_nc/', handler_logicmoo_cyclone, [prefix,chunked]).
 
 
