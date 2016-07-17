@@ -66,12 +66,12 @@ pmrt_file_search_path_library(pack('logicmoo_packages/prolog')).
 pmrt_file_search_path_library(pack('logicmoo_planner/prolog')).
 % pmrt_file_search_path_library(pack('MUD_ircbot/prolog')).
 
-:-asserta((user:library_directory(R):- pmrt(R))).
-:-asserta((user:library_directory(R):- pmrt_expand_file_search_path(library,R))).
 
 pmrt_expand_file_search_path(T,O):- pmrt_file_search_path(T,A), once((pmrt(D),absolute_file_name(A,R,[relative_to(D),file_type(directory),access(exist)]))),R=O.
 
 user:file_search_path(T,R):- pmrt_expand_file_search_path(T,R).
+:-asserta((user:library_directory(R):- pmrt(R))).
+:-asserta((user:library_directory(R):- pmrt_expand_file_search_path(library,R))).
 
 :- attach_packs.
 :- system:ensure_loaded(library(logicmoo_utils)).
