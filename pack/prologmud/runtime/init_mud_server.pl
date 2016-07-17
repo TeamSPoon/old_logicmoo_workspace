@@ -2,6 +2,7 @@
 /** <module> MUD server startup script in SWI-Prolog
 
 */
+:- system:ensure_loaded(setup_paths).
 :- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 % :- module(init_mud_server,[]).
@@ -40,11 +41,11 @@ ignored_weak_import(Into, From:PI):-wdmsg(ignored_weak_import(Into, From:PI)).
 
 :- system:ensure_loaded(library(prolog_server)).
 :- prolog_server(4001, [allow(_)]).
-:- system:ensure_loaded(setup_paths).
+:- if(exists_source(library(logicmoo_utils))).
 :- system:ensure_loaded(library(logicmoo_utils)).
 :- ensure_loaded(library(eggdrop)).
 :- egg_go.
-
+:- endif.
 %:- use_listing_vars.
 % :- [run].
 :- system:ensure_loaded(logicmoo_repl).
