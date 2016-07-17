@@ -600,7 +600,8 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(Why,MH,M,H))),
 % Using User Microtheory.
 %
 
-with_umt(U,G):- sanity(stack_check(1000)), 
+with_umt(mud_telnet,P):- !,with_umt(baseKB,P).
+with_umt(U,G):- sanity(stack_check(5000)), 
   (t_l:current_defaultAssertMt(W)->W=U,!,call_from_module(U,G)).
 with_umt(user,P):- !,with_umt(baseKB,P).
 with_umt(M,P):- 

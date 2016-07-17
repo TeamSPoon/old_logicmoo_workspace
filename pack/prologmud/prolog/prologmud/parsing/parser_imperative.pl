@@ -423,14 +423,16 @@ name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),member(t(Text,_),Lis
 name_text_atomic(Name,Text):-i_name_lc(Name,TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
-tCol(ttKeyworded).
-completelyAssertedCollection(ttKeyworded).
+:-dynamic(baseKB:ttKeyworded/1).
+
+:-ain((tCol(ttKeyworded))).
+:-ain((completelyAssertedCollection(ttKeyworded))).
 :-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
 :-ain((ttKeyworded(T),isa(F,T),{name_text_now_lc(F,Txt)}==>mudKeyword(F,Txt))).
-ttKeyworded(vtVerb).
-ttKeyworded(tCol).
-:-ain((vtVerb(F),{name_text_now_lc(F,Txt)}==>mudKeyword(F,Txt))).
-% :-ain(tCol(F)/name_text_now_lc(F,Txt)==>mudKeyword(F,Txt)).
+:-ain((ttKeyworded(vtVerb))).
+:-ain((ttKeyworded(tCol))).
+%:-ain((vtVerb(F),{name_text_now_lc(F,Txt)}==>mudKeyword(F,Txt))).
+%:-ain(tCol(F)/name_text_now_lc(F,Txt)==>mudKeyword(F,Txt)).
 
 impl_coerce_hook(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),

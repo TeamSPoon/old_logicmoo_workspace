@@ -64,7 +64,7 @@ pmrt_file_search_path_library(pack('logicmoo_base/prolog')).
 pmrt_file_search_path_library(pack('logicmoo_nlu/prolog')).
 pmrt_file_search_path_library(pack('logicmoo_packages/prolog')).
 pmrt_file_search_path_library(pack('logicmoo_planner/prolog')).
-pmrt_file_search_path_library(pack('MUD_ircbot/prolog')).
+% pmrt_file_search_path_library(pack('MUD_ircbot/prolog')).
 
 :-asserta((user:library_directory(R):- pmrt(R))).
 :-asserta((user:library_directory(R):- pmrt_expand_file_search_path(library,R))).

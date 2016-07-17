@@ -1480,12 +1480,9 @@ is_recompile:-fail.
 %
 % Optional Sanity Checking.
 %
-% sanity(Goal):- !, must(Goal),!.
-sanity(Goal):- \+ tracing, 1 is random(3),!, must(Goal),!.
-sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
+sanity(Goal):- current_prolog_flag(unsafe_speedups,true), \+ tracing, (1 is random(10)-> must(Goal) ; true).
 sanity(_):- notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
-sanity(_Goal):- \+ tracing, 1 is random(2),!.
 sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
 sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:dbreak).

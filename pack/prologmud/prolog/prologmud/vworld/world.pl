@@ -178,7 +178,7 @@ create_instance_now(What,Type,Props):-
      wno_tl(t_l:infInstanceOnly(_),   
       wno_tl(t_l:infAssertedOnly(_),
         wno_tl(lmconf:use_cyc_database, 
-     ((split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), create_instance_0(What,Type,Props)))))))))).
+     ((split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), (create_instance_0(What,Type,Props)->true)))))))))),!.
 
 :-discontiguous create_instance_0/3.
 
@@ -262,22 +262,9 @@ create_instance_0(T,MetaType,List):-
   must_det_l([
    create_meta(T,_Type,MetaType,P),
    padd(P,List),
-   add_missing_instance_defaults(P)]). 
+   add_missing_instance_defaults(P)]),!. 
 
-
-create_instance_0(T,MetaType,List):-
- dmsg(create_instance_0(T,MetaType,List)),
-leash(+call),trace,
-  must_det_l([
-   create_meta(T,_Type,MetaType,P),
-   padd(P,List),
-   put_in_world(P),   
-   add_missing_instance_defaults(P)]). 
-
-% in 1999, when i went to Teknowledge/Cycorp i learned that we hadnt yet created AI yet dispite .. but i did discover that we *can* create AI if somone would invest time and money
-
-
-create_instance_0(What,Type,Props):- leash(+call),trace_or_throw(dmsg(assumed_To_HAVE_creted_isnance(What,Type,Props))),!.
+create_instance_0(What,Type,Props):- leash(+call),wdmsg(assumed_To_HAVE_creted_isnance(What,Type,Props)),!.
 
 %ttSpatialType(col).
 
@@ -288,3 +275,5 @@ create_instance_0(What,Type,Props):- leash(+call),trace_or_throw(dmsg(assumed_To
 
 
 % :- include(prologmud(mud_footer)).
+
+
