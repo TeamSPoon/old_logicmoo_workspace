@@ -601,7 +601,8 @@ on_telnet_restore :-
       assert_if_new(( lmconf:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
         foreach(no_repeats(find_and_call(get_agent_sessions(A,O))),
          foreach(no_repeats(lmcache:session_io(O,_In,Out,_Id)),
-          fmtevent(Out,NewEvent))))).
+          fmtevent(Out,NewEvent))))),
+      start_mud_telnet_4000.
 
 
 :- initialization(on_telnet_restore).
