@@ -102,8 +102,10 @@ agent_text_command(Agent,["prolog"],Agent,actProlog(prolog_repl)).
 :-module_transparent(warnOnError/1).
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
-agent_call_command(Agent,actProlog(prolog_repl)) :- (side_effect_prone),true, prolog_repl,!.
+:- (rtrace,trace).
+agent_call_command(_Agent,actProlog(prolog_repl)) :- (side_effect_prone),true, prolog_repl,!.
 agent_call_command(Agent,actProlog(C)) :- (side_effect_prone),true,nonvar(C),agent_call_safely(Agent,C).
+:- break.
 
 :-export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
@@ -116,7 +118,9 @@ any_to_callable(C,X,Vs):-atom(C),!,atom_to_term_safe(C,X,Vs).
 any_to_callable(C,X,Vs):- (expand_goal(C,X)),term_variables((C,X),Vs),!.
 % any_to_callable(C,X,Vs):-force_expand(expand_goal(C,X)),term_variables((C,X),Vs),!.
 
+:- (rtrace,trace).
 agent_call_command(_Agent,actNpcTimer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
+:- break.
 agent_call_command(Who,actTick) :-  on_x_debug(command_actTick(Who)).
 agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea)),fmt(result_actIdea(Who,Idea)).
 agent_call_command(_Agent,actTock) :- (side_effect_prone), npc_tick.

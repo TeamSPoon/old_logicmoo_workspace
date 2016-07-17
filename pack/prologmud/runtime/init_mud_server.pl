@@ -27,17 +27,6 @@ ignored_weak_import(Into, From:PI):-wdmsg(ignored_weak_import(Into, From:PI)).
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
-:-multifile(lmconf:sanity_test/0).
-:-multifile(lmconf:regression_test/0).
-:-multifile(lmconf:feature_test/0).
-:- dynamic((        
-        lmconf:feature_test/0,
-        lmconf:mud_test/2,
-        lmconf:regression_test/0,
-        lmconf:sanity_test/0,
-        baseKB:agent_call_command/2,
-        lmconf:type_action_info/3)).
-
 
 :- system:ensure_loaded(library(prolog_server)).
 :- prolog_server(4001, [allow(_)]).
@@ -48,15 +37,28 @@ ignored_weak_import(Into, From:PI):-wdmsg(ignored_weak_import(Into, From:PI)).
 :- endif.
 %:- use_listing_vars.
 % :- [run].
+:- forall(debugging(X),nodebug(X)).
 :- system:ensure_loaded(logicmoo_repl).
-
-:- set_prolog_flag(logicmoo_debug,true).
-:- set_prolog_flag(unsafe_speedups,false).
+:- forall(debugging(X),nodebug(X)).
+%:- set_prolog_flag(logicmoo_debug,true).
+%:- set_prolog_flag(unsafe_speedups,false).
 
 :-assert_isa(iRR7,tRR).
 :-ain(genls(tRR,tRRP)).
 :-must( isa(iRR7,tRRP) ).
 :-must( tRRP(iRR7) ).
+:-kb_dynamic(lmconf:sanity_test/0).
+:-kb_dynamic(lmconf:regression_test/0).
+:-kb_dynamic(lmconf:feature_test/0).
+:- kb_dynamic((        
+        lmconf:feature_test/0,
+        lmconf:mud_test/2,
+        lmconf:regression_test/0,
+        lmconf:sanity_test/0,
+        agent_call_command/2,
+        action_info/2,
+        lmconf:type_action_info/3)).
+
 
 %:- ensure_webserver(3020).
 :- initialization(ensure_webserver(3020)).
@@ -111,7 +113,7 @@ ignored_weak_import(Into, From:PI):-wdmsg(ignored_weak_import(Into, From:PI)).
 :- show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader)))).
 :- reset_modules.
 
-:- set_prolog_flag(logicmoo_debug,true).
+%:- set_prolog_flag(logicmoo_debug,true).
 
 
 % ==============================
@@ -126,9 +128,9 @@ ignored_weak_import(Into, From:PI):-wdmsg(ignored_weak_import(Into, From:PI)).
 
 
 :- set_prolog_flag(dialect_pfc,true).
-:- set_prolog_flag(logicmoo_debug,true).
-:- set_prolog_flag(unsafe_speedups,false).
-
+%:- set_prolog_flag(logicmoo_debug,true).
+%:- set_prolog_flag(unsafe_speedups,false).
+:- forall(debugging(X),nodebug(X)).
 
 % [Optional] Creates or suppliments a world
 

@@ -232,10 +232,10 @@ get_agent_sessions(P,O):- no_repeats(P-O,(lmcache:session_agent(O,P);lmcache:age
 foc_current_agent(P):- current_agent(P),nonvar(P),!.
 foc_current_agent(P):- nonvar(P),tAgent(P),!,become_player(P),!.
 foc_current_agent(P):- 
-  must_det_l([    
-             get_session_id(O),
+  must_det_l((    
+             get_session_id(_),
              once((get_dettached_npc(NPC),NPC=P);generate_new_player(P)),
-             become_player(P)]),!.
+             become_player(P))),!.
                
 
 :-system:ensure_loaded(library(http/http_session)).

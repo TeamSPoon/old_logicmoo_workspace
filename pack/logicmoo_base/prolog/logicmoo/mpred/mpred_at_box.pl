@@ -288,9 +288,10 @@ mtCanAssert(baseKB).
 mtCanAssert(user):- !,fail.
 mtCanAssert(abox):- !,dumpST,fail.
 mtCanAssert(Module):- clause_b(mtCycL(Module)).
-mtCanAssert(Module):- loading_source_file(File),get_file_type(File,pfc),prolog_load_context(module,Module).
 mtCanAssert(Module):- clause_b(mtExact(Module)).
-mtCanAssert(ABox):- clause_b(mtProlog(ABox)),!,fail.
+mtCanAssert(Module):-  module_property(Module,file(_)),!,fail.
+mtCanAssert(Module):- loading_source_file(File),get_file_type(File,pfc),prolog_load_context(module,Module).
+mtCanAssert(Module):- clause_b(mtProlog(Module)),!,fail.
 mtCanAssert(_).
 
 :- decl_shared(baseKB:dynamic,genlMt/2).

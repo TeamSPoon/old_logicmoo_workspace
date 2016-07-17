@@ -121,7 +121,7 @@ base_clause_expansion(I,O):- expand_isEach_or_fail(I,O),!.
 base_clause_expansion(I,O):- mpred_term_expansion(I,O)->I\=@=O,!.
 
 system:clause_expansion(I,PosI,O,PosI):- I\=end_of_file, base_clause_expansion(I,O),!.
-system:clause_expansion(I,P1,O,P2):- I==end_of_file, \+ current_prolog_flag(mpred_te,false),mpred_te(term,system,I,P1,O,P2).
+system:clause_expansion(I,P1,O,P2):- I==end_of_file, mpred_te(term,user,I,P1,O,P2).
 
 
 

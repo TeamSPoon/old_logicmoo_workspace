@@ -6,7 +6,7 @@
 % Dec 13,2035
 %
 */
-:-swi_module(world_2d,[]).
+% :-swi_module(world_2d,[]).
 
 :-export(((
          check_for_fall/3,
@@ -168,6 +168,7 @@ is_at(Obj,Where):-mudSubPart(What,Obj),is_at(What,Where).
 % ((tObj(Obj), ~(mudPossess(_,Obj)))==>spatialInRegion(Obj)).
 tPathway(Obj)==>spatialInRegion(Obj).
 
+:- must(prolog_load_context(module,world)).
 
 localityOfObject(Obj,Region),tRegion(Region)==> inRegion(Obj,Region).
 mudAtLoc(Obj,LOC),{locationToRegion(LOC,Region)},tRegion(Region)==> inRegion(Obj,Region).
@@ -202,6 +203,7 @@ same_regions(Agent,Obj):-inRegion(Agent,Where1),dif(Agent,Obj),inRegion(Obj,Wher
 mostSpecificLocalityOfObject(Obj,Where):-
    one_must(is_asserted(mudAtLoc(Obj,Where)),one_must(is_asserted(localityOfObject(Obj,Where)),is_asserted(inRegion(Obj,Where)))).
 
+% :- (rtrace,trace).
 
 % objects can be two places x,y,z's at once
 ((spatialInRegion(Obj),mudAtLoc(Obj,NewLoc), 
@@ -209,11 +211,13 @@ mostSpecificLocalityOfObject(Obj,Where):-
    ==>
    ~mudAtLoc(Obj,OldLoc)).
 
+
 % objects are placed by default in center of region
 ((spatialInRegion(Obj), inRegion(Obj,Region), ~tPathway(Obj),
  {not_asserted(mudAtLoc(Obj,xyzFn(Region,_,_,_))),in_grid_rnd(Region,LOC)})
   ==>
    mudAtLoc(Obj,LOC)).
+
 
 % objects cannot be in two localities (Regions?) at once
 ((spatialInRegion(Obj),localityOfObject(Obj,NewLoc), 
@@ -272,8 +276,10 @@ predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):-
 
 simplifyFullName(FullNameFn,FullNameFn).
 
-find_instance_of(Pred,Subj,Obj):- relationAllExists(Pred,SubjT,ObjT), isa(Subj,SubjT), 
- (is_asserted(t(Pred,Subj,Obj)),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj]).
+find_instance_of(Pred,Subj,Obj):-
+ relationAllExists(Pred,SubjT,ObjT), 
+ isa(Subj,SubjT), 
+ ((is_asserted(t(Pred,Subj,Obj)),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
 
 mudSubPart(Outer,Inner):-mudInsideOf(Inner,Outer).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
@@ -284,6 +290,7 @@ mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
 % mudSubPart([pelvis,legs,left_leg,left_foot,left_toes]).
 % mudSubPart([pelvis,legs,right_leg,right_foot,right_toes]).
 
+:- must(prolog_load_context(module,world)).
 
 is_in_world(Obj):-isa_asserted(Obj,tRegion),!.
 is_in_world(Obj):-clause_u(mudAtLoc(Obj,_),true),!.
@@ -319,7 +326,7 @@ fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(path
 fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 
 (((localityOfObject(_,_),{localityOfObject(apathFn(LivingRoom,Dir),LivingRoom)},
-    \+ pathDirLeadsTo(LivingRoom, Dir, OfficeRoom)  ) ==>
+    \+ pathDirLeadsTo(LivingRoom, Dir, _)  ) ==>
      \+ localityOfObject(apathFn(LivingRoom,Dir),LivingRoom))).
 
 %  suggest a deducable fact that is probably true but not already asserted

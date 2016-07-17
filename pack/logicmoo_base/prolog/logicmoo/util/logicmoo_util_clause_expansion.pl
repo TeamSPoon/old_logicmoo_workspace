@@ -124,10 +124,8 @@ get_named_value_goal(G,N=V):- functor_non_colon(G,N,_), ((\+ \+ G )-> V=true; V=
 
 get_pos_at_c(C,Num):-compound(C),arg(1,C,Num),number(Num).
 
-is_fbe(term,I,PosI):-!,
-    source_location(S,_),
-    prolog_load_context(file,S),
-    prolog_load_context(source,S),
+is_fbe(term,I,PosI):- !,
+    source_location(S,_),prolog_load_context(file,S),
    compound(PosI),nonvar(I),
    nb_current_or_nil('$term',Was), Was==I,
    nb_current_or_nil('$term_position', Pos),
@@ -136,9 +134,7 @@ is_fbe(term,I,PosI):-!,
    PosAt>0,!,At>=PosAt.
 
 is_fbe(goal,I,PosI):-!,
-    source_location(S,_),
-    prolog_load_context(file,S),
-    prolog_load_context(source,S),
+    source_location(S,_),prolog_load_context(file,S),
    compound(PosI),nonvar(I),
    nb_current_or_nil('$term',Was), Was==[],
    nb_current_or_nil('$term_position', Pos),

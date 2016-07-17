@@ -625,11 +625,11 @@ expand_kif_string(I,O):- any_to_string(I,S),
 %
 % Fully Expand Clause.
 %
+fully_expand_clause_now(Op,Sent,SentO):- expand_isEach_or_fail(Sent,SentM),SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
 fully_expand_clause_now(Op,Sent,SentO):-memoize_on(fully_expand,Sent->SentO,fully_expand_clause(Op,Sent,SentO)).
 
 fully_expand_clause(Op,Sent,SentO):- sanity(is_ftNonvar(Op)),sanity(var(SentO)),var(Sent),!,Sent=SentO.
 fully_expand_clause(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
-fully_expand_clause(Op,Sent,SentO):- expand_isEach_or_fail(Sent,SentM),SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
 fully_expand_clause(_,(:-(Sent)),(:-(Sent))):-!.
 
 
@@ -926,8 +926,10 @@ fully_expand_head_throw_if_loop(A1,B1,C1):- must(loop_check_term(fully_expand_he
 %
 % Database Expand A Noloop.
 %
+fully_expand_head(Op,Sent,SentO):-
+  memoize_on(fully_expand,Sent->SentO,fully_expand_head_now(Op,Sent,SentO)).
 
-fully_expand_head(Why,Before,After):-
+fully_expand_head_now(Why,Before,After):-
    subst(Before,mpred_isa,isa,Before1),
    into_mpred_form(Before1,Before2),
    must(

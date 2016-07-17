@@ -308,11 +308,12 @@ mpred_prolog_only_file(_).
 
 :- prolog_load_context(directory,Dir),asserta(lmconf:mpred_loader_dir(Dir)).
 
-mpred_te(Type,_,I,_,_,_):- hotrace(dont_term_expansion(Type,I)),!,fail.
-mpred_te(_Type,_Module,I,PosI,O,PosI):- get_lang(pl), expand_kif_string_or_fail(pl_te,I,O),!.
-mpred_te(_Type,_Module,I,PosI,O,PosI):- get_lang(pl),!, expand_isEach_or_fail(I,O),!.
-mpred_te(Type,Module,I,PosI,O,PosO):- \+ current_prolog_flag(mpred_te,false),
-   prolog_load_context(file,S),prolog_load_context(source,S),   
+mpred_te(Type,_,I,_,_,_):- quietly(dont_term_expansion(Type,I)),!,fail.
+mpred_te(_Type,_Module,I,PosI,O,PosI):- expand_kif_string_or_fail(pl_te,I,O),!.
+mpred_te(_Type,_Module,I,PosI,O,PosI):- expand_isEach_or_fail(I,O),!.
+mpred_te(Type,Module,I,PosI,O,PosO):- 
+  \+ current_prolog_flag(mpred_te,false),
+   % prolog_load_context(file,S),prolog_load_context(source,S),   
    mpred_file_term_expansion(Type,Module,I,O)->PosO=PosI.
 
 dont_term_expansion(Type,I):- 
@@ -337,8 +338,8 @@ dont_term_expansion(Type,I):-
 mpred_file_term_expansion(_,_,I,_):- is_directive_form(I),!,fail.
 mpred_file_term_expansion(_,_,I,_):- is_ftVar(I),!,fail.
 mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !, Type = term, DefMod = user,             
-            do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
-mpred_file_term_expansion(_,_,_,_):- get_lang(pl),!,fail.
+      do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
+% mpred_file_term_expansion(_,_,_,_):- get_lang(pl),!,fail.
 % mpred_file_term_expansion(Type,LoaderMod,(I:-B),OO):-B==true,!,mpred_file_term_expansion(Type,LoaderMod,I,OO).
 % mpred_file_term_expansion(_Type,_LoaderMod,I,( :- must(ain(I)))):-!.
 
@@ -1107,7 +1108,7 @@ clause_count(Mask,N):-
          (clause_property(Ref,module(MW))->M==MW;true),
          flag(clause_count,X,X+1),fail)),flag(clause_count,N,0).
 
-check_clause_counts:- forall(checked_clause_count(Mask),check_clause_count(Mask)).
+check_clause_counts:- notrace((forall(checked_clause_count(Mask),check_clause_count(Mask)))).
 
 :- dynamic(checked_clause_count/2).
 

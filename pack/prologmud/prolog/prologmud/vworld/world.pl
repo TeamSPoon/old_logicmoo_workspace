@@ -13,9 +13,14 @@
 %
 */
 
-:-swi_module(world, []).
+:-module(world, []).
+:- '$set_source_module'(world).
+:- set_prolog_flag(logicmoo_debug,true).
+:- set_prolog_flag(unsafe_speedups,false).
+mtProlog(world).
+:-ain(hybrid_support(agent_call_command,2)).
 :-export((
-        a_unparsed/2,
+        % a_unparsed/2,
        % call_agent_action/2,
        get_agent_sessions/2,
             %mud_isa/2,
@@ -43,7 +48,7 @@
             check_for_fall/3,
             list_object_dir_sensed/4,
             list_object_dir_near/3,
-            num_near/3,
+            num_near_reverse/3,
             asInvoked/2,
             decl_type/1,
             
@@ -61,8 +66,8 @@
          init_location_grid/2,
          
          do_act_affect/3,
-         spread/0,
-         growth/0,
+         %spread/0,
+         %growth/0,
          isaOrSame/2,
          current_agent_or_var/1)).
 
@@ -81,14 +86,21 @@
 
 :- include(prologmud(mud_header)).
 % :- register_module_type (utility).
-
+:- must(prolog_load_context(module,world)).
 :- include(world_2d).
+:- must(prolog_load_context(module,world)).
 :- include(world_text).
+:- must(prolog_load_context(module,world)).
 :- include(world_text_output).
+:- must(prolog_load_context(module,world)).
 :- include(world_effects).
+:- must(prolog_load_context(module,world)).
 :- include(world_events).
+:- must(prolog_load_context(module,world)).
 :- include(world_agent).
+:- must(prolog_load_context(module,world)).
 :- include(world_npc).
+:- must(prolog_load_context(module,world)).
 :- if_file_exists(include(logicmoo('vworld/world_spawning.pl'))).
 
 :-export(isaOrSame/2).
@@ -159,6 +171,8 @@ create_agent(P):-functor(P,isKappaFn,_),!.
 create_agent(P):-create_agent(P,[]).
 create_agent(P,List):- must(create_instance(P,tAgent,List)),!.
 
+
+:- must(prolog_load_context(module,world)).
 
 :-export(create_instance/1).
 create_instance(P):- must((isa(P,What),ttSpatialType(What))),must(create_instance(P,What,[])),!.

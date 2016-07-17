@@ -320,8 +320,9 @@ no_loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> wno_tl(lmcache:
 
 %% loop_check_term( :GoalCall, ?Key, :GoalTODO) is semidet.
 %
-% Loop Check Term.
+% Loop Check Term 50% of the time
 %
+% loop_check_term(Call,_Key,_TODO):- 1 is random(2) ,!,call(Call).
 loop_check_term(Call,Key,TODO):- notrace(TT = lmcache:ilc(Key)),
  ( notrace( \+(TT)) -> (setup_call_cleanup(notrace(asserta(TT,REF)), Call, 
    erase(REF))) ; 
@@ -514,9 +515,10 @@ make_tabled_perm(Call):- must(really_can_table),must(outside_of_loop_check),
   asserta(lmcache:call_tabled_perm(Key,KList)),!,
   member(Vars,KList).
 
-memoize_on(M,(In->_),G):- \+ ground(In),retractall(lmcache:memoized_on(M,In,_)),!,G,!.
+memoize_on(M,(In->_),G):- \+ ground(In),nop((retractall(lmcache:memoized_on(M,In,_)))),!,G,!.
 % memoize_on(M,(In->Out),G):-make_key(In,Key),memoize_on(M,Key,Out,G).
-memoize_on(M,(In->Out),G):-memoize_on(M,In,Out,G),!.
+memoize_on(M,(In->Out),G):- memoize_on(M,In,Out,G),!.
+
 :- dynamic(lmcache:memoized_on/3).
 memoize_on(M,In,Out,_):- lmcache:memoized_on(M,In,Out),!.
 memoize_on(M,In,Out,G):- G,!,call(assert_if_new,lmcache:memoized_on(M,In,Out)),!.

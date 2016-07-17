@@ -1448,7 +1448,7 @@ mpred_undo1(Fact):-
 
 
 
-
+:- forall(debugging(X),nodebug(X)).
 
 %%  mpred_unfwc(+P) 
 %
@@ -1544,15 +1544,11 @@ mpred_fwc1(support_hilog(_,_)):-!.
 % mpred_fwc1(singleValuedInArg(_, _)):-!.
 % this line filters sequential (and secondary) dupes
 % mpred_fwc1(Fact):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(_One,Two),Six is Two * 3,filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
+
 mpred_fwc1(Fact):- 
   mpred_trace_msg(mpred_fwc1(Fact)),
   %ignore((mpred_non_neg_literal(Fact),remove_negative_version(Fact))),
-  mpred_do_rule(Fact),
-  copy_term_vn(Fact,F),
-  % check positive triggers
-  loop_check(mpred_do_fcpt(Fact,F),true),
-  % check negative triggers
-  mpred_do_fcnt(Fact,F).
+  mpred_do_rule(Fact),!.
 
 
 %% mpred_do_rule(P)
@@ -1589,7 +1585,12 @@ mpred_do_rule(('<=='(P,Q))):-
   !,
   mpred_define_bc_rule(P,Q,('<-'(P,Q))).
 
-mpred_do_rule(_).
+mpred_do_rule(Fact):-
+  copy_term_vn(Fact,F),
+  % check positive triggers
+  loop_check(mpred_do_fcpt(Fact,F),true),
+  % check negative triggers
+  mpred_do_fcnt(Fact,F).
 
 
 mpred_do_fcpt(Fact,F):- 

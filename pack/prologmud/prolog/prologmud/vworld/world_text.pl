@@ -13,7 +13,7 @@
 
 % :-export(eng_fully_expand/2).
 
-:- file_begin(prolog).
+%:- file_begin(prolog).
 
 when_command_show(Agent,ActionType):- 
   findall(Show,on_command_show(Agent,ActionType,Show),MORELOOK),
@@ -289,7 +289,7 @@ anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,S
 %anglify_noun_known(Obj,_Hint,String):-
 %nameStrings(X,Y,_,_)
 
-:- file_begin(prolog).
+%:- file_begin(prolog).
 
 
 

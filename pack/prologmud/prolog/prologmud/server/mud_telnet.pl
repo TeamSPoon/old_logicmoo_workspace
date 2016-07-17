@@ -27,7 +27,11 @@
          on_telnet_restore/0
       ]).
 
-:- add_import_module(mud_telnet,baseKB,end).
+% :- add_import_module(mud_telnet,baseKB,end).
+
+:- add_import_module(mud_telnet,world,end).
+
+:- ain(mtProlog(mud_telnet)).
 
 /** <module>  
 % Initial Telnet/Text console 
@@ -39,7 +43,7 @@
 %
 */ 
 
-:- set_file_lang(pl).
+% :- set_file_lang(pl).
 
 % % :- '$set_source_module'(mud_telnet).
 %:- maybe_add_import_module(mud_telnet,baseKB,start).
@@ -597,7 +601,7 @@ get_call_pred(Call, Options) :-
 	).
 
 on_telnet_restore :- 
-      add_import_module(mud_telnet,baseKB,end),
+      % add_import_module(mud_telnet,baseKB,end),
       assert_if_new(( lmconf:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
         foreach(no_repeats(find_and_call(get_agent_sessions(A,O))),
          foreach(no_repeats(lmcache:session_io(O,_In,Out,_Id)),

@@ -1317,10 +1317,10 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 skipWrapper:- notrace((skipWrapper0)).
 :- export(skipWrapper0/0).
 % skipWrapper:- tracing,!.
-skipWrapper0:- current_prolog_flag(unsafe_speedups,true),!.
-skipWrapper0:- current_prolog_flag(logicmoo_debug,true),!.
 skipWrapper0:- tracing, \+ tlbugger:rtracing,!.
 skipWrapper0:- tlbugger:dont_skip_bugger,!,fail.
+skipWrapper0:- current_prolog_flag(logicmoo_debug,true),!,fail.
+skipWrapper0:- current_prolog_flag(unsafe_speedups,true),!.
 skipWrapper0:- tlbugger:skip_bugger,!.
 skipWrapper0:- is_release,!.
 %skipWrapper0:- 1 is random(5),!.
@@ -1458,6 +1458,8 @@ hide_trace(G):-
 on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
 
 :- meta_predicate quietly(0).
+quietly(G):- !, G.
+quietly(G):- \+ tracing,!,call(G).
 quietly(G):- skipWrapper,!,call(G).
 % quietly(G):- !, on_x_f((G),setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),fail).
 quietly(G):- on_x_f(hide_trace(G),
@@ -1480,7 +1482,7 @@ is_recompile:-fail.
 %
 % Optional Sanity Checking.
 %
-sanity(Goal):- current_prolog_flag(unsafe_speedups,true), \+ tracing, (1 is random(10)-> must(Goal) ; true).
+sanity(Goal):- current_prolog_flag(unsafe_speedups,true), \+ tracing,!, (1 is random(10)-> must(Goal) ; true).
 sanity(_):- notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
 sanity(Goal):- quietly(Goal),!.
@@ -1504,7 +1506,7 @@ need_speed:-current_prolog_flag(unsafe_speedups,true).
 % If Is A Release.
 
 is_release:- current_prolog_flag(unsafe_speedups,true),!.
-is_release:- notrace((\+ current_prolog_flag(logicmoo_debug,true), \+ (1 is random(3)))).
+is_release:- notrace((\+ current_prolog_flag(logicmoo_debug,true), \+ (1 is random(4)))).
 
 
 
