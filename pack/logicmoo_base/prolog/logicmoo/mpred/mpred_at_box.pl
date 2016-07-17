@@ -351,11 +351,11 @@ set_fileAssertMt(ABox):-
    which_file(File),
    assert_setting(lmconf:file_to_module(File,ABox)),
    assert_setting(lmcache:mpred_directive_value(File,module,ABox)),
-   % MAYBE? '$set_typein_module'(_,TBox),
+   % MAYBE? '$set_typein_module'(TBox),
 
    onEndOfFile(set_defaultAssertMt(Was)),
-   onEndOfFile('$set_source_module'(_,SM)),
-   onEndOfFile('$set_typein_module'(_,CM))))).
+   onEndOfFile('$set_source_module'(SM)),
+   onEndOfFile('$set_typein_module'(CM))))).
 
 
 

@@ -276,12 +276,12 @@ push_modules:- current_smt(SM,M),
 reset_modules:- 
   prolog_load_context(source,F),
   once(lmconf:source_typein_modules(SM,M,F)),
-  '$set_source_module'(_,SM),'$set_typein_module'(_,M),!.
+  '$set_source_module'(SM),'$set_typein_module'(M),!.
 
 pop_modules:- 
   prolog_load_context(source,F),
   once(system:retract(lmconf:source_typein_modules(SM,M,F))),
-  '$set_source_module'(_,SM),'$set_typein_module'(_,M),!.
+  '$set_source_module'(SM),'$set_typein_module'(M),!.
 
 
 maybe_add_import_module(A,B):-maybe_add_import_module(A,B,start).
