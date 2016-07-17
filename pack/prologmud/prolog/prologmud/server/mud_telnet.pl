@@ -82,7 +82,7 @@ sanify_thread(ID):-
 % ===========================================================
 start_mud_telnet_4000:-start_mud_telnet(4000).
 start_mud_telnet(Port):- 
-  must(telnet_server(Port, [allow(_ALL),call_pred(login_and_run_nodebug)])),!.
+  must(telnet_server(Port, [allow(_ALL),get_call_pred(login_and_run_nodebug)])),!.
 
 :- volatile(lmcache:main_thread_error_stream/1).
 
@@ -123,7 +123,8 @@ player_connect_menu(In,Out,Wants,P):-
    get_session_id(O),
    get_session_io(In,Out),
    fmt('~N~nHello session ~q!~n',[O]),
-   setup_streams(In, Out),set_tty_control(true),
+   setup_streams(In, Out),
+   set_tty_control(true),
    foc_current_agent(Wants),
    foc_current_agent(P),
    assert_isa(P,tHumanControlled),
@@ -570,7 +571,7 @@ set_stream_ice(Stream, Alias, NV):- catch(set_stream(Alias,NV),_,catch(set_strea
 
 service_client(Slave, In, Out, Host, Peer, Options) :-
    allow(Peer, Options), !,
-   call_pred(Call, Options), !,
+   get_call_pred(Call, Options), !,
    setup_streams(In, Out),
    thread_self(Id),
    format(user_error,'% Welcome ~q to the SWI-Prolog LogicMOO server on thread ~w~n~n', [Peer,service_client(Slave, In, Out, Host, Peer, call(Call,Options))]),
@@ -588,8 +589,8 @@ allow(Peer, Options) :-
 	;   Peer = ip(127,0,0,1)
 	).
 
-call_pred(Call, Options) :-
-	(   member(call_pred(Allow), Options)
+get_call_pred(Call, Options) :-
+	(   member(get_call_pred(Allow), Options)
 	*-> Call = Allow,
 	    !
 	;   Call = prolog

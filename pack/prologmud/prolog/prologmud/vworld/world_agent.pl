@@ -312,7 +312,7 @@ list_agents(Agents) :- % build cache
 
 :-export((agent_into_corpse/1, display_stats/1)).
 
-tSet(tCorpse).
+tCol(tCorpse).
 
 % When an agent dies, it turns into a tCorpse.
 % corpse is defined as an object in the *.objects.pl files

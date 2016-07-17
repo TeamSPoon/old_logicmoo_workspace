@@ -153,8 +153,8 @@ arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(
 % mtCycL(baseKB).
 
 tCol(ttModule).
-tSet(ttModule).
-arity(tSet,1).
+tCol(ttModule).
+arity(tCol,1).
 arity(argsQuoted,1).
 arity(quasiQuote,1).
 
@@ -252,9 +252,9 @@ type_checking, mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
 type_checking, mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
 */
 
-%'==>'((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A), ==>(isa(F,S1))))).
-% ((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A),t(S1,F)))).
-((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A),{ASSERT=..[S1,F]},ASSERT))).
+%'==>'((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A), ==>(isa(F,S1))))).
+% ((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A),t(S1,F)))).
+((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A),{ASSERT=..[S1,F]},ASSERT))).
 
 mpred_mark(pfcPosTrigger,F, A)/(\+ ground(F/A))==>{trace_or_throw(mpred_mark(pfcPosTrigger,F, A))}.
 mpred_mark(pfcPosTrigger,F, A)==>marker_supported(F,A).
@@ -339,14 +339,14 @@ collectionConventionMt(Col,Where) ==> predicateConventionMt(Col,Where).
 
 % mtExact(Mt)==>{kb_dynamic(Mt)}.
 
-tCol(tSet).  % = isa(tSet,tCol).
+tCol(tCol).  % = isa(tCol,tCol).
 
 mtProlog(Mt),predicateConventionMt(F,Mt)/(Mt\==baseKB)==>prologBuiltin(F).
 
 % genlsFwd(Sub,Super)==> (isa(I,Super) :- isa(I,Sub)). 
 :- ain_expanded((genlsFwd(Sub,Super)==> (t(Sub,I) ==> t(Super,I)))).
 
-ttModule(M)==>tSet(M).
+ttModule(M)==>tCol(M).
 
 ttModule(MtType)==>genls(MtType,tMicrotheory).
 ttModule(mtProlog).

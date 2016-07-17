@@ -76,7 +76,7 @@ predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
 relationAllOnly(mudSubPart,tHumanBody,tBodyPart).
 
-tSet(tHumanBody).
+tCol(tHumanBody).
 
 ((relationAllOnly(Pred,Col1,Col2)/(G=..[Pred,VAL,Value])) ==> 
    (isa(VAL,Col1) ==> (( G ==> isa(Value,Col2))))).
@@ -188,7 +188,7 @@ relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),tRolePredicate(BP)).
 prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
 relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 
-relationMostInstance(BP,TCol,_)==>ptBinaryPredicate(BP),tSet(TCol).
+relationMostInstance(BP,TCol,_)==>ptBinaryPredicate(BP),tCol(TCol).
 (relationMostInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type))==> isa(Value,Type).
 %((relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value],GI=..[Pred,Inst,_]})) ==> (({GI=..[Pred,Inst,_]},isa(Inst,Type), ~GI) ==> G ).
 relationMostInstance(Pred,Type,Value) ==> mdefault(isa(Inst,Type) ==> t(Pred,Inst,Value)).

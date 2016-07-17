@@ -1005,8 +1005,9 @@ has_gui_debug :- getenv('DISPLAY',NV),NV\==''.
 %
 % Nodebugx.
 %
+nodebugx(X):- debugging(W),!,setup_call_cleanup_each(nodebug(W),nodebugx(X),debug(W)).
 nodebugx(X):- 
-  wno_tl_e(tlbugger:ifCanTrace,
+ wno_tl_e(tlbugger:ifCanTrace,
    w_tl(tlbugger:ifWontTrace,
     w_tl(tlbugger:show_must_go_on,
        w_tl(tlbugger:ifHideTrace,hotrace(X))))).

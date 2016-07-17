@@ -155,7 +155,7 @@ lmconf:wrap_shared(tCol,1,ereq).
 lmconf:wrap_shared(tNotForUnboundPredicates,1,ereq).
 lmconf:wrap_shared(tPred,1,ereq).
 lmconf:wrap_shared(tRelation,1,ereq).
-lmconf:wrap_shared(tSet,1,ereq).
+lmconf:wrap_shared(tCol,1,ereq).
 
 lmconf:wrap_shared(ttExpressionType,1,ereq).
 lmconf:wrap_shared(ttPredType,1,ereq).

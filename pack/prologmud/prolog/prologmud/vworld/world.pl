@@ -109,7 +109,7 @@ tCol(tItem).
 tCol(tAgent).
 tCol(tRegion).
 tCol(tItem).
-tCol(tItem).
+tSet(tItem).
 existingThing(O):-tItem(O).
 existingThing(O):-tAgent(O).
 existingThing(O):-tRegion(O).

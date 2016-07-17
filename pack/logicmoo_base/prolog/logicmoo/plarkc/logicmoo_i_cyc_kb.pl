@@ -399,7 +399,7 @@ notFormatType(tThing).
 notFormatType(tIndividual).
 notFormatType(tInferenceSupportedFunction).
 
-:- forall(notFormatType(NFT),ain(tSet(NFT))).
+:- forall(notFormatType(NFT),ain(tCol(NFT))).
 
 
 expT('SubLExpressionType').

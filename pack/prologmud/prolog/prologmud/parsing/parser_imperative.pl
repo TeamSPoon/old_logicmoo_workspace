@@ -423,7 +423,7 @@ name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),member(t(Text,_),Lis
 name_text_atomic(Name,Text):-i_name_lc(Name,TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
-tSet(ttKeyworded).
+tCol(ttKeyworded).
 completelyAssertedCollection(ttKeyworded).
 :-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
 :-ain((ttKeyworded(T),isa(F,T),{name_text_now_lc(F,Txt)}==>mudKeyword(F,Txt))).

@@ -270,7 +270,7 @@ type_suffix('Able',ttTypeByAction).
 %
 type_prefix(vt,ttValueType).
 type_prefix(tt,ttTypeType).
-type_prefix(t,tSet).
+type_prefix(t,tCol).
 type_prefix(v,vtValue).
 type_prefix(i,ftID).
 type_prefix(pred,tPred).
@@ -284,7 +284,7 @@ type_prefix(txt,ftTextType).
 type_prefix(sk,ftSkolemFunction).
 %type_prefix(is,tPred).
 %type_prefix(a,tFunction).
-%type_prefix(t,tSet).
+%type_prefix(t,tCol).
 type_prefix(fn,tFunction).
 type_prefix(mud,tMudPred).
 type_prefix(mud,tPred).
@@ -675,7 +675,7 @@ not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 %
 % True Structure Col Gen.
 %
-tCol_gen(T):- no_repeats(T,call_u(ttTemporalType(T);completelyAssertedCollection(T);tSet(T);tCol(T))). % ,atom(T).
+tCol_gen(T):- no_repeats(T,call_u(atom(T);ttTemporalType(T);completelyAssertedCollection(T);tSet(T);tCol(T))). % ,atom(T).
 % ==========================
 % isa_backchaing(i,c)
 % ==========================
@@ -706,9 +706,8 @@ isa_backchaing(I,T):- nonvar(I),is_ftVar(I),!,T=ftVar.
 isa_backchaing(I,T):- new_isa_genls,call_u(isa(I,T)).
 isa_backchaing(_,T):- T==ftProlog,!.
 isa_backchaing(I,T):- I==T,I=ttTypeByAction,!,fail.
-isa_backchaing(I,T):- is_ftVar(I),is_ftVar(T),!,tCol_gen(T),nonvar(T),isa_backchaing(I,T).
+isa_backchaing(I,T):- is_ftVar(T),!,tCol_gen(T),nonvar(T),isa_backchaing(I,T).
 isa_backchaing(I,T):- new_isa_genls,!,fail.
-
 
 isa_backchaing(I,T):- call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing_0(I,T)))).
 

@@ -223,7 +223,7 @@ assert_text_now(Ctx,CtxISA,String):-
 
 :-dynamic(asserted_text/3).
 
-tSet(describedTyped).
+tCol(describedTyped).
 describedTyped(tRegion).
 describedTyped(tObj).
 (describedTyped(Col),isa(Ctx,Col),mudDescription(Ctx,String)/ 
@@ -317,11 +317,11 @@ col(Pfx,C)-->subject(C,_,true),{atom_concat(Pfx,_,C)}.
 col(Pfx,C)-->{loosePass},subject(C,_,true).
 
 % set of small things in the world
-tSet(tSmall).  % I dont like doing this with adjectives.. but it cant be argued to be sane
+tCol(tSmall).  % I dont like doing this with adjectives.. but it cant be argued to be sane
 tSmall(X) <==> mudSize(X,vSmall).
 
 % set of green things in the world
-tSet(tGreen).
+tCol(tGreen).
 tGreen(X) <==> mudColor(X,vGreen).
 
 

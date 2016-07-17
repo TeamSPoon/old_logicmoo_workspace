@@ -245,7 +245,7 @@ check_consistent(Obj,Scope):-call(call,lmcache:is_instance_consistent(Obj,Was)),
 check_consistent(Obj,_):- t_l:is_checking_instance(Obj),!.
 check_consistent(Obj,Scope):- w_tl(t_l:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
 check_consistent_0(Obj,Scope):- once((catch((doall(((clause(hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(lmcache:is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
-check_consistent_0(Type,Scope):- once(tSet(Type)),
+check_consistent_0(Type,Scope):- once(tCol(Type)),
  catch((forall(isa(Obj,Type),check_consistent(Obj,Scope)),
                                                    assert_if_new(lmcache:is_instance_consistent(Type,Scope))),E,assert_if_new(bad_instance(Type,E))),fail.
 

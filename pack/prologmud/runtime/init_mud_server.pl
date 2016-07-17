@@ -14,7 +14,7 @@
 :- set_prolog_stack(global, limit(16*10**9)).
 :- set_prolog_stack(local, limit(16*10**9)).
 :- set_prolog_stack(trail, limit(16*10**9)).
-%:- set_prolog_flag(unsafe_speedups,true).
+:- set_prolog_flag(unsafe_speedups,true).
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
@@ -207,9 +207,10 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
 lar:- login_and_run.
 
-%:- set_prolog_flag(unsafe_speedups,true).
-isa(starTrek,mtCycL).
+:- set_prolog_flag(unsafe_speedups,true).
+% isa(starTrek,mtCycL).
 % :- starTrek:force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
+:- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 :- set_prolog_flag(unsafe_speedups,false).
 
 :- must_det(argIsa(genlPreds,2,_)).
