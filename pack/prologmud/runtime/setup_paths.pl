@@ -50,24 +50,24 @@ user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 
-pmrt_file_search_path(pack, '../../../pack').
-pmrt_file_search_path(cliopatria,pack('ClioPatria')). % :- current_prolog_flag(unix,true).
-pmrt_file_search_path(user, pack('ClioPatria/user')).
-pmrt_file_search_path(user, pack('swish')).
-pmrt_file_search_path(prologmud, library(prologmud)).
+system:pmrt_file_search_path(pack, '../../../pack').
+system:pmrt_file_search_path(cliopatria,pack('ClioPatria')). % :- current_prolog_flag(unix,true).
+system:pmrt_file_search_path(user, pack('ClioPatria/user')).
+system:pmrt_file_search_path(user, pack('swish')).
+system:pmrt_file_search_path(prologmud, library(prologmud)).
 
 
-pmrt_file_search_path(games, '../games').
-pmrt_file_search_path(library, LIB):- pmrt_file_search_path_library(LIB).
+system:pmrt_file_search_path(games, '../games').
+system:pmrt_file_search_path(library, LIB):- system:pmrt_file_search_path_library(LIB).
 
-pmrt_file_search_path_library(pack('logicmoo_base/prolog')).
-pmrt_file_search_path_library(pack('logicmoo_nlu/prolog')).
-pmrt_file_search_path_library(pack('logicmoo_packages/prolog')).
-pmrt_file_search_path_library(pack('logicmoo_planner/prolog')).
-% pmrt_file_search_path_library(pack('MUD_ircbot/prolog')).
+system:pmrt_file_search_path_library(pack('logicmoo_base/prolog')).
+system:pmrt_file_search_path_library(pack('logicmoo_nlu/prolog')).
+system:pmrt_file_search_path_library(pack('logicmoo_packages/prolog')).
+system:pmrt_file_search_path_library(pack('logicmoo_planner/prolog')).
+% system:pmrt_file_search_path_library(pack('MUD_ircbot/prolog')).
 
 
-pmrt_expand_file_search_path(T,O):- pmrt_file_search_path(T,A), once((pmrt(D),absolute_file_name(A,R,[relative_to(D),file_type(directory),access(exist)]))),R=O.
+system:pmrt_expand_file_search_path(T,O):- system:pmrt_file_search_path(T,A), once((pmrt(D),absolute_file_name(A,R,[relative_to(D),file_type(directory),access(exist)]))),R=O.
 
 :-asserta((user:file_search_path(T,R):- pmrt_expand_file_search_path(T,R))).
 :-asserta((user:library_directory(R):- pmrt(R))).
