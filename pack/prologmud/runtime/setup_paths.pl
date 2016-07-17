@@ -3,6 +3,10 @@
 
 */
 
+system:'$set_source_module'(X):-'$set_source_module'(_,X).
+system:'$set_typein_module'(X):-'$set_typein_module'(_,X).
+system:'$current_source_module'(X):-'$set_source_module'(X,X).
+system:'$current_typein_module'(X):-'$set_typein_module'(X,X).
 :- if(current_prolog_flag(dialect,yap)).
 :-  expects_dialect(swi).
 @(C,M) :- M:call(C).

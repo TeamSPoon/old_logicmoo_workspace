@@ -722,7 +722,7 @@ call_s2(G0):-
  '$set_source_module'(S,U),
  '$module'(M,U),
   call_cleanup(CALL,
-     ('$set_source_module'(S),'$set_typein_module'(M))).
+     ('$set_source_module'(_,S),'$set_typein_module'(_,M))).
 
 /*
 attvar_op(Op,Data):-
