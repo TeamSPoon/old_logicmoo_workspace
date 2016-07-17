@@ -26,16 +26,28 @@ genls(tFood,tEatAble).
 action_info(actEat(tEatAble),"nourish oneself").
 
 
+agent_coerce_for(Pred,_TC,Agent,String,Obj):-
+   \+ call(Pred,Agent,String),
+      call(Pred,Agent,Obj),
+      match_object(String,Obj).
+
+
 % Eat something held
+agent_call_command(Agent,actEat(String)) :- 
+      agent_coerce_for(mudPossess,tEatAble,Agent,String,Obj),!,
+      agent_call_command(Agent,actEat(Obj)).
+
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
 agent_call_command(Agent,actEat(Obj)) :-
+  rtrace((must_det((
 	mudPossess(Agent,Obj),
 	must((do_act_affect(Agent,actEat,Obj))),
-        dmsg_show(_),
-	must((clr(mudStowing(Agent,Obj)))),
-        must(not(mudPossess(Agent,Obj))),
-	must((call_update_charge(Agent,actEat))).
+        must((clr(mudStowing(Agent,Obj)))),
+        % dmsg_show(_),
+        destroy_instance(Obj),
+        sanity(\+ (mudPossess(Agent,Obj))),
+	must((call_update_charge(Agent,actEat))))))),!.
 
 update_charge(Agent,actEat) :- padd(Agent,mudEnergy(+ -1)).
 

@@ -44,13 +44,13 @@
             disjointWithT/2,
             dont_call_type_arity_one/1,
             get_mpred_arg/3,
-            guess_supertypes/1,
-            guess_supertypes_0/1,
-            guess_types/1,
-            guess_types/2,
-            guess_types_0/2,
-            guess_typetypes/1,
-            guess_typetypes_0/1,
+          guess_supertypes/1,
+          guess_supertypes_0/1,
+          guess_types/1,
+          guess_types/2,
+          guess_types_0/2,
+          guess_typetypes/1,
+          guess_typetypes_0/1,
             has_free_args/1,
             into_single_class/2,
             is_Template/1,
@@ -122,8 +122,15 @@ transitive_P_r_l(3,?,?,?),
 
 :- include('mpred_header.pi').
 
-
-
+:- module_transparent((
+            guess_supertypes/1,
+            guess_supertypes_0/1,
+            guess_types/1,
+            guess_types/2,
+            guess_types_0/2,
+            guess_typetypes/1,
+            guess_typetypes_0/1)).
+            
 
 
 
@@ -807,7 +814,8 @@ compound_isa(_,I,T):- cheaply_u(isa_asserted(I,T)).
 %
 
 isa_asserted(I,C):- new_isa_genls,!, call_u(isa(I,C)).
-
+isa_asserted(I,C):- !, no_repeats(loop_check(isa_asserted_0(I,C))).
+% isa_asserted(I,C):- !, call_u(isa(I,C)).
 isa_asserted(I,C):- ((call_tabled(isa(I,C),no_repeats(loop_check(isa_asserted_0(I,C)))))).
 %isa_asserted(I,CC):-no_repeats((isa_asserted_0(I,C),genls(C,CC))).
 
@@ -1108,7 +1116,7 @@ guess_supertypes_0(W):-T=t,to_first_break(W,lower,T,All,upper),to_first_break(Al
 %
 % Assert If New Guess.
 %
-ain_guess(G):-show_call(ain_guess,mpred_ain(G,(d,d))).
+ain_guess(G):-show_call(ain_guess,mpred_ain(G)).
 
 
 %= 	 	 
@@ -1128,7 +1136,7 @@ guess_typetypes(W):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_t
 % guess type Types  Primary Helper.
 %
 guess_typetypes_0(TtTypeType):-atom_concat(tt,TypeType,TtTypeType),atom_concat(Type,'Type',TypeType),
- atom_concat(t,Type,TType),ain_guess((isa(T,TtTypeType)=>genls(T,TType))).
+ atom_concat(t,Type,TType),ain((isa(T,TtTypeType)=>genls(T,TType))).
 
 /*
 system:term_expansion(isa(Compound,PredArgTypes),

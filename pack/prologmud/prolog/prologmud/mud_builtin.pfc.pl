@@ -532,6 +532,24 @@ genls(ttTypeByAction,tSet).
 
 % (isa(Inst,Type),isa(Type,ttTypeByAction)) ==> isa(Inst,tHasAction).
 
+ttTypeByAction(C),isa(I,C),{\+ is_in_world(I)} ==> \+ isa(I,C).
+
+% Produces actEat(String):- current_agent(Agent),agent_call_command(Agent,actEat(String)).
+((vtActionTemplate(Compound)/(compound(Compound), 
+    \+ current_predicate(_,Compound),
+    arg(1,Compound,TC),
+    functor(Compound,F,A),
+    functor(Skel,F,A),
+    arg(1,Compound,String)))
+  ==> 
+   ( (Skel 
+       :- 
+       current_agent(Agent),agent_call_command(Agent,Skel)),
+    {nop((asserta_if_new((agent_call_command(Agent,Skel) 
+       :- agent_coerce_for(mudPossess,TC,Agent,String,Obj),!,
+          agent_call_command(Agent,Skel)))))})).
+  
+
 
 genls(tAgent,tObj).
 genls(tAgent,tSpatialThing).
@@ -770,7 +788,7 @@ typeProps(tSkin,[mudColor(vUnique),mudShape(vUnique)]).
 
 %Empty Location
 % You *have* to use 0 as the id of the empty location. (no way!)
-mudLabelTypeProps(--,ftVar,[]).
+mudLabelTypeProps(--,tRegion,[]).
 
 %NEXT TODO predTypeMax(mudEnergy,tAgent,120).
 
@@ -823,6 +841,8 @@ pfc_slow((mudKeyword(Type,Str),tSet(Type),isa(I,Type)/(atom(I),ftID(I)) ==> mudK
 
 
 action_info(C,_)==>vtActionTemplate(C).
+
+completelyAssertedCollection(cachedPredicate).
 
 argsQuoted(cachedPredicate).
 

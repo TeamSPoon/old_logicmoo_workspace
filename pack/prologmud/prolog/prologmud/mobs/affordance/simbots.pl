@@ -581,7 +581,7 @@ agent_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_age
 
 genls(tShelf,tHasSurface).
 genls(tCounter,tHasSurface).
-genls(tEatAble,tEatAble).
+genls(tFood,tEatAble).
 genls(tBar,tHasSurface).
 genls(tSitAble,tHasSurface).
 genls(tSofa,tCouch).

@@ -285,9 +285,9 @@ system:random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Val
 
 
 
-get_dettached_npc(P):- random_instance_no_throw(tAgent,P,\+ isa(P,tHumanControlled)).
+get_dettached_npc(P):- random_instance_no_throw(tAgent,P, \+ isa(P,tHumanControlled)).
 
-generate_new_player(P):- var(P),!,must_det_l([gensym(iExplorer,N),not((isa_asserted(N,tAgent))),P=N,ensure_new_player(P)]),!.
+generate_new_player(P):- var(P),!,must_det_l([gensym(iExplorer,N), \+ ((isa_asserted(N,tAgent))),P=N,ensure_new_player(P)]),!.
 generate_new_player(P):- ensure_new_player(P),!.
 
 ensure_new_player(P):- must_det_l([nonvar(P),assert_isa(P,tExplorer),assert_isa(P,tHumanControlled),assert_isa(P,tAgent)]),!.

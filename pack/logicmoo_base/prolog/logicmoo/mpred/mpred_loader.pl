@@ -1124,12 +1124,14 @@ checked_clause_count(spft(_,_,ax)).
 
 :- dynamic(lmcache:last_clause_count/2).
 
-check_clause_count(Mask):- swc, clause_count(Mask,N),
+check_clause_count(Mask):- swc,
+ clause_count(Mask,N),
     (retract(lmcache:last_clause_count(Mask,Was)) -> true ; Was=0),
-     assert(lmcache:last_clause_count(Mask,N)),
-     Diff is N - Was , 
-     (Diff==0 -> true;
-     (Diff<0 -> trace_or_throw(bad_count(Mask,(Was --> N))) ; dmsg(good_count(Mask,(Was --> N))))).
+     (assert(lmcache:last_clause_count(Mask,N)),
+     Diff is N - Was ), 
+     (Diff ==0 -> true;
+     (Diff == -1 -> true;
+     (Diff<0 -> trace_or_throw(bad_count(Mask,(Was --> N))) ; dmsg(good_count(Mask,(Was --> N)))))).
 
 %% begin_pfc is det.
 %

@@ -48,7 +48,8 @@ do_change_for_take(_,Obj):-
         detatch_object(Obj),
         ain(mudStowing(Agent,Obj)),    
         must_post_for_take(Agent,Obj),
-        detatch_object(Obj).
+        detatch_object(Obj),
+        destroy_instance(Obj).
 do_change_for_take(Agent,Source) :-
 	props(Source,mudPermanence(actTake,vTakenCopyFn(What))),
         create_new_object([What],Obj),

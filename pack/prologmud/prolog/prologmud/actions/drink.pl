@@ -21,6 +21,7 @@ agent_call_command(Agent,actDrink(Obj)) :-
 	mudPossess(Agent,Obj),
 	do_act_affect(Agent,actDrink,Obj),
 	clr(mudPossess(Agent,Obj)),
+        destroy_instance(Obj),
 	call_update_charge(Agent,actDrink).
 
 update_charge(Agent,actDrink) :- ain(mudEnergy(Agent,+ -1)).

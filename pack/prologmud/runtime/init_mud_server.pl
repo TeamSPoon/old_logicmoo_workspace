@@ -8,6 +8,8 @@
 % restore entry state
 :- reset_modules.
 
+
+
 :- set_prolog_flag(dialect_pfc,false).
 :- set_prolog_stack(global, limit(16*10**9)).
 :- set_prolog_stack(local, limit(16*10**9)).
@@ -28,8 +30,13 @@
         lmconf:type_action_info/3)).
 
 
+:- system:ensure_loaded(library(prolog_server)).
+:- prolog_server(4001, [allow(_)]).
 :- system:ensure_loaded(setup_paths).
-%:- system:ensure_loaded(library(logicmoo_utils)).
+:- system:ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(library(eggdrop)).
+:- egg_go.
+
 %:- use_listing_vars.
 % :- [run].
 :- system:ensure_loaded(logicmoo_repl).
@@ -42,9 +49,9 @@
 :-must( isa(iRR7,tRRP) ).
 :-must( tRRP(iRR7) ).
 
-:- ensure_webserver(3020).
+%:- ensure_webserver(3020).
 :- initialization(ensure_webserver(3020)).
-:- initialization(ensure_webserver(3020),now).
+%:- initialization(ensure_webserver(3020),now).
 :- initialization(ensure_webserver(3020),restore).
 
 :- set_fileAssertMt(baseKB).
@@ -54,9 +61,6 @@
 
 :- file_begin(pl).
 :- ensure_loaded(logicmoo(logicmoo_engine)).
-:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
-
-% :- initialization(ltkb1,now).
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).
@@ -142,11 +146,16 @@ genls(tExplorer,tHominid).
 
 :- ain(localityOfObject(P,_)==>{put_in_world(P)}).
 
+
+tRegion(iLivingRoom7).
+tRegion(iOfficeRoom7).
+
 tExplorer(iExplorer7).
 wearsClothing(iExplorer7,'iBoots773').
 wearsClothing(iExplorer7,'iCommBadge774').
 wearsClothing(iExplorer7,'iGoldUniform775').
 mudStowing(iExplorer7,'iPhaser776').
+
 :-onSpawn(localityOfObject(iExplorer7,tLivingRoom)).
 
 pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
@@ -173,15 +182,12 @@ pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 
 mpred_argtypes(bordersOn(tRegion,tRegion)).
 
-tRegion(iLivingRoom7).
-tRegion(iOfficeRoom7).
-
 :-onSpawn(bordersOn(tLivingRoom,tOfficeRoom)).
 
 :- set_prolog_flag(dialect_pfc,false).
 
 :- file_begin(pl).
-:- ensure_loaded(logicmoo(logicmoo_engine)).
+
 :- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
 
@@ -206,11 +212,17 @@ isa(starTrek,mtCycL).
 % :- starTrek:force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 :- set_prolog_flag(unsafe_speedups,false).
 
-:- make.
+:- must_det(argIsa(genlPreds,2,_)).
+
+%:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
+%:- initialization(ltkb1,now).
 :- initialization(lar).
 :- initialization(lar,restore).
 
 end_of_file.
+
+
+
 
 Warning: baseKB:list_to_atomics_list/2, which is referenced by
 Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_text.pl:130:75: 1-st clause of baseKB:join_for_string/2

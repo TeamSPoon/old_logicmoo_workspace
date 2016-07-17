@@ -1481,8 +1481,8 @@ is_recompile:-fail.
 % Optional Sanity Checking.
 %
 % sanity(Goal):- !, must(Goal),!.
-sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
 sanity(Goal):- \+ tracing, 1 is random(3),!, must(Goal),!.
+sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
 sanity(_):- notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
 sanity(_Goal):- \+ tracing, 1 is random(2),!.

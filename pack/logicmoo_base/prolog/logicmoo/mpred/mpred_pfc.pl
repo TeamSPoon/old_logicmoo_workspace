@@ -1410,7 +1410,7 @@ mpred_undo(Fact):-
   show_call(mpred_unfwc(Fact)).
 % mpred_undo(X):- doall(mpred_undo1(X)).
 
-
+mpred_undo1((H:-B)):- reduce_clause(unpost,(H:-B),HB), HB\=@= (H:-B),!,mpred_undo1((HB)).
 mpred_undo1(actn(A)):-  
   % undo an action by finding a method and successfully executing it.
   !,

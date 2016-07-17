@@ -49,11 +49,19 @@ farthest_reachable_object0(Agent,Obj):-
   test_exists(Obj),
   mudPossess(Agent,Obj).
 
+% detatch from world
 detatch_object(Obj):-  
   (req1(mudPossess(Agent,Obj))->clr(mudPossess(Agent,Obj));true),
   (req1(mudAtLoc(Obj,LOC))-> clr(mudAtLoc(Obj,LOC));true),
   (req1(localityOfObject(Obj,R))-> clr(localityOfObject(Obj,R));true),
   (clr(inRegion(Obj,_))),!.
+   
+% destroy from ontology
+destroy_instance(Obj):- % forall(isa(Obj,Col),mpred_remove(isa(Obj,Col))),
+                        xlisting_inner(destroy_clause,Obj,[]),!.
+
+destroy_clause(H,B,R):- nonvar(R),catch(clause_property(R,_),_,fail),erase(R),wdmsg(destroy_clause(H,B,R)),!,mpred_undo((H:-B)).
+destroy_clause(H,B,R):- nop(wdmsg(misssed_destroy_clause(H,B,R))),!,mpred_undo((H:-B)).
    
 
 action_info(actInventory(isOptional(tAgent,isSelfAgent)), "Examine an inventory").

@@ -32,8 +32,9 @@ agent_call_command(Agent,actAttack(Dir)) :-
 agent_call_command(Agent,actAttack(Dir)) :-	
 	from_dir_target(Agent,Dir,XXYY),
 	mudAtLoc(What,XXYY),	
-	props(What,mudWeight(1)),
-	destroy_object(XXYY,What),
+	props(What,mudWeight(Was)),
+        Was =< 1,
+	destroy_object_via_attack(XXYY,What),
 	call_update_charge(Agent,actAttack).
 
 % Hit a big object... causes damage to agent attacking
@@ -67,8 +68,9 @@ check_for_weapon(Agent,Wpn) :-
 
 check_for_weapon(_,0).
 
-destroy_object(LOC,What) :-
-	del(mudAtLoc(What,LOC)).
+destroy_object_via_attack(LOC,What) :-
+	del(mudAtLoc(What,LOC)),
+        destroy_instance(What),!.
 
 % Does damage to other agent
 damage_foe(Agent,What,hit) :-
