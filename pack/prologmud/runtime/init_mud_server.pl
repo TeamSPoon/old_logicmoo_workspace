@@ -41,8 +41,8 @@ ignored_weak_import(Into, From:PI):-wdmsg(ignored_weak_import(Into, From:PI)).
 
 :- system:ensure_loaded(library(prolog_server)).
 :- prolog_server(4001, [allow(_)]).
-:- if(exists_source(library(logicmoo_utils))).
 :- system:ensure_loaded(library(logicmoo_utils)).
+:- if(exists_source(library(eggdrop))).
 :- ensure_loaded(library(eggdrop)).
 :- egg_go.
 :- endif.

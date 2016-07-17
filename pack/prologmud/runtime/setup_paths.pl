@@ -69,9 +69,9 @@ system:pmrt_file_search_path_library(pack('logicmoo_planner/prolog')).
 
 system:pmrt_expand_file_search_path(T,O):- system:pmrt_file_search_path(T,A), once((pmrt(D),absolute_file_name(A,R,[relative_to(D),file_type(directory),access(exist)]))),R=O.
 
-:-asserta((user:file_search_path(T,R):- pmrt_expand_file_search_path(T,R))).
+:-asserta((user:file_search_path(T,R):- system:pmrt_expand_file_search_path(T,R))).
 :-asserta((user:library_directory(R):- pmrt(R))).
-:-asserta((user:library_directory(R):- pmrt_expand_file_search_path(library,R))).
+:-asserta((user:library_directory(R):- system:pmrt_expand_file_search_path(library,R))).
 
 :- attach_packs.
 :- system:ensure_loaded(library(logicmoo_utils)).
