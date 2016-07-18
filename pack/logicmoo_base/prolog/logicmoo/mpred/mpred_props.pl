@@ -396,6 +396,7 @@ define_maybe_exact(M,PI):- % a(mtExact,M),!,
    must_det_l((    functor(PI,F,A),
      M:multifile(M:F/A),
      once((M==baseKB->true;ain(baseKB:predicateConventionMt(F,M)))),
+     asserta_if_new(lmconf:wrap_shared(F,A,ereq)),
      decl_shared(M:PI),     
      sanity(\+is_static_predicate(M:PI)),
      maybe_define_if_not_static(M,PI))),!.
@@ -403,8 +404,9 @@ define_maybe_exact(_,PI):-
      maybe_define_if_not_static(baseKB,PI).
 
 maybe_define_if_not_static(M,PI):- 
-  must_det_l((
+  must_det_l((              
               functor_h(PI,F,A),
+              asserta_if_new(lmconf:wrap_shared(F,A,ereq)),
               M:multifile(M:F/A),
               M:public(M:F/A),
               on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),

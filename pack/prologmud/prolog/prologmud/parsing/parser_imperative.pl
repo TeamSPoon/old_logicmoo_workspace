@@ -396,7 +396,7 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 name_text(Name,Text):- nonvar(Text),!,name_text_now(Name,TextS),equals_icase(Text,TextS),!.
 name_text(Name,Text):- var(Name),!,call_u(mudKeyword(Name,Text)).
-:- break.
+% :- break.
 name_text(Name,Text):- name_text_now(Name,Text).
 
 :- export(name_text_now_lc/2).

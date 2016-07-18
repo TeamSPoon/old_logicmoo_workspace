@@ -1,4 +1,5 @@
-/** <module> 
+/*
+ * &gt;module> 
 % NPC_Interface for calling actions
 %
 % "command"s are often text or a description of proposed actions
@@ -269,7 +270,7 @@ random_instance_no_throw(Type,Value,Test):-random_instance_no_throw0(Type,Value,
 
 random_instance_no_throw0(Type,Value,Test):-var(Test),!,Test=isa(Test,Type),random_instance_no_throw(Type,Value,Test).
 random_instance_no_throw0(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
-   hooked_random_instance(RType,RValue,RTest),
+   call_u(hooked_random_instance(RType,RValue,RTest)),
    checkAnyType(query(_,_),RValue,Type,Value),
    must_det(Test).
 
