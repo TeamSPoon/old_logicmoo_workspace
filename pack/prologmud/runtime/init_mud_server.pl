@@ -18,6 +18,7 @@
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
 :- set_prolog_flag(generate_debug_info,true).
 */
+:- add_import_module(mud_telnet,world,end).
 
 %:- system:ensure_loaded(setup_paths).
 %:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
