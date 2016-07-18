@@ -46,14 +46,6 @@
 
 % :- register_module_type (utility).
 
-:- add_import_module(lmconf,world,end).
-:- add_import_module(lmconf,baseKB,end).
-:- add_import_module(lmconf,mud_testing,end).
-:- add_import_module(lmconf,mud_telnet,end).
-:- add_import_module(mud_testing,mud_telnet,end).
-:- add_import_module(baseKB,lmcache,end).
-
-
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-
   forall(lmconf:mud_test(Name,Test),run_mud_test(Name,Test)).

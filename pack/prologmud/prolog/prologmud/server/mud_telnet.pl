@@ -29,8 +29,6 @@
 
 % :- add_import_module(mud_telnet,baseKB,end).
 
-:- add_import_module(mud_telnet,world,end).
-
 :- ain(mtProlog(mud_telnet)).
 
 /** <module>  

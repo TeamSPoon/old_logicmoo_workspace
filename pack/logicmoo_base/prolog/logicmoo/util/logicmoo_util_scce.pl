@@ -30,7 +30,7 @@
 
 :- include('logicmoo_util_header.pi').
 
-:- '$set_source_module'(system).
+% :- '$set_source_module'(system).
 
 :- meta_predicate scce_orig(0,0,0).
 system:scce_orig(Setup,Goal,Cleanup):-

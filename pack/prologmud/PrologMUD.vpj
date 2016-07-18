@@ -68,6 +68,7 @@
 			<Folder Name="prolog">
 				<F N="../logicmoo_nlu/prolog/parser_all.pl"/>
 			</Folder>
+			<F N="../logicmoo_nlu/sublUtils.lisp"/>
 		</Folder>
 		<Folder Name="../MUD_ircbot">
 			<Folder Name="prolog">

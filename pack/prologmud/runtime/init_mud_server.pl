@@ -20,7 +20,7 @@
 */
 
 :- system:ensure_loaded(setup_paths).
-:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 % :- module(init_mud_server,[]).
 % restore entry state
@@ -100,9 +100,6 @@
 :- initialization(ensure_webserver(3020),now).
 :- initialization(ensure_webserver(3020),restore).
 
-:- set_fileAssertMt(baseKB).
-:- set_defaultAssertMt(baseKB).
-
 :- set_prolog_flag(dialect_pfc,false).
 
 :- file_begin(pl).
@@ -154,10 +151,8 @@
 % ==============================
 % MUD SERVER CODE STARTS
 % ==============================
-:- set_fileAssertMt(baseKB).
 
 :- file_begin(pfc).
-
 :- set_prolog_flag(dialect_pfc,false).
 
 
@@ -236,7 +231,7 @@ mpred_argtypes(bordersOn(tRegion,tRegion)).
 
 :- file_begin(pl).
 
-:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
+%:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
 
 % [Optionaly] Start the telent server % iCommanderdata66

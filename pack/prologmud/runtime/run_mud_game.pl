@@ -8,10 +8,9 @@
 started_mud_server.
 
 :- push_modules.
-:- '$current_source_module'(user)->'$set_source_module'('baseKB');true.
+% :- '$current_source_module'(user)->'$set_source_module'('baseKB');true.
 
 % :- make.
-:- add_import_module(mpred_storage,baseKB,end).
 
 % ==============================
 % MUD GAME CODE LOADS

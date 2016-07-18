@@ -99,6 +99,7 @@
             gload/0,
             hdr_debug/2,
             include_mpred_files/1,
+            include_prolog_files/1,
             get_lang0/1,
             is_code_body/1,
             is_compiling/0,
@@ -635,6 +636,10 @@ term_expand_local_each(CM,X,F,A,X):-lmconf:registered_module_type(CM,dynamic),dy
 %
 include_mpred_files(Mask):- 
      forall(maybe_locate_file(Mask,E),ensure_mpred_file_loaded(E)).
+
+:- module_transparent(include_prolog_files/1).
+include_prolog_files(Mask):- 
+     forall(maybe_locate_file(Mask,E),ensure_loaded(E)).
 /*
 module(M,Preds):-
     'format'(user_output /*e*/,'% visting module ~w.~n',[M]),

@@ -14,7 +14,7 @@
 % Load logicmoo REPL Base
 % ==============================
 :- asserta(lmconf:load_mud_www).
-:- user:ensure_loaded(library(logicmoo_user)).
+:- system:ensure_loaded(library(logicmoo_user)).
 
 % :- statistics.
 user:file_search_path(prologmud, library(prologmud)).
@@ -40,7 +40,7 @@ setup_rl_read_history_0:-
 :- endif.
 
 % [Required] Load the Logicmoo Base System
-%USER :- time(user:ensure_loaded(logicmoo_user)).
+%USER :- time(system:ensure_loaded(logicmoo_user)).
 % :- meta_predicate testml(//).
 
 
@@ -49,10 +49,10 @@ setup_rl_read_history_0:-
 :- if(if_defined(lmconf:load_mud_www)).
 :- system:use_module(library(logicmoo/mpred_online/mpred_www)).
 /*
-:- (if_file_exists(user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www)))).
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_swish)))).
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_clio)))).
+:- (if_file_exists(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www)))).
+:- (if_file_exists(ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).
+:- (if_file_exists(ensure_loaded(library(logicmoo/logicmoo_run_swish)))).
+:- (if_file_exists(ensure_loaded(library(logicmoo/logicmoo_run_clio)))).
 
 :- ensure_webserver.
 */
@@ -65,7 +65,7 @@ setup_rl_read_history_0:-
 % ==============================
 
 % [Required] Load the Logicmoo Backchaining Inference System
-% :- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
+% :- gripe_time(40,with_no_mpred_expansions(if_file_exists(ensure_loaded(logicmoo(logicmoo_engine))))).
 
 % :-  m1,m4,m1,egg_go.
 

@@ -321,8 +321,9 @@ get_pos_at(C,Num):-compound(C),arg(1,C,Num),number(Num).
 :- dynamic(lmconf:known_complete_prolog_impl_file/3).
 glean_prolog_impl_file(_,_,_,_):- current_prolog_flag(xref,true),!.
 glean_prolog_impl_file(_,File,SM,TypeIn):- lmconf:known_complete_prolog_impl_file(SM,File,TypeIn),!.
-glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- atom(File),\+ atomic_list_concat([_,_|_],'.pfc',File),!,
-   lmconf:mpred_is_impl_file(File),
+glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- 
+   prolog_load_context(source,F),prolog_load_context(file,F),
+   lmconf:mpred_is_impl_file(File),!,
    assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),all_source_file_predicates_are_transparent.
 
       

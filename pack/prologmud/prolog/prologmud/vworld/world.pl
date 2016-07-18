@@ -13,7 +13,6 @@
 % general assistance Dr. Donald Nute
 %
 */
-:- '$set_source_module'(world).
 :- set_prolog_flag(logicmoo_debug,true).
 :- set_prolog_flag(unsafe_speedups,false).
 mtProlog(world).

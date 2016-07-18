@@ -581,12 +581,13 @@ def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 %
 % remove_pred(_,_,_):- !.
 remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
-remove_pred(PredMt,F,A):- functor(P,F,A),unlock_predicate(PredMt:F/A),
-  (current_predicate(PredMt:F/A) -> ignore((catchv(redefine_system_predicate(PredMt:P),_,true),abolish(PredMt:F,A)));true),
-  PredMt:asserta((P:- wdmsg(permission_error(P)),throw(permission_error(PredMt:F/A)))),
-  lock_predicate(PredMt:F/A).
-
-
+remove_pred(M,F,A):- 
+  w_tl(set_prolog_flag(access_level,system),
+  (functor(P,F,A),unlock_predicate(M:P),
+   redefine_system_predicate(M:F/A),redefine_system_predicate(F/A),M:redefine_system_predicate(P),M:redefine_system_predicate(M:P),
+   abolish(M:F,A),
+  M:asserta((M:P:- wdmsg(permission_error(P)),throw(permission_error(M:F/A)))),
+  lock_predicate(M:P))),!.
 
 % = :- meta_predicate(call_if_defined(0)).
 :- export(call_if_defined/1).
@@ -771,18 +772,18 @@ is_static_module(M):- module_property(M,class(library)),!.
 %
 % Static Predicate.
 %
-is_static_predicate(M:Var):- var(Var),!,is_static_module(M). % fail,trace_or_throw(var_is_static_predicate(Var)).
-is_static_predicate(M:M:H):-!,is_static_predicate(M:H).
-is_static_predicate((H:-_)):-!,is_static_predicate(H).
-is_static_predicate(~(H)):-!,is_static_predicate(H).
-is_static_predicate(M:'~'(H)):-!,is_static_predicate(M:H).
-is_static_predicate(M:(H:-_)):-!,is_static_predicate(M:H).
-is_static_predicate(M:F):-atom(F),predicate_property(M:F,static),!,predicate_property(F,number_of_clauses(_)),\+ predicate_property(F,dynamic).
-is_static_predicate((M:F)/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
-is_static_predicate((M:F)//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
+is_static_predicate(Var):- var(Var),!,trace_or_throw(var_is_static_predicate(Var)).
+is_static_predicate(M:Var):- var(Var),!,trace_or_throw(var_is_static_predicate(M:Var)).
+is_static_predicate(M:M:H):-!,nonvar(H),is_static_predicate(M:H).
+is_static_predicate((H:-_)):-!,nonvar(H),is_static_predicate(H).
+is_static_predicate(~(H)):-!,nonvar(H),is_static_predicate(H).
+is_static_predicate(M:'~'(H)):-!,nonvar(H),is_static_predicate(M:H).
+is_static_predicate(M:(H:-_)):-!,nonvar(H),!,is_static_predicate(M:H).
 is_static_predicate(M:F/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(M:F//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
-
+is_static_predicate(M:F):-atom(F),predicate_property(M:F,static),!,predicate_property(F,number_of_clauses(_)),\+ predicate_property(F,dynamic).
+is_static_predicate((M:F)//A2):-A is A2+2, !,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
+is_static_predicate((M:F)/A):-!,atom(F),current_predicate(M:F/A),!,functor(FA,F,A),is_static_predicate(M:FA).
 is_static_predicate(F/A):-!,atom(F),current_predicate(F/A),!,functor(FA,F,A),is_static_predicate(FA).
 is_static_predicate(F//A2):-A is A2+2, !,atom(F),current_predicate(F/A),!,functor(FA,F,A),is_static_predicate(FA).
 

@@ -12,13 +12,24 @@
 %
 */
 
-:- if(( world:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
-:- endif.
+%:- if(( use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+%:- endif.
 % :- module(mud_loader,[]).
 % restore entry state
-:- reset_modules.
+%:- reset_modules.
 
 
+%:- add_import_module(mpred_storage,baseKB,end).
+%:- add_import_module(mud_telnet,world,end).
+
+:- add_import_module(lmconf,world,end).
+% :- add_import_module(lmconf,baseKB,end).
+:- add_import_module(lmconf,mud_testing,end).
+:- add_import_module(lmconf,mud_telnet,end).
+:- add_import_module(mud_testing,mud_telnet,end).
+:- add_import_module(baseKB,lmcache,end).
+:- add_import_module(baseKB,lmconf,end).
+:- add_import_module(baseKB,world,end).
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
@@ -52,14 +63,14 @@
 
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
 
-:- world:ensure_loaded(prologmud(server/mud_telnet)).
+:- ensure_loaded(prologmud(server/mud_telnet)).
 
 % xyzFn(R,X,Y,Z):-dmsg(xyzFn(R,X,Y,Z)),trace_or_throw(xyzFn(R,X,Y,Z)).
 
 % :- multifile prolog:message/3.
 % prolog:message(git(update_versions),A,A):-!.
 
-:- world:use_module(library(settings)).
+:- use_module(library(settings)).
 % :- use_module(library(check)).
 % :- make.
 %:- portray_text(true).
@@ -84,6 +95,8 @@ unsafe_preds(M,F,A):-M=files_ex,current_predicate(M:F/A),member(X,[delete,copy])
 unsafe_preds(M,F,A):-M=process,current_predicate(M:F/A),member(X,[kill,create]),atom_contains(F,X).
 unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 
+:- set_prolog_flag(access_level,system).
+
 :-forall(unsafe_preds(M,F,A),bugger:remove_pred(M,F,A)).
 
 % [Optionaly] Solve the Halting problem
@@ -99,9 +112,7 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 :-lock_predicate(system:halt/1).
 
 :- dmsg('the halting problem is now solved!').
-
-:- file_begin(prolog).
-
+:- set_prolog_flag(access_level,user).
 
 :- asserta(t_l:disable_px).
 
@@ -113,7 +124,7 @@ now_try_game_dir(Else):-
  enumerate_files(game('.'), GAMEDIR) *-> 
   ((exists_directory(GAMEDIR) -> 
     with_all_dmsg(( 
-      % forall(enumerate_files(game('**/*.pl'),X),world:ensure_loaded(X)),
+      % forall(enumerate_files(game('**/*.pl'),X),ensure_loaded(X)),
       forall(no_repeats_old(X,enumerate_files(game('*.pfc.pl'),X)),declare_load_dbase(X)))); (wdmsg(missing(GAMEDIR)),Else)));  (wdmsg(no_game_dir),Else).
 
 
@@ -203,7 +214,7 @@ hard_work:-
   % system:ensure_loaded(logicmoo(launchcliopatria)),
   % system:ensure_loaded(logicmoo(testwebconsole)),
   % kill_term_expansion, 
-   world:ensure_loaded(swish(logicmoo_run_swish))
+   ensure_loaded(swish(logicmoo_run_swish))
    )))),!.
 
 % [Required] load the mud PFCs
@@ -411,17 +422,17 @@ Proof end.
 
 
 
-:- world:ensure_loaded(library(logicmoo_user)).
+:- ensure_loaded(library(logicmoo_user)).
 
 
-% :- world:ensure_loaded(('/root/lib/swipl/pack/prologmud/prolog/prologmud/actions/eat.pl')).
+% :- ensure_loaded(('/root/lib/swipl/pack/prologmud/prolog/prologmud/actions/eat.pl')).
 
 
-% :- world:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
-:- world:ensure_loaded(prologmud(server/mud_irc)).
-:- world:ensure_loaded(prologmud(vworld/world)).
+% :- ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
+:- ensure_loaded(prologmud(server/mud_irc)).
+:- ensure_loaded(prologmud(vworld/world)).
 
-:- world:ensure_loaded(prologmud(server/mud_testing)).
+:- ensure_loaded(prologmud(server/mud_testing)).
 
 
 /*
@@ -487,7 +498,7 @@ make_qlfs:-
 
 % done in 'user' to avoid reloading when we reload dbase
 
-:- include_mpred_files('../src_asserts/pldata/?*.pl').
+:- include_prolog_files('../src_asserts/pldata/?*.pl').
 
 */
 :-export(ensure_nl_loaded/1).
@@ -516,8 +527,8 @@ download_and_install_el:-
 
 % :- asserta(lmcache:loaded_external_kbs(mud)),show_call(kbp_to_mpred_t).
 
-:- world:ensure_loaded(prologmud(parsing/parser_imperative)).
-:- world:ensure_loaded(prologmud(parsing/simple_decl_parser)). 
+:- ensure_loaded(prologmud(parsing/parser_imperative)).
+:- ensure_loaded(prologmud(parsing/simple_decl_parser)). 
 :- dynamic(baseKB:mudStowing/2).
 
 /*
@@ -534,21 +545,21 @@ download_and_install_el:-
 :-wdmsg(loading_mobs).
 
 % NPC planners
-:- include_mpred_files(prologmud(mobs/'?*.pl')).
-:- exists_directory('../src_assets/mobs/')->include_mpred_files('../src_assets/mobs/?*.pl');true.
-% :- xperimental->include_mpred_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
+:- include_prolog_files(prologmud(mobs/'?*.pl')).
+:- exists_directory('../src_assets/mobs/')->include_prolog_files('../src_assets/mobs/?*.pl');true.
+% :- xperimental->include_prolog_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
 
 :-wdmsg(loading_actions).
 
 % Action/Commands implementation
-:- include_mpred_files(prologmud(actions/'?*.pl')).
-:- exists_directory('../src_assets/actions/')->include_mpred_files('../src_assets/actions/?*.pl');true.
-% :- xperimental->include_mpred_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
+:- include_prolog_files(prologmud(actions/'?*.pl')).
+:- exists_directory('../src_assets/actions/')->include_prolog_files('../src_assets/actions/?*.pl');true.
+% :- xperimental->include_prolog_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 % New Objects
-:- include_mpred_files(prologmud(objs/'?*.pl')).
-:- exists_directory('../src_assets/objs/')->include_mpred_files('../src_assets/objs/?*.pl');true.
-% :- xperimental->include_mpred_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
+:- include_prolog_files(prologmud(objs/'?*.pl')).
+:- exists_directory('../src_assets/objs/')->include_prolog_files('../src_assets/objs/?*.pl');true.
+% :- xperimental->include_prolog_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 
 % Define the agents traits, both for your agent and the world inhabitants. 

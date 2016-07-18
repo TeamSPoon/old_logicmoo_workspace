@@ -106,6 +106,7 @@ lmconf:wrap_shared(tAgent,1,ereq).
 lmconf:wrap_shared(mtCycL,1,ereq).
 lmconf:wrap_shared(mtExact,1,ereq).
 lmconf:wrap_shared(mtGlobal,1,ereq).
+lmconf:wrap_shared(nameStrings,1,ereq).
 
 
 %lmconf:wrap_shared(lmcache:loaded_external_kbs,1,ereq).
@@ -131,6 +132,12 @@ lmconf:wrap_shared(mpred_f,5,ereq).
 lmconf:wrap_shared(mpred_f,6,ereq).
 lmconf:wrap_shared(mpred_f,7,ereq).
 lmconf:wrap_shared(props,2,ereq).
+
+lmconf:wrap_shared(F,A,ereq):-
+   functor(P,F,A),
+   member(MVis,[baseKB,lmcache,lmconf]),
+   predicate_property(MVis:P,defined),
+   \+ predicate_property(MVis:P,imported_from(_)),!.
 
 lmconf:wrap_shared(mpred_mark,3,ereq).
 lmconf:wrap_shared(mudKeyword,2,ereq).
@@ -162,7 +169,6 @@ lmconf:wrap_shared(ttPredType,1,ereq).
 lmconf:wrap_shared(ttTemporalType,1,ereq).
 lmconf:wrap_shared(use_ideep_swi,0,ereq).
 
-lmconf:wrap_shared(F,A,ereq):- clause_b(hybrid_support(F,A)), \+ clause(lmconf:wrap_shared(F,A,_),true).
 
 clause_b(G):- clause(baseKB:G,Body),call(Body).
 

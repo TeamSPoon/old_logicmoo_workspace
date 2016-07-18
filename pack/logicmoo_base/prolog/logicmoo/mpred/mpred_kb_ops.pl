@@ -719,9 +719,9 @@ call_s2(G0):-
   strip_module(G0,WM,G),
   defaultAssertMt(U),  
   must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
- '$set_source_module'(S,U),
- '$module'(M,U),
-  call_cleanup(CALL,
+ '$set_source_module'(S,U),'$module'(M,U),
+  setup_call_cleanup_each(
+    ('$set_source_module'(U),'$set_typein_module'(U)),CALL,
      ('$set_source_module'(S),'$set_typein_module'(M))).
 
 /*

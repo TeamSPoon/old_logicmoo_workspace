@@ -28,7 +28,6 @@
 :- include(prologmud(mud_header)).
 
 
-:- '$set_source_module'(baseKB).
 :- file_begin(pfc).
 :- set_defaultAssertMt(baseKB).
 
