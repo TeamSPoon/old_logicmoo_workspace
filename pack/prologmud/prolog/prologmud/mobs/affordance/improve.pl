@@ -22,4 +22,4 @@
    localityOfObject(Obj,LOC),
    localityOfObject(Agent,LOC)) ==> 
      (~ agentTODO(Agent,actDo(Something,Obj)),
-     enqueue_agent_action(Agent,actDo(Something,Obj)))).
+     world:enqueue_agent_action(Agent,actDo(Something,Obj)))).

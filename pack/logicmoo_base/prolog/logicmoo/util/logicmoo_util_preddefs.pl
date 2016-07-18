@@ -582,12 +582,14 @@ def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 % remove_pred(_,_,_):- !.
 remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
 remove_pred(M,F,A):- 
+ on_x_log_cont((
   w_tl(set_prolog_flag(access_level,system),
-  (functor(P,F,A),unlock_predicate(M:P),
-   redefine_system_predicate(M:F/A),redefine_system_predicate(F/A),M:redefine_system_predicate(P),M:redefine_system_predicate(M:P),
-   abolish(M:F,A),
+    ((functor(P,F,A),unlock_predicate(M:P),
+    redefine_system_predicate(M:F/A),redefine_system_predicate(F/A),
+    M:redefine_system_predicate(P),M:redefine_system_predicate(M:P),
+    abolish(M:F,A),
   M:asserta((M:P:- wdmsg(permission_error(P)),throw(permission_error(M:F/A)))),
-  lock_predicate(M:P))),!.
+  lock_predicate(M:P)))))),!.
 
 % = :- meta_predicate(call_if_defined(0)).
 :- export(call_if_defined/1).

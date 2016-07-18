@@ -66,6 +66,32 @@
 :- system:ensure_loaded(library(prolog_server)).
 :- prolog_server(4001, [allow(_)]).
 :- system:ensure_loaded(library(logicmoo_utils)).
+
+:- set_prolog_flag(access_level,system).
+
+unsafe_preds_init('$syspreds',shell,1).
+unsafe_preds_init(M,F,A):-M=files_ex,current_predicate(M:F/A),member(X,[delete,copy]),atom_contains(F,X).
+unsafe_preds_init(M,F,A):-M=process,current_predicate(M:F/A),member(X,[kill,create]),atom_contains(F,X).
+unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
+
+:-forall(unsafe_preds_init(M,F,A),bugger:remove_pred(M,F,A)).
+
+% [Optionaly] Solve the Halting problem
+:-unlock_predicate(system:halt/0).
+:-redefine_system_predicate(system:halt/0).
+:-abolish(system:halt,0).
+:-asserta((system:halt :- format('the halting problem is now solved!'))).
+:-lock_predicate(system:halt/0).
+
+:-redefine_system_predicate(system:halt/1).
+:-abolish(system:halt,1).
+:-asserta((system:halt(_) :- format('the halting problem is now solved!'))).
+:-lock_predicate(system:halt/1).
+
+:- dmsg('the halting problem is now solved!').
+:- set_prolog_flag(access_level,user).
+
+
 :- if(exists_source(library(eggdrop))).
 :- ensure_loaded(library(eggdrop)).
 :- egg_go.
