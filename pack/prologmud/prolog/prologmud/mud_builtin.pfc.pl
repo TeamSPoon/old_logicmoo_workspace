@@ -75,7 +75,7 @@
 :-op(0,fx,  ('enabled')).
 :-op(0,fy,  ('disabled')).
 :-op(0,fy,  ('enabled')).
-:- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
+% :- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
 :- kb_dynamic(user_db:grant_openid_server/2).
 :- kb_dynamic(user_db:grant_openid_server/2).

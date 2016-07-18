@@ -348,7 +348,7 @@ create_random_fact(t(Other,Obj,Default)) :- nonvar(Obj),argIsa(Other,2,Type),ran
 
 %  suggest random values
 hooked_random_instance(vtDirection,Dir,Test) :- my_random_member(Dir,[vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW]),Test,!.
-hooked_random_instance(ftInt,3,Test):-call(Test),dmsg(random_instance(ftInt,3,Test)),dtrace,!,fail.
+hooked_random_instance(ftInt,3,Test):-call(Test),dmsg(random_instance(ftInt,3,Test)),dmsg(hooked_random_instance(ftInt,3,Test)),!,fail.
 
 %  give required forward deductions
 deduce_facts(mudAtLoc(Obj,LOC),localityOfObject(Obj,Region)):- nonvar(LOC),locationToRegion(LOC,Region).
