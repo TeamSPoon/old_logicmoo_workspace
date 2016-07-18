@@ -18,7 +18,7 @@
                    object_string/2,
                    save_fmt_a_0/2,
                    save_fmt_a/2,
-                   coerce/3,
+                   % coerce/3,
                    parseIsa//2,
                    phrase_parseForTypes_9//2,
                    name_text_atomic/2,
@@ -149,12 +149,12 @@ object_string(O,String) :-  object_string(_,O,1-4,String),!.
 object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 
 :-export(object_string/4).
-:-dynamic object_string_fmt/3.
-:-retractall(object_string_fmt(_,_,_)).
-object_string(_,O,DescSpecs,String):- object_string_fmt(O,DescSpecs,String),!.
+:-dynamic lmcache:object_string_fmt/3.
+:-retractall(lmcache:object_string_fmt(_,_,_)).
+object_string(_,O,DescSpecs,String):- lmcache:object_string_fmt(O,DescSpecs,String),!.
 object_string(Agent,O,DescSpecs,String):- String = [O], 
    object_print_details(save_fmt(String),Agent,O,DescSpecs,[tCol,tItem,ftProlog,ftID,ftTerm,tAgent,tChannel]),
-   asserta(object_string_fmt(O,DescSpecs,String)),!.
+   asserta(lmcache:object_string_fmt(O,DescSpecs,String)),!.
 
 save_fmt(OS,' ~w ',[A]):-!,save_fmt_e(OS,A),!.
 save_fmt(OS,'~w',[A]):-!,save_fmt_e(OS,A),!.
@@ -605,7 +605,7 @@ parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String
 parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
-coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_failure(isa(C,B))->!;true).
+coerce_hook(A,B,C):-no_repeats(coerce0(A,B,C)),(show_failure(isa(C,B))->!;true).
 
 coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).

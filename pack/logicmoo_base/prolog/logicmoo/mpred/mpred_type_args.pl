@@ -338,6 +338,7 @@ is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
 coerce(What,Type,NewThing,_Else):- call_u(coerce(What,Type,NewThing)),!.
 coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
+coerce(A,B,C):-no_repeats(call_u(coerce_hook(A,B,C))),(show_failure(call_u(isa(C,B)))->!;true).
 
 
 %= 	 	 

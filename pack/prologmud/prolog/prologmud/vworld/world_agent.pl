@@ -37,8 +37,10 @@ do_agent_action_queue(_). % was empty already
 
 :-export(enqueue_agent_action/1).
 enqueue_agent_action(C):-enqueue_agent_action(_,C).
+
 :-export(enqueue_agent_action/2).
 enqueue_agent_action(P,C):-foc_current_agent(P),get_agent_session(P,O),enqueue_agent_action(P,C,O).
+
 :-export(enqueue_agent_action/3).
 :-dynamic(enqueue_agent_action/3).
 enqueue_agent_action(P,C,O):- immediate_session(P,C,O),!, do_agent_action(P,C,O).
@@ -179,7 +181,7 @@ correctEachTypeOrFail( Who, F, Q,ARGS,TYPES,NEWS):- is_list(TYPES),!,maplist(cor
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)),not(is_ephemeral(Type)),isa(Arg,Type),!,Inst = Arg.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)),not(is_ephemeral(Type)), must(coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)), show_failure(coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
-correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- (coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- coerce(Arg,Type,Inst),not(is_ephemeral(Inst)),!.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- !,acceptableArg(Arg,Type),!,Inst = Arg.
 
 correctCommand_0(Who,CMD,OUT):-

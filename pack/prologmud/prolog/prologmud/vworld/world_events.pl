@@ -30,7 +30,7 @@ raise_location_event(Where,Event):- forall(no_repeats(Whom,(no_repeats(tAgent(Wh
 deliver_event(Whom,Event):- cnotrace(doall(call_no_cuts(lmconf:deliver_event_hooks(Whom,Event)))).
 
 
-:-export(mudDeliverableLocationEvents/3).
-:-dynamic(mudDeliverableLocationEvents/3).
+% :-export(mudDeliverableLocationEvents/3).
+:-dynamic(baseKB:mudDeliverableLocationEvents/3).
 prologHybrid(mudDeliverableLocationEvents(tAgent,tRegion,ftTerm)).
 
