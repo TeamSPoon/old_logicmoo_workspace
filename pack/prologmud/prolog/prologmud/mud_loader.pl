@@ -1,4 +1,6 @@
-/** <module> 
+/*
+
+* &ght;module> 
 % This file loads the world (world.pl), the map of the world, 
 % the agents and their definitions.
 % This file is used as a configuation file and a startup script.
@@ -27,6 +29,7 @@
 :- add_import_module(lmconf,mud_testing,end).
 :- add_import_module(lmconf,mud_telnet,end).
 :- add_import_module(mud_testing,mud_telnet,end).
+:- add_import_module(mud_telnet,world,end).
 :- add_import_module(baseKB,lmcache,end).
 :- add_import_module(baseKB,lmconf,end).
 :- add_import_module(baseKB,world,end).
@@ -669,6 +672,6 @@ lundef :- A = [],
 
 %:-mred_untrace.
 %:-mred_no_spy_all.
-:- lcme:reset_modules.
+%:- lcme:reset_modules.
 :- set_prolog_flag(pfc_booted,true).
 :- set_prolog_flag(assert_attvars,true).

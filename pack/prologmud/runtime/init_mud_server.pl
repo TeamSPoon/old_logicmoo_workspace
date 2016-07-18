@@ -19,12 +19,12 @@
 :- set_prolog_flag(generate_debug_info,true).
 */
 
-:- system:ensure_loaded(setup_paths).
-:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
-:- endif.
+%:- system:ensure_loaded(setup_paths).
+%:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+%:- endif.
 % :- module(init_mud_server,[]).
 % restore entry state
-:- lcme:reset_modules.
+%:- lcme:reset_modules.
 
 :- set_prolog_flag(access_level,system).
 
@@ -166,10 +166,10 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 % MUD SERVER CODE LOADS
 % ==============================
 
-:- push_modules.
+%:- push_modules.
 % [Required] load the mud system
 :- show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader)))).
-:- lcme:reset_modules.
+%:- lcme:reset_modules.
 
 %:- set_prolog_flag(logicmoo_debug,true).
 
