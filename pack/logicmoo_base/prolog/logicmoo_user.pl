@@ -23,7 +23,7 @@
  op(300,fx,'~'),
  op(300,fx,'-') */ ]).
 % restore entry state
-:- reset_modules.
+:- lcme:reset_modules.
 
 
 :- use_module(library(logicmoo_utils)).
@@ -52,7 +52,7 @@
 :- at_start((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, call_u(G))))).
 :- at_start((ignore((logicmoo_util_shared_dynamic:call(retract,(ereq(G):- find_and_call(G))),fail)))).
 
-:- reset_modules.
+:- lcme:reset_modules.
 
 :- set_prolog_flag(retry_undefined,true).
 

@@ -24,7 +24,7 @@
 :- endif.
 % :- module(init_mud_server,[]).
 % restore entry state
-:- reset_modules.
+:- lcme:reset_modules.
 
 :- set_prolog_flag(access_level,system).
 
@@ -169,7 +169,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- push_modules.
 % [Required] load the mud system
 :- show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader)))).
-:- reset_modules.
+:- lcme:reset_modules.
 
 %:- set_prolog_flag(logicmoo_debug,true).
 

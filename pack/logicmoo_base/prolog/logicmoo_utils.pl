@@ -20,7 +20,7 @@
 :- endif.
 :- module(logicmoo_utils_file,[]).
 % restore entry state
-:- reset_modules.
+:- lcme:reset_modules.
 
 :- set_prolog_flag(lm_expanders,false).
 
@@ -169,5 +169,5 @@ lmconf:logicmoo_scan_autoloads:-false.
 */
 
 :- set_prolog_flag(lm_expanders,true).
-:- reset_modules.
+:- lcme:reset_modules.
 

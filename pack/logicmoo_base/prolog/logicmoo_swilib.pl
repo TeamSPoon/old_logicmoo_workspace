@@ -19,7 +19,7 @@
 :- endif.
 :- module(logicmoo_swilib,[]).
 % restore entry state
-:- reset_modules.
+:- lcme:reset_modules.
 
 
 % ======================================================
@@ -231,7 +231,7 @@
    functor(PI,F,A),import(F/A),fail)).
 */
 
-:- reset_modules.
+:- lcme:reset_modules.
 
 :- autoload.
 

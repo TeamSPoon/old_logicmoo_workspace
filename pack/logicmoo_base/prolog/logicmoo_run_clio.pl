@@ -11,7 +11,7 @@
 :- endif.
 :- module(logicmoo_run_clio,[]).
 % restore entry state
-:- reset_modules.
+:- lcme:reset_modules.
 
 % :- use_module(logicmoo_base).
 

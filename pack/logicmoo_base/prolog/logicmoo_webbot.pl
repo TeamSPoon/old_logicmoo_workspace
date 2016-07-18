@@ -8,7 +8,7 @@
 :- endif.
 :- module(logicmoo_webbot_file,[]).
 % restore entry state
-:- reset_modules.
+:- lcme:reset_modules.
 
 %:- prolog_ide(thread_monitor).
 %:- prolog_ide(debug_monitor).

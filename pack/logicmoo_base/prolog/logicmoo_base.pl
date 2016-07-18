@@ -8,7 +8,7 @@
 :- endif.
 :- module(logicmoo_base_file,[]).
 % restore entry state
-:- reset_modules.
+:- lcme:reset_modules.
 
 
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
@@ -105,7 +105,7 @@ lmconf:mpred_skipped_module(eggdrop).
 
 
 :- thread_local t_l:side_effect_ok/0.
-:- reset_modules.
+:- lcme:reset_modules.
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
 :- enable_mpred_expansion.
@@ -222,4 +222,4 @@ user:lmbf:-
 % :- set_prolog_flag(read_attvars,false).
 :- set_prolog_flag(mpred_te,false).
 
-:- reset_modules.
+:- lcme:reset_modules.

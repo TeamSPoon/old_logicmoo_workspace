@@ -141,12 +141,12 @@
 :- kb_dynamic   impl_coerce_hook/3.
 
 :- kb_dynamic   create_random_fact/1.
-:- kb_dynamic   local_term_anglify/2.
-:- kb_dynamic   term_anglify_last/2.
-:- kb_dynamic   term_anglify_np/3.
-:- kb_dynamic   term_anglify_np_last/3.
+% :- kb_dynamic   local_term_anglify/2.
+% :- kb_dynamic   term_anglify_last/2.
+% :- kb_dynamic   term_anglify_np/3.
+% :- kb_dynamic   term_anglify_np_last/3.
 
-:- kb_dynamic   hooked_random_instance/3.
+% :- kb_dynamic   hooked_random_instance/3.
 
 :- kb_dynamic   now_unused/1.
 :- kb_dynamic   provide_mpred_read_attributes/3.

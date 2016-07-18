@@ -16,7 +16,7 @@
 %:- endif.
 % :- module(mud_loader,[]).
 % restore entry state
-%:- reset_modules.
+%:- lcme:reset_modules.
 
 
 %:- add_import_module(mpred_storage,baseKB,end).
@@ -669,6 +669,6 @@ lundef :- A = [],
 
 %:-mred_untrace.
 %:-mred_no_spy_all.
-:- reset_modules.
+:- lcme:reset_modules.
 :- set_prolog_flag(pfc_booted,true).
 :- set_prolog_flag(assert_attvars,true).
