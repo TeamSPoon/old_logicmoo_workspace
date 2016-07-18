@@ -1,4 +1,5 @@
-/* <module> Adds autoloading of LogicMOO Utilities predicates
+/* 
+< module > Adds autoloading of LogicMOO Utilities predicates
 % ===================================================================
     File:         'logicmoo_utils).'
     Purpose:       To load the logicmoo libraries as needed
@@ -99,10 +100,9 @@
 % ======================================================
 :- dynamic(lmconf:logicmoo_scan_autoloads/0).
 :- dynamic(lmconf:logicmoo_pre_release/0).
+ 	 	 
 
-%= 	 	 
-
-%% logicmoo_pre_release is semidet.
+%  logicmoo_pre_release() is semidet.
 %
 % Hook To [lmconf:logicmoo_pre_release/0] For Module Logicmoo_utils.
 % Logicmoo Pre Release.
@@ -125,7 +125,7 @@ lmconf:logicmoo_pre_release.
 :- endif.
 
 
-%% logicmoo_scan_autoloads is semidet.
+% lmconf:logicmoo_scan_autoloads() is semidet.
 %
 % Hook To [lmconf:logicmoo_scan_autoloads/0] For Module Logicmoo_utils.
 % Logicmoo Scan Autoloads.

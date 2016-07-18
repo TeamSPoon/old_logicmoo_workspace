@@ -796,7 +796,7 @@ extract_struct_parameter(Def,Name,Name,Def).
 
 %= 	 	 
 
-%% module_local_init is semidet.
+%% module_local_init() is semidet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Logicmoo_util_structs.
 % Module Local Init.

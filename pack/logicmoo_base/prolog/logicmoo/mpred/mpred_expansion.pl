@@ -85,7 +85,6 @@
             replaced_module/3,
             do_expand_args/3,
             ain_expanded/1,
-            do_expand_args/3,
             do_expand_args_l/3,
             do_expand_args_pa/4,
             ex_argIsa/3,
@@ -98,7 +97,7 @@
             expanded_different/2,
             expanded_different_1/2,
             expanded_different_ic/2,
-            expands_on/2,
+            %expands_on/2,
             fix_negations/2,
             fixed_negations/2,
             foreach_arg/7,
@@ -115,7 +114,7 @@
             functor_declares_instance/2,
             functor_declares_instance_0/2,
             holds_args/2,
-            if_expands_on/3,
+            %if_expands_on/3,
             infix_op/2,
             instTypePropsToType/2,
             into_functor_form/3,
@@ -416,7 +415,7 @@ functor_declares_collectiontype(typeProps,ttTemporalType).
 %
 % Inst Type Props Converted To Type.
 %
-instTypePropsToType(instTypeProps,ttSpatialType).
+instTypePropsToType(instTypeProps,ttSpatialType222).
 
 
 %= 	 	 
@@ -603,7 +602,7 @@ expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),quietly_must(demodulize(clause
    Sent,SentM)),Sent\=@=SentM,!,bagof(O,do_expand_args(isEach,SentM,O),SentO),!.
 */
 expand_isEach_or_fail(Sent,SentO):-
-    bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L.
+    notrace((bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L)).
 
 %% expand_kif_string_or_fail( ++Op, ++Sent, --SentO) is semidet.
 %
@@ -1682,7 +1681,6 @@ holds_args(HOFDS,FIST):- is_ftCompound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),
 %
 % Do Expand Arguments.
 %
-:- was_export((do_expand_args/3)).
 do_expand_args(_,Term,TermO):- \+ compound(Term),!,must(Term=TermO).
 do_expand_args(Exp,M:Sent,M:SentO):- atom(M),!,do_expand_args(Exp,Sent,SentO).
 do_expand_args(_,Term,Term):- functor(Term,F,_),cheaply_u(argsQuoted(F)),!.
@@ -1733,7 +1731,7 @@ do_expand_args_l(_,A,A).
 %
 % Expands Whenever.
 %
-expands_on(EachOf,Term):-subst(Term,EachOf,foooz,Term2),!,Term2\=Term, \+ ((do_expand_args(EachOf,Term,O),O = Term)).
+%expands_on(EachOf,Term):-subst(Term,EachOf,foooz,Term2),!,Term2\=Term, \+ ((do_expand_args(EachOf,Term,O),O = Term)).
 
 %= 	 	 
 
@@ -1741,7 +1739,7 @@ expands_on(EachOf,Term):-subst(Term,EachOf,foooz,Term2),!,Term2\=Term, \+ ((do_e
 %
 % If Expands Whenever.
 %
-if_expands_on(EachOf,Term,Call):- expands_on(EachOf,Term),subst(Call,Term,O,OCall),!, forall(do_expand_args(EachOf,Term,O),OCall).
+%if_expands_on(EachOf,Term,Call):- expands_on(EachOf,Term),subst(Call,Term,O,OCall),!, forall(do_expand_args(EachOf,Term,O),OCall).
 
 /*
 %db_reop(WhatNot,Call) :- into_mpred_form(Call,NewCall),NewCall\=@=Call,!,db_reop(WhatNot,NewCall).

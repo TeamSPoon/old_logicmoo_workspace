@@ -12,7 +12,7 @@
 %
 */
 
-:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+:- if(( world:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 % :- module(mud_loader,[]).
 % restore entry state
@@ -52,14 +52,14 @@
 
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
 
-:- system:ensure_loaded(prologmud(server/mud_telnet)).
+:- world:ensure_loaded(prologmud(server/mud_telnet)).
 
 % xyzFn(R,X,Y,Z):-dmsg(xyzFn(R,X,Y,Z)),trace_or_throw(xyzFn(R,X,Y,Z)).
 
 % :- multifile prolog:message/3.
 % prolog:message(git(update_versions),A,A):-!.
 
-:- system:use_module(library(settings)).
+:- world:use_module(library(settings)).
 % :- use_module(library(check)).
 % :- make.
 %:- portray_text(true).
@@ -93,6 +93,11 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 :-asserta((system:halt :- format('the halting problem is now solved!'))).
 :-lock_predicate(system:halt/0).
 
+:-redefine_system_predicate(system:halt/1).
+:-abolish(system:halt,1).
+:-asserta((system:halt(_) :- format('the halting problem is now solved!'))).
+:-lock_predicate(system:halt/1).
+
 :- dmsg('the halting problem is now solved!').
 
 :- file_begin(prolog).
@@ -108,7 +113,7 @@ now_try_game_dir(Else):-
  enumerate_files(game('.'), GAMEDIR) *-> 
   ((exists_directory(GAMEDIR) -> 
     with_all_dmsg(( 
-      % forall(enumerate_files(game('**/*.pl'),X),system:ensure_loaded(X)),
+      % forall(enumerate_files(game('**/*.pl'),X),world:ensure_loaded(X)),
       forall(no_repeats_old(X,enumerate_files(game('*.pfc.pl'),X)),declare_load_dbase(X)))); (wdmsg(missing(GAMEDIR)),Else)));  (wdmsg(no_game_dir),Else).
 
 
@@ -198,7 +203,7 @@ hard_work:-
   % system:ensure_loaded(logicmoo(launchcliopatria)),
   % system:ensure_loaded(logicmoo(testwebconsole)),
   % kill_term_expansion, 
-   system:ensure_loaded(swish(logicmoo_run_swish))
+   world:ensure_loaded(swish(logicmoo_run_swish))
    )))),!.
 
 % [Required] load the mud PFCs
@@ -406,17 +411,17 @@ Proof end.
 
 
 
-:- system:ensure_loaded(library(logicmoo_user)).
+:- world:ensure_loaded(library(logicmoo_user)).
 
 
-% :- system:ensure_loaded(('/root/lib/swipl/pack/prologmud/prolog/prologmud/actions/eat.pl')).
+% :- world:ensure_loaded(('/root/lib/swipl/pack/prologmud/prolog/prologmud/actions/eat.pl')).
 
 
-% :- system:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
-:- system:ensure_loaded(prologmud(server/mud_irc)).
-:- system:ensure_loaded(prologmud(vworld/world)).
+% :- world:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
+:- world:ensure_loaded(prologmud(server/mud_irc)).
+:- world:ensure_loaded(prologmud(vworld/world)).
 
-:- system:ensure_loaded(prologmud(server/mud_testing)).
+:- world:ensure_loaded(prologmud(server/mud_testing)).
 
 
 /*
@@ -511,8 +516,8 @@ download_and_install_el:-
 
 % :- asserta(lmcache:loaded_external_kbs(mud)),show_call(kbp_to_mpred_t).
 
-:- system:ensure_loaded(prologmud(parsing/parser_imperative)).
-:- system:ensure_loaded(prologmud(parsing/simple_decl_parser)). 
+:- world:ensure_loaded(prologmud(parsing/parser_imperative)).
+:- world:ensure_loaded(prologmud(parsing/simple_decl_parser)). 
 :- dynamic(baseKB:mudStowing/2).
 
 /*

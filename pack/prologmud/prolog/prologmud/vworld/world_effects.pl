@@ -1,4 +1,4 @@
-/** <module> 
+/* * <module> 
 % This file gives a common place where world effects 
 % (such as carrying  shield or being drunk) are implemented
 %

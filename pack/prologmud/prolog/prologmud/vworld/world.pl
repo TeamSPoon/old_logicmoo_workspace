@@ -1,3 +1,4 @@
+:-module(world, []).
 /** <module> 
 % Common place to reduce redundancy World utility prediates
 %
@@ -12,8 +13,6 @@
 % general assistance Dr. Donald Nute
 %
 */
-
-:-module(world, []).
 :- '$set_source_module'(world).
 :- set_prolog_flag(logicmoo_debug,true).
 :- set_prolog_flag(unsafe_speedups,false).
@@ -82,7 +81,7 @@ mtProlog(world).
           create_agent/2)).
 
 :- dynamic  agent_list/1.
-:- kb_dynamic(mudDescription/2).
+% :- kb_dynamic(mudDescription/2).
 
 :- include(prologmud(mud_header)).
 % :- register_module_type (utility).
@@ -175,7 +174,7 @@ create_agent(P,List):- must(create_instance(P,tAgent,List)),!.
 :- must(prolog_load_context(module,world)).
 
 :-export(create_instance/1).
-create_instance(P):- must((isa(P,What),ttSpatialType(What))),must(create_instance(P,What,[])),!.
+create_instance(P):- must(call_u((isa(P,What),ttSpatialType(What)))),must(create_instance(P,What,[])),!.
 :-export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
@@ -223,8 +222,8 @@ create_instance_0(T,tAgent,List):-
    create_meta(T,_,tAgent,P),
    mreq(isa(P,tAgent)),
    padd(P,List),   
-   % punless(mudPossess(P,_),rez_to_inventory(P,food,_Food)),
-   rez_to_inventory(P,tFood,_Food),
+   % punless(mudPossess(P,_),modCreate:rez_to_inventory(P,food,_Food)),
+   modCreate:rez_to_inventory(P,tFood,_Food),
    %reset_values(P),   
    padd(P, [ predInstMax(mudHealth,500),
                        predInstMax(mudEnergy,200),

@@ -128,9 +128,7 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 % ================================================
 
 
-%= 	 	 
-
-%% after_mpred_load is semidet.
+% after_mpred_load() is semidet.
 %
 % Hook To [lmcache:after_mpred_load/0] For Module Mpred_agenda.
 % After Managed Predicate Load.

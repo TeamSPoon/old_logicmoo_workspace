@@ -764,6 +764,9 @@ action_to_able(actObserve,tObserveAble).
 (action_to_able(ACT,ABLE)==> (argIsa(ACT,1,Type)==> genls(Type,ABLE))).
   
 
+genlInverse(mudContains,mudInsideOf).
+
+arity(mudInsideOf,2).
 
 vtBasicDir(vEast).
 vtBasicDir(vNorth).

@@ -528,7 +528,7 @@ show_call_fmt(Call):-show_failure(Call),fmt(Call).
 % args_match_types(ARGS,Types).
 args_match_types(In,Out):-In==[],!,Out=[].
 args_match_types(TemplIn,Templ):-is_list(TemplIn),is_list(Templ),!,maplist(args_match_types,TemplIn,Templ).
-args_match_types([X],X):-!.
+args_match_types([X],X):- nonvar(X),!.
 args_match_types(TemplIn,Templ):-compound(TemplIn),!,TemplIn=..TemplInL, Templ=..TemplL, args_match_types(TemplInL,TemplL).
 args_match_types(Templ,Templ):-!.
 args_match_types(Obj,Type):-!,isa(Obj,Type).

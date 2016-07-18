@@ -1,3 +1,4 @@
+:- module(parser_imperative, []).
 /* <module>
 % Imperitive Sentence Parser (using DCG)
 %
@@ -6,13 +7,9 @@
 % Dec 13, 2035
 %
 */
-
-
 :- include(prologmud(mud_header)).
 
-/*
 
-:-swi_module(parser_imperative, []).
 :-export((
                    parse_agent_text_command/5,            
                    parse_agent_text_command_0/5,            
@@ -27,7 +24,6 @@
                    name_text_atomic/2,
                    parseForTypes//2)).
 
-*/
 % :- register_module_type (utility).
 
 % =====================================================================================================================
@@ -46,7 +42,7 @@ get_agent_text_command_0(Agent,ListIn,AgentR,CMD):-
 % ===========================================================
 % PARSE command
 % ===========================================================
-type_action_info(tHumanControlled,actParse(ftProlog,ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+:-ain((type_action_info(tHumanControlled,actParse(ftProlog,ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack"))).
 
 agent_command(_Gent,actParse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
@@ -54,7 +50,7 @@ agent_command(_Gent,actParse(Type,StringM)):-
 % ===========================================================
 % CMDPARSE command
 % ===========================================================
-type_action_info(tHumanControlled,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
+:-ain((type_action_info(tHumanControlled,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack"))).
 
 agent_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt('==>'(parse_for(StringM) , [Term,LeftOver])).
 
@@ -64,7 +60,7 @@ agent_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,Left
 % ===========================================================
 % parsetempl command
 % ===========================================================
-type_action_info(tHumanControlled,actParsetempl(ftListFn(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetempl who").
+:-ain((type_action_info(tHumanControlled,actParsetempl(ftListFn(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetempl who"))).
 
 agent_text_command(Agent,[actParsetempl|List],Agent,actParsetempl(List)).
 
@@ -228,7 +224,7 @@ match_object_0(Atoms,Obj):-
    forall(member(A,Atoms),(member(W,WList),no_trace(string_equal_ci(A,W)))).
 
 match_object_1(A,Obj):-same_ci(A,Obj),!.
-match_object_1(A,Obj):-no_trace((isa(Obj,Type))),same_ci(A,Type),!.
+match_object_1(A,Obj):-isa(Obj,Type),same_ci(A,Type),!.
 
 
 % dmsg_parserm(D):-dmsg(D),!.
@@ -242,7 +238,8 @@ dmsg_parserm(F,A):-ignore((debugging(parser),dmsg(F,A))).
 :-debug(parser).
 :-nodebug(parser).
 
-must_atomic(A):-must(atomic(A)).
+
+must_atomics(A):-must(atomic(A)).
 
 
 parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- destringify(SVERB,AVERB),SVERB \=@= AVERB,!,
@@ -250,7 +247,7 @@ parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- destringify(SVERB,AVE
 parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- is_list(Args),maplist(destringify,Args,AArgs),AArgs \=@= Args,!,
    parse_agent_text_command(Agent,SVERB,AArgs,NewAgent,GOAL).
 parse_agent_text_command(Agent,SVERB,[],NewAgent,GOAL):-compound(SVERB),!,must((NewAgent=Agent,GOAL=SVERB)),!.
-parse_agent_text_command(_Agent,SVERB,ARGS,_,_):-slow_sanity((must(atomic(SVERB)),maplist(must_atomic,ARGS))),fail.
+parse_agent_text_command(_Agent,SVERB,ARGS,_,_):-slow_sanity((must(atomic(SVERB)),maplist(must_atomics,ARGS))),fail.
 
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
   dmsg(parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL)),

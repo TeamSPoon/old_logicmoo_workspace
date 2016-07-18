@@ -145,6 +145,7 @@ cnotrace:- notrace.
 %
 % Unlike notrace/1, it allows traceing when excpetions are raised during Goal.
 %
+hotrace:-!.
 hotrace:-notrace.
 %:- export(hotrace/1).
 %% = :- meta_predicate(hotrace(0)).
@@ -161,6 +162,7 @@ thread_leash(Some):- thread_self(main)->leash(Some);true.
 
 :- meta_predicate hotrace(0).
 
+hotrace(Goal):-!,call(Goal).
 hotrace(Goal):-
    ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
    '$leash'(OldL, OldL),'$visible'(OldV, OldV),
@@ -216,10 +218,11 @@ rtrace:- notrace,assert_if_new(tlbugger:rtracing),visible(+all),visible(+excepti
 %
 % Nor Trace.
 %
+nortrace:- notrace((\+ tlbugger:rtracing)),!.
 nortrace:- notrace,retractall(tlbugger:rtracing), visible(+all),visible(+exception),thread_leash(+all),thread_leash(+exception). % restore_guitracer,ignore(retract(tlbugger:rtracing)))).
 
 
-push_tracer_and_notrace:- hotrace((push_tracer,nortrace,hotrace)).
+push_tracer_and_notrace:- notrace((push_tracer,notrace)).
    
 %= 	 	 
 
@@ -286,7 +289,8 @@ restore_trace(Goal):-
 
 % rtrace(Goal):- wdmsg(rtrace(Goal)),!, restore_trace(setup_call_cleanup_each(rtrace,(trace,Goal),nortrace)).
 
-rtrace(Goal):- notrace(skipWrapper;tlbugger:rtracing),!,Goal.
+rtrace(Goal):- notrace(skipWrapper;tlbugger:rtracing),!,call(Goal).
+rtrace(Goal):- rtrace,!,trace,call(Goal).
 rtrace(Goal):- 
   ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
    '$leash'(OldL, OldL),'$visible'(OldV, OldV),

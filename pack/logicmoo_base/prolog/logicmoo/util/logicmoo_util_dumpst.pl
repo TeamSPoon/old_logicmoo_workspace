@@ -550,7 +550,7 @@ dumptrace(G):-
     w_tl(set_prolog_flag(retry_undefined, false),
      dumptrace0(G)))).
 
-dumptrace0(G):- notrace((tracing,notrace,wdmsg(tracing_dumptrace(G)))),!, (dumptrace0(G) -> trace ; (trace,fail)).
+dumptrace0(G):- notrace((tracing,notrace,wdmsg(tracing_dumptrace(G)))),!, catch(((dumptrace0(G) *-> trace ; (trace,fail))),_,true).
 dumptrace0(G):-   
   catch(attach_console,_,true),
     repeat, 

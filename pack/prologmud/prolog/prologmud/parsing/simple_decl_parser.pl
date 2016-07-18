@@ -1,4 +1,5 @@
-/* <module>
+:- module(simple_decl_parser, []).
+/** <module>
 % an example of simple parsing of an inform7 like language.
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
@@ -58,7 +59,7 @@ typeGenls(ttValueType,vtValue).
 
 toCol(Txt,I,TCOL):-member(TCOL,[tCol,tObj,tSpatialThing,vtValue,ttTypeType]),show_success(toCol_0(Txt,I,TCOL)),!.
 
-toCol_0(Txt,O,TCOL):-member(Pfx-Sfx-ISACISA, 
+toCol_0(Txt,O,TCOL):-member(Pfx-Sfx- _ISACISA, 
          [
           ''-''-_,
           't'-''-'tSpec',
@@ -98,8 +99,8 @@ detn(indef) --> ['An'].
 
 collection(I,Col,More)--> detn(_),!,collection(I,Col,More).
 collection(I,Col,true)--> collection0(I,Col).
-collection(I,Col,More)--> attribute(Pred,I,Value,More),collection0(I,Col).
-collection(I,Col,More)--> attribute(Pred,I,Value,More),{isa(I,Col)}.
+collection(I,Col,More)--> attribute(_Pred,I,_Value,More),collection0(I,Col).
+collection(I,Col,More)--> attribute(_Pred,I,_Value,More),{call_u(isa(I,Col))}.
 
 
 collection0(I,Col)--> [A,B,C],{toCamelAtom([A,B,C],O),collection00(O,I,Col)}.
@@ -244,12 +245,12 @@ translation_for(Room,'tRegion',(isa(Room,'tCorridor'),isa(Room,'tWellLit')),WS,[
  ('S'('NP'('PRP'('You')),'VP'('VBP'(find),'NP'('PRP'(yourself)),'PP'('IN'(in),'NP'('NP'('DT'(the),'NN'(middle)),'PP'('IN'(of),
   'NP'('NP'('DT'(a),'ADJP'('RB'(well),'JJ'(lit)),'NN'(corridor)),'PP'('IN'(on),'NP'('DT'(the),'NN'('Enterprise')))))))))).
 
-translation_for(Ctx,CtxISA,t(M,Prolog),WS,WE):- once((append(LeftSide,RightSide,WS), modality(M,List,Replace),append(LeftL,List,LeftSide),
+translation_for(_Ctx,_CtxISA,t(M,Prolog),WS,WE):- once((append(LeftSide,RightSide,WS), modality(M,List,Replace),append(LeftL,List,LeftSide),
   append(LeftL,List,LeftSide),append(LeftL,Replace,Left),
    append(Left,RightSide,NewWS))),
    translation_w(Prolog,NewWS,WE),!.
-translation_for(Ctx,CtxISA,Prolog) --> translation_w(Prolog).
-translation_for(Ctx,CtxISA,Prolog,WS,WE):-w_tl(loosePass,translation_w(Prolog,WS,WE)).
+translation_for(_Ctx,_CtxISA,Prolog) --> translation_w(Prolog).
+translation_for(_Ctx,_CtxISA,Prolog,WS,WE):-w_tl(loosePass,translation_w(Prolog,WS,WE)).
 
 
 translation_dbg_on_fail(Ctx,CtxISA,Prolog)-->translation_for(Ctx,CtxISA,Prolog),!.
@@ -296,8 +297,8 @@ predicate_named(Pred) --> dcgAnd(theText(Text),dcgLenBetween(1,5)),
 assumed_isa(I,C):-isa(I,C),!.
 assumed_isa(I,C):-loosePass,assert_isa(I,C),!.
 
-:- must(dcgAnd(dcgLenBetween(5,1),theText(_Text),[a,b,c],[])).
-:- must(predicate_named(_P,[proper,-,named],[])).
+:- call(must(dcgAnd(dcgLenBetween(5,1),theText(_Text),[a,b,c],[]))).
+:- call(must(predicate_named(_P,[proper,-,named],[]))).
 
 
 :-assertz_if_new(parserTest(iWorld7,"An object can be proper-named or improper-named.",partitionedInto(tObj,tProperNamed,tImproperNamed))).
@@ -314,7 +315,7 @@ translation_w(relationSomeInstance(isa,C1,C2)) --> collection(C1),[be],collectio
 translation_w(isa(C1,C2)) --> detn(def),col(v,C1),[is,a],col(vt,C2).  
 
 col(Pfx,C)-->subject(C,_,true),{atom_concat(Pfx,_,C)}.
-col(Pfx,C)-->{loosePass},subject(C,_,true).
+col(_Pfx,C)-->{loosePass},subject(C,_,true).
 
 % set of small things in the world
 tCol(tSmall).  % I dont like doing this with adjectives.. but it cant be argued to be sane

@@ -2,6 +2,23 @@
 /** <module> MUD server startup script in SWI-Prolog
 
 */
+/*
+:- set_prolog_flag(access_level,system).
+
+:- if( \+ current_module(prolog_stack)).
+:- system:use_module(library(prolog_stack)).
+ prolog_stack:stack_guard(none).
+:- endif.
+
+:- use_module(library(prolog_history)).
+:- use_module(library(base32)).
+:- set_prolog_flag(report_error,true).
+:- set_prolog_flag(compile_meta_arguments,false).
+:- set_prolog_flag(debug_on_error,true).
+:- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
+:- set_prolog_flag(generate_debug_info,true).
+*/
+
 :- system:ensure_loaded(setup_paths).
 :- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
@@ -9,15 +26,33 @@
 % restore entry state
 :- reset_modules.
 
+:- set_prolog_flag(access_level,system).
+
+:- 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'),
+ op(300,fx,'-'),
+ op(1199,fx,('==>')).
+
+:- set_prolog_flag(access_level,user).
 
 :- multifile
         prolog:message//1,
         prolog:message_hook/3.
 
-prolog:message(ignored_weak_import(Into, From:PI))--> { nonvar(Into),dtrace(ignored_weak_import(Into, From:PI)),fail}.
-prolog:message_hook(_,_,ignored_weak_import(Into, From:PI)):- nonvar(Into),dtrace(ignored_weak_import(Into, From:PI)),fail.
-
-ignored_weak_import(Into, From:PI):-wdmsg(ignored_weak_import(Into, From:PI)).
+% prolog:message(ignored_weak_import(Into, From:PI))--> { nonvar(Into),Into \== system,dtrace(dmsg(ignored_weak_import(Into, From:PI))),fail}.
+% prolog:message(Into)--> { nonvar(Into),functor(Into,_F,A),A>1,arg(1,Into,N),\+ number(N),dtrace(wdmsg(Into)),fail}.
+% prolog:message_hook(T,error,Warn):- dtrace(wdmsg(nessage_hook(T,warning,Warn))),fail.
+% prolog:message_hook(T,warning,Warn):- dtrace(wdmsg(nessage_hook(T,warning,Warn))),fail.
 
 :- set_prolog_flag(dialect_pfc,false).
 :- set_prolog_stack(global, limit(16*10**9)).
@@ -57,7 +92,7 @@ ignored_weak_import(Into, From:PI):-wdmsg(ignored_weak_import(Into, From:PI)).
         lmconf:sanity_test/0,
         agent_call_command/2,
         action_info/2,
-        lmconf:type_action_info/3)).
+        type_action_info/3)).
 
 
 %:- ensure_webserver(3020).
@@ -193,7 +228,9 @@ pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 
 mpred_argtypes(bordersOn(tRegion,tRegion)).
 
-:-onSpawn(bordersOn(tLivingRoom,tOfficeRoom)).
+
+:- call_u(onSpawn(bordersOn(tLivingRoom,tOfficeRoom))).
+:- nortrace,notrace.
 
 :- set_prolog_flag(dialect_pfc,false).
 

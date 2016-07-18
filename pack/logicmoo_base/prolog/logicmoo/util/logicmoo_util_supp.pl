@@ -59,6 +59,7 @@ must_notrace(Goal):- no_trace(must_or_die(Goal)).
 
 :- module_transparent(no_trace/1).
 :- '$hide'(no_trace/1).
+no_trace(G):- !,call(G).
 no_trace(G):- notrace((tracing,notrace))->
    setup_call_cleanup_each(notrace(notrace),G,notrace(trace)); 
    setup_call_cleanup_each(notrace(notrace),G,notrace(notrace)).

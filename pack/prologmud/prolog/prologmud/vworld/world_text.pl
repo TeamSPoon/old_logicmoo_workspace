@@ -1,4 +1,5 @@
-/** <module> 
+/* *
+ <module> 
 % Writer NPC_Interface  for supporting inforation based actions
 %
 %
@@ -9,7 +10,7 @@
 */
 % :-swi_module(world_text,[]).
 %      default_repl_obj_to_string/3,default_repl_writer/4,show_kb_via_pred/3,show_kb_preds/2,show_kb_preds/3,wasSuccess/2
-:- include(prologmud(mud_header)).
+% :- include(prologmud(mud_header)).
 
 % :-export(eng_fully_expand/2).
 
@@ -48,7 +49,7 @@ prologDynamic(mudTermAnglify/2).
 prologBuiltin(term_anglify_args/6).
 prologBuiltin(term_anglify_last/2).
 :-export(term_anglify_args/6).
-:-export(term_anglify_last/2).
+% :-export(term_anglify_last/2).
 
 term_anglify_last(Head,English):-compound(Head),
    functor(Head,F,A),A>1,
@@ -213,9 +214,9 @@ local_term_anglify_first(T,TA):-must(enter_term_anglify(T,TA)),!.
 
 
 
-:-export(local_term_anglify/2).
-local_term_anglify(Var,[ftCallable(Var)]):- var(Var),!.
-local_term_anglify([Var],[ftCallable([Var])]):- var(Var),!.
+% :-export(local_term_anglify/2).
+local_term_anglify(Var,O):- var(Var),!,O=[ftCallable(Var)].
+% local_term_anglify([Var],O):- var(Var),!,O=[ftCallable([Var])].
 
 local_term_anglify(posNP(P),English):- local_term_anglify_np(P,English).
 local_term_anglify(noun_phrase(P),English):- local_term_anglify_np(P,English).

@@ -1,11 +1,3 @@
-/** <module> 
-% Uses timers to make sure all Agents get a chance to do their things
-%
-% Logicmoo Project PrologMUD: A MUD server written in Prolog
-% Maintainer: Douglas Miles
-% Dec 13, 2035
-%
-*/
 :-swi_module(toploop_npc, [
           move_or_sit_memory_idea/3,
           npc_tick/0,
@@ -15,12 +7,20 @@
           warnOnError/1,
           get_world_agent_plan/3,
           tick_controller/2]).
+/* * <module> 
+% Uses timers to make sure all Agents get a chance to do their things
+%
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
 
 :- meta_predicate warnOnError(0).
 :- meta_predicate agent_call_safely(?,?,?).
 
 
-:- include(prologmud(mud_header)).
+% :- include(prologmud(mud_header)).
 % :- file_begin(mudcode).
 :- dynamic(npc_tick_tock_time/1).
 npc_tick_tock_time(60).
@@ -105,7 +105,7 @@ warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 :- (rtrace,trace).
 agent_call_command(_Agent,actProlog(prolog_repl)) :- (side_effect_prone),true, prolog_repl,!.
 agent_call_command(Agent,actProlog(C)) :- (side_effect_prone),true,nonvar(C),agent_call_safely(Agent,C).
-:- break.
+:- nortrace,notrace.
 
 :-export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
@@ -120,7 +120,7 @@ any_to_callable(C,X,Vs):- (expand_goal(C,X)),term_variables((C,X),Vs),!.
 
 :- (rtrace,trace).
 agent_call_command(_Agent,actNpcTimer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
-:- break.
+:- nortrace,notrace.
 agent_call_command(Who,actTick) :-  on_x_debug(command_actTick(Who)).
 agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea)),fmt(result_actIdea(Who,Idea)).
 agent_call_command(_Agent,actTock) :- (side_effect_prone), npc_tick.

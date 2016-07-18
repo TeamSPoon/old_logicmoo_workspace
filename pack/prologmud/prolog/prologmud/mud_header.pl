@@ -12,6 +12,26 @@
 
 % :- include(logicmoo(mpred/'mpred_header.pi')).
 
+:- set_prolog_flag(access_level,system).
+
+:- 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'),
+ op(300,fx,'-'),
+ op(1199,fx,('==>')).
+
+:- set_prolog_flag(access_level,user).
+
+
 :- enable_mpred_expansion.
 
 

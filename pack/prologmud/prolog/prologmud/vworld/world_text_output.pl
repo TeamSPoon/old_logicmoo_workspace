@@ -1,4 +1,7 @@
-/** <module>  
+:-swi_module(world_text_output, []).
+/*
+* 
+<module>  
 %  Database pretty outputing controls 
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
@@ -7,9 +10,7 @@
 %
 */
 
-:-swi_module(world_text_output, []).
-
-:- include(prologmud(mud_header)).
+% :- include(prologmud(mud_header)).
 
 % :- register_module_type (utility).
 

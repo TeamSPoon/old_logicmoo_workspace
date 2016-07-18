@@ -1,4 +1,4 @@
-/** <module> File used to implement in_world_events
+/* * <module> File used to implement in_world_events
 % like Talking, Appearing, falling rocks..
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog

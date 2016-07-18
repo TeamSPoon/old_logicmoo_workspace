@@ -438,7 +438,7 @@ transitive_subclass_or_same(A,B):-cheaply_u(genls(A,B)).
 %
 % Transitive P.
 %
-transitive_P(DB,P,L,R):-call(DB,P,L,R).
+transitive_P(DB,P,L,R):-call_u_t(DB,P,L,R).
 transitive_P(DB,P,L,R):-is_ftVar(L),!,transitive_P_r_l(DB,P,L,R).
 transitive_P(DB,P,L,R):-transitive_P_l_r(DB,P,L,R).
 
@@ -449,9 +449,9 @@ transitive_P(DB,P,L,R):-transitive_P_l_r(DB,P,L,R).
 %
 % Transitive P (list Version) R.
 %
-transitive_P_l_r(DB,P,L,R):-call(DB,P,L,A1),(call(DB,P,A1,R);call(DB,P,A1,A2),call(DB,P,A2,R)).
-transitive_P_l_r(DB,P,L,R):-nonvar(R),call(DB,P,L,A1),call(DB,P,A1,A2),call(DB,P,A2,A3),call(DB,P,A3,R).
-transitive_P_l_r(DB,P,L,R):-ground(L:R),call(DB,P,L,A1),call(DB,P,A1,A2),call(DB,P,A2,A3),call(DB,P,A3,A4),call(DB,P,A4,R).
+transitive_P_l_r(DB,P,L,R):-call_u_t(DB,P,L,A1),(call_u_t(DB,P,A1,R);call_u_t(DB,P,A1,A2),call_u_t(DB,P,A2,R)).
+transitive_P_l_r(DB,P,L,R):-nonvar(R),call_u_t(DB,P,L,A1),call_u_t(DB,P,A1,A2),call_u_t(DB,P,A2,A3),call_u_t(DB,P,A3,R).
+transitive_P_l_r(DB,P,L,R):-ground(L:R),call_u_t(DB,P,L,A1),call_u_t(DB,P,A1,A2),call_u_t(DB,P,A2,A3),call_u_t(DB,P,A3,A4),call_u_t(DB,P,A4,R).
 
 
 %= 	 	 
@@ -460,9 +460,9 @@ transitive_P_l_r(DB,P,L,R):-ground(L:R),call(DB,P,L,A1),call(DB,P,A1,A2),call(DB
 %
 % Transitive P R (list Version).
 %
-transitive_P_r_l(DB,P,L,R):-nonvar(R),(call(DB,P,A1,R),(call(DB,P,L,A1);call(DB,P,A2,A1),call(DB,P,L,A2))).
-transitive_P_r_l(DB,P,L,R):-nonvar(R),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB,P,A1,A2),call(DB,P,L,A1).
-transitive_P_r_l(DB,P,L,R):-ground(L:R),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB,P,A1,A2),call(DB,P,A0,A1),call(DB,P,L,A0).
+transitive_P_r_l(DB,P,L,R):-nonvar(R),(call_u_t(DB,P,A1,R),(call_u_t(DB,P,L,A1);call_u_t(DB,P,A2,A1),call_u_t(DB,P,L,A2))).
+transitive_P_r_l(DB,P,L,R):-nonvar(R),call_u_t(DB,P,A3,R),call_u_t(DB,P,A2,A3),call_u_t(DB,P,A1,A2),call_u_t(DB,P,L,A1).
+transitive_P_r_l(DB,P,L,R):-ground(L:R),call_u_t(DB,P,A3,R),call_u_t(DB,P,A2,A3),call_u_t(DB,P,A1,A2),call_u_t(DB,P,A0,A1),call_u_t(DB,P,L,A0).
 
 
 
@@ -682,7 +682,7 @@ tCol_gen(T):- no_repeats(T,call_u(atom(T);ttTemporalType(T);completelyAssertedCo
 
 %= 	 	 
 
-%% module_local_init is nondet.
+%% module_local_init() is nondet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Mpred_type_isa.
 % Module Local Init.
@@ -780,7 +780,7 @@ onLoadPfcRule('=>'(a(tCol,Inst), {isa_from_morphology(Inst,Type)} , isa(Inst,Typ
 %
 % Call Or.
 %
-callOr(Pred,I,T):-(call(Pred,I);call(Pred,T)),!.
+callOr(Pred,I,T):- call_u(call(Pred,I);call(Pred,T)),!.
 
 % type_deduced(I,T):-atom(T),i_name(mud,T,P),!,clause(a(P,_,I),true).
 
@@ -841,7 +841,7 @@ isa_asserted_0(I,T):- nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
 
 isa_asserted_0(I,T):- is_ftVar(T),!,tCol_gen(T),call_u(isa(I,T)).
 isa_asserted_0(I,T):- atom(T),current_predicate(T,_:G),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);
-  on_x_fail(G)).
+  on_x_fail(call_u(G))).
 isa_asserted_0(I,T):- nonvar(I),(  ((is_ftVar(T);chk_ft(T)),if_defined(term_is_ft(I,T)))*->true;type_deduced(I,T) ).
 isa_asserted_0(I,T):- is_ftCompound(I),is_non_unit(I),is_non_skolem(I),!,get_functor(I,F),compound_isa(F,I,T).
 isa_asserted_0(I,T):- nonvar(T),!,isa_asserted_1(I,T).
@@ -1381,7 +1381,10 @@ lmconf:module_local_init(_UserModule,_SystemModule):-
 lmconf:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(tCol)).
 lmconf:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(ttPredType)).
 
-
+call_u_t(DB,P,L,A1,A2):-call_u(call(DB,P,L,A1,A2)).
+call_u_t(DB,P,L,A1):-call_u(call(DB,P,L,A1)).
+call_u_t(DB,P,L):-call_u(call(DB,P,L)).
+call_u_t(DB,P):-call_u(call(DB,P)).
 
 mpred_type_isa_file.
 

@@ -1,15 +1,3 @@
-/* <module> mpred_clausify
-% Provides a prolog database replacement that uses an interpretation of KIF
-%
-%  t/N
-%  hybridRule/2
-%  
-%
-% Logicmoo Project PrologMUD: A MUD server written in Prolog
-% Maintainer: Douglas Miles
-% Dec 13, 2035
-%
-*/
 %:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(common_logic_skolem,
 	  [ form_sk/2,
@@ -22,6 +10,18 @@
             skolem_test/1,
             with_no_kif_var_coroutines/1
 	  ]).
+/** <module> mpred_clausify
+% Provides a prolog database replacement that uses an interpretation of KIF
+%
+%  t/N
+%  hybridRule/2
+%  
+%
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
 %:- endif.
 
 :- meta_predicate skolem_test(0).

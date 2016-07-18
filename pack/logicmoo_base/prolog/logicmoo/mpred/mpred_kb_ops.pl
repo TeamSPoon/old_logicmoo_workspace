@@ -625,7 +625,7 @@ w_get_fa(Mask,F,A):-get_functor(Mask,F,A).
 %
 set_prolog_stack_gb(Six):-set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 
-%% module_local_init is semidet.
+%% module_local_init() is semidet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Mpred_pfc.
 % Module Local Init.

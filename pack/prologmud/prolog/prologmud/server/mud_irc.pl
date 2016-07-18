@@ -1,4 +1,8 @@
-/** <module>  Initial IRC/Text console 
+end_of_file.
+
+% :-module(mud_irc, [irc_mud_event_hook/3, deliver_to_irc/2 ]).
+/*
+module  Initial IRC/Text console 
 % ALL IRC client MUD logic is here (removed from everywhere else!)
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
@@ -6,9 +10,6 @@
 % Dec 13, 2035
 %
 */
-end_of_file.
-
-% :-module(mud_irc, [irc_mud_event_hook/3, deliver_to_irc/2 ]).
 
 :- include(prologmud(mud_header)).
 

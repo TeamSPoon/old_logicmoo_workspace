@@ -1,4 +1,6 @@
-/** <module> 
+:-module(mud_testing,[]).
+/* *
+ <module> 
 % A MUD testing API is defined here
 % 
 %
@@ -7,7 +9,6 @@
 % Dec 13, 2035
 %
 */
-:-module(mud_testing,[]).
 
 /*
 :- maplist(export,
@@ -21,7 +22,7 @@
         test_call/1]).
 */
 
-% :- include(prologmud(mud_header)).
+:- include(prologmud(mud_header)).
 
 :- dynamic(lmcache:last_test_name/1).
 
@@ -43,7 +44,6 @@
 
 % :- trace,leash(+all),meta_predicate run_mud_tests().
 
-:- include(prologmud(mud_header)).
 % :- register_module_type (utility).
 
 :- add_import_module(lmconf,world,end).
@@ -308,3 +308,5 @@ lmconf:mud_test_local :- at_start(must_det(run_mud_tests)).
 :- module_predicates_are_exported.
 
 :- module_meta_predicates_are_transparent(mud_testing).
+
+

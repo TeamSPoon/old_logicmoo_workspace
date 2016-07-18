@@ -27,7 +27,7 @@ tStatPred(isEach(
          mudHeight)).
 
 
-agent_call_command(Agent,actStats(What)):-
+agent_call_command(_Agent,actStats(What)):-
   findall(Pred, (tStatPred(Stat),Pred=..[Stat,What,value]),Stats),
    sort(Stats,StatsS),
    show_kb_preds(What,StatsS),!.

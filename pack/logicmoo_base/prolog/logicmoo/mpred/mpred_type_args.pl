@@ -205,8 +205,9 @@ term_is_ft_how(Term,Type):- clause_umt(quotedDefnIff(Type,Info)),nonvar(Info),
 
 term_is_ft_how(Term,Type):- compound(Term),functor(Term,F,A),functor(Type,F,A),
   once((a(meta_argtypes,Type),Type=..[_|Types],Term=..[_|Args],
-     maplist(t,Types,Args))).
+     maplist(call_as_t,Types,Args))).
 
+call_as_t(T,A):-append_term(T,A,Call),call_u(Call).
 
 %= 	 	 
 
@@ -911,7 +912,7 @@ correctType0(Op,A,ftVoprop,AA):- !,w_tl(t_l:inVoprop,correctType0(Op,A,ftAskable
 correctType0(_ ,Obj,argIsaFn(_Prop,N),AA):-must_equals(Obj,AA),
    ignore((t_l:deduceArgTypes(_),
      sanity(N\=0),
-      findall(OT,isa_asserted(Obj,OT),_OType),
+      findall(OT,call_u(isa_asserted(Obj,OT)),_OType),
          ! /* must(nop(deduce_argN(Prop,N,Obj,OType,argIsaFn(Prop,N)))) */ )),!.
 
 
@@ -1102,7 +1103,7 @@ roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,
 
 %= 	 	 
 
-%% module_local_init is semidet.
+% module_local_init() is semidet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Mpred_type_args.
 % Module Local Init.

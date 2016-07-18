@@ -1,5 +1,6 @@
 #!/usr/bin/env swipl
-/** <module> Logic Engine startup
+/*
+ Logic Engine startup
 
 */
 

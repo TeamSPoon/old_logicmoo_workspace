@@ -1,5 +1,5 @@
 % :-swi_module(user). 
-:-module(modCreate, []).
+:-module(modCreate, [rez_to_inventory/3]).
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % health(Agent,Dam) = damage
@@ -37,7 +37,7 @@ rez_to_inventory(Agent,NameOrType,NewObj):-
 action_info(actRez(isOneOf([tCol,ftID,ftTerm])),"Rezes a new subclass of 'item' or clone of tObj of some NameOrType into mudStowing inventory").
 
 agent_call_command(Agent,actRez(NameOrType)):- nonvar(NameOrType),
-        must(rez_to_inventory(Agent,NameOrType,NewObj)),
+        must(modCreate:rez_to_inventory(Agent,NameOrType,NewObj)),
         fmt([rezed,NameOrType,NewObj]).
 
 % ====================================================

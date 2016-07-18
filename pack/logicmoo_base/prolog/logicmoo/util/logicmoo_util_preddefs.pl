@@ -579,11 +579,12 @@ def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 %
 % Remove Predicate.
 %
-remove_pred(_,_,_):-!.
+% remove_pred(_,_,_):- !.
 remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
-remove_pred(PredMt,F,A):- functor(P,F,A),
+remove_pred(PredMt,F,A):- functor(P,F,A),unlock_predicate(PredMt:F/A),
   (current_predicate(PredMt:F/A) -> ignore((catchv(redefine_system_predicate(PredMt:P),_,true),abolish(PredMt:F,A)));true),
-  PredMt:asserta((P:- wdmsg(error(P)),throw(permission_error(PredMt:F/A)))).
+  PredMt:asserta((P:- wdmsg(permission_error(P)),throw(permission_error(PredMt:F/A)))),
+  lock_predicate(PredMt:F/A).
 
 
 
@@ -596,7 +597,7 @@ remove_pred(PredMt,F,A):- functor(P,F,A),
 %
 % Call If Defined.
 %
-call_if_defined(G):-current_predicate(_,G),G.
+call_if_defined(G):-current_predicate(_,G)->call(G).
 
 
 :- module_transparent(p_predicate_property/2).
@@ -607,8 +608,8 @@ call_if_defined(G):-current_predicate(_,G),G.
 %
 % F Predicate Property.
 %
-p_predicate_property(P,PP):-predicate_property(P,PP),!.
-p_predicate_property(_:P,PP):-predicate_property(P,PP).
+p_predicate_property(P,PP) :- predicate_property(P,PP).
+p_predicate_property(_:P,PP) :- predicate_property(P,PP).
 %current_bugger_predicate(PredMt:FF/FA):-nonvar(FF),!,current_predicate(PredMt:FF,FA).
 %current_bugger_predicate(FF/FA):-nonvar(FF),!,!,current_predicate(FF/FA).
 :- module_transparent(current_predicate_module/2).

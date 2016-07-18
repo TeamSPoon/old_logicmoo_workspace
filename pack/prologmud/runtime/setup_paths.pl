@@ -1,5 +1,6 @@
 #!/usr/bin/env swipl
-/** <module> LogicMOO initial paths
+/*  
+  LogicMOO initial paths
 
 */
 

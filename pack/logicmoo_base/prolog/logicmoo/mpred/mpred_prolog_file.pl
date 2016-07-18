@@ -40,7 +40,7 @@
 
 :- multifile(user:prolog_load_file/2).
 :- dynamic(user:prolog_load_file/2).
-:- '$set_source_module'(system).
+% :- '$set_source_module'(system).
 
 %% mpred_process_input_1( :TermT) is semidet.
 %

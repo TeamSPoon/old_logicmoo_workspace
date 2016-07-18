@@ -1,4 +1,4 @@
-/** <module> 
+/* * <module> 
 % This module defines the way we lay out 2-D grids into room
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
@@ -281,8 +281,8 @@ find_instance_of(Pred,Subj,Obj):-
  isa(Subj,SubjT), 
  ((is_asserted(t(Pred,Subj,Obj)),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
 
-mudSubPart(Outer,Inner):-mudInsideOf(Inner,Outer).
-mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
+mudInsideOf(Inner,Outer)==>mudSubPart(Outer,Inner).
+wearsClothing(Agent,Clothes)==>mudSubPart(Agent,Clothes).
 % mudSubPart(Subj,Obj):- (nonvar(Subj);nonvar(Obj)),!,test_tl(infThirdOrder), find_instance_of(mudSubPart,Subj,Obj).
 % mudSubPart(face,isEach(eyes,nose,mouth)).
 % mudSubPart([upper_torso,arms,left_arm,left_hand,left_digits]).
