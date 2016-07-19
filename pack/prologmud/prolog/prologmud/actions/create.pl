@@ -21,17 +21,17 @@
 :-export(rez_to_inventory/3).
 rez_to_inventory(Agent,NameOrType,NewObj):-
   gensym('_rez',SS),
-  must_det_l([
+  call_u(must_det_l((
   w_tl(lmconf:current_source_suffix(SS),show_call(createByNameMangle(NameOrType,NewObj,Clz))),
    padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj,Clz))),
    ain(genls(Clz,tItem)),
    padd(Agent,mudStowing(NewObj)),
    find_and_call(add_missing_instance_defaults(NewObj)),
-   mudStowing(Agent,NewObj),
+   call_u(mudStowing(Agent,NewObj)),
    ireq(t(mudStowing,Agent,NewObj)),
-   mudPossess(Agent,NewObj),
+   call_u(mudPossess(Agent,NewObj)),
    ireq(t(mudPossess,Agent,NewObj)),
-   mudPossess(Agent,NewObj)]).
+   call_u(mudPossess(Agent,NewObj))))).
 
 
 action_info(actRez(isOneOf([tCol,ftID,ftTerm])),"Rezes a new subclass of 'item' or clone of tObj of some NameOrType into mudStowing inventory").
@@ -55,7 +55,7 @@ agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_new_o
 create_new_object(Agent,[tCol,NameOfType|DefaultParams]):-!,create_new_type(Agent,[NameOfType|DefaultParams]).
 
 create_new_object(Agent,[NameOrType|Params]):-
-    create_meta(NameOrType,NewType,tSpatialThing,NewObj),
+   call_u(( create_meta(NameOrType,NewType,tSpatialThing,NewObj),
    assert_isa(NewObj,NewType),
    ain(genls(NewType,tItem)),
    padd(NewObj,authorWas(create_new_object(Agent,[NameOrType|Params]))),
@@ -63,15 +63,15 @@ create_new_object(Agent,[NameOrType|Params]):-
    getPropInfo(Agent,NewObj,Params,2,PropList),!,
    padd(NewObj,PropList),
    must((isa(NewObj,tItem),padd(Agent,mudStowing(NewObj)))),
-   find_and_call(add_missing_instance_defaults(NewObj)).
+   find_and_call(add_missing_instance_defaults(NewObj)))).
 
 :-export(create_new_type/2).
 create_new_type(Agent,[NewObj|DefaultParams]):-
-   decl_type(NewObj),
+   call_u((decl_type(NewObj),
    padd(NewObj,authorWas(create_new_type(Agent,[NewObj|DefaultParams]))),
    padd(Agent,current_pronoun("it",NewObj)),
    getPropInfo(Agent,NewObj,DefaultParams,2,PropList),!,
-   ain(typeProps(NewObj,PropList)).
+   ain(typeProps(NewObj,PropList)))).
 
 
 getPropInfo(_Agent,_NewName,PropsIn,N,[mudDescription(ftText(need,to,actParse,PropsIn,N))]).
