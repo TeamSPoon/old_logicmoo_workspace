@@ -32,7 +32,7 @@
 :- add_import_module(mud_telnet,world,end).
 :- add_import_module(baseKB,lmcache,end).
 :- add_import_module(baseKB,lmconf,end).
-:- add_import_module(baseKB,world,end).
+% :- add_import_module(baseKB,world,end).
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.

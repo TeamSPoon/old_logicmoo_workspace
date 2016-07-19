@@ -152,9 +152,9 @@ lmce_system_term_expansion(Mod,end_of_file,P,O,P2):-  !, expand_whatnot(Mod,clau
 lmce_system_term_expansion(_,I,P,_O,_P2):- \+ is_fbe(term,I,P),!,fail.
 
 lmce_system_term_expansion(_, (:-module(_, _)) ,_P,_O,_P2):-!,fail.
-lmce_system_term_expansion(Mod,(:- B),P,O,P2):- !, expand_whatnot(Mod,directive_expansion,(:- B),P,O,P2).
 lmce_system_term_expansion(_,I,_P,_O,_P2):- nb_setval('$term_e',I),fail.
 lmce_system_term_expansion(Mod,(H ),P,O,P2):- expand_whatnot(Mod,clause_expansion,H ,P,O,P2).
+lmce_system_term_expansion(Mod,(:- B),P,O,P2):- !, expand_whatnot(Mod,directive_expansion,(:- B),P,O,P2).
 % lmce_system_term_expansion(Mod,(H :- I),P,(H :- O),P2):- expand_whatnot(Mod,body_expansion,I,P,O,P2).
 
 % lmce_system_goal_expansion(I,P,O,P2):- var(I),!,fail.
@@ -372,13 +372,13 @@ without_lm_expanders(Goal):-
 :- module_transparent(user:term_expansion/1).
 % system:term_expansion(I,P,O,P2):- fail, get_named_value_goal(is_fbe(term,I,P)),dmsg(te4(I,P,O,P2)),fail.
 system:goal_expansion(I,P,O,P2):- 
+  current_prolog_flag(lm_special_expanders,true), 
   current_prolog_flag(lm_expanders,true),
    prolog_load_context(module,Mod),
    without_lm_expanders((lmce_system_goal_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
 
-system:term_expansion(EOF,POS,_,_):-
- is_fbe(term,EOF,POS),
-    % current_prolog_flag(lm_expanders,true),
+system:term_expansion(EOF,POS,_,_):- % current_prolog_flag(lm_expanders,true),
+ is_fbe(term,EOF,POS),    
  nonvar(EOF),
  prolog_load_context(source,S),
  (EOF=end_of_file;EOF=(:-(module(_,_)))),
@@ -387,7 +387,8 @@ system:term_expansion(EOF,POS,_,_):-
    ignore(('$current_typein_module'(TM),
      glean_prolog_impl_file(EOF,S,M,TM))),fail.
 
-system:term_expansion(I,P,O,P2):- current_prolog_flag(lm_expanders,true), 
+system:term_expansion(I,P,O,P2):- current_prolog_flag(lm_special_expanders,true), 
+  current_prolog_flag(lm_expanders,true), 
   prolog_load_context(module,Mod), 
    without_lm_expanders((lmce_system_term_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
 

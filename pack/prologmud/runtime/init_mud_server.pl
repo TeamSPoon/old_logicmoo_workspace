@@ -283,12 +283,13 @@ lar:- login_and_run.
 % isa(starTrek,mtCycL).
 % :- starTrek:force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
-:- set_prolog_flag(unsafe_speedups,false).
 
 :- must_det(argIsa(genlPreds,2,_)).
 
 %:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 %:- initialization(ltkb1,now).
+
+% :- set_prolog_flag(unsafe_speedups,false).
 :- initialization(lar).
 :- initialization(lar,restore).
 

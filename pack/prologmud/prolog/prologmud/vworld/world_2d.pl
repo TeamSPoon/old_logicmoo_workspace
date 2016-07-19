@@ -124,7 +124,7 @@ rez_loc_object(XY,Type):-
            Name = xyN(XY,Name2),          
            assert_isa(Name,Type),
            ain(mudAtLoc(Name,XY)),!,
-           add_missing_instance_defaults(Name).
+           find_and_call(add_missing_instance_defaults(Name)).
 
 
 %prologDynamic(mudNearbyObjs(tObj,tObj)).

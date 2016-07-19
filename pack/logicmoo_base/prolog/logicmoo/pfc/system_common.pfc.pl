@@ -643,8 +643,8 @@ ttPredType(Prop)==>tCol(Prop).
 
 % :-rtrace.
 
-((((P/(nonvar(P),is_ftNonvar(P),functor(P,F,A), \+ mpred_connective(F), A>1) ==> 
-   {lmconf:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))})))).
+%((((P/(nonvar(P),is_ftNonvar(P),functor(P,F,A), \+ mpred_connective(F), A>1) ==> 
+%   {lmconf:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))})))).
 
 
 % tCol(Col) <==> isa(Col,tCol).

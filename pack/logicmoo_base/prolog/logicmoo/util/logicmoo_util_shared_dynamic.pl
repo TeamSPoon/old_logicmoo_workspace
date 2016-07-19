@@ -133,12 +133,6 @@ lmconf:wrap_shared(mpred_f,6,ereq).
 lmconf:wrap_shared(mpred_f,7,ereq).
 lmconf:wrap_shared(props,2,ereq).
 
-lmconf:wrap_shared(F,A,ereq):-
-   functor(P,F,A),
-   member(MVis,[baseKB,lmcache,lmconf]),
-   predicate_property(MVis:P,defined),
-   \+ predicate_property(MVis:P,imported_from(_)),!.
-
 lmconf:wrap_shared(mpred_mark,3,ereq).
 lmconf:wrap_shared(mudKeyword,2,ereq).
 lmconf:wrap_shared(pfcControlled,1,ereq).
@@ -168,9 +162,23 @@ lmconf:wrap_shared(ttExpressionType,1,ereq).
 lmconf:wrap_shared(ttPredType,1,ereq).
 lmconf:wrap_shared(ttTemporalType,1,ereq).
 lmconf:wrap_shared(use_ideep_swi,0,ereq).
+lmconf:wrap_shared(==>,_,ereq).
+lmconf:wrap_shared(<==>,_,ereq).
+lmconf:wrap_shared((<--),2,ereq).
+lmconf:wrap_shared(agent_text_command,_,ereq).
+lmconf:wrap_shared(agent_command,_,ereq).
+lmconf:wrap_shared(coerce,_,ereq).
+
+lmconf:wrap_shared(F,A,ereq):- atom(F),integer(A),
+   functor(P,F,A),
+   % member(MVis,[baseKB,lmcache,lmconf]),
+   baseKB = MVis,
+   predicate_property(MVis:P,defined),
+   \+ predicate_property(MVis:P,imported_from(_)),!.
 
 
-clause_b(G):- clause(baseKB:G,Body),call(Body).
+clause_b(G):-  clause(baseKB:G,true),!.
+% clause_b(G):- clause(baseKB:G,Body),(Body==true->true;call_u(Body)).
 
 
 %% system_goal_expansion_safe_wrap( :TermT, :TermARG2) is semidet.
@@ -181,14 +189,19 @@ clause_b(G):- clause(baseKB:G,Body),call(Body).
 %system_goal_expansion_safe_wrap(Goal,_):- functor(Goal,F,_),arg(_,v(call_u,call,(/),(',')),F),!,fail.
 %system_goal_expansion_safe_wrap(MT:Goal,(call_u(genlMt(abox,GMt)),with_umt(GMt,Goal))):- MT==tbox.
 
+
+
 system_goal_expansion_safe_wrap(T,_):- \+ callable(T),!,fail.
-system_goal_expansion_safe_wrap(MT:Goal,call_u(Goal)):-compound(Goal),MT==abox,!.
+system_goal_expansion_safe_wrap(MT:Goal,call_u(Goal)):- MT==abox,!.
 system_goal_expansion_safe_wrap(M:T,O):- callable(T),!,functor(T,F,A),lmconf:wrap_shared(F,A,How),!,safe_wrap(M:T,How,O).
 system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),lmconf:wrap_shared(F,A,How),!,safe_wrap(T,How,I).
 
+could_safe_wrap:- prolog_load_context(module,M),\+ clause_b(mtCycL(M)),
+     \+ ((current_prolog_flag(dialect_pfc,true); 
+       (source_location(F,_W),( atom_concat(_,'.pfc.pl',F);atom_concat(_,'.plmoo',F);atom_concat(_,'.pfc',F))))).
+
+
 really_safe_wrap(Type,I,O):- callable(I),
-   prolog_load_context(module,M),
-   \+ clause_b(mtCycL(M)),
    system_goal_expansion_safe_wrap(I,O)->I\=@=O,dmsg(really_safe_wrap(Type,I,O)).
 
 
@@ -291,8 +304,9 @@ check_never_decl_shared(_Plus,baseKB,mudComfort,1).
 
 swc.
 
-system:sub_call_expansion(I,O):-really_safe_wrap(ce,I,O).
+
 %system:sub_body_expansion(I,O):-really_safe_wrap(be,I,O).
-system:body_expansion(I,O):- O\== true, O\=(swc,_),really_safe_wrap(be,I,O).
-%system:goal_expansion(I,P,O,P):-really_safe_wrap(ge,I,O).
+%system:sub_body_expansion(I,O):- O\== true, O\=(swc,_),could_safe_wrap,really_safe_wrap(be,I,O).
+%system:sub_call_expansion(I,O):-really_safe_wrap(ce,I,O).
+system:goal_expansion(I,P,O,P):- I\== true, I\=(swc,_),current_prolog_flag(lm_expanders,true), really_safe_wrap(ge,I,O)-> I\=O.
 

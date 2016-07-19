@@ -1127,9 +1127,12 @@ checked_clause_count(genls(_,_)).
 checked_clause_count((_ ==> _)).
 checked_clause_count((_ <==> _)).
 checked_clause_count(spft(_,_,ax)).
+checked_clause_count(agent_command(_,_)).
+
 
 :- dynamic(lmcache:last_clause_count/2).
 
+check_clause_count(_):-current_prolog_flag(unsafe_speedups,true),!.
 check_clause_count(Mask):- swc,
  clause_count(Mask,N),
     (retract(lmcache:last_clause_count(Mask,Was)) -> true ; Was=0),

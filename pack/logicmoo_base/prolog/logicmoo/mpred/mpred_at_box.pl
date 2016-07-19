@@ -581,7 +581,6 @@ istAbove(Mt,Query):- Mt \== baseKB, genlMt(Mt,MtAbove),MtAbove:Query.
 
 
 % make sure we ignore calls to predicate_property/2  (or thus '$define_predicate'/1)
-% uses_predicate(_,error):- prolog_current_frame(F), show_success(prolog_frame_attribute(F,parent_goal,predicate_property(_,_))),!.
 uses_predicate(M:F/A,R):- !, '$current_source_module'(SM), uses_predicate(SM,M,F,A,R).
 uses_predicate(F/A,R):- '$current_source_module'(SM),'$current_typein_module'(M),uses_predicate(M,SM,F,A,R).
 
@@ -595,11 +594,13 @@ has_parent_goal(G):- prolog_current_frame(F),prolog_frame_attribute(F,parent, PF
 has_parent_goal(F,G):-prolog_frame_attribute(F,goal, G);(prolog_frame_attribute(F,parent, PF),has_parent_goal(PF,G)).
 
 
+uses_predicate(_,CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
+uses_predicate(_,M,F,A,R):- 
+  prolog_current_frame(FR), functor(P,F,A),show_success(prolog_frame_attribute(FR,parent_goal,predicate_property(M:P,_))),!,R=error.
 uses_predicate(_,Module,Name,Arity,Action) :- 
       current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
 	Action = retry.
-uses_predicate(_,CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
 
 uses_predicate(BaseKB,System, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),!,
    must(uses_predicate(System,BaseKB,F,A,R)),!.

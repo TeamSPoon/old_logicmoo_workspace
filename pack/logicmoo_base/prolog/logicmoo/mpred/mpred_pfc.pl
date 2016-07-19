@@ -420,11 +420,13 @@ to_real_mt(_Why,BOX,BOX).
 % Ensure modules are correct when asserting/calling information into the correct MTs
 %
 %fix_mp(Why,I,UO):- compound(UO),dtrace,UO=(U:O),!,quietly_must(fix_mp(Why,I,U,O)).
+fix_mp(Why,I,MT:UO):- current_prolog_flag(unsafe_speedups,true), !, strip_module(I,_,UO),defaultAssertMt(MT).
 fix_mp(Why,I,UO):- quietly_must(fix_mp(Why,I,U,O)),maybe_prepend_mt(U,O,UO).
 
 
 fix_mp(Why,G,M,GOO):-
   fix_mp0(Why,G,M,GO),strip_module(GO,_,GOO).
+
 
 fix_mp0(Nonvar,Var,ABox,VarO):- sanity(nonvar(Nonvar)), is_ftVar(Var),!,Var=VarO,defaultAssertMt(ABox),!.
 fix_mp0(Why, '~'(G0), M, '~'(CALL)):-nonvar(G0),!,fix_mp0(Why,G0,M,CALL).
@@ -523,10 +525,10 @@ attvar_op_fully(Why,MH):- full_transform(Why, MH,MHH),each_E(attvar_op(Why),MHH,
 throw_depricated:- trace_or_throw(throw_depricated).
 
 assert_u(MH):- assert_u_no_dep(MH).
-assert_u_no_dep(MH):- fix_mp(clause(assert,assert_u),MH,M,H),
-    attvar_op_fully(assert_i, M:H),expire_tabled_list(H).
-asserta_u(MH):- throw_depricated, fix_mp(clause(assert,asserta_u),MH,M,H),attvar_op_fully(asserta_i,M:H).
-assertz_u(MH):- throw_depricated, fix_mp(clause(assert,assertz_u),MH,M,H),attvar_op_fully(assertz_i,M:H).
+assert_u_no_dep(MH):- fix_mp(clause(assert,assert_u),MH,MHA),
+    attvar_op_fully(assert_i, MHA),expire_tabled_list(H).
+asserta_u(MH):- throw_depricated, fix_mp(clause(assert,asserta_u),MH,MHA),attvar_op_fully(asserta_i,MHA).
+assertz_u(MH):- throw_depricated, fix_mp(clause(assert,assertz_u),MH,MHA),attvar_op_fully(assertz_i,MHA).
 retract_u(H):- retract_u0(H) *-> true; attvar_op_fully(retract_u0,H).
 
 retract_u0(H0):- strip_module(H0,_,H),(H = ( \+ _ )),!,trace_or_throw(mpred_warn(retract_u(H0))),expire_tabled_list(H).
@@ -574,7 +576,7 @@ clause_u(MH,B,R):- Why = clause(clause,clause_u),
 %
 %clause_u(pfc,H,B,Proof):-clause_u(H,B,Proof).
 
-
+lookup_u(SPFT):- current_prolog_flag(unsafe_speedups,true), !,baseKB:mtCycL(MT),call(MT:SPFT).
 lookup_u(H):-lookup_u(H,_).
 
 
@@ -1612,6 +1614,7 @@ mpred_do_fcnt(_ZFact,F):-
   NT = nt(F,Condition,Body),
   SPFT = spft(X,F1,NT),
   lookup_u(SPFT),
+  %clause(SPFT,true),
   mpred_trace_msg('~N~n\tFound negative trigger: ~p~n\t\tcond: ~p~n\t\tbody: ~p~n\tSupport: ~p~n',
                  [F,Condition,Body,SPFT]),
   mpred_call_no_bc(Condition),
@@ -1892,7 +1895,9 @@ mpred_METACALL(_How, _Cut, retract(X)):- !, mpred_remove(X).
 %mpred_METACALL(How, Cut, argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(mpred_METACALL(How, Cut, argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
 % TODO: test removal
 % mpred_METACALL(How, Cut, isa(H,B)):-!,isa_asserted(H,B).
-mpred_METACALL(_How, _Cut, (H:-B)):- clause_u((H:-B)).
+mpred_METACALL(_How, _Cut, (H:-B)):- !, clause_u((H :- B)).
+mpred_METACALL(_How, _Cut, M:(H:-B)):- !, clause_u((M:H :- B)).
+mpred_METACALL(_How, _Cut, M:HB):- current_prolog_flag(unsafe_speedups,true)!, call(M:HB).
 mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call(P).
 %mpred_METACALL(How, Cut, (H)):- is_static_pred(H),!,show_pred_info(H),dtrace(mpred_METACALL(How, Cut, (H))).
 mpred_METACALL( How,   Cut, P) :- fail, predicate_property(P,number_of_clauses(_)),!,
@@ -2420,9 +2425,16 @@ clause_asserted_call(H,B):-clause_asserted(H,B).
 
 clause_asserted_u(MH):- sanity((nonvar(MH), ignore(show_failure(\+ is_static_predicate(MH))))),fail.
 %clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
-clause_asserted_u((MH:-B)):- must(nonvar(MH)), !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,clause_asserted_i((M:H :-B )).
-clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_i(M:H).
+clause_asserted_u((MH:-B)):- must(nonvar(MH)), !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,
+              (current_prolog_flag(unsafe_speedups,true) -> 
+                 (clause_asserted_ii((M:H , B ))  /*; clause_asserted_u((M:H :- B ))*/ );
+                 ; clause_asserted_u((M:H :- B ))).
 
+clause_asserted_u(MH):- current_prolog_flag(unsafe_speedups,true), !,clause_asserted_ii(MH).
+clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_ii(M:H).
+
+clause_asserted_ii(H,B):-clause(H,B,R),clause(HH,BB,R),HH:BB=@=H:B,!.
+clause_asserted_ii(H):-clause(H,true,R),clause(HH,true,R),HH=@=H,!.
 
 variant_u(HeadC,Head_copy):-variant_i(HeadC,Head_copy).
 

@@ -26,11 +26,6 @@
          login_and_run_nodebug/0,
          on_telnet_restore/0
       ]).
-
-% :- add_import_module(mud_telnet,baseKB,end).
-
-:- ain(mtProlog(mud_telnet)).
-
 /** <module>  
 % Initial Telnet/Text console 
 % ALL telnet client business logic is here (removed from everywhere else!)
@@ -41,11 +36,7 @@
 %
 */ 
 
-% :- set_file_lang(pl).
-
-% % :- '$set_source_module'(mud_telnet).
-%:- maybe_add_import_module(mud_telnet,baseKB,start).
-%:- maybe_add_import_module(logicmoo_user,mud_telnet,start).
+:- ain(mtProlog(mud_telnet)).
 
 % learnLaterWhenToCallProceedure(What):- ... code ...
 
@@ -105,7 +96,7 @@ service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
 
 
 get_session_io(In,Out):-
-  must(get_session_id(O)),
+  must(get_session_id_local(O)),
   thread_self(Id),
   lmcache:session_io(O,In,Out,Id),!.
 get_session_io(In,Out):-
@@ -119,17 +110,18 @@ get_current_io(In,Out):-
 
 login_and_run_nodebug:- nodebugx(login_and_run).
 
+get_session_id_local(O):- find_and_call(get_session_id(O)).
 
 player_connect_menu(In,Out,Wants,P):-
  must_det_l((
-   get_session_id(O),
+   get_session_id_local(O),
    get_session_io(In,Out),
    fmt('~N~nHello session ~q!~n',[O]),
    setup_streams(In, Out),
    set_tty_control(true),
-   foc_current_agent(Wants),
-   foc_current_agent(P),
-   assert_isa(P,tHumanControlled),
+   find_and_call(foc_current_agent(Wants)),
+   find_and_call(foc_current_agent(P)),
+   call_u(assert_isa(P,tHumanControlled)),
    register_player_stream_local(P,In,Out),
    fmt('~N~nWelcome to the MUD ~w!~n',[P]),
    fmt(Out,'~N~nThe stream ~w!~n',[Out]),
@@ -149,7 +141,7 @@ set_player_telnet_options(P):-
      ain(repl_to_string(P,telnet_repl_obj_to_string)).
 
 goodbye_player:- 
-     foc_current_agent(P3),
+     find_and_call(foc_current_agent(P3)),
      deliver_event(P3,goodBye(P3)).
 
 run_session:-
@@ -158,7 +150,7 @@ run_session:-
 
 run_session(In,Out):-  
   must_det_l((
-  get_session_id(O),
+  get_session_id_local(O),
   get_session_io(In,Out),
   asserta(t_l:telnet_prefix([isSelfAgent,wants,to])),
   retractall(t_l:wants_logout(O)))),!,
@@ -170,7 +162,7 @@ run_session(In,Out):-
       retractall(lmcache:session_io(O,_,_,_)),!.
 
 session_loop(In,Out):-
-  get_session_id(O),
+  get_session_id_local(O),
   (current_agent(P)->true;player_connect_menu(In,Out,_,_);player_connect_menu(In,Out,_,P)),
   start_agent_action_thread,
   ignore(look_brief(P)),!,
@@ -183,7 +175,7 @@ session_loop(In,Out):-
 :-export(register_player_stream_local/3).
 register_player_stream_local(P,In,Out):-
    set_player_telnet_options(P),
-   get_session_id(O),thread_self(Id),
+   get_session_id_local(O),thread_self(Id),
    retractall(lmcache:session_io(_,_,_,Id)),
    retractall(lmcache:session_io(O,_,_,_)),
    asserta_new(lmcache:session_io(O,In,Out,Id)),
@@ -220,7 +212,7 @@ fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).
 
 :-export(prompt_read/4).
 prompt_read_telnet(In,Out,Prompt,Atom):-
-      get_session_id(O),      
+      get_session_id_local(O),      
       prompt_read(In,Out,Prompt,IAtom),
       (IAtom==end_of_file -> (hooked_asserta(t_l:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 

@@ -9,7 +9,7 @@
 % Douglas Miles 2014
 */
 :- include(prologmud(mud_header)).
-
+:- use_module(prologmud(vworld/world)).
 % :- register_module_type (mtCommand).
 
 
@@ -26,7 +26,7 @@ rez_to_inventory(Agent,NameOrType,NewObj):-
    padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj,Clz))),
    ain(genls(Clz,tItem)),
    padd(Agent,mudStowing(NewObj)),
-   add_missing_instance_defaults(NewObj),
+   find_and_call(add_missing_instance_defaults(NewObj)),
    mudStowing(Agent,NewObj),
    ireq(t(mudStowing,Agent,NewObj)),
    mudPossess(Agent,NewObj),
@@ -63,7 +63,7 @@ create_new_object(Agent,[NameOrType|Params]):-
    getPropInfo(Agent,NewObj,Params,2,PropList),!,
    padd(NewObj,PropList),
    must((isa(NewObj,tItem),padd(Agent,mudStowing(NewObj)))),
-   add_missing_instance_defaults(NewObj).
+   find_and_call(add_missing_instance_defaults(NewObj)).
 
 :-export(create_new_type/2).
 create_new_type(Agent,[NewObj|DefaultParams]):-

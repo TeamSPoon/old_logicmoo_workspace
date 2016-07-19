@@ -112,16 +112,19 @@ lmconf:mpred_skipped_module(eggdrop).
 % system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
 %system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
 
-base_clause_expansion(I,O):-  expand_kif_string_or_fail(pl_te,I,O),!.
-base_clause_expansion( :-(I), O):- !, expand_isEach_or_fail(:-(I),O),!.
-base_clause_expansion(I,':-'(ain_expanded(I))):- in_dialect_pfc,!.
-base_clause_expansion(I,':-'(ain_expanded(I))):- get_consequent_functor(I,F,A),
-   (lmconf:wrap_shared(F,A,ereq);call_u(hybrid_support(F,_));call_u(prologMacroHead(F))),!.
-base_clause_expansion(I,O):- expand_isEach_or_fail(I,O),!.
-base_clause_expansion(I,O):- mpred_term_expansion(I,O)->I\=@=O,!.
 
-system:clause_expansion(I,PosI,O,PosI):- I\=end_of_file, base_clause_expansion(I,O),!.
-system:clause_expansion(I,P1,O,P2):- I==end_of_file, mpred_te(term,user,I,P1,O,P2).
+base_clause_expansion(P1,end_of_file,O):- !, prolog_load_context(module,Module),mpred_te(term,Module,end_of_file,P1,O,_P2)->fail.
+base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
+base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
+base_clause_expansion(_,I,':-'(ain_expanded(I))):- (in_dialect_pfc;needs_pfc(I)),!.
+
+
+needs_pfc(I) :- nonvar(I),get_consequent_functor(I,F,A),
+   (clause_b(prologMacroHead(F));clause_b(hybrid_support(F,_));lmconf:wrap_shared(F,A,ereq)),!.
+
+
+% system:clause_expansion(I,PosI,O,PosI):- base_clause_expansion(PosI,I,O),!.
+system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),nonvar(I), base_clause_expansion(PosI,I,O)->I\==O.
 
 
 

@@ -1442,8 +1442,8 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; must(Goal)),!.
 :- meta_predicate(hide_trace(0)).
 
 hide_trace(G):- \+ tracing,!,call(G).
-% hide_trace(G):- skipWrapper,!,call(G).
 hide_trace(G):- !,call(G).
+hide_trace(G):- skipWrapper,!,call(G).
 hide_trace(G):- 
  restore_trace((
    hotrace(
@@ -1482,6 +1482,7 @@ is_recompile:-fail.
 %
 % Optional Sanity Checking.
 %
+sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
 sanity(Goal):- current_prolog_flag(unsafe_speedups,true), \+ tracing,!, (1 is random(10)-> must(Goal) ; true).
 sanity(_):- notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
@@ -1569,6 +1570,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
+must(Goal):- skipWrapper,!, (Goal *-> true;trace_or_throw(failed_must(Goal))).
 must(Goal):-  notrace((get_must(Goal,MGoal),!)),call(MGoal).
 
 dumpST_error(Msg):- notrace((ddmsg(error,Msg),dumpST,ddmsg(error,Msg))).
