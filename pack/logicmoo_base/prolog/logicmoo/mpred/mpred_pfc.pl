@@ -420,7 +420,7 @@ to_real_mt(_Why,BOX,BOX).
 % Ensure modules are correct when asserting/calling information into the correct MTs
 %
 %fix_mp(Why,I,UO):- compound(UO),dtrace,UO=(U:O),!,quietly_must(fix_mp(Why,I,U,O)).
-fix_mp(Why,I,MT:UO):- current_prolog_flag(unsafe_speedups,true), !, strip_module(I,_,UO),defaultAssertMt(MT).
+% fix_mp(Why,I,MT:UO):- current_prolog_flag(unsafe_speedups,true), !, strip_module(I,_,UO),defaultAssertMt(MT).
 fix_mp(Why,I,UO):- quietly_must(fix_mp(Why,I,U,O)),maybe_prepend_mt(U,O,UO).
 
 
@@ -2427,9 +2427,9 @@ clause_asserted_u(MH):- sanity((nonvar(MH), ignore(show_failure(\+ is_static_pre
 %clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
 clause_asserted_u((MH:-B)):- must(nonvar(MH)), !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,
               (current_prolog_flag(unsafe_speedups,true) -> 
-                 (clause_asserted_ii((M:H , B ))  
+                 (clause_asserted_ii((M:H , B )))
                  /*; clause_asserted_u((M:H :- B ))*/
-                 ; clause_asserted_u((M:H :- B )))).
+                 ; clause_asserted_i((M:H :- B ))).
 
 clause_asserted_u(MH):- current_prolog_flag(unsafe_speedups,true), !,clause_asserted_ii(MH).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_ii(M:H).
