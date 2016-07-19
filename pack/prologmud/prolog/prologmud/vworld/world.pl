@@ -271,10 +271,10 @@ create_instance_0(T,Type,List):-
 */
 
 create_instance_0(T,MetaType,List):-  
-  must_det_l([
+  call_u((must_det_l((
    create_meta(T,_Type,MetaType,P),
    padd(P,List),
-   add_missing_instance_defaults(P)]),!. 
+   add_missing_instance_defaults(P))))),!. 
 
 create_instance_0(What,Type,Props):- leash(+call),wdmsg(assumed_To_HAVE_creted_isnance(What,Type,Props)),!.
 

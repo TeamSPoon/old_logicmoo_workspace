@@ -1,6 +1,6 @@
 % :-swi_module(user). 
-:-module(modCreate, [rez_to_inventory/3]).
-/** <module> A command to  ...
+% :-module(modCreate, [rez_to_inventory/3]).
+/* A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % health(Agent,Dam) = damage
 % mudLastCmdSuccess(Agent,Action,Suc) = checks success of last action (actually checks the cmdfailure predicate)

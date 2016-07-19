@@ -1796,5 +1796,5 @@ localityOfObject('Tricorder761','iArea1015').
 
 % 
 
-:- force_reload_mpred_file('**/*.pfc.pl').
+:- baseKB:force_reload_mpred_file('**/*.pfc.pl').
 

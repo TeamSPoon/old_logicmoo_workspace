@@ -149,7 +149,7 @@ run_session:-
    run_session(In,Out).
 
 run_session(In,Out):-  
-  must_det_l((
+  call_u((must_det_l((
   get_session_id_local(O),
   get_session_io(In,Out),
   asserta(t_l:telnet_prefix([isSelfAgent,wants,to])),
@@ -159,11 +159,11 @@ run_session(In,Out):-
       retract(t_l:wants_logout(O)),!,
       thread_self(Id),
       retractall(lmcache:session_io(_,_,_,Id)),      
-      retractall(lmcache:session_io(O,_,_,_)),!.
+      retractall(lmcache:session_io(O,_,_,_)))),!.
 
 session_loop(In,Out):-
   get_session_id_local(O),
-  (current_agent(P)->true;player_connect_menu(In,Out,_,_);player_connect_menu(In,Out,_,P)),
+  call_u((current_agent(P)->true;player_connect_menu(In,Out,_,_);player_connect_menu(In,Out,_,P))),
   start_agent_action_thread,
   ignore(look_brief(P)),!,
   (t_l:telnet_prefix(Prefix)->(sformat(S,'~w ~w>',[P,Prefix]));sformat(S,'~w> ',[P])),
