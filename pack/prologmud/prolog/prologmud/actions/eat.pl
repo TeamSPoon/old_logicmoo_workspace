@@ -5,7 +5,7 @@
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module> 
+/*
 % This file defines the agents action of eating. 
 % Very simple... but kept separate to maintain modularity
 %

@@ -1897,7 +1897,7 @@ mpred_METACALL(_How, _Cut, retract(X)):- !, mpred_remove(X).
 % mpred_METACALL(How, Cut, isa(H,B)):-!,isa_asserted(H,B).
 mpred_METACALL(_How, _Cut, (H:-B)):- !, clause_u((H :- B)).
 mpred_METACALL(_How, _Cut, M:(H:-B)):- !, clause_u((M:H :- B)).
-mpred_METACALL(_How, _Cut, M:HB):- current_prolog_flag(unsafe_speedups,true),!, call(M:HB).
+% TODO: mpred_METACALL(_How, _Cut, M:HB):- current_prolog_flag(unsafe_speedups,true),!, call(M:HB).
 mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call(P).
 %mpred_METACALL(How, Cut, (H)):- is_static_pred(H),!,show_pred_info(H),dtrace(mpred_METACALL(How, Cut, (H))).
 mpred_METACALL( How,   Cut, P) :- fail, predicate_property(P,number_of_clauses(_)),!,
