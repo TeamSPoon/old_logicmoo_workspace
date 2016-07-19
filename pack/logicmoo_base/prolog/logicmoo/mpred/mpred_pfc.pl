@@ -1897,7 +1897,7 @@ mpred_METACALL(_How, _Cut, retract(X)):- !, mpred_remove(X).
 % mpred_METACALL(How, Cut, isa(H,B)):-!,isa_asserted(H,B).
 mpred_METACALL(_How, _Cut, (H:-B)):- !, clause_u((H :- B)).
 mpred_METACALL(_How, _Cut, M:(H:-B)):- !, clause_u((M:H :- B)).
-mpred_METACALL(_How, _Cut, M:HB):- current_prolog_flag(unsafe_speedups,true)!, call(M:HB).
+mpred_METACALL(_How, _Cut, M:HB):- current_prolog_flag(unsafe_speedups,true),!, call(M:HB).
 mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call(P).
 %mpred_METACALL(How, Cut, (H)):- is_static_pred(H),!,show_pred_info(H),dtrace(mpred_METACALL(How, Cut, (H))).
 mpred_METACALL( How,   Cut, P) :- fail, predicate_property(P,number_of_clauses(_)),!,
@@ -2427,8 +2427,9 @@ clause_asserted_u(MH):- sanity((nonvar(MH), ignore(show_failure(\+ is_static_pre
 %clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
 clause_asserted_u((MH:-B)):- must(nonvar(MH)), !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,
               (current_prolog_flag(unsafe_speedups,true) -> 
-                 (clause_asserted_ii((M:H , B ))  /*; clause_asserted_u((M:H :- B ))*/ );
-                 ; clause_asserted_u((M:H :- B ))).
+                 (clause_asserted_ii((M:H , B ))  
+                 /*; clause_asserted_u((M:H :- B ))*/
+                 ; clause_asserted_u((M:H :- B )))).
 
 clause_asserted_u(MH):- current_prolog_flag(unsafe_speedups,true), !,clause_asserted_ii(MH).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_ii(M:H).
