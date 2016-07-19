@@ -222,7 +222,7 @@ create_instance_0(T,tAgent,List):-
    mreq(isa(P,tAgent)),
    padd(P,List),   
    % punless(mudPossess(P,_),modCreate:rez_to_inventory(P,food,_Food)),
-   modCreate:rez_to_inventory(P,tFood,_Food),
+   find_and_call(rez_to_inventory(P,tFood,_Food)),
    %reset_values(P),   
    padd(P, [ predInstMax(mudHealth,500),
                        predInstMax(mudEnergy,200),
