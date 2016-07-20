@@ -168,7 +168,7 @@ is_at(Obj,Where):-mudSubPart(What,Obj),is_at(What,Where).
 % ((tObj(Obj), ~(mudPossess(_,Obj)))==>spatialInRegion(Obj)).
 tPathway(Obj)==>spatialInRegion(Obj).
 
-:- must(prolog_load_context(module,world)).
+
 
 localityOfObject(Obj,Region),tRegion(Region)==> inRegion(Obj,Region).
 mudAtLoc(Obj,LOC),{locationToRegion(LOC,Region)},tRegion(Region)==> inRegion(Obj,Region).
@@ -290,12 +290,17 @@ wearsClothing(Agent,Clothes)==>mudSubPart(Agent,Clothes).
 % mudSubPart([pelvis,legs,left_leg,left_foot,left_toes]).
 % mudSubPart([pelvis,legs,right_leg,right_foot,right_toes]).
 
-:- must(prolog_load_context(module,world)).
 
+
+
+is_in_world(Var):- is_ftVar(Var),!,trace_or_throw(var_is_in_world(Var)).
+is_in_world(apathFn(_,_)):-!.
 is_in_world(Obj):-isa_asserted(Obj,tRegion),!.
-is_in_world(Obj):-clause_u(mudAtLoc(Obj,_),true),!.
-is_in_world(Obj):-clause(mudStowing(Who,Obj),true),!,is_in_world(Who).
-is_in_world(Obj):-mudSubPart(What,Obj),is_in_world(What),!.
+is_in_world(Obj):-lookup_u(mudAtLoc(Obj,_)),!.
+is_in_world(Obj):-lookup_u(mudStowing(Who,Obj)),!,is_in_world(Who).
+is_in_world(Obj):-lookup_u(mudSubPart(Who,Obj)),!,is_in_world(Who).
+
+
 
 put_in_world(Obj):- is_in_world(Obj),!.
 put_in_world(Obj):- random_xyzFn(LOC),ain(mudAtLoc(Obj,LOC)),ain(mudNeedsLook(Obj,vTrue)).

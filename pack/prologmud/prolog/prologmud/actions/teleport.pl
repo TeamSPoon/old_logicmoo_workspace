@@ -1,4 +1,4 @@
-/** <module>
+/* * module *
 % teleport.pl
 %
 % This file defines how an agent teleports 

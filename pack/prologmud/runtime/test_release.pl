@@ -1,5 +1,5 @@
 #!/usr/bin/env swipl
-/** <module> Logicmoo_base sanity test script to be ran before a release
+/* * module * Logicmoo_base sanity test script to be ran before a release
 
 */
 

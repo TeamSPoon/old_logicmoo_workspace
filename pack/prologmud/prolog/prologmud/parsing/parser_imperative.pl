@@ -1,5 +1,7 @@
+:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(parser_imperative, []).
-/* <module>
+:- endif.
+/* module
 % Imperitive Sentence Parser (using DCG)
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog

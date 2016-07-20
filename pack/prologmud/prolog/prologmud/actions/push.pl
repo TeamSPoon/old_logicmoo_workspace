@@ -5,7 +5,7 @@
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module> 
+/* * module * 
 % This is meant to be used as a basic template for how the action
 % files are formatted.
 %

@@ -307,7 +307,9 @@ define_maybe_prolog(M,PI,F,A):-
 % ain_expanded(loves(isElement(a/1,b/2,c/1,d),mother)).
 kb_dynamic(M):- M =.. [isEach|List],!,must_maplist(kb_dynamic,List).
 kb_dynamic(List):- is_list(List),!,must_maplist(kb_dynamic,List).
-kb_dynamic(MPI):- must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),MPI))),!.
+
+% kb_dynamic(MPI):- must(decl_shared(MPI)),must(dynamic(MPI)),!.
+kb_dynamic(MPI):- must(decl_shared(MPI)),must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),MPI))),!.
 
 
 kb_dynamic(F/A):- var(A),atom(F),

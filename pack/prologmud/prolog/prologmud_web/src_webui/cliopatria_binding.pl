@@ -2,7 +2,7 @@
 
 :- throw('dont call cliopatria_binding!').
 
-/** <module> Separate module so setting ends up in right place
+/* * module * Separate module so setting ends up in right place
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart
 

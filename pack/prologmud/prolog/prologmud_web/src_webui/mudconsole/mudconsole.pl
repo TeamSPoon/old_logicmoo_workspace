@@ -51,7 +51,7 @@
 	    mc_error_area//0
 	  ]).
 
-/** <module> Use a browser as HTML console
+/* * module * Use a browser as HTML console
 
 The  library(mudconsole)  allows  for    writing  classical  query/reply
 programs that use a web-browser for I/O.  In the typical user scenarion,

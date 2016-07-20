@@ -1,4 +1,4 @@
-/** <module>
+/* * module 
 % ===================================================================
 % File 'mud_builtin.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
@@ -21,6 +21,9 @@
 % Douglas Miles
 */
 
+
+:- dynamic(lmconf:agent_call_command/2).
+:- baseKB:import(lmconf:agent_call_command/2).
 
 :- assert_until_eof(infSupertypeName).
 :- onEndOfFile(dmsg(infSupertypeName)).
@@ -703,6 +706,7 @@ genls(ttTypeByAction,tCol).
 
 ttTypeByAction(C),isa(I,C),{\+ is_in_world(I)} ==> \+ isa(I,C).
 
+/*
 % Produces actEat(String):- current_agent(Agent),agent_call_command(Agent,actEat(String)).
 ((vtActionTemplate(Compound)/(compound(Compound), 
     \+ current_predicate(_,Compound),
@@ -717,7 +721,7 @@ ttTypeByAction(C),isa(I,C),{\+ is_in_world(I)} ==> \+ isa(I,C).
     {nop((asserta_if_new((agent_call_command(Agent,Skel) 
        :- agent_coerce_for(mudPossess,TC,Agent,String,Obj),!,
           agent_call_command(Agent,Skel)))))})).
-  
+*/
 
 
 genls(tAgent,tObj).

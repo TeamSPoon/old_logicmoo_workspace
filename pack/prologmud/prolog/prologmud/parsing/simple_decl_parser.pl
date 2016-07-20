@@ -1,5 +1,8 @@
+:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(simple_decl_parser, []).
-/** <module>
+:- endif.
+
+/* module
 % an example of simple parsing of an inform7 like language.
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog

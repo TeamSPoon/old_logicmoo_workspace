@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % All modules are declared here so that this next lines dont have to be pasted into every file.
 % Since this list will need at least 160 entries to cover the obj classes rooms and commands, 
 % we add the modules here to not waste 160^2 lines of text and having to not 

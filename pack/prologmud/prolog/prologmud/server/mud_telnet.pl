@@ -1,4 +1,4 @@
-
+:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mud_telnet, [
          telnet_server/2,
          setup_streams/2,
@@ -26,7 +26,8 @@
          login_and_run_nodebug/0,
          on_telnet_restore/0
       ]).
-/** <module>  
+:- endif.
+/* * module   
 % Initial Telnet/Text console 
 % ALL telnet client business logic is here (removed from everywhere else!)
 %
@@ -36,7 +37,9 @@
 %
 */ 
 
+
 :- ain(mtProlog(mud_telnet)).
+:- add_import_module(mud_telnet,world,end).
 
 % learnLaterWhenToCallProceedure(What):- ... code ...
 
@@ -77,6 +80,7 @@ start_mud_telnet_4000:-start_mud_telnet(4000).
 start_mud_telnet(Port):- 
   must(telnet_server(Port, [allow(_ALL),get_call_pred(login_and_run_nodebug)])),!.
 
+:- dynamic(lmcache:main_thread_error_stream/1).
 :- volatile(lmcache:main_thread_error_stream/1).
 
 save_error_stream:- lmcache:main_thread_error_stream(_),!.
@@ -164,7 +168,7 @@ run_session(In,Out):-
 session_loop(In,Out):-
   get_session_id_local(O),
   call_u((current_agent(P)->true;player_connect_menu(In,Out,_,_);player_connect_menu(In,Out,_,P))),
-  start_agent_action_thread,
+  find_and_call(start_agent_action_thread),
   ignore(look_brief(P)),!,
   (t_l:telnet_prefix(Prefix)->(sformat(S,'~w ~w>',[P,Prefix]));sformat(S,'~w> ',[P])),
   prompt_read_telnet(In,Out,S,List),!,
@@ -336,6 +340,7 @@ cmdShowRoomGrid(Room) :- ignore(show_room_grid_new(Room)),!.
 % ===================================================================
 :-export(show_room_grid_new/1).
 show_room_grid_new(Room):-
+ call_u((
    grid_size(Room,Xs,Ys,_Zs),
    Ys1 is Ys+1,Xs1 is Xs+1,
    forall(between(0,Ys1,Y),
@@ -344,7 +349,7 @@ show_room_grid_new(Room):-
    ((loc_to_xy(Room,X,Y,LOC),
    write(' '),
    OutsideTest = (not(between(1,Xs,X));not(between(1,Ys,Y))),
-   once(show_room_grid_single(Room,LOC,OutsideTest)))))))),!,nl.
+   once(show_room_grid_single(Room,LOC,OutsideTest)))))))))),!,nl.
 show_room_grid_new(_):-nl.
 
 door_label(R,Dir,'  '):- pathBetween_call(R,Dir,SP),atomic(SP).
@@ -601,7 +606,7 @@ on_telnet_restore :-
       http_handler('/hmud', http_reply_from_files(pack(hMUD), []), [prefix]),!.
       
 
-
+:- all_source_file_predicates_are_transparent.
 
 
 :- initialization(on_telnet_restore).

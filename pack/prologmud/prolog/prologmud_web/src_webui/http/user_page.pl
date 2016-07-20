@@ -1,5 +1,5 @@
 :- module(user_page, []).
-/** <module> The web page the user interacts with
+/* * module * The web page the user interacts with
 
 */
 :- multifile(style/1).

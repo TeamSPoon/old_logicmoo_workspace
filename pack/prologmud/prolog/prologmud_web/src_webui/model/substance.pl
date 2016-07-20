@@ -1,5 +1,5 @@
 :- module(substance, [substance/1]).
-/** <module> Interface module tying display engines to the underlying model
+/* * module * Interface module tying display engines to the underlying model
 
 */
 

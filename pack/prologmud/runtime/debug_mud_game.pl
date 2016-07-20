@@ -1,5 +1,5 @@
 #!/usr/bin/env swipl
-/** <module> Debug the MUD Game
+/* * module * Debug the MUD Game
 
 */
 

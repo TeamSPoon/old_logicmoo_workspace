@@ -40,6 +40,10 @@
 :- asserta(baseKB:mtCycL(baseKB)).
 :- set_fileAssertMt(baseKB).
 
+:- dynamic(lmconf:agent_call_command/2).
+:- baseKB:import(lmconf:agent_call_command/2).
+
+
 :- dynamic(baseKB:mtCycL/1).
 :- dynamic(baseKB:mtExact/1).
 :- dynamic(baseKB:predicateConventionMt/2).

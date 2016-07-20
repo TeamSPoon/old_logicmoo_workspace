@@ -4,7 +4,7 @@
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module> 
+/* * module * 
 % This file defines the basic drop predicate
 % 
 */

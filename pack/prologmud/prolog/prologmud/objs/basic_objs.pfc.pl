@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % This file contains the definitions for the objects in a household
 % To create a new world, simply change the object definitions as
 % described below (or in manual)

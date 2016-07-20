@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % This is simple example pddl for the maze world.
 %
 %

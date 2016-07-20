@@ -1,6 +1,6 @@
 % :-swi_module(user). 
 :-swi_module(modHelp, [show_help/0]).
-/** <module> A command to tell an agent all the possible commands
+/* * module * A command to tell an agent all the possible commands
 % help.pl
 % Douglas Miles 2014
 */

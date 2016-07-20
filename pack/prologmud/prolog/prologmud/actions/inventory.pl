@@ -1,6 +1,6 @@
 % :-swi_module(user). 
 :-swi_module(modInventory, [mudInventoryLocation/3,show_inventory/2]).
-/** <module> A command to  ...
+/* * module * A command to  ...
 % Douglas Miles 2014
 % inventory(Agt,Inv) = inventory (anything the agent has taken)
 */
@@ -58,7 +58,7 @@ detatch_object(Obj):-
    
 % destroy from ontology
 destroy_instance(Obj):- % forall(isa(Obj,Col),mpred_remove(isa(Obj,Col))),
-                        xlisting_inner(destroy_clause,Obj,[]),!.
+                        xlisting_inner(destroy_clause,contains(Obj),[]),!.
 
 destroy_clause(H,B,R):- nonvar(R),catch(clause_property(R,_),_,fail),erase(R),wdmsg(destroy_clause(H,B,R)),!,mpred_undo((H:-B)).
 destroy_clause(H,B,R):- nop(wdmsg(misssed_destroy_clause(H,B,R))),!,mpred_undo((H:-B)).

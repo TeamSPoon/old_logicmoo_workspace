@@ -1,5 +1,7 @@
-:-module(world, []).
-/** <module> 
+:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- module(world, []).
+:- endif.
+/* * module  
 % Common place to reduce redundancy World utility prediates
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
@@ -16,7 +18,7 @@
 %:- set_prolog_flag(logicmoo_debug,true).
 %:- set_prolog_flag(unsafe_speedups,false).
 mtProlog(world).
-:-ain(hybrid_support(agent_call_command,2)).
+% :-ain(hybrid_support(agent_call_command,2)).
 :-export((
         % a_unparsed/2,
        % call_agent_action/2,
@@ -84,21 +86,21 @@ mtProlog(world).
 
 :- include(prologmud(mud_header)).
 % :- register_module_type (utility).
-:- must(prolog_load_context(module,world)).
+
 :- include(world_2d).
-:- must(prolog_load_context(module,world)).
+
 :- include(world_text).
-:- must(prolog_load_context(module,world)).
+
 :- include(world_text_output).
-:- must(prolog_load_context(module,world)).
+
 :- include(world_effects).
-:- must(prolog_load_context(module,world)).
+
 :- include(world_events).
-:- must(prolog_load_context(module,world)).
+
 :- include(world_agent).
-:- must(prolog_load_context(module,world)).
+
 :- include(world_npc).
-:- must(prolog_load_context(module,world)).
+
 :- if_file_exists(include(logicmoo('vworld/world_spawning.pl'))).
 
 :-export(isaOrSame/2).
@@ -170,7 +172,7 @@ create_agent(P):-create_agent(P,[]).
 create_agent(P,List):- must(create_instance(P,tAgent,List)),!.
 
 
-:- must(prolog_load_context(module,world)).
+
 
 :-export(create_instance/1).
 create_instance(P):- must(call_u((isa(P,What),ttSpatialType(What)))),must(create_instance(P,What,[])),!.
@@ -207,8 +209,8 @@ ttSpatialType(tAgent).
 genls(tActor,tAgent).
 genls(tExplorer,tAgent).
 
-:-kb_dynamic(predTypeMax/3).
-:-kb_dynamic(predInstMax/3).
+:-decl_shared(predTypeMax/3).
+:-decl_shared(predInstMax/3).
 
 %NEXT TODO predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),isa(I,AgentType).
 %predInstMax(I,mudHealth,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(I,AgentType).
@@ -288,4 +290,5 @@ create_instance_0(What,Type,Props):- leash(+call),wdmsg(assumed_To_HAVE_creted_i
 
 % :- include(prologmud(mud_footer)).
 
+:- all_source_file_predicates_are_transparent.
 

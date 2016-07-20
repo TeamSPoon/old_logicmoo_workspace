@@ -5,7 +5,7 @@
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module>
+/* * module *
 % This file defines the basic look action
 % Agents will use the predicate:
 % mudGetPrecepts(Agent,Percepts) = list of lists of objects in agents location plus 2 locations in each direction

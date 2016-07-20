@@ -546,6 +546,7 @@ clause_u(C):- expand_to_hb(C,H,B),!,clause_u(H,B).
 
 
 %% clause_u( ?H, ?B) is semidet.
+clause_u(H,B):-  current_prolog_flag(unsafe_speedups,true), ground(H:B),!,clause(H,B).
 clause_u(H,B):- clause_u(H,B,_).
 %clause_u(H,B):- clause_true( ==>( B , H) ).
 %clause_u(H,B):- clause_true( <-( H , B) ).
@@ -559,8 +560,9 @@ clause_u(H,B,Ref):-var(H),!,trace_or_throw(var_clause_u(H,B,Ref)).
 clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u((H:-B),BB,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u(MH,B,R):- Why = clause(clause,clause_u),
- ((mnotrace(fix_mp(Why,MH,M,H)),clause_i(M:H,B,R))*->true;
-   (fix_mp(Why,MH,M,CALL)->clause_i(M:CALL,B,R))).
+ ((mnotrace(fix_mp(Why,MH,M,H)),
+  clause(M:H,B,R))*->true;
+           (fix_mp(Why,MH,M,CALL)->clause_i(M:CALL,B,R))).
 % clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
 %clause_u(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
@@ -773,7 +775,8 @@ mpred_ain(MTP,S):- sanity(stack_check), strip_module(MTP,MT,P),P\==MTP,!,
 mpred_ain(MTP :- B,S):- strip_module(MTP,MT,P),P\==MTP,!,
   with_umt(MT,mpred_ain(P :- B,S)),!.
 
-mpred_ain(P,S):- 
+mpred_ain(PIn,S):- 
+  must(add_eachRulePreconditional(PIn,P)),
   must(full_transform(ain,P,P0)),!,
   must(ain_fast(P0,S)),!.
 
@@ -783,14 +786,35 @@ mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
 
 ain_fast(P):- call_u((( get_source_ref(UU), ain_fast(P,UU)))).
 
-ain_fast(P,S):- maybe_updated_value(P,RP,OLD),subst(S,P,RP,RS),!,
- ain_fast(RP,RS),ignore(mpred_retract(OLD)).
+ain_fast(P,S):- maybe_updated_value(P,RP,OLD),subst(S,P,RP,RS),!,ain_fast(RP,RS),ignore(mpred_retract(OLD)).
+
 ain_fast(P,S):- 
   fwc1s_post1s(One,Two),
   filter_buffer_trim('$last_mpred_fwc1s',One),
   filter_buffer_trim('$last_mpred_post1s',Two),
   each_E(mpred_post1,P,[S]),
   mpred_run.
+
+
+:- dynamic(lmconf:eachRulePreconditional/1).
+lmconf:eachRulePreconditional(true).
+:- dynamic(lmconf:eachFactPreconditional/1).
+lmconf:eachFactPreconditional(true).
+
+add_eachRulePreconditional(A,A):-var(A),!.
+add_eachRulePreconditional(B::::A,B::::AA):-add_eachRulePreconditional(A,AA).
+add_eachRulePreconditional(A==>B,AA==>B):-!,add_eachRulePreconditional_now(A,AA).
+add_eachRulePreconditional(A<==>B, ('==>'(AA , B) , (BB ==> A)) ):-!,add_eachRulePreconditional_now(A,AA),add_eachRulePreconditional_now(B,BB).
+add_eachRulePreconditional((B <- A), (B <- AA)) :-!,add_eachRulePreconditional_now(A,AA).
+add_eachRulePreconditional(A,AA):-add_eachFactPreconditional_now(A,AA).
+
+add_eachFactPreconditional_now(A,A):- lmconf:eachFactPreconditional(true),!.
+add_eachFactPreconditional_now(A,(Was==>A)):- lmconf:eachFactPreconditional(Was),!.
+
+add_eachRulePreconditional_now(A,A):- lmconf:eachRulePreconditional(true),!.
+add_eachRulePreconditional_now(A,(Was,A)):- lmconf:eachRulePreconditional(Was),!.
+
+
 
 
 remove_negative_version(_P):- current_prolog_flag(unsafe_speedups,true),!.
@@ -2293,7 +2317,7 @@ really_mpred_mark(_  ,Type,F,A):- mpred_call_no_bc(mpred_mark(Type,F,A)),!.
 really_mpred_mark(Sup,Type,F,A):- 
   MARK = mpred_mark(Type,F,A),
   check_never_assert(MARK),
-  with_no_mpred_trace_exec(with_fc_mode(direct,ain_fast(MARK,(s(Sup),ax)))).
+  with_no_mpred_trace_exec(with_fc_mode(direct,mpred_post(MARK,(s(Sup),ax)))).
   % with_no_mpred_trace_exec(with_fc_mode(direct,mpred_fwc1(MARK,(s(Sup),ax)))),!.
    
 

@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % last file loaded per file (loses at any module side effects
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog

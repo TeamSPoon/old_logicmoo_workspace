@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % This is simple example explorer for the maze world.
 %
 %

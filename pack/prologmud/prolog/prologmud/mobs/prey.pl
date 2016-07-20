@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % This is a *very* simple example of an agent meant to be 
 % used as prey (dead prey turns into food) in simple simulations.
 %

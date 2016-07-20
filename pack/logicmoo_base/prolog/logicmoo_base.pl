@@ -74,7 +74,11 @@ lmconf:mpred_skipped_module(eggdrop).
 :- kb_dynamic(lmconf:mpred_skipped_module/1).
 
 
-:-use_module(system:library('logicmoo/mpred/mpred_userkb.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_userkb.pl')).
+:- dynamic(baseKB:argsQuoted/1).
+:- dynamic(baseKB:resolveConflict/1).
+:- dynamic(lmconf:agent_call_command/2).
+:- baseKB:import(lmconf:agent_call_command/2).
 
 :-use_module(system:library('logicmoo/snark/common_logic_sexpr.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_listing.pl')).

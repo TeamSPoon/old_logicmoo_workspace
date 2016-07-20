@@ -1,6 +1,6 @@
 % :-swi_module(user). 
 :-swi_module(modSit, []).
-/** <module> Agent Postures there and does nothing
+/* * module * Agent Postures there and does nothing
 % Agent will loose a bit of charge, but heal a bit of damage
 % May 18, 1996
 % John Eikenberry

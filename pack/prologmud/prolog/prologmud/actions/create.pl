@@ -10,7 +10,7 @@
 % Douglas Miles 2014
 */
 :- include(prologmud(mud_header)).
-:- use_module(prologmud(vworld/world)).
+
 % :- register_module_type (mtCommand).
 
 

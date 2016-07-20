@@ -5,7 +5,7 @@
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module> 
+/* * module * 
 % This file defines the predicates for the agent to move
 %
 */

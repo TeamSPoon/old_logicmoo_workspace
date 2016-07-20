@@ -1,6 +1,6 @@
 :- module(mudconsolestart, [http_mud_server/0,
 			   http_mud_server/1]).
-/** <module> Launch the http interaction, the 'mudconsole'
+/* * module * Launch the http interaction, the 'mudconsole'
 
 */
 :- use_module(logicmoo('mudconsole/mudconsole')).

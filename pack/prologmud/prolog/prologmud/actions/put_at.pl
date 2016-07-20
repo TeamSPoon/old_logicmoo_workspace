@@ -1,4 +1,4 @@
-/** <module>
+/* * module *
 % actPut.pl
 %
 % This file defines how an agent puts 

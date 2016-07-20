@@ -1,4 +1,4 @@
-/** <module>
+/* * module *
 % climb.pl
 % June 18, 1996
 % John Eikenberry

@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % This is isOptional (simple) monster to prowl the maze world.
 %
 % monster.pl

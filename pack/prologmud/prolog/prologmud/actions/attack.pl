@@ -4,7 +4,7 @@
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module> 
+/* * module * 
 % This file defines the agents action of attacking. 
 % Comments below document the basic idea.
 %

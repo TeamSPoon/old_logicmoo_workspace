@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % This file loads the world (world.pl), the map of the world, 
 % the agents and their definitions.
 % This file is used as a configuation file and a startup script.

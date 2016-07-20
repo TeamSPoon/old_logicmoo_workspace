@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % Very simple... but kept separate to maintain modularity
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog

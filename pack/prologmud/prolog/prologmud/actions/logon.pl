@@ -1,4 +1,4 @@
-/** <module>
+/* * module *
 % logon.pl
 %
 % This file defines how the agents gain their presence and leave the sim

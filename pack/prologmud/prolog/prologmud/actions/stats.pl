@@ -1,6 +1,6 @@
 % :-swi_module(user). 
 :- module(modStats, []).
-/** <module> A command to  ...
+/* * module * A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % health(Agent,Dam) = damage
 % wasSuccess(Agent,Suc) = checks success of last action (actually checks the cmdfailure predicate)

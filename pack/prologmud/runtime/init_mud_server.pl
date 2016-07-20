@@ -1,5 +1,5 @@
 #!/usr/bin/env swipl
-/** <module> MUD server startup script in SWI-Prolog
+/* * module  MUD server startup script in SWI-Prolog
 
 */
 /*
@@ -19,6 +19,7 @@
 :- set_prolog_flag(generate_debug_info,true).
 */
 :- add_import_module(mud_telnet,world,end).
+:- add_import_module(lmconf,baseKB,end).
 
 %:- system:ensure_loaded(setup_paths).
 %:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
@@ -117,7 +118,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
         lmconf:mud_test/2,
         lmconf:regression_test/0,
         lmconf:sanity_test/0,
-        agent_call_command/2,
+        baseKB:agent_call_command/2,
         action_info/2,
         type_action_info/3)).
 
@@ -126,6 +127,8 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- initialization(ensure_webserver(3020)).
 :- initialization(ensure_webserver(3020),now).
 :- initialization(ensure_webserver(3020),restore).
+
+:- assert_setting01(lmconf:eachRulePreconditional(true)).
 
 :- set_prolog_flag(dialect_pfc,false).
 
@@ -167,6 +170,9 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 % MUD SERVER CODE LOADS
 % ==============================
 
+% :- assert_setting01(lmconf:eachRulePreconditional(isRuntime)).
+
+
 %:- push_modules.
 % [Required] load the mud system
 :- show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader)))).
@@ -181,7 +187,6 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 :- file_begin(pfc).
 :- set_prolog_flag(dialect_pfc,false).
-
 
 
 :- set_prolog_flag(dialect_pfc,true).
@@ -279,18 +284,26 @@ lar:- login_and_run.
 
 :- initialization(ensure_webserver(3020),now).
 
+% :- assert_setting01(lmconf:eachFactPreconditional(isRuntime)).
+
 :- set_prolog_flag(unsafe_speedups,true).
 % isa(starTrek,mtCycL).
 % :- starTrek:force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
-:- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
+% :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 :- must_det(argIsa(genlPreds,2,_)).
 
 %:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 %:- initialization(ltkb1,now).
 
-% :- set_prolog_flag(unsafe_speedups,false).
-:- initialization(lar).
+% :- break.
+
+:- assert_setting01(lmconf:eachRulePreconditional(true)).
+:- assert_setting01(lmconf:eachFactPreconditional(true)).
+:- ain(isRuntime).
+
+:- set_prolog_flag(unsafe_speedups,false).
+% :- initialization(lar).
 :- initialization(lar,restore).
 
 end_of_file.

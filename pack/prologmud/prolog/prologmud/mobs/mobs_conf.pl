@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % This module is the CircleMUD configurator
 */
 

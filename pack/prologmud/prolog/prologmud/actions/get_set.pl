@@ -1,6 +1,6 @@
 % :-swi_module(user). 
 :-swi_module(get_set, []).
-/** <module> Agent changes one of their own variables
+/* * module * Agent changes one of their own variables
 % Douglas Miles 2014
 
 */

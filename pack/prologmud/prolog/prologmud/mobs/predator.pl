@@ -1,4 +1,4 @@
-/** <module> 
+/* * module * 
 % This is a *very* simple example of an agent for
 % the predator example world.
 %

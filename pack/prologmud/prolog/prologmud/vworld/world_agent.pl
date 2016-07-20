@@ -160,11 +160,11 @@ agent_call_command_now_3(Agent,CMD):-
    with_agent(Agent,
      w_tl(t_l:side_effect_ok,
      w_tl(t_l:agent_current_action(Agent,CMD),
-  (on_f_debug(agent_call_command(Agent,CMD))*->true;agent_call_command_all_fallback(Agent,CMD))))),
+  (find_and_call(agent_call_command(Agent,CMD))*->true;agent_call_command_all_fallback(Agent,CMD))))),
   padd(Agent,mudLastCommand(CMD)).
 
 agent_call_command_all_fallback(Agent,CMD):- if_defined(agent_call_command_fallback(Agent,CMD)),!.
-agent_call_command_all_fallback(_Agent,CMD):- xlisting(CMD).
+agent_call_command_all_fallback(_Agent,CMD):- nop(xlisting(CMD)).
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
