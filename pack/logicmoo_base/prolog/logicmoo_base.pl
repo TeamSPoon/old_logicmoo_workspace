@@ -18,8 +18,8 @@
 :- use_module(library(logicmoo_utils)).
 
 /*
-% lmconf:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
-% lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
+% baseKB:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
+% baseKB:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 :- set_prolog_flag(report_error,true).
 :- set_prolog_flag(fileerrors,false).
 :- set_prolog_flag(access_level,system).
@@ -36,22 +36,22 @@
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(baseKB:mpred_is_impl_file/1).
+:- dynamic(baseKB:mpred_is_impl_file/1).
 
-:- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
+:- source_location(F,_),asserta(baseKB:ignore_file_mpreds(F)).
 
-:- multifile lmconf:startup_option/2. 
-:- dynamic lmconf:startup_option/2. 
-:- multifile lmconf:mpred_system_status/2.
-:- dynamic lmconf:mpred_system_status/2.
+:- multifile baseKB:startup_option/2. 
+:- dynamic baseKB:startup_option/2. 
+:- multifile baseKB:mpred_system_status/2.
+:- dynamic baseKB:mpred_system_status/2.
 :- multifile(t_l:disable_px/0).
 :- thread_local(t_l:disable_px/0).
 
 
-lmconf:mpred_skipped_module(eggdrop).
-:- forall(current_module(CM),system:assert(lmconf:mpred_skipped_module(CM))).
-:- retractall(lmconf:mpred_skipped_module(pfc)).
+baseKB:mpred_skipped_module(eggdrop).
+:- forall(current_module(CM),system:assert(baseKB:mpred_skipped_module(CM))).
+:- retractall(baseKB:mpred_skipped_module(pfc)).
 
 
 % ================================================
@@ -71,14 +71,14 @@ lmconf:mpred_skipped_module(eggdrop).
 :-multifile( baseKB:predicateConventionMt/2).
 :-dynamic( baseKB:predicateConventionMt/2).
 :- kb_dynamic(lmcache:loaded_external_kbs/1).
-:- kb_dynamic(lmconf:mpred_skipped_module/1).
+:- kb_dynamic(baseKB:mpred_skipped_module/1).
 
 
 :-ensure_loaded(system:library('logicmoo/mpred/mpred_userkb.pl')).
 :- dynamic(baseKB:argsQuoted/1).
 :- dynamic(baseKB:resolveConflict/1).
-:- dynamic(lmconf:agent_call_command/2).
-:- baseKB:import(lmconf:agent_call_command/2).
+:- dynamic(baseKB:agent_call_command/2).
+:- baseKB:import(baseKB:agent_call_command/2).
 
 :-use_module(system:library('logicmoo/snark/common_logic_sexpr.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_listing.pl')).
@@ -124,7 +124,7 @@ base_clause_expansion(_,I,':-'(ain_expanded(I))):- (in_dialect_pfc;needs_pfc(I))
 
 
 needs_pfc(I) :- nonvar(I),get_consequent_functor(I,F,A),
-   (clause_b(prologMacroHead(F));clause_b(hybrid_support(F,_));lmconf:wrap_shared(F,A,ereq)),!.
+   (clause_b(prologMacroHead(F));clause_b(hybrid_support(F,_));baseKB:wrap_shared(F,A,ereq)),!.
 
 
 % system:clause_expansion(I,PosI,O,PosI):- base_clause_expansion(PosI,I,O),!.
@@ -136,8 +136,8 @@ system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),no
 
 :- autoload. % ([verbose(false)]).
 
-bad_thing_to_do:- doall((clause(lmconf:wrap_shared(F,A,ereq),Body),
-    retract(( lmconf:wrap_shared(F,A,ereq):- Body )), 
+bad_thing_to_do:- doall((clause(baseKB:wrap_shared(F,A,ereq),Body),
+    retract(( baseKB:wrap_shared(F,A,ereq):- Body )), 
       between(0,9,A),ain((arity(F,A),pfcControlled(F),prologHybrid(F))),fail)).
 
 % :- doall((current_module(W),import_module(W,system),\+ import_module(W, user), W\==baseKB, add_import_module(lmcode,W,end))).
@@ -151,11 +151,11 @@ bad_thing_to_do:- doall((clause(lmconf:wrap_shared(F,A,ereq),Body),
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
 
-%lmconf:sanity_check:- findall(U,(current_module(U),default_module(U,baseKB)),L),must(L==[baseKB]).
-lmconf:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(U,M),U\==M),L),
+%baseKB:sanity_check:- findall(U,(current_module(U),default_module(U,baseKB)),L),must(L==[baseKB]).
+baseKB:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(U,M),U\==M),L),
      wdmsg(imports_eache :- (L,[sees(M)])))).
-lmconf:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(M,U),U\==M),L),wdmsg(imports(M):-L))).
-lmconf:sanity_check:- doall((baseKB:mtProlog(M),
+baseKB:sanity_check:- doall((current_module(M),setof(U,(current_module(U),default_module(M,U),U\==M),L),wdmsg(imports(M):-L))).
+baseKB:sanity_check:- doall((baseKB:mtProlog(M),
     setof(U,(current_module(U),default_module(M,U),U\==M),L),wdmsg(imports(M):-L))).
 
 
@@ -167,7 +167,7 @@ lmconf:sanity_check:- doall((baseKB:mtProlog(M),
 :- dynamic system:exception/3.
 
 /*
-:-ignore((lmconf:source_typein_modules(O, _O, _), O\=user,O\=baseKB,O\=system,
+:-ignore((baseKB:source_typein_modules(O, _O, _), O\=user,O\=baseKB,O\=system,
    setup_module_ops(O), add_abox_module(O), set_defaultAssertMt(O))).
 */  
 
@@ -186,8 +186,8 @@ user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_unde
 %:- rtrace((mpred_at_box:defaultAssertMt(G40331),rtrace(set_prolog_flag(G40331:unknown,warning)))).
 %:- dbreak.
 :- must(set_prolog_flag(abox:unknown,warning)).
-:- w_tl(t_l:side_effect_ok,doall(call_no_cuts(lmconf:module_local_init(abox,baseKB)))).
-% :- forall(lmconf:sanity_check,true).
+:- w_tl(t_l:side_effect_ok,doall(call_no_cuts(baseKB:module_local_init(abox,baseKB)))).
+% :- forall(baseKB:sanity_check,true).
 
 :-module_transparent(logicmoo_util_database:ain/1).
 :-module_transparent(logicmoo_util_database:aina/1).

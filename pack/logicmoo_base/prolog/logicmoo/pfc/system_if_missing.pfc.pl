@@ -11,7 +11,7 @@ pfcControlled(if_missing(ftAskable,ftAssertable)).
 if_missing(Missing,Create) ==> 
  ( ( \+ (Missing/(Missing\=@=Create))) ==> Create).
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
 :- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_foob.pfc')).
 

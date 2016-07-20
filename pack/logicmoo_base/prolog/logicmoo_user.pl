@@ -32,7 +32,7 @@
 :- set_prolog_flag(pfc_booted,false).
 :-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
 :- set_prolog_flag(pfc_booted,true).
-% :- forall(lmconf:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
+% :- forall(baseKB:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
 
 :- set_prolog_flag(pfc_booted,false).
 

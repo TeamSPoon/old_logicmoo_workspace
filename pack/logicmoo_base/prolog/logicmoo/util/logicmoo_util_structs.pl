@@ -106,7 +106,7 @@
         member_arg_convert/5,
         member_datatype/2,
         merge_values/3,
-        lmconf:module_local_init /0,
+        baseKB:module_local_init /0,
         nb_set_pairlist/3,
         nb_set_pairlist0/3,
         nb_set_s2list/4,
@@ -148,7 +148,7 @@
         term_to_ord_term/2,
         to_datatype/3.
 :- dynamic
-        lmconf:module_local_init/0.
+        baseKB:module_local_init/0.
 
 :- if(current_module(logicmoo_utils)).
 :- public((
@@ -798,10 +798,10 @@ extract_struct_parameter(Def,Name,Name,Def).
 
 %% module_local_init() is semidet.
 %
-% Hook To [lmconf:module_local_init/0] For Module Logicmoo_util_structs.
+% Hook To [baseKB:module_local_init/0] For Module Logicmoo_util_structs.
 % Module Local Init.
 %
-lmconf:module_local_init(_UserModule,SystemModule):- ain(SystemModule:'==>'(struct_decl(StructDecl),decl_struct(StructDecl))).
+baseKB:module_local_init(_UserModule,SystemModule):- ain(SystemModule:'==>'(struct_decl(StructDecl),decl_struct(StructDecl))).
 
 
 

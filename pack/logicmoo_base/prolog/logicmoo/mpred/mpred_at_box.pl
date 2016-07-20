@@ -133,7 +133,7 @@ baseKB:mtProlog(Mt):-
          common_logic_sexpr,
          common_logic_skolem,
          common_logic_snark,
-         lmconf,
+         baseKB,
          lmcache,
          t_l,
          
@@ -243,7 +243,7 @@ box_type(_,_,abox).
 
 
 :- thread_local(t_l:current_defaultAssertMt/1).
-:- dynamic(lmconf:file_to_module/2).
+:- dynamic(baseKB:file_to_module/2).
 
 
 %:- multifile(get_current_default_tbox/1).
@@ -350,7 +350,7 @@ set_fileAssertMt(ABox):-
 
    set_defaultAssertMt(ABox),
    which_file(File),
-   assert_setting(lmconf:file_to_module(File,ABox)),
+   assert_setting(baseKB:file_to_module(File,ABox)),
    assert_setting(lmcache:mpred_directive_value(File,module,ABox)),
    % MAYBE? '$set_typein_module'(TBox),
 
@@ -360,14 +360,15 @@ set_fileAssertMt(ABox):-
 
 
 
-make_module_name_local(A,B):- make_module_name_local0(A,B), \+ exists_file(B).
+make_module_name_local(A,B):- make_module_name_local0(A,B), \+ exists_file(B),!.
 
 make_module_name_local0(Source,KB):- clause_b(mtProlog(Source)),t_l:current_defaultAssertMt(KB),!.
 make_module_name_local0(Source,KB):- clause_b(mtGlobal(Source)),t_l:current_defaultAssertMt(KB),!.
-make_module_name_local0(Source,SetName):- lmconf:file_to_module(Source,SetName),!.
+make_module_name_local0(Source,SetName):- baseKB:file_to_module(Source,SetName),!.
 make_module_name_local0(Source,Source):- lmcache:has_pfc_database_preds(Source).
 make_module_name_local0(Source,Source):- clause_b(mtCycL(Source)),!.
 make_module_name_local0(user,KB):- t_l:current_defaultAssertMt(KB),!.
+make_module_name_local0(user,baseKB):-!.
 make_module_name_local0(Source,GetName):- make_module_name(Source,GetName).
 
 
@@ -553,7 +554,7 @@ autoload_library_index(F,A,PredMt,File):- functor(P,F,A),'$autoload':library_ind
 
 :- multifile(baseKB:hybrid_support/2).
 :- dynamic(baseKB:hybrid_support/2).
-baseKB_hybrid_support(F,A):-lmconf:wrap_shared(F,A,_).
+baseKB_hybrid_support(F,A):-baseKB:wrap_shared(F,A,_).
 baseKB_hybrid_support(F,A):-clause_b(hybrid_support(F,A)).
 
 baseKB:hybrid_support(predicateConventionMt,2).
@@ -693,7 +694,7 @@ retry_undefined(CallerMt,'$pldoc',4):- multifile(CallerMt:'$pldoc'/4),discontigu
 
 % 3 very special Mts
 % Module defines the type
-retry_undefined(lmconf,F,A):- make_as_dynamic(retry_undefined(lmconf),lmconf,F,A),!.
+% retry_undefined(baseKB,F,A):- make_as_dynamic(retry_undefined(baseKB),baseKB,F,A),!.
 retry_undefined(lmcache,F,A):- volatile(lmcache:F/A),make_as_dynamic(retry_undefined(lmcache),lmcache,F,A),!.
 retry_undefined(t_l,F,A):- thread_local(t_l:F/A),!,make_as_dynamic(retry_undefined(t_l),t_l,F,A),!.
 
@@ -784,7 +785,7 @@ shared_multifile(PI):- kb_dynamic(PI).
 make_shared_multifile(CallerMt, PredMt,FA):- get_fa(FA,F,A), make_shared_multifile(CallerMt, PredMt,F,A),!.
 
 make_shared_multifile(CallerMt,    t_l,F,A):-!,CallerMt:thread_local(t_l:F/A),CallerMt:multifile(t_l:F/A).
-make_shared_multifile(CallerMt,lmconf ,F,A):-!,CallerMt:multifile(lmconf:F/A),CallerMt:dynamic(lmconf:F/A),!.
+% make_shared_multifile(CallerMt,baseKB ,F,A):-!,CallerMt:multifile(baseKB:F/A),CallerMt:dynamic(baseKB:F/A),!.
 make_shared_multifile(CallerMt,lmcache,F,A):-!,CallerMt:multifile(lmcache:F/A),CallerMt:volatile(lmcache:F/A),CallerMt:dynamic(lmcache:F/A),!.
 
 make_shared_multifile(CallerMt,PredMt,F,A):- 

@@ -264,12 +264,12 @@ Writing in Prolog is actually really easy for a MUD is when X is chosen
 % inital a/2 database
 % ============================================
 
-% lmconf:hasInstance_dyn(W,SS):-nonvar(W),nonvar(SS),SS=isKappaFn(_,S),nonvar(S),!.
+% baseKB:hasInstance_dyn(W,SS):-nonvar(W),nonvar(SS),SS=isKappaFn(_,S),nonvar(S),!.
 
 
 /*
-disabled a(T,I):- not(current_predicate(deduce_M/1)),!,lmconf:hasInstance_dyn(T,I).
-disabled a(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(lmconf:hasInstance_dyn(T,I)))),fail))).
+disabled a(T,I):- not(current_predicate(deduce_M/1)),!,baseKB:hasInstance_dyn(T,I).
+disabled a(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(baseKB:hasInstance_dyn(T,I)))),fail))).
 disabled a(T,I):- rdf_x(I,rdf:type,T).
 */
 
@@ -573,7 +573,7 @@ fully_expand_now(Op,Sent,SentO):-
     SentO=BO,
     sanity(Sent=@=NoVary),
    ignore(((fail,cnotrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
-    (Sent \=@= lmconf:SentO), dmsg(fully_expand_now(Op,(Sent --> SentO)))))))))))))),!.
+    (Sent \=@= baseKB:SentO), dmsg(fully_expand_now(Op,(Sent --> SentO)))))))))))))),!.
 */
      
 :- decl_shared(mtExact/1).

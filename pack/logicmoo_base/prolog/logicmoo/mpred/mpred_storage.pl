@@ -63,7 +63,7 @@
             may_storage_op/2,
             mdel/1,
             mpred_modify/2,
-            lmconf:mpred_provide_storage_op/4,
+            baseKB:mpred_provide_storage_op/4,
             must_storage_op/2,
             nonground_throw_else_fail/1,
             not_variant/2,
@@ -517,7 +517,7 @@ ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)
                                        source_context_module(CM),
                                        dmsg(wrong_import_module(M,Other:C,from(CM))),
                                        ignore(delete_import_module(CM,Other)),
-                                       '@'((M:dynamic(C),M:export(C)),M),lmconf:zz2import(M:C))),fail.
+                                       '@'((M:dynamic(C),M:export(C)),M),baseKB:zz2import(M:C))),fail.
 ensure_predicate_reachable(_,_).
 */
 
@@ -586,7 +586,7 @@ requires_storage(_,_,t_l:consulting_sources):-t_l:consulting_sources,mpred_may_e
 %
 special_wrapper_functor(call_mpred_body,direct_to_prolog).
 special_wrapper_functor(body_req,direct_to_prolog).
-special_wrapper_functor(lmconf:mpred_provide_setup,direct_to_prolog).
+special_wrapper_functor(baseKB:mpred_provide_setup,direct_to_prolog).
 special_wrapper_functor(call_provided_mpred_storage_op,direct_to_prolog).
 special_wrapper_functor(loop_check,meta).
 special_wrapper_functor(loop_check_term,meta).
@@ -824,7 +824,7 @@ add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
 add_0(A):- A =(:-(Term)), !, call_u(Term).
 % add_0(C0):-check_override(ain(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
-%add_0(C0):- ignore((ground(C0),asserta(lmconf:already_added_this_round(C0)))),!,must(ain_fast(C0)),!.
+%add_0(C0):- ignore((ground(C0),asserta(baseKB:already_added_this_round(C0)))),!,must(ain_fast(C0)),!.
 add_0(C0):- must(ain_fast(C0)),!.
 add_0(A):-trace_or_throw(fmt('ain/1 is failing ~q.',[A])).
 */
@@ -839,7 +839,7 @@ add_0(A):-trace_or_throw(fmt('ain/1 is failing ~q.',[A])).
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
 implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(Skipped);out_of_mpred_t(Skipped)).
-%implied_skipped(Skipped):-lmconf:already_added_this_round(Skipped),(clause_u(Skipped)).
+%implied_skipped(Skipped):-baseKB:already_added_this_round(Skipped),(clause_u(Skipped)).
 
 
 :- was_export(ain/1).
@@ -1167,22 +1167,22 @@ hooked_retractall(G):- Op = change(retract,all),
 % Hook To [isa_lmconf:mpred_provide_storage_op/2] For Module Mpred_storage.
 % Managed Predicate Provide Storage Oper..
 %
-lmconf:mpred_provide_storage_op(Op,G):- get_functor(G,F,A),lmconf:mpred_provide_storage_op(Op,G,F,A).
+baseKB:mpred_provide_storage_op(Op,G):- get_functor(G,F,A),baseKB:mpred_provide_storage_op(Op,G,F,A).
 
 
 %= 	 	 
 
 %% mpred_provide_storage_op( ?Op, ?G, ?F, ?A) is semidet.
 %
-% Hook To [lmconf:mpred_provide_storage_op/4] For Module Mpred_storage.
+% Hook To [baseKB:mpred_provide_storage_op/4] For Module Mpred_storage.
 % Managed Predicate Provide Storage Oper..
 %
-lmconf:mpred_provide_storage_op(Op,G, F,_A):- a(pfcControlled,F),!,loop_check(prolog_mpred_provide_storage_op(Op,G)).
-lmconf:mpred_provide_storage_op(Op,G, F,_A):- a(prologDynamic,F),!,loop_check(lmconf:mpred_provide_storage_op(Op,G)).
-lmconf:mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_storage_op(Op,G)).
+baseKB:mpred_provide_storage_op(Op,G, F,_A):- a(pfcControlled,F),!,loop_check(prolog_mpred_provide_storage_op(Op,G)).
+baseKB:mpred_provide_storage_op(Op,G, F,_A):- a(prologDynamic,F),!,loop_check(baseKB:mpred_provide_storage_op(Op,G)).
+baseKB:mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_storage_op(Op,G)).
 
-%lmconf:mpred_provide_storage_op(Op,G):- (loop_check(isa_lmconf:mpred_provide_storage_op(Op,G))).
-%lmconf:mpred_provide_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(lmconf:mpred_provide_storage_clauses(G,true,_Proof))).
+%baseKB:mpred_provide_storage_op(Op,G):- (loop_check(isa_lmconf:mpred_provide_storage_op(Op,G))).
+%baseKB:mpred_provide_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(baseKB:mpred_provide_storage_clauses(G,true,_Proof))).
 
 
 %= 	 	 
@@ -1200,7 +1200,7 @@ must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 %
 % May Storage Oper..
 %
-may_storage_op(Op,G):-call_no_cuts(lmconf:mpred_provide_storage_op(Op,G)).
+may_storage_op(Op,G):-call_no_cuts(baseKB:mpred_provide_storage_op(Op,G)).
 
 
 :- meta_predicate hooked_asserta(+), hooked_assertz(+), hooked_retract(+), hooked_retractall(+).

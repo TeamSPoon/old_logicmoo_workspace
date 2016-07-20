@@ -323,7 +323,7 @@ make_module_name00(mpred/P,PredMt):-nonvar(P),!,make_module_name00(P,PredMt).
 make_module_name00(util/P,PredMt):-nonvar(P),!,make_module_name00(P,PredMt).
 make_module_name00(P,PredMt):-must(filematch(P,F)),F\=P,!,make_module_name00(F,PredMt).
 
-:- op(1150,fx,lmconf:dynamic_safe).
+:- op(1150,fx,baseKB:dynamic_safe).
 
 %= 	 	 
 
@@ -456,8 +456,8 @@ only_3rd(With,CallerMt, user, PI):-!, show_call(with_pi,call(With,CallerMt:PI)).
 % only_3rd(With,user, PredMt, PI):-!, show_call(with_pi,call(With,PredMt:PI)).
 only_3rd(With,CallerMt, PredMt, PI):- CallerMt:call(With,PredMt:PI).
 
-:- multifile(lmconf:mpred_is_decl_called/4).
-:- dynamic(lmconf:mpred_is_decl_called/4).
+:- multifile(baseKB:mpred_is_decl_called/4).
+:- dynamic(baseKB:mpred_is_decl_called/4).
 
 :- meta_predicate(with_pfa_group(3,+,+,+)).
 :- module_transparent(with_pfa_group/4).
@@ -530,12 +530,12 @@ with_pfa_group(With,CallerMt, PredMt, PI):- must(with_pfa_single(With,CallerMt, 
 %
 % Using Pfa Single.
 %
-with_pfa_single(With,CallerMt, PredMt, FA):- lmconf:mpred_is_decl_called(With,CallerMt, PredMt, FA),!.
+with_pfa_single(With,CallerMt, PredMt, FA):- baseKB:mpred_is_decl_called(With,CallerMt, PredMt, FA),!.
 % with_pfa_single(With,_CallerMt, PredMt, FA):- to_canonical_mpi(FA,P), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property(RM:P,imported_from(_)), PredMt==RM))))),fail.
 with_pfa_single([], _CallerMt, _M, _FA):-!.
 with_pfa_single([With|List],CallerMt, PredMt, FA):- is_list(List),!,with_pfa_single(With,CallerMt, PredMt, FA),!,with_pfa_single(List,CallerMt, PredMt, FA).
-with_pfa_single(With,CallerMt, PredMt, FA):- lmconf:mpred_is_decl_called(With,CallerMt0, M0, FA),M0\==PredMt, dmsg(with_pfa_single(With,CallerMt->CallerMt0, PredMt->M0, FA)),!,asserta(lmconf:mpred_is_decl_called(With,CallerMt, PredMt, FA)),!.
-with_pfa_single(With,CallerMt, PredMt, FA):- asserta(lmconf:mpred_is_decl_called(With,CallerMt, PredMt, FA)), must(call(With,CallerMt, PredMt, FA)).
+with_pfa_single(With,CallerMt, PredMt, FA):- baseKB:mpred_is_decl_called(With,CallerMt0, M0, FA),M0\==PredMt, dmsg(with_pfa_single(With,CallerMt->CallerMt0, PredMt->M0, FA)),!,asserta(baseKB:mpred_is_decl_called(With,CallerMt, PredMt, FA)),!.
+with_pfa_single(With,CallerMt, PredMt, FA):- asserta(baseKB:mpred_is_decl_called(With,CallerMt, PredMt, FA)), must(call(With,CallerMt, PredMt, FA)).
 
 
 % ----------
@@ -657,7 +657,7 @@ dynamic_transparent([]):-!.
 dynamic_transparent([X]):-dynamic_transparent(X),!.
 dynamic_transparent([X|Xs]):-!,dynamic_transparent(X),dynamic_transparent(Xs),!.
 dynamic_transparent(PredMt:F/A):-!, module_transparent(PredMt:F/A),dynamic(PredMt:F/A).
-dynamic_transparent(F/A):-!,multi_transparent(lmconf:F/A).
+dynamic_transparent(F/A):-!,multi_transparent(baseKB:F/A).
 dynamic_transparent(X):-functor_catch(X,F,A),dynamic_transparent(F/A),!.
 
 
@@ -672,7 +672,7 @@ multi_transparent([]):-!.
 multi_transparent([X]):-multi_transparent(X),!.
 multi_transparent([X|Xs]):-!,multi_transparent(X),multi_transparent(Xs),!.
 multi_transparent(PredMt:F/A):-!, module_transparent(PredMt:F/A),dynamic(PredMt:F/A),multifile(PredMt:F/A).
-multi_transparent(F/A):-!,multi_transparent(lmconf:F/A).
+multi_transparent(F/A):-!,multi_transparent(baseKB:F/A).
 multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 
 
@@ -760,7 +760,7 @@ is_static_predicate_3(PredMt,F,A):-
 
 is_dynamic_module(user).
 is_dynamic_module(baseKB).
-is_dynamic_module(lmconf).
+is_dynamic_module(baseKB).
 is_dynamic_module(lmcache).
 is_dynamic_module(t_l).
 is_dynamic_module(prolog).
@@ -865,7 +865,7 @@ rebuild_as_dyn(PredMt,C,F,A):- redefine_system_predicate(PredMt:C),PredMt:abolis
 dynamic_safe(PredMt,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,dmsg(warn(predicate_property(PredMt:C,imported_from(system)))).
 dynamic_safe(PredMt,F,A):- (is_static_predicate(PredMt:F/A) 
   -> show_call(why,convert_to_dynamic(PredMt,F,A)) ; on_x_log_cont((dynamic(PredMt:F/A),multifile(PredMt:F/A)))). % , warn_module_dupes(PredMt,F,A).
-:- op(1150,fx,lmconf:dynamic_safe).
+:- op(1150,fx,baseKB:dynamic_safe).
 
 
 % pred_prop(Spec,DO,TEST,DONT)

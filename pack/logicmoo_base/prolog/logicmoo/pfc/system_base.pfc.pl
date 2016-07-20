@@ -40,8 +40,8 @@
 :- asserta(baseKB:mtCycL(baseKB)).
 :- set_fileAssertMt(baseKB).
 
-:- dynamic(lmconf:agent_call_command/2).
-:- baseKB:import(lmconf:agent_call_command/2).
+:- dynamic(baseKB:agent_call_command/2).
+:- baseKB:import(baseKB:agent_call_command/2).
 
 
 :- dynamic(baseKB:mtCycL/1).
@@ -332,7 +332,7 @@ baseKB:predicateConventionMt(predicateConventionMt,baseKB).
 baseKB:predicateConventionMt(collectionConventionMt,baseKB).
 
 predicateConventionMt(genlMt,baseKB).
-predicateConventionMt(regression_test,lmconf).
+predicateConventionMt(regression_test,baseKB).
 
 
 
@@ -393,7 +393,7 @@ mtGlobal(system).
 
 ttModule(mtExact,
   comment("mtExact(?Mt) states that all predicates the Mt specifies should be called and asserted using only this ?Mt.")).
-mtExact(lmconf).
+mtExact(baseKB).
 mtExact(lmcache).
 mtExact(t_l).
 mtExact(Mt)==> mtGlobal(Mt).

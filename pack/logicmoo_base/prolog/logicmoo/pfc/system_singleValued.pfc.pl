@@ -81,7 +81,7 @@ someSV_testing(a,c,3).
 :- listing(someSV_testing/3).
 
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
 :- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_sv.pfc')).
 

@@ -858,12 +858,12 @@ if_startup_script_local(_).
 
 /*
 
-:- was_export(lmconf:rff/0).
+:- was_export(baseKB:rff/0).
 
-lmconf:rff:-lmconf:rff(wdmsg(n(first)),wdmsg(n(retry)),wdmsg(n(success)),wdmsg(n(failure))).
+baseKB:rff:-baseKB:rff(wdmsg(n(first)),wdmsg(n(retry)),wdmsg(n(success)),wdmsg(n(failure))).
 
-:- was_export(lmconf:rff/4).
-lmconf:rff(OnFirst,OnRetry,OnSuccess,OnFailure) :- CU = was(never,first),
+:- was_export(baseKB:rff/4).
+baseKB:rff(OnFirst,OnRetry,OnSuccess,OnFailure) :- CU = was(never,first),
   call_cleanup((
     process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),
     (nb_setarg(1,CU,first));((nb_setarg(1,CU,second)),!,fail)),

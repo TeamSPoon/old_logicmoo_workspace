@@ -246,13 +246,13 @@ end_of_file.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
 
-:- multifile lmconf:startup_option/2. 
-:- dynamic lmconf:startup_option/2. 
+:- multifile baseKB:startup_option/2. 
+:- dynamic baseKB:startup_option/2. 
 
 :- ensure_loaded(library(logicmoo_utils)).
 
-lmconf:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
-lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
+baseKB:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
+baseKB:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 
 
 
@@ -270,11 +270,11 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 :- initialization(user:attach_packs).
 
 % [Required] Load the Logicmoo Library Utils
-% lmconf:mpred_is_impl_file(error,logicmoo(logicmoo_utils)).
+% baseKB:mpred_is_impl_file(error,logicmoo(logicmoo_utils)).
 
 :- user:file_search_path(logicmoo,_)-> true; (user:prolog_load_context(directory,Dir),asserta_if_new(user:file_search_path(logicmoo,Dir))).
 
-:- was_dynamic(lmconf:isa_pred_now_locked/0).
+:- was_dynamic(baseKB:isa_pred_now_locked/0).
 */
 
 % :- include(mpred/'mpred_header.pi').
@@ -298,9 +298,9 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 % ========================================
 
 % TODO uncomment the next line without breaking it all!
-% lmconf:use_cyc_database.
+% baseKB:use_cyc_database.
 
-:- asserta(lmconf:pfcManageHybrids).
+:- asserta(baseKB:pfcManageHybrids).
 
 
 
@@ -372,7 +372,7 @@ when_debugging(_,_).
 
 % :- read_source_files.
 % logicmoo_html_needs_debug.
-:- if((lmconf:startup_option(www,sanity),if_defined(logicmoo_html_needs_debug))).
+:- if((baseKB:startup_option(www,sanity),if_defined(logicmoo_html_needs_debug))).
 :- write(ready),nl,flush_output.
 :- prolog.
 :- endif.

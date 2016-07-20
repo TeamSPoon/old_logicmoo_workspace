@@ -8,9 +8,9 @@
 % Setup Testing Options
 % ==============================
 
-:- asserta(lmconf:load_mud_www).
+:- asserta(baseKB:load_mud_www).
 :- asserta(t_l:verify_side_effect_buffer).
-:- asserta(lmconf:skip_el_assertions).
+:- asserta(baseKB:skip_el_assertions).
 
 
 % ==============================
@@ -51,7 +51,7 @@
 :- gripe_time(40,with_no_mpred_expansions(if_file_exists(test_for_release(logicmoo(logicmoo_engine))))).
 
 
-:- asserta(lmconf:skip_el_assertions).
+:- asserta(baseKB:skip_el_assertions).
 :- dynamic  el_assertions:el_holds/4.
 :- dynamic  el_assertions:el_holds/10.
 :- dynamic  el_assertions:el_holds/11.
@@ -105,7 +105,7 @@ feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 % [Optionaly] Run a battery of tests
-% :- if_startup_script( doall(lmconf:regression_test)).
+% :- if_startup_script( doall(baseKB:regression_test)).
 
 
 sanity_test0a:- enqueue_agent_action("hide").

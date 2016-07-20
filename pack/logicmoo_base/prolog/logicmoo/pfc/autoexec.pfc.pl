@@ -118,9 +118,9 @@
 
 :- set_fileAssertMt(baseKB).
 
-:- multifile(lmconf:locked_baseKB/0).
-:- dynamic(lmconf:locked_baseKB/0).
-:- asserta((lmconf:locked_baseKB)).
+:- multifile(baseKB:locked_baseKB/0).
+:- dynamic(baseKB:locked_baseKB/0).
+:- asserta((baseKB:locked_baseKB)).
 
 
 % :- mpred_test(ensure_loaded('pttpFWC.pfc')).

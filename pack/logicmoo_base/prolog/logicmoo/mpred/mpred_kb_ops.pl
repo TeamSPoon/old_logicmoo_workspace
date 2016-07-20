@@ -260,7 +260,7 @@ call_with_bc_triggers/1,
 attvar_op/2,
 %supporters_list/2,
 %justifications/2,
-% lmconf:mpred_provide_storage_clauses/3,
+% baseKB:mpred_provide_storage_clauses/3,
 % justification/2,
 
 mpred_facts_and_universe/1
@@ -627,12 +627,12 @@ set_prolog_stack_gb(Six):-set_prolog_stack(global, limit(Six*10**9)),set_prolog_
 
 %% module_local_init() is semidet.
 %
-% Hook To [lmconf:module_local_init/0] For Module Mpred_pfc.
+% Hook To [baseKB:module_local_init/0] For Module Mpred_pfc.
 % Module Local Init.
 %
-:- multifile(lmconf:mpred_hook_rescan_files/0).
-:- dynamic(lmconf:mpred_hook_rescan_files/0).
-lmconf:module_local_init:-set_prolog_stack_gb(16).
+:- multifile(baseKB:mpred_hook_rescan_files/0).
+:- dynamic(baseKB:mpred_hook_rescan_files/0).
+baseKB:module_local_init:-set_prolog_stack_gb(16).
 %:- was_dynamic(use_presently/0).
 % used to annotate a predciate to indicate PFC support
 
@@ -849,7 +849,7 @@ mpred_is_taut(B==>(A,_)):- mpred_is_assertable(A),mpred_is_taut(A==>B),!.
 mpred_is_taut(B==>(_,A)):- mpred_is_assertable(A),mpred_is_taut(A==>B),!.
 
 
-% lmconf:decl_database_hook(Op,Hook):- loop_check_nr(pfc_provide_storage_op(Op,Hook)).
+% baseKB:decl_database_hook(Op,Hook):- loop_check_nr(pfc_provide_storage_op(Op,Hook)).
 
 
 %% is_retract_first( +VALUE1) is semidet.
@@ -1297,7 +1297,7 @@ is_already_supported(P,_S,UU):- clause_asserted_local(spft(P,US,UT)),must(get_so
 % is_already_supported(P,_S):- copy_term_and_varnames(P,PC),sp ftY(PC,_,_),P=@=PC,!.
 
 
-if_missing(Q):- mpred_literal_nv(Q), \+ ~Q, if_missing_mask(Q,R,Test),!, lookup_u(R), Test.
+if_missing(Q):- mpred_literal_nv(Q), call_u( \+ ~ Q), if_missing_mask(Q,R,Test),!, lookup_u(R), Test.
 
 %% if_missing_mask( +Q, ?R, ?Test) is semidet.
 %
@@ -1398,7 +1398,7 @@ mpred_tms_supported0(local,P,How) :-  mpred_get_support(P,How). % ,sanity(mpred_
 mpred_tms_supported0(cycles,P,How) :-  well_founded(P,How).
 mpred_tms_supported0(deep,P,How) :- mpred_deep_support(How,P).
 
-% lmconf:hook_one_minute_timer_tick:- statistics.
+% baseKB:hook_one_minute_timer_tick:- statistics.
 
 %% well_founded( +Fact, ?How) is semidet.
 %
@@ -1592,8 +1592,8 @@ neg_in_code(G):-nonvar(G),loop_check(neg_in_code0(G)).
 :- meta_predicate neg_in_code0(*).
 :- export(neg_in_code0/1).
 neg_in_code0(G):- var(G),!,lookup_u(~ G).
-neg_in_code0(call_u(G)):- !,~G.
-neg_in_code0(~(G)):- nonvar(G),!,  \+ ~G ,!.
+neg_in_code0(call_u(G)):- !,call_u(~G).
+neg_in_code0(~(G)):- nonvar(G),!,  \+ call_u(~G) ,!.
 neg_in_code0(G):-   neg_may_naf(G), \+ call_u(G),!.
 neg_in_code0(G):-  is_ftNonvar(G), a(prologSingleValued,G),must((if_missing_mask(G,R,Test),nonvar(R),nonvar(Test))),call_u(R),!,call_u(Test).
 
@@ -1843,7 +1843,7 @@ maybeSupport(P,S):-( \+ ground(P)-> true;
 mpred_ignored(argIsa(F, A, argIsaFn(F, A))).
 mpred_ignored(genls(A,A)).
 mpred_ignored(isa(tCol,tCol)).
-%mpred_ignored(isa(W,tCol)):-mreq(lmconf:hasInstance_dyn(tCol,W)).
+%mpred_ignored(isa(W,tCol)):-mreq(baseKB:hasInstance_dyn(tCol,W)).
 mpred_ignored(isa(W,_)):-is_ftCompound(W),call_u(isa(W,meta_argtypes)).
 mpred_ignored(C):-clause_safe(C,true). 
 mpred_ignored(isa(_,Atom)):-atom(Atom),atom_concat(ft,_,Atom),!.
@@ -1870,10 +1870,10 @@ mpred_negation_w_neg(P,NF):-mpred_nf1_negation(P,NF).
 
 %% hook_one_minute_timer_tick is semidet.
 %
-% Hook To [lmconf:hook_one_minute_timer_tick/0] For Module Mpred_pfc.
+% Hook To [baseKB:hook_one_minute_timer_tick/0] For Module Mpred_pfc.
 % Hook One Minute Timer Tick.
 %
-lmconf:hook_one_minute_timer_tick:-mpred_cleanup.
+baseKB:hook_one_minute_timer_tick:-mpred_cleanup.
 
 
 %% mpred_cleanup is semidet.
@@ -2034,7 +2034,7 @@ mpred_trigger_key(X,X).
 %	restore, reset, etc).
 
 
-lmconf:module_local_init:- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
+baseKB:module_local_init:- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
 
 
 
@@ -2268,7 +2268,7 @@ cnstrn0(X,V):-when(is_ftNonvar(V),X).
 %
 % Rescan Prolog Forward Chaining.
 %
-rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(rescan_pfc,Body)).
+rescan_pfc:-forall(clause(baseKB:mpred_hook_rescan_files,Body),show_entry(rescan_pfc,Body)).
 
 
 %% mpred_facts_and_universe( +P) is semidet.
@@ -2365,8 +2365,8 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 
 :- debug(dmiles).
 
-:- was_dynamic(lmconf:module_local_init/0).
-:- discontiguous(lmconf:module_local_init/0).
+:- was_dynamic(baseKB:module_local_init/0).
+:- discontiguous(baseKB:module_local_init/0).
 % :- include('mpred_header.pi').
 :- style_check(+singleton).
 

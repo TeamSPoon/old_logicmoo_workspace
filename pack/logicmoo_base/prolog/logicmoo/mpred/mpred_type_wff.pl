@@ -1142,7 +1142,7 @@ is_function(_,F,_):- atom_concat(_Was,'Fn',F).
 is_function(_,F,_):- cheaply_u(tFunction(F)).
 % is_function(_,F,A):- A2 is A+1, current_predicate(F/A2), \+ current_predicate(F/A).
 
-%:- ain(isa(I,C)<=(ttPredType(C),lmconf:isa(I,C))).
+%:- ain(isa(I,C)<=(ttPredType(C),baseKB:isa(I,C))).
 
 
 

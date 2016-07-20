@@ -18,8 +18,6 @@
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
 :- set_prolog_flag(generate_debug_info,true).
 */
-:- add_import_module(mud_telnet,world,end).
-:- add_import_module(lmconf,baseKB,end).
 
 %:- system:ensure_loaded(setup_paths).
 %:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
@@ -110,14 +108,14 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :-ain(genls(tRR,tRRP)).
 :-must( isa(iRR7,tRRP) ).
 :-must( tRRP(iRR7) ).
-:-kb_dynamic(lmconf:sanity_test/0).
-:-kb_dynamic(lmconf:regression_test/0).
-:-kb_dynamic(lmconf:feature_test/0).
+:-kb_dynamic(baseKB:sanity_test/0).
+:-kb_dynamic(baseKB:regression_test/0).
+:-kb_dynamic(baseKB:feature_test/0).
 :- kb_dynamic((        
-        lmconf:feature_test/0,
-        lmconf:mud_test/2,
-        lmconf:regression_test/0,
-        lmconf:sanity_test/0,
+        baseKB:feature_test/0,
+        baseKB:mud_test/2,
+        baseKB:regression_test/0,
+        baseKB:sanity_test/0,
         baseKB:agent_call_command/2,
         action_info/2,
         type_action_info/3)).
@@ -128,7 +126,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- initialization(ensure_webserver(3020),now).
 :- initialization(ensure_webserver(3020),restore).
 
-:- assert_setting01(lmconf:eachRulePreconditional(true)).
+:- assert_setting01(baseKB:eachRulePreconditional(true)).
 
 :- set_prolog_flag(dialect_pfc,false).
 
@@ -162,7 +160,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 % ==========================================================
 
 :- if((gethostname(ubuntu),fail)). % INFO this fail is so we can start faster
-:- show_entry(gripe_time(40, doall(lmconf:regression_test))).
+:- show_entry(gripe_time(40, doall(baseKB:regression_test))).
 :- endif.
 
 
@@ -170,7 +168,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 % MUD SERVER CODE LOADS
 % ==============================
 
-% :- assert_setting01(lmconf:eachRulePreconditional(isRuntime)).
+% :- assert_setting01(baseKB:eachRulePreconditional(isRuntime)).
 
 
 %:- push_modules.
@@ -284,7 +282,7 @@ lar:- login_and_run.
 
 :- initialization(ensure_webserver(3020),now).
 
-% :- assert_setting01(lmconf:eachFactPreconditional(isRuntime)).
+% :- assert_setting01(baseKB:eachFactPreconditional(isRuntime)).
 
 :- set_prolog_flag(unsafe_speedups,true).
 % isa(starTrek,mtCycL).
@@ -298,8 +296,8 @@ lar:- login_and_run.
 
 % :- break.
 
-:- assert_setting01(lmconf:eachRulePreconditional(true)).
-:- assert_setting01(lmconf:eachFactPreconditional(true)).
+:- assert_setting01(baseKB:eachRulePreconditional(true)).
+:- assert_setting01(baseKB:eachFactPreconditional(true)).
 :- ain(isRuntime).
 
 :- set_prolog_flag(unsafe_speedups,false).
@@ -326,5 +324,5 @@ Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_tex
 Warning: baseKB:tag_pos/2, which is referenced by
 Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:241:106: 1-st clause of baseKB:translation_for/5
 Warning: kellerStorage:kellerStorageTestSuite/0, which is referenced by
-Warning:        2-nd clause of lmconf:mud_test_local/0: 2-nd clause of lmconf:mud_test_local/0
+Warning:        2-nd clause of baseKB:mud_test_local/0: 2-nd clause of baseKB:mud_test_local/0
 

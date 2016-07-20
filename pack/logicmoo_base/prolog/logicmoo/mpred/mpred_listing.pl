@@ -354,10 +354,10 @@ mpred_contains_term(What,Inside):- (\+ \+ once((subst(Inside,What,foundZadooksy,
 
 %% hook_mpred_listing( ?What) is semidet.
 %
-% Hook To [lmconf:hook_mpred_listing/1] For Module Mpred_listing.
+% Hook To [baseKB:hook_mpred_listing/1] For Module Mpred_listing.
 % Hook Managed Predicate Listing.
 %
-lmconf:hook_mpred_listing(What):- on_x_rtrace(mpred_list_triggers(What)).
+baseKB:hook_mpred_listing(What):- on_x_rtrace(mpred_list_triggers(What)).
 
 :- thread_local t_l:mpred_list_triggers_disabled.
 % listing(L):-w_tl(t_l:mpred_list_triggers_disabled,listing(L)).

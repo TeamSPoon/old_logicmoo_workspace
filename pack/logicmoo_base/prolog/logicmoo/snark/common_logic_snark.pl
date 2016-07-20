@@ -25,7 +25,7 @@
             any_to_pfc/2,
             any_to_pfc0/2,
             as_dlog/2,
-            lmconf:as_prolog_hook/2,
+            baseKB:as_prolog_hook/2,
             as_symlog/2,
             check_is_kb/1,
             kif_to_pfc/2,
@@ -176,7 +176,7 @@
 
 /*
 :- was_dynamic
-        lmconf:as_prolog_hook/2,
+        baseKB:as_prolog_hook/2,
         elInverse/2,
         kif_test_string/1,
         mudEquals/2,
@@ -598,12 +598,12 @@ as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(FmlM,OPS,F
 
 %= 	 	 
 
-%% lmconf:as_prolog_hook( ?Fml, ?Fml) is semidet.
+%% baseKB:as_prolog_hook( ?Fml, ?Fml) is semidet.
 %
 % Converted To Prolog.
 %
-lmconf:as_prolog_hook(Fml,Fml):- is_ftVar(Fml),!.
-lmconf:as_prolog_hook(Fml,FmlO):- as_symlog(Fml,FmlM),
+baseKB:as_prolog_hook(Fml,Fml):- is_ftVar(Fml),!.
+baseKB:as_prolog_hook(Fml,FmlO):- as_symlog(Fml,FmlM),
   to_prolog_ops(OPS),subsT_each(FmlM,OPS,FmlO).
 
 
@@ -773,7 +773,7 @@ flatten_or_list(_KB,X,[X]).
 %
 % Fmtl.
 %
-fmtl(X):- lmconf:as_prolog_hook(X,XX), fmt(XX).
+fmtl(X):- baseKB:as_prolog_hook(X,XX), fmt(XX).
 
 
 %= 	 	 
@@ -1019,10 +1019,10 @@ kif_to_boxlog_attvars(WffIn0,KB0,Why0,FlattenedO):-
 
 %% no_rewrites is semidet.
 %
-% Hook To [lmconf:no_rewrites/0] For Module Common_logic_snark.
+% Hook To [baseKB:no_rewrites/0] For Module Common_logic_snark.
 % No Rewrites.
 %
-lmconf:no_rewrites.
+baseKB:no_rewrites.
 
 
 
@@ -1042,7 +1042,7 @@ check_is_kb(KB):-ignore('$VAR'('KB')=KB).
 %
 % Add Preconds.
 %
-add_preconds(X,X):- lmconf:no_rewrites,!.
+add_preconds(X,X):- baseKB:no_rewrites,!.
 add_preconds(X,Z):-
  w_tl(leave_as_is_db('CollectionS666666666666666ubsetFn'(_,_)),
    w_tl(t_l:dont_use_mudEquals,defunctionalize('=>',X,Y))),add_preconds2(Y,Z).
@@ -1267,10 +1267,10 @@ tkif:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 
 %% regression_test is semidet.
 %
-% Hook To [lmconf:regression_test/0] For Module Common_logic_snark.
+% Hook To [baseKB:regression_test/0] For Module Common_logic_snark.
 % Regression Test.
 %
-lmconf:regression_test:- tsn.
+baseKB:regression_test:- tsn.
 
 :- thread_local(t_l:kif_action_mode/1).
 :- asserta_if_new(t_l:kif_action_mode(tell)).
@@ -1399,7 +1399,7 @@ kif_ask(P => Q):- kif_ask_sent(P => Q).
 kif_ask((P v Q)):- kif_ask_sent(((P v Q))).
 kif_ask((P & Q)):- kif_ask_sent((P & Q)).
 kif_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
-    no_repeats(lmconf:(
+    no_repeats(baseKB:(
 	if_defined(add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],_ProofOut1,Goal1,_)),!,
         call(call,search(Goal1,60,0,1,3,DepthIn,DepthOut)))).
 
@@ -1412,7 +1412,7 @@ kif_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
 % Knowledge Interchange Format Complete Inference.
 %
 kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
-    no_repeats(lmconf:(
+    no_repeats(baseKB:(
 	if_defined(add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_)),!,
         call(call,search(Goal1,60,0,1,3,DepthIn,DepthOut)),
         call(call,contract_output_proof(ProofOut1,ProofOut)))).
@@ -1578,7 +1578,7 @@ simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),l
 %
 % Save Well-founded Semantics Version.
 %
-save_wfs(Why,PrologI):- must_det_l((lmconf:as_prolog_hook(PrologI,Prolog),
+save_wfs(Why,PrologI):- must_det_l((baseKB:as_prolog_hook(PrologI,Prolog),
    w_tl(t_l:current_local_why(Why,Prolog),
    ain_h(save_in_code_buffer,Why,Prolog)))).
 

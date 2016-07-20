@@ -131,7 +131,7 @@ last_arg_ground/3,
 make_builtin/1,
 mpred_prop_ordered/2,
 mpred_t_call_op/2,
-lmconf:mpred_provide_storage_op/2,
+baseKB:mpred_provide_storage_op/2,
 mpred_t_mpred_storage_clauses_facts/3,
 mpred_t_storage_op/2,
 mud_call_store_op/2,
@@ -247,12 +247,12 @@ db_redir_op_if_needed(Op,_C0,Prop,ARGS):- database_modify_units(Op,Unit).
 % ================================================================================
 
 
-% :- meta_predicate lmconf:decl_database_hook(?,0).
-%OLD lmconf:decl_database_hook(change(assert,_),local_q_mpred_isa(F,StubType)):- maybe_storage_stub(F,StubType).
+% :- meta_predicate baseKB:decl_database_hook(?,0).
+%OLD baseKB:decl_database_hook(change(assert,_),local_q_mpred_isa(F,StubType)):- maybe_storage_stub(F,StubType).
 
-%OLD lmconf:decl_database_hook(change(assert,_),isa(F,StubType)):- maybe_storage_stub(F,StubType).
+%OLD baseKB:decl_database_hook(change(assert,_),isa(F,StubType)):- maybe_storage_stub(F,StubType).
 
-%OLD lmconf:decl_database_hook(change(assert,_),arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),local_q_mpred_isa(F,StubType),must(ensure_universal_stub(F/A)).
+%OLD baseKB:decl_database_hook(change(assert,_),arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),local_q_mpred_isa(F,StubType),must(ensure_universal_stub(F/A)).
 
 
 
@@ -597,7 +597,7 @@ mpred_prop_ordered(Pred,Prop):-local_q_mpred_isa(Pred,Prop),not(first_mpred_prop
 %
 provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead,_),  
   findall((PHead :- B),
-   no_repeats_old([PHead:B],((call_no_cuts(lmconf:mpred_provide_storage_clauses(PHead,B,Proof)),is_source_proof(Proof)))),
+   no_repeats_old([PHead:B],((call_no_cuts(baseKB:mpred_provide_storage_clauses(PHead,B,Proof)),is_source_proof(Proof)))),
    HBLIST),
    create_stub_body(PHead,Stub),
    delete(HBLIST,Stub,HBLISTO),!.
@@ -621,13 +621,13 @@ get_cc(PI,NC):-provide_clauses_list(PI,HBLISTO),length(HBLISTO,NC).
 
 %% mpred_provide_setup( ?Op, ?HeadIn, ?StubType, ?OUT) is semidet.
 %
-% Hook To [lmconf:mpred_provide_setup/4] For Module Mpred_stubs.
+% Hook To [baseKB:mpred_provide_setup/4] For Module Mpred_stubs.
 % Managed Predicate Provide Setup.
 %
-lmconf:mpred_provide_setup(Op,HeadIn,StubType,OUT):- StubType \== prologDynamic,
+baseKB:mpred_provide_setup(Op,HeadIn,StubType,OUT):- StubType \== prologDynamic,
  sanity(var(OUT)),
  must((StubType = prologHybrid)),
- OUT=defined(lmconf:mpred_provide_setup(Op,HeadIn,StubType)).
+ OUT=defined(baseKB:mpred_provide_setup(Op,HeadIn,StubType)).
 
 %% tf_result( :GoalCall, +TF) is semidet.
 %
@@ -657,13 +657,13 @@ assert_mpred_t(G):-add_from_file(G).
 
 %% hook_mpred_listing( ?What) is semidet.
 %
-% Hook To [lmconf:hook_mpred_listing/1] For Module Mpred_stubs.
+% Hook To [baseKB:hook_mpred_listing/1] For Module Mpred_stubs.
 % Hook Managed Predicate Listing.
 %
-lmconf:hook_mpred_listing(Match):- fail,
+baseKB:hook_mpred_listing(Match):- fail,
  (( 
   dif:dif(Proof,prologRef(_)),
-  no_repeats_old([H,B],((lmconf:mpred_provide_storage_clauses(H,B,Proof)),
+  no_repeats_old([H,B],((baseKB:mpred_provide_storage_clauses(H,B,Proof)),
                 Proof\=prologRef(_))),term_matches_hb(Match,H,B),portray_hb(Proof:H,B))),fail.
 
       
@@ -675,7 +675,7 @@ lmconf:hook_mpred_listing(Match):- fail,
 % Hook To [isa_lmconf:mpred_provide_storage_clauses/3] For Module Mpred_stubs.
 % Managed Predicate Provide Storage Clauses.
 %
-lmconf:mpred_provide_storage_clauses(H,B,Proof):-mpred_t_mpred_storage_clauses_facts(H,B,Proof).
+baseKB:mpred_provide_storage_clauses(H,B,Proof):-mpred_t_mpred_storage_clauses_facts(H,B,Proof).
 
 
 %= 	 	 
@@ -704,7 +704,7 @@ mpred_t_mpred_storage_clauses_facts(H,true,t(H)):-compound(H),!,current_predicat
 % Hook To [isa_lmconf:mpred_provide_storage_op/2] For Module Mpred_stubs.
 % Managed Predicate Provide Storage Oper..
 %
-lmconf:mpred_provide_storage_op(Op,HB):-
+baseKB:mpred_provide_storage_op(Op,HB):-
   must(baseKB:is_mpred_op(Op)),
   (hotrace(baseKB:remodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),
     once(F==t; baseKB:a(prologHybrid,F)),   
@@ -724,7 +724,7 @@ lmconf:mpred_provide_storage_op(Op,HB):-
 mpred_t_storage_op(Op,(Head:-Body)):- is_true(Body),!,mpred_t_storage_op(Op,Head).
 
 
-mpred_t_storage_op(Op,H):- lmconf:pfcManageHybrids,!,lmconf:mpred_provide_storage_op(Op,H).
+mpred_t_storage_op(Op,H):- baseKB:pfcManageHybrids,!,baseKB:mpred_provide_storage_op(Op,H).
 
 mpred_t_storage_op(Op,(:-(Body))):-!,loop_check(mpred_op(Op,(:-(Body))),true),!.
 
@@ -978,7 +978,7 @@ constrain_args(A,B):-constrain_args_pttp(A,B).
 
 body_req_isa(I,C):-isa_backchaing(I,C).
 
-body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [t|PLIST], lmconf:use_cyc_database,!, no_repeats(kbp_t(PLIST)).
+body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [t|PLIST], baseKB:use_cyc_database,!, no_repeats(kbp_t(PLIST)).
 
 % =====================================
 % = body_req
@@ -1017,7 +1017,7 @@ body_req_no_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
 body_req_only_rules(HEAD, _):-  ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 body_req_only_rules(_,_,_,t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
-body_req_plus_cyc(F,_,_,HEAD_T):-  local_q_mpred_isa(F,cycPlus2(_)),t_l:useOnlyExternalDBs,!,w_tl(lmconf:use_cyc_database,body_call_cyckb(HEAD_T)).
+body_req_plus_cyc(F,_,_,HEAD_T):-  local_q_mpred_isa(F,cycPlus2(_)),t_l:useOnlyExternalDBs,!,w_tl(baseKB:use_cyc_database,body_call_cyckb(HEAD_T)).
 
 */
 
@@ -1030,7 +1030,7 @@ foo_b(b3):-!.
 */
 
 
-%OLD lmconf:decl_database_hook(AR,C):-smart_decl_database(AR,C).
+%OLD baseKB:decl_database_hook(AR,C):-smart_decl_database(AR,C).
 
 /*
 smart_decl_database(AR,svo(S,V,O)):- !,dbase2pred2svo(DBASE,PRED,svo(S,V,O)),!,smart_db_op(AR,DBASE,PRED,svo(S,V,O)).
@@ -1092,7 +1092,7 @@ registerCycPredMtWhy_3(M,_PI,F/A2):-
 %
 % Register Cyc Predicate User Microtheory Generation Of Proof.
 %
-registerCycPredMtWhy(P):-!,lmconf:with_pi(P,baseKB:registerCycPredMtWhy_3).
+registerCycPredMtWhy(P):-!,baseKB:with_pi(P,baseKB:registerCycPredMtWhy_3).
 
 
 

@@ -114,7 +114,7 @@ appear in the source-code.
 
 :- meta_predicate get_named_value_goal(0,*).
 
-is_user_module :- prolog_load_context(source,F), lmconf:mpred_is_impl_file(F),!,fail.
+is_user_module :- prolog_load_context(source,F), baseKB:mpred_is_impl_file(F),!,fail.
 is_user_module :- prolog_load_context(module,M), module_property(M,class(L)),L=library,!,fail.
 is_user_module :- prolog_load_context(module,user). 
 is_user_module.
@@ -255,11 +255,11 @@ call_whatnot_expansion(Mod,MMTE,[M-Preds|TList], Clause0, Pos0, Clause, Pos) :-
 
 
 
-:- system:multifile(lmconf:source_typein_modules/3),
-   system:dynamic(lmconf:source_typein_modules/3).
+:- system:multifile(baseKB:source_typein_modules/3),
+   system:dynamic(baseKB:source_typein_modules/3).
 
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(baseKB:mpred_is_impl_file/1).
+:- dynamic(baseKB:mpred_is_impl_file/1).
 
 
 current_smt(SM,M):-
@@ -267,16 +267,16 @@ current_smt(SM,M):-
 
 push_modules:- current_smt(SM,M),
   prolog_load_context(source,F),
-  system:asserta(lmconf:source_typein_modules(SM,M,F)).
+  system:asserta(baseKB:source_typein_modules(SM,M,F)).
 
 reset_modules:- 
   prolog_load_context(source,F),
-  once(lmconf:source_typein_modules(SM,M,F)),
+  once(baseKB:source_typein_modules(SM,M,F)),
   '$set_source_module'(SM),'$set_typein_module'(M),!.
 
 pop_modules:- 
   prolog_load_context(source,F),
-  once(system:retract(lmconf:source_typein_modules(SM,M,F))),
+  once(system:retract(baseKB:source_typein_modules(SM,M,F))),
   '$set_source_module'(SM),'$set_typein_module'(M),!.
 
 
@@ -318,13 +318,13 @@ swi_module(M,Preds):- forall(member(P,Preds),M:export(P)). % ,dmsg(swi_module(M)
 
 get_pos_at(C,Num):-compound(C),arg(1,C,Num),number(Num).
 
-:- dynamic(lmconf:known_complete_prolog_impl_file/3).
+:- dynamic(baseKB:known_complete_prolog_impl_file/3).
 glean_prolog_impl_file(_,_,_,_):- current_prolog_flag(xref,true),!.
-glean_prolog_impl_file(_,File,SM,TypeIn):- lmconf:known_complete_prolog_impl_file(SM,File,TypeIn),!.
+glean_prolog_impl_file(_,File,SM,TypeIn):- baseKB:known_complete_prolog_impl_file(SM,File,TypeIn),!.
 glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- 
    prolog_load_context(source,F),prolog_load_context(file,F),
-   lmconf:mpred_is_impl_file(File),!,
-   assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),all_source_file_predicates_are_transparent.
+   baseKB:mpred_is_impl_file(File),!,
+   assertz(baseKB:known_complete_prolog_impl_file(SM,File,TypeIn)),all_source_file_predicates_are_transparent.
 
       
 

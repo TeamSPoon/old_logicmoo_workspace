@@ -182,8 +182,8 @@ prolog_load_file_nlc_pre(Module:Spec, Options) :-
 prolog_load_file_nlc(Module:Spec, Options) :- 
    filematch(Module:Spec,Where1),Where1\=Spec,!,forall(filematch(Module:Spec,Where),Module:load_files(Module:Where,Options)).
 
-prolog_load_file_nlc(Module:Spec, Options):- lmconf:never_reload_file(Spec),
-   wdmsg(warn(error(skip_prolog_load_file_nlc(lmconf:never_reload_file(Module:Spec, Options))))),!.
+prolog_load_file_nlc(Module:Spec, Options):- baseKB:never_reload_file(Spec),
+   wdmsg(warn(error(skip_prolog_load_file_nlc(baseKB:never_reload_file(Module:Spec, Options))))),!.
 
 prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID), \+ is_main_thread,
    nop(wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options)))))),!.
@@ -201,7 +201,7 @@ prolog_load_file_nlc(Module:FileName, Options):- exists_file_safe(FileName),!,
    prolog_load_file_nlc_0(Module:FileName, Options).
 
 prolog_load_file_nlc(Module:Spec, Options):- term_to_atom(Spec,String),member(S,['?','*']),sub_atom(String,_,1,_,S),!, 
- foreach(lmconf:filematch(Module:Spec,FileName),
+ foreach(baseKB:filematch(Module:Spec,FileName),
     (loop_check((prolog_load_file_nlc_0(Module:FileName, Options))),TF=true)),!,
   nonvar(TF).
 

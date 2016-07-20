@@ -23,7 +23,7 @@
 rez_to_inventory(Agent,NameOrType,NewObj):-
   gensym('_rez',SS),
   call_u(must_det_l((
-  w_tl(lmconf:current_source_suffix(SS),show_call(createByNameMangle(NameOrType,NewObj,Clz))),
+  w_tl(baseKB:current_source_suffix(SS),show_call(createByNameMangle(NameOrType,NewObj,Clz))),
    padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj,Clz))),
    ain(genls(Clz,tItem)),
    padd(Agent,mudStowing(NewObj)),

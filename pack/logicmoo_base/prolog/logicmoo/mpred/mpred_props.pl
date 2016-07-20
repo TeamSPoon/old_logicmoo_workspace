@@ -238,7 +238,7 @@ decl_mpred_prolog(Any,M,PI,MFAIn):-
 
 decl_mpred_prolog(_:CM,M,PI,F,A):-var(A),!,
    forall(between(1,11,A),decl_mpred_prolog(CM,M,PI,F,A)),!.
-decl_mpred_prolog(CM:M,lmconf,PI,F,A):- M\==lmconf, must(decl_mpred_prolog(CM:lmconf,lmconf,PI,F,A)).
+decl_mpred_prolog(CM:M,baseKB,PI,F,A):- M\==baseKB, must(decl_mpred_prolog(CM:baseKB,baseKB,PI,F,A)).
 
 
 
@@ -347,7 +347,7 @@ kb_dynamic(F,Other):-
 :- was_export((kb_dynamic)/4).
 
 
-no_need_to_import(lmconf).
+no_need_to_import(baseKB).
 no_need_to_import(lmcache).
 no_need_to_import(t_l).
 no_need_to_import(system).
@@ -377,7 +377,7 @@ kb_dynamic(CM:Imp,M,PI,F,A):-M==CM,
 
 % kb_dynamic(CM,M,PI,F,A):- dmsg(kb_dynamic(CM,M,PI,F,A)),fail.
 
-% kb_dynamic(CM:M,lmconf,PI,F,A):- M\==lmconf, must(kb_dynamic(CM:lmconf,lmconf,PI,F,A)).
+% kb_dynamic(CM:M,baseKB,PI,F,A):- M\==baseKB, must(kb_dynamic(CM:baseKB,baseKB,PI,F,A)).
 
 kb_dynamic(CM:baseKB,M,PI,F,A):- M==abox, defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic(CM:baseKB,Mt,PI,F,A)).
 
@@ -398,7 +398,7 @@ define_maybe_exact(M,PI):- % a(mtExact,M),!,
    must_det_l((    functor(PI,F,A),
      M:multifile(M:F/A),
      once((M==baseKB->true;ain(baseKB:predicateConventionMt(F,M)))),
-     asserta_if_new(lmconf:wrap_shared(F,A,ereq)),
+     asserta_if_new(baseKB:wrap_shared(F,A,ereq)),
      decl_shared(M:PI),     
      sanity(\+is_static_predicate(M:PI)),
      maybe_define_if_not_static(M,PI))),!.
@@ -408,7 +408,7 @@ define_maybe_exact(_,PI):-
 maybe_define_if_not_static(M,PI):- 
   must_det_l((              
               functor_h(PI,F,A),
-              asserta_if_new(lmconf:wrap_shared(F,A,ereq)),
+              asserta_if_new(baseKB:wrap_shared(F,A,ereq)),
               M:multifile(M:F/A),
               M:public(M:F/A),
               on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
@@ -629,7 +629,7 @@ decl_mpred_2(_,meta_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(A
 % decl_mpred_2(F,prologHybrid):- kb_dynamic(F).
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_mt_why(F,A).
 
-decl_mpred_2(F,A):-once(lmconf:mpred_provide_write_attributes(F,A)).
+decl_mpred_2(F,A):-once(baseKB:mpred_provide_write_attributes(F,A)).
 decl_mpred_2(F,Prop):-ain_expanded(mpred_isa(F,Prop)).
 
 

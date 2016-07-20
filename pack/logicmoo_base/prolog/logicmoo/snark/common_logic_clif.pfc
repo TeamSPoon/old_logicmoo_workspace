@@ -99,7 +99,7 @@ end_of_file.
 % <a href="https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md">https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md</a>
 
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 :- file_begin(pfc).
 :- include(try_logicmoo_examples).
 :- endif.

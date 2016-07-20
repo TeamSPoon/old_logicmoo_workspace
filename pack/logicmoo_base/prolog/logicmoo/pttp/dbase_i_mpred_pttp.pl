@@ -271,8 +271,8 @@ gripe_pttp_failure(Test):- pttp_test_fails_is_ok(Test),!.
 gripe_pttp_failure(Test):- dmsg(gripe_pttp_failure(Test)),!.
 gripe_pttp_failure(Test):- ignore(pttp_test_took(Test, failure, Time)),trace_or_throw(pttp_test_took(Test, failure, Time)).
 
-:- shared_multifile(lmconf:sanity_test/0).
-% lmconf:sanity_test :- do_pttp_tests.
+:- shared_multifile(baseKB:sanity_test/0).
+% baseKB:sanity_test :- do_pttp_tests.
 
 
 :- was_export(isNegOf/2).

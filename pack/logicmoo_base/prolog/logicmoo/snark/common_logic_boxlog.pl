@@ -569,5 +569,5 @@ boxlog_to_pfc_pass_4(IN,OUT):-demodal_sents(_KB,IN,M),IN\=@=M,!,boxlog_to_pfc_pa
 
 
 boxlog_to_pfc_pass_4( H, HH):- H=..[F|ARGS],!,boxlog_to_pfc_pass_4(ARGS,ARGSO),!,HH=..[F|ARGSO].
-boxlog_to_pfc_pass_4(BL,PTTP):- lmconf:as_prolog_hook(BL,PTTP).
+boxlog_to_pfc_pass_4(BL,PTTP):- baseKB:as_prolog_hook(BL,PTTP).
 

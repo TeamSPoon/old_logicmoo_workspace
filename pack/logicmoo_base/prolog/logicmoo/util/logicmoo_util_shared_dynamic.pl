@@ -61,7 +61,7 @@
 :- meta_predicate decl_shared(1,+).
 :- meta_predicate decl_shared(+).
 
-:- dynamic(lmconf:wrap_shared/3).
+:- dynamic(baseKB:wrap_shared/3).
 
 
 :- use_module(logicmoo_util_clause_expansion).
@@ -77,101 +77,101 @@ ereq(C):- find_and_call(C).
 :- module_transparent(dbreq/1).
 dbreq(C):- ereq(C).
 
-%% lmconf:wrap_shared( ?VALUE1, :Wrapper, ?VALUE3) is semidet.
+%% baseKB:wrap_shared( ?VALUE1, :Wrapper, ?VALUE3) is semidet.
 %
 % Wrap Shared.
 %
 
-% lmconf:wrap_shared(_,_,_):-!,fail.
-lmconf:wrap_shared(isa,2,ereq).
-lmconf:wrap_shared(t,_,ereq).
-%lmconf:wrap_shared(call,_,ereq).
-%lmconf:wrap_shared(apply,_,ereq).
+% baseKB:wrap_shared(_,_,_):-!,fail.
+baseKB:wrap_shared(isa,2,ereq).
+baseKB:wrap_shared(t,_,ereq).
+%baseKB:wrap_shared(call,_,ereq).
+%baseKB:wrap_shared(apply,_,ereq).
 
-lmconf:wrap_shared(assert,1,dbreq):- is_user_module.
-lmconf:wrap_shared(assert,2,dbreq):- is_user_module.
-lmconf:wrap_shared(asserta,1,dbreq):- is_user_module.
-lmconf:wrap_shared(asserta,2,dbreq):- is_user_module.
-lmconf:wrap_shared(assertz,1,dbreq):- is_user_module.
-lmconf:wrap_shared(assertz,2,dbreq):- is_user_module.
-lmconf:wrap_shared(clause,2,dbreq):- is_user_module.
-lmconf:wrap_shared(clause,3,dbreq):- is_user_module.
-lmconf:wrap_shared(retract,1,dbreq):- is_user_module.
-lmconf:wrap_shared(retractall,1,dbreq):- is_user_module.
-
-
-lmconf:wrap_shared(mtCore,1,ereq).
-lmconf:wrap_shared(mtProlog,1,ereq).
-lmconf:wrap_shared(tAgent,1,ereq).
-lmconf:wrap_shared(mtCycL,1,ereq).
-lmconf:wrap_shared(mtExact,1,ereq).
-lmconf:wrap_shared(mtGlobal,1,ereq).
-lmconf:wrap_shared(nameStrings,1,ereq).
+baseKB:wrap_shared(assert,1,dbreq):- is_user_module.
+baseKB:wrap_shared(assert,2,dbreq):- is_user_module.
+baseKB:wrap_shared(asserta,1,dbreq):- is_user_module.
+baseKB:wrap_shared(asserta,2,dbreq):- is_user_module.
+baseKB:wrap_shared(assertz,1,dbreq):- is_user_module.
+baseKB:wrap_shared(assertz,2,dbreq):- is_user_module.
+baseKB:wrap_shared(clause,2,dbreq):- is_user_module.
+baseKB:wrap_shared(clause,3,dbreq):- is_user_module.
+baseKB:wrap_shared(retract,1,dbreq):- is_user_module.
+baseKB:wrap_shared(retractall,1,dbreq):- is_user_module.
 
 
-%lmconf:wrap_shared(lmcache:loaded_external_kbs,1,ereq).
-lmconf:wrap_shared(argQuotedIsa,3,ereq).
+baseKB:wrap_shared(mtCore,1,ereq).
+baseKB:wrap_shared(mtProlog,1,ereq).
+baseKB:wrap_shared(tAgent,1,ereq).
+baseKB:wrap_shared(mtCycL,1,ereq).
+baseKB:wrap_shared(mtExact,1,ereq).
+baseKB:wrap_shared(mtGlobal,1,ereq).
+baseKB:wrap_shared(nameStrings,1,ereq).
 
-lmconf:wrap_shared(arity,2,ereq).
-lmconf:wrap_shared(functorDeclares,1,ereq).
 
-lmconf:wrap_shared(call_OnEachLoad,1,ereq).
-lmconf:wrap_shared(completeExtentEnumerable,1,ereq).
-lmconf:wrap_shared(completelyAssertedCollection,1,ereq).
-lmconf:wrap_shared(constrain_args_pttp,2,ereq).
-lmconf:wrap_shared(cycPlus2,2,ereq).
-lmconf:wrap_shared(cycPred,2,ereq).
-lmconf:wrap_shared(decided_not_was_isa,2,ereq).
-lmconf:wrap_shared(genls,2,ereq).
-lmconf:wrap_shared(isa,2,ereq).
-lmconf:wrap_shared(lambda,5,ereq).
+%baseKB:wrap_shared(lmcache:loaded_external_kbs,1,ereq).
+baseKB:wrap_shared(argQuotedIsa,3,ereq).
 
-lmconf:wrap_shared(meta_argtypes,1,ereq).
-lmconf:wrap_shared(mpred_f,4,ereq).
-lmconf:wrap_shared(mpred_f,5,ereq).
-lmconf:wrap_shared(mpred_f,6,ereq).
-lmconf:wrap_shared(mpred_f,7,ereq).
-lmconf:wrap_shared(props,2,ereq).
+baseKB:wrap_shared(arity,2,ereq).
+baseKB:wrap_shared(functorDeclares,1,ereq).
 
-lmconf:wrap_shared(mpred_mark,3,ereq).
-lmconf:wrap_shared(mudKeyword,2,ereq).
-lmconf:wrap_shared(pfcControlled,1,ereq).
-lmconf:wrap_shared(pfcRHS,1,ereq).
+baseKB:wrap_shared(call_OnEachLoad,1,ereq).
+baseKB:wrap_shared(completeExtentEnumerable,1,ereq).
+baseKB:wrap_shared(completelyAssertedCollection,1,ereq).
+baseKB:wrap_shared(constrain_args_pttp,2,ereq).
+baseKB:wrap_shared(cycPlus2,2,ereq).
+baseKB:wrap_shared(cycPred,2,ereq).
+baseKB:wrap_shared(decided_not_was_isa,2,ereq).
+baseKB:wrap_shared(genls,2,ereq).
+baseKB:wrap_shared(isa,2,ereq).
+baseKB:wrap_shared(lambda,5,ereq).
 
-lmconf:wrap_shared(predicateConventionMt,2,ereq).
-lmconf:wrap_shared(prologBuiltin,1,ereq).
-lmconf:wrap_shared(prologDynamic,1,ereq).
-lmconf:wrap_shared(prologHybrid,1,ereq).
-lmconf:wrap_shared(prologKIF,1,ereq).
-lmconf:wrap_shared(prologMacroHead,1,ereq).
-lmconf:wrap_shared(prologPTTP,1,ereq).
-lmconf:wrap_shared(prologSideEffects,1,ereq).
+baseKB:wrap_shared(meta_argtypes,1,ereq).
+baseKB:wrap_shared(mpred_f,4,ereq).
+baseKB:wrap_shared(mpred_f,5,ereq).
+baseKB:wrap_shared(mpred_f,6,ereq).
+baseKB:wrap_shared(mpred_f,7,ereq).
+baseKB:wrap_shared(props,2,ereq).
 
-lmconf:wrap_shared(resultIsa,2,ereq).
-lmconf:wrap_shared(singleValuedInArg,2,ereq).
-lmconf:wrap_shared(spft,3,ereq).
-lmconf:wrap_shared(support_hilog,2,ereq).
-lmconf:wrap_shared(t,3,ereq).
-lmconf:wrap_shared(tCol,1,ereq).
-lmconf:wrap_shared(tNotForUnboundPredicates,1,ereq).
-lmconf:wrap_shared(tPred,1,ereq).
-lmconf:wrap_shared(tRelation,1,ereq).
-lmconf:wrap_shared(tCol,1,ereq).
+baseKB:wrap_shared(mpred_mark,3,ereq).
+baseKB:wrap_shared(mudKeyword,2,ereq).
+baseKB:wrap_shared(pfcControlled,1,ereq).
+baseKB:wrap_shared(pfcRHS,1,ereq).
 
-lmconf:wrap_shared(ttExpressionType,1,ereq).
-lmconf:wrap_shared(ttPredType,1,ereq).
-lmconf:wrap_shared(ttTemporalType,1,ereq).
-lmconf:wrap_shared(use_ideep_swi,0,ereq).
-lmconf:wrap_shared(==>,_,ereq).
-lmconf:wrap_shared(<==>,_,ereq).
-lmconf:wrap_shared((<--),2,ereq).
-lmconf:wrap_shared(agent_text_command,_,ereq).
-lmconf:wrap_shared(agent_command,_,ereq).
-lmconf:wrap_shared(coerce,_,ereq).
+baseKB:wrap_shared(predicateConventionMt,2,ereq).
+baseKB:wrap_shared(prologBuiltin,1,ereq).
+baseKB:wrap_shared(prologDynamic,1,ereq).
+baseKB:wrap_shared(prologHybrid,1,ereq).
+baseKB:wrap_shared(prologKIF,1,ereq).
+baseKB:wrap_shared(prologMacroHead,1,ereq).
+baseKB:wrap_shared(prologPTTP,1,ereq).
+baseKB:wrap_shared(prologSideEffects,1,ereq).
 
-lmconf:wrap_shared(F,A,ereq):- atom(F),integer(A),
+baseKB:wrap_shared(resultIsa,2,ereq).
+baseKB:wrap_shared(singleValuedInArg,2,ereq).
+baseKB:wrap_shared(spft,3,ereq).
+baseKB:wrap_shared(support_hilog,2,ereq).
+baseKB:wrap_shared(t,3,ereq).
+baseKB:wrap_shared(tCol,1,ereq).
+baseKB:wrap_shared(tNotForUnboundPredicates,1,ereq).
+baseKB:wrap_shared(tPred,1,ereq).
+baseKB:wrap_shared(tRelation,1,ereq).
+baseKB:wrap_shared(tCol,1,ereq).
+
+baseKB:wrap_shared(ttExpressionType,1,ereq).
+baseKB:wrap_shared(ttPredType,1,ereq).
+baseKB:wrap_shared(ttTemporalType,1,ereq).
+baseKB:wrap_shared(use_ideep_swi,0,ereq).
+baseKB:wrap_shared(==>,_,ereq).
+baseKB:wrap_shared(<==>,_,ereq).
+baseKB:wrap_shared((<--),2,ereq).
+baseKB:wrap_shared(agent_text_command,_,ereq).
+baseKB:wrap_shared(agent_command,_,ereq).
+baseKB:wrap_shared(coerce,_,ereq).
+
+baseKB:wrap_shared(F,A,ereq):- atom(F),integer(A),
    functor(P,F,A),
-   % member(MVis,[baseKB,lmcache,lmconf]),
+   % member(MVis,[baseKB,lmcache,baseKB]),
    baseKB = MVis,
    predicate_property(MVis:P,defined),
    \+ predicate_property(MVis:P,imported_from(_)),!.
@@ -193,8 +193,8 @@ clause_b(G):-  clause(baseKB:G,true),!.
 
 system_goal_expansion_safe_wrap(T,_):- \+ callable(T),!,fail.
 system_goal_expansion_safe_wrap(MT:Goal,call_u(Goal)):- MT==abox,!.
-system_goal_expansion_safe_wrap(M:T,O):- callable(T),!,functor(T,F,A),lmconf:wrap_shared(F,A,How),!,safe_wrap(M:T,How,O).
-system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),lmconf:wrap_shared(F,A,How),!,safe_wrap(T,How,I).
+system_goal_expansion_safe_wrap(M:T,O):- callable(T),!,functor(T,F,A),baseKB:wrap_shared(F,A,How),!,safe_wrap(M:T,How,O).
+system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),baseKB:wrap_shared(F,A,How),!,safe_wrap(T,How,I).
 
 could_safe_wrap:- prolog_load_context(module,M),\+ clause_b(mtCycL(M)),
      \+ ((current_prolog_flag(dialect_pfc,true); 
@@ -249,7 +249,7 @@ decl_shared(Plus,M:F/A):- check_never_decl_shared(Plus,M,F,A),fail.
 decl_shared(Plus,F/A):- check_never_decl_shared(Plus,baseKB,F,A),fail.
 
 decl_shared(Plus,M:F/A):-must(atom(F)),!,
- asserta_if_new(lmconf:wrap_shared(F,A,M:ereq)),
+ asserta_if_new(baseKB:wrap_shared(F,A,M:ereq)),
  ignore((integer(A),
    baseKB:multifile(M:F/A),
    baseKB:dynamic(M:F/A),
@@ -258,16 +258,16 @@ decl_shared(Plus,M:F/A):-must(atom(F)),!,
    on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
    once((M==baseKB->true;ain(baseKB:predicateConventionMt(F,M)))),
    functor(P,F,A),
-      %once(on_f_throw( (M:F/A)\== (lmconf:loaded_external_kbs/1))),
+      %once(on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1))),
       %once(on_f_throw( (M:F/A)\== (mpred_online:semweb_startup/0))),
-      %once(on_f_throw( (M:F/A)\== (lmconf:irc_user_plays/3))),
+      %once(on_f_throw( (M:F/A)\== (baseKB:irc_user_plays/3))),
    call(Plus,M:P),
    % (find_and_call(mtCycL(M))->ain(baseKB:prologHybrid(F));true),
    ain(baseKB:arity(F,A)) )).
 
 
 decl_shared(Plus,F/A):-atom(F),!,
- asserta_if_new(lmconf:wrap_shared(F,A,ereq)),
+ asserta_if_new(baseKB:wrap_shared(F,A,ereq)),
  ignore((integer(A),
    baseKB:multifile(F/A),
    baseKB:dynamic(F/A),

@@ -47,7 +47,7 @@ was_pttp_functor(base, pred_t,3-3).
 
 % -- CODEBLOCK
 
-lmconf:use_mpred_t.
+baseKB:use_mpred_t.
 
 :- was_dynamic t/3.
 :- shared_multifile t/3.
@@ -73,7 +73,7 @@ map_int_functors(EXT,CALLF,A,PREREQ):-
 
 :- forall(was_pttp_functor(base, asserted_t,Begin-End),
         forall(between(Begin,End,A),
-           map_int_functors(asserted_t,t,A,(use_mpred_t,lmconf:call_t)))).
+           map_int_functors(asserted_t,t,A,(use_mpred_t,baseKB:call_t)))).
 
 
 % -- CODEBLOCK
@@ -84,7 +84,7 @@ map_int_functors(EXT,CALLF,A,PREREQ):-
 :- map_int_functors(pred_t,t,3,((use_mpred_t, G=call_t,arg(1,G,B),arg(2,G,C),dif(B,C),G))).
 /*
 int_pred_t(A, B, C, H, I, D, E, F, J, G) :-
-   pretest_call((use_mpred_t, dif(B,C), lmconf:t(A, B, C),D=E)),
+   pretest_call((use_mpred_t, dif(B,C), baseKB:t(A, B, C),D=E)),
   F=[K, [pred_t(A, B, C), G, H, I]|L], J=[K|L].
 */
 
@@ -95,7 +95,7 @@ int_pred_t(A, B, C, H, I, D, E, F, J, G) :-
 
 :- map_int_functors(pred_t,t,3,((use_mpred_t, G=call_t,arg(1,G,B),arg(2,G,C),dif(B,C),G))).
 int_not_pred_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((use_mpred_t,not(lmconf:t(A, B, C)), dif(B,C),D=E)),
+   pretest_call((use_mpred_t,not(baseKB:t(A, B, C)), dif(B,C),D=E)),
  F=[K, [not_pred_t(A, B, C), G, H, I]|L], J=[K|L].
 
 
@@ -105,7 +105,7 @@ int_not_pred_t(A, B, C, H, I, D, E, F, J, G) :-
 :- shared_multifile int_not_true_t/10.
 
 int_not_true_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((is_extent_known(A),use_mpred_t,not(lmconf:t(A, B, C)), dif(B,C),D=E)),
+   pretest_call((is_extent_known(A),use_mpred_t,not(baseKB:t(A, B, C)), dif(B,C),D=E)),
  F=[K, [not_true_t(A, B, C), G, H, I]|L], J=[K|L].
 
 

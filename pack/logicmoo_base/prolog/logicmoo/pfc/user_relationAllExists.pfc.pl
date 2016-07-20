@@ -233,7 +233,7 @@ relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) ==>
 */
 
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
 %isa(iExplorer1,tHumanControlled).
 %isa(iExplorer2,tHumanControlled).
@@ -283,7 +283,7 @@ pass4,relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 :- endif.
 
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
 % :- mpred_spy_all.
 
@@ -311,7 +311,7 @@ isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),tCol(C).
 
 end_of_file.
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
 :- listing(mudSubPart).
 %:-rtrace((isa(Inst,tHumanNeck),mudSubPart(iExplorer1,Inst))).

@@ -22,8 +22,8 @@
 */
 
 
-:- dynamic(lmconf:agent_call_command/2).
-:- baseKB:import(lmconf:agent_call_command/2).
+:- dynamic(baseKB:agent_call_command/2).
+:- baseKB:import(baseKB:agent_call_command/2).
 
 :- assert_until_eof(infSupertypeName).
 :- onEndOfFile(dmsg(infSupertypeName)).
@@ -39,12 +39,11 @@
 :- file_begin(code).
 :- op(1150,fx,kb_dynamic).
 
-:- kb_dynamic(  lmconf:irc_event_hooks/3).
-:- kb_dynamic(  lmconf:deliver_event_hooks/2).
-:- kb_dynamic   lmconf:irc_user_plays/3.
+:- kb_dynamic(  baseKB:irc_event_hooks/3).
+:- kb_dynamic(  baseKB:deliver_event_hooks/2).
+:- kb_dynamic   baseKB:irc_user_plays/3.
 
-:- thread_local t_l:wants_logout/1.
-:- kb_dynamic t_l:wants_logout/1.
+:- kb_dynamic lmcache:wants_logout/1.
 
 :- kb_dynamic   lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 :- kb_dynamic lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
@@ -57,12 +56,12 @@
 :- kb_dynamic   use_usable/4.
 :- kb_dynamic   verb_alias/2.
 :- kb_dynamic   vtActionTemplate/1.
-% :- kb_dynamic   lmconf:mud_test/0.
-:- kb_dynamic  lmconf:mud_test/1.
-:- kb_dynamic  lmconf:mud_test/2.
-:- kb_dynamic  lmconf:mud_test_local/0.
-:- kb_dynamic  lmconf:mud_test_local/1.
-:- kb_dynamic  lmconf:mud_test_local/2.
+% :- kb_dynamic   baseKB:mud_test/0.
+:- kb_dynamic  baseKB:mud_test/1.
+:- kb_dynamic  baseKB:mud_test/2.
+:- kb_dynamic  baseKB:mud_test_local/0.
+:- kb_dynamic  baseKB:mud_test_local/1.
+:- kb_dynamic  baseKB:mud_test_local/2.
 :- kb_dynamic   world_agent_plan/3.
 :- kb_dynamic   action_info/2.
 :- kb_dynamic   action_rules/4.
@@ -119,7 +118,7 @@
 :- kb_dynamic(  tChannel/1).
 
 
-:- kb_dynamic lmcache:pfcManageHybrids/0.
+:- kb_dynamic baseKB:pfcManageHybrids/0.
 :- kb_dynamic t_l:infMustArgIsa/0.
 :- thread_local t_l:into_form_code/0.
 :- thread_local t_l:current_local_why/2.
@@ -129,7 +128,7 @@
 :- kb_dynamic   lmcache:loaded_external_kbs/1.
 % :- break.
 :- kb_dynamic   loading_module_h/1.
-:- kb_dynamic   lmconf:registered_module_type/2.
+:- kb_dynamic   baseKB:registered_module_type/2.
 :- kb_dynamic   must_compile_special_clause_file/1.
 
 % HOOKS
@@ -163,15 +162,15 @@
 
 % DYN FOR CODE
 :- kb_dynamic lmcache:after_mpred_load/0.
-:- thread_local lmconf:use_cyc_database/0.
-:- kb_dynamic lmconf:use_cyc_database/0.
+:- thread_local baseKB:use_cyc_database/0.
+:- kb_dynamic baseKB:use_cyc_database/0.
 
 :- kb_dynamic   fact_is_false/2.
 % :- kb_dynamic(kbp_t_list_prehook/2).
 
 
 % DYN KB
-:- kb_dynamic   lmconf:only_if_pttp/0.
+:- kb_dynamic   baseKB:only_if_pttp/0.
 :- kb_dynamic   use_kif/2.
 :- kb_dynamic   is_mpred_prop/2.
 %:- kb_dynamic   hasInstance_dyn/2.
@@ -191,12 +190,12 @@
 :- kb_dynamic   use_usable/4.
 :- kb_dynamic   verb_alias/2.
 :- kb_dynamic   vtActionTemplate/1.
-:- kb_dynamic  lmconf:mud_test/0.
-:- kb_dynamic  lmconf:mud_test/1.
-:- kb_dynamic  lmconf:mud_test/2.
-:- kb_dynamic  lmconf:mud_test_local/0.
-:- kb_dynamic  lmconf:mud_test_local/1.
-:- kb_dynamic  lmconf:mud_test_local/2.
+:- kb_dynamic  baseKB:mud_test/0.
+:- kb_dynamic  baseKB:mud_test/1.
+:- kb_dynamic  baseKB:mud_test/2.
+:- kb_dynamic  baseKB:mud_test_local/0.
+:- kb_dynamic  baseKB:mud_test_local/1.
+:- kb_dynamic  baseKB:mud_test_local/2.
 :- kb_dynamic   world_agent_plan/3.
 :- kb_dynamic   action_info/2.
 :- kb_dynamic   action_rules/4.
@@ -205,7 +204,7 @@
 :- kb_dynamic   agent_text_command/4.
 :- kb_dynamic   check_permanence/4.
 
-predicateConventionMt(agent_call_command,lmconf).
+predicateConventionMt(agent_call_command,baseKB).
 
 :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/pfc/autoexec.pfc')).
 
@@ -780,7 +779,7 @@ vtBasicDirPlusUpDown(vUp).
 %localityOfObject(Above,HasSurface):- mudLocOnSurface(Above,HasSurface).
 %localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
 %localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
-%localityOfObject(Inner,Outer):- lmconf:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+%localityOfObject(Inner,Outer):- baseKB:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
 meta_argtypes(mudMaterial(tSpatialThing,vtMaterial)).
 meta_argtypes(mudTexture(tSpatialThing,vtTexture)).

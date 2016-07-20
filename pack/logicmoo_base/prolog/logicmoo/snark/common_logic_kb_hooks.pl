@@ -596,7 +596,7 @@ kbp_to_mpred_0:- time_call(drain_assert_next_buffer),!.
 % Knowledge Base P- Converted To Managed Predicate No More.
 %
 kbp_to_mpred_nomore:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(_F,PLIST)),
- retractall(lmconf:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_mpred_t).
+ retractall(baseKB:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_mpred_t).
 
 
 :- was_export(move_implied/0).

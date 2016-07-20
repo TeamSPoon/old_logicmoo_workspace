@@ -1051,7 +1051,7 @@ negated_literal(-(A),A):-!.
 negated_literal(A,-(A)):-is_ftVar(A),!.
 negated_literal(-(A),(A)):-is_ftVar(A),!.
 negated_literal(A,-(A)):-atom(A),A\=(~),A\=(-),!.
-negated_literal(A,B):- functor(A,F,_Arity),member(F,[&,(,),(;),(v),(all),(:-)]),must_det_l((as_dlog(A,AA),IN=not(AA), call((nnf('$VAR'('KB'),IN,BB),BB \=@= IN,lmconf:as_prolog(BB,B))))).
+negated_literal(A,B):- functor(A,F,_Arity),member(F,[&,(,),(;),(v),(all),(:-)]),must_det_l((as_dlog(A,AA),IN=not(AA), call((nnf('$VAR'('KB'),IN,BB),BB \=@= IN,baseKB:as_prolog(BB,B))))).
 negated_literal(not(A),B):-negated_literal(A,AA),!,negated_literal_0(AA,B),!.
 negated_literal(-A,B):-negated_literal(A,AA),!,negated_literal_0(AA,B),!.
 negated_literal(A,B):- var(B),!,negated_literal_0(A,B),!.

@@ -87,6 +87,7 @@
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
 % % :- '$set_source_module'(mpred_type_args).
 
+:- include('mpred_header.pi').
 
 /*
 :- dynamic((
@@ -96,7 +97,7 @@
         decl_coerce/3,
         deduceFromArgTypes/1,
    hook_coerce/3,
-        lmconf:module_local_init/0)).
+        baseKB:module_local_init/0)).
 */
 
 
@@ -493,7 +494,7 @@ argIsa_call_0(must,1,ftAskable).
 
 argIsa_call_0(predicateConventionMt,1,tPred).
 argIsa_call_0(predicateConventionMt,2,ftAtom).
-% argIsa_call_0(lmconf:agent_text_command,_,ftTerm).
+% argIsa_call_0(baseKB:agent_text_command,_,ftTerm).
 argIsa_call_0('<=>',_,ftTerm).
 argIsa_call_0(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftListFn(ftVoprop)).
 argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),arity(Arity,A),number(A),number(N),N=<A,arg(N,vv(tPred,ftInt,tCol),T).
@@ -1106,10 +1107,10 @@ roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,
 
 % module_local_init() is semidet.
 %
-% Hook To [lmconf:module_local_init/0] For Module Mpred_type_args.
+% Hook To [baseKB:module_local_init/0] For Module Mpred_type_args.
 % Module Local Init.
 %
-lmconf:module_local_init:- ain_fast(prologHybrid(formatted_resultIsa/2)).
-lmconf:module_local_init:- ain_fast(prologHybrid(resultIsa/2)).
+baseKB:module_local_init:- ain_fast(prologHybrid(formatted_resultIsa/2)).
+baseKB:module_local_init:- ain_fast(prologHybrid(resultIsa/2)).
 
 mpred_type_args_file.

@@ -190,7 +190,7 @@ source_context_module(CM):-'$set_source_module'(CM,CM).
 %
 % Match Predicates.
 %
-match_predicates(M:Spec,Preds):- catch('$find_predicate'(M:Spec, Preds),_,catch('$find_predicate'(Spec, Preds),_,catch('$find_predicate'(lmconf:Spec, Preds),_,fail))),!.
+match_predicates(M:Spec,Preds):- catch('$find_predicate'(M:Spec, Preds),_,catch('$find_predicate'(Spec, Preds),_,catch('$find_predicate'(baseKB:Spec, Preds),_,fail))),!.
 match_predicates(MSpec,MatchesO):- catch('$dwim':'$find_predicate'(MSpec,Matches),_,Matches=[]),!,MatchesO=Matches.
 
 

@@ -158,7 +158,7 @@ tCol(completelyAssertedCollection).
 % Prolog Builtin.
 %
 %WRONG prologBuiltin(resolveConflict/1,predicateConventionMt(baseKB)).
-%WRONG prologBuiltin(mpred_select/2,predicateConventionMt(lmconf)).
+%WRONG prologBuiltin(mpred_select/2,predicateConventionMt(baseKB)).
 %:-rtrace.
 prologBuiltin(agent_text_command/4,prologDynamic).
 %tPred(t,prologDynamic).
@@ -537,7 +537,7 @@ isa(tRelation,ttAbstractType).
 
 
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
 :- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'neg_sanity.pfc')).
 
@@ -636,15 +636,15 @@ ttPredType(Prop)==>tCol(Prop).
 
 
 
-%:-lmconf:agenda_slow_op_enqueue(ain(((arity(Pred,2),argIsa(Pred,1,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tCol(Col)), \+prologSideEffects(Pred), t(Pred,Arg,_)/is_ftNonvar(Arg)) ==> t(Col,Arg)))).
-%:-lmconf:agenda_slow_op_enqueue(ain(((arity(Pred,2),argIsa(Pred,2,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tCol(Col)), \+prologSideEffects(Pred), t(Pred,_,Arg)/is_ftNonvar(Arg)) ==> t(Col,Arg)))).
+%:-baseKB:agenda_slow_op_enqueue(ain(((arity(Pred,2),argIsa(Pred,1,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tCol(Col)), \+prologSideEffects(Pred), t(Pred,Arg,_)/is_ftNonvar(Arg)) ==> t(Col,Arg)))).
+%:-baseKB:agenda_slow_op_enqueue(ain(((arity(Pred,2),argIsa(Pred,2,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tCol(Col)), \+prologSideEffects(Pred), t(Pred,_,Arg)/is_ftNonvar(Arg)) ==> t(Col,Arg)))).
 %:-add_slow(((arity(Pred,2),argIsa(Pred,2,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tCol(Col)),t(Pred,_,Arg)/is_ftNonvar(Arg)) ==> t(Col,Arg))).
-%(((P/(has_functor(P),get_functor(P,F,A),A\=2,\+prologSideEffects(F),mpred_literal(P)) ==> {lmconf:agenda_slow_op_enqueue(deduceEachArgType(P))}))).
+%(((P/(has_functor(P),get_functor(P,F,A),A\=2,\+prologSideEffects(F),mpred_literal(P)) ==> {baseKB:agenda_slow_op_enqueue(deduceEachArgType(P))}))).
 
 % :-rtrace.
 
 %((((P/(nonvar(P),is_ftNonvar(P),functor(P,F,A), \+ mpred_connective(F), A>1) ==> 
-%   {lmconf:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))})))).
+%   {baseKB:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))})))).
 
 
 % tCol(Col) <==> isa(Col,tCol).
@@ -668,19 +668,19 @@ prologHybrid(argIsa/3).
 
 /*
 :- ain(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
-:- ain(((lmconf:action_info(ArgTypes,_)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
+:- ain(((baseKB:action_info(ArgTypes,_)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
 :- ain(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) ==> functorDeclares(F))).
 (ttExpressionType(FT)/is_declarations(FT))==>meta_argtypes(FT).
 
 
 */
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
 
 % :- if_startup_script(w_tl(t_l:pfcExpansion,ensure_loaded(mpred_i_mpred_mpred_testing))).
 
-% :-asserta(lmconf:isa_pred_now_locked).
+% :-asserta(baseKB:isa_pred_now_locked).
 
 
 % :-loadTinyAssertions1.
@@ -1143,7 +1143,7 @@ specialFunctor('\\+').
 specialFunctor('/').
 
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 /*
 :- must((expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),ain(mdefault(O)))).
 

@@ -518,7 +518,7 @@ facing_offset(behind,F,X,Y,Z):-dir_offset(vSouth,F,X,Y,Z).
 facing_offset(front,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
 
 
-% lmconf:decl_database_hook(change( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
+% baseKB:decl_database_hook(change( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
 
 % mudAtLoc(Agent,_)==> mudNeedsLook(Agent,vTrue).
 mudAtLoc(Agent,_)==>{padd(Agent,mudNeedsLook(vTrue))}.

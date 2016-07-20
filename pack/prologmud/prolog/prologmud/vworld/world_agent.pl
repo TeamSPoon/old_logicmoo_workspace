@@ -229,7 +229,7 @@ has_tty(O):-no_repeats(O,lmcache:session_io(O,_,_,_)).
 get_agent_session(P,O):-get_session_id(O),get_agent_sessions(P,O),!.
 get_agent_session(P,O):-get_agent_sessions(P,O),has_tty(O).
 :-export(get_agent_sessions/2).
-get_agent_sessions(P,O):- no_repeats(P-O,(lmcache:session_agent(O,P);lmcache:agent_session(P,O);(lmconf:irc_user_plays(P,O,C),ground(lmconf:irc_user_plays(P,O,C))))).
+get_agent_sessions(P,O):- no_repeats(P-O,(lmcache:session_agent(O,P);lmcache:agent_session(P,O);(baseKB:irc_user_plays(P,O,C),ground(baseKB:irc_user_plays(P,O,C))))).
 
 :-export(foc_current_agent/1).
 foc_current_agent(P):- current_agent(P),nonvar(P),!.

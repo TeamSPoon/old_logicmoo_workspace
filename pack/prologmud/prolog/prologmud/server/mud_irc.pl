@@ -14,18 +14,18 @@ module  Initial IRC/Text console
 :- include(prologmud(mud_header)).
 
 
-:-ain_expanded(( prologDynamic(lmconf:irc_user_plays(tAgent,ftAtom,ftAtom)))).
+:-ain_expanded(( prologDynamic(baseKB:irc_user_plays(tAgent,ftAtom,ftAtom)))).
 :-ain_expanded(( prologOrdered(agent_action_queue(tAgent,ftTerm,ftTerm)))).
 
-:-ain(( lmconf:deliver_event_hooks(Agent,Event):- fail,ignore(once(deliver_to_irc(Agent,Event))))).
-lmconf:irc_event_hooks(Channel,User,Stuff):- fail,ignore(once(irc_mud_event_hook(Channel,User,Stuff))).
+:-ain(( baseKB:deliver_event_hooks(Agent,Event):- fail,ignore(once(deliver_to_irc(Agent,Event))))).
+baseKB:irc_event_hooks(Channel,User,Stuff):- fail,ignore(once(irc_mud_event_hook(Channel,User,Stuff))).
 
 invite_to_mud(Nick):-eggdrop:to_egg('.tcl putserv "PRIVMSG ~w :DCC CHAT chat 73.37.100.94 4000"',[Nick]).
 
 deliver_to_irc(_,actNotice(_,done(_,AL))):-actLook==AL.
 deliver_to_irc(_,actNotice(_,begin(_,AL))):-actLook==AL.
-deliver_to_irc(Agent,Event):-  lmconf:irc_user_plays(Agent,User,Channel), Channel=='##prolog',!,dmsg(deliver_to_irc(Agent,User,Channel,Event)),!.
-deliver_to_irc(Agent,Event):-  lmconf:irc_user_plays(Agent,User,Channel) -> 
+deliver_to_irc(Agent,Event):-  baseKB:irc_user_plays(Agent,User,Channel), Channel=='##prolog',!,dmsg(deliver_to_irc(Agent,User,Channel,Event)),!.
+deliver_to_irc(Agent,Event):-  baseKB:irc_user_plays(Agent,User,Channel) -> 
   eggdrop:say(Channel,[Agent,': ',Event]) ; nop(eggdrop:say(Agent,Event)).
 
 
@@ -39,12 +39,12 @@ irc_mud_event_hook(Channel,User,call('?-'(foc_current_agent(Agent)),_Vs)):-
  get_session_id(ID),
  retractall(lmcache:agent_session(_,ID)),
  retractall(lmcache:session_agent(ID,_)),
- ain(lmconf:irc_user_plays(Agent,User,Channel)),
+ ain(baseKB:irc_user_plays(Agent,User,Channel)),
    asserta_if_new(lmcache:agent_session(Agent,ID)),
    asserta_if_new(lmcache:session_agent(ID,Agent)),!.
 
-irc_mud_event_hook(Channel,User,actDo(TODO)):- lmconf:irc_user_plays(Agent,User,Channel),ground(lmconf:irc_user_plays(Agent,User,Channel)),irc_action_queue(Agent,TODO,Channel).
-irc_mud_event_hook(Channel,User,say(TODO)):- lmconf:irc_user_plays(Agent,User,Channel),ground(lmconf:irc_user_plays(Agent,User,Channel)),irc_action_queue(Agent,TODO,Channel).
+irc_mud_event_hook(Channel,User,actDo(TODO)):- baseKB:irc_user_plays(Agent,User,Channel),ground(baseKB:irc_user_plays(Agent,User,Channel)),irc_action_queue(Agent,TODO,Channel).
+irc_mud_event_hook(Channel,User,say(TODO)):- baseKB:irc_user_plays(Agent,User,Channel),ground(baseKB:irc_user_plays(Agent,User,Channel)),irc_action_queue(Agent,TODO,Channel).
 
 irc_skipped(W):- catch(clpfd:read_term_from_atom(W,CMD,[double_quotes(string)]),_,fail),!,CMD= ('?-'(_)).
 
@@ -54,12 +54,12 @@ irc_action_queue(Agent,TODO,Channel):-  get_session_id(ID), enqueue_session_acti
 
 
 
-:-ain(( (lmconf:irc_user_plays(Agent,User,Channel)/
-  ( lmconf:irc_user_plays(OAgent,User,Other), (Other\=Channel;OAgent\=Agent) ))
-   ==> \+ lmconf:irc_user_plays(OAgent,User,Other))).
+:-ain(( (baseKB:irc_user_plays(Agent,User,Channel)/
+  ( baseKB:irc_user_plays(OAgent,User,Other), (Other\=Channel;OAgent\=Agent) ))
+   ==> \+ baseKB:irc_user_plays(OAgent,User,Other))).
 
 
-:-ain(( ~lmconf:irc_user_plays(Agent,User,_) ==> {retractall(lmcache:agent_session(Agent,User)),retractall(lmcache:session_agent(User,Agent))} )).
+:-ain(( ~baseKB:irc_user_plays(Agent,User,_) ==> {retractall(lmcache:agent_session(Agent,User)),retractall(lmcache:session_agent(User,Agent))} )).
 
 end_of_file.
 

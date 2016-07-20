@@ -73,7 +73,7 @@
             target_module/2,
             list_item_per_line/4,
             write_modules/0,
-            lmconf:sf_known/4,
+            baseKB:sf_known/4,
             attempt_head_vnames/1,
             attempt_head_varnames_0/1,
             helper_name0/1, is_crossfile_module_0/1, make_summary0/3, mpred_source_file_0/2, skip_functor_export_0/1, to_comparable_name_arity/3, to_mfa_0/4
@@ -82,11 +82,11 @@
 :- meta_predicate notes_to_better_text(2,*,*).
 :- meta_predicate list_item_per_line(0,*,*,*),
    list_item_per_line(0,?,?).
-:- (multifile lmconf:sf_known/4).
+:- (multifile baseKB:sf_known/4).
 :- (module_transparent current_predicate_mfa/3, summary_ending/2, export_file_preds/0, export_file_preds/1, export_file_preds/6, export_module_preds/0, functor_compare/3, helper_name/1, helper_name0/1, is_crossfile_module_0/1, list_file_preds/0,
   list_file_preds/1, list_file_preds/2, longer_sumry/2, make_l_summary/3, make_module_name/2, module_meta_transparent/1, mpred_prolog_only_module/1, mpred_source_file/2, merge_mode_and_varname/3, no_location/3, portray_clause_pi_LR/2, portray_clause_pi_UD/2, autodoc_pred/2, scan_and_list_file_preds/1, skip_functor_export_0/1, some_flocation/3, some_location/3, target_module/2, to_comparable_name_arity/3, to_mfa_0/4, write_modules/0).
 :- export((helper_name0/1, is_crossfile_module_0/1, make_summary0/3, mpred_source_file_0/2, skip_functor_export_0/1, to_comparable_name_arity/3, to_mfa_0/4)).
-% :- shared_multifile(lmconf:sf_known/4).
+% :- shared_multifile(baseKB:sf_known/4).
 
 :- dynamic(mpred_prolog_only_module/1).
 /*
@@ -273,7 +273,7 @@ skip_functor_export_0('$pldoc'/_).
 %
 % If Is A crossfile module  Primary Helper.
 %
-is_crossfile_module_0(lmconf).
+is_crossfile_module_0(baseKB).
 is_crossfile_module_0(baseKB).
 is_crossfile_module_0(basePFC).
 is_crossfile_module_0(user).
@@ -365,8 +365,8 @@ module_meta_transparent(M:P):-functor(P,F,A),module_transparent(M:F/A),!. % grou
 module_meta_transparent(_).
 
 
-:-multifile(lmconf:sf_known/4).
-:-dynamic(lmconf:sf_known/4).
+:-multifile(baseKB:sf_known/4).
+:-dynamic(baseKB:sf_known/4).
 :- export(mpred_source_file_0/2).
 
 %= 	 	 
@@ -384,9 +384,9 @@ mpred_source_file(M:P,S):- no_repeats(mpred_source_file_0(M:P,S)).
 %
 % Managed Predicate source file  Primary Helper.
 %
-mpred_source_file_0(M:P,S):- !, source_file(M:P,S). % ,once((to_comparable_name_arity(P,F,A))),nop(assert_if_new(lmconf:sf_known(S,F,A,M))).
+mpred_source_file_0(M:P,S):- !, source_file(M:P,S). % ,once((to_comparable_name_arity(P,F,A))),nop(assert_if_new(baseKB:sf_known(S,F,A,M))).
 mpred_source_file_0(M:P,S):- current_module(M),predicate_property(M:P,file(S)),\+ predicate_property(M:P,imported_from(_)). % to_comparable_name_arity(P,F,A).
-mpred_source_file_0(M:P,S):- var(P)-> (lmconf:sf_known(S,F,A,M),functor(P,F,A)) ; (functor(P,F,A),lmconf:sf_known(S,F,A,M)).
+mpred_source_file_0(M:P,S):- var(P)-> (baseKB:sf_known(S,F,A,M),functor(P,F,A)) ; (functor(P,F,A),baseKB:sf_known(S,F,A,M)).
 
 % Return the correct M for the F/A
 
@@ -406,7 +406,7 @@ current_predicate_mfa(M,F,A):-no_repeats(M:F/A,((current_predicate(_,M:P),functo
 %
 % No Location.
 %
-no_location(M,F,A):-current_predicate_mfa(M,F,A),\+ lmconf:sf_known(_S,F,A,_MN).
+no_location(M,F,A):-current_predicate_mfa(M,F,A),\+ baseKB:sf_known(_S,F,A,_MN).
 
 
 %= 	 	 
@@ -415,7 +415,7 @@ no_location(M,F,A):-current_predicate_mfa(M,F,A),\+ lmconf:sf_known(_S,F,A,_MN).
 %
 % Some Location.
 %
-some_location(M,F,A):-no_repeats(F/A,(( current_predicate_mfa(M,F,A); lmconf:sf_known(_S,F,A,_MN)))).
+some_location(M,F,A):-no_repeats(F/A,(( current_predicate_mfa(M,F,A); baseKB:sf_known(_S,F,A,_MN)))).
 
 %= 	 	 
 
@@ -423,7 +423,7 @@ some_location(M,F,A):-no_repeats(F/A,(( current_predicate_mfa(M,F,A); lmconf:sf_
 %
 % Some Flocation.
 %
-some_flocation(FM,F,A):-no_repeats(F/A,(( lmconf:sf_known(_S,F,A,FM);current_predicate_mfa(FM,F,A)))).
+some_flocation(FM,F,A):-no_repeats(F/A,(( baseKB:sf_known(_S,F,A,FM);current_predicate_mfa(FM,F,A)))).
 
 
 :- module_transparent(export_file_preds/1).
@@ -461,9 +461,9 @@ predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_proper
 
 :- style_check(-singleton).
 
-:- dynamic(lmconf:mpred_is_impl_file/1).
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- volatile(lmconf:mpred_is_impl_file/1).
+:- dynamic(baseKB:mpred_is_impl_file/1).
+:- multifile(baseKB:mpred_is_impl_file/1).
+:- volatile(baseKB:mpred_is_impl_file/1).
 
 :- if(false).
 :- else.
@@ -476,7 +476,7 @@ predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_proper
 %
 % Write Modules.
 %
-write_modules:- forall(lmconf:mpred_is_impl_file(F),(export_file_preds(F),list_file_preds(F))).
+write_modules:- forall(baseKB:mpred_is_impl_file(F),(export_file_preds(F),list_file_preds(F))).
 
 
 
@@ -528,9 +528,9 @@ export_module_preds:- source_context_module(M),source_file_property(S,module(M))
 merge_mode_and_varname(ModeAs,NameAs,ModeAs:NameAs).
 
 
-:- dynamic(lmconf:mpred_is_impl_file/1).
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- volatile(lmconf:mpred_is_impl_file/1).
+:- dynamic(baseKB:mpred_is_impl_file/1).
+:- multifile(baseKB:mpred_is_impl_file/1).
+:- volatile(baseKB:mpred_is_impl_file/1).
 
 
 %= 	 	 
@@ -539,7 +539,7 @@ merge_mode_and_varname(ModeAs,NameAs,ModeAs:NameAs).
 %
 % Target Module.
 %
-target_module(P,M):-mpred_source_file(M:P,F),lmconf:mpred_is_impl_file(F),make_module_name(F,M).
+target_module(P,M):-mpred_source_file(M:P,F),baseKB:mpred_is_impl_file(F),make_module_name(F,M).
 
 % autodoc_output_path(_,user):- !.
 
@@ -1352,12 +1352,12 @@ mpred_prolog_only_module(logicmoo_utils).
 mpred_prolog_only_module(t_l).
 mpred_prolog_only_module(tlbugger).
 mpred_prolog_only_module(lmcache).
-mpred_prolog_only_module(lmconf).
+mpred_prolog_only_module(baseKB).
 mpred_prolog_only_module(M):-atom_concat(mpred_,_,M).
 mpred_prolog_only_module(M):-atom_concat(logicmoo_util,_,M).
 mpred_prolog_only_module(M):-atom_concat(common_logic_,_,M).
 
-% mpred_prolog_only_module(M):- lmconf:mpred_is_impl_file(F),make_module_name(F,M).
+% mpred_prolog_only_module(M):- baseKB:mpred_is_impl_file(F),make_module_name(F,M).
 % mpred_prolog_only_module(user). 
 
 

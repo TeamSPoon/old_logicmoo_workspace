@@ -98,18 +98,18 @@
 % ======================================================
 % Pre-release Sanity tests
 % ======================================================
-:- dynamic(lmconf:logicmoo_scan_autoloads/0).
-:- dynamic(lmconf:logicmoo_pre_release/0).
+:- dynamic(baseKB:logicmoo_scan_autoloads/0).
+:- dynamic(baseKB:logicmoo_pre_release/0).
  	 	 
 
 %  logicmoo_pre_release() is semidet.
 %
-% Hook To [lmconf:logicmoo_pre_release/0] For Module Logicmoo_utils.
+% Hook To [baseKB:logicmoo_pre_release/0] For Module Logicmoo_utils.
 % Logicmoo Pre Release.
 %
-lmconf:logicmoo_pre_release.
+baseKB:logicmoo_pre_release.
 
-:- if(lmconf:logicmoo_pre_release).
+:- if(baseKB:logicmoo_pre_release).
 /*
 :- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_error,true),set_prolog_flag(debug, true).
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(100000)]).
@@ -125,19 +125,19 @@ lmconf:logicmoo_pre_release.
 :- endif.
 
 
-% lmconf:logicmoo_scan_autoloads() is semidet.
+% baseKB:logicmoo_scan_autoloads() is semidet.
 %
-% Hook To [lmconf:logicmoo_scan_autoloads/0] For Module Logicmoo_utils.
+% Hook To [baseKB:logicmoo_scan_autoloads/0] For Module Logicmoo_utils.
 % Logicmoo Scan Autoloads.
 %
-lmconf:logicmoo_scan_autoloads:-false.
+baseKB:logicmoo_scan_autoloads:-false.
 
 :- endif.
 % ======================================================
 % Pre-release Should check if autoloading messes up anything
 % ======================================================
 
-:- if(lmconf:logicmoo_scan_autoloads).
+:- if(baseKB:logicmoo_scan_autoloads).
 %:- set_prolog_flag(verbose_autoload, false).
 %:- autoload([verbose(false)]).
 %:- set_prolog_flag(verbose_autoload, true).

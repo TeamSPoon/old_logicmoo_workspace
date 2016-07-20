@@ -19,17 +19,17 @@
 % We save the name of the module loading this module
 :- module(logicmoo_util_all,[]).
 /*
-:- dynamic(lmconf:logicmoo_utils_separate/0).
-:- retractall(lmconf:logicmoo_utils_separate).
+:- dynamic(baseKB:logicmoo_utils_separate/0).
+:- retractall(baseKB:logicmoo_utils_separate).
 :- set_prolog_flag(generate_debug_info, true).
 
 
 % :- abox:defaultTBoxMt(_)->true;('$current_typein_module'(M),asserta(abox:defaultTBoxMt(M))).
 
 
-:- dynamic(lmconf:mpred_is_impl_file/1).
-:- multifile(lmconf:mpred_is_impl_file/1).
-% :- volatile(lmconf:mpred_is_impl_file/1).
+:- dynamic(baseKB:mpred_is_impl_file/1).
+:- multifile(baseKB:mpred_is_impl_file/1).
+% :- volatile(baseKB:mpred_is_impl_file/1).
 
 
 */

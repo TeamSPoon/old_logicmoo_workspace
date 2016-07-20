@@ -92,7 +92,7 @@ pttp_listens_to_stub(prologPTTP).
 pttp_listens_to_stub(prologKIF).
 
 
-lmconf:mpred_provide_setup(Op,H):- provide_kif_op(Op,H).
+baseKB:mpred_provide_setup(Op,H):- provide_kif_op(Op,H).
 
 % OPHOOK ASSERT
 provide_kif_op(change(assert,How),(HeadBody)):- 
@@ -108,7 +108,7 @@ provide_kif_op(call(How),Head):-
 % OPHOOK CLAUSES
 provide_kif_op(clauses(How),(Head:- Body)):- 
    pttp_listens_to_head(clauses(How),Head),
-   lmconf:mpred_provide_storage_clauses(Head,Body,_Why).
+   baseKB:mpred_provide_storage_clauses(Head,Body,_Why).
 
 % OPHOOK 
 provide_kif_op(OP,(HeadBody)):- 
@@ -117,12 +117,12 @@ provide_kif_op(OP,(HeadBody)):-
 
 
 % CLAUSES HOOK 
-lmconf:mpred_provide_storage_clauses(H,B,wid3(IDWhy)):- wid(IDWhy,_,(H:- B)).
-lmconf:mpred_provide_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
+baseKB:mpred_provide_storage_clauses(H,B,wid3(IDWhy)):- wid(IDWhy,_,(H:- B)).
+baseKB:mpred_provide_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
 
 
 % REGISTER HOOK
-lmconf:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
+baseKB:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
    get_pifunctor(HeadIn,Head,F),
       assert_if_new(isa(F,prologPTTP)),
          ensure_universal_stub(Head),
@@ -131,7 +131,7 @@ lmconf:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(St
 
 /*
 
-:- was_dynamic(lmconf:int_proven_t/10).
+:- was_dynamic(baseKB:int_proven_t/10).
 
 int_proven_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
@@ -139,7 +139,7 @@ int_proven_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         G=[H|I].
 
 
-:- was_dynamic(lmconf:int_assumed_t/10).
+:- was_dynamic(baseKB:int_assumed_t/10).
 int_assumed_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
         C=[H, [assumed_t(P, X, Y), D, E, F]|I],
@@ -603,14 +603,14 @@ kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) 
 kif_sanity_test_0:-kif_test(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).
 
 
-lmconf:sanity_test:- kif_test(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
+baseKB:sanity_test:- kif_test(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
 
-lmconf:sanity_test:- kif_to_boxlog(not((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
+baseKB:sanity_test:- kif_to_boxlog(not((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
   list_to_set(L,SET),forall(member(P,SET),writeln(P)),!.
 
-lmconf:sanity_test:- logicmoo_example3.
+baseKB:sanity_test:- logicmoo_example3.
 
-lmconf:regression_test:- logicmoo_example3.
+baseKB:regression_test:- logicmoo_example3.
 
 
 kif_sanity_tests:- forall(clause(kif_sanity_test_0,B),must(B)).

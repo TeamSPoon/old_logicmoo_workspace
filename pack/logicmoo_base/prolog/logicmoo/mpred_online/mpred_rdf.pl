@@ -15,7 +15,7 @@
 
 
 
-:- shared_multifile(lmconf:expire_one_rdf_cache/0).
+:- shared_multifile(baseKB:expire_one_rdf_cache/0).
 
 
 :- shared_multifile(rdf_db:rdf_open_hook/3).
@@ -191,10 +191,10 @@ cache_all_qnames:- lmcache:all_qnames_cached -> check_each_ns ;
 check_each_ns :- !.
 check_each_ns :- rdf_current_prefix(NS,_),not(lmcache:rdf_current_qname_cached(NS,_)),retractall(lmcache:all_qnames_cached),cache_all_qnames.
 
-lmconf:expire_one_rdf_cache :- dmsg(color(red,expire_one_rdf_cache)).
-lmconf:expire_one_rdf_cache :- retractall(lmcache:all_qnames_cached).
+baseKB:expire_one_rdf_cache :- dmsg(color(red,expire_one_rdf_cache)).
+baseKB:expire_one_rdf_cache :- retractall(lmcache:all_qnames_cached).
 
-:- lmconf:expire_one_rdf_cache.
+:- baseKB:expire_one_rdf_cache.
 
 :- export(atom_to_qname/2).
 
@@ -334,7 +334,7 @@ any_to_rdf(_,U,U):-is_url(U),!.
 any_to_rdf(_,A,Sx):-var(A),format(atom(S),'~w',[(A)]),atom_concat('__bnode',S,Sx),!.
 any_to_rdf(DB,User:B,URL):-not(rdf_current_prefix(User,_)),!,any_to_rdf(DB,prefix_concat(User,B),URL),!.
 any_to_rdf(DB,A:B,URL):-is_ftVar(A),!,any_to_rdf(DB,prefix_concat(A,B),URL),!.
-any_to_rdf(DB,lmconf:B,URL):-!,any_to_rdf(DB,prefix_concat(user,B),URL),!.
+any_to_rdf(DB,baseKB:B,URL):-!,any_to_rdf(DB,prefix_concat(user,B),URL),!.
 any_to_rdf(DB,A / B,URL):-any_to_rdf(DB,f_a(A,B),URL),!.
 any_to_rdf(_,'$VAR'('_'),Sx):-format(atom(S),'~w',[_]),atom_concat('__bnode',S,Sx),!.
 any_to_rdf(_,'$VAR'(A),Sx):-format(atom(S),'~w',['$VAR'(A)]),atom_concat('__bnode',S,Sx),!.
@@ -432,10 +432,10 @@ rdf_object(L):-is_list(L),!.
 rdf_object(C):-atomic(C).
 rdf_object(O):-ground(O).
 
-:- dynamic(lmconf:using_rdf_mpred_hook).
+:- dynamic(baseKB:using_rdf_mpred_hook).
 
-% :- shared_multifile(lmconf:decl_database_hook).
-%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), lmconf:using_rdf_mpred_hook,unnumbervars_with_names(DB),rdf_assert_hook(DB),!.
+% :- shared_multifile(baseKB:decl_database_hook).
+%OLD baseKB:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), baseKB:using_rdf_mpred_hook,unnumbervars_with_names(DB),rdf_assert_hook(DB),!.
 
 :- thread_local(t_l:rdf_asserting/2).
 
@@ -690,9 +690,9 @@ sync_to_rdf:-
    forall(mpred_isa(P,O),rdf_assert_hook(mpred_isa(P,O))),
    forall(t(C,I),rdf_assert_hook(isa(I,C))),
    forall(is_known_trew(B),rdf_assert_hook(B)),
-   (lmconf:using_rdf_mpred_hook -> true ; (asserta(lmconf:using_rdf_mpred_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),
-   asserta_if_new(lmconf:call_OnEachLoad(sync_to_rdf)),
-   asserta_if_new(lmconf:call_OnEachLoad(sync_from_rdf)),
+   (baseKB:using_rdf_mpred_hook -> true ; (asserta(baseKB:using_rdf_mpred_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),
+   asserta_if_new(baseKB:call_OnEachLoad(sync_to_rdf)),
+   asserta_if_new(baseKB:call_OnEachLoad(sync_from_rdf)),
    !.
 
 
@@ -701,7 +701,7 @@ mpred_online:semweb_startup:- must(sync_from_rdf).
 mpred_online:semweb_startup:- must(sync_to_rdf).
 
 
-:- shared_multifile(lmconf:call_OnEachLoad/1).
-mpred_online:semweb_startup:- asserta_if_new(lmconf:call_OnEachLoad(sync_to_rdf)).
-mpred_online:semweb_startup:- asserta_if_new(lmconf:call_OnEachLoad(sync_from_rdf)).
+:- shared_multifile(baseKB:call_OnEachLoad/1).
+mpred_online:semweb_startup:- asserta_if_new(baseKB:call_OnEachLoad(sync_to_rdf)).
+mpred_online:semweb_startup:- asserta_if_new(baseKB:call_OnEachLoad(sync_from_rdf)).
 

@@ -1356,7 +1356,7 @@ print_numbervars_maybe(H):-(compound(H);var(H)), copy_term(H,HC), \+ \+ ((get_cl
 %
 print_numbervars_1(H):- loop_check(print_numbervars_2(H),format('~N~q.~n',[H])).
 
-% print_numbervars_2(H):- dtrace,lmconf:portray_one_line_hook(H),!.
+% print_numbervars_2(H):- dtrace,baseKB:portray_one_line_hook(H),!.
 
 %= 	 	 
 

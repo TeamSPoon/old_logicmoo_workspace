@@ -13,7 +13,7 @@
 % ==============================
 % Load logicmoo REPL Base
 % ==============================
-:- asserta(lmconf:load_mud_www).
+:- asserta(baseKB:load_mud_www).
 :- system:ensure_loaded(library(logicmoo_user)).
 
 % :- statistics.
@@ -29,7 +29,7 @@ setup_rl_read_history_0:-
 
 % :- use_module(library(persistency)).
 
-:- asserta(lmconf:load_mud_www).
+:- asserta(baseKB:load_mud_www).
 
 
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
@@ -46,7 +46,7 @@ setup_rl_read_history_0:-
 
 
 % [Optionaly] Load the Logicmoo WWW System
-:- if(if_defined(lmconf:load_mud_www)).
+:- if(if_defined(baseKB:load_mud_www)).
 :- system:use_module(library(logicmoo/mpred_online/mpred_www)).
 /*
 :- (if_file_exists(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www)))).

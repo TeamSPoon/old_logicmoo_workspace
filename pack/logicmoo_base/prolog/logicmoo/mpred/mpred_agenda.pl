@@ -93,7 +93,7 @@ time_tick(*,0),
 :- dynamic
         agenda_slow_op_todo/1,
         suspend_timers/0,
-        lmconf:will_call_after/2.
+        baseKB:will_call_after/2.
 
 /*
 :- was_dynamic((
@@ -133,7 +133,7 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 % Hook To [lmcache:after_mpred_load/0] For Module Mpred_agenda.
 % After Managed Predicate Load.
 %
-lmcache:after_mpred_load:- \+(t_l:loading_mpred_file(_,_)),lmconf:loaded_mpred_file(_,_),!.
+lmcache:after_mpred_load:- \+(t_l:loading_mpred_file(_,_)),baseKB:loaded_mpred_file(_,_),!.
 
 % when all previous tasks have completed
 
@@ -143,7 +143,7 @@ lmcache:after_mpred_load:- \+(t_l:loading_mpred_file(_,_)),lmconf:loaded_mpred_f
 %
 % After Managed Predicate Load Pass Extended Helper.
 %
-after_mpred_load_pass2:- \+ (lmconf:will_call_after(lmcache:after_mpred_load,_)).
+after_mpred_load_pass2:- \+ (baseKB:will_call_after(lmcache:after_mpred_load,_)).
 :- meta_predicate(call_after_mpred_load(0)).
 % call_after_mpred_load(Code):- lmcache:after_mpred_load,!, call_after_next(after_mpred_load_pass2,Code).
 
@@ -193,10 +193,10 @@ time_tick(Time,Pred):- repeat,sleep(Time), (suspend_timers->true;(once(doall(on_
 
 %% hook_one_second_timer_tick is semidet.
 %
-% Hook To [lmconf:hook_one_second_timer_tick/0] For Module Mpred_agenda.
+% Hook To [baseKB:hook_one_second_timer_tick/0] For Module Mpred_agenda.
 % Hook One Second Timer Tick.
 %
-lmconf:hook_one_second_timer_tick.
+baseKB:hook_one_second_timer_tick.
 
 
 %= 	 	 
@@ -205,7 +205,7 @@ lmconf:hook_one_second_timer_tick.
 %
 % Managed Predicate One Second Timer.
 %
-mpred_one_second_timer:- repeat,time_tick(1.0,lmconf:hook_one_second_timer_tick),fail.
+mpred_one_second_timer:- repeat,time_tick(1.0,baseKB:hook_one_second_timer_tick),fail.
 
 %= 	 	 
 
@@ -222,10 +222,10 @@ start_one_second_timer:-thread_property(_,alias(mpred_one_second_timer))-> true 
 
 %% hook_one_minute_timer_tick is semidet.
 %
-% Hook To [lmconf:hook_one_minute_timer_tick/0] For Module Mpred_agenda.
+% Hook To [baseKB:hook_one_minute_timer_tick/0] For Module Mpred_agenda.
 % Hook One Minute Timer Tick.
 %
-lmconf:hook_one_minute_timer_tick.
+baseKB:hook_one_minute_timer_tick.
 
 
 %= 	 	 
@@ -234,7 +234,7 @@ lmconf:hook_one_minute_timer_tick.
 %
 % Managed Predicate One Minute Timer.
 %
-mpred_one_minute_timer:- repeat,sleep(60.0),time_tick(60.0,lmconf:hook_one_minute_timer_tick),fail.
+mpred_one_minute_timer:- repeat,sleep(60.0),time_tick(60.0,baseKB:hook_one_minute_timer_tick),fail.
 
 %= 	 	 
 
@@ -360,9 +360,9 @@ call_after(When,C):- assert_next(When,C),!.
 %
 assert_next(_,_:true):-!.
 assert_next(_,true):-!.
-assert_next(When,C):- clause_asserted(lmconf:will_call_after(When,logOnFailure(C))),!.
+assert_next(When,C):- clause_asserted(baseKB:will_call_after(When,logOnFailure(C))),!.
 % assert_next(When,C):- nonground_throw_else_fail(C).
-assert_next(When,C):- retractall(lmconf:will_call_after(When,logOnFailure(C))),!, assertz_if_new(lmconf:will_call_after(When,logOnFailure(C))).
+assert_next(When,C):- retractall(baseKB:will_call_after(When,logOnFailure(C))),!, assertz_if_new(baseKB:will_call_after(When,logOnFailure(C))).
 
 
 %= 	 	 
@@ -399,7 +399,7 @@ do_all_of(When):- ignore(loop_check(do_all_of_ilc(When),true)),!.
 %
 % Do All Of Inside Of Loop Checking.
 %
-do_all_of_ilc(When):- not(lmconf:will_call_after(When,_)),!.
+do_all_of_ilc(When):- not(baseKB:will_call_after(When,_)),!.
 do_all_of_ilc(When):-  repeat,do_stuff_of_ilc(When), not(more_to_do(When)).
 
 
@@ -409,7 +409,7 @@ do_all_of_ilc(When):-  repeat,do_stuff_of_ilc(When), not(more_to_do(When)).
 %
 % More Converted To Do.
 %
-more_to_do(When):-predicate_property(lmconf:will_call_after(When,_),number_of_clauses(N)),!,N>0.
+more_to_do(When):-predicate_property(baseKB:will_call_after(When,_),number_of_clauses(N)),!,N>0.
 
 
 %= 	 	 
@@ -419,7 +419,7 @@ more_to_do(When):-predicate_property(lmconf:will_call_after(When,_),number_of_cl
 % Do Stuff Of Inside Of Loop Checking.
 %
 do_stuff_of_ilc(When):-not(more_to_do(When)),!.
-do_stuff_of_ilc(When):- lmconf:will_call_after(When,A),!,retract(lmconf:will_call_after(When,A)),!,call(A),!.
+do_stuff_of_ilc(When):- baseKB:will_call_after(When,A),!,retract(baseKB:will_call_after(When,A)),!,call(A),!.
 
 
 
@@ -449,14 +449,14 @@ add_later(Fact):- call_after_mpred_load(ain(Fact)).
 %     assert/retract hooks
 % ========================================
 /*
-:- was_dynamic(lmconf:decl_database_hook/2).
-:- shared_multifile(lmconf:decl_database_hook/2).
-:- was_export(lmconf:decl_database_hook/2).
-:- meta_predicate lmconf:decl_database_hook(?,0).
+:- was_dynamic(baseKB:decl_database_hook/2).
+:- shared_multifile(baseKB:decl_database_hook/2).
+:- was_export(baseKB:decl_database_hook/2).
+:- meta_predicate baseKB:decl_database_hook(?,0).
 */
 % hooks are declared as
-%        lmconf:decl_database_hook(change(assert,A_or_Z),Fact):- ...
-%        lmconf:decl_database_hook(change( retract,One_or_All),Fact):- ...
+%        baseKB:decl_database_hook(change(assert,A_or_Z),Fact):- ...
+%        baseKB:decl_database_hook(change( retract,One_or_All),Fact):- ...
 
 
 %= 	 	 
@@ -504,7 +504,7 @@ run_database_hooks_0(TypeIn,HookIn):-  trace_or_throw(use_pfc(run_database_hooks
    kb_db_op(TypeIn,Type),
    into_mpred_form(HookIn,Hook),
    copy_term(Hook,HookCopy),
-   loop_check_term(doall(call_no_cuts(lmconf:decl_database_hook(Type,HookCopy))),run_database_hooks(Hook),true).
+   loop_check_term(doall(call_no_cuts(baseKB:decl_database_hook(Type,HookCopy))),run_database_hooks(Hook),true).
 */
 
 % ========================================
@@ -554,11 +554,11 @@ finish_processing_dbase:- savedb,fail.
 finish_processing_dbase:- do_gc,dmsginfo(end_finish_processing_dbase),fail.
 finish_processing_dbase.
 
-lmconf:hook_one_minute_timer_tick:-agenda_slow_op_restart.
+baseKB:hook_one_minute_timer_tick:-agenda_slow_op_restart.
 
 
 %:-meta_predicate(rescandb/0).
-% rescandb:- forall(defaultAssertMt(World),(findall(File,lmconf:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),call_u(finish_processing_world))).
+% rescandb:- forall(defaultAssertMt(World),(findall(File,baseKB:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),call_u(finish_processing_world))).
 
 %= 	 	 
 
@@ -588,7 +588,7 @@ agenda_mpred_repropigate:-  loop_check(rescan_mpred_facts_local).
 %
 % Rescan Managed Predicate Facts Local.
 %
-rescan_mpred_facts_local:-wno_tl(lmconf:use_cyc_database,(must_det(rescan_duplicated_facts),must_det(rerun_database_hooks))).
+rescan_mpred_facts_local:-wno_tl(baseKB:use_cyc_database,(must_det(rescan_duplicated_facts),must_det(rerun_database_hooks))).
 
 
 %= 	 	 
@@ -703,7 +703,7 @@ englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglis
 % Whenever Load.
 %
 onLoad(C):-call_after_mpred_load(C).
-:- was_export(lmconf:onEachLoad/1).
+:- was_export(baseKB:onEachLoad/1).
 
 %= 	 	 
 
@@ -711,7 +711,7 @@ onLoad(C):-call_after_mpred_load(C).
 %
 % Whenever Each Load.
 %
-onEachLoad(C):-assert_if_new(lmconf:call_OnEachLoad(C)).
+onEachLoad(C):-assert_if_new(baseKB:call_OnEachLoad(C)).
 
 
 

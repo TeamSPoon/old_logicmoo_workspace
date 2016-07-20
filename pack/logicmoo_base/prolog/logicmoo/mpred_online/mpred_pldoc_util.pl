@@ -45,9 +45,9 @@
 
 % prolog:doc_object_summary(A,B,C,D):-man_object_summary(A,B,C,D).
 
-:- thread_local(lmconf:html_listed/1).
+:- thread_local(baseKB:html_listed/1).
 
-prolog:doc_object_page_footer(Obj,_) --> { not(lmconf:html_listed(Obj)) },!,pldoc_html:html_listing('Footer',Obj).
+prolog:doc_object_page_footer(Obj,_) --> { not(baseKB:html_listed(Obj)) },!,pldoc_html:html_listing('Footer',Obj).
 
 %prolog:doc_page_header(A,B) --> {format(user_error,'~n~q~n',[doc_page_header(A, B)]),fail}.
 %prolog:doc_object_summary(A,B,C,D) :- format(user_error,'~n~q~n',[doc_object_summary(A, B,C,D)]),dumpST(10),fail.
@@ -160,12 +160,12 @@ to_tclass(Prop,New):- isa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
 to_tclass(Prop,New):- (t(_,_,Prop);t(_,_,Prop,_);t(_,_,_,Prop)),ensure_starts_with_prefix(Prop,v,New),!.
 % to_tclass(Prop,actDrop).
 
-is_actverb(X):-lmconf:type_action_info(_,PX,_),functor(PX,X,_).
-is_actverb(X):-lmconf:action_info(PX,_),functor(PX,X,_).
+is_actverb(X):-baseKB:type_action_info(_,PX,_),functor(PX,X,_).
+is_actverb(X):-baseKB:action_info(PX,_),functor(PX,X,_).
 is_actverb(X):-vtActionTemplate(PX),functor(PX,X,_).
 is_actverb(X):-vtPosture(PX),functor(PX,X,_).
-is_actverb(X):-lmconf:verb_alias(_,X).
-% lmconf:vtVerb(X):-is_actverb(X).
+is_actverb(X):-baseKB:verb_alias(_,X).
+% baseKB:vtVerb(X):-is_actverb(X).
 
 :- was_export(ensure_starts_with_prefix/3).
 ensure_starts_with_prefix(A,Prefix,A):- atom_concat(Prefix,Rest,A),toCamelcase(Rest,CC),toPropercase(CC,PC),Rest==PC,!.

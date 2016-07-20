@@ -16,7 +16,7 @@
 abolish_and_make_static/2,
 add_push_prefix_arg/4,
 % bb:'$sourcefile_info_env'/1,
-% lmconf:decl_env_mepred/2, a-box:defaultTBoxMt/1,
+% baseKB:decl_env_mepred/2, a-box:defaultTBoxMt/1,
 clause_to_hb/3,
 clause_to_hb0/3,
 decl_env_mepred/2,
@@ -137,7 +137,7 @@ env_mpred_op(OP,P):- functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_mp
 env_mpred_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(why,/*ocluser*/ocl:CALL).
 env_mpred_op(OP,P):- dtrace,trace_or_throw(unk_env_mpred_op(OP,P)).
 
-env_shadow(OP,P):-lmconf:call(OP,P).
+env_shadow(OP,P):-baseKB:call(OP,P).
 
 :- dynamic( in_dyn/2).
 in_dyn(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
@@ -214,7 +214,7 @@ decl_env_mepred_fa(Prop,_Pred,F,A):- t_l:push_env_ctx,
    add_push_prefix_arg(Pred,Type,Prefix,Pred1),
    decl_env_mepred_real(Prop,Pred1,F,A1),!,
    abolish_and_make_static(F,A),!,
-   if_defined(lmconf:arity(F,AA)),
+   if_defined(baseKB:arity(F,AA)),
    must(arity(F,A1)==arity(F,AA)))).
 decl_env_mepred_fa(Prop,Pred,F,A):-
    decl_env_mepred_real(Prop,Pred,F,A).
@@ -224,14 +224,14 @@ decl_env_mepred_real(Prop,Pred,F,A):-
   (Prop==dyn->(dynamic(/*ocluser*/ocl:F/A));true),
   (Prop==cache->'$set_pattr'(ocl:Pred, pred, (volatile));true),
   (Prop==dom->(multifile(/*ocluser*/ocl:F/A));true),
-  lmconf:export(/*ocluser*/ocl:F/A),
+  baseKB:export(/*ocluser*/ocl:F/A),
   if_defined(decl_mpred(Pred,Prop),ain(baseKB:box_prop(F,Prop))),
   ain(isa_kb:box_prop(Prop)), ain(get_mp_arity(F,A)),ain(arity(F,A)),!,
   dtrace,ain(prop_mpred(Prop,F,A)).
 
 
 env_learn_pred(_,_):-nb_getval(disabled_env_learn_pred,true),!.
-env_learn_pred(ENV,P):-lmconf:decl_env_mepred(ENV,P).
+env_learn_pred(ENV,P):-baseKB:decl_env_mepred(ENV,P).
 
 env_recorded(call,Val) :- recorded(Val,Val).
 env_recorded(assert, Val) :- recordz(Val,Val).

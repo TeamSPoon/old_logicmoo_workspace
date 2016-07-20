@@ -24,14 +24,13 @@
 %:- add_import_module(mpred_storage,baseKB,end).
 %:- add_import_module(mud_telnet,world,end).
 
-:- add_import_module(lmconf,world,end).
-% :- add_import_module(lmconf,baseKB,end).
-:- add_import_module(lmconf,mud_testing,end).
-:- add_import_module(lmconf,mud_telnet,end).
+:- add_import_module(baseKB,world,end).
+% :- add_import_module(baseKB,baseKB,end).
+:- add_import_module(baseKB,mud_testing,end).
+:- add_import_module(baseKB,mud_telnet,end).
 :- add_import_module(mud_testing,mud_telnet,end).
 :- add_import_module(mud_telnet,world,end).
 :- add_import_module(baseKB,lmcache,end).
-:- add_import_module(baseKB,lmconf,end).
 % :- add_import_module(baseKB,world,end).
 
 :- dynamic   user:file_search_path/2.
@@ -136,7 +135,7 @@ create_module(M):-current_module(M),!.
 create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),writeq(switching_back_to_module(M,CM)),module(CM).
 :-create_module(user).
 :-create_module(t_l).
-:-create_module(lmconf).
+:-create_module(baseKB).
 %:-create_module(moo).
 
 
@@ -253,7 +252,7 @@ run_setup:- within_user(at_start(run_setup_now)).
 
 debug_repl_w_cyc(Module,CallFirst):- !,         
           wno_tl(t_l:useOnlyExternalDBs,
-            w_tl(lmconf:use_cyc_database,
+            w_tl(baseKB:use_cyc_database,
                ((decl_type(person),          
                 ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.pfc.pl')),
                 module(Module),
@@ -262,7 +261,7 @@ debug_repl_w_cyc(Module,CallFirst):- !,
 
 debug_repl_wo_cyc(Module,CallFirst):- !,         
           w_tl(t_l:useOnlyExternalDBs,
-            wno_tl(lmconf:use_cyc_database,
+            wno_tl(baseKB:use_cyc_database,
                ((decl_type(person),          
                 ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.pfc.pl')),
                 module(Module),

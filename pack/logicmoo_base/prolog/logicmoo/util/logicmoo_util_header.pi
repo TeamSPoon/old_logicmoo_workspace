@@ -1,6 +1,6 @@
 
-:- dynamic(lmconf:mpred_is_impl_file/1).
-:- multifile(lmconf:mpred_is_impl_file/1).
+:- dynamic(baseKB:mpred_is_impl_file/1).
+:- multifile(baseKB:mpred_is_impl_file/1).
 :- system_module.
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
 :- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
@@ -21,11 +21,11 @@
 	user:prolog_list_goal/1,
 	user:prolog_predicate_name/2,
 	user:prolog_clause_name/2,
-        lmconf:mpred_is_impl_file/1.
+        baseKB:mpred_is_impl_file/1.
 :- dynamic
 	user:portray/1,
 %	user:'$pldoc'/4,
-        lmconf:mpred_is_impl_file/1.
+        baseKB:mpred_is_impl_file/1.
 
 */
 :- thread_local(tlbugger:ifHideTrace/0).
@@ -33,19 +33,19 @@
 
 :- (current_prolog_flag(xref,true)->true;
   (prolog_load_context(source,F),
-   (lmconf:mpred_is_impl_file(F)->true;call(call,assert,(lmconf:mpred_is_impl_file(F)))),
-   initialization((lmconf:mpred_is_impl_file(F)->true;assertz(lmconf:mpred_is_impl_file(F)))))).
+   (baseKB:mpred_is_impl_file(F)->true;call(call,assert,(baseKB:mpred_is_impl_file(F)))),
+   initialization((baseKB:mpred_is_impl_file(F)->true;assertz(baseKB:mpred_is_impl_file(F)))))).
 
 % ===================================================================
 % Creates a warning if we are in the incorrect context
 % ===================================================================
 /*
 :- if(current_predicate(lmcode:combine_logicmoo_utils/0)).
-:- multifile(lmconf:logicmoo_utils_separate/0).
-lmconf:logicmoo_utils_separate.
+:- multifile(baseKB:logicmoo_utils_separate/0).
+baseKB:logicmoo_utils_separate.
 :- set_prolog_flag(generate_debug_info, true).
 :- else.
-:- \+ lmconf:logicmoo_utils_separate.
+:- \+ baseKB:logicmoo_utils_separate.
 :- endif.
 */
 

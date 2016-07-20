@@ -385,7 +385,7 @@ not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollect
 %
 % Asserted Subclass.
 %
-asserted_subclass(I,T):- ((t_l:useOnlyExternalDBs,!);lmconf:use_cyc_database),(kbp_t([genls,I,T])).
+asserted_subclass(I,T):- ((t_l:useOnlyExternalDBs,!);baseKB:use_cyc_database),(kbp_t([genls,I,T])).
 asserted_subclass(T,ST):- t(genls,T,ST).
 
 
@@ -684,12 +684,12 @@ tCol_gen(T):- no_repeats(T,call_u(atom(T);ttTemporalType(T);completelyAssertedCo
 
 %% module_local_init() is nondet.
 %
-% Hook To [lmconf:module_local_init/0] For Module Mpred_type_isa.
+% Hook To [baseKB:module_local_init/0] For Module Mpred_type_isa.
 % Module Local Init.
 %
-lmconf:module_local_init:- ain((isa(I,T):- cwc,isa_backchaing(I,T))).
+baseKB:module_local_init:- ain((isa(I,T):- cwc,isa_backchaing(I,T))).
 %a(P,F):-loop_check(isa(F,P)).
-%a(T,I):- lmconf:pfcManageHybrids,clause_safe(isa(I,T),true).
+%a(T,I):- baseKB:pfcManageHybrids,clause_safe(isa(I,T),true).
 :- was_export(isa_backchaing/2).
 
 
@@ -831,7 +831,7 @@ isa_asserted_0(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),ari
 isa_asserted_0(isInstFn(I),T):-nonvar(I),dtrace,!,T=I.
 isa_asserted_0(aRelatedFn(T,_),I):-nonvar(T),!,T=I.
 isa_asserted_0(aRelatedFn(T,_,_),I):-nonvar(T),!,T=I.
-isa_asserted_0(I,T):- ((t_l:useOnlyExternalDBs,!);lmconf:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
+isa_asserted_0(I,T):- ((t_l:useOnlyExternalDBs,!);baseKB:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
 isa_asserted_0(ttPredType, completelyAssertedCollection):-!.
 isa_asserted_0(I,T):- atom(I),isa_from_morphology(I,T).
 isa_asserted_0(I,T):- (atom(I);atom(T)),type_isa(I,T).
@@ -1044,11 +1044,11 @@ assert_subclass_safe(O,T):-
 %
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
 
-%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
+%OLD baseKB:decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
 
 
-%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
-%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
+%OLD baseKB:decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
+%OLD baseKB:decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
 
 %:- was_dynamic(tried_guess_types_from_name/1).
 :- was_dynamic(did_learn_from_name/1).
@@ -1139,7 +1139,7 @@ guess_typetypes_0(TtTypeType):-atom_concat(tt,TypeType,TtTypeType),atom_concat(T
 /*
 system:term_expansion(isa(Compound,PredArgTypes),
   (:-dmsg(ain(wizza(Compound,PredArgTypes))))):-
-  lmconf:isa_pred_now_locked,
+  baseKB:isa_pred_now_locked,
    ground(Compound:PredArgTypes),show_call(why,ain_expanded(isa(Compound,PredArgTypes))),!.
 */
 
@@ -1177,7 +1177,7 @@ isa_lmconf:mpred_provide_storage_clauses(H,true,hasInstanceCI):-
 %isa_lmconf:mpred_provide_storage_clauses(isa(I,C),B,W):-nonvar(C),append_term(C,I,H),mpred_t_mpred_storage_clauses_rules(H,B,W).
 
 
-lmconf:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_lmconf:mpred_provide_storage_clauses(H,B,What).
+baseKB:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_lmconf:mpred_provide_storage_clauses(H,B,What).
 
 
 % isa_backchaing(I,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(I,T)))),!,fail.
@@ -1292,11 +1292,11 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 % ================================================
 % assert_isa HOOKS
 % ================================================
-%OLD lmconf:decl_database_hook(_,genls(_,_)):-retractall(a(_,isa,_,_)),retractall(a(_,genls,_,_)).
-%OLD lmconf:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
-%OLD lmconf:decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
+%OLD baseKB:decl_database_hook(_,genls(_,_)):-retractall(a(_,isa,_,_)),retractall(a(_,genls,_,_)).
+%OLD baseKB:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
+%OLD baseKB:decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
 
-%OLD lmconf:decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
+%OLD baseKB:decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
 
 %= 	 	 
@@ -1328,7 +1328,7 @@ assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 % assert_isa_hooked(I,T):-dmsg((told(assert_isa(I,T)))).
 
 
-%OLD lmconf:decl_database_hook(change(assert,_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
+%OLD baseKB:decl_database_hook(change(assert,_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
 
 
 %= 	 	 
@@ -1357,8 +1357,8 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 % assert_isa_hooked_creation(I,T):- doall((ttTemporalType(ST),impliedSubClass(T,ST),call_after_mpred_load((create_instance(I,ST,[isa(T)]))))).
 
 
-% :- ain((lmconf:isa(I,C):-loop_check(isa_backchaing(I,C)))).
-% lmconf:module_local_init:- ain(('$toplevel':isa(I,C):-lmconf:isa(I,C))).
+% :- ain((baseKB:isa(I,C):-loop_check(isa_backchaing(I,C)))).
+% baseKB:module_local_init:- ain(('$toplevel':isa(I,C):-baseKB:isa(I,C))).
 
 
 %= 	 	 
@@ -1370,7 +1370,7 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 mpred_types_loaded.
 
 % ISA QUERY
-lmconf:module_local_init(_UserModule,_SystemModule):- 
+baseKB:module_local_init(_UserModule,_SystemModule):- 
   asserta_if_new((system:goal_expansion(ISA,GO) :- \+ t_l:disable_px, \+current_predicate(_,ISA),
   once((is_ftCompound(ISA),was_isa(ISA,I,C))),t_l:is_calling,show_call(why,GO=no_repeats(isa(I,C))))).
 % ISA GOAL
@@ -1378,8 +1378,8 @@ lmconf:module_local_init(_UserModule,_SystemModule):-
 % ISA EVER
 %mpred_term_expansion(G,GO):-  \+ t_l:disable_px,was_isa(G,I,C),GO=isa(I,C).
 
-lmconf:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(tCol)).
-lmconf:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(ttPredType)).
+baseKB:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(tCol)).
+baseKB:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(ttPredType)).
 
 call_u_t(DB,P,L,A1,A2):-call_u(call(DB,P,L,A1,A2)).
 call_u_t(DB,P,L,A1):-call_u(call(DB,P,L,A1)).

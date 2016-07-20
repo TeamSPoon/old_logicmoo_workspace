@@ -45,9 +45,9 @@ on_x_fail_priv(Goal):- catch(Goal,_,fail).
 
 :- discontiguous some_test/0.
 
-:- multifile(lmconf:is_prolog_stream/1).
-:- dynamic(lmconf:is_prolog_stream/1).
-:- export(lmconf:is_prolog_stream/1).
+:- multifile(baseKB:is_prolog_stream/1).
+:- dynamic(baseKB:is_prolog_stream/1).
+:- export(baseKB:is_prolog_stream/1).
 
 %=	open_prolog_stream(+Module, +Mode, -Stream, +Options)
 %
@@ -169,7 +169,7 @@ with_write_stream_pred(Callback,Stream,Goal,Exit):-
    setup_call_cleanup_each(
    ( asserta(((tl_with_prolog_streams:stream_write(Stream,Data):- (ignore(logicmoo_util_prolog_streams:on_x_fail_priv(call(Callback,Data)))))),Ref),
      asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(logicmoo_util_prolog_streams:on_x_fail_priv(call(Callback,end_of_file)))))),Ref2),
-     asserta(((lmconf:is_prolog_stream(Stream))),Ref3)),
+     asserta(((baseKB:is_prolog_stream(Stream))),Ref3)),
     Goal,
    (catch(flush_output(Stream),_,true),erase(Ref),erase(Ref2),erase(Ref3))),
   Exit).

@@ -396,7 +396,7 @@ update_value/3,
 
 :- op(1100,fx,(shared_multifile)).
 
-% % %%% :- shared_multifile lmconf:decl_database_hook/2.
+% % %%% :- shared_multifile baseKB:decl_database_hook/2.
 % %%% :- shared_multifile deduce_facts/2.
 % %%% :- shared_multifile default_type_props/3.
 % %%% :- shared_multifile fact_always_true/1.
@@ -408,7 +408,7 @@ update_value/3,
 % %%% :- shared_multifile now_unused/1.
 
 
-% %%% :- shared_multifile(lmconf:startup_option/2).
+% %%% :- shared_multifile(baseKB:startup_option/2).
 % %%% :- shared_multifile(is_edited_clause/3).
 
 % %%% :- shared_multifile(lmcache:loaded_external_kbs/1).
@@ -420,7 +420,7 @@ update_value/3,
 
 
 % %%% :- shared_multifile mudKeyword/2.
-% %%% :- shared_multifile lmconf:only_if_pttp/0.
+% %%% :- shared_multifile baseKB:only_if_pttp/0.
 % %%% :- shared_multifile relationMostInstance/3.
 
 
@@ -428,8 +428,8 @@ update_value/3,
 % %%% :- shared_multifile tNearestReachableItem/1.
 
 
-:- multifile(lmconf:use_cyc_database/0).
-:- thread_local(lmconf:use_cyc_database/0).
+:- multifile(baseKB:use_cyc_database/0).
+:- thread_local(baseKB:use_cyc_database/0).
 % % %%% :- shared_multifile decl_database_hook/2.
 
 
@@ -1168,7 +1168,7 @@ xcall_t(P):- call(P).
 % todo hook into loaded files!
 :- was_export(assertion_t/1).
 
-% assertion_t(Call):- t_l:useOnlyExternalDBs,!,lmconf:use_cyc_database,wno_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
+% assertion_t(Call):- t_l:useOnlyExternalDBs,!,baseKB:use_cyc_database,wno_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
 
 %= 	 	 
 
@@ -1176,7 +1176,7 @@ xcall_t(P):- call(P).
 %
 % Assertion True Stucture.
 %
-assertion_t(Call):- lmconf:use_cyc_database,!,w_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
+assertion_t(Call):- baseKB:use_cyc_database,!,w_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
 % assertion_t(Call):- w_tl(t_l:useOnlyExternalDBs,loop_check(call_u(Call))).
 
 % ================================================================================

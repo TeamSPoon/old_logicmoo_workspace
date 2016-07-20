@@ -169,7 +169,7 @@
         show_edit_term1(0, ?, ?),
         with_search_filters(0),
         with_search_filters0(0).
-:- (multifile http:location/3, http_dispatch:handler/4, http_log:log_stream/2, http_session:session_data/2, http_session:urandom_handle/1, lmconf:shared_hide_data/1, system:'$init_goal'/3, user:file_search_path/2).
+:- (multifile http:location/3, http_dispatch:handler/4, http_log:log_stream/2, http_session:session_data/2, http_session:urandom_handle/1, baseKB:shared_hide_data/1, system:'$init_goal'/3, user:file_search_path/2).
 :- (module_transparent edit1term/1, must_run/1, if_html/2, return_to_pos/1, show_edit_term/3, show_edit_term0/3, show_edit_term1/3, with_search_filters/1).
 :- (volatile http_log:log_stream/2, http_session:session_data/2, http_session:urandom_handle/1).
 :- export((current_form_var0/1, get_http_session0/1,  is_context0/1, make_quotable_0/2, pp_i2tml_0/1, pp_i2tml_1/1, put_string0/1, put_string0/2, sanity_test_000/0, show_edit_term0/3, show_edit_term1/3, show_select1/2, show_select2/3)).
@@ -1633,7 +1633,7 @@ indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   '
 
 
 
-:- multifile lmconf:shared_hide_data/1.
+:- multifile baseKB:shared_hide_data/1.
 
 
 
@@ -1643,14 +1643,14 @@ indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   '
 % Hook To [logicmoo_util_term_listing:shared_hide_data/1] For Module Mpred_www.
 % Shared Hide Data.
 %
-lmconf:shared_hide_data(M:F/A):-nonvar(M),!,lmconf:shared_hide_data(F/A).
-lmconf:shared_hide_data('$si$':'$was_imported_kb_content$'/2):- !,listing_filter(hideMeta).
-lmconf:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(nt/3):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(pt/2):- !, listing_filter(hideTriggers).
-lmconf:shared_hide_data(bt/2):- !, listing_filter(hideTriggers).
-lmconf:shared_hide_data((_:-
+baseKB:shared_hide_data(M:F/A):-nonvar(M),!,baseKB:shared_hide_data(F/A).
+baseKB:shared_hide_data('$si$':'$was_imported_kb_content$'/2):- !,listing_filter(hideMeta).
+baseKB:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
+baseKB:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
+baseKB:shared_hide_data(nt/3):- !,listing_filter(hideTriggers).
+baseKB:shared_hide_data(pt/2):- !, listing_filter(hideTriggers).
+baseKB:shared_hide_data(bt/2):- !, listing_filter(hideTriggers).
+baseKB:shared_hide_data((_:-
  cwc,
         second_order(_,G19865),
         (   _G19865 = (G19867,!,G19871) ->
@@ -1660,11 +1660,11 @@ lmconf:shared_hide_data((_:-
         ))):- CALL=@=call(G19865).
 
 
-lmconf:shared_hide_data(saved_request/_):- !.
-lmconf:shared_hide_data(session_data/_):- !.
-lmconf:shared_hide_data(mpred_mark/3):- !,listing_filter(hideMeta).
-lmconf:shared_hide_data(last_item_offered/1):- !,listing_filter(hideMeta).
-lmconf:shared_hide_data(P0):- strip_module(P0,_,P), compound(P),functor(P,F,A),F\== (/) , !,lmconf:shared_hide_data(F/A).
+baseKB:shared_hide_data(saved_request/_):- !.
+baseKB:shared_hide_data(session_data/_):- !.
+baseKB:shared_hide_data(mpred_mark/3):- !,listing_filter(hideMeta).
+baseKB:shared_hide_data(last_item_offered/1):- !,listing_filter(hideMeta).
+baseKB:shared_hide_data(P0):- strip_module(P0,_,P), compound(P),functor(P,F,A),F\== (/) , !,baseKB:shared_hide_data(F/A).
 
 
 
@@ -2834,13 +2834,13 @@ test_bind([X='$VAR'(X)|L]) :-
 :- dynamic user:portray/1.
 :- multifile user:portray/1.
 
-% '$messages':lmconf:my_portray(X):-fail,loop_check(lmconf:my_portray(X)).
-% user:portray(X):-loop_check(lmconf:my_portray(X)).
+% '$messages':baseKB:my_portray(X):-fail,loop_check(baseKB:my_portray(X)).
+% user:portray(X):-loop_check(baseKB:my_portray(X)).
 /*
 :- discontiguous my_portray/1. 
-:- export(lmconf:my_portray/1).
-lmconf:my_portray(A) :- var(A),!,fail,writeq(A).
-lmconf:my_portray(A) :-
+:- export(baseKB:my_portray/1).
+baseKB:my_portray(A) :- var(A),!,fail,writeq(A).
+baseKB:my_portray(A) :-
         atom(A),
         sub_atom(A, 0, _, _, 'http://'), !,
         (   style(B)
@@ -2848,7 +2848,7 @@ lmconf:my_portray(A) :-
         ;   B=prefix:id
         ),
         portray_url(B, A).
-lmconf:my_portray(A) :-
+baseKB:my_portray(A) :-
         atom(A),
         atom_concat('__file://', B, A),
         sub_atom(B, D, _, C, #),
@@ -2856,9 +2856,9 @@ lmconf:my_portray(A) :-
         sub_atom(B, 0, D, _, E),
         file_base_name(E, F),
         format('__~w#~w', [F, G]).
-lmconf:my_portray(A) :- atom(A),!,lmconf:write_atom_link(A,A).
-lmconf:my_portray(A) :- \+compound(A),fail.
-%lmconf:my_portray(P):- must_run((return_to_pos(rok_portray_clause(P)),!)).
+baseKB:my_portray(A) :- atom(A),!,baseKB:write_atom_link(A,A).
+baseKB:my_portray(A) :- \+compound(A),fail.
+%baseKB:my_portray(P):- must_run((return_to_pos(rok_portray_clause(P)),!)).
 */
 
 

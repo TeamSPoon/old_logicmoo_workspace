@@ -45,7 +45,7 @@
 
 :- use_module(logicmoo_util_dmsg).
 
-:- prolog_load_context(file,F),call(assert_if_new,lmconf:mpred_is_impl_file(F)).
+:- prolog_load_context(file,F),call(assert_if_new,baseKB:mpred_is_impl_file(F)).
 :- current_prolog_flag(read_attvars,Was)->asserta(restore_attvar_reader(Was));asserta(restore_attvar_reader(false)).
 :- set_prolog_flag(read_attvars,false).
 

@@ -101,7 +101,7 @@
             xlisting_inner/3
           ]).
 :- multifile     
-        lmconf:shared_hide_data/1,
+        baseKB:shared_hide_data/1,
         synth_clause_for/5.
 :- meta_predicate maybe_separate(*,0).
 :- meta_predicate maybe_separate_0(*,0).
@@ -174,7 +174,7 @@
         searchable_of_clause_1/3,
         searchable_terms/1,
         searchable_terms_tl/1,
-        lmconf:shared_hide_data/1,
+        baseKB:shared_hide_data/1,
         sourceTextPredicate/1,
         sourceTextPredicateSource/1,
         synth_clause_for/5,
@@ -198,7 +198,7 @@
 
 :- export(mstatistics/0).
 
-:- prolog_load_context(directory,Dir),asserta(lmconf:mpred_loader_dir(Dir)).
+:- prolog_load_context(directory,Dir),asserta(baseKB:mpred_loader_dir(Dir)).
 
 %= 	 	 
 
@@ -597,7 +597,7 @@ save_search_ref_tl(Ref,Atomic):-nb_setval(Atomic,[Ref]).
 % that is    CL=beliefs(we,loves(joe,turkey)), asserta(C,Ref),forall(find_each_atom(CL,A),(assert_if_new(idexed_atom(A)),asserta(atom_index(A,Ref)))).
 
 
-:- multifile lmconf:shared_hide_data/1.
+:- multifile baseKB:shared_hide_data/1.
 
 
 %= 	 	 
@@ -606,9 +606,9 @@ save_search_ref_tl(Ref,Atomic):-nb_setval(Atomic,[Ref]).
 %
 % Shared Hide Data.
 %
-lmconf:shared_hide_data(lmcache:varname_info/4):- !,listing_filter(hideMeta).
-lmconf:shared_hide_data(lmcache:_):- listing_filter(hideMeta).
-lmconf:shared_hide_data(wid):- listing_filter(hideMeta).
+baseKB:shared_hide_data(lmcache:varname_info/4):- !,listing_filter(hideMeta).
+baseKB:shared_hide_data(lmcache:_):- listing_filter(hideMeta).
+baseKB:shared_hide_data(wid):- listing_filter(hideMeta).
 
 
 %= 	 	 
@@ -630,7 +630,7 @@ hide_data0(P):-var(P),!,fail.
 hide_data0(~(_)):-!,fail.
 hide_data0(hideMeta):-listing_filter(showAll),!,fail.
 hide_data0(P):-t_l:tl_hide_data(P),!.
-hide_data0(P):-lmconf:shared_hide_data(P),!.
+hide_data0(P):-baseKB:shared_hide_data(P),!.
 hide_data0(_/_):-!,fail.
 hide_data0(P):- compound(P),functor(P,F,A), (hide_data0(F/A);hide_data0(F)).
 hide_data0(M:P):- atom(M),(listing_filter(M);hide_data0(P)).
@@ -737,7 +737,7 @@ xlisting0(f(Match)):- !,xlisting_inner(portray_hbr,Match,[_:varname_info(_,_,_,_
 
 xlisting0(Match):- mpred_match_listing_skip_pi(Match,[]),!. % ,w_tl(t_l:no_xlisting(Match),plisting(Match)),!.
 
-% lmconf:xlisting(G):-logicmoo_util_term_listing:xlisting(G).
+% baseKB:xlisting(G):-logicmoo_util_term_listing:xlisting(G).
 % listing with varnames
 :- export(plisting/1).
 :- module_transparent(plisting/1).
@@ -835,7 +835,7 @@ user:prolog_list_goal(Goal):- cnotrace(xlisting(Goal)). % writeq(hello(prolog_li
 % :- dynamic(buggery_ok/0).
 :- export(buggery_ok/0).
 :- thread_local(tlbugger:no_buggery_tl/0).
-:- dynamic(lmconf:no_buggery/0).
+:- dynamic(baseKB:no_buggery/0).
 
 
 %= 	 	 
@@ -844,7 +844,7 @@ user:prolog_list_goal(Goal):- cnotrace(xlisting(Goal)). % writeq(hello(prolog_li
 %
 % Buggery Ok.
 %
-buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,!.
+buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ baseKB:no_buggery, \+ tlbugger:no_buggery_tl,!.
 
 
 :- multifile((synth_clause_for/5)).
@@ -1290,7 +1290,7 @@ portray_hb(H,B):- B==true, !, portray_one_line(H), format('~N').
 portray_hb(H,B):- portray_one_line((H:-B)), format('~N').
 
 :- export(portray_one_line/1).
-:- thread_local(lmconf:portray_one_line_hook/1).
+:- thread_local(baseKB:portray_one_line_hook/1).
 
 
 %= 	 	 
@@ -1300,7 +1300,7 @@ portray_hb(H,B):- portray_one_line((H:-B)), format('~N').
 % Portray One Line.
 %
 portray_one_line(H):- cnotrace((tlbugger:no_slow_io,!, writeq(H),write('.'),nl)),!.
-portray_one_line(H):- lmconf:portray_one_line_hook(H),!.
+portray_one_line(H):- baseKB:portray_one_line_hook(H),!.
 portray_one_line(H):- maybe_separate(H,(format('~N'))),fail.
 portray_one_line(H):- \+ \+ ((logicmoo_varnames:get_clause_vars(H), portray_clause(H))),!.
 portray_one_line(H):- user:portray(H),write('.'),nl,!.
@@ -1419,8 +1419,8 @@ use_listing_vars(TF):-set_prolog_flag(listing_vars,TF).
 
 :- thread_local t_l:in_prolog_locate_clauses/1.
 
-:- multifile(lmconf:hook_mpred_listing/1).
-:- dynamic(lmconf:hook_mpred_listing/1).
+:- multifile(baseKB:hook_mpred_listing/1).
+:- dynamic(baseKB:hook_mpred_listing/1).
 
 % Hook that prints additional information about source code
 :- multifile prolog:locate_clauses/2.
@@ -1439,8 +1439,8 @@ prolog:locate_clauses(A, OutOthers) :-
  (       
    w_tl(t_l:in_prolog_listing(A),
     ( 
-    ignore((predicate_property(lmconf:hook_mpred_listing(A),number_of_clauses(C)),C>0,
-      current_prolog_flag(xlisting,true),doall(call_no_cuts(lmconf:hook_mpred_listing(A))))),    
+    ignore((predicate_property(baseKB:hook_mpred_listing(A),number_of_clauses(C)),C>0,
+      current_prolog_flag(xlisting,true),doall(call_no_cuts(baseKB:hook_mpred_listing(A))))),    
    prolog:locate_clauses(A, OutOthers))))),!.
 
 

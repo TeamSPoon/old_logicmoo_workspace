@@ -151,11 +151,11 @@ wno_tl_e(UHead,Call):- w_tl_e((UHead :- !,fail),Call).
 to_thread_head_1m(_: (TL:Head :- BODY),TL,TL:(TL:Head :- BODY),(TL:Head :- BODY)):- nonvar(TL),
    check_thread_local_1m(TL:Head).
 to_thread_head_1m((H:-B),TL,HO,(HH:-B)):-to_thread_head_1m(H,TL,HO,HH).
-to_thread_head_1m(lmconf:Head,lmconf,lmconf:Head,Head).
+to_thread_head_1m(baseKB:Head,baseKB,baseKB:Head,Head).
 
 to_thread_head_1m(TL:Head,TL,TL:Head,Head):- check_thread_local_1m(TL:Head).
 % to_thread_head_1m(Head,Module,Module:Head,Head):-Head \= (_:_), predicate_module(Head,Module).
-to_thread_head_1m(lmconf:Head,user,lmconf:Head,Head).
+to_thread_head_1m(baseKB:Head,user,baseKB:Head,Head).
 to_thread_head_1m(Head,t_l,t_l:Head,Head):-check_thread_local_1m(t_l:Head).
 to_thread_head_1m(Head,tlbugger,tlbugger:Head,Head):-check_thread_local_1m(tlbugger:Head).
 
@@ -172,6 +172,6 @@ check_thread_local_1m((H:-_)):-!,check_thread_local_1m(H).
 check_thread_local_1m(tlbugger:_):-!.
 check_thread_local_1m(lmcache:_):-!.
 check_thread_local_1m(lmcache:TLHead):- slow_sanity(predicate_property(lmcache:TLHead,(volatile))).
-%check_thread_local_1m(lmconf:_):-!.
+%check_thread_local_1m(baseKB:_):-!.
 check_thread_local_1m(TLHead):- slow_sanity(predicate_property(TLHead,(thread_local))).
 

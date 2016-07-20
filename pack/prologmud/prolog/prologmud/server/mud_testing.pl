@@ -27,13 +27,13 @@
 :- dynamic(lmcache:last_test_name/1).
 
 :- thread_local t_l:was_test_name/1.
-:- multifile(lmconf:mud_regression_test/0).
-:- multifile(lmconf:mud_test_local/0).
-:- multifile(lmconf:mud_test_full/0).
+:- multifile(baseKB:mud_regression_test/0).
+:- multifile(baseKB:mud_test_local/0).
+:- multifile(baseKB:mud_test_full/0).
 
-:- discontiguous(lmconf:mud_regression_test/0).
-:- discontiguous(lmconf:mud_test_local/0).
-:- discontiguous(lmconf:mud_test_full/0).
+:- discontiguous(baseKB:mud_regression_test/0).
+:- discontiguous(baseKB:mud_test_local/0).
+:- discontiguous(baseKB:mud_test_full/0).
 
 :- meta_predicate test_call(+).
 :- meta_predicate run_mud_test(+,+).
@@ -48,7 +48,7 @@
 
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-
-  forall(lmconf:mud_test(Name,Test),run_mud_test(Name,Test)).
+  forall(baseKB:mud_test(Name,Test),run_mud_test(Name,Test)).
 
 action_info(actTests,"run run_mud_tests").
 
@@ -85,7 +85,7 @@ test_false(SomeGoal):- test_true(not(SomeGoal)).
 
 run_mud_test(Filter):-
    doall((
-   member(F/A,[lmconf:mud_test/0,lmconf:mud_test/1,lmconf:mud_test/2]),   
+   member(F/A,[baseKB:mud_test/0,baseKB:mud_test/1,baseKB:mud_test/2]),   
    current_predicate(M:F/A),
    functor(H,F,A),
    not(predicate_property(M:H,imported_from(_))),
@@ -111,7 +111,7 @@ run_mud_test(Name,Test):-
 %:- mpred_trace_exec.
 %:- set_prolog_flag(logicmoo_debug,true).
 
-lmconf:mud_test(test_fwc_1,
+baseKB:mud_test(test_fwc_1,
   (on_x_debug(ain(tAgent(iExplorer1))),
    nop(mpred_fwc(tAgent(iExplorer1))),
    % test_false(mudFacing(iExplorer1,vSouth)),
@@ -120,7 +120,7 @@ lmconf:mud_test(test_fwc_1,
    test_false(mudFacing(iExplorer1,vNorth)),
    test_true(mudFacing(iExplorer1,vSouth)))).
 
-lmconf:mud_test(test_fwc_2,
+baseKB:mud_test(test_fwc_2,
   (ain(tAgent(iExplorer1)),
     mpred_fwc1(tAgent(iExplorer1)),
    mpred_remove(mudFacing(iExplorer1,vSouth)),
@@ -128,7 +128,7 @@ lmconf:mud_test(test_fwc_2,
    test_false(mudFacing(iExplorer1,vSouth)))).
 
 
-lmconf:mud_test(test_movedist,
+baseKB:mud_test(test_movedist,
  (
   foc_current_agent(P),
    test_name("teleport to main enginering"),
@@ -171,56 +171,56 @@ mud_test_level2(drop_take,
 % [Optionaly] Add some game content
 :- if_flag_true(was_runs_tests_pl, declare_load_dbase(logicmoo('rooms/startrek.all.pfc.pl'))).
 
-lmconf:mud_test_local:-
+baseKB:mud_test_local:-
    test_name("tests to see if we have: player1"),
    test_true(show_call(foc_current_agent(_Agent))).
 
-lmconf:mud_test_local:-
+baseKB:mud_test_local:-
    test_name("tests to see if we have: mudAtLoc"),
    test_true((foc_current_agent(Agent),show_call(mudAtLoc(Agent,_Where)))).
 
-lmconf:mud_test_local:- 
+baseKB:mud_test_local:- 
    test_name("tests to see if we have: localityOfObject"),
    test_true((foc_current_agent(Agent),show_call(localityOfObject(Agent,_Where)))).
 
-lmconf:mud_test_local:- 
+baseKB:mud_test_local:- 
    test_name("tests to see if our clothing doesnt: mudAtLoc"),
    test_false(mudAtLoc('iGoldUniform775',_X)).
     
-lmconf:mud_test_local:- 
+baseKB:mud_test_local:- 
    foc_current_agent(Agent),
    test_name("tests to see if we have: argIsas on mudEnergy"),
    test_true(correctArgsIsa(mudEnergy(Agent,_),_)).
 
-lmconf:mud_test_local:- 
+baseKB:mud_test_local:- 
    test_name("tests to see if we have: singleValued on mudMoveDist"),
    foc_current_agent(Agent),
    must(ain(mudMoveDist(Agent,3))),
    test_true(must((findall(X,mudMoveDist(Agent,X),L),length(L,1)))).
 
-lmconf:mud_test_local:- 
+baseKB:mud_test_local:- 
       test_name("nudity test"), 
       foc_current_agent(Agent),
        test_true_req(wearsClothing(Agent, 'ArtifactCol1003-Gold-Uniform775')).
 
-lmconf:mud_test_local:- 
+baseKB:mud_test_local:- 
       test_name("genlInverse test"), 
       foc_current_agent(Agent),
        test_true_req(mudPossess(Agent, 'ArtifactCol1003-Gold-Uniform775')).
 
-lmconf:mud_test_local:- 
+baseKB:mud_test_local:- 
    test_name("Tests our action templates"), doall((get_all_templates(Templates),dmsg(get_all_templates(Templates)))).
 
-lmconf:mud_test_local:-
+baseKB:mud_test_local:-
    test_name("tests to see if 'food' can be an item"),
       test_true(parseIsa(tItem, _, [food], [])).
 
-lmconf:mud_test_local:-req1(cmdShowRoomGrid('Area1000')).
+baseKB:mud_test_local:-req1(cmdShowRoomGrid('Area1000')).
 
 
 % more tests even
-lmconf:mud_test_local :- call_u(do_agent_action("look")).
-lmconf:mud_test_local :- forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
+baseKB:mud_test_local :- call_u(do_agent_action("look")).
+baseKB:mud_test_local :- forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 % ---------------------------------------------------------------------------------------------
 
@@ -243,7 +243,7 @@ check_consistent_0(Type,Scope):- once(tCol(Type)),
 
 hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg(checked_consistent(object_string(_,Obj,0-5,String))).
 % ---------------------------------------------------------------------------------------------
-lmconf:mud_test_local:-
+baseKB:mud_test_local:-
   test_name("Tests our types to populate bad_instance/2 at level 5"),
   retractall(lmcache:is_instance_consistent(_,_)),
   retractall(bad_instance(_,_)),
@@ -251,7 +251,7 @@ lmconf:mud_test_local:-
   listing(bad_instance/2).
 
 
-% lmconf:mud_test("local sanity tests",  do_mud_test_locals).
+% baseKB:mud_test("local sanity tests",  do_mud_test_locals).
 
 % w_tl/2
 
@@ -261,7 +261,7 @@ lmconf:mud_test_local:-
 :- if_flag_true(was_runs_tests_pl, at_start(run_setup)).
 
 % the real tests now (once)
-do_mud_test_locals:- forall(clause(lmconf:mud_test_local,B),must(B)).
+do_mud_test_locals:- forall(clause(baseKB:mud_test_local,B),must(B)).
 :- if_flag_true(was_runs_tests_pl,at_start(must_det(run_mud_tests))).
 
 % the local tests each reload (once)
@@ -273,23 +273,23 @@ do_mud_test_locals:- forall(clause(lmconf:mud_test_local,B),must(B)).
 
 
 % the local tests each reload (once)
-now_run_local_tests_dbg :- doall(lmconf:mud_test_local).
+now_run_local_tests_dbg :- doall(baseKB:mud_test_local).
 
 % nasty way i debug the parser
 % :-repeat, trace, do_agent_action('who'),fail.
-lmconf:mud_test_local :- call_u(do_agent_action('who')).
+baseKB:mud_test_local :- call_u(do_agent_action('who')).
 
-% lmconf:mud_test_local :-do_agent_action("scansrc").
+% baseKB:mud_test_local :-do_agent_action("scansrc").
 
 % more tests even
-lmconf:mud_test_local :- call_u(do_agent_action("look")).
-lmconf:mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
+baseKB:mud_test_local :- call_u(do_agent_action("look")).
+baseKB:mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
    forall(mudAtLoc(O,L),fmt(mudAtLoc(O,L)))).
 
 % the real tests now (once)
-lmconf:mud_test_local :- at_start(must_det(run_mud_tests)).
+baseKB:mud_test_local :- at_start(must_det(run_mud_tests)).
 
 
 % :- forall(clause(mud_regression_test,Call),must(Call)).

@@ -357,7 +357,7 @@ get_where0(F:L):-source_location(file,F),current_input(S),line_position(S,L),!.
 get_where0(F:L):-source_location(F,L),!.
 get_where0(A:0):-current_input(S),stream_property(S,alias(A)),!.
 get_where0(M:0):-source_context_module(M),!.
-get_where0(lmconf:0):-!.
+get_where0(baseKB:0):-!.
 
 
 %= 	 	 
@@ -424,12 +424,12 @@ retract_can_table :- retractall(maybe_table_key(_)).
 
 % = :- meta_predicate(make_key(?,-)).
 
-:- multifile(lmconf:mpred_on_expire_caches/1).
-:- dynamic(lmconf:mpred_on_expire_caches/1).
+:- multifile(baseKB:mpred_on_expire_caches/1).
+:- dynamic(baseKB:mpred_on_expire_caches/1).
 :- module_transparent((ex)/0).
 
-:- dynamic(lmconf:already_added_this_round/1).
-:- export(lmconf:already_added_this_round/1).
+:- dynamic(baseKB:already_added_this_round/1).
+:- export(baseKB:already_added_this_round/1).
 
 %= 	 	 
 
@@ -437,7 +437,7 @@ retract_can_table :- retractall(maybe_table_key(_)).
 %
 % Expire Dont Add.
 %
-expire_dont_add:-retractall(lmconf:already_added_this_round(_)),mpred_expire_caches(all),nop(dmsg(expire_dont_add)).
+expire_dont_add:-retractall(baseKB:already_added_this_round(_)),mpred_expire_caches(all),nop(dmsg(expire_dont_add)).
 
 
 %= 	 	 
@@ -446,7 +446,7 @@ expire_dont_add:-retractall(lmconf:already_added_this_round(_)),mpred_expire_cac
 %
 % Lex.
 %
-lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcache:F/A)),catchv(listing(lmconf:already_added_this_round),_,true).
+lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcache:F/A)),catchv(listing(baseKB:already_added_this_round),_,true).
 
 %= 	 	 
 
@@ -463,10 +463,10 @@ lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcac
 %
 % Managed Predicate Expire Caches.
 %
-mpred_expire_caches(A):-doall(call_no_cuts(must(lmconf:mpred_on_expire_caches(A)))).
+mpred_expire_caches(A):-doall(call_no_cuts(must(baseKB:mpred_on_expire_caches(A)))).
 
-:-multifile(lmconf:mpred_on_expire_caches/1).
-:-asserta((lmconf:mpred_on_expire_caches(A):-expire_tabled_list(A))).
+:-multifile(baseKB:mpred_on_expire_caches/1).
+:-asserta((baseKB:mpred_on_expire_caches(A):-expire_tabled_list(A))).
 
 
 %= 	 	 

@@ -108,7 +108,7 @@
         erase_safe/2,
         current_modules_from/2,
         find_and_call/1,
-        lmconf:first_std_provider/3,
+        baseKB:first_std_provider/3,
         std_provider/3,
         mpred_split_op_data/3,
         retract_eq/1,
@@ -183,6 +183,7 @@
 :- include('logicmoo_util_header.pi').
 :- endif.
 
+baseKB:first_std_provider(_,_,mpred_op_prolog).
 
 :- meta_predicate clause_safe(:, ?).
 :- module_transparent clause_safe/2.
@@ -375,10 +376,10 @@ eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(sys
 
 :-thread_local(t_l:std_provider_asserted/3).
 :-thread_local(t_l:current_std_provider/1).
-:-dynamic(lmconf:first_std_provider/2).
-:-dynamic(lmconf:next_std_provider/2).
-:-multifile(lmconf:first_std_provider/2).
-:-multifile(lmconf:next_std_provider/2).
+:-dynamic(baseKB:first_std_provider/2).
+:-dynamic(baseKB:next_std_provider/2).
+:-multifile(baseKB:first_std_provider/2).
+:-multifile(baseKB:next_std_provider/2).
 
 %= 	 	 
 
@@ -389,9 +390,8 @@ eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(sys
 %
 std_provider(OP,Term,PROVIDER):- t_l:std_provider_asserted(OP,Term,PROVIDER).
 std_provider(_,_,PROVIDER):- t_l:current_std_provider(PROVIDER).
-std_provider(OP,Term,PROVIDER):- lmconf:first_std_provider(OP,Term,PROVIDER).
+std_provider(OP,Term,PROVIDER):- baseKB:first_std_provider(OP,Term,PROVIDER).
 
-lmconf:first_std_provider(_,_,mpred_op_prolog).
 
 :- meta_predicate call_provider(?).
 
@@ -414,7 +414,7 @@ call_provider(OP,Term):- must(std_provider(OP,Term,PROVIDER)),!,call(PROVIDER,OP
 
 call_provider(OP,Term):- must(std_provider(OP,Term,PROVIDER)),!,
    (loop_check_early(call(PROVIDER,OP,Term),fail)*->true;
-   (loop_check_early(must(lmconf:next_std_provider(PROVIDER,NEXT)),NEXT=mpred_op_prolog),!,PROVIDER\=NEXT,call(NEXT,OP,Term))).
+   (loop_check_early(must(baseKB:next_std_provider(PROVIDER,NEXT)),NEXT=mpred_op_prolog),!,PROVIDER\=NEXT,call(NEXT,OP,Term))).
 
 
 

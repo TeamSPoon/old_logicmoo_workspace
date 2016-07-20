@@ -504,7 +504,7 @@ convention_to_symbolic_mt(_Why,mtProlog,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,functorDeclares,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,F,A,abox):- mpred_database_term(F,A,_).
 convention_to_symbolic_mt(_Why,F,_,Mt):-  call_u(predicateConventionMt(F,Mt)),!.
-convention_to_symbolic_mt(_Why,F,A,abox):- lmconf:wrap_shared(F,A,ereq).
+convention_to_symbolic_mt(_Why,F,A,abox):- baseKB:wrap_shared(F,A,ereq).
 % convention_to_symbolic_mt(_Why,_,_,M):- atom(M),!.
 
 full_transform(Why,MH,MHH):-
@@ -573,7 +573,7 @@ clause_u(MH,B,R):- Why = clause(clause,clause_u),
 
 %% clause_u( +VALUE1, ?H, ?B, ?Proof) is semidet.
 %
-% Hook To [lmconf:clause_u/4] For Module Mpred_pfc.
+% Hook To [baseKB:clause_u/4] For Module Mpred_pfc.
 % PFC Provide Storage Clauses.
 %
 %clause_u(pfc,H,B,Proof):-clause_u(H,B,Proof).
@@ -796,10 +796,10 @@ ain_fast(P,S):-
   mpred_run.
 
 
-:- dynamic(lmconf:eachRulePreconditional/1).
-lmconf:eachRulePreconditional(true).
-:- dynamic(lmconf:eachFactPreconditional/1).
-lmconf:eachFactPreconditional(true).
+:- dynamic(baseKB:eachRulePreconditional/1).
+baseKB:eachRulePreconditional(true).
+:- dynamic(baseKB:eachFactPreconditional/1).
+baseKB:eachFactPreconditional(true).
 
 add_eachRulePreconditional(A,A):-var(A),!.
 add_eachRulePreconditional(B::::A,B::::AA):-add_eachRulePreconditional(A,AA).
@@ -808,11 +808,11 @@ add_eachRulePreconditional(A<==>B, ('==>'(AA , B) , (BB ==> A)) ):-!,add_eachRul
 add_eachRulePreconditional((B <- A), (B <- AA)) :-!,add_eachRulePreconditional_now(A,AA).
 add_eachRulePreconditional(A,AA):-add_eachFactPreconditional_now(A,AA).
 
-add_eachFactPreconditional_now(A,A):- lmconf:eachFactPreconditional(true),!.
-add_eachFactPreconditional_now(A,(Was==>A)):- lmconf:eachFactPreconditional(Was),!.
+add_eachFactPreconditional_now(A,A):- baseKB:eachFactPreconditional(true),!.
+add_eachFactPreconditional_now(A,(Was==>A)):- baseKB:eachFactPreconditional(Was),!.
 
-add_eachRulePreconditional_now(A,A):- lmconf:eachRulePreconditional(true),!.
-add_eachRulePreconditional_now(A,(Was,A)):- lmconf:eachRulePreconditional(Was),!.
+add_eachRulePreconditional_now(A,A):- baseKB:eachRulePreconditional(true),!.
+add_eachRulePreconditional_now(A,(Was,A)):- baseKB:eachRulePreconditional(Was),!.
 
 
 
@@ -2317,7 +2317,7 @@ really_mpred_mark(_  ,Type,F,A):- mpred_call_no_bc(mpred_mark(Type,F,A)),!.
 really_mpred_mark(Sup,Type,F,A):- 
   MARK = mpred_mark(Type,F,A),
   check_never_assert(MARK),
-  with_no_mpred_trace_exec(with_fc_mode(direct,mpred_post(MARK,(s(Sup),ax)))).
+  with_no_mpred_trace_exec(with_fc_mode(direct,mpred_ain(MARK,(s(Sup),ax)))).
   % with_no_mpred_trace_exec(with_fc_mode(direct,mpred_fwc1(MARK,(s(Sup),ax)))),!.
    
 
@@ -2458,8 +2458,13 @@ clause_asserted_u((MH:-B)):- must(nonvar(MH)), !, must(mnotrace(fix_mp(clause(cl
 clause_asserted_u(MH):- current_prolog_flag(unsafe_speedups,true), !,clause_asserted_ii(MH).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_ii(M:H).
 
-clause_asserted_ii(H,B):-clause(H,B,R),clause(HH,BB,R),HH:BB=@=H:B,!.
-clause_asserted_ii(H):-clause(H,true,R),clause(HH,true,R),HH=@=H,!.
+clause_asserted_ii(H,B):- HB=(H:-B),copy_term(HB,HHBB),clause(H,B),variant(HHBB,HB),!.
+clause_asserted_ii(H):-copy_term(H,HH),clause(H,true),variant(HH,H),!.
+
+variant_m(_:H,_:HH):-!,H=@=HH.
+variant_m(H,_:HH):-!,H=@=HH.
+variant_m(_:H,HH):-!,H=@=HH.
+variant_m(H,HH):-!,H=@=HH.
 
 variant_u(HeadC,Head_copy):-variant_i(HeadC,Head_copy).
 

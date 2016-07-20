@@ -202,7 +202,7 @@
             writeOverwritten/0,
             writeSTDERR0/1,
             writeSavedPrompt/0,
-     op(1150,fx,(lmconf:shared_multifile))
+     op(1150,fx,(baseKB:shared_multifile))
 
           ]).
 :- meta_predicate with_skip_bugger(0).
@@ -428,7 +428,7 @@
 
 
 :- 
-      op(1150,fx,(lmconf:shared_multifile)),
+      op(1150,fx,(baseKB:shared_multifile)),
       op(1150,fx,meta_predicate),
       op(1150,fx,thread_local).
 
@@ -1694,8 +1694,8 @@ do_gc0:- set_prolog_flag(gc,true), do_gc1, set_prolog_flag(gc,false).
 do_gc1:- cnotrace((garbage_collect, cleanup_strings /*garbage_collect_clauses*/ /*, statistics*/
                     )).
 
-:- multifile(lmconf:is_prolog_stream/1).
-:- dynamic(lmconf:is_prolog_stream/1).
+:- multifile(baseKB:is_prolog_stream/1).
+:- dynamic(baseKB:is_prolog_stream/1).
 
 
 %= 	 	 
@@ -1712,7 +1712,7 @@ fresh_line:-current_output(Strm),fresh_line(Strm),!.
 %
 % Fresh Line.
 %
-fresh_line(Strm):-lmconf:is_prolog_stream(Strm),on_x_fail(format(Strm,'~n',[])),!.
+fresh_line(Strm):-baseKB:is_prolog_stream(Strm),on_x_fail(format(Strm,'~n',[])),!.
 fresh_line(Strm):-on_x_fail(format(Strm,'~N',[])),!.
 fresh_line(Strm):-on_x_fail((stream_property(Strm,position('$stream_position'(_,_,POS,_))),(POS>0->nl(Strm);true))),!.
 fresh_line(Strm):-on_x_fail(nl(Strm)),!.
@@ -2704,7 +2704,7 @@ test_tl(C):-functor(C,F,A),test_tl(C,F,A).
 %
 % Test Thread Local.
 %
-test_tl(C,F,A):-current_predicate(lmconf:F/A),call(lmconf:C).
+test_tl(C,F,A):-current_predicate(baseKB:F/A),call(baseKB:C).
 test_tl(C,F,A):-current_predicate(t_l:F/A),call(t_l:C).
 test_tl(C,F,A):-current_predicate(t_l_global:F/A),call(t_l_global:C).
 
@@ -2925,7 +2925,7 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 
 % :-disabled_this.
 
-:- dynamic(lmconf:no_buggery/0).
+:- dynamic(baseKB:no_buggery/0).
 % show the warnings origins
 :- multifile(user:message_hook/3). 
 :- dynamic(user:message_hook/3).
@@ -2950,7 +2950,7 @@ user:message_hook(Term, Kind, Lines):-
  catch(((
  (Kind= warning;Kind= error), 
  Term\=syntax_error(_), 
- backtrace(40), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,
+ backtrace(40), \+ baseKB:no_buggery, \+ tlbugger:no_buggery_tl,
   dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(10)),dmsg(message_hook(Term, Kind, Lines)),
    !,fail,
    (sleep(1.0),read_pending_codes(user_input, Chars, []), format(error_error, '~s', [Chars]),flush_output(error_error),!,Chars=[C],

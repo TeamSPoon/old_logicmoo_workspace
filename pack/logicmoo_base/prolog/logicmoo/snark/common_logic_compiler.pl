@@ -159,18 +159,18 @@
             op(1150,fx,(was_export)),
             op(1150,fx,(shared_multifile)).
 
-:-ain(baseKB:predicateConventionMt(mud_test,lmconf)).
+:-ain(baseKB:predicateConventionMt(mud_test,baseKB)).
 
 
 
 :- multifile((        
-        lmconf:feature_test/0,
-        lmconf:regression_test/0,
-        lmconf:sanity_test/0)).
+        baseKB:feature_test/0,
+        baseKB:regression_test/0,
+        baseKB:sanity_test/0)).
 :- dynamic((        
-        lmconf:feature_test/0,
-        lmconf:regression_test/0,
-        lmconf:sanity_test/0)).
+        baseKB:feature_test/0,
+        baseKB:regression_test/0,
+        baseKB:sanity_test/0)).
 
 :- include('../mpred/mpred_header.pi').
 % % :- '$set_source_module'(common_logic_compiler).
@@ -241,9 +241,9 @@
 % - room(R):- - has(R,_).
 
 :- %(current_prolog_flag(argv,[pl|_]) -> )
-     %op(400, fy, lmconf:(nesc) ),	% Necessity, Always
-     %op(400, fy, lmconf:(poss) ),	% Possibly, Eventually
-     op(400, fy, lmconf:(cir) ),	% Next time
+     %op(400, fy, baseKB:(nesc) ),	% Necessity, Always
+     %op(400, fy, baseKB:(poss) ),	% Possibly, Eventually
+     op(400, fy, baseKB:(cir) ),	% Next time
      op(1075,xfx,user:'<-'),
   
   
@@ -1455,7 +1455,7 @@ make_1_cl(Extras,One,Conj,cl([One],NewBodyListO)):-
   delete_eq(Conj,One,Rest0),delete_eq(Rest0,NHead,Rest),
   must_maplist(negate_one_maybe(Extras),Rest,NewBodyList),!,
   flattenConjs(Extras,NewBodyList,NewBodyListM),
-  Pred= lmconf:as_prolog_hook, must_maplist(Pred,NewBodyListM,NewBodyListO).
+  Pred= baseKB:as_prolog_hook, must_maplist(Pred,NewBodyListM,NewBodyListO).
 
 
 %= 	 	 
@@ -1952,7 +1952,7 @@ cf_to_flattened_clauses_0(KB,Why,NCFsI,FlattenedO):-
    % wdmsgl(cf(NCFs)),
    must_maplist(clauses_to_boxlog(KB,Why),NCFs,ListOfLists),
    flatten([ListOfLists],Flattened),
-   lmconf:as_prolog_hook(Flattened,FlattenedL),
+   baseKB:as_prolog_hook(Flattened,FlattenedL),
    list_to_set(FlattenedL,FlattenedS),
    must_maplist(demodal_sents(KB),FlattenedS,FlattenedO))),!.
   

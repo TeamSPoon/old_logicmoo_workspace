@@ -46,7 +46,7 @@ checkKB:m1:- gripe_time(40,ensure_loaded(baseKB:logicmoo(mpred_online/mpred_www)
 % :- set_prolog_flag(verbose_autoload,false).
 % :- set_prolog_flag(verbose_load,true).
 % m9   :-asserta_if_new((user:term_expansion(I,O):- lmbase_expansion(term,user,I,O))).
-%m31 :-   (F = mpred/_),foreach(must(lmconf:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
+%m31 :-   (F = mpred/_),foreach(must(baseKB:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
 %m32:- rtrace(ensure_mpred_system).
 % m33:- must(filematch_ext(['',mpred,ocl,moo,plmoo,pl,plt,pro,p,'pl.in',pfc,pfct],logicmoo_user:pfc/mpred,W)),dmsg(W),!.
 
@@ -82,9 +82,9 @@ mpred_load_restore_file(File):-
   time_file(File,Time),
   qcompile(File),
   ensure_loaded(File),
-   ((\+ (lmconf:loaded_file_world_time(N,_,NewTime),NewTime>=Time)) ->true ;
+   ((\+ (baseKB:loaded_file_world_time(N,_,NewTime),NewTime>=Time)) ->true ;
     (
-    ignore((lmconf:loaded_file_world_time(N,_,NewTime),NewTime>Time,with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N)),fail)),
+    ignore((baseKB:loaded_file_world_time(N,_,NewTime),NewTime>Time,with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N)),fail)),
     mpred_save_restore_file('some_test.pl~'))))),!.
 
 mpred_save_resore_predicate(M:H,AFN):-
@@ -112,9 +112,9 @@ mpred_save_restore_file(File):-
     mpred_save_resore_predicate(baseKB:H,AFN),
    flush_output,
    fail)),!,
-      format('~N:- ~q.~n',['$set_source_module'(lmconf)]),
+      format('~N:- ~q.~n',['$set_source_module'(baseKB)]),
       format('~N:- style_check(-singleton).~n'),
-      listing(lmconf:loaded_file_world_time/3),
+      listing(baseKB:loaded_file_world_time/3),
       flush_output,
    told)),!.
   
