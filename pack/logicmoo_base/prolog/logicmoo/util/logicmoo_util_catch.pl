@@ -1482,9 +1482,9 @@ is_recompile:-fail.
 %
 % Optional Sanity Checking.
 %
-sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
-sanity(Goal):- current_prolog_flag(unsafe_speedups,true), \+ tracing,!, (1 is random(10)-> must(Goal) ; true).
-sanity(_):- notrace((is_release, \+ is_recompile)),!.
+
+sanity(Goal):- \+ current_prolog_flag(logicmoo_debug,true), current_prolog_flag(unsafe_speedups,true), \+ tracing,!, (1 is random(10)-> must(Goal) ; true).
+sanity(_):- \+ current_prolog_flag(logicmoo_debug,true), notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
 sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).

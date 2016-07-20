@@ -1,4 +1,4 @@
-:-module(mud_testing,[]).
+%:-module(mud_testing,[]).
 /* *
  <module> 
 % A MUD testing API is defined here
@@ -234,7 +234,7 @@ baseKB:mud_test_local :- forall(localityOfObject(O,L),dmsg(localityOfObject(O,L)
 
 check_consistent(Obj,Scope):-var(Scope),!,check_consistent(Obj,0).
 check_consistent(Obj,Scope):-call(call,lmcache:is_instance_consistent(Obj,Was)),!,Was>=Scope.
-check_consistent(Obj,_):- t_l:is_checking_instance(Obj),!.
+check_consistent(Obj,_):- call(call,t_l:is_checking_instance(Obj)),!.
 check_consistent(Obj,Scope):- w_tl(t_l:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
 check_consistent_0(Obj,Scope):- once((catch((doall(((clause(hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(lmcache:is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
 check_consistent_0(Type,Scope):- once(tCol(Type)),

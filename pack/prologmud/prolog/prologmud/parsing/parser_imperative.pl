@@ -607,29 +607,37 @@ parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String
 parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
-coerce_hook(A,B,C):-no_repeats(coerce0(A,B,C)),(show_failure(isa(C,B))->!;true).
+
+coerce_hook(A,B,C):- to_arg_value(A,AStr)->isa(AStr,B)->A=C.
+coerce_hook(AStr,B,C):- catch(text_to_string(AStr,A),_,fail), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(isa(C,B))->!;true).
 
 coerce0(String,Type,Inst):- var(Type),!,trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
+coerce0([String],Type,Inst):- !, coerce(String,Type,Inst).
+coerce0(_,tObj,iCommBadge774):- dtrace,!,fail.
 coerce0(String,Type,Inst):- \+ string(String),!,text_to_string(String,StringS),!,coerce(StringS,Type,Inst).
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(impl_coerce_hook(Text,Type,Inst)))).
 
-coerce0([String],Type,Inst):- coerce0(String,Type,Inst).
-coerce0(String,isNot(Type),Inst):-!, \+ (coerce0(String,Type,Inst)).
+coerce0(String,isNot(Type),Inst):-!, sanity(nonvar(Type)), \+ (coerce(String,Type,Inst)).
+coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,Inst),!.
+
 coerce0(isRandom(WhatNot),Type,Inst):- !, must((nonvar(WhatNot),to_arg_value(WhatNot,TypeR),random_instance(TypeR,Inst,isa(Inst,Type)))).
-coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),is_asserted(tCol(Inst)),!.
+coerce0(String,Type,Inst):- Type==tCol, i_name('t',String,Inst),is_asserted(tCol(Inst)),!.
 coerce0(String,Type,Inst):- ttExpressionType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
 %coerce0(String,Type,Longest) :- findall(Inst, (impl_coerce_hook(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,Inst),!.
 coerce0(String,C,Inst):- compound(C),!,loop_check(parseIsa(C,Inst,[String],[])).
-coerce0(String,Type,Inst):-  \+ (ttExpressionType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+coerce0(String,Type,Inst):- must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+
 % coerce0(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
+
+
 
 instances_of_type(Inst,Type):- no_repeats_old(instances_of_type_0(Inst,Type)).
 
 available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), isa(Obj,Type), mudDistance(Agent,Obj,D),D<6.
 
-instances_of_type_0(Inst,Type):- instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
+% test_with ?- coerce(s,vtDirection,O).
+%TODO add back if usefull instances_of_type_0(Inst,Type):- \+ current_prolog_flag(unsafe_speedups,true), instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
 % should never need this but .. instances_of_type_0(Inst,Type):- genls(SubType,Type),isa(Inst,SubType).
 instances_of_type_0(Inst,Type):- isa(Inst,Type).
 

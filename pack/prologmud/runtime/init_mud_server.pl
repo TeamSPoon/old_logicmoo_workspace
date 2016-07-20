@@ -18,6 +18,7 @@
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
 :- set_prolog_flag(generate_debug_info,true).
 */
+:- profile(true).
 
 %:- system:ensure_loaded(setup_paths).
 %:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
@@ -101,7 +102,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- forall(debugging(X),nodebug(X)).
 :- system:ensure_loaded(logicmoo_repl).
 :- forall(debugging(X),nodebug(X)).
-%:- set_prolog_flag(logicmoo_debug,true).
+:- set_prolog_flag(logicmoo_debug,true).
 %:- set_prolog_flag(unsafe_speedups,false).
 
 :-assert_isa(iRR7,tRR).
@@ -287,7 +288,7 @@ lar:- login_and_run.
 :- set_prolog_flag(unsafe_speedups,true).
 % isa(starTrek,mtCycL).
 % :- starTrek:force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
-% :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
+lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 :- must_det(argIsa(genlPreds,2,_)).
 
@@ -300,8 +301,17 @@ lar:- login_and_run.
 :- assert_setting01(baseKB:eachFactPreconditional(true)).
 :- ain(isRuntime).
 
-:- set_prolog_flag(unsafe_speedups,false).
+:- set_prolog_flag(unsafe_speedups,true).
 % :- initialization(lar).
+
+% test_with ?- gripe_time(3.0,coerce(s,vtDirection,_)).
+
+:- gripe_time(3.0,coerce(s,vtDirection,_)).
+
+:- gripe_time(3.0,coerce(l,vtDirection,_)).
+
+:- break.
+
 :- initialization(lar,restore).
 
 end_of_file.

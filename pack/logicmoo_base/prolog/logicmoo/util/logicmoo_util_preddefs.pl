@@ -124,6 +124,7 @@
 % Call Using Source Module.
 %
 :- meta_predicate with_source_module(+,0).
+with_source_module(OldSModule, Goal ):- '$current_source_module'(OldSModule),!,OldSModule:Goal.
 with_source_module(NewModule,Goal):-  
    '$current_source_module'(OldModule),
     NewModule:setup_call_cleanup_each(
@@ -137,8 +138,9 @@ with_source_module(NewModule,Goal):-
 %
 :- meta_predicate call_from_module(+,+).
 
-call_from_module(NewModule,Goal):- sanity((atom(NewModule),nonvar(Goal))),fail.
-call_from_module(NewModule,( H:-B ) ):- !, sanity(nonvar(H)),call_from_module(NewModule, clause_asserted_call(H,B) ).
+call_from_module(NewModule,( H:-B ) ):- !, must(nonvar(H)),call_from_module(NewModule, clause_asserted_call(H,B) ).
+call_from_module(OldSModule, Goal ):- '$current_source_module'(OldSModule),!,OldSModule:Goal.
+% call_from_module(NewModule,Goal):- sanity((atom(NewModule),nonvar(Goal))),fail.
 call_from_module(NewModule,Goal):-
    '$current_typein_module'(OldModule),
    '$current_source_module'(OldSModule),

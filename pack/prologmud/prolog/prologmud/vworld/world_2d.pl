@@ -355,12 +355,6 @@ create_random_fact(t(Other,Obj,Default)) :- nonvar(Obj),argIsa(Other,2,Type),ran
 hooked_random_instance(vtDirection,Dir,Test) :- my_random_member(Dir,[vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW]),Test,!.
 hooked_random_instance(ftInt,3,Test):-call(Test),dmsg(random_instance(ftInt,3,Test)),dmsg(hooked_random_instance(ftInt,3,Test)),!,fail.
 
-%  give required forward deductions
-deduce_facts(mudAtLoc(Obj,LOC),localityOfObject(Obj,Region)):- nonvar(LOC),locationToRegion(LOC,Region).
-deduce_facts(localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)):- tRegion(Region),not_asserted((mudAtLoc(Obj,_))), nonvar(Obj),
-  show_call(put_in_world(Obj)),
-  must_det(mudAtLoc(Obj,LOC)).
-
 
 random_region(LOC):- var(LOC),findall(O,isa(O,tRegion),LOCS),my_random_member(LOC,LOCS).
 
@@ -368,7 +362,7 @@ random_region(LOC):- var(LOC),findall(O,isa(O,tRegion),LOCS),my_random_member(LO
 random_xyzFn(LOC):-
    must_det(random_instance(tRegion,Region,true)),
    in_grid_rnd(Region,LOC),!.
-random_xyzFn(xyzFn('Area1000',1,1,1)):-  dmsg(trace_or_throw(mpred_not_loaded)).
+random_xyzFn(xyzFn('Area1000',1,1,1)):- fail, dmsg(trace_or_throw(mpred_not_loaded)).
 
 unoccupied(_,Loc):- not_asserted((mudAtLoc(_,Loc))),!.
 unoccupied(_,_):-!.

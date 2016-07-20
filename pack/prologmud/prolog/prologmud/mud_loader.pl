@@ -148,10 +148,13 @@ parser_chat80_module(moo).
 
 :-export(prolog_repl/0).
 prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to resume to the mud!"),nl,
-  must(lmcache:main_thread_error_stream(O0)),
-  set_prolog_IO(current_input,O0,O0),
-  must(get_thread_current_error(O)),
-  with_ioe((set_prolog_IO(current_input,O,O),call_u(break))))).
+  current_input(In),
+  current_output(Out),
+  current_error(Err),
+  /*must(lmcache:main_thread_error_stream(Err)),*/
+  set_prolog_IO(In,Out,Err),
+  % must(get_thread_current_error(O)),
+  with_ioe(call_u(break)))).
 
 %:- set_prolog_flag(gui,false).
 %:- set_prolog_flag(history,1000).
