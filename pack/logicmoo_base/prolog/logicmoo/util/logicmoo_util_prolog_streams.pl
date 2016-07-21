@@ -6,6 +6,7 @@
             with_output_to_pred/2,
             with_write_stream_pred/4,
             set_error_stream/1,
+            set_o_stream/1,
             with_ioe/1,
             on_x_fail_priv/1,
             current_error/1
@@ -93,7 +94,7 @@ on_x_fail_priv(Goal):- catch(Goal,_,fail).
 %
 with_ioe(CMD):-
  with_dmsg_to_main((
-  current_input(IN),current_output(OUT),get_thread_current_error(Err),  
+  current_input(IN),current_output(OUT),current_error(Err),  
   setup_call_cleanup(set_prolog_IO(IN,OUT,Err),
     call(CMD),
     (set_input(IN),set_output(OUT),set_error_stream(Err))))).
@@ -120,7 +121,7 @@ set_error_stream(Err):- current_input(In),current_output(Out),
 
 
 set_o_stream(Out):- current_input(In),current_error(Err),
-      plz_set_stream(Out,alias(user_output)),
+      % plz_set_stream(Out,alias(user_output)),
       plz_set_stream(Out,alias(current_output)),
       set_prolog_IO(In,Out,Err).
 

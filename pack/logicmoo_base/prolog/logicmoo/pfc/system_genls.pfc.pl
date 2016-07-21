@@ -44,8 +44,12 @@ nearestGenls(C1,C2)==>
 %(isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, 
 %  \+ ~(completelyAssertedCollection(Super))) ==> ({dif(Sub, Super)}, isa(I,Super)).
 
+(completelyAssertedCollection(C2),genls(C1,C2))==>
+ ({get_functor(C1,F1),get_functor(C2,F2),
+   P1 =.. [F1,X],
+    P2 =.. [F2,X]},(P1==>P2)).
 
-(genls(C1,C2)==>
+(genls(C1,C2)/( \+ completelyAssertedCollection(C2))==>
  ({get_functor(C1,F1),get_functor(C2,F2),
    P1 =.. [F1,X],
     P2 =.. [F2,X],

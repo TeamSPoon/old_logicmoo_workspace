@@ -72,7 +72,8 @@ genls(Sub, _Super) ==> tCol(Sub).
 (isa(F,tPred),arity(F,A),{once((tinyAssertion0(DB,MT,STR),arg(1,DB,F),atom(F)))})==>tinyInstallToAssertedEL(F,A).
 */
 
-argQuotedIsa(sentenceTruth,1,'CycLSentence-Assertible').
+% argQuotedIsa(sentenceTruth,1,'CycLSentence-Assertible').
+argQuotedIsa(sentenceTruth,1,'ftAssertible').
 :- ain(((collectionExpansion(COL,RULE),isa(PRED,COL),{subst(RULE,':ARG1',PRED,NEWRULE)}) ==> trueSentence(NEWRULE))).
 :- ain(((expansion(F,RULE),arity(F,A),{make_kw_functor(F,A,CYCL),kw_to_vars((CYCL<==>RULE),NEWRULE)}) ==> trueSentence(NEWRULE))).
 

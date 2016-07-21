@@ -3,8 +3,8 @@
 	Version="10.0"
 	VendorName="SlickEdit"
 	WorkingDir="."
-	BuildSystem="vsbuild"
-	BuildMakeFile="">
+	BuildSystem="automakefile"
+	BuildMakeFile="Makefile.mk">
 	<Config
 		Name="Release"
 		OutputFile=""
@@ -19,7 +19,7 @@
 				ClearProcessBuffer="1"
 				Verbose="1"
 				Beep="1">
-				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" build "%w" "%r"'/>
+				<Exec CmdLine='make -f "Makefile.mk" CFG=%b'/>
 			</Target>
 		</Menu>
 		<PreBuildCommands StopOnError="1"/>
@@ -41,34 +41,56 @@
 			<F N="../../StartMUDServer.bat"/>
 			<F N="../../startMUDServer.sh"/>
 		</Folder>
-		<Folder Name="../games">
+		<Folder Name="../../games">
 			<F
-				N="../games/*.*"
+				N="../../games/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
-		</Folder>
-		<Folder Name="../jllykifsh">
-			<Folder Name="prolog">
-				<F N="../jllykifsh/prolog/script_ontology.pfc.pl"/>
-			</Folder>
-			<F
-				N="../jllykifsh/*.*"
-				Recurse="1"
-				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/;.svn/"/>
-			<F N="../jllykifsh/pack.pl"/>
+				Excludes=""/>
 		</Folder>
 		<Folder Name="../logicmoo_base">
+			<Folder Name="prolog">
+				<Folder Name="logicmoo">
+					<Folder Name="mpred">
+						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_builtin.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_coroutining.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_header.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_listing.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_loader.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_pfc.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_store.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_term_expansion.pl"/>
+					</Folder>
+					<Folder Name="mpred_online">
+						<F N="../logicmoo_base/prolog/logicmoo/mpred_online/logicmoo_i_www.pl"/>
+					</Folder>
+					<Folder Name="util">
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_all.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_bb_env.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_bugger.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_bugger_listing.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_filestreams.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_library.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_strings.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_structs.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/rec_lambda.pl"/>
+					</Folder>
+					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_base.pl"/>
+					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_engine.pl"/>
+					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_run_clio.pl"/>
+					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_run_swish.pl"/>
+				</Folder>
+			</Folder>
 			<F
 				N="../logicmoo_base/*.*"
 				Recurse="1"
-				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/;*.html;*.unused;*.bak"/>
+				Refilter="0"
+				Excludes=".git/;*.*~;*~/;.*/"/>
 		</Folder>
 		<Folder Name="../logicmoo_nlu">
 			<Folder Name="prolog">
 				<F N="../logicmoo_nlu/prolog/parser_all.pl"/>
 			</Folder>
-			<F N="../logicmoo_nlu/sublUtils.lisp"/>
 		</Folder>
 		<Folder Name="../MUD_ircbot">
 			<Folder Name="prolog">
@@ -80,31 +102,20 @@
 				N="prolog/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
-		</Folder>
-		<Folder Name="../prologmud">
-			<Folder Name="games">
-				<F
-					N="../prologmud/games/*.*"
-					Recurse="1"
-					Refilter="0"
-					Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
-			</Folder>
+				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="runtime">
 			<F
 				N="runtime/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes=".git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
-			<F N="runtime/README.md"/>
+				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
-		<Folder Name="t">
-			<F
-				N="t/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes="git/;*.*~;*.bak;*.prc;*.pd*;*~/"/>
+		<Folder Name="../../runtime">
+			<F N="../../runtime/run_mud_server.pl"/>
 		</Folder>
+		<F
+			N="Makefile.mk"
+			Type="Makefile"/>
 	</Files>
 </Project>

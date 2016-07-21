@@ -864,7 +864,8 @@ eraseall(Key) :-
 
 
 dmsg(Term):-dmsg(debug,Term).
-dmsg(Color,Term):-   tell(user),fresh_line, sformat(S,Term,[],[]),print_message_lines(user_output,kind(Color),[S-[]]),fresh_line,told,!.
+dmsg(Color,Term):-   current_error(Err),fresh_line(Err), sformat(S,Term,[],[]),
+    print_message_lines(Err,kind(Color),[S-[]]),fresh_line(Err),!.
 /*
 dmsg(Color,Term):- current_prolog_flag(tty_control, true),!,  tell(user),fresh_line,to_petty_color(Color,Type),
    call_cleanup(((sformat(S,Term,[],[]),print_message(Type,if_tty([S-[]])))),told).

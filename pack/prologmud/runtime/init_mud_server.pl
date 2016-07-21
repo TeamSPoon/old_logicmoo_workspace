@@ -64,6 +64,9 @@
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
 
+:- system:ensure_loaded(setup_paths).
+
+
 :- system:ensure_loaded(library(prolog_server)).
 :- prolog_server(4001, [allow(_)]).
 :- system:ensure_loaded(library(logicmoo_utils)).
@@ -105,10 +108,12 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- set_prolog_flag(logicmoo_debug,true).
 %:- set_prolog_flag(unsafe_speedups,false).
 
-:-assert_isa(iRR7,tRR).
-:-ain(genls(tRR,tRRP)).
-:-must( isa(iRR7,tRRP) ).
-:-must( tRRP(iRR7) ).
+:-baseKB:assert_isa(iRR7,tRR).
+:-baseKB:ain(genls(tRR,tRRP)).
+:-must( baseKB:isa(iRR7,tRRP) ).
+:-must( baseKB:tRRP(iRR7) ).
+
+
 :-kb_dynamic(baseKB:sanity_test/0).
 :-kb_dynamic(baseKB:regression_test/0).
 :-kb_dynamic(baseKB:feature_test/0).
@@ -121,6 +126,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
         action_info/2,
         type_action_info/3)).
 
+:- statistics.
 
 %:- ensure_webserver(3020).
 :- initialization(ensure_webserver(3020)).

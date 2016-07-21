@@ -14,6 +14,7 @@
          start_mud_telnet/1,
          run_session/0,
          run_session/2,
+         correct_o_stream/0,
          login_and_run/0,
          login_and_run/2,
          session_loop/2,
@@ -208,9 +209,9 @@ enqueue_session_action(A,L,S):- show_call(must(find_and_call(enqueue_agent_actio
 set_tty_control(TF):- 
   ignore((logOnFailure((
    set_prolog_flag(color_term,TF),
-   set_stream(user_output, tty(TF)),
-   set_stream(user_error, tty(TF)),
-   set_stream(user_input, tty(TF)),
+   set_stream(current_output, tty(TF)),
+   set_stream(current_error, tty(TF)),
+   set_stream(current_input, tty(TF)),
    set_prolog_flag(tty_control, TF))))),!.
 
 fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).
@@ -550,9 +551,12 @@ strm_info(Out,Name,Strm):-nl,write(Out,Name = Strm),forall(stream_property(Strm,
 setup_streams(In, Out):-
       Err=Out,
       set_prolog_IO(In, Out, Err),
+      set_stream(In,  alias(current_input)),
+      set_stream(Out, alias(current_output)),
+      set_stream(Err, alias(current_error)),
       set_stream(In, close_on_abort(false)),
       set_stream(Out, close_on_abort(false)),!.
-
+/*
 setup_streams_pt2(In, Out):-
       set_stream(In,  alias(user_input)),
       set_stream(Out, alias(user_output)),
@@ -571,7 +575,8 @@ setup_streams_pt3(In, Out):-
       set_stream_ice(In, user_input, newline(detect)),
       set_stream_ice(Out, user_output, newline(dos)),
       set_stream_ice(Err, user_error, newline(dos)),!.
-  
+*/
+
 set_stream_ice(Stream, Alias, NV):- catch(set_stream(Alias,NV),_,catch(set_stream(Stream,NV),E,nop(dmsg(E)))).
 
 service_client(Slave, In, Out, Host, Peer, Options) :-
@@ -600,6 +605,9 @@ get_call_pred(Call, Options) :-
 	    !
 	;   Call = prolog
 	).
+
+
+correct_o_stream:-current_error(E),set_o_stream(E).
 
 on_telnet_restore :- 
       % add_import_module(mud_telnet,baseKB,end),

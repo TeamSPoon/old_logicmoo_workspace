@@ -734,7 +734,7 @@ writeFmtFlushed(X,Y,Z):-catch((format(X,Y,Z),flush_output_safe(X)),_,true).
 writeFmtFlushed(X,Y):-catch((format(X,Y),flush_output),_,true).
 writeFmtFlushed(X):- once((atom(X) -> catch((format(X,[]),flush_output),_,true) ; writeFmtFlushed('~q~n',[X]))).
 
-writel(Lisp):-writel(user_output,Lisp).
+writel(Lisp):-writel(current_output,Lisp).
 
 writel(OutStream,Send):-     
       writel(OutStream,Send,_Vars).

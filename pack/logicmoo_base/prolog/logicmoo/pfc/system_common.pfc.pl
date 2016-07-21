@@ -150,6 +150,7 @@ tCol(completelyAssertedCollection).
 
 (ttExpressionType(P) ==> ( ~ tSet(P), tCol(P))).
 
+tSet(C)==>completelyAssertedCollection(C).
 
 %= 	 	 
 
@@ -615,8 +616,10 @@ isa('CycLTerm',ttNonGenled).
  ttFormatType | tCol
 */
 
-isa(I,C):- cwc, is_ftNonvar(C),ttExpressionType(C),!,quotedIsa(I,C).
-isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),current_predicate(C,CI),call_u(CI).
+% isa(I,C):- cwc, is_ftNonvar(C),ttExpressionType(C),!,quotedIsa(I,C).
+%isa(I,C):- cwc, tCol(C),(ttExpressionType(C)*->quotedIsa(I,C)).
+%isa(I,C):- cwc, tSet(C),(ttExpressionType(C)*->quotedIsa(I,C)).
+%isa(I,C):- cwc, tCol(C), mpred_univ(C,I,CI),call_u(CI).
 isa(I,C):- cwc, isa_backchaing(I,C).
 
 quotedIsa(I,C):- cwc, term_is_ft(I,C).

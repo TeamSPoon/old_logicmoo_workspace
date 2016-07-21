@@ -676,7 +676,8 @@ with_dmsg(Functor,Goal):-
 %
 % Sformat.
 %
-sformat(Str,Msg,Vs,Opts):- nonvar(Msg),functor_safe(Msg,':-',_),!,with_output_to_each(string(Str),portray_clause_w_vars(user_output,Msg,Vs,Opts)).
+sformat(Str,Msg,Vs,Opts):- nonvar(Msg),functor_safe(Msg,':-',_),!,with_output_to_each(string(Str),
+   (current_output(CO),portray_clause_w_vars(CO,Msg,Vs,Opts))).
 sformat(Str,Msg,Vs,Opts):- with_output_to_each(chars(Codes),(current_output(CO),portray_clause_w_vars(CO,':-'(Msg),Vs,Opts))),append([_,_,_],PrintCodes,Codes),'sformat'(Str,'   ~s',[PrintCodes]),!.
 
 
@@ -1531,7 +1532,7 @@ sgr_code_on_off(_Ctrl,_OnCode,[default]):-!.
 % Msg Converted To String.
 %
 msg_to_string(Var,Str):-var(Var),!,sformat(Str,'~q',[Var]),!.
-msg_to_string(portray(Msg),Str):- with_output_to_each(string(Str),portray_clause_w_vars(user_output,Msg,[],[])),!.
+msg_to_string(portray(Msg),Str):- with_output_to_each(string(Str),(current_output(Out),portray_clause_w_vars(Out,Msg,[],[]))),!.
 msg_to_string(pp(Msg),Str):- sformat(Str,Msg,[],[]),!.
 msg_to_string(fmt(F,A),Str):-sformat(Str,F,A),!.
 msg_to_string(format(F,A),Str):-sformat(Str,F,A),!.

@@ -147,6 +147,9 @@ parser_chat80_module(moo).
 
 
 :-export(prolog_repl/0).
+
+prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to resume to the mud!"),nl,!,call_u(break).
+
 prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to resume to the mud!"),nl,
   current_input(In),
   current_output(Out),

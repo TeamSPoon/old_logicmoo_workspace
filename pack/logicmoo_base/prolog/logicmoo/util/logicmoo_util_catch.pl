@@ -335,15 +335,15 @@ with_current_io(Goal):-
 
 
 with_dmsg_to_main(Goal):-
-  get_main_error_stream(Err),get_thread_current_error(ErrWas),Err=ErrWas,!,Goal.
+  get_main_error_stream(Err),current_error(ErrWas),Err=ErrWas,!,Goal.
 with_dmsg_to_main(Goal):-
-  get_main_error_stream(Err),get_thread_current_error(ErrWas),
+  get_main_error_stream(Err),current_error(ErrWas),
   current_input(IN),current_output(OUT),
    w_tl(t_l:thread_local_current_main_error_stream(Err),
    setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,ErrWas))).
    
 with_error_to_main(Goal):-
-  get_main_error_stream(Err),get_thread_current_error(ErrWas),Err=ErrWas,!,Goal.
+  get_main_error_stream(Err),current_error(ErrWas),Err=ErrWas,!,Goal.
 with_error_to_main(Goal):-
   get_main_error_stream(Err),get_thread_current_error(ErrWas),
   current_input(IN),current_output(OUT),
