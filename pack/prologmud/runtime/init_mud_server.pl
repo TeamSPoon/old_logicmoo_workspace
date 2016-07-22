@@ -307,43 +307,15 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 :- assert_setting01(baseKB:eachFactPreconditional(true)).
 :- ain(isRuntime).
 
-
 :- ain(isa(iFoodRez2,tFood)).
 :- must(isa(iFoodRez2,tEatAble)).
 :- must(parseIsa_Call(tEatAble,O,[food],Rest)).
 
 :- set_prolog_flag(unsafe_speedups,true).
-% :- initialization(lar).
-
-% test_with ?- gripe_time(3.0,coerce(s,vtDirection,_)).
 
 :- gripe_time(3.0,coerce(s,vtDirection,_)).
-
-:- gripe_time(3.0,coerce(l,vtDirection,_)).
-
-:- break.
+:- gripe_time(3.0, \+ coerce(l,vtDirection,_)).
 
 :- initialization(lar,restore).
-
-end_of_file.
-
-
-
-
-Warning: baseKB:list_to_atomics_list/2, which is referenced by
-Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_text.pl:130:75: 1-st clause of baseKB:join_for_string/2
-Warning: baseKB:logOnFailureIgnore/1, which is referenced by
-Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:218:1: 1-st clause of baseKB:assert_text_now/3
-Warning: baseKB:member_eq/2, which is referenced by
-Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/parsing/parser_imperative.pl:176:18: 8-th clause of baseKB:save_fmt_e/2
-Warning: baseKB:prevent_transform_moo_preds/0, which is referenced by
-Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/mud_loader.pl:201:20: 1-st clause of baseKB:slow_work/0
-Warning: baseKB:replace_nth_arglist/5, which is referenced by
-Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_text.pl:68:65: 1-st clause of baseKB:term_anglify_args/6
-Warning: baseKB:show_load_call/1, which is referenced by
-Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/vworld/world_text.pl:363:64: 3-th clause of baseKB:add_description_kv/3
-Warning: baseKB:tag_pos/2, which is referenced by
-Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:241:106: 1-st clause of baseKB:translation_for/5
-Warning: kellerStorage:kellerStorageTestSuite/0, which is referenced by
-Warning:        2-nd clause of baseKB:mud_test_local/0: 2-nd clause of baseKB:mud_test_local/0
+% :- initialization(lar).
 
