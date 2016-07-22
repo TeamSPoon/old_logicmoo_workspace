@@ -724,7 +724,7 @@ isa_backchaing_0(I,T):-  nonvar(T),cheaply_u(completelyAssertedCollection(T)),!,
 isa_backchaing_0(I,T):-  nonvar(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT),!.
 isa_backchaing_0(I,T):-  is_ftVar(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
 isa_backchaing_0(I,T):-  sanity(nonvar(I)),isa_asserted_0(I,AT),transitive_subclass_or_same(AT,T).
-isa_backchaing_0(I,C):-  nonvar(C), tCol(C), mpred_univ(C,I,CI),call_u(CI).
+isa_backchaing_0(I,C):-  nonvar(C), tCol(C), call_u(mpred_univ(C,I,CI)),call_u(CI).
 
 
 % ============================================

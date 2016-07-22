@@ -310,7 +310,8 @@ ttExpressionType(C)==> \+ completelyAssertedCollection(C).
 %
 % Managed Predicate Univ.
 %
-% TODO decide if still needed mpred_univ(C,I,Head):- cwc,atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
+% TODO decide if still needed 
+mpred_univ(C,I,Head):- cwc,atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
 
 (someTimesBuggy2ndOrder,genlPreds(C1,C2),arity(C1,2)) ==>
   {P1 =.. [C1,X,Y],

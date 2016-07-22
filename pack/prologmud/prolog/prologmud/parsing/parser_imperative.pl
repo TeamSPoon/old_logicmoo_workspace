@@ -222,10 +222,8 @@ match_object(S,Obj):-name_text(Obj,S),!.
 match_object(S,Obj):-i_name(Obj,S),!.
 match_object([S],Obj):-!,match_object(S,Obj).
 match_object([S1|S],Obj):-match_object(S1,Obj),match_object(S,Obj),!.
+match_object(S,Obj):-to_case_breaks(Obj,List)->member(t(Str,_),List),string_equal_ci(S,Str),!.
 match_object(S,Obj):-ground(S:Obj),match_object_exp(S,Obj),!.
-match_object(S,Obj):-to_case_breaks(Obj,List),!,member(t(Str,_),List),string_equal_ci(S,Str),!.
-
-
 
 match_object_exp(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).
 
@@ -616,15 +614,15 @@ parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String
 parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
-
+coerce_hook(A,B,C):- var(A),!,freeze(A,coerce_hook(A,B,C)).
 coerce_hook(A,B,C):- to_arg_value(A,AStr)->isa(AStr,B)->A=C.
-coerce_hook(AStr,B,C):- catch(text_to_string(AStr,A),_,fail), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(isa(C,B))->!;true).
+coerce_hook(AStr,B,C):- any_to_string(AStr,A), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(isa(C,B))->!;true).
 
 coerce0(String,Type,Inst):- var(Type),!,trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
 coerce0([String],Type,Inst):- !, coerce(String,Type,Inst).
 coerce0(_,tObj,iCommBadge774):- dtrace,!,fail.
-coerce0(String,Type,Inst):- \+ string(String),!,text_to_string(String,StringS),!,coerce(StringS,Type,Inst).
+coerce0(String,Type,Inst):- \+ string(String),!,text_to_string_safe(String,StringS),!,coerce(StringS,Type,Inst).
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(impl_coerce_hook(Text,Type,Inst)))).
 
 coerce0(String,isNot(Type),Inst):-!, sanity(nonvar(Type)), \+ (coerce(String,Type,Inst)).

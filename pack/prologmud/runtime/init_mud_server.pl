@@ -307,6 +307,11 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 :- assert_setting01(baseKB:eachFactPreconditional(true)).
 :- ain(isRuntime).
 
+
+:- ain(isa(iFoodRez2,tFood)).
+:- must(isa(iFoodRez2,tEatAble)).
+:- must(parseIsa_Call(tEatAble,O,[food],Rest)).
+
 :- set_prolog_flag(unsafe_speedups,true).
 % :- initialization(lar).
 
