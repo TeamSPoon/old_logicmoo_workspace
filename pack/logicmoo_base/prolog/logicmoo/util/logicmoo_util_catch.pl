@@ -137,7 +137,12 @@
 %
 % Not User Console.
 %
-non_user_console:-thread_self(Self),Self\=main,current_input(In),stream_property(In,tty(TF)),TF\==true. %,!,set_stream(In,close_on_exec(true)).
+non_user_console:-thread_self(main),!,fail.
+non_user_console:-current_input(In),stream_property(In,tty(true)),!,fail.
+non_user_console:-current_prolog_flag(debug_threads,true),!,fail.
+non_user_console:-current_input(In),stream_property(In, close_on_abort(true)).
+non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
+
 
 
 :- if(\+ current_predicate(system:nop/1)).
@@ -310,8 +315,8 @@ is_pdt_like:-lmcache:thread_main(user,Goal),!,Goal \= main.
 is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
 
 :- thread_local(tlbugger:no_colors/0).
-:- thread_local(t_l:thread_local_current_main_error_stream/1).
-:- volatile(t_l:thread_local_current_main_error_stream/1).
+:- thread_local(t_l:thread_local_error_stream/1).
+:- volatile(t_l:thread_local_error_stream/1).
 
 :- is_pdt_like-> assert(tlbugger:no_colors); true.
 
@@ -326,7 +331,7 @@ is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
 %
 with_main_error_to_output(Goal):-
  current_output(Out),
-  w_tl(t_l:thread_local_current_main_error_stream(Out),Goal).
+  w_tl(t_l:thread_local_error_stream(Out),Goal).
    
 
 with_current_io(Goal):-
@@ -339,7 +344,7 @@ with_dmsg_to_main(Goal):-
 with_dmsg_to_main(Goal):-
   get_main_error_stream(Err),current_error(ErrWas),
   current_input(IN),current_output(OUT),
-   w_tl(t_l:thread_local_current_main_error_stream(Err),
+   w_tl(t_l:thread_local_error_stream(Err),
    setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,ErrWas))).
    
 with_error_to_main(Goal):-
@@ -347,7 +352,7 @@ with_error_to_main(Goal):-
 with_error_to_main(Goal):-
   get_main_error_stream(Err),get_thread_current_error(ErrWas),
   current_input(IN),current_output(OUT),
-   w_tl(t_l:thread_local_current_main_error_stream(Err),
+   w_tl(t_l:thread_local_error_stream(Err),
    setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,ErrWas))).
    
    
@@ -358,9 +363,8 @@ with_error_to_main(Goal):-
 %
 % Thread Current Error Stream.
 %
-get_thread_current_error(Err):- t_l:thread_local_current_main_error_stream(Err),!.
+get_thread_current_error(Err):- t_l:thread_local_error_stream(Err),!.
 get_thread_current_error(Err):- thread_self(ID),lmcache:thread_current_error_stream(ID,Err),!.
-get_thread_current_error(Err):- stream_property(Err,alias(current_error)),!.
 get_thread_current_error(Err):- stream_property(Err,alias(user_error)),!.
 get_thread_current_error(Err):- get_main_error_stream(Err),!.
 
@@ -368,10 +372,11 @@ get_thread_current_error(Err):- get_main_error_stream(Err),!.
 %
 % Current Main Error Stream.
 %
+get_main_error_stream(Err):- stream_property(Err,alias(main_error)),!.
 get_main_error_stream(Err):- lmcache:thread_main(user,ID),lmcache:thread_current_error_stream(ID,Err).
-get_main_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
+get_main_error_stream(Err):- t_l:thread_local_error_stream(Err),!.
 get_main_error_stream(Err):- stream_property(Err,alias(user_error)),!.
-get_main_error_stream(Err):- stream_property(Err,alias(current_error)),!.
+
 
 %= 	 	 
 
@@ -404,6 +409,14 @@ fresh_line_to_err:- notrace((flush_output_safe,get_main_error_stream(Err),format
 save_streams:- thread_self(ID), save_streams(ID).
 
 
+set_main_error:- (thread_self(main)->((stream_property(Err, alias(user_error)),set_stream(Err,alias(main_error))),
+       (stream_property(In, alias(user_input)),set_stream(In,alias(main_input))),
+       (stream_property(Out, alias(user_output)),set_stream(Out,alias(main_output))),
+                                    set_stream(Err,alias(current_error)));true).
+
+:- initialization(set_main_error).
+:- initialization(set_main_error,restore).
+
 %= 	 	 
 
 %% save_streams( ?ID) is semidet.
@@ -427,9 +440,7 @@ save_streams(ID):-
 % Using Main Input.
 %
 with_main_input(Goal):-
-    current_output(OutPrev),
-    current_input(InPrev),
-    stream_property(ErrPrev,alias(user_error)),
+    current_output(OutPrev),current_input(InPrev),stream_property(ErrPrev,alias(user_error)),
     lmcache:thread_main(user,ID),lmcache:thread_current_input(ID,In),lmcache:thread_current_error_stream(ID,Err),
     setup_call_cleanup_each(set_prolog_IO(In,OutPrev,Err),Goal,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
 

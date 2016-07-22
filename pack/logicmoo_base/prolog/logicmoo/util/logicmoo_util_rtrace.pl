@@ -24,6 +24,8 @@
       push_tracer_and_notrace/0,
       restore_guitracer/0,
       rtrace/0,
+      stop_rtrace/0,
+      start_rtrace/0,
       save_guitracer/0,
       reset_tracer/0,
       cnotrace/1,
@@ -210,17 +212,20 @@ restore_guitracer:- ignore((retract(t_l:wasguitracer(GWas)),set_prolog_flag(gui_
 %
 % R Trace.
 %
-rtrace:- notrace,assert_if_new(tlbugger:rtracing),visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception),trace. % save_guitracer,noguitracer
+rtrace:- notrace,start_rtrace,trace. % save_guitracer,noguitracer
 
-%= 	 	 
+start_rtrace:- assert_if_new(tlbugger:rtracing),visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception).
+
+
 
 %% nortrace is semidet.
 %
 % Nor Trace.
 %
 nortrace:- notrace((\+ tlbugger:rtracing)),!.
-nortrace:- notrace,retractall(tlbugger:rtracing), visible(+all),visible(+exception),thread_leash(+all),thread_leash(+exception). % restore_guitracer,ignore(retract(tlbugger:rtracing)))).
+nortrace:- notrace,stop_rtrace.
 
+stop_rtrace:- retractall(tlbugger:rtracing),visible(+all),visible(+exception),thread_leash(+all),thread_leash(+exception).
 
 push_tracer_and_notrace:- notrace((push_tracer,notrace)).
    
@@ -290,7 +295,8 @@ restore_trace(Goal):-
 % rtrace(Goal):- wdmsg(rtrace(Goal)),!, restore_trace(setup_call_cleanup_each(rtrace,(trace,Goal),nortrace)).
 
 rtrace(Goal):- notrace(skipWrapper;tlbugger:rtracing),!,call(Goal).
-rtrace(Goal):- rtrace,!,trace,call(Goal).
+rtrace(Goal):- tracing,!,setup_call_cleanup(start_rtrace,call(Goal),stop_rtrace).
+rtrace(Goal):- \+ tracing,start_rtrace,!,setup_call_cleanup(trace,call(Goal),(notrace,stop_rtrace)).
 rtrace(Goal):- 
   ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
    '$leash'(OldL, OldL),'$visible'(OldV, OldV),

@@ -61,6 +61,8 @@ do_agent_action(P,C,_):-wdmsg('skipping_unknown_player_action(~q,~q).~n',[P,C]),
 
 :-export(parse_agent_text_command_checked/5).
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
+  freeze(ARGS,sanity(is_list(ARGS))),
+  % freeze(CMD,sanity(compound(CMD))),
    catch(( parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD),
          nonvar(CMD),must(nonvar(NewAgent))),'$aborted',true),
          ignore((CMD=actTick)),ignore((NewAgent=Agent)).

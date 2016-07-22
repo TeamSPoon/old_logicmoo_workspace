@@ -619,8 +619,7 @@ isa('CycLTerm',ttNonGenled).
 % isa(I,C):- cwc, is_ftNonvar(C),ttExpressionType(C),!,quotedIsa(I,C).
 %isa(I,C):- cwc, tCol(C),(ttExpressionType(C)*->quotedIsa(I,C)).
 %isa(I,C):- cwc, tSet(C),(ttExpressionType(C)*->quotedIsa(I,C)).
-%isa(I,C):- cwc, tCol(C), mpred_univ(C,I,CI),call_u(CI).
-isa(I,C):- cwc, isa_backchaing(I,C).
+isa(I,C):- cwc, no_repeats(isa_backchaing(I,C)).
 
 quotedIsa(I,C):- cwc, term_is_ft(I,C).
 

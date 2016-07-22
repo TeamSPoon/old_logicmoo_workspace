@@ -1,5 +1,5 @@
 :- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
-:- module(world, []).
+% :- module(world, []).
 :- endif.
 /* * module  
 % Common place to reduce redundancy World utility prediates
@@ -87,19 +87,13 @@ mtProlog(world).
 :- include(prologmud(mud_header)).
 % :- register_module_type (utility).
 
-:- include(world_2d).
-
-:- include(world_text).
-
-:- include(world_text_output).
-
-:- include(world_effects).
-
-:- include(world_events).
-
-:- include(world_agent).
-
-:- include(world_npc).
+:- ensure_loaded(world_2d).
+:- ensure_loaded(world_text).
+:- ensure_loaded(world_text_output).
+:- ensure_loaded(world_effects).
+:- ensure_loaded(world_events).
+:- ensure_loaded(world_agent).
+:- ensure_loaded(world_npc).
 
 :- if_file_exists(include(logicmoo('vworld/world_spawning.pl'))).
 

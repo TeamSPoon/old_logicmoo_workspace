@@ -214,8 +214,17 @@ must_make_object_string_list_cached(P,Obj,WList):-
 
 same_ci(A,B):-no_trace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
 
-match_object(S,Obj):-name_text(Obj,S).
+match_object(S,Obj):-var(S),!,freeze(S,match_object(S,Obj)).
+match_object(S,Obj):-var(Obj),!,freeze(Obj,match_object(S,Obj)).
+match_object(S,Obj):-number(S),atom_number(A,S),!,match_object(A,Obj).
+
+match_object(S,Obj):-name_text(Obj,S),!.
+match_object(S,Obj):-i_name(Obj,S),!.
+match_object([S],Obj):-!,match_object(S,Obj).
+match_object([S1|S],Obj):-match_object(S1,Obj),match_object(S,Obj),!.
 match_object(S,Obj):-ground(S:Obj),match_object_exp(S,Obj),!.
+match_object(S,Obj):-to_case_breaks(Obj,List),!,member(t(Str,_),List),string_equal_ci(S,Str),!.
+
 
 
 match_object_exp(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).

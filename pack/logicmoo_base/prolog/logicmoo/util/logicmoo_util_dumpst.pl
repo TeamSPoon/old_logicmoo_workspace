@@ -378,11 +378,12 @@ simplify_var_printed(Var,'$avar'(Dict)):- get_attrs(Var,ATTRS),must(printable_va
                          dict_create(Dict,'$VAR'(Name),List).
 simplify_var_printed(Var,'$VAR'(Name)):- is_ftVar(Var),!,printable_variable_name(Var, Name).
 
-
+simplify_goal_printed(Var,Var):-var(Var),!.
 simplify_goal_printed(Var,Name):-cyclic_term(Var),!,Name=Var.
 simplify_goal_printed(Var,Name):-is_ftVar(Var),\+ current_prolog_flag(variable_names_bad,true),simplify_var_printed(Var,Name),!.
+simplify_goal_printed(Var,Var):-var(Var),!.
 simplify_goal_printed(setup_call_catcher_cleanup,sccc).
-simplify_goal_printed(existence_error(X,Y),_):-nl,writeq(existence_error(X,Y)),nl,fail.
+simplify_goal_printed(existence_error(X,Y),existence_error(X,Y)):-nl,writeq(existence_error(X,Y)),nl,fail.
 simplify_goal_printed(setup_call_cleanup,scc).
 simplify_goal_printed(existence_error,'existence_error_XXXXXXXXX__\e[0m\e[1;34m%-6s\e[m\'This is text\e[0mRED__existence_error_existence_error').
 simplify_goal_printed(setup_call_cleanup_each,scce).

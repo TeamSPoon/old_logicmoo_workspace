@@ -84,7 +84,8 @@ mmake:- update_changed_files.
 
 update_changed_files:-thread_signal(main,update_changed_files0).
 update_changed_files0 :-
-        set_prolog_flag(verbose_load,true),
+  w_tl(set_prolog_flag(dialect_pfc,false),
+       (( set_prolog_flag(verbose_load,true),
         ensure_loaded(library(make)),
 	findall(File, make:modified_file(File), Reload0),
 	list_to_set(Reload0, Reload),
@@ -99,7 +100,7 @@ update_changed_files0 :-
 	->  true
 	;   
            true %list_undefined,list_void_declarations
-	).
+	)))).
 */
 
 include_moo_file_ni_1(M):- atomic_list_concat([_,_|_],'_i_',M),!.

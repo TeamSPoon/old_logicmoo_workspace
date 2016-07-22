@@ -415,8 +415,8 @@ dmsg_text_to_string_safe(Expr,Forms):-on_x_fail(text_to_string(Expr,Forms)).
 %
 % Format Primary Helper.
 %
-fmt0(user_error,F,A):-!,get_main_error_stream(Err),!,format(Err,F,A).
-fmt0(current_error,F,A):-!,get_thread_current_error(Err),!,format(Err,F,A).
+%fmt0(user_error,F,A):-!,get_main_error_stream(Err),!,format(Err,F,A).
+%fmt0(current_error,F,A):-!,get_thread_current_error(Err),!,format(Err,F,A).
 fmt0(X,Y,Z):-catchvvnt((format(X,Y,Z),flush_output_safe(X)),E,dfmt(E:format(X,Y))).
 
 %= 	 	 

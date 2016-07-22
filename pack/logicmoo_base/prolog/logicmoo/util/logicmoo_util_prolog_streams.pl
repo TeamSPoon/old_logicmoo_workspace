@@ -6,10 +6,12 @@
             with_output_to_pred/2,
             with_write_stream_pred/4,
             set_error_stream/1,
-            set_o_stream/1,
+            set_output/1,
             with_ioe/1,
             on_x_fail_priv/1,
-            current_error/1
+            current_error/1,
+            current_error0/1,
+            current_error1/1
           ]).
 :- meta_predicate
         with_err_to_pred(:, 0),
@@ -97,11 +99,30 @@ with_ioe(CMD):-
   current_input(IN),current_output(OUT),current_error(Err),  
   setup_call_cleanup(set_prolog_IO(IN,OUT,Err),
     call(CMD),
-    (set_input(IN),set_output(OUT),set_error_stream(Err))))).
+    set_prolog_IO(IN,OUT,Err)))).
+ % (set_input(IN),set_output(OUT),set_error_stream(Err))))).
+
+set_main_io:- (thread_self(main)->((stream_property(Err, alias(user_error)),set_stream(Err,alias(main_error))),
+       (stream_property(In, alias(user_input)),set_stream(In,alias(main_input))),
+       (stream_property(Out, alias(user_output)),set_stream(Out,alias(main_output))),
+                                    set_stream(Err,alias(current_error)));true).
+
+:- initialization(set_main_io).
+:- initialization(set_main_io,restore).
 
 
-current_error(Err):-must((get_thread_current_error(Err); stream_property(Err,alias(current_error)); stream_property(Err,alias(user_error)))),!.
+current_error(Err):- current_error0(Err), (thread_self(main)->true; \+ stream_property(Err,alias(main_error))), 
+  !. % stream_property(Err,type(text)),!.
 
+current_error0(Err):- clause(current_error1(Err),B),catch(B,_,fail).
+current_error1(Err):- stream_property(Err,alias(user_error)).
+current_error1(Err):- stream_property(user_error,file_no(N)),quintus:current_stream(N,write,Err).
+current_error1(Err):- current_output(Out),quintus:current_stream(X,write,Out),integer(X),Y is X+1,quintus:current_stream(Y,write,Err), \+ stream_property(Err,file_name(_)), \+ stream_property(Err,alias(_)).
+current_error1(Err):- current_output(Out),stream_property(Err,output),Err\==Out, \+ stream_property(Err,file_name(_)), \+ stream_property(Err,alias(_)).
+current_error1(Err):- get_thread_current_error(Err).
+current_error1(Err):- stream_property(Err,alias(current_error)).
+
+% current_output(Out),quintus:current_stream(X,write,Out),Y is X+1,quintus:current_stream(Y,write,Err),stream_property(Err,Prop).
 %= 	 	 
 
 %% with_output_to_pred( :PRED1Callback, :GoalGoal) is semidet.
@@ -109,22 +130,12 @@ current_error(Err):-must((get_thread_current_error(Err); stream_property(Err,ali
 % Using Output Converted To Predicate.
 %
 with_output_to_pred(Callback,Goal):-
-  current_output(Prev), FinalClean = set_o_stream(Prev),
+  current_output(Prev), FinalClean = set_output(Prev),
     with_write_stream_pred(Callback,Out,
-      (set_o_stream(Out),Goal,FinalClean),FinalClean).
+      (set_output(Out),Goal,FinalClean),FinalClean).
 
 
-set_error_stream(Err):- current_input(In),current_output(Out),
-      % plz_set_stream(Err,alias(user_error)),
-      plz_set_stream(Err,alias(current_error)),
-      set_prolog_IO(In,Out,Err).
-
-
-set_o_stream(Out):- current_input(In),current_error(Err),
-      % plz_set_stream(Out,alias(user_output)),
-      plz_set_stream(Out,alias(current_output)),
-      set_prolog_IO(In,Out,Err).
-
+set_error_stream(Err):- current_input(In), current_output(Out), set_prolog_IO(In,Out,Err).
 
 
 %% with_err_to_pred( :PRED1Callback, :Goal) is semidet.

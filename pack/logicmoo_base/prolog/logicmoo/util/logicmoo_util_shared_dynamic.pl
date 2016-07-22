@@ -171,9 +171,10 @@ baseKB:wrap_shared(coerce,_,ereq).
 
 baseKB:wrap_shared(F,A,ereq):- atom(F),integer(A),
    functor(P,F,A),
-   % member(MVis,[baseKB,lmcache,baseKB]),
+   % member(MVis,[baseKB,lmcache,lmconfig]),
    baseKB = MVis,
    predicate_property(MVis:P,defined),
+   \+ predicate_property(MVis:P,static),
    \+ predicate_property(MVis:P,imported_from(_)),!.
 
 

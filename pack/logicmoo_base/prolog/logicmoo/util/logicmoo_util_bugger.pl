@@ -1006,6 +1006,7 @@ has_gui_debug :- getenv('DISPLAY',NV),NV\==''.
 % Nodebugx.
 %
 nodebugx(X):- debugging(W),!,setup_call_cleanup_each(nodebug(W),nodebugx(X),debug(W)).
+nodebugx(X):- current_prolog_flag(debug_threads,true),!,call(X).
 nodebugx(X):- 
  wno_tl_e(tlbugger:ifCanTrace,
    w_tl(tlbugger:ifWontTrace,

@@ -1,5 +1,5 @@
 /* *
- <module> 
+ module
 % Writer NPC_Interface  for supporting inforation based actions
 %
 %

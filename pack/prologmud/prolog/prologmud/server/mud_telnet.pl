@@ -2,7 +2,6 @@
 :- module(mud_telnet, [
          telnet_server/2,
          setup_streams/2,
-         set_tty_control/1,
          player_connect_menu/4,
          look_brief/1,
          cmdShowRoomGrid/1,
@@ -18,7 +17,6 @@
          login_and_run/0,
          login_and_run/2,
          session_loop/2,
-         get_current_io/2,
          get_session_io/2,
          kill_naughty_threads/0,
          set_player_telnet_options/1,
@@ -77,9 +75,13 @@ sanify_thread(ID):-
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
-start_mud_telnet_4000:-start_mud_telnet(4000).
+start_mud_telnet_4000:- start_mud_telnet(4000),start_prolog_telnet(4002).
+
 start_mud_telnet(Port):- 
   must(telnet_server(Port, [allow(_ALL),get_call_pred(login_and_run_nodebug)])),!.
+
+start_prolog_telnet(Port):- 
+  must(telnet_server(Port, [allow(_ALL),get_call_pred(prolog)])),!.
 
 :- dynamic(lmcache:main_thread_error_stream/1).
 :- volatile(lmcache:main_thread_error_stream/1).
@@ -89,9 +91,9 @@ save_error_stream:- ignore((thread_self(main),(quintus:current_stream(2, write, 
 :- initialization(save_error_stream,restore).
 :- save_error_stream.
 
-get_main_thread_error_stream(user_error):-!.
+
 get_main_thread_error_stream(ES):-lmcache:main_thread_error_stream(ES),!.
-get_main_thread_error_stream(user_error).
+get_main_thread_error_stream(main_error).
 
 service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
    thread_self(Id),
@@ -106,14 +108,15 @@ get_session_io(In,Out):-
   lmcache:session_io(O,In,Out,Id),!.
 
 get_session_io(In,Out):-
-  get_current_io(In,Out).
+  must(get_session_id_local(O)),
+  thread_self(Id),
+  current_input(In),
+  current_output(Out),
+  asserta(lmcache:session_io(O,In,Out,Id)),!.
 
-get_current_io(In,Out):-
-   current_input(In),
-   current_output(Out),
-   setup_streams(In, Out),
-   set_tty_control(true).
+:- set_prolog_flag(debug_threads,true).
 
+login_and_run_nodebug:- current_prolog_flag(debug_threads,true),!,login_and_run.
 login_and_run_nodebug:- nodebugx(login_and_run).
 
 get_session_id_local(O):- find_and_call(get_session_id(O)).
@@ -121,10 +124,7 @@ get_session_id_local(O):- find_and_call(get_session_id(O)).
 player_connect_menu(In,Out,Wants,P):-
  must_det_l((
    get_session_id_local(O),
-   get_session_io(In,Out),
    fmt('~N~nHello session ~q!~n',[O]),
-   setup_streams(In, Out),
-   set_tty_control(true),
    find_and_call(foc_current_agent(Wants)),
    find_and_call(foc_current_agent(P)),
    call_u(assert_isa(P,tHumanControlled)),
@@ -135,7 +135,7 @@ player_connect_menu(In,Out,Wants,P):-
 
 
 login_and_run:-
-   get_current_io(In,Out),!,
+   get_session_io(In,Out),!,
    login_and_run(In,Out).
 
 set_player_telnet_options(P):-
@@ -147,7 +147,7 @@ goodbye_player:-
      deliver_event(P3,goodBye(P3)).
 
 run_session:-
-   get_current_io(In,Out),
+   get_session_io(In,Out),
    run_session(In,Out).
 
 login_and_run(In,Out):-
@@ -157,17 +157,17 @@ login_and_run(In,Out):-
 run_session(In,Out):-  
   call_u((must_det_l((
   get_session_id_local(O),
-  get_session_io(In,Out),
   asserta(t_l:telnet_prefix([isSelfAgent,wants,to])),
+  thread_self(Id),
   retractall(lmcache:wants_logout(O)))),!,
-  repeat,     
+  repeat,
       once(session_loop(In,Out)),
       retract(lmcache:wants_logout(O)),!,
-      thread_self(Id),
-      retractall(lmcache:session_io(_,_,_,Id)),      
+      retractall(lmcache:session_io(_,_,_,Id)),   
       retractall(lmcache:session_io(O,_,_,_)))),!.
 
 session_loop(In,Out):-
+ call_u((must_det_l((
   get_session_id_local(O),
   call_u((current_agent(P)->true;player_connect_menu(In,Out,_,_);player_connect_menu(In,Out,_,P))),
   register_player_stream_local(P,In,Out),
@@ -175,11 +175,12 @@ session_loop(In,Out):-
   ignore(look_brief(P)),!,
   (t_l:telnet_prefix(Prefix)->(sformat(S,'~w ~w>',[P,Prefix]));sformat(S,'~w> ',[P])),
   prompt_read_telnet(In,Out,S,List),!,
-  enqueue_session_action(P,List,O).
+  enqueue_session_action(P,List,O))))).
 
 
 :-export(register_player_stream_local/3).
 register_player_stream_local(P,In,Out):-
+ call_u((must_det_l((
    set_player_telnet_options(P),
    get_session_id_local(O),thread_self(Id),
    retractall(lmcache:session_io(_,_,_,Id)),
@@ -190,7 +191,7 @@ register_player_stream_local(P,In,Out):-
    asserta_new(lmcache:session_agent(O,P)),
    retractall(lmcache:agent_session(_,O)), 
    asserta_new(lmcache:agent_session(P,O)), 
-   nop(check_console(Id,In,Out,_Err)).
+   nop(check_console(Id,In,Out,_Err)))))).
 
 check_console(Id,In,Out,Err):-
     (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),
@@ -205,14 +206,45 @@ enqueue_session_action(_A,[+, Text],_S):- string(Text), must(assert_text(tWorld,
 %enqueue_session_action(A,[W0,W1|WL],S):- string(Text),!,enqueue_session_action(A,[actSay,[W0,W1|WL]],S).
 enqueue_session_action(A,L,S):- show_call(must(find_and_call(enqueue_agent_action(A,L,S)))),!.
 
+setup_streams:-
+  get_session_io(In,Out),
+  setup_streams(In, Out),
+  listing(thread_util:has_console/4).
 
-set_tty_control(TF):- 
-  ignore((logOnFailure((
-   set_prolog_flag(color_term,TF),
-   set_stream(current_output, tty(TF)),
-   set_stream(current_error, tty(TF)),
-   set_stream(current_input, tty(TF)),
-   set_prolog_flag(tty_control, TF))))),!.
+setup_streams(In, Out):- thread_self(main),!,
+   set_prolog_flag(color_term,true),
+   set_prolog_flag(tty_control, true),
+   stream_property(Err,alias(user_error)),set_stream(Err,alias(current_error)),
+   retractall(thread_util:has_console(Id, _, _, _)),
+   asserta(thread_util:has_console(Id, In, Out, Err)).
+
+setup_streams(In,Out):-
+  call_u((must_det_l((
+   thread_self(Id),
+   thread_at_exit(retractall(thread_util:has_console(Id, _, _, _))),
+   set_prolog_flag(color_term,true),
+   set_stream(In, tty(true)),
+   set_prolog_IO(In, Out, Out),
+   stream_property(user_error,file_no(N)),quintus:current_stream(N,write,Err),
+   retractall(thread_util:has_console(Id, _, _, _)),
+   asserta(thread_util:has_console(Id, In, Out, Err)),
+   set_stream(Err,alias(user_error)), % set_stream(Err,alias(current_error)),
+   set_stream(In, close_on_exec(false)),
+   set_stream(Out, close_on_exec(false)),
+   set_stream(Err, close_on_exec(false)),
+   set_stream(In, close_on_abort(false)),
+   set_stream(Out, close_on_abort(false)),
+   set_stream(Err, close_on_abort(false)),
+   set_prolog_flag(tty_control, false),
+   % catch(set_prolog_flag(tty_control, true),_,true),
+   current_prolog_flag(encoding, Enc),
+   set_stream(user_input, encoding(Enc)),
+   set_stream(user_output, encoding(Enc)),
+   set_stream(user_error, encoding(Enc)),
+   set_stream(user_input, newline(detect)),
+   set_stream(user_output, newline(dos)),
+   set_stream(user_error, newline(dos)))))).
+
 
 fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).
 fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).
@@ -227,10 +259,9 @@ prompt_read_telnet(In,Out,Prompt,Atom):-
       prompt_read(In,Out,Prompt,IAtom),
       (IAtom==end_of_file -> (hooked_asserta(lmcache:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
-prompt_read(In,Out,Prompt,Atom):-         
-        with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),      
-        get_session_io(In,Out),
-        repeat,read_code_list_or_next_command_with_prefix(In,Atom),!.
+prompt_read(In,Out,Prompt,Atom):-
+     with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),      
+     repeat,read_code_list_or_next_command_with_prefix(In,Atom),!.
 
 local_to_words_list(Atom,Words):-var(Atom),!,Words = Atom.
 local_to_words_list(end_of_file,end_of_file):-!.
@@ -487,10 +518,11 @@ display_grid_labels :-
 %	(Control-C).  To terminate the Prolog shell one must enter the
 %	command "end_of_file."
 
-
-telnet_server(_Port, _Options) :- thread_property(X, status(running)),X=telnet_server,!.
+telnet_server(Port, Options):- \+ member(alias(_),Options),atom_concat(telnet_server_,Port,Alias),!,telnet_server(Port, [alias(Alias)|Options]).
+telnet_server(_Port, Options) :- member(alias(Alias),Options),thread_property(Was, status(running)),Was==Alias,!.
 
 telnet_server(Port, Options) :-  
+        member(alias(Alias),Options),!,
 	tcp_socket(ServerSocket),        
 	tcp_setopt(ServerSocket, reuseaddr),
         % tcp_setopt(ServerSocket, nodelay),
@@ -498,21 +530,22 @@ telnet_server(Port, Options) :-
 	must((tcp_bind(ServerSocket, Port),
 	tcp_listen(ServerSocket, 5))),
 	thread_create(server_loop(ServerSocket, Options), _,
-		      [ alias(telnet_server)
+		      [ alias(Alias)
 		      ]).
 
+make_client_alias(Host,Alias):- thread_self(Prefix),make_client_alias3(Prefix,Host,Alias).
 
-make_client_alias(Host,AliasH):- compound(Host),Host=..HostL, must(atomic_list_concat(['client@'| HostL],'-', AliasH)),!.
-make_client_alias(Host,AliasH):- is_list(Host),must(atomic_list_concat(['client@'| Host], ' ', AliasH)),!.
-make_client_alias(Host,AliasH):- term_to_atom(Host,AHost),must(atomic_list_concat(['client@', AHost], ' ', AliasH)).
+make_client_alias3(Prefix,Host,AliasH):- is_list(Host),must(atomic_list_concat([Prefix,'client'| Host], '.', AliasH)),!.
+make_client_alias3(Prefix,Host,AliasH):- compound(Host),Host=..HostL,make_client_alias3(Prefix,HostL,AliasH).
+make_client_alias3(Prefix,Host,AliasH):- term_to_atom(Host,AHost),must(atomic_list_concat([Prefix,'client', AHost], '_', AliasH)).
 
 
 
 server_loop(ServerSocket, Options) :-
 	tcp_accept(ServerSocket, Slave, Peer),
 	tcp_open_socket(Slave, In, Out),
-	set_stream(In, close_on_abort(false)),
-	set_stream(Out, close_on_abort(false)),
+	%set_stream(In, close_on_abort(false)),
+	%set_stream(Out, close_on_abort(false)),
 	catch(tcp_host_to_address(Host, Peer),_,Host = Peer),
 	/*(   Postfix = []
 	;   between(2, 1000, Num),
@@ -527,19 +560,15 @@ server_loop(ServerSocket, Options) :-
                       alias(Alias)
                      % detached(true)
 		  ]),
-	      error(permission_error(actCreate, thread, Alias/ThreadID), _),
+	      error(permission_error(create, thread, Alias/ThreadID), _),
 	      fail), !,
 	server_loop(ServerSocket, Options).
 
 
-call_close_and_detatch(In, Out, Id, Call):-         
-               setup_streams(In, Out),
-                 call_cleanup(call(Call),
-		     ( close_connection(In, Out),
-		       ignore(thread_detach(Id))
-                       )).
+call_close_and_detatch(In, Out, Id, Call):-
+    call_cleanup(call(Call),( close_connection(In, Out),ignore(thread_detach(Id)))).
 
- 
+
 
 close_connection(In, Out) :-
         retractall(thread_util:has_console(_,In,Out,_)),
@@ -548,48 +577,21 @@ close_connection(In, Out) :-
 
 strm_info(Out,Name,Strm):-nl,write(Out,Name = Strm),forall(stream_property(Strm,P),'format'(Out,', ~q',[P])),nl(Out).
 
-setup_streams(In, Out):-
-      Err=Out,
-      set_prolog_IO(In, Out, Err),
-      set_stream(In,  alias(current_input)),
-      set_stream(Out, alias(current_output)),
-      set_stream(Err, alias(current_error)),
-      set_stream(In, close_on_abort(false)),
-      set_stream(Out, close_on_abort(false)),!.
-/*
-setup_streams_pt2(In, Out):-
-      set_stream(In,  alias(user_input)),
-      set_stream(Out, alias(user_output)),
-      % set_stream(Err, alias(user_error)),
-      set_stream(In,  alias(current_input)),
-      set_stream(Out, alias(current_output)),!.
-
-setup_streams_pt3(In, Out):-
-      thread_self(Id),
-     % retractall(thread_util:has_console(Id, _, _, _)),
-      assert(thread_util:has_console(Id, In, Out, Err)),
-     % current_prolog_flag(encoding, Enc),
-     % set_stream_ice(In, user_input, encoding(Enc)),
-     % set_stream_ice(Out, user_output, encoding(Enc)),
-     % set_stream_ice(Err, user_error, encoding(Enc)),
-      set_stream_ice(In, user_input, newline(detect)),
-      set_stream_ice(Out, user_output, newline(dos)),
-      set_stream_ice(Err, user_error, newline(dos)),!.
-*/
 
 set_stream_ice(Stream, Alias, NV):- catch(set_stream(Alias,NV),_,catch(set_stream(Stream,NV),E,nop(dmsg(E)))).
 
 service_client(Slave, In, Out, Host, Peer, Options) :-
    allow(Peer, Options), !,
-   get_call_pred(Call, Options), !,
    setup_streams(In, Out),
+   get_call_pred(Call, Options), !,
    thread_self(Id),
    format(user_error,'% Welcome ~q to the SWI-Prolog LogicMOO server on thread ~w~n~n', [Peer,service_client(Slave, In, Out, Host, Peer, call(Call,Options))]),
-   call_close_and_detatch(In, Out, Id, service_client_call(Call, Slave, In, Out, Host, Peer, Options)).
+   call_close_and_detatch(In, Out, Id, 
+    service_client_call(Call, Slave, In, Out, Host, Peer, Options)),!.
 
 service_client(_Slave, In, Out, Host, Peer, _Options):- 
    thread_self(Id),
-    call_close_and_detatch(In, Out, Id,
+   call_close_and_detatch(In, Out, Id,
        'format'(Out, 'Go away ~q!!~n', [Host:Peer])).
 
 allow(Peer, Options) :-
@@ -607,7 +609,7 @@ get_call_pred(Call, Options) :-
 	).
 
 
-correct_o_stream:-current_error(E),set_o_stream(E).
+% correct_o_stream:-current_error(E),set_stream(E).
 
 on_telnet_restore :- 
       % add_import_module(mud_telnet,baseKB,end),
