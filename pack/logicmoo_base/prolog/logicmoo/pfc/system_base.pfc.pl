@@ -437,7 +437,7 @@ tCol(tCol).  % = isa(tCol,tCol).
 mtProlog(Mt),predicateConventionMt(F,Mt)/(Mt\==baseKB)==>prologBuiltin(F).
 
 % genlsFwd(Sub,Super)==> (isa(I,Super) :- isa(I,Sub)). 
-:- ain_expanded((genlsFwd(Sub,Super)==> (t(Sub,I) ==> t(Super,I)))).
+% :- ain_expanded((genlsFwd(Sub,Super)==> (t(Sub,I) ==> t(Super,I)))).
 
 ttModule(M)==>tCol(M).
 
@@ -451,22 +451,17 @@ tCol(Decl)==>functorDeclares(Decl).
 :- sanity(( fully_expand_now(cuz,((ttModule(mtCycL,
   comment("yada....................."),
   genlsFwd(tMicrotheory)))),
-  OO),dmsg(full_transform=OO),
-      OO=(_,_))).
+  OO),dmsg(full_transform=OO),OO=(_,_))).
 
 % :- rtrace((trace,fully_expand_now(zzz,ttModule(mtCycL777One,comment("hi there"),genlsFwd(tMicrotheory)),O))),nl,writeq(O),nl,notrace.
 % :- break.
 
 :- ain_expanded(ttModule(mtCycL,
   comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),
-  genlsFwd(tMicrotheory))).
+   genlsFwd(tMicrotheory))).
 
-:- sanity(arity(ttModule,1)).
-
-:- sanity(\+ arity(ttModule,3)).
-:- sanity(\+ predicate_property(ttModule(_,_,_),_)).
-
-:- ain_expanded(ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
+:- ain_expanded(
+ ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
   genls(tMicrotheory))).
 
 :- sanity(arity(ttModule,1)).
@@ -474,7 +469,7 @@ tCol(Decl)==>functorDeclares(Decl).
 :- sanity(\+ predicate_property(ttModule(_,_,_),_)).
 
 :- ain_expanded(ttModule(mtProlog,comment("Builtin Prolog code modules such as 'lists' or 'apply' and PFC system like 'mpred_loader' or 'mpred_type_wff'"),
-  genlsFwd(mtProlog),genls(mtCore))).
+  genls(mtCore))).
 
 
 % ttModule(mtLocal,comment("mtLocal(?Mt) is always scoped underneath baseKB")).
@@ -499,6 +494,11 @@ genls(mtCore,tMicrotheory).
 
 
 mtCycL(O)==>({call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
+
+:- sanity(arity(ttModule,1)).
+
+:- sanity(\+ arity(ttModule,3)).
+:- sanity(\+ predicate_property(ttModule(_,_,_),_)).
 
 
 :- dynamic(nondet/0).
