@@ -1110,20 +1110,25 @@ unload_this_file(File):-
 clause_count(Mask,N):- 
      flag(clause_count,_,0),
       ignore((current_module(M),clause(M:Mask,_,Ref),
-         (clause_property(Ref,module(MW))->M==MW;true),
+         (clause_property(Ref,module(MW))->must(M==MW);true),
          flag(clause_count,X,X+1),fail)),flag(clause_count,N,0).
 
-check_clause_counts:- notrace((forall(checked_clause_count(Mask),check_clause_count(Mask)))).
+check_clause_counts:- notrace((forall(checked_clause_count(Mask),check_clause_count(Mask)))),fail.
+check_clause_counts.
 
 :- dynamic(checked_clause_count/2).
 
 checked_clause_count(isa(_,_)).
+checked_clause_count(~(_)).
 checked_clause_count(t(_,_)).
 checked_clause_count(t(_,_,_)).
 checked_clause_count(arity(_,_)).
+checked_clause_count(argIsa(_,_,_)).
+checked_clause_count(argQuotedIsa(_,_,_)).
 checked_clause_count(tCol(_)).
 checked_clause_count(resultIsa(_,_)).
 checked_clause_count(genls(_,_)).
+checked_clause_count((_ <- _)).
 checked_clause_count((_ ==> _)).
 checked_clause_count((_ <==> _)).
 checked_clause_count(spft(_,_,ax)).
@@ -1132,7 +1137,7 @@ checked_clause_count(agent_command(_,_)).
 
 :- dynamic(lmcache:last_clause_count/2).
 
-check_clause_count(_):-current_prolog_flag(unsafe_speedups,true),!.
+% check_clause_count(_):-current_prolog_flag(unsafe_speedups,true),!.
 check_clause_count(Mask):- swc,
  clause_count(Mask,N),
     (retract(lmcache:last_clause_count(Mask,Was)) -> true ; Was=0),
@@ -1688,7 +1693,8 @@ make_dynamic((H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(H)).
 make_dynamic(M:(H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(M:H)).
 make_dynamic(C):- loop_check(make_dynamic_ilc(C),true).
 
-make_dynamic_ilc(C):- compound(C),strip_module(C,MIn,_),get_functor(C,F,A),quietly_must(F\=='$VAR'),
+make_dynamic_ilc(C):- trace_or_throw(make_dynamic_ilc(C)),
+   compound(C),strip_module(C,MIn,_),get_functor(C,F,A),quietly_must(F\=='$VAR'),
   (\+ a(mtCycL,MIn) -> must(defaultAssertMt(M)) ; MIn =M),
   functor(P,F,A),
 
@@ -1812,7 +1818,7 @@ ensure_loaded_no_mpreds(F):-with_no_mpred_expansions(forall(must_locate_file(F,L
 %
 % use was  (isa/2).
 %
-use_was_isa(G,I,C):-call((current_predicate(_,_:mpred_types_loaded/0),if_defined(was_isa_syntax(G,I,C)))).
+use_was_isa(G,I,C):-call((current_predicate(_,_:mpred_types_loaded/0),if_defined(was_mpred_isa(G,I,C)))).
 
 
 

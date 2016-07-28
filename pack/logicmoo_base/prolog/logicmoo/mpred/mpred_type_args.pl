@@ -33,7 +33,6 @@
             asserted_argIsa_known/3,
             atom_to_value/2,
             checkAnyType/4,
-            clause_umt/1,
             % coerce/4,
             correctAnyType/4,
             correctAnyTypeOrFail/4,
@@ -130,7 +129,7 @@ assert_predArgTypes(ArgTs):- numbervars(ArgTs,0,_,[functor_name(ftTerm),attvar(s
 %
 assert_predArgTypes_fa(_,ArgTs):- nonvar(ArgTs),ArgTs=(_/_),!.
 assert_predArgTypes_fa(F,ArgTs):- not(is_list(ArgTs)),ArgTs=..[_|ArgsL],!,assert_predArgTypes_fa(F,ArgsL).
-%assert_predArgTypes_fa(F,ArgsList):- clause_umt(ftAction(F),true),!,show_call(why,must(assert_predArgTypes_from_left(F,1,ArgsList))).
+%assert_predArgTypes_fa(F,ArgsList):- clause_b(ftAction(F),true),!,show_call(why,must(assert_predArgTypes_from_left(F,1,ArgsList))).
 assert_predArgTypes_fa(F,ArgsList):- length(ArgsList,L),assert_predArgTypes_l(F,L,ArgsList).
 
 %assert_predArgTypes_l(F,L,ArgsList):- arity(F,A),!,must( (A>=L) -> assert_predArgTypes_from_right(F,A,ArgsList);true).
@@ -167,16 +166,6 @@ assert_predArgTypes_from_left(_,_,[]):-!.
 assert_predArgTypes_from_left(F,A,[Type|ArgsList]):-assert_argIsa(F,A,Type),!,Ap1 is A + 1,assert_predArgTypes_from_left(F,Ap1,ArgsList).
 
 
-%= 	 	 
-
-%% clause_umt( ?C) is semidet.
-%
-% Clause User Microtheory.
-%
-clause_umt(M:C):-!,clause(M:C,true).
-clause_umt(C):- call_u(clause(C,true)).
-clause_umt(C):-!,clause(_:C,true).
-
 
 %= 	 	 
 
@@ -199,7 +188,7 @@ term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subf
 %
 % Term If Is A Format Type How.
 %
-term_is_ft_how(Term,Type):- clause_umt(quotedDefnIff(Type,Info)),nonvar(Info),
+term_is_ft_how(Term,Type):- clause_b(quotedDefnIff(Type,Info)),nonvar(Info),
    (show_success(why,(Info='SubLQuoteFn'(LISPSYMBOL),nop(dmsg(Term+Type+LISPSYMBOL))))-> 
                  fail;
                  (append_term(Info,Term,CALL),call_u(CALL))),!.
@@ -217,9 +206,9 @@ call_as_t(T,A):-append_term(T,A,Call),call_u(Call).
 % Trans Subft.
 %
 trans_subft(FT,FT).
-trans_subft(FT,Sub):-clause_umt(subFormat(FT,Sub)).
-trans_subft(FT,Sub):-clause_umt(subFormat(FT,A)),clause_umt(subFormat(A,Sub)).
-trans_subft(FT,Sub):-clause_umt(subFormat(FT,A)),clause_umt(subFormat(A,B)),clause_umt(subFormat(B,Sub)).
+trans_subft(FT,Sub):-clause_b(subFormat(FT,Sub)).
+trans_subft(FT,Sub):-clause_b(subFormat(FT,A)),clause_b(subFormat(A,Sub)).
+trans_subft(FT,Sub):-clause_b(subFormat(FT,A)),clause_b(subFormat(A,B)),clause_b(subFormat(B,Sub)).
 
 
 %= 	 	 
@@ -339,7 +328,7 @@ is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
 coerce(What,Type,NewThing,_Else):- call_u(coerce(What,Type,NewThing)),!.
 coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
-coerce(A,B,C):-no_repeats(call_u(coerce_hook(A,B,C))),(show_failure(call_u(isa(C,B)))->!;true).
+coerce(A,B,C):-no_repeats(call_u(coerce_hook(A,B,C))),(sanity(show_failure(call_u(isa(C,B))))->!;true).
 
 
 %= 	 	 
@@ -410,8 +399,8 @@ asserted_argIsa_known(F,N,Type):- argIsa_call_6(F,N,Type),!.
 % Converted To Format Type.
 %
 to_format_type(FT,FT):-a(ttExpressionType,FT),!.
-to_format_type(COL,FT):- clause_umt(formatted_resultIsa(FT,COL)),!.
-to_format_type(COL,FT):- clause_umt(resultIsa(FT,COL)),a(ttExpressionType,FT),!.
+to_format_type(COL,FT):- clause_b(formatted_resultIsa(FT,COL)),!.
+to_format_type(COL,FT):- clause_b(resultIsa(FT,COL)),a(ttExpressionType,FT),!.
 to_format_type(COL,ftTerm(COL)).
 
 
@@ -500,7 +489,7 @@ argIsa_call_0(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftListFn(ftVoprop)
 argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),arity(Arity,A),number(A),number(N),N=<A,arg(N,vv(tPred,ftInt,tCol),T).
 argIsa_call_0(F,2,ftString):-member(F,[descriptionHere,mudDescription,nameStrings,mudKeyword]),!.
 
-argIsa_call_0(F,N,Type):-t(functorDeclares,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
+argIsa_call_0(F,N,Type):-a(functorDeclares,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
 argIsa_call_0(F,N,Type):-a(tCol,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
 argIsa_call_0(Compound,N,Type):-compound(Compound),!,arg(N,Compound,Type),tCol(Type).
 argIsa_call_0(F,N,Type):-between(1,2,N),argIsa_call_3(F,Type).
@@ -553,7 +542,7 @@ grab_argsIsa(F,Types):- grab_argsIsa_6(Types),get_functor(Types,F0),F0==F,!,asse
 %
 grab_argsIsa_6(Types):- meta_argtypes(Types).
 grab_argsIsa_6(mudColor(tSpatialThing, vtColor)).
-grab_argsIsa_6(Types):- clause_umt(quotedDefnIff(Types,_)),maybe_argtypes(Types).
+grab_argsIsa_6(Types):- clause_b(quotedDefnIff(Types,_)),maybe_argtypes(Types).
 % grab_argsIsa_6(Types):- current_predicate(get_all_templates/1),get_all_templates(Types),maybe_argtypes(Types).
 
 %argIsa_call_6(F,N,Type):- isa(F,argIsa(N,Type)),nonvar(Type),assert_argIsa(F,N,Type),!.
@@ -982,7 +971,7 @@ correctType0(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],
    functor(Props,F,A),
    A2 is A+1,
-   clause_umt(arity(F,A2)),
+   clause_b(arity(F,A2)),
    C=..[F,Arg|TypesL],
    correctArgsIsa(Op,C,CC),
    CC=..[F,NewArg|_].
@@ -990,8 +979,8 @@ correctType0(Op,Arg,Props,NewArg):- compound(Props),
 correctType0(_ ,A,Type,AA):- \+ (a(ttExpressionType,Type)),a(tCol,Type),isa_asserted(A,Type),!,must_equals(A,AA).
 correctType0(_,A,_,_):- not(compound(A)),!,fail.
 correctType0(Op,A,T,AAA):- once(correctArgsIsa(Op,A,AA)),A\=AA,!,correctType0(Op,AA,T,AAA).
-correctType0(_ ,A,T,AA):- get_functor(A,F),clause_umt(resultIsa(F,T)),must_det(A=AA),!.
-correctType0(_ ,A,T,AA):- get_functor(A,F),clause_umt(formatted_resultIsa(F,T)),must_det(A=AA),!.
+correctType0(_ ,A,T,AA):- get_functor(A,F),clause_b(resultIsa(F,T)),must_det(A=AA),!.
+correctType0(_ ,A,T,AA):- get_functor(A,F),clause_b(formatted_resultIsa(F,T)),must_det(A=AA),!.
 
 
 

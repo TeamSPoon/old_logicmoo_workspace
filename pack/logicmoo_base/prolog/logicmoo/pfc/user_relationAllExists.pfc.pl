@@ -184,7 +184,7 @@ relationExistsInstance(Pred,D_COL,VAL) ==>
 
 
 prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
-relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),tRolePredicate(BP)).
+relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),ptRolePredicate(BP)).
 prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
 relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 
