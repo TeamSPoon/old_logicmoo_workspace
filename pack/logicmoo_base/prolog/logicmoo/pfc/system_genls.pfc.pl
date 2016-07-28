@@ -56,3 +56,8 @@ nearestGenls(C1,C2)==>
     asserta_if_new(baseKB:((P2:-loop_check(P1))))})).
 
 
+genls(C,P), completelyAssertedCollection(P)  ==> genlsFwd(C,P).
+genls(C,P)/ ( \+ ttExpressionType(C) , \+ ttExpressionType(P) )  ==> genlsFwd(C,P).
+
+genlsFwd(C,P)/(C\=P) ==> (isa(I,C) ==> isa(I,P)).
+

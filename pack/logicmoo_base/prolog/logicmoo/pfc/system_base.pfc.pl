@@ -136,6 +136,8 @@ functorDeclares(ttModule).
 
 %:- sanity((fix_mp(clause(assert,sanity),arity(apathFn,2),M,O),M:O=baseKB:arity(apathFn,2))).
 
+:- dynamic(ttPredType/1).
+
 arity(apathFn,2).
 arity(isKappaFn,2).
 arity('$VAR',1).
@@ -145,7 +147,7 @@ arity(xyzFn,4).
 arity(arity,2).
 arity(is_never_type,1).
 arity(argIsa, 3).
-arity(Prop,1):- cwc, ttPredType(Prop).
+arity(Prop,1):- cwc, clause_b(ttPredType(Prop)).
 arity(meta_argtypes,1).
 arity(arity,2).
 arity(is_never_type,1).

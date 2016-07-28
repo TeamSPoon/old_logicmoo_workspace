@@ -22,8 +22,6 @@ mpred_sv(Pred,Arity)==> prologSingleValued(Pred),arity(Pred,Arity),singleValuedI
 % mdefault(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg(Pred,Arity))).
 prologSingleValued(Pred),arity(Pred,Arity), \+ singleValuedInArg(Pred,_) ==> singleValuedInArg(Pred,Arity).
 
-((singleValuedInArg(Pred,_))==>(prologSingleValued(Pred))).
-
 
 % singleValuedInArg(singleValuedInArg,2).
 
@@ -50,38 +48,56 @@ somtimesBuggyBackChaining ==> (((singleValuedInArgDefault(F, N, Q_SLOT)/is_ftNon
    {functor(P,F,A),replace_arg(P,N,Q_SLOT,Q),replace_arg(Q,N,R_SLOT,R)})
        ==> mdefault( Q <- ({ground(P)},~R/nonvar(R_SLOT))))).
 
-((singleValuedInArg(F, N), arity(F,A), % \+ singleValuedInArgDefault(F, N, Q_SLOT),
+
+((singleValuedInArg(Pred,_))==>(prologSingleValued(Pred))).
+
+(((singleValuedInArg(F, N), arity(F,A), \+ singleValuedInArgDefault(F, N, Q_SLOT),
    {functor(P,F,A),arg(N,P,P_SLOT),replace_arg(P,N,Q_SLOT,Q)})
-       ==> ( P ==> {dif:dif(Q_SLOT,P_SLOT), call_u(Q), ground(Q)}, \+ Q)).
-
-
-(((singleValuedInArgTest(F, N), arity(F,A), \+ singleValuedInArgDefault(F, N, Q_SLOT),
-   {functor(P,F,A),arg(N,P,P_SLOT),replace_arg(P,N,Q_SLOT,Q)})
-       ==> ( P ==> {dif:dif(Q_SLOT,P_SLOT), call_u(Q), ground(Q)}, \+ Q))).
-
-
+       ==> (( P ==> 
+          {dif:dif(Q_SLOT,P_SLOT), call_u(Q), ground(Q)}, \+Q, P)))).
 
 somtimesBuggy==>((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) <==> relationMostInstance(P,Most,V)).
 
-:- dynamic(someSV_tested/3).
-arity(someSV_tested,3).
-someSV_tested(a,b,1).
-someSV_tested(a,b,2).
-singleValuedInArg(someSV_tested,3).
 
-:- listing(someSV_tested/3).
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity);current_prolog_flag(logicmoo_debug,true)).
+
+:- dynamic(someSV_testeed/3).
+arity(someSV_testeed,3).
+
+singleValuedInArg(someSV_testeed,3).
+someSV_testeed(a,b,1).
+someSV_testeed(a,b,2).
+someSV_testeed(a,c,3).
+
+:- listing(someSV_testeed/3).
+:- must( \+ someSV_testeed(a,b,1)).
+:- must(someSV_testeed(a,b,2)).
+
+
+
+% :- set_prolog_flag(logicmoo_debug,true).
 
 :- dynamic(someSV_testing/3).
 arity(someSV_testing,3).
-singleValuedInArg(someSV_testing,3).
+
 someSV_testing(a,b,1).
 someSV_testing(a,b,2).
 someSV_testing(a,c,3).
 
+:- mpred_trace_exec.
+singleValuedInArg(someSV_testing,3).
+someSV_testing(a,c,4).
+
 :- listing(someSV_testing/3).
+:- must(someSV_testing(a,c,4)).
+:- must( \+ someSV_testing(a,b,1)).
+:- must(someSV_testing(a,b,2)).
+:- mpred_notrace_exec.
+:- endif.
 
 
-:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
+
+:- if(current_prolog_flag(logicmoo_debug,true);baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
 :- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_sv.pfc')).
 

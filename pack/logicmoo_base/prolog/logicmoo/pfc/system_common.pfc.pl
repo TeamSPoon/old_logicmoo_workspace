@@ -212,24 +212,6 @@ ftSpec(meta_argtypes).  % A specification may be a syntactic description
 
 
 
-arity(apathFn,2).
-arity(isKappaFn,2).
-arity(isInstFn,1).
-arity(ftListFn,1).
-arity(xyzFn,4).
-arity(arity,2).
-arity(is_never_type,1).
-arity(argIsa, 3).
-arity(Prop,1):-ttPredType(Prop).
-arity(meta_argtypes,1).
-arity(arity,2).
-arity(is_never_type,1).
-arity(prologSingleValued,1).
-arity('<=>',2).
-arity(F,A):- is_ftNameArity(F,A), current_predicate(F/A),A>1.
-arity(F,1):- is_ftNameArity(F,1), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
-
-
 pfcControlled(P),arity(P,A)==>hybrid_support(P,A).
 
 ttPredType(X)==>tCol(X).
@@ -580,13 +562,7 @@ completelyAssertedCollection(completelyAssertedCollection).
 
 % isa(Col1, ttObjectType) ==> ~(isa(Col1, ttExpressionType)).
 
-tCol(tCol).
-tCol(tPred).
-tCol(tFunction).
-tCol(tRelation).
-tCol(ttTemporalType).
-tCol(ttExpressionType).
-tCol(functorDeclares).
+
 % tCol(ArgsIsa):-ttPredType(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
