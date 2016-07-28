@@ -963,6 +963,7 @@ dmsg1(V):- w_tl(tlbugger:skipDMsg,((once(dmsg2(V)), ignore((tlbugger:dmsg_hook(V
 % (debug)message Extended Helper.
 %
 dmsg2(NC):- cyclic_term(NC),!,format_to_error('~N% ~q~n',[dmsg_cyclic_term_2]).
+dmsg2(NC):- var(NC),!,format_to_error('~N% DMSG VAR ~q~n',[NC]).
 dmsg2(skip_dmsg(_)):-!.
 %dmsg2(C):- \+ always_show_dmsg, dmsg_hides_message(C),!.
 %dmsg2(trace_or_throw(V)):- dumpST(350),dmsg(warning,V),fail.

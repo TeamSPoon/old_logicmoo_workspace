@@ -207,7 +207,7 @@ user:lmbf:-
   w_tl( set_prolog_flag(lm_expanders,true),
    w_tl(set_prolog_flag(pfc_booted,false),
      with_umt(baseKB,
-  gripe_time(6.0,time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc'))))))))),
+  time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))))))),
   set_prolog_flag(pfc_booted,true).
 
 
@@ -223,7 +223,8 @@ user:lmbf:-
 system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),nonvar(I), base_clause_expansion(PosI,I,O)->I\==O.
 
 :- list_undefined.
-:- user:lmbf.
+:- gripe_time(4.0,user:lmbf).
+:- halt(666).
 :- prolog.
 :- set_prolog_flag(lm_expanders,false).
 % 

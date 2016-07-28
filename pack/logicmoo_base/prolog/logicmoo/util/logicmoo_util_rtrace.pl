@@ -294,7 +294,8 @@ restore_trace(Goal):-
 
 % rtrace(Goal):- wdmsg(rtrace(Goal)),!, restore_trace(setup_call_cleanup_each(rtrace,(trace,Goal),nortrace)).
 
-rtrace(Goal):- notrace(skipWrapper;tlbugger:rtracing),!,call(Goal).
+% rtrace(Goal):- notrace(tlbugger:rtracing),!,call(Goal).
+rtrace(Goal):- !,setup_call_cleanup(start_rtrace,call((rtrace,Goal)),stop_rtrace).
 rtrace(Goal):- tracing,!,setup_call_cleanup(start_rtrace,call(Goal),stop_rtrace).
 rtrace(Goal):- \+ tracing,start_rtrace,!,setup_call_cleanup(trace,call(Goal),(notrace,stop_rtrace)).
 rtrace(Goal):- 

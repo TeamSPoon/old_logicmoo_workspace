@@ -1664,8 +1664,8 @@ to_word_list_0([A],[A]):-number(A),!.
 to_word_list_0(E,[]):-empty_str(E),!.
 to_word_list_0([A|C],[A|C]):- string(A),!.
 %to_word_list_0(A,WList):- string(A),Final=" (period) ",replace_periods(A,Final,S),not(A=S),!,to_word_list_0(S,WList),!.
-to_word_list_0([A|C],[A|C]):- (compound(A);catch((text_to_string([A|C],_),fail),_,true)),!.
-to_word_list_0(A,WList):-any_to_string(A,String),!,text_to_string(String,Atom),to_word_list_2(Atom,WList),!.
+%to_word_list_0([A|C],[A|C]):- (atomic(A);catch((text_to_string([A|C],_),fail),_,true)),!.
+to_word_list_0(A,WList):- must(any_to_string(A,String)),!,must(text_to_string(String,Atom)),to_word_list_2(Atom,WList),!.
 
 
 
