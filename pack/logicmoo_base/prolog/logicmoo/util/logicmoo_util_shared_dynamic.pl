@@ -64,6 +64,14 @@
 :- dynamic(baseKB:wrap_shared/3).
 
 
+
+:- multifile(baseKB:col_as_isa/1).
+:- multifile(baseKB:col_as_unary/1).
+:- multifile(baseKB:col_as_static/1).
+:- dynamic(baseKB:col_as_isa/1).
+:- dynamic(baseKB:col_as_unary/1).
+:- dynamic(baseKB:col_as_static/1).
+
 :- use_module(logicmoo_util_clause_expansion).
 :- use_module(logicmoo_util_dmsg).
 :- use_module(logicmoo_util_rtrace).
@@ -161,6 +169,10 @@ baseKB:wrap_shared(tCol,1,ereq).
 baseKB:wrap_shared(ttExpressionType,1,ereq).
 baseKB:wrap_shared(ttPredType,1,ereq).
 baseKB:wrap_shared(ttTemporalType,1,ereq).
+
+baseKB:wrap_shared(COL,1,ereq):- clause_b(col_as_isa(COL)).
+baseKB:wrap_shared(COL,1,ereq):- clause_b(col_as_unary(COL)).
+
 baseKB:wrap_shared(use_ideep_swi,0,ereq).
 baseKB:wrap_shared(==>,_,ereq).
 baseKB:wrap_shared(<==>,_,ereq).
@@ -177,8 +189,28 @@ baseKB:wrap_shared(F,A,ereq):- atom(F),integer(A),
    \+ predicate_property(MVis:P,static),
    \+ predicate_property(MVis:P,imported_from(_)),!.
 
+:- dynamic(baseKB:t/2).
 
-clause_b(G):-  clause(baseKB:G,true),!.
+%% clause_b( ?C) is semidet.
+%
+% Clause User Microtheory.
+%
+%clause_b(M:G):-  !,clause(M:G,true).
+%clause_b(G):-  !,clause(baseKB:G,true).
+
+clause_b(G):-  baseKB:clause(G,B),call(B).
+
+%clause_b(G):-  baseKB:clause(G,B)*->call(B);clause_b0(G).
+%clause_b(G):-  baseKB:clause(G,true)*->true;clause_b0(G).
+
+clause_b0(G):- if_defined(to_was_isa(clause_b,G,P0),fail),!,
+           G\=P0,baseKB:clause(P0,true).
+
+%clause_b(M:C):-!,clause(M:C,true).
+%clause_b(C):- call_u(clause(C,true)).
+%clause_b(C):-!,clause(_:C,true).
+%clause_b(G):-  G=..[C,I],!,baseKB:t(C,I).
+%clause_b(G):-  current_predicate(_,baseKB:G),!,loop_check(baseKB:G).
 % clause_b(G):- clause(baseKB:G,Body),(Body==true->true;call_u(Body)).
 
 
@@ -211,10 +243,11 @@ really_safe_wrap(Type,I,O):- callable(I),
 % Safely Paying Attention To Corner Cases Wrap.
 %
 
-safe_wrap(M:I,M:How,call(How,M:I)):-!.
-safe_wrap(M:I,How,call(How,M:I)):-!.
-safe_wrap(I,M:How,call(How,M:I)):-!.
-safe_wrap(I,How,call(How,I)):-!.
+safe_wrap(A,B,C):-safe_wrap0(A,B,C).
+safe_wrap0(M:I,M:How,call(How,M:I)):-!.
+safe_wrap0(M:I,How,call(How,M:I)):-!.
+safe_wrap0(I,M:How,call(How,M:I)):-!.
+safe_wrap0(I,How,call(How,I)):-!.
 
 warn_if_static(F,A):- 
  ignore((F\={},
@@ -256,10 +289,10 @@ decl_shared(Plus,M:F/A):-must(atom(F)),!,
    baseKB:dynamic(M:F/A),
    baseKB:discontiguous(M:F/A),
    baseKB:public(M:F/A),
-   on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
+   % on_f_throw( (M:F/A)\== (lmcache:loaded_external_kbs/1)),
    once((M==baseKB->true;ain(baseKB:predicateConventionMt(F,M)))),
    functor(P,F,A),
-      %once(on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1))),
+      %once(on_f_throw( (M:F/A)\== (lmcache:loaded_external_kbs/1))),
       %once(on_f_throw( (M:F/A)\== (mpred_online:semweb_startup/0))),
       %once(on_f_throw( (M:F/A)\== (baseKB:irc_user_plays/3))),
    call(Plus,M:P),
