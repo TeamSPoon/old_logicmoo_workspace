@@ -68,7 +68,7 @@
 
 
 :- system:ensure_loaded(library(prolog_server)).
-:- prolog_server(4001, [allow(_)]).
+:- prolog_server(4022, [allow(_)]).
 :- system:ensure_loaded(library(logicmoo_utils)).
 
 :- set_prolog_flag(access_level,system).
