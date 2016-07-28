@@ -152,7 +152,7 @@ to_tclass(F,FO):- string(F),!,atom_string(F,S),to_tclass(S,FO).
 to_tclass(Prop,New):- ttExpressionType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
 to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
 
-to_tclass(Prop,New):- arity(Prop,1),arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
+to_tclass(Prop,New):- arity(Prop,1),isa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
 to_tclass(Prop,New):- mpred_isa(Prop,prologHybrid),arity(Prop,M),M>1,mpred_isa(Prop,meta_argtypes(_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- (call(t,Prop,_,_);t(Prop,_,_,_);t(Prop,_,_,_,_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- is_actverb(Prop),ensure_starts_with_prefix(Prop,act,New),!.

@@ -150,7 +150,7 @@
             translate_args/9,
             translateListOps/8,
             translateOneArg/8,
-            was_isa_syntax/3,
+            was_mpred_isa/3,
           mpred_expansion_file/0,
           expand_kif_string/2,
          temp_comp/4,
@@ -1515,7 +1515,7 @@ into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H,B),(HH,BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H;B),(HH;BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H/B),(HH/BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
-into_mpred_form(WAS,isa(I,C)):-was_isa_syntax(WAS,I,C),!.
+into_mpred_form(WAS,isa(I,C)):-was_mpred_isa(WAS,I,C),!.
 into_mpred_form(t(P,A),O):-atom(P),!,O=..[P,A].
 into_mpred_form(t(P,A,B),O):-atom(P),!,O=..[P,A,B].
 into_mpred_form(t(P,A,B,C),O):-atom(P),!,O=..[P,A,B,C].
@@ -1544,15 +1544,15 @@ into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,
 
 %= 	 	 
 
-%% was_isa_syntax( ?G, ?VALUE2, ?VALUE3) is semidet.
+%% was_mpred_isa( ?G, ?VALUE2, ?VALUE3) is semidet.
 %
 % was  (isa/2) syntax.
 %
-was_isa_syntax(G,_,_):-is_ftVar(G),!,fail.
-was_isa_syntax(isa(I,C),I,C):-!.
-was_isa_syntax(t(C,I),I,C):-!.
-was_isa_syntax(a(C,I),I,C):-!.
-was_isa_syntax(G,I,C):-was_isa(G,I,C).
+was_mpred_isa(G,_,_):-is_ftVar(G),!,fail.
+was_mpred_isa(isa(I,C),I,C):-!.
+was_mpred_isa(t(C,I),I,C):-!.
+was_mpred_isa(a(C,I),I,C):-!.
+was_mpred_isa(G,I,C):-was_isa(G,I,C).
 
 
 %= 	 	 
@@ -1567,7 +1567,7 @@ into_mpred_form6(_,F,_,1,[C],O):-alt_calls(F),!,into_mpred_form(C,O),!.
 into_mpred_form6(_,':-',C,1,_,':-'(O)):-!,into_mpred_form_ilc(C,O).
 into_mpred_form6(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
 into_mpred_form6(C,isa,_,2,_,C):-!.
-into_mpred_form6(C,_,_,_,_,isa(I,T)):-was_isa_syntax(C,I,T),!.
+into_mpred_form6(C,_,_,_,_,isa(I,T)):-was_mpred_isa(C,I,T),!.
 into_mpred_form6(_X,t,P,_N,A,O):-!,(atom(P)->O=..[P|A];O=..[t,P|A]).
 into_mpred_form6(G,_,_,1,_,G):-predicate_property(G,number_of_rules(N)),N >0, !.
 into_mpred_form6(G,F,C,1,_,O):-real_builtin_predicate(G),!,into_mpred_form(C,OO),O=..[F,OO].
@@ -1587,7 +1587,7 @@ into_mpred_form6(G,F,_,_,_,G):-nop(dmsg(warn(unknown_mpred_type(F,G)))).
 %
 % Acceptable Xform.
 %
-acceptable_xform(From,To):- From \=@= To,  (To = isa(I,C) -> was_isa_syntax(From,I,C); true).
+acceptable_xform(From,To):- From \=@= To,  (To = isa(I,C) -> was_mpred_isa(From,I,C); true).
 
 % ========================================
 % transform_holds(Functor,In,Out)
@@ -1646,7 +1646,7 @@ transform_holds_3(Op,[SVOFunctor,Obj,Prop|ARGS],OUT):- is_svo_functor(SVOFunctor
 transform_holds_3(Op,[P|ARGS],[P|ARGS]):- not(atom(P)),!,dmsg(transform_holds_3),trace_or_throw(transform_holds_3(Op,[P|ARGS],[P|ARGS])).
 transform_holds_3(HFDS,[HOFDS,P,A|ARGS],OUT):- is_holds_true(HOFDS),!,transform_holds_3(HFDS,[P,A|ARGS],OUT).
 transform_holds_3(HFDS,[HOFDS,P,A|ARGS],OUT):- HFDS==HOFDS, !, transform_holds_3(HFDS,[P,A|ARGS],OUT).
-transform_holds_3(_,HOFDS,isa(I,C)) :- was_isa_syntax(HOFDS,I,C),!.
+transform_holds_3(_,HOFDS,isa(I,C)) :- was_mpred_isa(HOFDS,I,C),!.
 transform_holds_3(_,[Type,Inst],isa(Inst,Type)):-is_ftNonvar(Type),a(tCol,Type),!.
 transform_holds_3(_,HOFDS,isa(I,C)):- holds_args(HOFDS,[ISA,I,C]),ISA==isa,!.
 

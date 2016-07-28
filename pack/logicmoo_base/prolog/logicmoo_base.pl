@@ -224,8 +224,6 @@ system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),no
 
 :- list_undefined.
 :- gripe_time(4.0,user:lmbf).
-:- halt(666).
-:- prolog.
 :- set_prolog_flag(lm_expanders,false).
 % 
 :- set_defaultAssertMt(baseKB).

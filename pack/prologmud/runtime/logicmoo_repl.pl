@@ -14,9 +14,12 @@
 % Load logicmoo REPL Base
 % ==============================
 :- asserta(baseKB:load_mud_www).
-:- system:ensure_loaded(library(logicmoo_user)).
+:- system:ensure_loaded(library(logicmoo_utils)).
+:- gripe_time(60,system:ensure_loaded(library(logicmoo_user))).
 
-% :- statistics.
+:- statistics.
+:- prolog.
+
 user:file_search_path(prologmud, library(prologmud)).
 setup_rl_read_history_0:-
   ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
@@ -57,8 +60,6 @@ setup_rl_read_history_0:-
 :- ensure_webserver.
 */
 :- endif.
-
-:- (if_file_exists(system:ensure_loaded(library(logicmoo_user)))).
 
 % ==============================
 % Load the infernce engine
