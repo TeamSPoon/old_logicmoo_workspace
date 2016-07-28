@@ -1046,7 +1046,7 @@ any_to_value(A,A).
 % Any Converted To Number.
 %
 any_to_number(N,N):- number(N),!.
-any_to_number(ftDice(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
+any_to_number(ftDiceFn(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
 any_to_number(A,N):-atom(A),atom_to_value(A,V),A\=V,any_to_number(V,N).
 any_to_number(A,N):- catch(number_string(N,A),_,fail).
 
@@ -1062,8 +1062,8 @@ atom_to_value(V,Term):-not(atom(V)),!,any_to_value(V,Term).
 % 56
 atom_to_value(V,Term):- catch((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.
 % 18d18+4000
-atom_to_value(V,ftDice(T1,T2,+T3)):- atomic_list_concat_safe([D1,'d',D2,'+',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
-atom_to_value(V,ftDice(T1,T2,-T3)):- atomic_list_concat_safe([D1,'d',D2,'-',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
+atom_to_value(V,ftDiceFn(T1,T2,+T3)):- atomic_list_concat_safe([D1,'d',D2,'+',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
+atom_to_value(V,ftDiceFn(T1,T2,-T3)):- atomic_list_concat_safe([D1,'d',D2,'-',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
 
 
 

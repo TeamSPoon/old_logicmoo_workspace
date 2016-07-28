@@ -1004,7 +1004,7 @@ define_ft_0(xyzFn):-!.
 define_ft_0(Spec):- a(ttExpressionType,Spec),!.
 define_ft_0(C):- new_isa_genls,!, ain(ttExpressionType(C)).
 define_ft_0(Spec):- a(tCol,Spec),dmsg(once(maybe_coierting_plain_type_to_formattype(Spec))),fail.
-define_ft_0(Spec):- hooked_asserta(isa(Spec,ttExpressionType)),(is_ftCompound(Spec)->hooked_asserta(isa(Spec,meta_argtypes));true).
+define_ft_0(Spec):- aina(isa(Spec,ttExpressionType)),(is_ftCompound(Spec)->aina(isa(Spec,meta_argtypes));true).
 
 :- was_export(assert_subclass/2).
 
@@ -1261,7 +1261,7 @@ assert_compound_isa(I,_,_):- is_ftCompound(I), I\=resultIsaFn(_),glean_pred_prop
 assert_compound_isa(I,T,_):- hotrace(chk_ft(T)),dmsg(once(dont_assert_is_ft(I,T))),rtrace((chk_ft(T))).
 %assert_compound_isa(I,T,F):- is_Template(I),!,assert_hasInstance(T,I),show_call(why,ain(resultIsa(I,T))),assert_hasInstance(T,resultIsaFn(F)).
 assert_compound_isa(I,T,F):- ignore((is_Template(I),w_tl(infConfidence(vWeak),assert_predArgTypes(I)))),
-   hooked_asserta(isa(I,T)),assert_hasInstance(T,I),show_call(why,ain_expanded(resultIsa(F,T))),assert_hasInstance(T,resultIsaFn(F)),!.
+   aina(isa(I,T)),assert_hasInstance(T,I),show_call(why,ain_expanded(resultIsa(F,T))),assert_hasInstance(T,resultIsaFn(F)),!.
    
 
 

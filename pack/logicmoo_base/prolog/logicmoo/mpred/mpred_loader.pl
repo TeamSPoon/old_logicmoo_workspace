@@ -2153,7 +2153,7 @@ assert_kif(D):-
            sexpr_sterm_to_pterm],D,CycLOut),
 
          format('~q.~n',[(CycLOut)]),
-         baseKB:(ground(CycLOut)->ain((CycLOut));ain(tinyKB8(CycLOut))))).
+         call_u((ground(CycLOut)->ain((CycLOut));ain(tinyKB8(CycLOut)))))).
 
 
 

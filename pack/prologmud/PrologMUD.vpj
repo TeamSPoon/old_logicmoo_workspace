@@ -51,34 +51,16 @@
 		<Folder Name="../logicmoo_base">
 			<Folder Name="prolog">
 				<Folder Name="logicmoo">
-					<Folder Name="mpred">
-						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_builtin.pl"/>
-						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_coroutining.pl"/>
-						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_header.pl"/>
-						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_listing.pl"/>
-						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_loader.pl"/>
-						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_pfc.pl"/>
-						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_store.pl"/>
-						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_term_expansion.pl"/>
-					</Folder>
-					<Folder Name="mpred_online">
-						<F N="../logicmoo_base/prolog/logicmoo/mpred_online/logicmoo_i_www.pl"/>
-					</Folder>
 					<Folder Name="util">
 						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_all.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_bb_env.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_bugger.pl"/>
-						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_bugger_listing.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_filestreams.pl"/>
-						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_library.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_strings.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_structs.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/util/rec_lambda.pl"/>
 					</Folder>
-					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_base.pl"/>
 					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_engine.pl"/>
-					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_run_clio.pl"/>
-					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_run_swish.pl"/>
 				</Folder>
 			</Folder>
 			<F
@@ -90,11 +72,6 @@
 		<Folder Name="../logicmoo_nlu">
 			<Folder Name="prolog">
 				<F N="../logicmoo_nlu/prolog/parser_all.pl"/>
-			</Folder>
-		</Folder>
-		<Folder Name="../MUD_ircbot">
-			<Folder Name="prolog">
-				<F N="../MUD_ircbot/prolog/eggdrop.pl"/>
 			</Folder>
 		</Folder>
 		<Folder Name="prolog">
@@ -110,9 +87,6 @@
 				Recurse="1"
 				Refilter="0"
 				Excludes=".git/;*.*~;*~/"/>
-		</Folder>
-		<Folder Name="../../runtime">
-			<F N="../../runtime/run_mud_server.pl"/>
 		</Folder>
 		<F
 			N="Makefile.mk"

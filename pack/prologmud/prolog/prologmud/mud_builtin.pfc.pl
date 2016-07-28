@@ -65,7 +65,7 @@
 :- kb_dynamic   world_agent_plan/3.
 :- kb_dynamic   action_info/2.
 :- kb_dynamic   action_rules/4.
-:- kb_dynamic   action_verb_useable/4.
+:- kb_dynamic   action_verb_useable/5.
 :- kb_dynamic   agent_command/2.
 :- kb_dynamic   agent_command_fallback/2.
 :- kb_dynamic   agent_text_command/4.
@@ -199,7 +199,7 @@
 :- kb_dynamic   world_agent_plan/3.
 :- kb_dynamic   action_info/2.
 :- kb_dynamic   action_rules/4.
-:- kb_dynamic   action_verb_useable/4.
+:- kb_dynamic   action_verb_useable/5.
 :- kb_dynamic   agent_command/2.
 :- kb_dynamic   agent_text_command/4.
 :- kb_dynamic   check_permanence/4.
@@ -258,7 +258,7 @@ typeGenls(ttSpatialType,tSpatialThing).
 genls(tSpatialThing,tTemporalThing).
 genls(ttSpatialType,ttTemporalType).
  
-ttUnverifiableType(ftDice).
+ttUnverifiableType(ftDiceFn(ftInt,ftInt,ftInt)).
 ttUnverifiableType(vtDirection).
 
 
@@ -312,7 +312,7 @@ dividesBetween(tItem,tMassfull,tMassless).
 disjointdividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tTemporalThing,tObj,tRegion).
-formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
+formatted_resultIsa(ftDiceFn(ftInt,ftInt,ftInt),ftInt).
 % disjointWith(P1,P2) ==> ((neg(isa(C,P1))) <==> isa(C,P2)).
 
 % isa(Col1, ttObjectType) ==> neg(isa(Col1, ttExpressionType)).
@@ -503,7 +503,7 @@ prologSingleValued(mudArmorLevel(tWearAble,ftInt),prologHybrid).
 prologSingleValued(mudAtLoc(tObj,xyzFn(tRegion,ftInt,ftInt,ftInt)),prologHybrid).
 prologSingleValued(mudAttack(tObj,ftInt),prologHybrid).
 prologSingleValued(mudBareHandDamage(tAgent,ftInt),prologHybrid).
-% prologSingleValued(mudBareHandDamage(tAgent,ftDice),prologHybrid).
+% prologSingleValued(mudBareHandDamage(tAgent,ftDiceFn),prologHybrid).
 % prologSingleValued(mudEnergy(tChargeAble,ftInt(90)),prologHybrid).
 prologSingleValued(mudEnergy(tChargeAble,ftInt),prologHybrid).
 prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
@@ -764,7 +764,7 @@ genls(vtPosture,vtVerb).
 action_to_able(actSearch,tSearchAble).
 action_to_able(actOperate,tOperateAble).
 action_to_able(actObserve,tObserveAble).
-(action_to_able(ACT,ABLE)==> (argIsa(ACT,1,Type)==> genls(Type,ABLE))).
+(action_to_able(ACT,ABLE)==> ((argIsa(ACT,1,Type),isa(Type,ttObjectType))==> genls(Type,ABLE))).
   
 
 genlInverse(mudContains,mudInsideOf).
@@ -816,16 +816,18 @@ tCol(tChannel).
 tChannel(A):- tAgent(A).
 tChannel(A):- tRegion(A).
 tChannel(iGossupChannel).
-ttTypeFacet(tChannel).
+%ttTypeFacet(tChannel).
 :-ain_expanded(isa(tObj,ttTemporalType)).
 :-ain_expanded(isa(tRegion,ttTemporalType)).
 
+/*
+already defined
 typeGenls(ttAgentType,tAgent).
 typeGenls(ttItemType,tItem).
 typeGenls(ttObjectType,tObj).
 typeGenls(ttRegionType,tRegion).
 % cycAssert(A,B):- trace_or_throw(cycAssert(A,B)).
-
+*/
 
 
 
@@ -839,7 +841,7 @@ dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tTemporalThing,tObj,tRegion).
-formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
+formatted_resultIsa(ftDiceFn(ftInt,ftInt,ftInt),ftInt).
 
 isa(tRegion,ttTemporalType).
 
@@ -888,6 +890,8 @@ genls(tClothing, tItem).
 genls( tCarryAble, tItem).
 genls( tCarryAble, tDropAble).
 
+/*
+
 tCol(genlsInheritable).
 :-dynamic(genlsInheritable/1).
 
@@ -895,10 +899,10 @@ genlsInheritable(tCol).
 genlsInheritable(ttPredType).
 :-must(ain((genls(ttTypeType,genlsInheritable)))).
 
-
 :- dynamic(nearestIsa/2).
-
 (genls(C,SC)/ground(genls(C,SC)),nearestIsa(SC,W),\+ genlsInheritable(W) )==>isa(C,W).
+
+*/
 
 % throw(sane_transitivity (genls( tCarryAble, tThrowAble))).
 % genls( tCarryAble, tCarryAble).

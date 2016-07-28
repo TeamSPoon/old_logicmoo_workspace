@@ -113,18 +113,27 @@
  op(350,xfx,'xor'),
  op(300,fx,'~'))).
 
-:- shared_multifile((   
-        argGenl/3,
-        argIsa/3,
-        argQuotedIsa/3)).
+
+:- set_prolog_flag(lm_expanders,false).
+
+:- dynamic logicmoo_i_cyc_kb:argIsa/3.
+:- multifile logicmoo_i_cyc_kb:argIsa/3.
+:- public logicmoo_i_cyc_kb:argIsa/3.
+:- module_transparent logicmoo_i_cyc_kb:argIsa/3.
+
+logicmoo_i_cyc_kb:argIsa(6,6,6):-trace_or_throw(logicmoo_i_cyc_kb:argIsa(6,6,6)).
+argIsa(6,6,6):-trace_or_throw(argIsa(7,7,7)).
+:- set_prolog_flag(lm_expanders,true).
+
+:- compile_predicates([ logicmoo_i_cyc_kb:argIsa/3]).
+
+% :- shared_multifile((  argGenl/3,argIsa/3,argQuotedIsa/3)).
 
 :- dynamic((
   
-        
+        % argGenl/3,argIsa/3,argQuotedIsa/3,
+
         addTiny_added/1,
-        argGenl/3,
-        argIsa/3,
-        argQuotedIsa/3,
         baseKB:cycPrepending/2,
         baseKB:cyc_to_plarkc/2,
         lmcache:isCycUnavailable_known/1,
@@ -133,7 +142,6 @@
 :- volatile(lmcache:isCycAvailable_known/0).
 
 isa_db(I,C):-clause(isa(I,C),true).
-
 
 :- dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
 :- dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
@@ -464,19 +472,20 @@ tinyKB_wstr(P):-tUndressedMt(MT),tinyKB(P,MT,_).
 tinyKB_wstr(ist(MT,P)):-tDressedMt(MT),tinyKB(P,MT,_).
 
 mwkb1:- tell(fooooo0),
-      ignore(( tinyKB(D), maybe_ruleRewrite(D,E),format('~q.~n',[tinyKB0(E)]),attvar_op(asserta_if_new,tinyKB0(E)),fail)),
+      ignore(( tinyKB(D), maybe_ruleRewrite(D,E),format('~q.~n',[tinyKB0(E)]),attvar_op(baseKB:asserta_if_new,tinyKB0(E)),fail)),
       told.
 
 ltkb1:- check_clause_counts,
  defaultAssertMt(MT),
+ must(logicmoo_i_cyc_kb\==MT),
  with_current_why(mfl(MT, ltkb1, _ ),
- ( MT: must_det_l(( mwkb1,forall(find_and_call(tinyKB0(D)), cycAssert(D)))),
+ ( MT: must_det_l(( mwkb1,forall(find_and_call(tinyKB0(D)), MT:cycAssert(D)))),
          check_clause_counts,
          finish_asserts,
   ltkb1_complete)).
 
 
-finish_asserts:-baseKB: forall(find_and_call(tinyKB8(Fact)),mpred_post(baseKB:Fact,(tinyKB8(Fact),ax))).
+finish_asserts:- call_u(forall(find_and_call(tinyKB8(Fact)),mpred_post(baseKB:Fact,(tinyKB8(Fact),ax)))).
 
 ltkb1_complete:- 
   finish_asserts,

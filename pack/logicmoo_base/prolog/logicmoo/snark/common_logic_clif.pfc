@@ -82,7 +82,7 @@ pfclog(PROLOG) ==> PROLOG.
 ({is_clif(CLIF),kb_dynamic(CLIF)} ==>
   (CLIF/is_clif(CLIF) ==> clif(CLIF))).
 
-(CLIF/is_kif_clause(CLIF) ==> clif(CLIF)).
+% (CLIF/is_kif_clause(CLIF) ==> clif(CLIF)).
 
 
 /*

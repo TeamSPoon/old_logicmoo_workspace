@@ -192,7 +192,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 %:- push_modules.
 % [Required] load the mud system
-:- show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader)))).
+:- with_mpred_trace_exec(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
 %:- lcme:reset_modules.
 
 %:- set_prolog_flag(logicmoo_debug,true).
@@ -205,6 +205,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- file_begin(pfc).
 :- set_prolog_flag(dialect_pfc,false).
 
+:- mpred_trace_exec.
 
 :- set_prolog_flag(dialect_pfc,true).
 %:- set_prolog_flag(logicmoo_debug,true).
@@ -255,7 +256,7 @@ pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 
 tMonster(iCommanderdata66).
 tExplorer(iCommanderdata66).
-mudDescription(iCommanderdata66,txtFormatFn("Very screy looking monster named ~w",[iCommanderdata66])).
+mudDescription(iCommanderdata66,txtFormatFn("Very scary looking monster named ~w",[iCommanderdata66])).
 tAgent(iCommanderdata66).
 tHominid(iCommanderdata66).
 wearsClothing(iCommanderdata66,'iBoots673').
@@ -277,6 +278,8 @@ mpred_argtypes(bordersOn(tRegion,tRegion)).
 :- nortrace,notrace.
 
 :- set_prolog_flag(dialect_pfc,false).
+
+:- mpred_notrace_exec.
 
 :- file_begin(pl).
 

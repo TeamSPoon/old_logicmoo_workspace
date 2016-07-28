@@ -77,13 +77,13 @@ argQuotedIsa(sentenceTruth,1,'ftAssertible').
 :- ain(((collectionExpansion(COL,RULE),isa(PRED,COL),{subst(RULE,':ARG1',PRED,NEWRULE)}) ==> trueSentence(NEWRULE))).
 :- ain(((expansion(F,RULE),arity(F,A),{make_kw_functor(F,A,CYCL),kw_to_vars((CYCL<==>RULE),NEWRULE)}) ==> trueSentence(NEWRULE))).
 
-nearestIsa(I,C) <- mpred_fact(isa(I,C)).
-% nearestGenls(I,C) <- mpred_fact(genls(I,C)).
+nearestIsa(I,C) :- cwc, tSet(C), (fully_expand(isa(I,C),ISA)->mpred_fact(ISA)).
+% nearestGenls(I,C) :- mpred_fact(genls(I,C)).
 
 
 % meta_argtypes(ArgTypes)/is_declarations(ArgTypes) ==> {wdmsg(in_loop(meta_argtypes))},meta_argtypes(ArgTypes).
 tRelation(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
-:- ain(((isa(Compound,prologMacroHead)/(compound_functor(Compound,F),\+ tFunction(Compound))) ==> functorDeclares(F))).
+:- ain(((isa(Compound,prologMacroHead)/(compound_functor(Compound,F),\+ tFunction(F))) ==> functorDeclares(F))).
 (ttExpressionType(FT)/is_declarations(FT))==>meta_argtypes(FT).
 
 :- show_call(why,source_location(_,_)).

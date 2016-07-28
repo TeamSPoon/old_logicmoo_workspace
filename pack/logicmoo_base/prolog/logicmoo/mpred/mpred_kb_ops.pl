@@ -1309,8 +1309,8 @@ if_missing_mask(Q,~Q,\+Q):- \+ is_ftCompound(Q),!.
 if_missing_mask(PQ,RO,TestO):- once(mpred_rule_hb(PQ,Q,P)),P\==true,PQ\==Q,!,if_missing_mask(Q,R,TestO),subst(PQ,Q,R,RO).
 if_missing_mask(Q,R,Test):-
    which_missing_argnum(Q,N),
-   if_missing_mask(Q,N,R,Test).
-
+   if_missing_mask(Q,N,R,Test),!.
+if_missing_mask(ISA, ~ ISA, \+ ISA).
 
 %% if_missing_mask( +Q, ?N, ?R, ?Test) is semidet.
 %

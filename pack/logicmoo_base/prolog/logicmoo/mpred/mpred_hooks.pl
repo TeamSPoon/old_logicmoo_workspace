@@ -820,7 +820,7 @@ list_update_op(OLDI,-X,NEW):-flatten([OLDI],OLD),flatten([X],XX),!,list_differen
 %
 % Compute Value No Dice.
 %
-compute_value_no_dice(NEW,NEW):- compound(NEW),functor_catch(NEW,ftDice,_),!.
+compute_value_no_dice(NEW,NEW):- compound(NEW),functor_catch(NEW,ftDiceFn,_),!.
 compute_value_no_dice(NEW,NEWV):-compute_value(NEW,NEWV).
 
 

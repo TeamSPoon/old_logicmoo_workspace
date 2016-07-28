@@ -1755,7 +1755,7 @@ mpred_eval_rhs1( P,Support):-
 
 mpred_eval_rhs1( P,Support):-
  % predicate to remove.
-  mpred_negated_literal( P),
+  \+ \+ mpred_negated_literal( P),
   %TODO Shouldn''t we be mpred_withdrawing the Positive version?  
   % perhaps we aready negated here dirrent nf1_*
   mpred_trace_msg('~N~n =pred_eval_rhs1= ~n\t\tWithdrawing: ~p \n\tSupport: ~p~n',[P,Support]),
@@ -1769,8 +1769,8 @@ mpred_eval_rhs1([X|Xrest],Support):-
 
 mpred_eval_rhs1(Assertion,Support):- !,
  % an assertion to be added.
- mpred_trace_msg('~N~n =pred_eval_rhs1= ~n\tPost1: ~p \n\tSupport: ~p~n',[Assertion,Support]),!,
- (must(mpred_post(Assertion,Support)) *->
+ mpred_trace_msg('~N~n =pred_eval_rhs1= ~n~n\tPost1: ~p \n\tSupport: ~p~n',[Assertion,Support]),!,
+ (must_det(mpred_post(Assertion,Support)) *->
     true;
     mpred_warn("\n\t\t\n\t\tMalformed rhs of a rule (mpred_post1 failed)\n\t\tPost1: ~p\n\t\tSupport=~p.",[Assertion,Support])).
 
@@ -2878,7 +2878,9 @@ mpred_set_warnings(false):-
 
 justification(F,J):- supporters_list(F,J).
 
-justifications(F,Js):- bagof(J,justification(F,J),Js).
+justifications(F,Js):- bagof_nr(J,justification(F,J),Js).
+
+mpred_why(F,Js):- bagof_nr(J,justification(F,J),Js).
 
 
 
@@ -2916,7 +2918,7 @@ mpred_axiom(F):-
 %  an mpred_assumption is a failed goal, i.e. were assuming that our failure to 
 %  prove P is a proof of not(P)
 %
-mpred_assumption(P):- mpred_unnegate(P,_).
+mpred_assumption(P):- nonvar(P), mpred_unnegate(P,_).
    
 
 %% mpred_assumptions( +X, +AsSet) is semidet.
@@ -2966,7 +2968,7 @@ mpred_child(P,Q):-
 %
 % PFC Children.
 %
-mpred_children(P,L):- bagof(C,mpred_child(P,C),L).
+mpred_children(P,L):- bagof_nr(C,mpred_child(P,C),L).
 
 
 
@@ -2993,9 +2995,12 @@ mpred_descendant1(P,Q,Seen):-
 % PFC Descendants.
 %
 mpred_descendants(P,L):- 
-  bagof(Q,mpred_descendant1(P,Q,[]),L).
+  bagof_nr(Q,mpred_descendant1(P,Q,[]),L).
 
-bagof_or_nil(T,G,B):- (bagof(T,G,B) *-> true; B=[]).
+
+bagof_nr(T,G,B):- no_repeats(B,(bagof(T,G,B))).
+
+bagof_or_nil(T,G,B):- (bagof_nr(T,G,B) *-> true; B=[]).
 
 % 
 %  predicates for manipulating support relationships
@@ -3069,10 +3074,6 @@ mpred_trigger_key(chart(Concept,_ZL),Concept):- !.
 mpred_trigger_key(X,X).
 
 
-
-%%%%%%%%%%%%%%%%%% 99999999999999999999999999999999999999999999
-
-%%%%%%%%%%%%%%%%%% 99999999999999999999999999999999999999999999
 
 %% pp_DB is semidet.
 %
@@ -3323,10 +3324,12 @@ supporters_list(F,[Fact|MoreFacts]):-
   mpred_get_support(F,(Fact,Trigger)),
   triggerSupports(Trigger,MoreFacts).
 
+is_file_ref(A):-compound(A),A=mfl(_,_,_).
+
 triggerSupports(uWas(_),[]):-!.
 triggerSupports(ax,[]):-!.
-triggerSupports(U,[(U)]):- get_source_ref1(U),!.
-triggerSupports(U,[uWas(U)]):- get_source_ref((U1,U2)),member(U,[U1,U2]).
+triggerSupports(U,[(U)]):- is_file_ref(U),!.
+triggerSupports(U,[uWas(U)]):- get_source_ref((U1,U2))->member(U12,[U1,U2]),U12=@=U.
 triggerSupports(Trigger,[Fact|MoreFacts]):-
   mpred_get_support(Trigger,(Fact,AnotherTrigger)),
   triggerSupports(AnotherTrigger,MoreFacts).

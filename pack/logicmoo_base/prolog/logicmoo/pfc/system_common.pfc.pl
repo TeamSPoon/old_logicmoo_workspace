@@ -150,7 +150,6 @@ tCol(completelyAssertedCollection).
 
 (ttExpressionType(P) ==> ( ~ tSet(P), tCol(P))).
 
-tSet(C)==>completelyAssertedCollection(C).
 
 %= 	 	 
 
@@ -190,6 +189,7 @@ never_retract_u(tHumanHair(skRelationAllExistsFn(mudSubPart, skRelationAllExists
 never_retract_u((father(skArg1ofFatherFn(trudy), trudy)),sanity_test).
 never_retract_u(argQuotedIsa(thereExistAtLeast, 1, ftPositiveInteger),sanity_test).
 
+% P/never_assert_u(P,Why) ==> conflict(never_assert_u(P,Why))
 
 tPred(arity/2,prologHybrid).
 tPred(is_never_type/1,prologDynamic).
@@ -286,13 +286,6 @@ ttPredType(P)==>(tCol(P),completelyAssertedCollection(P)).
 
 ttTypeType(C)==>completelyAssertedCollection(C).
 
-%overkill
-tSet(C)<==>completelyAssertedCollection(C).
-
-%underkill - Though it is making bad things happen 
-ttExpressionType(C)==> \+ completelyAssertedCollection(C).
-
-
 %% mpred_univ( ?C, ?I, ?Head) is semidet.
 %
 % Managed Predicate Univ.
@@ -309,20 +302,6 @@ mpred_univ(C,I,Head):- cwc,atom(C),!,Head=..[C,I],predicate_property(Head,number
   {P1 =.. [C1,X,Y,Z],
     P2 =.. [C2,X,Y,Z]},
   clif(P1 => P2).
-
-
-tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),mpred_univ(C,I,TCI),
- {call_u((decl_type(C), 
-  ignore((
-   \+ is_static_predicate(C/1),
-   kb_dynamic(C/1),
-   \+ completelyAssertedCollection(C),
-   call_u(ain((
-   ((TCI :- 
-    ((cwc, call_u((
-      predicate_property(TCI,number_of_rules(1)),
-    lazy(( \+ call_u(~(TCI)))),
-    isa_backchaing(I,C))))))))))))))}).
 
 % (tInferInstanceFromArgType(Col),tCol(Col)/i_name('',Col,ColName),tPred(Prop)/i_name('',Prop,PropName),{ColName=PropName}==> tInferInstanceFromArgType(Prop)).
 
@@ -396,19 +375,39 @@ pfcControlled(argIsa).
 
 :- sanity(get_lang(pfc)).
 
-:- must(ain((tSet(C)==>
+% tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
+
+%overkill
+tSet(C)<==>completelyAssertedCollection(C).
+
+tSet(C)==>completelyAssertedCollection(C).
+
+%underkill - Though it is making bad things happen 
+ttExpressionType(C)==> \+ completelyAssertedCollection(C).
+
+tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),mpred_univ(C,I,TCI),
+ {call_u((decl_type(C), 
+  ignore((
+   \+ is_static_predicate(C/1),
+   kb_dynamic(C/1),
+   \+ completelyAssertedCollection(C),
+   call_u(ain((
+   ((TCI :- 
+    ((cwc, call_u((
+      predicate_property(TCI,number_of_rules(1)),
+    lazy(( \+ call_u(~(TCI)))),
+    isa_backchaing(I,C))))))))))))))}).
+
+
+tSet(C)==>
  ( {atom(C), functor(Head,C,1), call(BHead=baseKB:Head),
   ( \+(predicate_property(BHead,_))-> kb_dynamic(C/1); true),
     (predicate_property(BHead,dynamic)->true;show_pred_info(BHead))},
    functorDeclares(C),
    pfcControlled(C),
-   arity(C,1))))).
+   arity(C,1)).
 
 ==>tCol(vtVerb).
-:- must(tCol(vtVerb)).
-%:- must(isa(vtVerb,tCol)).
-%:- must(t(tCol,vtVerb)).
-
 
 % :- call((system:rtrace)).
 ==>tCol(tCol).
@@ -417,15 +416,16 @@ pfcControlled(argIsa).
 % :- dbreak.
 % (tCol(C)/atom(C) ==> ({Head=..[C,I]}, (isa(I,C)/ground(I:C)==>Head))).
 
-ttExpressionType(P) ==> {get_functor(P,F), functor(Head,F,1), call(BHead=baseKB:Head),
-  call((\+ predicate_property(BHead,defined) -> kb_dynamic(F/1);true)),
-  Head=..[F,_],
+ttExpressionType(P) ==> 
+ {get_functor(P,F), functor(Head,F,1), call(BHead=baseKB:Head),
+  call((\+ predicate_property(BHead,defined) -> kb_dynamic(F/1); true)),
   call((predicate_property(BHead,dynamic)->(ain(Head==>{ignore(retract(Head))}));show_pred_info(BHead)))},
   ~functorDeclares(F),
+  ~tSet(F),
   notAssertibleCollection(F),
   completelyDecidableCollection(F),
   arity(F,1).
-   
+
    
 arity(prologMacroHead,1).
 
@@ -441,12 +441,14 @@ functorDeclares(X)==>tCol(X).
 % prologMacroHead(pddlSomethingIsa/2).
 tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 
+/*
 prologBuiltin(A) :- cwc,head_to_functor_name(A, B),prologBuiltin(B).
 prologBuiltin(P) :- cwc,is_ftCompound(P),!,get_functor(P,F,A),functor(C,F,A),(predicate_property(C,built_in)). % predicate_property(P,static)).
 ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,head_to_functor_name(I,F),call_u(call(PT,F))).
+*/
 
 
-
+tCol(iExplorer4)==>{trace_or_throw(never_tCol(iExplorer4))}.
 
 isa(pddlSomethingIsa/2, prologHybrid).
 
@@ -455,7 +457,7 @@ arity(argIsa,3).
 % prologHybrid(F/A)/(atom(F),number(A)) ==> arity(F,A),{must(dynamic_safe(F/A))}.
 
 % Functions
-tFunction(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
+tFunction(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes),{get_functor(ArgTypes,F)},tFunction(F).
 % FormatTypes
 ttExpressionType(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
 
@@ -606,8 +608,11 @@ isa('CycLTerm',ttNonGenled).
 */
 
 % isa(I,C):- cwc, is_ftNonvar(C),ttExpressionType(C),!,quotedIsa(I,C).
-%isa(I,C):- cwc, tCol(C),(ttExpressionType(C)*->quotedIsa(I,C)).
+%isa(I,C):- cwc, tCol(C),(ttExpressionType(C)*->quotedIsa(I,C);loop_check(isa_backchaing(I,C))).
 %isa(I,C):- cwc, tSet(C),(ttExpressionType(C)*->quotedIsa(I,C)).
+% isa(I,C):- cwc, when(?=(I,C),\+ clause_b(isa(I,C))), (loop_check(visit_pred(I,C))*->true;loop_check(no_repeats(isa_backchaing(I,C)))).
+%isa(I,C):- cwc, loop_check(visit_pred(I,C)).
+%isa(I,C):- cwc, loop_check(visit_isa(I,C)).
 isa(I,C):- cwc, no_repeats(isa_backchaing(I,C)).
 
 quotedIsa(I,C):- cwc, term_is_ft(I,C).
@@ -848,7 +853,7 @@ argIsa(Prop,N,Type),{number(N)},ttExpressionType(Type) ==> argQuotedIsa(Prop,N,T
 
 :- kb_dynamic(mudLabelTypeProps/3).
 :- shared_multifile(mudLabelTypeProps/3).
-:- forall(ttPredType(F),must((decl_type(F),ain(isa(F,functorDeclares)),ain(genls(F,tPred))))).
+:- forall(ttPredType(F),must((decl_type(F),ain(functorDeclares(F)),ain(genls(F,tPred))))).
 % :-  /**/ export(mtForPred/2).
 
 /*
@@ -907,7 +912,9 @@ isa(prologMultiValued, tCol).
 arity(ftListFn,1).
 arity(isLikeFn,2).
 arity(ftDeplictsFn,1).
-tFunction(ftDice(ftInt,ftInt,ftInt)).
+
+arity(tFunction,1).
+tFunction(ftDiceFn(ftInt,ftInt,ftInt)).
 tFunction(ftListFn(ftRest)).
 tFunction(ftDeplictsFn(tCol)).
 
@@ -948,7 +955,7 @@ tCol(ftSpec).
 resultIsa(_F,C)/ground(C)==>ftSpec(C).
 
 % resultIsa(F,C)==>(ftSpec(C),'tFunction'(F)).
-% % ( meta_argtypes(FT)/dif(FT,COL), genls(FT, COL),tCol(COL),{not(isa(COL,ttExpressionType))}) ==> formatted_resultIsa(FT,COL).
+% ( meta_argtypes(FT)/dif(FT,COL), genls(FT, COL),tCol(COL),{\+ (isa(COL,ttExpressionType))}) ==> formatted_resultIsa(FT,COL).
 
 %:- mpred_trace.
 %:- pfcWatch.
@@ -964,6 +971,10 @@ prologHybrid(argQuotedIsa(tRelation,ftInt,ttExpressionType)).
 prologHybrid(argIsa(tRelation,ftInt,tCol)).
 prologHybrid(formatted_resultIsa(ttExpressionType,tCol)).
 
+:- sanity(argIsa(genlPreds,2,_)).
+:- must(tCol(vtVerb)).
+:- must(t(tCol,vtVerb)).
+:- must(isa(vtVerb,tCol)).
 
 
 prologHybrid(quotedDefnIff(ttExpressionType,ftTerm)).
@@ -1009,7 +1020,7 @@ resultIsa(txtFormatFn,ftText).
 %'<==>'(prologMultiValued(CallSig,[predProxyAssert(pttp_tell),predProxyRetract(pttp_retract),predProxyQuery(pttp_ask)]),prologPTTP(CallSig)).
 subFormat(ftAtom,ftTerm).
 subFormat(ftCallable,ftProlog).
-resultIsa(ftDice,ftInt).
+resultIsa(ftDiceFn,ftInt).
 subFormat(ftID,ftTerm).
 subFormat(ftInt,ftNumber).
 subFormat(ftInteger,ftNumber).
@@ -1034,7 +1045,7 @@ tCol(ttTypeFacet).
 :- dynamic(tNewlyCreated/1).
 tNewlyCreated(W)==>{guess_types(W)}.
 
-ttTypeFacet(tNewlyCreated).
+%ttTypeFacet(tNewlyCreated).
 ttTypeFacet(ttTypeFacet).
 ttTypeFacet(ttUnverifiableType).
 
@@ -1054,7 +1065,7 @@ typeGenls(ttTypeType,tCol).
 
 
 ttTypeFacet(ttUnverifiableType).
-ttUnverifiableType(ftDice).
+ttUnverifiableType(ftDiceFn(ftInt,ftInt,ftInt)).
 ttUnverifiableType(ftID).
 ttUnverifiableType(ftListFn(ftTerm)).
 ttUnverifiableType(ftString).
@@ -1170,5 +1181,8 @@ tCol(predIsFlag).
 tCol(prologDynamic).
 prologHybrid(formatted_resultIsa/2).
 
-:-sanity(argIsa(genlPreds,2,_)).
+:- sanity(argIsa(genlPreds,2,_)).
+:- must(tCol(vtVerb)).
+:- must(t(tCol,vtVerb)).
+:- must(isa(vtVerb,tCol)).
 

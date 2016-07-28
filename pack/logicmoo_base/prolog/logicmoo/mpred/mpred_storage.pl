@@ -43,10 +43,6 @@
             get_pifunctor/2,
             get_pifunctor/3,
             get_pifunctor/4,
-            hooked_asserta/1,
-            hooked_assertz/1,
-            hooked_retract/1,
-            hooked_retractall/1,
             idel/1,
             if_main/1,
             implied_skipped/1,
@@ -113,10 +109,12 @@
         del(-),
         fact_checked(?, 0),
         fact_loop_checked(+, 0),
-        hooked_asserta(+),
-        hooked_assertz(+),
-        hooked_retract(+),
-        hooked_retractall(+),
+        /*
+        aina(+),
+        ainz(+),
+        del(+),
+        clr(+),
+	    */
         with_fallbacks(0),
         with_fallbacksg(0),
         with_no_db_hooks(0),
@@ -959,7 +957,7 @@ db_assert_sv_update(Must,C,F,A,UPDATE):-
 % db_assert_sv_replace_noisey_so_disabled
 db_assert_sv_replace(_Must,C,_,A,NEW):- fail,
    replace_arg(C,A,_,CBLANK),
-   hooked_retractall(CBLANK),
+   clr(CBLANK),
    replace_arg(C,A,NEW,CNEW),
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
@@ -971,7 +969,7 @@ db_assert_sv_replace(Must,C,F,A,NEW):-
 
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- var(OLD),!,   
    dmsg(db_assert_sv(COLD,'__add__',CNEW)),
-   % replace_arg(C,A,_,CBLANK),hooked_retractall(CBLANK),
+   % replace_arg(C,A,_,CBLANK),clr(CBLANK),
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- OLD =@= NEW,!.
@@ -980,7 +978,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- equals_call(OLD,NEW),!
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
    dmsg(db_assert_sv(COLD,'__replace__',CNEW)),
    hotrace((ignore(show_failure(why,(clr(COLD), not(ireq(COLD))))))),
-   %replace_arg(C,A,_,CBLANK),must_det(clr(CBLANK)),hooked_retractall(CBLANK),   
+   %replace_arg(C,A,_,CBLANK),must_det(clr(CBLANK)),clr(CBLANK),   
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
 */
@@ -1082,9 +1080,10 @@ mpred_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,
 database_modify_0(Op,                       M:G):- atom(M),!, database_modify_0(Op,G).
 database_modify_0(Op,                   (C1,C2)):- !, must(database_modify_0(Op,C1)), must(database_modify_0(Op,C2)).
 database_modify_0(change(Assert,AorZ),(G:-TRUE)):- is_true(TRUE),!,database_modify_0(change(Assert,AorZ),G).
-database_modify_0(change(retract,a),          G):- hooked_retract(G).
-database_modify_0(change(retract,one),        G):- hooked_retract(G).
-database_modify_0(change(retract,_),          G):- hooked_retractall(G).
+database_modify_0(change(retract,a),          G):- !, del(G).
+database_modify_0(change(retract,one),        G):- !, del(G),!.
+database_modify_0(change(retract,all),          G):- !, clr(G).
+database_modify_0(change(retract,_  ),          G):- !, clr(G).
 database_modify_0(change(assert,AZ),          G):- singletons_throw_else_fail(assert(AZ,G)).
 database_modify_0(change(assert,AZ),          G):- database_modify_assert(change(assert,AZ),G).
 
@@ -1092,7 +1091,10 @@ database_modify_0(change(assert,AZ),          G):- database_modify_assert(change
 % database_modify_assert(change(assert,_),        G):- ( \+ \+ clause_u(G)),must(variant(G,GG)),!.
 % database_modify_assert(change(assert,AZ),       G):- expire_pre_change(AZ,GG),fail.
 
-%= 	 	 
+
+% ========================================
+% only place ever should actual game database be changed from
+% ========================================
 
 %% database_modify_assert( :TermAorZ, ?G) is semidet.
 %
@@ -1101,18 +1103,14 @@ database_modify_0(change(assert,AZ),          G):- database_modify_assert(change
 database_modify_assert(change(assert,_AorZ),       G):- !,ain_expanded(G).
 database_modify_assert(change(assert,AorZ),       G):- 
  get_functor(G,F,_),!,
-   (AorZ == a -> hooked_asserta(G);
-    AorZ == z ->  hooked_assertz(G);
+   (AorZ == a -> aina(G);
+    AorZ == z ->  ainz(G);
     a(prologOrdered,F) -> database_modify_assert(change(assert,z),G);
     a(prologSingleValued,F) -> database_modify_assert(change(assert,a),G);
-      hooked_asserta(G)).
-
-% ========================================
-% only place ever should actual game database be changed from
-% ========================================
+      aina(G)).
 
 
-%= 	 	 
+/*	 	 
 
 %% hooked_asserta( +G) is semidet.
 %
@@ -1120,18 +1118,13 @@ database_modify_assert(change(assert,AorZ),       G):-
 %
 hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),aina(G)).
 
-
-%= 	 	 
-
 %% hooked_assertz( +G) is semidet.
 %
 % Hooked Assertz.
 %
 hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),ainz(G)).
 
-
-%= 	 	 
-
+ 	 
 %% hooked_retract( +G) is semidet.
 %
 % Hooked Retract.
@@ -1144,8 +1137,7 @@ hooked_retract(G):-  Op = change(retract,a),
                    sanity(ignore(show_failure(why,\+ clause_u((G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,a),G),true).
 
-
-%= 	 	 
+ 	 	 
 
 %% hooked_retractall( +G) is semidet.
 %
@@ -1159,8 +1151,7 @@ hooked_retractall(G):- Op = change(retract,all),
 
 
 
-
-%= 	 	 
+*/ 	 	 
 
 %% mpred_provide_storage_op( :TermOp, ?G) is semidet.
 %
@@ -1203,7 +1194,7 @@ must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 may_storage_op(Op,G):-call_no_cuts(baseKB:mpred_provide_storage_op(Op,G)).
 
 
-:- meta_predicate hooked_asserta(+), hooked_assertz(+), hooked_retract(+), hooked_retractall(+).
+% :- meta_predicate aina(+), ainz(+), del(+), clr(+).
 
 :- meta_predicate del(-),clr(-). % ,ain(-). % ,call_u(-).
 
