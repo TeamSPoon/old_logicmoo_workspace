@@ -73,6 +73,8 @@
 
 :- set_prolog_flag(access_level,system).
 
+:- shell('./hmud/policyd').
+
 unsafe_preds_init('$syspreds',shell,1).
 unsafe_preds_init(M,F,A):-M=files_ex,current_predicate(M:F/A),member(X,[delete,copy]),atom_contains(F,X).
 unsafe_preds_init(M,F,A):-M=process,current_predicate(M:F/A),member(X,[kill,create]),atom_contains(F,X).
