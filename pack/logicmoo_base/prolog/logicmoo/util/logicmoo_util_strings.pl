@@ -613,8 +613,9 @@ toPropercase(I,O):-toCaseSplit(_Same,to_titlecase,I,O).
 toCase(_Pred,MiXed,MiXed):-noCaseChange(MiXed),!.
 toCase(_Pred,95,45):-!.
 toCase( Pred,MiXed,CASED):-atom(MiXed),!,call(Pred,MiXed,CASED),!.
-toCase( Pred,D3,DD3):-text_to_string_safe(D3,S),!,string_to_atom(S,A3),toCase(Pred,A3,DD3).
-toCase( Pred,[CX|Y],[D3|YY]):-!,toCase(Pred,CX,D3),toCase(Pred,Y,YY).
+toCase( Pred,D3,DD3):- text_to_string_safe(D3,S),!,string_to_atom(S,A3),toCase(Pred,A3,DD3).
+toCase( Pred,D3,DD3):- is_list(D3),atomic_list_concat(D3," ",Str),maplist(toCase( Pred),Str,DD3).
+toCase( Pred,D3,DD3):- is_list(D3),!,maplist(toCase( Pred),D3,DD3).
 toCase( Pred,MiXed,CASED):-compound(MiXed),MiXed=..MList,maplist(toCase(Pred),MList,UList),!,CASED=..UList.
 
 
@@ -1456,9 +1457,9 @@ divide_list(L,L0,LT):-append(L0,LT,L).
 %% string_equal_ci( ?A0, ?A0) is semidet.
 %
 % String Equal Ci.
-%
-string_equal_ci(A0,A0):-!.
-string_equal_ci(L0,L1):- to_word_list(L0,WL0),WL0\==[],to_word_list(L1,WL1),WL1\==[],!,string_equal_ci0(WL0,WL1),!.
+% 
+string_equal_ci(L0,L1):- 
+ freeze(L0,(to_word_list(L0,WL0),WL0\==[],to_word_list(L1,WL1)->WL1\==[],!,string_equal_ci0(WL0,WL1))),!.
 
 
 %= 	 	 
@@ -1468,7 +1469,7 @@ string_equal_ci(L0,L1):- to_word_list(L0,WL0),WL0\==[],to_word_list(L1,WL1),WL1\
 % String Equal Ci Primary Helper.
 %
 string_equal_ci0([],_):-!,fail.
-string_equal_ci0(_,[]):-!,fail.
+%string_equal_ci0(_,[]):-!,fail.
 string_equal_ci0(L0,R0):- string_equal_ci1(L0,R0),!.
 string_equal_ci0(L,R):-divide_list(L,L0,LT),divide_list(R,R0,RT),string_equal_ci1(L0,R0),!,string_equal_ci0(LT,RT).
 
@@ -1636,12 +1637,13 @@ replace_periods_string_list(A,S):-replace_periods(A,AR),to_word_list(AR,WL),subs
 %
 % Converted To Word List.
 %
+to_word_list(A,SL):-var(A),!,A=SL.
 to_word_list(A,SL):-once(hotrace((to_word_list_0(A,S0),(is_list(S0)->delete(S0,'',S);S=S0)))),
    maplist(as_atom,S,SSL),!,
    must(SSL=SL),!.
 
 % as_atom(A,A):-atom(A),!.
-% as_atom(S,A):-string_to_atom(S,A),!.
+% 
 
 %= 	 	 
 
@@ -1649,7 +1651,10 @@ to_word_list(A,SL):-once(hotrace((to_word_list_0(A,S0),(is_list(S0)->delete(S0,'
 %
 % Converted To Atom.
 %
-as_atom(A,A).
+as_atom(A,A):-atom(A),!.
+as_atom(T,A):- compound(T), \+ is_list(T),arg(_,T,M),atomic(M),as_atom(M,A),!.
+as_atom(S,A):-string_to_atom(S,A),!.
+as_atom(T,A):-term_to_atom(T,A).
 
 :- export(to_word_list_0/2).
 

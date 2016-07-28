@@ -44,6 +44,7 @@ nearestGenls(C1,C2)==>
 %(isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, 
 %  \+ ~(completelyAssertedCollection(Super))) ==> ({dif(Sub, Super)}, isa(I,Super)).
 
+/*
 (completelyAssertedCollection(C2),genls(C1,C2))==>
  ({get_functor(C1,F1),get_functor(C2,F2),
    P1 =.. [F1,X],
@@ -54,10 +55,17 @@ nearestGenls(C1,C2)==>
    P1 =.. [F1,X],
     P2 =.. [F2,X],
     asserta_if_new(baseKB:((P2:-loop_check(P1))))})).
-
+*/
 
 genls(C,P), completelyAssertedCollection(P)  ==> genlsFwd(C,P).
 genls(C,P)/ ( \+ ttExpressionType(C) , \+ ttExpressionType(P) )  ==> genlsFwd(C,P).
 
 genlsFwd(C,P)/(C\=P) ==> (isa(I,C) ==> isa(I,P)).
+
+(genls(C1,C2)/( \+ genlsFwd(C2))==>
+ ({get_functor(C1,F1),get_functor(C2,F2),
+   P1 =.. [F1,X],
+    P2 =.. [F2,X],
+    asserta_if_new(baseKB:((P2:-loop_check(P1))))})).
+
 

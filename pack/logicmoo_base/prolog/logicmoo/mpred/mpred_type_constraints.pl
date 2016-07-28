@@ -396,8 +396,9 @@ mdif(A,B):-A\==B.
 % Same.
 %
 same(X,Y):- samef(X,Y),!.
-same(X,Y):- compound(X),arg(1,X,Y),!.
-same(X,Y):- compound(Y),arg(1,Y,X),!.
+same(X,Y):- compound(X),arg(1,X,XX)->same(XX,Y),!.
+same(Y,X):- compound(X),arg(1,X,XX),!,same(XX,Y).
+
 
 
 

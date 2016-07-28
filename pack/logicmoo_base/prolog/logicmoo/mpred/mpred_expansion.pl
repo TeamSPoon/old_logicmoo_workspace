@@ -63,7 +63,7 @@
             as_is_term/1,as_is_term/1,
             as_list/2,
             cheaply_u/1,
-            cheaply_u_ilc/1,
+            cheaply_u/1,
             compare_op/4,
             comparitiveOp/1,
             compound_all_open/1,
@@ -167,7 +167,7 @@
    % mpred_expansion
    cheaply_u(+),
    ain_expanded(+),
-   cheaply_u_ilc(+),
+   cheaply_u(+),
    db_expand_maplist(2,*,*,*,*),
    % mpred_expansion
    transitive_lc_nr(2,*,*),
@@ -334,14 +334,14 @@ cheaply_u(G):- quickly(quietly(Goal)).
 
 */
 
-cheaply_u(G):- need_speed,!, (ground(G)->(quietly(baseKB:G),!);quietly(lookup_u(G))).
-cheaply_u(G):- loop_check(cheaply_u_ilc(G),loop_check_term(cheaply_u_ilc(G),ilc2(G),fail)).
+cheaply_u(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
+cheaply_u(call(ereq,G)):- must(callable(G)),!,cheaply_u(G).
+cheaply_u(G):- quietly(call_u(G)).
+%cheaply_u(G):- need_speed,!, (ground(G)->(quietly(baseKB:G),!);quietly(lookup_u(G))).
+%cheaply_u(G):- loop_check(cheaply_u(G),loop_check_term(cheaply_u(G),ilc2(G),fail)).
+%cheaply_u(G):- predicate_property(G,number_of_rules(N)),N=0,!,lookup_u(G).
+%cheaply_u(G):- strip_module(G,_,C),G\==C,!,cheaply_u(C).
 
-cheaply_u_ilc(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
-cheaply_u_ilc(call(ereq,G)):- !,cheaply_u_ilc(G).
-cheaply_u_ilc(G):- predicate_property(G,number_of_rules(N)),N=0,!,lookup_u(G).
-cheaply_u_ilc(G):- strip_module(G,_,C),G\==C,!,cheaply_u_ilc(C).
-cheaply_u_ilc(G):- call_u(G).
 
 %= 	 	 
 

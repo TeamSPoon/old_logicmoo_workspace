@@ -69,7 +69,7 @@
             isa_atom_call/2,
             isa_atom_call_ilc/2,
             isa_backchaing/2,
-            isa_backchaing_0/2,
+            % isa_backchaing_0/2,
             isa_from_morphology/2,
             isa_w_type_atom/2,
             ain_guess/1,
@@ -702,15 +702,17 @@ baseKB:module_local_init:- ain((isa(I,T):- cwc,isa_backchaing(I,T))).
 %
 %  (isa/2) backchaing.
 %
-isa_backchaing(I,T):- T==ftVar,!,is_ftVar(I).
-isa_backchaing(I,T):- nonvar(I),is_ftVar(I),!,T=ftVar.
-isa_backchaing(I,T):- new_isa_genls,call_u(isa(I,T)).
-isa_backchaing(_,T):- T==ftProlog,!.
-isa_backchaing(I,T):- I==T,I=ttTypeByAction,!,fail.
-isa_backchaing(I,T):- is_ftVar(I),is_ftVar(T),!,tCol_gen(T),nonvar(T),isa_backchaing(I,T).
-isa_backchaing(I,T):- new_isa_genls,!,fail.
-isa_backchaing(I,T):- no_repeats(loop_check(isa_backchaing_0(I,T))).
-% isa_backchaing(I,T):- call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing_0(I,T)))).
+isa_backchaing(I,C):- C==ftVar,!,is_ftVar(I).
+isa_backchaing(I,C):- nonvar(I),is_ftVar(I),!,C=ftVar.
+isa_backchaing(I,C):- new_isa_genls,call_u(isa(I,C)).
+isa_backchaing(_,C):- C==ftProlog,!.
+isa_backchaing(I,C):- I==C,I=ttTypeByAction,!,fail.
+isa_backchaing(I,C):- nonvar(I),sanity(\+ is_ftVar(I)), clause_b(completeIsaAsserted(I)),!,isa_asserted(I,C).
+isa_backchaing(I,C):- var(C),!,tCol_gen(C),nonvar(C),isa_backchaing(I,C).
+isa_backchaing(I,C):- sanity(\+ is_ftVar(C)), clause_b(completelyAssertedCollection(C)),!,isa_asserted(I,C).
+isa_backchaing(I,C):- no_repeats_old(transitive_subclass_or_same(AT,C)),once(isa_asserted_0(I,AT)).
+isa_backchaing(I,C):- isa_asserted_0(I,AT),once(transitive_subclass_or_same(AT,C)).
+% isa_backchaing(I,C):- call_tabled(isa(I,C),no_repeats(loop_check(isa_backchaing_0(I,C)))).
 
 
 %= 	 	 
@@ -719,12 +721,6 @@ isa_backchaing(I,T):- no_repeats(loop_check(isa_backchaing_0(I,T))).
 %
 %  (isa/2) backchaing  Primary Helper.
 %
-isa_backchaing_0(I,T):-  nonvar(T),is_ftVar(T),!,trace_or_throw(var_isa_backchaing(I,T)).
-isa_backchaing_0(I,T):-  nonvar(T),cheaply_u(completelyAssertedCollection(T)),!,isa_asserted(I,T).
-isa_backchaing_0(I,T):-  nonvar(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT),!.
-isa_backchaing_0(I,T):-  is_ftVar(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
-isa_backchaing_0(I,T):-  sanity(nonvar(I)),isa_asserted_0(I,AT),transitive_subclass_or_same(AT,T).
-isa_backchaing_0(I,C):-  nonvar(C), tCol(C), call_u(mpred_univ(C,I,CI)),call_u(CI).
 
 
 % ============================================
@@ -815,8 +811,10 @@ compound_isa(_,I,T):- cheaply_u(isa_asserted(I,T)).
 %
 
 % isa_asserted(I,C):- !,loop_check(call_u(isa(I,C))).
-isa_asserted(I,C):- new_isa_genls,!, call_u(isa(I,C)).
-isa_asserted(I,C):- !, no_repeats(loop_check(isa_asserted_0(I,C))).
+%isa_asserted(I,C):- new_isa_genls,!, call_u(isa(I,C)).
+isa_asserted(I,C):-  compound(I),!,no_repeats(loop_check(isa_asserted_0(I,C))).
+isa_asserted(I,C):-  ground(I:C),!,no_loop_check(no_repeats(loop_check(isa_asserted_0(I,C)))).
+isa_asserted(I,C):-  no_repeats(loop_check(isa_asserted_0(I,C))).
 % isa_asserted(I,C):- !, call_u(isa(I,C)).
 %isa_asserted(I,C):- ((call_tabled(isa(I,C),no_repeats(loop_check(isa_asserted_0(I,C)))))).
 %isa_asserted(I,CC):-no_repeats((isa_asserted_0(I,C),call_u(genls(C,CC)))).
@@ -828,27 +826,31 @@ isa_asserted(I,C):- !, no_repeats(loop_check(isa_asserted_0(I,C))).
 %
 %  (isa/2) asserted  Primary Helper.
 %
-isa_asserted_0(I,T):-is_known_trew(isa(I,T)).
+isa_asserted_0(I,C):-is_known_trew(isa(I,C)).
 isa_asserted_0(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),call_u(arity(F,1)).
-%isa_asserted_0([I],T):-nonvar(I),!,isa_asserted_0(I,T).
+%isa_asserted_0([I],C):-nonvar(I),!,isa_asserted_0(I,C).
 
-isa_asserted_0(isInstFn(I),T):-nonvar(I),dtrace,!,T=I.
-isa_asserted_0(aRelatedFn(T,_),I):-nonvar(T),!,T=I.
-isa_asserted_0(aRelatedFn(T,_,_),I):-nonvar(T),!,T=I.
-isa_asserted_0(I,T):- ((t_l:useOnlyExternalDBs,!);baseKB:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
+isa_asserted_0(isInstFn(I),C):-nonvar(I),dtrace,!,C=I.
+isa_asserted_0(aRelatedFn(C,_),I):-nonvar(C),!,C=I.
+isa_asserted_0(aRelatedFn(C,_,_),I):-nonvar(C),!,C=I.
+isa_asserted_0(I,C):- ((t_l:useOnlyExternalDBs,!);baseKB:use_cyc_database),(kbp_t([isa,I,C]);kbp_t([C,I])).
+
+isa_asserted_0(I,C):- atom(I),isa_from_morphology(I,C).
+isa_asserted_0(I,C):- (atom(I);atom(C)),type_isa(I,C).
+
+isa_asserted_0(I,C):- var(C),!,tCol_gen(C),nonvar(C),isa_asserted_0(I,C).
+isa_asserted_0(I,C):- sanity(tCol(C)), call_u(mpred_univ(C,I,CI)),call_u(CI).
 isa_asserted_0(ttPredType, completelyAssertedCollection):-!.
-isa_asserted_0(I,T):- atom(I),isa_from_morphology(I,T).
-isa_asserted_0(I,T):- (atom(I);atom(T)),type_isa(I,T).
-isa_asserted_0(I,T):- atom(I), I = ttTypeByAction, T=ttTypeByAction,!,fail.
-isa_asserted_0(I,T):- nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
-% isa_asserted_0(I,T):- HEAD= isa(I, T),ruleBackward(HEAD,BODY),dtrace,call_mpred_body(HEAD,BODY).
+isa_asserted_0(I,C):- nonvar(I),sanity(\+ is_ftVar(I)), clause_b(completeIsaAsserted(I)),!,fail.
+isa_asserted_0(I,C):- sanity(\+ is_ftVar(C)), clause_b(completelyAssertedCollection(C)),!,fail.
+isa_asserted_0(I,C):-  not_mud_isa(I,C),!,fail.
+% isa_asserted_0(I,C):- I == ttTypeByAction, C=ttTypeByAction,!,fail.
+% isa_asserted_0(I,C):- HEAD= isa(I, C),ruleBackward(HEAD,BODY),dtrace,call_mpred_body(HEAD,BODY).
 
-isa_asserted_0(I,T):- is_ftVar(T),!,tCol_gen(T),call_u(isa(I,T)).
-isa_asserted_0(I,T):- atom(T),current_predicate(T,_:G),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);
-  on_x_fail(call_u(G))).
-isa_asserted_0(I,T):- nonvar(I),(  ((is_ftVar(T);chk_ft(T)),if_defined(term_is_ft(I,T)))*->true;type_deduced(I,T) ).
-isa_asserted_0(I,T):- is_ftCompound(I),is_non_unit(I),is_non_skolem(I),!,get_functor(I,F),compound_isa(F,I,T).
-isa_asserted_0(I,T):- nonvar(T),!,isa_asserted_1(I,T).
+% isa_asserted_0(I,C):- atom(C),current_predicate(C,_:G),G=..[C,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);on_x_fail(call_u(G))).
+% isa_asserted_0(I,C):- ( ((is_ftVar(C);chk_ft(C)),if_defined(term_is_ft(I,C)))*->true;type_deduced(I,C) ).
+isa_asserted_0(I,C):- is_ftCompound(I),is_non_unit(I),is_non_skolem(I),!,get_functor(I,F),compound_isa(F,I,C).
+isa_asserted_0(I,C):- isa_asserted_1(I,C).
 
 % isa_asserted_1(I,T):- T\=predStub(_),isa(I,T).
 
@@ -1297,7 +1299,7 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 % assert_isa HOOKS
 % ================================================
 %OLD baseKB:decl_database_hook(_,genls(_,_)):-retractall(a(_,isa,_,_)),retractall(a(_,genls,_,_)).
-%OLD baseKB:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
+%OLD baseKB:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(isa_asserted_sanely(I,T))).
 %OLD baseKB:decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
 
 %OLD baseKB:decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).

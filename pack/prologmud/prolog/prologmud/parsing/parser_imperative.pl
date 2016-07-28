@@ -109,9 +109,9 @@ objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text
 objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,isOneOf([text_means(Agent,Text,isThis),isAnd([isOneOf(Match),match_object(Text,isThis)])]),ObjList).  
 
 
-text_means(Agent,Text,Agent):- equals_icase(Text,"self"),!.
-text_means(Agent,Text,Loc):- equals_icase(Text,"here"),where_atloc(Agent,Loc).
-text_means(Agent,Text,Region):- equals_icase(Text,"region"),where_atloc(Agent,Loc),locationToRegion(Loc,Region).
+text_means(Agent,Text,Agent):- string_equal_ci(Text,"self"),!.
+text_means(Agent,Text,Loc):- string_equal_ci(Text,"here"),where_atloc(Agent,Loc).
+text_means(Agent,Text,Region):- string_equal_ci(Text,"region"),where_atloc(Agent,Loc),locationToRegion(Loc,Region).
 text_means(_Agent,_Text,_Value):-fail.
 
 relates(Agent,Relation,Obj):-loop_check(relates_ilc(Agent,Relation,Obj),fail).
@@ -403,43 +403,43 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :- ain('==>'(prologBuiltin(name_text_now(ftTerm,ftString)))).
 
-name_text(Name,Text):- nonvar(Text),!,name_text_now(Name,TextS),equals_icase(Text,TextS),!.
-name_text(Name,Text):- var(Name),!,call_u(mudKeyword(Name,Text)).
-% :- break.
-name_text(Name,Text):- name_text_now(Name,Text).
+name_text(I,O):- nonvar(I),no_repeats_var(O),name_text_now(I,O).
 
-:- export(name_text_now_lc/2).
-name_text_now_lc(I,O):-nonvar(I),name_text_now(I,M),!,toLowercase(M,O).
+:- export(name_text_now/2).
 
 
 :-dynamic(name_text_now/2).
 :-multifile(name_text_now/2).
 :-export(name_text_now/2).
+name_text_now(Name,Text):-clause_b(nameStrings(Name,Text)).
+name_text_now(Name,Text):-clause_b(mudKeyword(Name,Text)).
+name_text_now(Name,Text):-nonvar(Text),!,name_text_now(Name,TextS)->string_equal_ci(Text,TextS),!.
 name_text_now(Name,Text):-atomic(Name),name_text_atomic(Name,Text).
-name_text_now(Name,Text):-call_u(nameStrings(Name,Text)).
-name_text_now(Name,Text):-call_u(mudKeyword(Name,Text)).
 % name_text_now(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),t(N,Name,Text).
-name_text_now(Name,Text):-is_list(Name),!,member(N,Name),name_text_now(N,Text).
-name_text_now(Name,Text):-compound(Name),!,Name=..[F,A|List],!,F\='[|]',name_text_now([F,A|List],Text).
+name_text_now(Name,Text):-is_list(Name),!,case_breaks_text(Name,Text).
+name_text_now(Name,Text):-compound(Name),!,Name=..[F,A|List],!,F\='[|]',case_breaks_text([F,A|List],Text).
 
 name_text_atomic([],_):-!,fail.
 name_text_atomic('',_):-!,fail.
 name_text_atomic("",_):-!,fail.
 name_text_atomic(Name,Text):-string(Name),Name=Text.
-name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),member(t(Text,_),ListN).
-name_text_atomic(Name,Text):-i_name_lc(Name,TextN),atom_string(TextN,Text).
+name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atom_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
+name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),!,case_breaks_text(ListN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
+case_breaks_text(ListN,TextT):- maplist(as_atom,ListN,TextT).
+case_breaks_text(ListN,Text):- member(t(TextL,_),ListN),string_equal_ci(TextL,Text).
+ 
 :-dynamic(baseKB:ttKeyworded/1).
 
 :-ain((tCol(ttKeyworded))).
 :-ain((completelyAssertedCollection(ttKeyworded))).
 :-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
-:-ain((ttKeyworded(T),isa(F,T),{name_text_now_lc(F,Txt)}==>mudKeyword(F,Txt))).
+:-ain((ttKeyworded(T),isa(F,T),{name_text_now(F,Txt)}==>mudKeyword(F,Txt))).
 :-ain((ttKeyworded(vtVerb))).
 :-ain((ttKeyworded(tCol))).
-%:-ain((vtVerb(F),{name_text_now_lc(F,Txt)}==>mudKeyword(F,Txt))).
-%:-ain(tCol(F)/name_text_now_lc(F,Txt)==>mudKeyword(F,Txt)).
+%:-ain((vtVerb(F),{name_text_now(F,Txt)}==>mudKeyword(F,Txt))).
+%:-ain(tCol(F)/name_text_now(F,Txt)==>mudKeyword(F,Txt)).
 
 impl_coerce_hook(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),
@@ -478,7 +478,7 @@ phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):- optional_strings_opt,
       (string_append(T1,[isOptionalStr(Str)],T2,TYPEARGS),
       (StrT =[_] /*;StrT=[_,_]*/),
       string_append(A1,StrT,A2,ARGS),
-      equals_icase(Str,StrT)),!,
+      string_equal_ci(Str,StrT)),!,
       show_call((phrase_parseForTypes_1(T1,A1,G1,[]),
          phrase_parseForTypes_9(T2,A2,G2,LeftOver),      
          string_append(G1,[Str],G2,GOODARGS))).
@@ -575,8 +575,8 @@ parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(isSelfAgent,Goal,Left,Righ
 
 parseIsa(t(P,S,O),TermV) -->{!},parseIsa(call(t(P,S,O)),TermV).
 parseIsa(call(Call),TermV) --> {!,subst(Call,isThis,TermV,NewCall)},theText(TermT), {req1(NewCall),match_object(TermT,TermV)}.
-parseIsa(exactStr(Str),Str) --> {!},[Atom],{equals_icase(Atom,Str),!}.
-parseIsa(isOptionalStr(Str),Str) --> { \+ (optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
+parseIsa(exactStr(Str),Str) --> {!},[Atom],{string_equal_ci(Atom,Str),!}.
+parseIsa(isOptionalStr(Str),Str) --> { \+ (optional_strings_opt)},[Atom],{string_equal_ci(Atom,Str),!}.
 parseIsa(isOptionalStr(_),isMissing) --> {!},[].
 parseIsa(isOptionalStr(_Str),_) --> {!,fail}.
 parseIsa(isOptional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
@@ -631,7 +631,7 @@ coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,In
 coerce0(isRandom(WhatNot),Type,Inst):- !, must((nonvar(WhatNot),to_arg_value(WhatNot,TypeR),random_instance(TypeR,Inst,isa(Inst,Type)))).
 coerce0(String,Type,Inst):- Type==tCol, i_name('t',String,Inst),is_asserted(tCol(Inst)),!.
 coerce0(String,Type,Inst):- ttExpressionType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
-%coerce0(String,Type,Longest) :- findall(Inst, (impl_coerce_hook(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+%coerce0(String,Type,Longest) :- findall(Inst, (impl_coerce_hook(Inst,Type,Inst),string_equal_ci(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce0(String,C,Inst):- compound(C),!,loop_check(parseIsa(C,Inst,[String],[])).
 coerce0(String,Type,Inst):- must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 

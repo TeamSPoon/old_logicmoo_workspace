@@ -45,7 +45,8 @@ vtColor(vRed).
 
 ttValueType(vtColor).
 
-'==>'((isa(X,ttValueType)/(X\==vtValue)),(genls(X,vtValue),completelyAssertedCollection(X))).
+'==>'((isa(X,ttValueType)/(X\==vtValue)),
+  (genls(X,vtValue),completelyAssertedCollection(X))).
 
 completelyAssertedCollection(vtValue).
 

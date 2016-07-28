@@ -359,7 +359,7 @@ prologHybrid(localityOfObject(tObj,tSpatialThing)).
 %((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) ==>    disjointWith(C1,P2)).
 % (disjointWith(C1,P2) <- (genls(C1,P1), {dif:dif(C1,P1)}, disjointWith(P1,P2))).
 
-completelyAssertedCollection(Complete)==> ~ttExpressionType(Complete).
+completelyAssertedCollection(Complete)==> {must(\+ ttExpressionType(Complete))}.
 
 tCol(completelyAssertedCollection).
 tCol(completeIsaAsserted).

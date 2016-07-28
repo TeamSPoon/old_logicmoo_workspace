@@ -1828,6 +1828,7 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 call_u(G):- var(G),!,dtrace,defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,G)).
 call_u(M:G):- var(M),!,trace_or_throw(var_call_u(M:G)).
 call_u(M:G):- nonvar(M),var(G),!,sanity(mtCycL(M)),with_umt(M,mpred_fact_mp(M,G)).
+call_u(G):- current_prolog_flag(unsafe_speedups,true),!,baseKB:call(G).
 call_u(M:G):- clause_b(mtProlog(M)),predicate_property(M:G,defined),!,call(M:G).
 call_u(G):- strip_module(G,M,P),
   (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)),!,
@@ -1872,6 +1873,7 @@ mpred_BC_CACHE0(_,P):-
 % I''d like to remove this soon
 mpred_call_no_bc(P0):- strip_module(P0,_,P), sanity(stack_check),var(P),!, mpred_fact(P).
 mpred_call_no_bc(baseKB:true):-!.
+
 mpred_call_no_bc(P):- no_repeats(loop_check(mpred_call_no_bc0(P),mpred_METACALL(call, P))).
 
 % mpred_call_no_bc0(P):- lookup_u(P).
@@ -1882,12 +1884,14 @@ mpred_call_no_bc(P):- no_repeats(loop_check(mpred_call_no_bc0(P),mpred_METACALL(
 % TODO .. mpred_call_no_bc0(P):-  defaultAssertMt(Mt), clause_b(genlMt(Mt,SuperMt)), call_umt(SuperMt,P).
 %mpred_call_no_bc0(P):- mpred_call_with_no_triggers(P).
 % mpred_call_no_bc0(P):- nonvar(P),predicate_property(P,defined),!, P.
+mpred_call_no_bc0(P):- current_prolog_flag(unsafe_speedups,true),!,baseKB:call(P).
 mpred_call_no_bc0(P):- loop_check(mpred_METACALL(ereq, P)).
 
 pred_check(A):- var(A),!.
 % catch module prefix issues
 pred_check(A):- nonvar(A),must(atom(A)).
 
+mpred_METACALL(How,P):- current_prolog_flag(unsafe_speedups,true),!,baseKB:call(How,P).
 mpred_METACALL(How,P):- mpred_METACALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);mpred_call_no_bc(Cut))).
 
 mpred_METACALL(How, Cut, Var):- var(Var),!,trace_or_throw(var_mpred_METACALL_MI(How,Cut,Var)).

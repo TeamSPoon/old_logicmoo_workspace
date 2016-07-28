@@ -377,15 +377,12 @@ pfcControlled(argIsa).
 
 % tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
 
-%overkill
-tSet(C)<==>completelyAssertedCollection(C).
-
-tSet(C)==>completelyAssertedCollection(C).
-
 %underkill - Though it is making bad things happen 
 ttExpressionType(C)==> \+ completelyAssertedCollection(C).
 
-tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),mpred_univ(C,I,TCI),
+/*
+tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),
+ % mpred_univ(C,I,TCI),
  {call_u((decl_type(C), 
   ignore((
    \+ is_static_predicate(C/1),
@@ -397,7 +394,10 @@ tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),mpred_univ(C,I,TCI),
       predicate_property(TCI,number_of_rules(1)),
     lazy(( \+ call_u(~(TCI)))),
     isa_backchaing(I,C))))))))))))))}).
+*/
 
+%overkill
+tSet(C)<==>completelyAssertedCollection(C).
 
 tSet(C)==>
  ( {atom(C), functor(Head,C,1), call(BHead=baseKB:Head),
@@ -436,7 +436,7 @@ ttPredType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,
 prologMacroHead(prologMacroHead).
 ttPredType(X)==>functorDeclares(X).
 tCol(X)==>functorDeclares(X).
-functorDeclares(X)==>tCol(X).
+% functorDeclares(X)==>tCol(X).
 % prologMacroHead(X)==>functorDeclares(X).
 % prologMacroHead(pddlSomethingIsa/2).
 tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
