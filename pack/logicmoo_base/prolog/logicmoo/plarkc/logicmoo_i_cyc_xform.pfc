@@ -83,7 +83,7 @@ nearestIsa(I,C) <- mpred_fact(isa(I,C)).
 
 % meta_argtypes(ArgTypes)/is_declarations(ArgTypes) ==> {wdmsg(in_loop(meta_argtypes))},meta_argtypes(ArgTypes).
 tRelation(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
-:- ain(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) ==> functorDeclares(F))).
+:- ain(((isa(Compound,prologMacroHead)/(compound_functor(Compound,F),\+ tFunction(Compound))) ==> functorDeclares(F))).
 (ttExpressionType(FT)/is_declarations(FT))==>meta_argtypes(FT).
 
 :- show_call(why,source_location(_,_)).
@@ -93,7 +93,7 @@ tRelation(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
 
 end_of_file.
 
-%(exactlyAssertedSentence(CycL), is_simple_gaf(CycL)) ==> ({cycAdd(CycL)},CycL).
+%(exactlyAssertedSentence(CycL), is_simple_gaf(CycL)) ==> ({cycAssert(CycL)},CycL).
 %(exactlyAssertedSentence(CycL), needs_indexing(CycL)) ==> assertedSentence(CycL).
 %(exactlyAssertedSentence(CycL), needs_canoncalization(CycL)) ==> trueSentence(CycL).
 %:- prolog.

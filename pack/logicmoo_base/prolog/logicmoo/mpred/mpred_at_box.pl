@@ -65,7 +65,7 @@
          inherit_into_module/2,
          box_type/3,
          make_reachable/2,
-         clause_b/1,
+         % clause_b/1,
          fixup_module/2,
          is_undefaulted/1,
          ensure_imports_tbox/2,

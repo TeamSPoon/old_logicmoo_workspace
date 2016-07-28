@@ -18,13 +18,14 @@
 :- gripe_time(60,system:ensure_loaded(library(logicmoo_user))).
 
 :- statistics.
-:- prolog.
 
 user:file_search_path(prologmud, library(prologmud)).
 setup_rl_read_history_0:-
   ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
 :- setup_rl_read_history_0.
 :- initialization(setup_rl_read_history_0,restore).
+
+:- must((statistics(cputime,X),X<45)).
 
 % ==============================
 % Default Daemons

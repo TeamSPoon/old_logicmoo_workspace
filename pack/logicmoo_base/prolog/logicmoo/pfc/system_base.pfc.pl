@@ -31,6 +31,10 @@
 % Douglas Miles
 */
 
+:- dynamic(baseKB:col_as_isa/1).
+:- dynamic(baseKB:col_as_unary/1).
+:- dynamic(baseKB:col_as_static/1).
+
 :- set_prolog_flag(lm_expanders,true).
 % :- set_prolog_flag(read_attvars,false).
 %:- set_prolog_flag(mpred_te,true).
@@ -43,6 +47,7 @@
 :- dynamic(baseKB:agent_call_command/2).
 :- baseKB:import(baseKB:agent_call_command/2).
 
+arity(comment,2).
 
 :- dynamic(baseKB:mtCycL/1).
 :- dynamic(baseKB:mtExact/1).
@@ -192,8 +197,8 @@ argsQuoted({}).
 argsQuoted(second_order).
 % argsQuoted((':-')).
 
-
 :- dynamic((==>)/2).
+:- kb_dynamic((==>)/2).
 %doing_slow_rules,
 %:-rtrace(ain(((prologBuiltin(F),{atom(F)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)}))).
 %((prologBuiltin(P),{compound(P),get_arity(P,F,A)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)}).
@@ -222,6 +227,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 %prologBuiltin(resolveConflict/1).
 
 :- dynamic(bt/2).
+:- kb_dynamic(bt/2).
 bt(P,_)/nonvar(P) ==> (P:- mpred_bc_only(P)).
 
 ((sometimesUseless,prologHybrid(F),arity(F,A))==>hybrid_support(F,A)).
@@ -250,6 +256,8 @@ pfcControlled(C)==>prologHybrid(C).
 
 :- dynamic(hybrid_support/2).
 :- dynamic(type_checking/1).
+:- kb_dynamic(hybrid_support/2).
+:- kb_dynamic(type_checking/1).
 
 /*
 % catching of misinterpreations
@@ -272,6 +280,8 @@ mpred_mark(pfcCreates,F, A)==>
   {functor(P,F,A),make_dynamic(P),kb_dynamic(P),
     create_predicate_istAbove(abox,F,A)},
     marker_supported(F,A).
+
+:- do_gc.
 
 mpred_mark(pfcCallCode,F, A)/predicate_is_undefined_fa(F,A)
     ==> marker_supported(F,A).
@@ -367,6 +377,9 @@ tCol(Decl)==>functorDeclares(Decl).
   OO),dmsg(full_transform=OO),
       OO=(_,_))).
 
+% :- rtrace((trace,fully_expand_now(zzz,ttModule(mtCycL777One,comment("hi there"),genlsFwd(tMicrotheory)),O))),nl,writeq(O),nl,notrace.
+% :- break.
+
 :- ain_expanded(ttModule(mtCycL,
   comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),
   genlsFwd(tMicrotheory))).
@@ -412,6 +425,7 @@ mtCycL(O)==>({call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
 
 
 :- dynamic(nondet/0).
+:- kb_dynamic(nondet/0).
 
 /*
 % These rules break the loader 
@@ -445,6 +459,7 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 */
 
 :- dynamic(baseKB:isRegisteredCycPred/3).
+:- kb_dynamic(baseKB:isRegisteredCycPred/3).
 
 /*
 :- ((rtrace, dtrace)).

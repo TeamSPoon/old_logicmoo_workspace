@@ -305,16 +305,17 @@ define_maybe_prolog(M,PI,F,A):-
 % kb_dynamic(A):- \+(compound(A)),!,ain00(prologHybrid(A)).
 % ain_expanded(love(isEach(a/1,b/2,c/1,d),mother)).
 % ain_expanded(loves(isElement(a/1,b/2,c/1,d),mother)).
+kb_dynamic(M):- var(M),!,trace_or_throw(var_kb_dynamic(M)).
 kb_dynamic(M):- M =.. [isEach|List],!,must_maplist(kb_dynamic,List).
-kb_dynamic(List):- is_list(List),!,must_maplist(kb_dynamic,List).
+kb_dynamic(F/A):- var(F),!,trace_or_throw(var_kb_dynamic(F/A)).
+kb_dynamic([H|List]):- is_list(List),!,kb_dynamic(H),must_maplist(kb_dynamic,List).
 
 % kb_dynamic(MPI):- must(decl_shared(MPI)),must(dynamic(MPI)),!.
 kb_dynamic(MPI):- must(decl_shared(MPI)),must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),MPI))),!.
 
-
-kb_dynamic(F/A):- var(A),atom(F),
- call_u((must(current_smt(SM,CM)),!,
-   forall(between(1,11,A),must((functor(PI,F,A),kb_dynamic(CM,SM,PI,F,A)))))).
+kb_dynamic(F/A):- var(A),atom(F),!,
+ must(call_u((must(current_smt(SM,CM)),!,
+   forall(between(1,11,A),must((functor(PI,F,A),kb_dynamic(CM,SM,PI,F,A))))))),!.
 kb_dynamic(P):- must(call_u(with_pi(P,kb_dynamic))).
 
 
@@ -480,8 +481,8 @@ get_arity(F/A,F,A):- atom(F),ensure_arity(F,A),!,(A>0).
 get_arity(M:FA,F,A):-atom(M),!,get_arity(FA,F,A).
 get_arity(FA,F,A):- get_functor(FA,F,A),must(A>0).
 
-
-arity_no_bc(F,A):- call_u(arity(F,A)).
+% arity_no_bc(F,A):- call_u(arity(F,A)).
+arity_no_bc(F,A):- clause_b(arity(F,A)).
 %= 	 	 
 
 %% ensure_arity( ?VALUE1, ?VALUE2) is semidet.

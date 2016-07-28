@@ -130,6 +130,8 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 :- statistics.
 
+:- must((statistics(cputime,X),X<45)).
+
 %:- ensure_webserver(3020).
 :- initialization(ensure_webserver(3020)).
 :- initialization(ensure_webserver(3020),now).

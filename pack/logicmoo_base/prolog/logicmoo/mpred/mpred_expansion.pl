@@ -1564,6 +1564,7 @@ into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,
 
 % TODO confirm negations
 
+:- expire_tabled_list(all).
 
 %= 	 	 
 

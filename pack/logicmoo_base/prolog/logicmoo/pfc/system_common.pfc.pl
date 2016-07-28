@@ -224,7 +224,12 @@ tCol(ttExpressionType).
 completelyAssertedCollection(ttExpressionType).  % syntactic
 completelyAssertedCollection(tCol). % existential
 
-ttExpressionType(T)==>completelyDecidableCollection(T).
+ttExpressionType(F)==>
+ (~functorDeclares(F),
+  notAssertibleCollection(F),
+  completelyDecidableCollection(F),
+  arity(F,1)).
+
 
 % relations are predsor functions
 completelyAssertedCollection(tRelation).
@@ -401,6 +406,9 @@ pfcControlled(argIsa).
 
 ==>tCol(vtVerb).
 :- must(tCol(vtVerb)).
+%:- must(isa(vtVerb,tCol)).
+%:- must(t(tCol,vtVerb)).
+
 
 % :- call((system:rtrace)).
 ==>tCol(tCol).
@@ -453,7 +461,10 @@ ttExpressionType(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes)
 
 
 (meta_argtypes(ArgTypes)/is_ftCompound(ArgTypes)) ==> ({get_functor(ArgTypes,F,A)},arity(F,A),{arg(N,ArgTypes,Type)},argIsa(F,N,Type)).
-
+meta_argtypes(predicateConventionMt(tPred,tPrologModule)).
+meta_argtypes(argIsa(tRelation,ftInt,tCol)).
+:- must(argIsa(predicateConventionMt,1,tPred)).
+:- must(argIsa(predicateConventionMt,2,tPrologModule)).
 
 prologMacroHead(tCol).
 
@@ -476,6 +487,7 @@ arity(completeExtentAsserted,1).
 tCol(completeExtentAsserted).
 argIsa(completeExtentAsserted,1,tPred).
 meta_argtypes(genlPreds(tPred,tPred)).
+:- must_det(argIsa(genlPreds,2,_)).
 completeExtentAsserted(defnSufficient).
 
 
@@ -993,7 +1005,7 @@ genls(ttExpressionType, ftSpec).
 prologSingleValued(predInstMax(ftID,prologSingleValued,ftInt),prologHybrid).
 prologSingleValued(predTypeMax(prologSingleValued,tCol,ftInt),prologHybrid).
 resultIsa(txtFormatFn,ftText).
-%'<==>'(prologMultiValued(CallSig,[predProxyAssert(hooked_asserta),predProxyRetract(hooked_retract),predProxyQuery(call)]),prologDynamic(CallSig)).
+%'<==>'(prologMultiValued(CallSig,[predProxyAssert(aina),predProxyRetract(del),predProxyQuery(call)]),prologDynamic(CallSig)).
 %'<==>'(prologMultiValued(CallSig,[predProxyAssert(pttp_tell),predProxyRetract(pttp_retract),predProxyQuery(pttp_ask)]),prologPTTP(CallSig)).
 subFormat(ftAtom,ftTerm).
 subFormat(ftCallable,ftProlog).

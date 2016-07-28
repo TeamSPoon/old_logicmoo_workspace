@@ -373,10 +373,12 @@ get_source_ref_stack(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
 is_user_fact((_,U)):-atomic(U).
 
 get_first_user_reason(P,(F,T)):-
-  (((lookup_u(spft(P,F,T))),UU=(F,T),is_user_fact(UU))*-> true;
-  (((lookup_u(spft(P,F,T))),UU=(F,T), \+ is_user_fact(UU))*-> true ; 
-        (clause_asserted_u(P),get_source_ref(UU),is_user_fact(UU)))).
-
+  UU=(F,T),
+  (((lookup_u(spft(P,F,T))),is_user_fact(UU))*-> true;
+    (((lookup_u(spft(P,F,T))), \+ is_user_fact(UU))*-> true ; 
+       (clause_asserted_u(P),get_source_ref(UU),is_user_fact(UU)))),!.
+get_first_user_reason(P,UU):-get_source_ref_stack(UU),is_user_fact(UU),!.
+get_first_user_reason(P,UU):-must(get_source_ref_stack(UU)),!.
 %get_first_user_reason(_,UU):- get_source_ref(UU),\+is_user_fact(UU). % ignore(get_source_ref(UU)).
 
 %% get_source_ref1(+Mt) is semidet.
@@ -795,11 +797,10 @@ ain_fast(P,S):-
   each_E(mpred_post1,P,[S]),
   mpred_run.
 
-
-:- dynamic(baseKB:eachRulePreconditional/1).
-baseKB:eachRulePreconditional(true).
-:- dynamic(baseKB:eachFactPreconditional/1).
-baseKB:eachFactPreconditional(true).
+:- dynamic(lmconf:eachRule_Preconditional/1).
+lmconf:eachRule_Preconditional(true).
+:- dynamic(lmconf:eachFact_Preconditional/1).
+lmconf:eachFact_Preconditional(true).
 
 add_eachRulePreconditional(A,A):-var(A),!.
 add_eachRulePreconditional(B::::A,B::::AA):-add_eachRulePreconditional(A,AA).
@@ -808,11 +809,11 @@ add_eachRulePreconditional(A<==>B, ('==>'(AA , B) , (BB ==> A)) ):-!,add_eachRul
 add_eachRulePreconditional((B <- A), (B <- AA)) :-!,add_eachRulePreconditional_now(A,AA).
 add_eachRulePreconditional(A,AA):-add_eachFactPreconditional_now(A,AA).
 
-add_eachFactPreconditional_now(A,A):- baseKB:eachFactPreconditional(true),!.
-add_eachFactPreconditional_now(A,(Was==>A)):- baseKB:eachFactPreconditional(Was),!.
+add_eachFactPreconditional_now(A,A):- lmconf:eachFact_Preconditional(true),!.
+add_eachFactPreconditional_now(A,(Was==>A)):- lmconf:eachFact_Preconditional(Was),!.
 
-add_eachRulePreconditional_now(A,A):- baseKB:eachRulePreconditional(true),!.
-add_eachRulePreconditional_now(A,(Was,A)):- baseKB:eachRulePreconditional(Was),!.
+add_eachRulePreconditional_now(A,A):- lmconf:eachRule_Preconditional(true),!.
+add_eachRulePreconditional_now(A,(Was,A)):- lmconf:eachRule_Preconditional(Was),!.
 
 
 
@@ -832,7 +833,9 @@ remove_negative_version(P):-
   must(mpred_ain(\+ (~(P)), S)))))),!.
 
      
+fwc1s_post1s(1,2):-!.     
 fwc1s_post1s(1,2):- current_prolog_flag(unsafe_speedups,false),!.
+    
 fwc1s_post1s(100,200):- fresh_mode,!.
 fwc1s_post1s(1,2):- current_prolog_flag(pfc_booted,true),!.
 % fwc1s_post1s(10,20):- defaultAssertMt(Mt)->Mt==baseKB,!.
@@ -876,7 +879,7 @@ mpred_post(P, S):- fully_expand_now(post,P,P0),each_E(mpred_post1,P0,[S]).
 % adds an entry to the Pfc queue for subsequent forward chaining.
 % It always succeeds.
 %
-
+mpred_post1( isa(_,_,_),   _):- dumpST,dtrace.
 mpred_post1( P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post1( P0,   S).
 
 mpred_post1(Fact, _):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(One,_Two),Three is One * 3, filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
@@ -914,6 +917,19 @@ mpred_post12(P,S):- fail,
      !)),
   plus_fwc(P),!.
   
+
+% this would be for complete repropagation
+mpred_post12(P,S):- t_l:is_repropagating(_),!,
+ ignore(( %  db mpred_ain_db_to_head(P,P2),
+  % mpred_remove_old_version(P),  
+  mpred_add_support(P,S),
+  (mpred_unique_u(P)->
+     assert_u_confirmed_was_missing(P);
+     assert_u_confirm_if_missing(P)), 
+  mpred_trace_op(add,P,S),
+  !,
+  mpred_enqueue(P,S))),
+  !.
 
 % this would be the very inital by Tim Finnin...
 mpred_post12(P,S):- fail, fresh_mode,
@@ -2270,7 +2286,8 @@ mpred_mark_as_ml(Sup,Type,P):- mpred_mark_as(Sup,P,Type).
 %
 pos_2_neg(p,n):-!.
 pos_2_neg(n,p):-!.
-pos_2_neg(P,~(P)).
+pos_2_neg(P,~(P)):- (var(P); P \= '~'(_)),!.
+% pos_2_neg(P,~(P)).
 
 
 %% mpred_mark_as(+VALUE1, ?VALUE2, :TermP, ?VALUE4) is semidet.
@@ -2749,7 +2766,15 @@ mpred_nowatch:-  retractall_u(mpred_is_tracing_exec).
 %
 % Using Trace exec.
 %
-with_mpred_trace_exec(P):- wno_tl_e(t_l:hide_mpred_trace_exec,w_tl_e(t_l:mpred_debug_local, must(show_if_debug(P)))).
+
+% with_mpred_trace_exec(P):- wno_tl_e(t_l:hide_mpred_trace_exec,w_tl_e(t_l:mpred_debug_local, must(show_if_debug(P)))).
+with_mpred_trace_exec(P):- 
+ ((\+ lookup_u(mpred_is_tracing_exec),mpred_trace_exec)
+      -> Exit = mpred_notrace_exec; Exit = true),
+   wno_tl_e(t_l:hide_mpred_trace_exec,
+       w_tl_e(t_l:mpred_debug_local, 
+           must(show_if_debug(P)))),
+        call(Exit).
 
 %% with_mpred_trace_exec( +P) is semidet.
 %
@@ -2773,7 +2798,7 @@ show_if_debug(A):-  get_mpred_is_tracing(A) -> show_call(A) ; A.
 % If Is A Silient.
 %
 mpred_is_silient :- t_l:hide_mpred_trace_exec,!, \+ tracing.
-mpred_is_silient :- mnotrace(( \+ t_l:mpred_debug_local, \+ clause_asserted_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_tracing_pred(_)), 
+mpred_is_silient :- notrace(( \+ t_l:mpred_debug_local, \+ lookup_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_spying_pred(_)), 
   current_prolog_flag(debug,false), is_release)) ,!.
 
 

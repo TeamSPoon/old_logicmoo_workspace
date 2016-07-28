@@ -251,7 +251,8 @@ get_source_suffix(SS):- baseKB:current_source_suffix(SS),!.
 get_source_suffix('7').
 %get_source_suffix(SS):- source_location(F,_),!,file_directory_name(F,DN),file_base_name(DN,SS),concat_atom(['-',SS,'7'],SSM),asserta_if_new(baseKB:current_source_suffix(SSM)).
 
-
+clip_source_suffix(TypeStemNum,TypeStem):- get_source_suffix(SS), atom_concat(TypeStem,SS,TypeStemNum),!.
+clip_source_suffix(TypeStem,TypeStem):-!.
 
 %= 	 	 
 
@@ -259,13 +260,24 @@ get_source_suffix('7').
 %
 % Create Converted From Type.
 %
-create_from_type(OType,Name,Type):- sanity(var(Name)),
-   i_name(OType,TypeWT),
-   atom_concat('t',TypeWT,Type),
+create_from_type(InstOrType,Name,Type):- sanity(var(Name)),
+  must_det_l(( 
+   guess_type_name(InstOrType,Type),
+   guess_inst_name(InstOrType,Type,Name),
+   assert_isa(Type,tCol),
+   assert_isa(Name,Type))),!.
+
+guess_type_name(InstOrType,InstOrType):- isa_asserted(InstOrType,tCol),!.
+guess_type_name(InstOrType,Type):-
+   i_name(InstOrType,TypeStemNum),
+   clip_source_suffix(TypeStemNum,TypeStem),
+   atom_concat('t',TypeStem,Type).
+
+guess_inst_name(Type,Type,Name):-
+   i_name('i',Type,NameNeedsNum),
    get_source_suffix(SS),
-   atom_concat(Type,SS,InstA7),!,
-   i_name(i,InstA7,Name),
-   must_det(assert_isa(Name,Type)),!.
+   atom_concat(NameNeedsNum,SS,Name),!.
+guess_inst_name(Inst,_Type,Inst).
 
 
 

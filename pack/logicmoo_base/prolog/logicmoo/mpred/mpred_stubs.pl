@@ -562,7 +562,7 @@ agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
 %
 rescan_mpred_props_ilc:-no_rescans,!.
 rescan_mpred_props_ilc:-rescan_duplicated_facts(user,local_q_mpred_isa(_,_)),fail.
-rescan_mpred_props_ilc:- prolog_statistics:time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(local_q_mpred_isa(Pred,Prop)))),fail.
+rescan_mpred_props_ilc:- prolog_statistics:time(forall(mpred_prop_ordered(Pred,Prop),ain(local_q_mpred_isa(Pred,Prop)))),fail.
 rescan_mpred_props_ilc.
 
 
