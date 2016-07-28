@@ -20,7 +20,7 @@
 */
 :- profile(true).
 
-%:- system:ensure_loaded(setup_paths).
+%:- user:ensure_loaded(setup_paths).
 %:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 %:- endif.
 % :- module(init_mud_server,[]).
@@ -64,7 +64,7 @@
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
 
-:- system:ensure_loaded(setup_paths).
+:- user:ensure_loaded(setup_paths).
 
 
 :- system:ensure_loaded(library(prolog_server)).

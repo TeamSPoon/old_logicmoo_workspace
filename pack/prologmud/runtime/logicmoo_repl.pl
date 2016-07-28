@@ -8,7 +8,7 @@
 :- set_prolog_stack(local, limit(16*10**9)).
 :- set_prolog_stack(trail, limit(16*10**9)).
 
-:- system:ensure_loaded(setup_paths).
+:- user:ensure_loaded(setup_paths).
 
 % ==============================
 % Load logicmoo REPL Base
