@@ -465,7 +465,9 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 :-recreate(can_hold_type/2).
 :-recreate(verb_affordance/5).
 
+:- check_clause_counts.
 :- kb_dynamic(argIsa/3).
+:- check_clause_counts.
 :- kb_dynamic(genls/2).
 :- kb_dynamic(mudActionMaxDistance(vtActionType,ttObjectType,ftInt)).
 

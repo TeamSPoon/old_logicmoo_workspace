@@ -1292,20 +1292,28 @@ portray_hb(H,B):- portray_one_line((H:-B)), format('~N').
 :- export(portray_one_line/1).
 :- thread_local(baseKB:portray_one_line_hook/1).
 
+:- meta_predicate(catch_each(:,-,-)).
 
-%= 	 	 
+catch_each(M:G,E,Or):-
+  LE = ex((failed_catch_each(G))),
+  catchv((
+  ((must(clause(M:G,B,Ref)), once(clause_property(Ref,module(Module));Module=M),
+  (Module:catchv(M:B,E,(nb_setarg(1,LE,E),fail))))->!;(LE = ex(W),throw(W)))),E,Or).
+
 
 %% portray_one_line( ?H) is semidet.
 %
 % Portray One Line.
 %
-portray_one_line(H):- cnotrace((tlbugger:no_slow_io,!, writeq(H),write('.'),nl)),!.
-portray_one_line(H):- baseKB:portray_one_line_hook(H),!.
-portray_one_line(H):- maybe_separate(H,(format('~N'))),fail.
-portray_one_line(H):- \+ \+ ((logicmoo_varnames:get_clause_vars(H), portray_clause(H))),!.
-portray_one_line(H):- user:portray(H),write('.'),nl,!.
-portray_one_line(H):- print(H),write('.'),nl,!.
-portray_one_line(H):- writeq(H),write('.'),nl,!.
+portray_one_line(H):- notrace((tlbugger:no_slow_io,!, writeq(H),write('.'),nl)),!.
+portray_one_line(H):-  catch_each(portray_one_line0(H),_,(writeq(H),write('.'),nl)),!.
+
+portray_one_line0(H):- baseKB:portray_one_line_hook(H),!.
+portray_one_line0(H):- maybe_separate(H,(format('~N'))),fail.
+portray_one_line0(H):- \+ \+ ((logicmoo_varnames:get_clause_vars(H), portray_clause(H))),!.
+portray_one_line0(H):- user:portray(H),write('.'),nl,!.
+portray_one_line0(H):- print(H),write('.'),nl,!.
+portray_one_line0(H):- writeq(H),write('.'),nl,!.
 
 
 :- thread_local t_l:last_portray_key/1.

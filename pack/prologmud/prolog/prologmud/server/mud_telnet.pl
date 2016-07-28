@@ -257,7 +257,7 @@ fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).
 prompt_read_telnet(In,Out,Prompt,Atom):-
       get_session_id_local(O),      
       prompt_read(In,Out,Prompt,IAtom),
-      (IAtom==end_of_file -> (hooked_asserta(lmcache:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
+      (IAtom==end_of_file -> (ain(lmcache:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
 prompt_read(In,Out,Prompt,Atom):-
      with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),      

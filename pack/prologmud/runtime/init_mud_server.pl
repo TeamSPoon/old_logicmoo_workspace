@@ -2,22 +2,22 @@
 /* * module  MUD server startup script in SWI-Prolog
 
 */
-/*
-:- set_prolog_flag(access_level,system).
 
 :- if( \+ current_module(prolog_stack)).
 :- system:use_module(library(prolog_stack)).
  prolog_stack:stack_guard(none).
 :- endif.
 
+/*
+:- set_prolog_flag(access_level,system).
 :- use_module(library(prolog_history)).
 :- use_module(library(base32)).
-:- set_prolog_flag(report_error,true).
 :- set_prolog_flag(compile_meta_arguments,false).
+*/
+:- set_prolog_flag(report_error,true).
 :- set_prolog_flag(debug_on_error,true).
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
 :- set_prolog_flag(generate_debug_info,true).
-*/
 :- profile(true).
 
 %:- user:ensure_loaded(setup_paths).
@@ -135,7 +135,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- initialization(ensure_webserver(3020),now).
 :- initialization(ensure_webserver(3020),restore).
 
-:- assert_setting01(baseKB:eachRulePreconditional(true)).
+:- assert_setting01(lmconf:eachRule_Preconditional(true)).
 
 :- set_prolog_flag(dialect_pfc,false).
 
@@ -168,6 +168,14 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 % Regression tests that first run whenever a person stats the MUD on the public server
 % ==========================================================
 
+
+%:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_col_as_unary.pfc')).
+%:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_birdt.pfc')).
+%:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_sv.pfc')).
+%:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_foob.pfc')).
+
+
+
 :- if((gethostname(ubuntu),fail)). % INFO this fail is so we can start faster
 :- show_entry(gripe_time(40, doall(baseKB:regression_test))).
 :- endif.
@@ -177,7 +185,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 % MUD SERVER CODE LOADS
 % ==============================
 
-% :- assert_setting01(baseKB:eachRulePreconditional(isRuntime)).
+% :- assert_setting01(lmconf:eachRule_Preconditional(isRuntime)).
 
 
 %:- push_modules.
@@ -270,7 +278,7 @@ mpred_argtypes(bordersOn(tRegion,tRegion)).
 
 :- file_begin(pl).
 
-%:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
+:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
 
 % [Optionaly] Start the telent server % iCommanderdata66
@@ -291,12 +299,14 @@ lar:- login_and_run.
 
 :- initialization(ensure_webserver(3020),now).
 
-% :- assert_setting01(baseKB:eachFactPreconditional(isRuntime)).
+% :- assert_setting01(lmconf:eachFact_Preconditional(isRuntime)).
 
 :- set_prolog_flag(unsafe_speedups,true).
 % isa(starTrek,mtCycL).
 % :- starTrek:force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
+
+:- check_clause_counts.
 
 :- must_det(argIsa(genlPreds,2,_)).
 
@@ -305,8 +315,8 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 % :- break.
 
-:- assert_setting01(baseKB:eachRulePreconditional(true)).
-:- assert_setting01(baseKB:eachFactPreconditional(true)).
+:- assert_setting01(lmconf:eachRule_Preconditional(true)).
+:- assert_setting01(lmconf:eachFact_Preconditional(true)).
 :- ain(isRuntime).
 
 :- ain(isa(iFoodRez2,tFood)).
@@ -317,6 +327,8 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 :- gripe_time(3.0,coerce(s,vtDirection,_)).
 :- gripe_time(3.0, \+ coerce(l,vtDirection,_)).
+
+:- check_clause_counts.
 
 :- initialization(lar,restore).
 % :- initialization(lar).

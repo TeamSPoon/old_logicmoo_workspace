@@ -777,7 +777,7 @@ as_clause_w_m(MHB, M1H, H, B, M2B):-  expand_to_hb( MHB,  MH, MB),strip_module(M
 %
 % If Is A Format Type of a Compound specifier
 %
-is_ftNameArity(F,A):-atom(F),integer(A),A>=0.      
+is_ftNameArity(F,A):-integer(A), atom(F), (F \= (/)),A>=0.      
 
 %% is_ftCompound( ?Goal) is semidet.
 %

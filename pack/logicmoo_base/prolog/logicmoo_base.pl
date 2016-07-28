@@ -65,15 +65,22 @@ baseKB:mpred_skipped_module(eggdrop).
 :-use_module(system:library('logicmoo/mpred/mpred_prolog_file.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_props.pl')).
 
+:-multifile( baseKB:predicateConventionMt/2).
+:-dynamic( baseKB:predicateConventionMt/2).
+:-multifile( baseKB:predicateConventionMt/2).
+:-dynamic( baseKB:predicateConventionMt/2).
+:-multifile( baseKB:argsQuoted/1).
+:-dynamic( baseKB:argsQuoted/1).
+
+
+:-use_module(system:library('logicmoo/mpred/mpred_type_isa.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_kb_ops.pl')).
-:-multifile( baseKB:predicateConventionMt/2).
-:-dynamic( baseKB:predicateConventionMt/2).
-:-multifile( baseKB:predicateConventionMt/2).
-:-dynamic( baseKB:predicateConventionMt/2).
 :- kb_dynamic(lmcache:loaded_external_kbs/1).
 :- kb_dynamic(baseKB:mpred_skipped_module/1).
 
 
+:-use_module(system:library('logicmoo/mpred/mpred_agenda.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_storage.pl')).
 :-ensure_loaded(system:library('logicmoo/mpred/mpred_userkb.pl')).
 :- dynamic(baseKB:argsQuoted/1).
 :- dynamic(baseKB:resolveConflict/1).
@@ -82,14 +89,11 @@ baseKB:mpred_skipped_module(eggdrop).
 
 :-use_module(system:library('logicmoo/snark/common_logic_sexpr.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_listing.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_storage.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_stubs.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_type_constraints.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_type_isa.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_type_naming.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_type_wff.pl')).
 :-use_module(system:library('logicmoo/mpred/mpred_type_args.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_agenda.pl')).
 
 % :-use_module(system:library('logicmoo/mpred/mpred_*.pl')).
 
@@ -127,8 +131,6 @@ needs_pfc(I) :- nonvar(I),get_consequent_functor(I,F,A),
    (clause_b(prologMacroHead(F));clause_b(hybrid_support(F,_));baseKB:wrap_shared(F,A,ereq)),!.
 
 
-% system:clause_expansion(I,PosI,O,PosI):- base_clause_expansion(PosI,I,O),!.
-system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),nonvar(I), base_clause_expansion(PosI,I,O)->I\==O.
 
 
 
@@ -202,20 +204,28 @@ user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_unde
 % Load boot base file
 user:lmbf:- 
  w_tl( set_prolog_flag(mpred_te,true),
+  w_tl( set_prolog_flag(lm_expanders,true),
    w_tl(set_prolog_flag(pfc_booted,false),
      with_umt(baseKB,
-  time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc'))))))),
+  gripe_time(6.0,time((ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc'))))))))),
   set_prolog_flag(pfc_booted,true).
+
+
 
  :- meta_predicate mpred_expansion:temp_comp(*,*,2,?).
  :- meta_predicate mpred_storage:mdel(+).
- :- meta_predicate mpred_type_isa:assert_isa_hooked_after(?,1).
+ %:- meta_predicate mpred_type_isa:assert_isa_hooked_after(?,1).
  :- meta_predicate mpred_pfc:attvar_op_fully(1,?).
 
+:- set_prolog_flag(lm_expanders,false).
+
+% system:clause_expansion(I,PosI,O,PosI):- base_clause_expansion(PosI,I,O),!.
+system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),nonvar(I), base_clause_expansion(PosI,I,O)->I\==O.
 
 :- list_undefined.
 :- user:lmbf.
-
+:- prolog.
+:- set_prolog_flag(lm_expanders,false).
 % 
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).

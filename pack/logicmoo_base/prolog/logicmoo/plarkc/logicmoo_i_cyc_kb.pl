@@ -1,6 +1,6 @@
 /* 
 % ===================================================================
-% File 'mpred_cyc_kb.pl'
+% File 'logicmoo_i_cyc_kb.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -37,7 +37,7 @@
             cyc_to_mpred_idiom_unused/2,
             cyc_to_mpred_sent_idiom_2/3,
             %baseKB:cyc_to_plarkc/2,
-            
+            finish_asserts/0,
             expT/1,
             %lmcache:isCycAvailable_known/0,
             %lmcache:isCycUnavailable_known/1,
@@ -468,13 +468,18 @@ mwkb1:- tell(fooooo0),
       told.
 
 ltkb1:- check_clause_counts,
- baseKB: must_det_l(( mwkb1,forall(find_and_call(tinyKB0(D)), cycAssert(D)))),
- check_clause_counts.
+ defaultAssertMt(MT),
+ with_current_why(mfl(MT, ltkb1, _ ),
+ ( MT: must_det_l(( mwkb1,forall(find_and_call(tinyKB0(D)), cycAssert(D)))),
+         check_clause_counts,
+         finish_asserts,
+  ltkb1_complete)).
 
 
+finish_asserts:-baseKB: forall(find_and_call(tinyKB8(Fact)),mpred_post(baseKB:Fact,(tinyKB8(Fact),ax))).
 
 ltkb1_complete:- 
-  baseKB: forall(find_and_call(tinyKB8(Fact)),mpred_post(baseKB:Fact,(tinyKB8(Fact),ax))),
+  finish_asserts,
   doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pfc'),F),
   source_file(X,F),
   predicate_property(X,dynamic),retract(X:-_))).
@@ -837,7 +842,9 @@ checkCycAvailablity:- catchv((current_predicate(invokeSubL/2),ignore((invokeSubL
 :- disable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,false).
 :- (include(logicmoo(plarkc/'logicmoo_i_cyc_kb_preds.pfc'))).
-:- (include(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'))).
+
+:- ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc')).
+
 :- enable_mpred_expansion.
 :- gripe_time(60,ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_xform.pfc'))).
 %:-must(forall(retract(at_eof_action(CALL)),must(CALL))).

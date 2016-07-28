@@ -339,7 +339,7 @@ fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)
 fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
 
 % create_and_assert_random_fact(_):- t_l:noDBaseHOOKS(_),!.
-create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),hooked_asserta(Fact).
+create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),aina(Fact).
 
 %  suggest a random fact that is probably is not already true
 create_random_fact(G) :- into_functor_form(t,G,MPred),G\=@=MPred,!,create_random_fact(MPred).
