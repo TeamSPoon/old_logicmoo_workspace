@@ -1107,11 +1107,18 @@ unload_this_file(File):-
 :- export(clause_count/2).
 :- module_transparent(clause_count/2).
 
+clause_count(Mask,N):- arg(_,Mask,Var),nonvar(Var),!,
+   flag(clause_count,_,0),
+    ignore((current_module(M),clause(M:Mask,_,Ref),
+       (clause_property(Ref,module(MW))->must(M==MW);true),
+       flag(clause_count,X,X+1),fail)),flag(clause_count,N,0),!.
 clause_count(Mask,N):- 
      flag(clause_count,_,0),
-      ignore((current_module(M),clause(M:Mask,_,Ref),
-         (clause_property(Ref,module(MW))->must(M==MW);true),
-         flag(clause_count,X,X+1),fail)),flag(clause_count,N,0).
+      ignore((current_module(M),
+         \+ predicate_property(M:Mask,imported_from(_)),
+         predicate_property(M:Mask,number_of_clauses(Count)),
+         flag(clause_count,X,X), must(X=0),
+         flag(clause_count,X,X+Count),fail)),flag(clause_count,N,0),!.
 
 check_clause_counts:- notrace((forall(checked_clause_count(Mask),check_clause_count(Mask)))),fail.
 check_clause_counts.
@@ -1120,6 +1127,10 @@ check_clause_counts.
 
 checked_clause_count(isa(_,_)).
 checked_clause_count(~(_)).
+checked_clause_count(prologBuiltin(_)).
+checked_clause_count(prologHybrid(_)).
+checked_clause_count(hybrid_support(_)).
+checked_clause_count(pfcControlled(_)).
 checked_clause_count(t(_,_)).
 checked_clause_count(t(_,_,_)).
 checked_clause_count(arity(_,_)).
@@ -1137,7 +1148,7 @@ checked_clause_count(agent_command(_,_)).
 
 :- dynamic(lmcache:last_clause_count/2).
 
-% check_clause_count(_):-current_prolog_flag(unsafe_speedups,true),!.
+check_clause_count(_):-current_prolog_flag(unsafe_speedups,true),!.
 check_clause_count(Mask):- swc,
  clause_count(Mask,N),
     (retract(lmcache:last_clause_count(Mask,Was)) -> true ; Was=0),

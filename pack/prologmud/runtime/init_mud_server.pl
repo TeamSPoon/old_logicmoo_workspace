@@ -68,7 +68,7 @@
 
 
 :- system:ensure_loaded(library(prolog_server)).
-:- prolog_server(4022, [allow(_)]).
+:- prolog_server(4023, [allow(_)]).
 :- system:ensure_loaded(library(logicmoo_utils)).
 
 :- set_prolog_flag(access_level,system).
@@ -192,7 +192,8 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 %:- push_modules.
 % [Required] load the mud system
-:- with_mpred_trace_exec(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
+% :- with_mpred_trace_exec(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
+:- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
 %:- lcme:reset_modules.
 
 %:- set_prolog_flag(logicmoo_debug,true).
@@ -281,8 +282,6 @@ mpred_argtypes(bordersOn(tRegion,tRegion)).
 
 :- file_begin(pl).
 
-:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
-
 
 % [Optionaly] Start the telent server % iCommanderdata66
 start_telnet:- on_x_log_cont(start_mud_telnet_4000).
@@ -313,8 +312,9 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 :- must_det(argIsa(genlPreds,2,_)).
 
-%:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
-%:- initialization(ltkb1,now).
+load_ckb:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)),ltkb1.
+
+%:- initialization(ltkb1,load_ckb).
 
 % :- break.
 
@@ -332,8 +332,9 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 :- set_prolog_flag(unsafe_speedups,true).
 :- statistics.
-:- gripe_time(1.0,coerce(s,vtDirection,_)).
-:- gripe_time(2.0, \+ coerce(l,vtDirection,_)).
+:- time(gripe_time(1.0,coerce(s,vtDirection,_))).
+%:- time(gripe_time(8.0, \+ coerce(l,vtDirection,_))).
+%:- time(gripe_time(1.0, \+ coerce(l,vtDirection,_))).
 
 :- check_clause_counts.
 

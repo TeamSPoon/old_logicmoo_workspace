@@ -11,6 +11,7 @@
          telnet_repl_obj_to_string/3,
          start_mud_telnet_4000/0,
          start_mud_telnet/1,
+         start_prolog_telnet/1,
          run_session/0,
          run_session/2,
          correct_o_stream/0,
@@ -121,6 +122,11 @@ login_and_run_nodebug:- nodebugx(login_and_run).
 
 get_session_id_local(O):- find_and_call(get_session_id(O)).
 
+
+ensure_player_attached(In,Out,P):-
+  call_u((
+    current_agent(P)->true;player_connect_menu(In,Out,_,P))).
+
 player_connect_menu(In,Out,Wants,P):-
  must_det_l((
    get_session_id_local(O),
@@ -139,8 +145,16 @@ login_and_run:-
    login_and_run(In,Out).
 
 set_player_telnet_options(P):-
+     get_session_id_local(O),
+     asserta(t_l:telnet_prefix(O,[P,wants,to])),
      ain(repl_writer(P,telnet_repl_writer)),
      ain(repl_to_string(P,telnet_repl_obj_to_string)).
+
+unset_player_telnet_options(P):-
+     get_session_id_local(O),
+     retractall(t_l:telnet_prefix(O,[P,wants,to])),
+     clr(repl_writer(P,_)),
+     clr(repl_to_string(P,_)).
 
 goodbye_player:- 
      find_and_call(foc_current_agent(P3)),
@@ -156,25 +170,27 @@ login_and_run(In,Out):-
 
 run_session(In,Out):-  
   call_u((must_det_l((
-  get_session_id_local(O),
-  asserta(t_l:telnet_prefix([isSelfAgent,wants,to])),
-  thread_self(Id),
-  retractall(lmcache:wants_logout(O)))),!,
-  repeat,
-      once(session_loop(In,Out)),
-      retract(lmcache:wants_logout(O)),!,
-      retractall(lmcache:session_io(_,_,_,Id)),   
-      retractall(lmcache:session_io(O,_,_,_)))),!.
+     get_session_id_local(O),
+     ensure_player_attached(In,Out,P),
+     retractall(lmcache:wants_logout(O)))),!,
+     register_player_stream_local(P,In,Out),
+     call_u((repeat,
+         once(session_loop(In,Out)),
+         retract(lmcache:wants_logout(O)))),!,
+      % this leaves the session
+      retractall(lmcache:wants_logout(O)),
+      ignore(current_agent(Agnt)->true;Agnt=P),
+      deregister_player_stream_local(Agnt,In,Out))).
+  
 
 session_loop(In,Out):-
  call_u((must_det_l((
   get_session_id_local(O),
-  call_u((current_agent(P)->true;player_connect_menu(In,Out,_,_);player_connect_menu(In,Out,_,P))),
-  register_player_stream_local(P,In,Out),
+  ensure_player_attached(In,Out,P),
   find_and_call(start_agent_action_thread),
   ignore(look_brief(P)),!,
-  (t_l:telnet_prefix(Prefix)->(sformat(S,'~w ~w>',[P,Prefix]));sformat(S,'~w> ',[P])),
-  prompt_read_telnet(In,Out,S,List),!,
+  (t_l:telnet_prefix(O,Prefix)->(sformat(Prompt,'~w ~w>',[P,Prefix]));sformat(Prompt,'~w> ',[P])),
+  prompt_read_telnet(In,Out,Prompt,List),!,
   enqueue_session_action(P,List,O))))).
 
 
@@ -191,6 +207,17 @@ register_player_stream_local(P,In,Out):-
    asserta_new(lmcache:session_agent(O,P)),
    retractall(lmcache:agent_session(_,O)), 
    asserta_new(lmcache:agent_session(P,O)), 
+   nop(check_console(Id,In,Out,_Err)))))).
+
+deregister_player_stream_local(P,In,Out):-
+ call_u((must_det_l((
+   unset_player_telnet_options(P),
+   get_session_id_local(O),thread_self(Id),
+   retractall(lmcache:session_io(_,_,_,Id)),
+   retractall(lmcache:session_io(O,_,_,_)),
+   %  wdmsg(asserta_new(lmcache:session_io(O,In,Out,Id))),
+   retractall(lmcache:session_agent(O,_)),
+   retractall(lmcache:agent_session(_,O)),   
    nop(check_console(Id,In,Out,_Err)))))).
 
 check_console(Id,In,Out,Err):-
@@ -249,7 +276,7 @@ setup_streams(In,Out):-
 fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).
 fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).
 
-:-thread_local(t_l:telnet_prefix/1).
+:-thread_local(t_l:telnet_prefix/2).
 
 % :-set_tty_control(true).
 

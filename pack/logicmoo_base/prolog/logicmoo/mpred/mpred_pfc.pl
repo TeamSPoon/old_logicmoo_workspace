@@ -880,7 +880,6 @@ mpred_post(P, S):- fully_expand_now(post,P,P0),each_E(mpred_post1,P0,[S]).
 % adds an entry to the Pfc queue for subsequent forward chaining.
 % It always succeeds.
 %
-mpred_post1(P, S):- compound(P), ( \+ P = argsQuoted(_) ), functor(P,F,N), ( F \== (==>) ), arg(N,P,A),member(A,['$VAR'('????????????'),'$VAR'(_)])->trace_or_throw(mpred_post1(P, S)).
 mpred_post1( isa(_,_,_),   _):- dumpST,dtrace.
 mpred_post1( P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post1( P0,   S).
 
@@ -892,6 +891,8 @@ mpred_post1(P,S):- gripe_time(0.6,mpred_post12(P,S)).
 :- module_transparent(mpred_post1/2).
 :- module_transparent(mpred_post12/2).
 :- export(mpred_post12/2).
+
+mpred_post12(P, S):- compound(P), ( \+ P = argsQuoted(_) ), functor(P,F,N), ( F \==  action_rules, F \== (==>) ), (arg(N,P,A);arg(1,P,A)), member(A,['$VAR'('????????????'),'$VAR'(_)])->trace_or_throw(mpred_post1(P, S)).
 
 mpred_post12( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 
@@ -2380,7 +2381,7 @@ build_code_test(_,Test,Test).
 %
 build_consequent(_      ,Test,Test):- is_ftVar(Test),!.
 build_consequent(_      ,Test,TestO):-is_ftVar(Test),!,TestO=added(Test).
-build_consequent(_Sup,!,cut_c):-!.
+build_consequent(_Sup,!,{cut_c}):-!.
 build_consequent(WS,'{}'(Test),'{}'(TestO)) :- !,build_code_test(WS,Test,TestO).
 build_consequent(WS,rhs(Test),rhs(TestO)) :- !,build_consequent(WS,Test,TestO).
 build_consequent(WS,Test,TestO):- is_list(Test),must_maplist(build_consequent(WS),Test,TestO).

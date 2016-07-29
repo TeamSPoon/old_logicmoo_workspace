@@ -83,6 +83,15 @@ damage_foe(Agent,What,hit) :-
 	NewDam is (OldDam - (Atk - Def)),
 	ain(mudHealth(What,NewDam)).
 
+:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
+:- must(prologBuiltin(damage_foe)).
+:- must(prologBuiltin(check_for_weapon)).
+
+prologBuiltin(upprop,1).
+prologBuiltin(upprop,2).
+
+:- endif.
+
 % Record keeping
 update_charge(Agent,actAttack) :- upprop(Agent,mudEnergy(+ -5)).
 update_stats(Agent,actBash) :-  upprop(Agent,mudHealth(+ -2)),

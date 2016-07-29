@@ -1459,7 +1459,9 @@ divide_list(L,L0,LT):-append(L0,LT,L).
 % String Equal Ci.
 % 
 string_equal_ci(L0,L1):- 
- freeze(L0,(to_word_list(L0,WL0),WL0\==[],to_word_list(L1,WL1)->WL1\==[],!,string_equal_ci0(WL0,WL1))),!.
+ to_word_list(L0,WL0),WL0\==[],to_word_list(L1,WL1)->WL1\==[],!,
+   string_equal_ci0(WL0,WL1),!.
+    % (string_equal_ci0(WL0,WL1);(var(L1),freeze(L1,string_equal_ci0(WL0,WL1)))).
 
 
 %= 	 	 
@@ -1653,8 +1655,8 @@ to_word_list(A,SL):-once(hotrace((to_word_list_0(A,S0),(is_list(S0)->delete(S0,'
 %
 as_atom(A,A):-atom(A),!.
 as_atom(T,A):- compound(T), \+ is_list(T),arg(_,T,M),atomic(M),as_atom(M,A),!.
-as_atom(S,A):-string_to_atom(S,A),!.
-as_atom(T,A):-term_to_atom(T,A).
+as_atom(S,A):- string_to_atom(S,A),!.
+as_atom(T,A):- term_to_atom(T,A).
 
 :- export(to_word_list_0/2).
 

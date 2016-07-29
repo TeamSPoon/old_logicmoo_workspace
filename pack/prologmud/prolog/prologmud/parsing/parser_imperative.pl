@@ -403,7 +403,7 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :- ain('==>'(prologBuiltin(name_text_now(ftTerm,ftString)))).
 
-name_text(I,O):- nonvar(I),no_repeats_var(O),name_text_now(I,O).
+name_text(I,O):- nonvar(I),no_repeats(O,name_text_now(I,O)).
 
 :- export(name_text_now/2).
 
@@ -422,24 +422,25 @@ name_text_now(Name,Text):-compound(Name),!,Name=..[F,A|List],!,F\='[|]',case_bre
 name_text_atomic([],_):-!,fail.
 name_text_atomic('',_):-!,fail.
 name_text_atomic("",_):-!,fail.
-name_text_atomic(Name,Text):-string(Name),Name=Text.
+name_text_atomic(Name,Text):-string(Name),!,Name=Text.
 name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atom_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
-name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),!,case_breaks_text(ListN,Text).
+name_text_atomic(Name,Text):-to_case_breaks(Name,ListN),case_breaks_text(ListN,TextL),atomic_list_concat(TextL,' ',Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
-case_breaks_text(ListN,TextT):- maplist(as_atom,ListN,TextT).
-case_breaks_text(ListN,Text):- member(t(TextL,_),ListN),string_equal_ci(TextL,Text).
+case_breaks_text([t(TextL,lower),A|ListN],TextT):-member(TextL,[tt,t,pt]),!,case_breaks_text([A|ListN],TextT).
+case_breaks_text([ListN],[TextT]):- !,as_atom(ListN,TextT).
+case_breaks_text(ListN,TextT):- maplist(as_atom,ListN,TextT),!.
+case_breaks_text(ListN,[Text]):- member(t(TextL,_),ListN),string_equal_ci(TextL,Text).
  
 :-dynamic(baseKB:ttKeyworded/1).
 
 :-ain((tCol(ttKeyworded))).
 :-ain((completelyAssertedCollection(ttKeyworded))).
 :-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
-:-ain((ttKeyworded(T),isa(F,T),{name_text_now(F,Txt)}==>mudKeyword(F,Txt))).
+:-ain((ttKeyworded(T),isa(F,T),{\+ mudKeyword(F,_),once(name_text_now(F,Txt))}==>(mudKeyword(F,Txt)))).
 :-ain((ttKeyworded(vtVerb))).
 :-ain((ttKeyworded(tCol))).
-%:-ain((vtVerb(F),{name_text_now(F,Txt)}==>mudKeyword(F,Txt))).
-%:-ain(tCol(F)/name_text_now(F,Txt)==>mudKeyword(F,Txt)).
+% :-ain((ttKeyworded(tRelation))).
 
 impl_coerce_hook(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),

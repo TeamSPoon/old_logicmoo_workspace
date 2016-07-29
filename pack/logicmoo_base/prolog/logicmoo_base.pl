@@ -124,11 +124,20 @@ baseKB:mpred_skipped_module(eggdrop).
 base_clause_expansion(P1,end_of_file,O):- !, prolog_load_context(module,Module),mpred_te(term,Module,end_of_file,P1,O,_P2)->fail.
 base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
 base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
-base_clause_expansion(_,I,':-'(ain_expanded(I))):- (in_dialect_pfc;needs_pfc(I)),!.
+base_clause_expansion(_,I,':-'(ain_expanded(I))):- get_consequent_functor(I,F,_),
+   \+ (clause_b(prologBuiltin(F))),
+   (in_dialect_pfc;needs_pfc(I)),!.
+base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.
+base_clause_expansion(_,I, _):- once(maybe_builtin(I)),fail.
 
 
 needs_pfc(I) :- nonvar(I),get_consequent_functor(I,F,A),
-   (clause_b(prologMacroHead(F));clause_b(hybrid_support(F,_));baseKB:wrap_shared(F,A,ereq)),!.
+   \+ (clause_b(prologBuiltin(F))),
+   (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(hybrid_support(F,_));baseKB:wrap_shared(F,A,ereq)),!.
+
+maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
+  % \+ (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(hybrid_support(F,_));baseKB:wrap_shared(F,A,ereq)),
+   ain(prologBuiltin(F/A)).
 
 
 
@@ -176,9 +185,9 @@ baseKB:sanity_check:- doall((baseKB:mtProlog(M),
 :- set_prolog_flag(retry_undefined,false).
 
 % Enable System
-system:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_undefined,true),
+system:exception(undefined_predicate,MFA, Action):- false,current_prolog_flag(retry_undefined,true),
     must(loop_check(mpred_at_box:uses_predicate(MFA, Action),true)).
-user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_undefined,true),
+user:exception(undefined_predicate,MFA, Action):- false,current_prolog_flag(retry_undefined,true),
     must(loop_check(mpred_at_box:uses_predicate(MFA, Action),true)).
 
 :- set_prolog_flag(system:unknown,error).
