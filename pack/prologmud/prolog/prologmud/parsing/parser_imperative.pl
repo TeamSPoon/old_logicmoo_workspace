@@ -424,13 +424,13 @@ name_text_atomic('',_):-!,fail.
 name_text_atomic("",_):-!,fail.
 name_text_atomic(Name,Text):-string(Name),!,Name=Text.
 name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atom_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
-name_text_atomic(Name,Text):-to_case_breaks(Name,ListN),case_breaks_text(ListN,TextL),atomic_list_concat(TextL,' ',Text).
+name_text_atomic(Name,Text):-to_case_breaks(Name,ListN),case_breaks_text(ListN,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
-case_breaks_text([t(TextL,lower),A|ListN],TextT):-member(TextL,[tt,t,pt]),!,case_breaks_text([A|ListN],TextT).
-case_breaks_text([ListN],[TextT]):- !,as_atom(ListN,TextT).
+case_breaks_text([t(TextL,Type)|ListN],Out):- 
+ (member(TextL,[tt,t,pt]) -> maplist(as_atom,ListN,TextT);
+    maplist(as_atom,[t(TextL,Type)|ListN],Text)).
 case_breaks_text(ListN,TextT):- maplist(as_atom,ListN,TextT),!.
-case_breaks_text(ListN,[Text]):- member(t(TextL,_),ListN),string_equal_ci(TextL,Text).
  
 :-dynamic(baseKB:ttKeyworded/1).
 
