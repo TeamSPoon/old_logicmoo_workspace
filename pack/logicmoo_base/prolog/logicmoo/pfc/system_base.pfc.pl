@@ -59,6 +59,10 @@ col_as_unary(tPred).
 col_as_unary(tCol).
 :- mpred_trace_exec.
 % :- rtrace((ain_expanded(tCol(tCol)))).
+
+prologHybrid(C)==>{must(callable(C))}.
+pfcControlled(C)==>{must(callable(C))}.
+
 :- mpred_notrace_exec.
 
 % :- break.
@@ -72,6 +76,10 @@ col_as_isa(ttPredType).
 
 col_as_unary(completeExtentAsserted).
 col_as_unary(completelyAssertedCollection).
+
+
+
+% ((prologHybrid(C),{must(callable(C)),get_functor(C,F,A),C\=F}) ==> arity(F,A)).
 
 t(C,I)==>isa(I,C).
 
@@ -206,14 +214,14 @@ alwaysGaf(pfcLHS).
 tCol(A)/atom(A)==>{decl_type_unsafe(A), kb_dynamic(A/1)}.
 % tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
 
-tCol(tCol).
-tCol(tPred).
-tCol(tFunction).
-tCol(tRelation).
-tCol(ttTemporalType).
-tCol(ttExpressionType).
-tCol(functorDeclares).
-functorDeclares(ttModule).
+tSet(tCol).
+tSet(tPred).
+tSet(tFunction).
+tSet(tRelation).
+tSet(ttTemporalType).
+tSet(ttExpressionType).
+tSet(prologMacroHead).
+prologMacroHead(ttModule).
 
 
 %:- sanity((fix_mp(clause(assert,sanity),arity(apathFn,2),M,O),M:O=baseKB:arity(apathFn,2))).
@@ -222,7 +230,7 @@ functorDeclares(ttModule).
 
 arity(apathFn,2).
 arity(isKappaFn,2).
-arity('$VAR',1).
+%arity('$VAR',_).
 arity(isInstFn,1).
 arity(ftListFn,1).
 arity(xyzFn,4).
@@ -283,9 +291,12 @@ argsQuoted(second_order).
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
-:- ain(((tPred(F),arity(F,A)/(is_ftNameArity(F,A),A>1), 
+:- ain(((tPred(F),
+ arity(F,A)/
+  (is_ftNameArity(F,A),A>1, 
       \+ prologBuiltin(F), 
-      sanity(\+ tCol(F))) ==> (~(tCol(F)),support_hilog(F,A)))).
+      sanity(\+ tCol(F))) 
+                   ==> (~(tCol(F)),support_hilog(F,A))))).
 
 :- kb_dynamic(support_hilog/2).
 
@@ -433,6 +444,9 @@ collectionConventionMt(Col,Where) ==> predicateConventionMt(Col,Where).
 % mtExact(Mt)==>{kb_dynamic(Mt)}.
 
 tCol(tCol).  % = isa(tCol,tCol).
+tCol(tSet).
+tSet(tCol).
+tSet(tSet).
 
 mtProlog(Mt),predicateConventionMt(F,Mt)/(Mt\==baseKB)==>prologBuiltin(F).
 

@@ -861,6 +861,7 @@ isa_asserted_0(I,C):- isa_asserted_1(I,C).
 %  (isa/2) asserted  Secondary Helper.
 %
 isa_asserted_1(_, ttPredType):-!,fail.
+isa_asserted_1(_, prologMacroHead):-!,fail.
 isa_asserted_1(_, functorDeclares):-!,fail.
 isa_asserted_1(_, prologHybrid):-!,fail.
 isa_asserted_1(I,T):- atom(T),loop_check(isa_w_type_atom(I,T)).

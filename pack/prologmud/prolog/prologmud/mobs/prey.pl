@@ -21,8 +21,8 @@
 % :- register_module_type (planning).
 % :- register_module_type (mtCommand).
 
-tCol(tPrey).
-tCol(tPrey).
+ttAgentType(tPrey).
+resultIsa(aPreyFn(ftInt),tPrey).
 
 % Predicates asserted during run.
 % :- dynamic memory/2. 
@@ -53,7 +53,7 @@ prey_idea(Self,actMove(Dir)) :-
 	mudGetPrecepts(Self,List),
 	list_object_dir_sensed(_,List,tNut,Dir).
 prey_idea(_Agent,_) :-
-	actSpawn.
+	actSpawnPrey.
 
 prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tNut]).
 
@@ -64,10 +64,10 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 vtActionTemplate(actSpawn(tCol)).
 
-agent_command(_Agent,actSpawn(tPrey)):-actSpawn.
+agent_command(_Agent,actSpawn(tPrey)):-actSpawnPrey.
 
-actSpawn :-
-	maybe(10),
+actSpawnPrey :-
+	% maybe(10),
 	spawn_prey(1),
 	!,
 	fail.
@@ -80,7 +80,7 @@ actSpawn :-
 spawn_prey(10) :-
 	!.
 spawn_prey(N) :-
-       Prey = tPrey(N),
+       Prey = aPreyFn(N),
        assert_isa(Prey,tPrey),
        put_in_world(Prey),!.
 

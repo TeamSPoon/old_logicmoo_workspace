@@ -41,7 +41,7 @@
             forall_setof/2,
             get_body_functor/3,
             get_pifunctor/2,
-            get_pifunctor/3,
+            get_pifunctor3/3,
             get_pifunctor/4,
             idel/1,
             if_main/1,
@@ -247,11 +247,11 @@ get_pifunctor(Head,PHead):- get_pifunctor(Head,PHead,_,_),!.
 
 %= 	 	 
 
-%% get_pifunctor( ?Head, ?PHead, ?F) is semidet.
+%% get_pifunctor3( ?Head, ?PHead, ?F) is semidet.
 %
 % Get Pifunctor.
 %
-get_pifunctor(Head,PHead,F):- get_pifunctor(Head,PHead,F,_).
+get_pifunctor3(Head,PHead,F):- get_pifunctor(Head,PHead,F,_).
 
 
 %= 	 	 
@@ -264,7 +264,7 @@ get_pifunctor(M:Head,M:PHead,F,A):-atom(M),!,get_pifunctor(Head,PHead,F,A).
 get_pifunctor((F/A),PHead,F,A):- integer(A),!,must(atom(F)),functor(PHead,F,A).
 get_pifunctor(Head,PHead,F,A):-atom(Head),F=Head,!,call_u(arity(F,A)),must(integer(A)),functor(PHead,F,A).
 %get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(Head/A,PHead,F,A).
-get_pifunctor(Head,PHead,F,A):-var(Head),!,sanity(atom(F)),must(ensure_arity(F,A)),functor(PHead,F,A),ignore(PHead=Head).
+get_pifunctor(Head,PHead,F,A):-var(Head),!,(atom(F)),must(ensure_arity(F,A)),functor(PHead,F,A),ignore(PHead=Head).
 get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(PHead=Head),!.
 
 

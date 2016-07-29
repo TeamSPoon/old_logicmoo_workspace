@@ -504,6 +504,7 @@ convention_to_symbolic_mt(_Why,genlMt,2,baseKB):-!.
 convention_to_symbolic_mt(_Why,mtCycL,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,mtProlog,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,functorDeclares,1,baseKB):-!.
+convention_to_symbolic_mt(_Why,prologMacroHead,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,F,A,abox):- mpred_database_term(F,A,_).
 convention_to_symbolic_mt(_Why,F,_,Mt):-  call_u(predicateConventionMt(F,Mt)),!.
 convention_to_symbolic_mt(_Why,F,A,abox):- baseKB:wrap_shared(F,A,ereq).
@@ -879,6 +880,7 @@ mpred_post(P, S):- fully_expand_now(post,P,P0),each_E(mpred_post1,P0,[S]).
 % adds an entry to the Pfc queue for subsequent forward chaining.
 % It always succeeds.
 %
+mpred_post1(P, S):- compound(P), ( \+ P = argsQuoted(_) ), functor(P,F,N), ( F \== (==>) ), arg(N,P,A),member(A,['$VAR'('????????????'),'$VAR'(_)])->trace_or_throw(mpred_post1(P, S)).
 mpred_post1( isa(_,_,_),   _):- dumpST,dtrace.
 mpred_post1( P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post1( P0,   S).
 

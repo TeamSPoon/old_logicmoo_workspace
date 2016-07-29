@@ -123,7 +123,7 @@ baseKB:mpred_provide_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),comp
 
 % REGISTER HOOK
 baseKB:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
-   get_pifunctor(HeadIn,Head,F),
+   get_pifunctor3(HeadIn,Head,F),
       assert_if_new(isa(F,prologPTTP)),
          ensure_universal_stub(Head),
          RESULT = declared(pttp_listens_to_head(OP,Head)).

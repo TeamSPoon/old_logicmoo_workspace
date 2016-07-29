@@ -501,6 +501,8 @@ db_expand_maplist(FE,List,T,G,O):-bagof(M, (member(T,List),call(FE,G,M)), ML),li
 %
 must_expand(/*to_exp*/(_)).
 must_expand(props(_,_)).
+must_expand(iprops(_,_)).
+must_expand(upprop(_,_)).
 must_expand(typeProps(_,_)).
 must_expand(G):-functor(G,_,A),!,A==1.
 
@@ -717,6 +719,7 @@ recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..
 as_is_term(NC):- cyclic_break(NC), var(NC),!.
 as_is_term(A):-atomic(A),!.
 as_is_term(argsQuoted(Atom)):- !, \+ compound(Atom).
+as_is_term(prologMacroHead(Atom)):- !, \+ compound(Atom).
 as_is_term(functorDeclares(Atom)):- !, \+ compound(Atom).
 as_is_term('$VAR'(_)).
 as_is_term(PARSE):-is_parse_type(PARSE),!,fail.
@@ -1039,6 +1042,10 @@ db_expand_0(_ ,include(CALL),(load_data_file_now(CALL))):- dtrace, !.
 
 db_expand_0(Op,=>(G),(GG)):-!,db_expand_0(Op,(G),(GG)).
 db_expand_0(Op,(G,B),(GGBB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB),conjoin_l(GG,BB,GGBB).
+
+db_expand_0(Op,(G==>B),(GG==>BB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB).
+
+
 db_expand_0(Op,(G;B),(GG;BB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB).
 db_expand_0(Op,(G:-B),(GG:-BB)):-!,db_expand_0(Op,G,GG),fully_expand_goal(Op,B,BB).
 % db_expand_0(_,Term,CL):- bagof(O,do_expand_args(isEach,Term,O),L),L\=@=[Term],!,list_to_conjuncts(L,CL).

@@ -361,7 +361,7 @@ change( retract,one)  using =
 change( retract,all)  using =
 
 good_for_hybrid(H,F):- not(local_q_mpred_isa(F,_ANY_)),predicate_property(H,number_of_clauses(0)),predicate_property(H,dynamic).
-ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicate_property(PHead,dynamic)->true;(predicate_property(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
+ensure_exists(Head):-get_pifunctor3(Head,PHead,F),get_functor(Head,F,A),(predicate_property(PHead,dynamic)->true;(predicate_property(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
 
 */
 
@@ -595,7 +595,7 @@ mpred_prop_ordered(Pred,Prop):-local_q_mpred_isa(Pred,Prop),not(first_mpred_prop
 %
 % Provide Clauses List.
 %
-provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead,_),  
+provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead),  
   findall((PHead :- B),
    no_repeats_old([PHead:B],((call_no_cuts(baseKB:mpred_provide_storage_clauses(PHead,B,Proof)),is_source_proof(Proof)))),
    HBLIST),

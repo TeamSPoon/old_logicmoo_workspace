@@ -85,17 +85,18 @@ ereq(C):- find_and_call(C).
 :- module_transparent(dbreq/1).
 dbreq(C):- ereq(C).
 
+
+never_wrap(apply,_).
+never_wrap(call,_).
+never_wrap(ereq,_).
+
 %% baseKB:wrap_shared( ?VALUE1, :Wrapper, ?VALUE3) is semidet.
 %
 % Wrap Shared.
 %
 
 % baseKB:wrap_shared(_,_,_):-!,fail.
-baseKB:wrap_shared(isa,2,ereq).
-baseKB:wrap_shared(t,_,ereq).
-%baseKB:wrap_shared(call,_,ereq).
-%baseKB:wrap_shared(apply,_,ereq).
-
+baseKB:wrap_shared(F,A,ereq):- never_wrap(F,A),!,fail.
 baseKB:wrap_shared(assert,1,dbreq):- is_user_module.
 baseKB:wrap_shared(assert,2,dbreq):- is_user_module.
 baseKB:wrap_shared(asserta,1,dbreq):- is_user_module.
@@ -108,6 +109,8 @@ baseKB:wrap_shared(retract,1,dbreq):- is_user_module.
 baseKB:wrap_shared(retractall,1,dbreq):- is_user_module.
 
 
+baseKB:wrap_shared(isa,2,ereq).
+baseKB:wrap_shared(t,_,ereq).
 baseKB:wrap_shared(mtCore,1,ereq).
 baseKB:wrap_shared(mtProlog,1,ereq).
 baseKB:wrap_shared(tAgent,1,ereq).

@@ -771,6 +771,7 @@ is_dynamic_module(M):- ereq(mtCycL(M)).
 is_static_module(system).
 is_static_module(M):- is_dynamic_module(M),!,fail.
 is_static_module(M):- module_property(M,class(library)),!.
+is_static_module(M):- module_property(M,class(system)),!.
 
 %% is_static_predicate( :TermA) is semidet.
 %

@@ -228,7 +228,7 @@ mudHeightOnObj(Agent,Ht) :-
 	mudAtLoc(Agent,LOC),
 	mudAtLocList(LOC,Objs),
 	member(Obj,Objs),
-	props(Obj,mudHeight(ObjHt)),
+	iprops(Obj,mudHeight(ObjHt)),
 	mudHeight(Agent,AgHt),
 	Ht = (AgHt + ObjHt) - 1,!.
 mudHeightOnObj(Agent,Ht) :-
