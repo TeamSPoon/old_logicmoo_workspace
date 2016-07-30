@@ -423,7 +423,9 @@ name_text_atomic([],_):-!,fail.
 name_text_atomic('',_):-!,fail.
 name_text_atomic("",_):-!,fail.
 name_text_atomic(Name,Text):-string(Name),!,Name=Text.
-%name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atom_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
+name_text_atomic(Name,Text):-is_list(Name),!,maplist(name_text_atomic,Name,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
+name_text_atomic(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text_atomic([F,A|List],Text).
+name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atom_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-to_case_breaks(Name,ListN),case_breaks_text(ListN,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
@@ -434,8 +436,8 @@ case_breaks_text_trim([t(TextL,Type)|ListN],Text):-
 case_breaks_text(ListN,TextT):- case_breaks_text_trim(ListN,TextT),!.
 case_breaks_text(ListN,TextT):- maplist(as_atom,ListN,TextT),!.
 
-guess_mudDescription(Name,Desc):- isa(Name,tPred), \+ isa(Name,tCol),make_summary([],Name,Desc).
-guess_mudDescription(Name,Desc):- to_case_breaks(Name,ListN),!, maplist(as_atom,ListN,TextT),!,
+guess_mudDescription(Name,Desc):- isa(Name,tPred), \+ isa(Name,tCol),atomic(Name),make_summary([],Name,Desc).
+guess_mudDescription(Name,Desc):- atomic(Name),to_case_breaks(Name,ListN),!, maplist(as_atom,ListN,TextT),!,
    maplist(to_descriptive_name,TextT,TextL),!,atomic_list_concat(TextL,' ',Desc).
 
 guess_nameStrings(F,Txt):-once(name_text_atomic(F,Txt)).
