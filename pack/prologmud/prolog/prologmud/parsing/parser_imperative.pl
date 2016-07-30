@@ -423,24 +423,44 @@ name_text_atomic([],_):-!,fail.
 name_text_atomic('',_):-!,fail.
 name_text_atomic("",_):-!,fail.
 name_text_atomic(Name,Text):-string(Name),!,Name=Text.
-name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atom_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
+%name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atom_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-to_case_breaks(Name,ListN),case_breaks_text(ListN,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
-case_breaks_text([t(TextL,Type)|ListN],Out):- 
- (member(TextL,[tt,t,pt]) -> maplist(as_atom,ListN,TextT);
-    maplist(as_atom,[t(TextL,Type)|ListN],Text)).
+case_breaks_text_trim([t(TextL,Type)|ListN],Text):- 
+ must((as_atom(TextL,Atom),type_prefix(Atom,_)) -> maplist(as_atom,ListN,Text);
+    maplist(as_atom,[t(TextL,Type)|ListN],Text)),!.
+
+case_breaks_text(ListN,TextT):- case_breaks_text_trim(ListN,TextT),!.
 case_breaks_text(ListN,TextT):- maplist(as_atom,ListN,TextT),!.
- 
+
+guess_mudDescription(Name,Desc):- isa(Name,tPred), \+ isa(Name,tCol),make_summary([],Name,Desc).
+guess_mudDescription(Name,Desc):- to_case_breaks(Name,ListN),!, maplist(as_atom,ListN,TextT),!,
+   maplist(to_descriptive_name,TextT,TextL),!,atomic_list_concat(TextL,' ',Desc).
+
+guess_nameStrings(F,Txt):-once(name_text_atomic(F,Txt)).
+
+to_descriptive_name(t,'FirstOrder').
+to_descriptive_name(tt,'SecondOrder').
+to_descriptive_name(vt,'ValueType').
+to_descriptive_name('Col','Class').
+to_descriptive_name(Pefix,Desc):-type_prefix(Pefix,Name),
+       to_case_breaks(Name,ListN),case_breaks_text_trim(ListN,TextL),atomic_list_concat(TextL,' ',Desc),!.
+to_descriptive_name(Desc,Atom):-longer_sumry(Desc,Atom),!.
+to_descriptive_name(Desc,Atom):-any_to_atom(Desc,Atom),!.
+
 :-dynamic(baseKB:ttKeyworded/1).
 
+:- mpred_trace_exec.
 :-ain((tCol(ttKeyworded))).
 :-ain((completelyAssertedCollection(ttKeyworded))).
 :-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
-:-ain((ttKeyworded(T),isa(F,T),{\+ mudKeyword(F,_),once(name_text_now(F,Txt))}==>(mudKeyword(F,Txt)))).
+:-onSpawn((ttKeyworded(T),isa(F,T),{\+ nameString(F,_),once(guess_nameStrings(F,Txt))}==>(nameString(F,Txt)))).
+:-onSpawn((ttKeyworded(T),isa(F,T),{\+ mudDescription(F,_),once(guess_mudDescription(F,Txt))}==>(mudDescription(F,Txt)))).
 :-ain((ttKeyworded(vtVerb))).
 :-ain((ttKeyworded(tCol))).
 % :-ain((ttKeyworded(tRelation))).
+:- mpred_notrace_exec.
 
 impl_coerce_hook(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),

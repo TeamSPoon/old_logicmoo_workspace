@@ -600,6 +600,8 @@ genls(tSpatialThing,tTemporalThing).
 % remove conflicts early 
 % (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_remove(P)}, (\+P ))).
 
+tSet(ttTypeFacet).
+
 ttTypeFacet(ttNonGenled, comment("ttNonGenled means that backchain is required for subclasses to gain membership TODO: Give example ")).
 % genls(ttExpressionType,ttNonGenled).
 isa('Thing',ttNonGenled).
@@ -1047,7 +1049,6 @@ tCol(W)==>{guess_supertypes(W)}.
 
 
 tSet(tNewlyCreated).
-tSet(ttTypeFacet).
 
 :- dynamic(tNewlyCreated/1).
 tNewlyCreated(W)==>{guess_types(W)}.

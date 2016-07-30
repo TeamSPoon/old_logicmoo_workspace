@@ -311,6 +311,7 @@ modality(~,[never],[]).
 %
 onSpawn(A):-A==true,!.
 onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
+onSpawn(Class==>Fact):-!,ain(isRuntime==>(Class==>Fact)).
 onSpawn(ClassFact):-
   fully_expand(clause(assert,onSpawn),ClassFact,ClassFactO),!,
   onSpawn_0(t,ClassFactO).
