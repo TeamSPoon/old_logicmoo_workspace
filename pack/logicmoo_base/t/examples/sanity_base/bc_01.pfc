@@ -19,7 +19,7 @@
 :- dynamic(bc_q/1).
 :- dynamic(bc_p/1).
 
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_msg("before trace").
 :- mpred_trace_exec.
 
@@ -27,7 +27,7 @@
 
 :- mpred_trace_msg("after trace").
 
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_exec.
 
 

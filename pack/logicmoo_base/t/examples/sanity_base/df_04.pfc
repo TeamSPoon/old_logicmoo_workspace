@@ -52,7 +52,7 @@ most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( \+(R=Q
 %(most(P=>Q)/nonvar(Q)) ==> (P => most(Q)).
 
 :- begin_pfc.
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_exec.
 
 most(t(test1_2_3,1,2,3)).

@@ -94,7 +94,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :-asserta((system:halt(_) :- format('the halting problem is now solved!'))).
 :-lock_predicate(system:halt/1).
 
-:- dmsg('the halting problem is now solved!').
+:- dmsg("the halting problem is now solved!").
 :- set_prolog_flag(access_level,user).
 
 
@@ -104,9 +104,9 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- endif.
 %:- use_listing_vars.
 % :- [run].
-:- forall(debugging(X),nodebug(X)).
+
 :- system:ensure_loaded(logicmoo_repl).
-:- forall(debugging(X),nodebug(X)).
+
 :- set_prolog_flag(logicmoo_debug,true).
 %:- set_prolog_flag(unsafe_speedups,false).
 
@@ -211,7 +211,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- set_prolog_flag(dialect_pfc,true).
 %:- set_prolog_flag(logicmoo_debug,true).
 %:- set_prolog_flag(unsafe_speedups,false).
-:- forall(debugging(X),nodebug(X)).
+
 
 % [Optional] Creates or suppliments a world
 

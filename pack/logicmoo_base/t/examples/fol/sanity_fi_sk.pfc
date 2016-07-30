@@ -77,7 +77,7 @@ N=((min_isa, max_isa),dom,[pred])
 
 
 
-:- nodebug(_).
+:- nodebug_logicmoo(_).
 :- use_module(library(gui_tracer)).
 :- noguitracer.
 :- guitracer.

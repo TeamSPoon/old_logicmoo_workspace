@@ -13,7 +13,10 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_bugger.pl
 :- module(logicmoo_util_bugger,
           [ 
-
+          debug_logicmoo/1,
+          nodebug_logicmoo/1,
+          debugging_logicmoo/1,
+          logicmoo_topic/2,
             asserta_if_ground/1,
             atom_contains666/2,
             call_count/2,
@@ -307,6 +310,11 @@
  :- meta_predicate do_ref_job(0,*).
 
 :- module_transparent
+          debug_logicmoo/1,
+          nodebug_logicmoo/1,
+          debugging_logicmoo/1,
+          logicmoo_topic/2,
+
                     show_failure/1,
         asserta_if_ground/1,
         atom_contains666/2,
@@ -596,9 +604,9 @@ throw_safe(Exc):-trace_or_throw(Exc).
 test_for_release(File):-  source_file(File), \+ make:modified_file(File), !.
 test_for_release(File):-  
  G = test_for_release(File),
- setup_call_cleanup_each(dmsg('~N~nPress Ctrl-D to begin ~n~n  :- ~q. ~n~n',[G]),
+ setup_call_cleanup_each(dmsg("~N~nPress Ctrl-D to begin ~n~n  :- ~q. ~n~n",[G]),
   if_interactive(prolog),
-   setup_call_cleanup(dmsg('~N~nStarting ~q...~n',[G]),
+   setup_call_cleanup(dmsg("~N~nStarting ~q...~n",[G]),
       w_tl(t_l:testing_for_release(File),ensure_loaded(File)),
       test_for_release_problems(File))).
 
@@ -611,7 +619,7 @@ test_for_release(File):-
 %
 test_for_release_problems(_):-!.
 test_for_release_problems(File):-  
-      dmsg('~N~nListing problems after ~q...~n',[File]),
+      dmsg("~N~nListing problems after ~q...~n",[File]),
       list_undefined,
       nop(at_start(if_defined(gxref,true))),!.
 
@@ -638,9 +646,9 @@ if_interactive0(Goal):-
    stream_property(In,input),
    stream_property(In,tty(true)),
    read_pending_input(In,_,_),!,
-   dmsg('~n(waiting ... ~n',[]),!,
+   dmsg("~n(waiting ... ~n",[]),!,
    wait_for_input([In],RL,5),!,
-   ( RL ==[] -> dmsg('...moving on)~n',[]) ; (dmsg('... starting goal)~n',[]),Goal)),
+   ( RL ==[] -> dmsg("...moving on)~n",[]) ; (dmsg("... starting goal)~n",[]),Goal)),
    !.
 
 
@@ -759,6 +767,13 @@ wdmsg(X):- cnotrace(show_source_location),
 % Wdmsg.
 %
 wdmsg(F,X):- cnotrace(ignore(with_all_dmsg(dmsg(F,X)))).
+
+
+%% wdmsg( ?F, ?X) is semidet.
+%
+% Wdmsg.
+%
+wdmsg(W,F,X):- cnotrace(ignore(with_all_dmsg(dmsg(W,F,X)))).
 
 
 %= 	 	 
@@ -1005,13 +1020,34 @@ has_gui_debug :- getenv('DISPLAY',NV),NV\==''.
 %
 % Nodebugx.
 %
-nodebugx(X):- debugging(W),!,setup_call_cleanup_each(nodebug(W),nodebugx(X),debug(W)).
+nodebugx(X):- prolog_debug:debugging(Topic, true, _),!,setup_call_cleanup_each(nodebug(Topic),nodebugx(X),debug(Topic)).
 nodebugx(X):- current_prolog_flag(debug_threads,true),!,call(X).
 nodebugx(X):- 
  wno_tl_e(tlbugger:ifCanTrace,
    w_tl(tlbugger:ifWontTrace,
     w_tl(tlbugger:show_must_go_on,
        w_tl(tlbugger:ifHideTrace,hotrace(X))))).
+
+debugging_logicmoo(Mask):- logicmoo_topic(Mask,Topic),prolog_debug:debugging(Topic, TF, _),!,TF=true.
+
+logicmoo_topic(Mask,Topic):-var(Mask),!,Topic=logicmoo(_).
+logicmoo_topic(logicmoo,Topic):-!,Topic=logicmoo(_).
+logicmoo_topic(Mask,Topic):-prolog_debug:debugging(Topic, _, _),Topic=@=Mask,!.
+logicmoo_topic(Mask,Topic):-atomic(Mask),!,logicmoo_topic(logicmoo(Mask),Topic),!.
+logicmoo_topic(Topic,Topic):-(ground(Topic)->nodebug(Topic);true).
+
+nodebug_logicmoo(Mask):-
+  forall(retract(prolog_debug:debugging(Mask, true, O)),asserta(prolog_debug:debugging(Mask, false, O))),
+   logicmoo_topic(Mask,Topic),
+   forall(retract(prolog_debug:debugging(Topic, true, O)),asserta(prolog_debug:debugging(Topic, false, O))),
+   (ground(Mask)->nodebug(Topic);true),!.
+
+debug_logicmoo(Mask):-
+  forall(retract(prolog_debug:debugging(Mask, false, O)),asserta(prolog_debug:debugging(Mask, true, O))),
+   logicmoo_topic(Mask,Topic),
+   forall(retract(prolog_debug:debugging(Topic, false, O)),asserta(prolog_debug:debugging(Topic, true, O))),
+   (ground(Mask)->debug(Topic);debug(Topic)),!.
+
 
 
 :- dynamic isDebugging/1.
@@ -2189,7 +2225,7 @@ prolog_must_l(H):-must(H).
 %
 % Programmer Error.
 %
-programmer_error(E):-dtrace, randomVars(E),dmsg('~q~n',[error(E)]),dtrace,randomVars(E),!,throw(E).
+programmer_error(E):-dtrace, randomVars(E),dmsg("~q~n",[error(E)]),dtrace,randomVars(E),!,throw(E).
 
 
 
@@ -2491,7 +2527,7 @@ loading_module(M):- (((loading_module(M,_),M\=user));M=user),!.
 %
 % Show Module.
 %
-show_module(W):-dmsg('<!--':W),ignore((show_call(why,(loading_module(_,_))),fail)),dmsg(W:'-->').
+show_module(W):-dmsg("<!--:~w",[W]),ignore((show_call(why,(loading_module(_,_))),fail)),dmsg("~w:-->",[W]).
 
 
 

@@ -16,13 +16,54 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+
+:- if((prolog_load_context(directory,Dir),
+   multifile(user:file_search_path/2),
+   dynamic(user:file_search_path/2),
+   (( \+ user:file_search_path(library,Dir)) ->asserta(user:file_search_path(library,Dir));true))).
+:- endif.
+
+:- if((exists_source(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), 
+       system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_utils_file,[]).
 % restore entry state
-:- lcme:reset_modules.
+:- current_predicate(lcme:reset_modules/0)->lcme:reset_modules;true.
 
 :- set_prolog_flag(lm_expanders,false).
+
+% ======================================================
+% Add Extra file_search_paths
+% ======================================================
+:- dynamic(user:file_search_path/2).
+:- multifile(user:file_search_path/2).
+
+
+add_file_search_path_local(Name,Path):-  resolve_dir_local(Path,Dir),
+   is_absolute_file_name(Dir), (( \+ user:file_search_path(Name,Dir)) ->asserta(user:file_search_path(Name,Dir));true).
+
+resolve_dir_local(Dir,Dir):- is_absolute_file_name(Dir),exists_directory(Dir),!.
+resolve_dir_local(Dir,ABS):- absolute_file_name(Dir,ABS),exists_directory(ABS),!.
+resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directory(ABS),!.
+
+% ======================================================
+% Add Extra pack-ages directory
+% ======================================================
+% :- initialization(attach_packs,now).
+:- if( \+ exists_source(pack(logicmoo_base/prolog/logicmoo/logicmoo_utils))).
+:- add_file_search_path_local(pack,'../../').
+% :- initialization(attach_packs,now).
+:- endif.
+% ======================================================
+% Save a directory of *this* file into logicmoo(..)
+% And adds the local directories to file search path of logicmoo(..)
+% ======================================================
+:- if( \+ exists_source(logicmoo(logicmoo_engine))).
+:- add_file_search_path_local(logicmoo,'./logicmoo/').
+:- exists_source(logicmoo(logicmoo_engine)).
+:- endif.
+
+
 
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
 :- system:use_module(library('logicmoo/util/logicmoo_util_supp.pl')).
@@ -65,29 +106,6 @@
 
 :- system:use_module(library(logicmoo_swilib)).
 :- forall((current_module(M),M\==baseKB),assert_if_new(baseKB:mtProlog(M))).
-
-% ======================================================
-% Add Extra file_search_paths
-% ======================================================
-:- dynamic(user:file_search_path/2).
-:- multifile(user:file_search_path/2).
-
-% ======================================================
-% Add Extra pack-ages directory
-% ======================================================
-% :- initialization(attach_packs,now).
-:- if( \+ exists_source(pack(logicmoo_base/prolog/logicmoo/logicmoo_utils))).
-:- add_file_search_path(pack,'../../').
-% :- initialization(attach_packs,now).
-:- endif.
-% ======================================================
-% Save a directory of *this* file into logicmoo(..)
-% And adds the local directories to file search path of logicmoo(..)
-% ======================================================
-:- if( \+ exists_source(logicmoo(logicmoo_engine))).
-:- add_file_search_path(logicmoo,'./logicmoo/').
-:- exists_source(logicmoo(logicmoo_engine)).
-:- endif.
 
 
 % ======================================================

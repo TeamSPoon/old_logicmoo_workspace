@@ -42,9 +42,9 @@ fix_pwd :- (exists_directory(runtime) -> working_directory(_,runtime);(exists_di
 :- dynamic   user:library_directory/1.
 :- multifile user:library_directory/1.
 
+:- working_directory(X,X),asserta(lmcache:restore_working_directory(X)).
 
-:-source_file(in_logicmoo_repl_source_file,F),file_directory_name(F, D),
-  asserta(pmrt(D)),cd(D).
+:- source_location(F,_),file_directory_name(F, D),asserta(lmcache:pmrt(D)),cd(D).
 
 
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
@@ -68,10 +68,10 @@ system:pmrt_file_search_path_library(pack('logicmoo_planner/prolog')).
 % system:pmrt_file_search_path_library(pack('MUD_ircbot/prolog')).
 
 
-system:pmrt_expand_file_search_path(T,O):- system:pmrt_file_search_path(T,A), once((pmrt(D),absolute_file_name(A,R,[relative_to(D),file_type(directory),access(exist)]))),R=O.
+system:pmrt_expand_file_search_path(T,O):- system:pmrt_file_search_path(T,A), once((lmcache:pmrt(D),absolute_file_name(A,R,[relative_to(D),file_type(directory),access(exist)]))),R=O.
 
 :-asserta((user:file_search_path(T,R):- system:pmrt_expand_file_search_path(T,R))).
-:-asserta((user:library_directory(R):- pmrt(R))).
+:-asserta((user:library_directory(R):- lmcache:pmrt(R))).
 :-asserta((user:library_directory(R):- system:pmrt_expand_file_search_path(library,R))).
 
 :- attach_packs.
@@ -83,4 +83,4 @@ system:pmrt_expand_file_search_path(T,O):- system:pmrt_file_search_path(T,A), on
 
 :- endif.   % SWI-Prolog
 
-
+:- retract(lmcache:restore_working_directory(X)),working_directory(_,X).

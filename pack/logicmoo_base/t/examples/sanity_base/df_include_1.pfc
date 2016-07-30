@@ -10,7 +10,7 @@
 
 :- use_module(library(logicmoo_base)).
 
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_exec.
 
 :- include('df_include.pfc').

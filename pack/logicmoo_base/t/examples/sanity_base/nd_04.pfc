@@ -16,7 +16,7 @@
 :- abolish(b,1).
 :- dynamic((a/1,b/1)).
 
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_exec.
 :- mpred_warn.
 

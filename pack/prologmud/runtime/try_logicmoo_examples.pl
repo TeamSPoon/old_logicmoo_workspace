@@ -48,7 +48,7 @@ If we obeyed the limitations set forth upon Horn clauses only being "positive" t
 :- use_module(logicmoo(snark/common_logic_snark)).
 :- ensure_loaded(logicmoo('snark/common_logic_clif.pfc')).
 
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 
 
 

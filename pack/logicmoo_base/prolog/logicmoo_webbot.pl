@@ -14,8 +14,8 @@
 %:- prolog_ide(debug_monitor).
 
 :- system:use_module(library(debug)).
-:- forall(prolog_debug:debugging(X,true,_),prolog_debug:nodebug(X)).
-:- prolog_debug:nodebug(logicmoo_webbot).
+:- nodebug_logicmoo(_).
+:- nodebug_logicmoo(logicmoo_webbot).
 
 :- set_prolog_flag(lm_expanders,true).
 :- set_prolog_flag(mpred_te,true).
@@ -29,7 +29,7 @@
 :- initialization(ensure_webserver(3020),restore).
 
 
-:- forall(prolog_debug:debugging(X,true,_),prolog_debug:nodebug(X)).
+
 
 :- initialization(wdmsg("Running Initialization/1")).
 :- initialization(wdmsg("Initialization of restore state"),restore).
@@ -40,7 +40,7 @@
 :- set_lang(pl).
 :- system:use_module(library(socket)).
 :- user:use_module(library(eggdrop)).
-:- forall(prolog_debug:debugging(X,true,_),prolog_debug:nodebug(X)).
+
 :- initialization(eggdrop:egg_go,restore).
 :- initialization(eggdrop:egg_go).
 wbg:- eggdrop:egg_go.
@@ -48,7 +48,7 @@ wbg:- eggdrop:egg_go.
 :- set_prolog_flag(lm_expanders,true).
 :- set_prolog_flag(mpred_te,true).
 
-:- forall(prolog_debug:debugging(X,true,_),prolog_debug:nodebug(X)).
+
 
 size666_stacks:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 
@@ -57,7 +57,7 @@ size666_stacks:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_
 
 
 :- user:use_module(library(logicmoo_user),except([op(_,_,_)])).
-%:- forall(prolog_debug:debugging(X,true,_),prolog_debug:nodebug(X)).
+%
 %:- initialization(set_prolog_flag(mpred_te,false)).
 %:- initialization(set_prolog_flag(mpred_te,false),restore).
 

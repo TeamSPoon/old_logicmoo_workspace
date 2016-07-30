@@ -177,13 +177,70 @@
 :- system:use_module(library(rdf_ntriples),[rdf_ntriple_part/4]).
 :- system:use_module(library(tty),[menu/3]).
 
+:- redefine_system_predicate(system:'$term_in_file'(_,_,_,_,_,_,_,_)).
+:- abolish(system:'$term_in_file'/8).
+system:'$term_in_file'(In, Read, RLayout, Term, TLayout, Stream, Parents, Options) :-
+        '$skip_script_line'(In),
+        '$read_clause_options'(Options, ReadOptions),
+        repeat,
+          read_clause(In, Raw,
+                      [ variable_names(Bindings),
+                        term_position(Pos),
+                        subterm_positions(RawLayout)
+                      | ReadOptions
+                      ]),
+          b_setval('$term_position', Pos),
+          b_setval('$source_term', Raw), /* DRM: added for expansion hooks*/
+          b_setval('$variable_names', Bindings),
+          (   Raw == end_of_file
+          ->  !,
+              (   Parents = [_,_|_]     % Included file
+              ->  fail
+              ;   '$expanded_term'(In,
+                                   Raw, RawLayout, Read, RLayout, Term, TLayout,
+                                   Stream, Parents, Options)
+              )
+          ;   '$expanded_term'(In, Raw, RawLayout, Read, RLayout, Term, TLayout,
+                               Stream, Parents, Options)
+          ).
+
+:- redefine_system_predicate('$toplevel':'$query_loop'()).
+:- abolish('$toplevel':'$query_loop',0).
+'$toplevel':'$query_loop' :-
+   '$toplevel':
+   (
+        (   current_prolog_flag(break_level, BreakLev)
+        ->  true
+        ;   BreakLev = -1
+        ),
+        repeat,
+            (   '$current_typein_module'(TypeIn),
+                (   stream_property(user_input, tty(true))
+                ->  '$system_prompt'(TypeIn, BreakLev, Prompt),
+                    prompt(Old, '|    ')
+                ;   Prompt = '',
+                    prompt(Old, '')
+                ),
+                trim_stacks,
+                read_query(Prompt, Query, Bindings),
+                b_setval('$goal_term', Query), /* DRM: added for expansion hooks*/
+                b_setval('$variable_names', Bindings),  /* DRM: added debugging of queries */
+                prompt(_, Old),
+                call_expand_query(Query, ExpandedQuery,
+                                  Bindings, ExpandedBindings)
+            ->  expand_goal(ExpandedQuery, Goal),
+                '$execute'(Goal, ExpandedBindings)
+            )), !.
+
 
 
 :- forall(filematch(swi(('library/*.pl')),M),
  ignore((
-   \+ (member(C,['/terms.pl','/backcomp.pl','/r.pl','/index.pl',rdf,pengi,win_men,swicli,'swicli.pl',swicffi,quintus,solution_sequences,metaterm,coind,drac,'INDEX',jpl,nb_set,yall,settings]), atom_contains(M,C)),
+   \+ (member(C,['/terms.pl','/backcomp.pl','/r.pl','/index.pl',rdf,pengi,win_men,swicli,'swicli.pl',
+     swicffi,quintus,solution_sequences,metaterm,coind,drac,'INDEX',
+     jpl,nb_set,yall,settings]), atom_contains(M,C)),
    \+ (member(C,[persistency,chr,rewrite,bdb,check,xpath,record]),atom_contains(M,C)),
-   catch(system:use_module(M,except([op(_,_,_)])),E,wdmsg(E))))).
+   catch(system:use_module(M,except([op(_,_,_)])),E,(wdmsg(E),trace))))).
 
 :- include(library(pldoc/hooks)).
 
@@ -222,6 +279,10 @@
 :- system:use_module(library(http/http_parameters)).
 :- system:use_module(library(http/http_server_files)).
 :- system:use_module(library(http/http_wrapper)).
+
+:- if(exists_source(library(yall))).
+:- system:use_module(library(yall), []).
+:- endif.
 
 /*
 

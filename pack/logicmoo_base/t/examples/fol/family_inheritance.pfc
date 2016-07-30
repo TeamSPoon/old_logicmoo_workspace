@@ -20,7 +20,7 @@ show_test(G):- cwc, defaultAssertMt(KB),printAll(must(KB:G)).
 %= ````
 %= logic tests...
 %= ````
-%:- debug(mpred).
+%:- debug_logicmoo(logicmoo(_)).
 
 prologBuiltin(otherGender/2).
 otherGender(male,female).
@@ -95,7 +95,7 @@ human(trudy).
 never_retract_u(human(trudy)).
 never_retract_u(human(eileen)).
 
-:- nodebug(_).
+:- nodebug_logicmoo(_).
 % :- mpred_trace_exec.
 
 % :-  debug(foo).

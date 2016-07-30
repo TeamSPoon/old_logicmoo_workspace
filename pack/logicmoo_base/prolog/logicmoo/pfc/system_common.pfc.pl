@@ -95,9 +95,9 @@ prologHybrid(genls/2).
 
 
 /*
- %  % :- debug(_).
-:- nodebug(http(_)).
-:- debug(mpred).
+ %  % :- debug_logicmoo(_).
+:- nodebug_logicmoo(http(_)).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_exec.
 :- begin_pfc.
 

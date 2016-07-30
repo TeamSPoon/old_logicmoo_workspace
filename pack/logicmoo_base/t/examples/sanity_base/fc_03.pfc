@@ -20,7 +20,7 @@
 :- abolish(b,0).
 :- dynamic((a/0,b/0)).
 
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_exec.
 
 a ==> b.

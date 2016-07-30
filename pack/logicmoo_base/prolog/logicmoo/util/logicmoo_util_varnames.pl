@@ -212,6 +212,7 @@ name_variable('$VAR'(Var), Name):- var(Var),Name=Var,!.
 % name_variable('$VAR'(Var), Name) :- trace_or_throw(numbervars_name_variable(Var, Name)),!.
 name_variable(_, _).
 
+:- nodebug(logicmoo(varnames)).
 
 
 

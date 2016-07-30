@@ -132,8 +132,8 @@ arity(comment,2).
 :- asserta(baseKB:spft(7,7,7)).
 :- compile_predicates([mpred_kb_ops:spft/3]).
 :- compile_predicates([baseKB:spft/3]).
-*/
 :- listing(spft/3).
+*/
 baseKB:mtCycL(baseKB).
 :- mpred_run.
 %baseKB:mtExact(baseKB).

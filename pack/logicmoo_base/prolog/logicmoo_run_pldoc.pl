@@ -180,9 +180,10 @@ do_semweb_startup:-
 % :- do_semweb_startup.
 
 
+
 % [Optionaly] remove debug noises
-% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(why,asserta(prolog_debug:debugging(http(X), false, O)))).
-% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(why,asserta(prolog_debug:debugging((X), false, O)))).
+% mpred_online:semweb_startup:- nodebug_logicmoo(http(_)).
+% mpred_online:semweb_startup:- nodebug_logicmoo(_).
 
 :- shared_multifile(pre_file_search_path/2).
 
@@ -344,7 +345,7 @@ sanity(P):- on_x_rtrace(no_trace(P)),!.
 sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!,ignore(ftrace(P)).
 
 :- meta_predicate(when_debugging(+,0)).
-when_debugging(What,Call):- debugging(What),!,Call.
+when_debugging(What,Call):- debugging_logicmoo(What),!,Call.
 when_debugging(_,_).
 
 % :- asserta(tlbugger:no_colors).

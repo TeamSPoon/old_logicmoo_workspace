@@ -119,7 +119,7 @@ user_login(finin).
 :- mpred_test(\+ host_name(robin,isMissing)).
 
 :- mpred_trace_exec.
-:- debug(_).
+:- debug_logicmoo(_).
 
 ==> ~host_name(robin,rmachine).
 

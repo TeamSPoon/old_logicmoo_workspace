@@ -141,8 +141,8 @@ read_attvars(TF):-
   install_attvar_expander(M).
 
 is_term_expanding_in_file(I):- var(I),!,fail.
-is_term_expanding_in_file(_:-_):-!.
-is_term_expanding_in_file(I):- source_file(_,_),nb_current('$term',CT),CT==I.
+% is_term_expanding_in_file(_:-_):-!.
+is_term_expanding_in_file(I):- source_file(_,_),nb_current('$source_term',CT),CT==I.
 
 system_expanded_attvars(M:goal,_P,I,O):-
      \+ is_term_expanding_in_file(I),

@@ -124,23 +124,10 @@ get_named_value_goal(G,N=V):- functor_non_colon(G,N,_), ((\+ \+ G )-> V=true; V=
 
 get_pos_at_c(C,Num):-compound(C),arg(1,C,Num),number(Num).
 
-is_fbe(term,I,PosI):- !,
-    source_location(S,_),prolog_load_context(file,S),
-   compound(PosI),nonvar(I),
-   nb_current_or_nil('$term',Was), Was==I,
-   nb_current_or_nil('$term_position', Pos),
-   get_pos_at_c(Pos,PosAt),
-   get_pos_at_c(PosI,At),!,
-   PosAt>0,!,At>=PosAt.
-
-is_fbe(goal,I,PosI):-!,
-    source_location(S,_),prolog_load_context(file,S),
-   compound(PosI),nonvar(I),
-   nb_current_or_nil('$term',Was), Was==[],
-   nb_current_or_nil('$term_position', Pos),
-   get_pos_at_c(Pos,PosAt),
-   get_pos_at_c(PosI,At),!,
-   PosAt>0,!,At>=PosAt.
+is_fbe(_,I,PosI):-
+   source_location(S,_),prolog_load_context(file,S),
+   compound(PosI),
+   nb_current_or_nil('$source_term',Was), Was==I.
 
 functor_non_colon(G,F,A):- compound(G), functor(G,':',2),arg(2,G,GG),!,functor_non_colon(GG,F,A).
 functor_non_colon(G,F,A):- functor(G,F,A).
@@ -354,7 +341,7 @@ all_source_file_predicates_are_transparent:-
 
 :- module_transparent(all_source_file_predicates_are_transparent/1).
 all_source_file_predicates_are_transparent(File):-
-    dmsg(all_source_file_predicates_are_transparent(File)),
+    debug(logicmoo(loader),'~N~p~n',[all_source_file_predicates_are_transparent(File)]),
     forall((source_file(ModuleName:P,File),functor(P,F,A)),
       ignore(( 
         ignore(( \+ atom_concat('$',_,F), ModuleName:export(ModuleName:F/A))),

@@ -243,6 +243,7 @@ system:must_notrace_pfc(G):- must(quietly(G)).
 % the database and should not be present in an empty Pfc database
 %
 
+:- nodebug(logicmoo(pfc)).
 
 :- dynamic(mpred_database_term/3).
 % mined from program database      
@@ -1259,7 +1260,7 @@ mpred_ain_trigger_reprop(PT,Support):-
   sanity(\+ string(Support)),
   sanity(\+ string(Trigger)),
   sanity(\+ string(Body)),
-  %  (debugging(foo)->dtrace;true),
+  %  (debugging(logicmoo(_))->dtrace;true),
   mpred_assert_w_support(PT,Support),
   copy_term(PT,Tcopy),
   mpred_call_no_bc(Trigger),
@@ -1493,8 +1494,6 @@ mpred_undo1(Fact):-
   mpred_unfwc(Fact).
 
 
-
-:- forall(debugging(X),nodebug(X)).
 
 %%  mpred_unfwc(+P) 
 %
@@ -2588,7 +2587,7 @@ mpred_retract_i_or_warn(X):- mpred_retract_i_or_warn_0(X).
 mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(_,a,a),!,fail.
 mpred_retract_i_or_warn(X):- fail,
   mpred_warn("Couldn't retract_u ~p.~n",[X]),
-  (debugging(dmiles)->rtrace(retract_u(X));true),!.
+  (debugging_logicmoo(logicmoo(pfc))->rtrace(retract_u(X));true),!.
 mpred_retract_i_or_warn(X):- 
   mpred_warn("Couldn't retract_u ~p.~n",[X]),!.
 
@@ -2744,7 +2743,7 @@ not_not_ignore_mnotrace(G):- ignore(mnotrace(\+ \+ G)).
 log_failure(ALL):- cnotrace((log_failure_red,maybe_mpred_break(ALL),log_failure_red)).
 log_failure_red:- cnotrace(doall((between(1,3,_),wdmsg(color(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")),fail))).
 
-maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(mpred)->dtrace(dmsg(Info));(dmsg(Info)))).
+maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(logicmoo(pfc))->dtrace(dmsg(Info));(dmsg(Info)))).
 
 % if the correct flag is set, dtrace exection of Pfc
 mpred_trace_msg(Info):- not_not_ignore_mnotrace(((((clause_asserted_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)))).
@@ -2752,12 +2751,12 @@ mpred_trace_msg(Format,Args):- not_not_ignore_mnotrace((((clause_asserted_u(mpre
 % mpred_trace_msg(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_trace_msg(Info))))).
 
 mpred_warn(Info):- not_not_ignore_mnotrace((((lookup_u(mpred_warnings(true));tracing) -> 
-  wdmsg(warn(mpred,Info)) ; mpred_trace_msg('WARNING/PFC:  ~p ',[Info])),
+  wdmsg(warn(logicmoo(pfc),Info)) ; mpred_trace_msg('WARNING/PFC:  ~p ',[Info])),
   maybe_mpred_break(Info))).
 
 mpred_warn(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_warn(Info))))).
 
-mpred_error(Info):- not_not_ignore_mnotrace(((tracing -> wdmsg(error(pfc,Info)) ; mpred_warn(error(Info))))).
+mpred_error(Info):- not_not_ignore_mnotrace(((tracing -> wdmsg(error(logicmoo(pfc),Info)) ; mpred_warn(error(Info))))).
 mpred_error(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_error(Info))))).
 
 mpred_trace_exec:- assert_u_no_dep(mpred_is_tracing_exec).
@@ -3005,6 +3004,7 @@ mpred_descendants(P,L):-
   bagof_nr(Q,mpred_descendant1(P,Q,[]),L).
 
 
+:- meta_predicate bagof_nr(?,^,*).
 bagof_nr(T,G,B):- no_repeats(B,(bagof(T,G,B))).
 
 bagof_or_nil(T,G,B):- (bagof_nr(T,G,B) *-> true; B=[]).

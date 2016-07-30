@@ -12,7 +12,7 @@
 :- dynamic(foob/1).
 
 
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_exec.
 
 :- begin_pfc.

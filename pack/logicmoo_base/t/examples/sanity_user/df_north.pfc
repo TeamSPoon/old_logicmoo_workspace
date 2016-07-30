@@ -10,9 +10,9 @@
 
 :- use_module(library(logicmoo_user)).
 
-:- debug(_).
-:- nodebug(http(_)).
-:- debug(mpred).
+:- debug_logicmoo(_).
+:- nodebug_logicmoo(http(_)).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_exec.
 :- mpred_trace.
 :- begin_pfc.

@@ -16,9 +16,9 @@ demo_nb_linkval(T) :-
             writeln(V)
         ).
 
-:- debug(_).
-% :- nodebug(http(_)).
-:- debug(mpred).
+:- debug_logicmoo(_).
+% :- nodebug_logicmoo(http(_)).
+:- debug_logicmoo(logicmoo(_)).
 
 :- file_begin(pfc).
 

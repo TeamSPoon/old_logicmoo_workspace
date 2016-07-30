@@ -217,11 +217,13 @@ same_ci(A,B):-no_trace((must((non_empty(A),non_empty(B))),any_to_string(A,String
 match_object(S,Obj):-var(S),!,freeze(S,match_object(S,Obj)).
 match_object(S,Obj):-var(Obj),!,freeze(Obj,match_object(S,Obj)).
 match_object(S,Obj):-number(S),atom_number(A,S),!,match_object(A,Obj).
-
+match_object(S,Obj):-same_ci(S,Obj),!.
+match_object(S,Obj):-atomic(S),string_to_atom(S,ID),call_u(tKnownID(ID)),!,(var(Obj)->Obj=ID;same_ci(ID,Obj)).
 match_object(S,Obj):-name_text(Obj,S),!.
 match_object(S,Obj):-i_name(Obj,S),!.
 match_object([S],Obj):-!,match_object(S,Obj).
 match_object([S1|S],Obj):-match_object(S1,Obj),match_object(S,Obj),!.
+% match_object(S,Obj):-atomic(S),string_to_atom(S,ID),call_u(tKnownID(ID)),!,(var(Obj)->Obj=ID;same_ci(ID,Obj)).
 match_object(S,Obj):-to_case_breaks(Obj,List)->member(t(Str,_),List),string_equal_ci(S,Str),!.
 match_object(S,Obj):-ground(S:Obj),match_object_exp(S,Obj),!.
 
@@ -235,17 +237,16 @@ match_object_0(Atoms,Obj):-
 match_object_1(A,Obj):-same_ci(A,Obj),!.
 match_object_1(A,Obj):-isa(Obj,Type),same_ci(A,Type),!.
 
+:-nodebug(logicmoo(parser)).
 
 % dmsg_parserm(D):-dmsg(D),!.
-dmsg_parserm(D):-ignore((debugging(parser),dmsg(D))).
-dmsg_parserm(F,A):-ignore((debugging(parser),dmsg(F,A))).
+dmsg_parserm(D):- dmsg(parser,D).
+dmsg_parserm(F,A):-ignore((debugging_logicmoo(logicmoo(parser)),dmsg(F,A))).
 
 
 % ===========================================================
 % PARSER
 % ===========================================================
-:-debug(parser).
-:-nodebug(parser).
 
 
 must_atomics(A):-must(atomic(A)).
@@ -272,7 +273,7 @@ parse_agent_text_command(Agent,PROLOGTERM,[],Agent,actProlog(PROLOGTERM)):- nonv
 
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
  dmsg(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),
- debugging(parser),
+ debugging_logicmoo(logicmoo(parser)),
  debug,visible(+all),leash(+all), 
  parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!.
 

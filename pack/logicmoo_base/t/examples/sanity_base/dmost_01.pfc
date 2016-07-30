@@ -12,9 +12,9 @@
 
 :- asserta((was_missing(Q):- mpred_literal_nv(Q), \+ ~Q, if_missing_mask(Q,R,Test),!, lookup_u(R), Test)).
 
-:- nodebug(_).
-:- nodebug(http(_)).
-:- debug(mpred).
+:- nodebug_logicmoo(_).
+:- nodebug_logicmoo(http(_)).
+:- debug_logicmoo(logicmoo(_)).
 :- mpred_trace_exec.
 :- mpred_trace.
 :- begin_pfc.

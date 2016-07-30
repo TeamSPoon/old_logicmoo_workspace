@@ -56,7 +56,7 @@ do_agent_action(P,C,_):- var(C),!,fmt('unknown_var_command(~q,~q).',[P,C]).
 do_agent_action(_,EOF,_):- end_of_file == EOF, !, npc_tick_tock.
 do_agent_action(_,'',_):-!, npc_tick_tock.
 do_agent_action(P,C,O):- do_gc,with_session(O,agent_call_unparsed(P, C)),!.
-do_agent_action(P,C,_):-wdmsg('skipping_unknown_player_action(~q,~q).~n',[P,C]),!.
+do_agent_action(P,C,_):-wdmsg("skipping_unknown_player_action(~q,~q).~n",[P,C]),!.
 
 
 :-export(parse_agent_text_command_checked/5).
@@ -68,7 +68,7 @@ parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):-
          ignore((CMD=actTick)),ignore((NewAgent=Agent)).
 
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
-   debugging(parser), parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
+   debugging_logicmoo(logicmoo(parser)), parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
 
 must_ac(G):- show_failure(must(G)).
 

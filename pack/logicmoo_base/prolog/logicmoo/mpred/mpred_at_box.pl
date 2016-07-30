@@ -800,7 +800,7 @@ make_shared_multifile(CallerMt,Home,F,A):- clause_b(mtProlog(Home)),!,
 make_shared_multifile(_CallerMt, baseKB,F,A):-  kb_dynamic(F,A),!.
 
 make_shared_multifile(_CallerMt,PredMt,F,A):-!,
- debug(make_shared_multifile,'~p',make_shared_multifile(PredMt:F/A)),
+ dmsg(make_shared_multifile(PredMt:F/A)),
  w_tl(set_prolog_flag(access_level,system),
   PredMt:( 
    sanity( \+ ((PredMt:F/A) = (qrTBox:p/1))),

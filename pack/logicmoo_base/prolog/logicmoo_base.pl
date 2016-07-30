@@ -120,8 +120,13 @@ baseKB:mpred_skipped_module(eggdrop).
 % system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
 %system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
 
+base_clause_expansion(_,I,_):- var(I),!,fail.
+base_clause_expansion(_,I,_):-
+   b_getval('$source_term',TermWas),
+   \+ same_terms(TermWas, I),!,
+   fail.
 
-base_clause_expansion(P1,end_of_file,O):- !, prolog_load_context(module,Module),mpred_te(term,Module,end_of_file,P1,O,_P2)->fail.
+base_clause_expansion(P1,end_of_file,O):- !, prolog_load_context(module,Module),mpred_te(term,Module,end_of_file,P1,O,_P2),!,fail.
 base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
 base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
 base_clause_expansion(_,I,':-'(ain_expanded(I))):- get_consequent_functor(I,F,_),
@@ -136,7 +141,7 @@ needs_pfc(I) :- nonvar(I),get_consequent_functor(I,F,A),
    (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(hybrid_support(F,_));baseKB:wrap_shared(F,A,ereq)),!.
 
 maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
-  % \+ (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(hybrid_support(F,_));baseKB:wrap_shared(F,A,ereq)),
+   \+ (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(hybrid_support(F,_))),
    ain(prologBuiltin(F/A)).
 
 
@@ -229,10 +234,11 @@ user:lmbf:-
 :- set_prolog_flag(lm_expanders,false).
 
 % system:clause_expansion(I,PosI,O,PosI):- base_clause_expansion(PosI,I,O),!.
-system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),nonvar(I), base_clause_expansion(PosI,I,O)->I\==O.
+system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),nonvar(I), 
+      base_clause_expansion(PosI,I,O)->I\==O.
 
 :- list_undefined.
-:- gripe_time(4.0,user:lmbf).
+:- gripe_time(4.5,user:lmbf).
 :- set_prolog_flag(lm_expanders,false).
 % 
 :- set_defaultAssertMt(baseKB).

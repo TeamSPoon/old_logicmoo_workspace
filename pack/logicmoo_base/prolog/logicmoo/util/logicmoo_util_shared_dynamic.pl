@@ -239,7 +239,7 @@ could_safe_wrap:- prolog_load_context(module,M),\+ clause_b(mtCycL(M)),
 
 
 really_safe_wrap(Type,I,O):- callable(I),
-   system_goal_expansion_safe_wrap(I,O)->I\=@=O,dmsg(really_safe_wrap(Type,I,O)).
+   system_goal_expansion_safe_wrap(I,O)->I\=@=O,nop(dmsg(really_safe_wrap(Type,I,O))).
 
 
 %% safe_wrap( Term, +How, -Wrapped) is semidet.

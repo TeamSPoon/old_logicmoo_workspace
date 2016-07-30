@@ -4,8 +4,8 @@
 
 :- use_module(library(logicmoo_user)).
 
-:- debug(_).
-:- nodebug(http(_)).
+:- debug_logicmoo(_).
+:- nodebug_logicmoo(http(_)).
 :- begin_pfc.
 
 

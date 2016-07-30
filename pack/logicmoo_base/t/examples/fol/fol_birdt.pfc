@@ -102,7 +102,7 @@ tFly(iChilly).
 */
 
 :- dmsg("chilly is no longer a penguin").
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 
 :- mpred_trace_exec.
 

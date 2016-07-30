@@ -106,7 +106,7 @@ y(x).
 %=
 
 :- mpred_trace_exec.
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 
 r2.
 

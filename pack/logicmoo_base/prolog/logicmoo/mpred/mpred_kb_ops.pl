@@ -1697,7 +1697,7 @@ mpred_call_1(M,G,F):- sanity(\+  is_side_effect_disabled),
                 ignore((loop_check(call_with_bc_triggers(M:G)),maybeSupport(G,(g,ax)),fail)),
                  \+ current_predicate(F,M:G),\+ current_predicate(_,_:G),
                  doall(show_call(predicate_property(_UM:G,_PP))),
-                 debug(mpred),
+                 debug_logicmoo(logicmoo(_)),
                  fail,
                  %TODO remove this failure
                  must(show_call(kb_dynamic(M:G))),
@@ -2362,8 +2362,6 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 
 
 :- thread_local(t_l:user_abox/1).
-
-:- debug(dmiles).
 
 :- was_dynamic(baseKB:module_local_init/0).
 :- discontiguous(baseKB:module_local_init/0).

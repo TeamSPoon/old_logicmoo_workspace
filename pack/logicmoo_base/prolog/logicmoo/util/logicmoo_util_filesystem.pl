@@ -240,7 +240,7 @@ expand_wfm(G,GG):- once((sub_term(Sub, G),compound(Sub),Sub=wfm(F))),
 %
 % Current Filedir.
 %
-current_filedir(D):- no_repeats([D],(current_filesource(F),file_directory_name(F,D))).
+current_filedir(D):- no_repeats(D,(current_filesource(F),file_directory_name(F,D))).
 
 %= 	 	 
 
@@ -248,6 +248,7 @@ current_filedir(D):- no_repeats([D],(current_filesource(F),file_directory_name(F
 %
 % Current Filesource.
 %
+current_filesource(F):-source_location(F,_).
 current_filesource(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)).
 current_filesource(F):-stream_property(_,file_name(F)).
 

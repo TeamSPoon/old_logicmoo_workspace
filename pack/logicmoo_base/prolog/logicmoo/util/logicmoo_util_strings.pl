@@ -1418,7 +1418,10 @@ member_ci(W,WL):-to_word_list(WL,ListI),member(LL2,ListI),string_equal_ci(LL2,W)
 %
 % String Ci.
 %
-string_ci(A,LIC):-hotrace((must(nonvar(A)),non_empty(A),any_to_string(A,S),!,text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),
+string_ci(A,LIC):-ground(string_ci(A,LIC)),!,string_ci(A,LIC1),string_ci(LIC,LIC2),LIC1=LIC2.
+string_ci(A,LIC):-hotrace((must(nonvar(A)),non_empty(A),any_to_string(A,S),!,text_to_string(S,SS),
+   string_lower(SS,SL),
+  atomics_to_string(SLIC,"_",SL),
    atomics_to_string(SLIC," ",LIC))),!.
 
 :- export(append_ci/3).

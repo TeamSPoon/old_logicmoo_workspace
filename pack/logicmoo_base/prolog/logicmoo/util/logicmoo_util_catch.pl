@@ -329,12 +329,12 @@ is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
 %
 % Using Main Error Converted To Output.
 %
-with_main_error_to_output(Goal):-
+with_main_error_to_output(Goal):- trace,
  current_output(Out),
   w_tl(t_l:thread_local_error_stream(Out),Goal).
    
 
-with_current_io(Goal):-
+with_current_io(Goal):- trace,
   current_input(IN),current_output(OUT),get_thread_current_error(Err),  
   setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,Err)).
 
@@ -347,9 +347,9 @@ with_dmsg_to_main(Goal):-
    w_tl(t_l:thread_local_error_stream(Err),
    setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,ErrWas))).
    
-with_error_to_main(Goal):-
+with_error_to_main(Goal):- 
   get_main_error_stream(Err),current_error(ErrWas),Err=ErrWas,!,Goal.
-with_error_to_main(Goal):-
+with_error_to_main(Goal):- trace,
   get_main_error_stream(Err),get_thread_current_error(ErrWas),
   current_input(IN),current_output(OUT),
    w_tl(t_l:thread_local_error_stream(Err),
@@ -472,7 +472,7 @@ with_main_input(Goal):-
 %
 % Ddmsg.
 %
-ddmsg(D):- ddmsg('~q',[D]).
+ddmsg(D):- ddmsg("~N~q~n",[D]).
 %ddmsg(F,A):- current_predicate(_:wdmsg/2),wdmsg(F,A),!.
 
 %= 	 	 

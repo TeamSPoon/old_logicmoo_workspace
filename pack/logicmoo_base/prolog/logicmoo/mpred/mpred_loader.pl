@@ -354,7 +354,7 @@ mpred_file_term_expansion0(Type,LoaderMod,I,O):-
   % \+ mpred_prolog_only_file(F),
   call_u(baseKB:mtCycL(MT1)),
   must((proper_source_mod([LoaderMod,MF,MT1],AM))),
-  b_getval('$term',TermWas), TermWas == I,
+  b_getval('$source_term',TermWas), TermWas == I,
   call_cleanup(
         w_tl(t_l:current_why_source(mfl(AM,F,L)),
         (( get_original_term_source(Orig), 
@@ -421,6 +421,8 @@ show_load_context:-
   show_bool(mpred_expand_inside_file_anyways),
   show_bool(t_l:mpred_term_expansion_ok),
   show_bool(loading_source_file(_)),
+  show_bool(nb_current('$source_term',_)),
+  show_bool(nb_current('$goal_term',_)),
   show_bool(nb_current('$term',_)),
   show_bool(nb_current('$orig_term',_)),
   show_bool(get_lang(_)))).
@@ -511,7 +513,9 @@ onEndOfFile(Call):- which_file(F), asserta(t_l:on_eof(F,Call)).
 %
 assert_until_eof(F):- must_det_l((loading_source_file(File),assert_until_eof(File,F))).
 
-assert_until_eof(File,F):-dmsg(assert_until_eof(File,F)),must_det_l((asserta(F,Ref),asserta((t_l:on_eof(File,ignore(erase(Ref))))))).
+assert_until_eof(File,F):-
+  debug(logicmoo(loader),'~N~p~n',[assert_until_eof(File,F)]),
+  must_det_l((asserta(F,Ref),asserta((t_l:on_eof(File,ignore(erase(Ref))))))).
 
 :- style_check(+singleton).
 :- style_check(-discontiguous).
@@ -1257,7 +1261,7 @@ set_file_lang(W):-
    ignore((  % \+ lmcache:mpred_directive_value(Source,language,W),
    decache_file_type(Source),
 
-   wdmsg(lmcache:mpred_directive_value(Source,language,W)),
+   debug(logicmoo(loader),'~N~p~n',[lmcache:mpred_directive_value(Source,language,W)]),
    (Source = '/root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/pfc/system_common.pfc.pl'-> must(W=pfc);true),
    assert_until_eof(Source,lmcache:mpred_directive_value(Source,language,W))))),
    must(get_lang(W)).
@@ -2083,7 +2087,7 @@ force_reload_mpred_file2(WorldIn,MFileIn):-
 load_mpred_on_file_end(World,File):- atom(File),
    quietly_must(atom(File)),
    asserta_new(baseKB:loaded_mpred_file(World,File)),
-   dmsginfo(info(load_mpred_file_complete(File))),
+   debug(logicmoo(loader),'~N~p~n',[(info(load_mpred_file_complete(File)))]),
    forall(t_l:on_eof(File,Call),quietly_must((on_f_log_ignore(Call),retractall(t_l:on_eof(File,Call))))).
 
 

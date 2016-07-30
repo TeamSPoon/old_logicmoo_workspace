@@ -108,9 +108,9 @@ tFly(iChilly).
 :- dmsg("chilly is no longer a penguin (hopefly the assertion above about him being a bird wont be removed)").
 
 
-:- debug(_).
+:- debug_logicmoo(_).
 :- mpred_trace_exec.
-:- debug(mpred).
+:- debug_logicmoo(logicmoo(_)).
 
 :- mpred_test(tBird(iChilly)).
 

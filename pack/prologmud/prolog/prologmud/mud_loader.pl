@@ -113,7 +113,7 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 :-asserta((system:halt(_) :- format('the halting problem is now solved!'))).
 :-lock_predicate(system:halt/1).
 
-:- dmsg('the halting problem is now solved!').
+:- dmsg("the halting problem is now solved!").
 :- set_prolog_flag(access_level,user).
 
 :- asserta(t_l:disable_px).
@@ -149,7 +149,7 @@ parser_chat80_module(moo).
 :-export(prolog_repl/0).
 
 prolog_repl:- !, with_all_dmsg((nl,fmt("Press Ctrl-D to resume to the mud!"),nl,!,call_u(break))).
-
+/*
 prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to resume to the mud!"),nl,
   current_input(In),
   current_output(Out),
@@ -158,13 +158,14 @@ prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to resume to the mud!"),nl,
   set_prolog_IO(In,Out,Err),
   % must(get_thread_current_error(O)),
   with_ioe(call_u(break)))).
+*/
 
 %:- set_prolog_flag(gui,false).
 %:- set_prolog_flag(history,1000).
 
 % :- prolog_ide(debug_monitor),prolog_ide(open_debug_status). % ,prolog_ide(xref).
 
-%:- debug(wotp).
+
 
 
 :-export(within_user/1).

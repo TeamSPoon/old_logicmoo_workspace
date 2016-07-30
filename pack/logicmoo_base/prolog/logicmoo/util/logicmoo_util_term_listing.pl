@@ -18,6 +18,7 @@
           use_xlisting/0,
           use_xlisting/1,
           pi_to_head_l/2,
+          xlisting0/1,
             bad_pred/1,
             blob_info/3,
             bookeepingPredicateXRef/1,

@@ -193,14 +193,14 @@ door(What).
 /*
 :- told.
 :- dmsg_show(_).
-:- dmsg('i see this').
+:- dmsg("i see this").
 :- kif_add(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
 :- forall(kif_test_string(TODO),(kif_io(string(TODO),current_output)))
 :- set_no_debug.
 :- cnotrace.
 :- nodebug.
 
-:- wdmsg('we see this').
+:- wdmsg("we see this").
 
 :- kif_add((p => q)).
 :- kif_add(~p <=> ~q).
