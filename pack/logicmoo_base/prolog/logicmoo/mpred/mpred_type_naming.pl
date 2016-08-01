@@ -65,8 +65,8 @@
 create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    must_det(split_name_type(SuggestedName,SystemName,NewSuggestedClass)),
    ignore(SuggestedClass=NewSuggestedClass),   
-   assert_genls_safe(SuggestedClass,BaseClass),
-   assert_genls_safe(NewSuggestedClass,BaseClass),
+   assert_subclass_safe(SuggestedClass,BaseClass),
+   assert_subclass_safe(NewSuggestedClass,BaseClass),
    assert_isa_safe(SystemName,BaseClass),
    assert_isa_safe(SystemName,NewSuggestedClass),
    assert_isa_safe(SystemName,SuggestedClass).
@@ -311,7 +311,7 @@ modality(~,[never],[]).
 %
 onSpawn(A):-A==true,!.
 onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
-onSpawn(Class==>Fact):-!,ain((isLoadedType(tSourceData),isRuntime)==>(Class==>Fact)).
+onSpawn(Class==>Fact):-!,ain(isRuntime==>(Class==>Fact)).
 onSpawn(ClassFact):-
   fully_expand(clause(assert,onSpawn),ClassFact,ClassFactO),!,
   onSpawn_0(t,ClassFactO).

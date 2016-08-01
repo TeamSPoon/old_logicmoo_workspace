@@ -680,6 +680,7 @@ lundef :- A = [],
 %:-mred_no_spy_all.
 %:- lcme:reset_modules.
 
+tSourceCode(iSourceCode7).
 :- set_prolog_flag(pfc_booted,true).
 :- ain(isLoaded(iSourceCode7)).
 :- set_prolog_flag(assert_attvars,true).

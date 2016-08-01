@@ -169,7 +169,7 @@ pfcControlled(isa(ftTerm,tCol)).
 tSet(tSet).
 tSet(tCol).
 tSet(ttModule).
-prologHybrid(ttModule).
+functorDeclares(ttModule).
 tFixedArityRelation(tSet).
 tFixedArityRelation(tCol).
 ttPredType(prologHybrid).

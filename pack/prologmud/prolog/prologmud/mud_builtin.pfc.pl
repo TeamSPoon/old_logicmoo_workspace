@@ -367,8 +367,8 @@ tSourceCode(iSourceCode7,comment("PrologMUD Server code")).
 tSourceData(iSourceData8,comment("PrologMUD WorldState Data")).
 
 
-isLoadedType(tSourceCode) ==> (tPred(Toy),arity(Toy,A)/ ( \+ current_predicate(Toy/A)) ==> dynamic(Toy/A)).
-isLoadedType(tSourceCode) ==> (functorDeclares(Toy),prologArity(Toy,A)/( \+ current_predicate(Toy/A)) ==> dynamic(Toy/A)).
+%isLoadedType(tSourceCode) ==> (tPred(Toy),arity(Toy,A)/ ( \+ current_predicate(Toy/A)) ==> dynamic(Toy/A)).
+%isLoadedType(tSourceCode) ==> (functorDeclares(Toy),prologArity(Toy,A)/( \+ current_predicate(Toy/A)) ==> dynamic(Toy/A)).
 
 
 functorDeclares(Toy),tFunction(Toy),arity(Toy,A),{A2 is A + 1}==>prologArity(Toy,A2).

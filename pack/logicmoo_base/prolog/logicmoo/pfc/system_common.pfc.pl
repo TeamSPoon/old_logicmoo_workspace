@@ -453,7 +453,7 @@ prologMacroHead(prologMacroHead).
 ttPredType(X)==>functorDeclares(X).
 tCol(X)==>functorDeclares(X).
 % functorDeclares(X)==>tCol(X).
-prologMacroHead(X)==>functorDeclares(X).
+% prologMacroHead(X)==>functorDeclares(X).
 prologMacroHead(pddlSomethingIsa/2).
 tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 

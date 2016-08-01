@@ -447,8 +447,8 @@ to_untyped_name(Name,Desc):- to_case_breaks(Name,ListN),case_breaks_text_trim(Li
 
 guess_nameStrings(F,Txt):-once(name_text_atomic(F,Txt)).
 
-type_descriptive_name(tPred,Desc,Atom):-longer_sumry(Desc,Atom).
 type_descriptive_name(tCol,t,'First-Order').
+type_descriptive_name(tPred,Desc,Atom):-longer_sumry(Desc,Atom).
 type_descriptive_name(tCol,tt,'Second-Order').
 type_descriptive_name(tCol,vt,'Type-Class').
 type_descriptive_name(tCol,'Col','Class').

@@ -1,4 +1,4 @@
-/* 2605  
+/*  
 % ===================================================================
 % File 'dbase_c_term_expansion'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
@@ -403,7 +403,7 @@ functor_declares_instance_0(P,ttModule):- arg(_,s(tCol,tModule),P).
 functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttExpressionType),P).
 
 functor_declares_instance_0(P,P):- cheaply_u(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
-functor_declares_instance_0(COL,COL):- call_u(tSet(COL)).
+functor_declares_instance_0(COL,COL):- call_u(tCol(COL)).
 
 %= 	 	 
 
@@ -456,14 +456,6 @@ old_is_stripped_module(baseKB).
 % Converted To Reduced Head+body.
 %
 to_reduced_hb(Op,HB,HH,BB):-reduce_clause(Op,HB,HHBB),expand_to_hb(HHBB,HH,BB).
-
-%% neck_reduced_mhb( ?Op, ?HB, ?HH, ?BB) is semidet.
-neck_reduced_mhb(_Op,H,_,_,_):-is_ftVar(H),!,fail.
-neck_reduced_mhb(_Op,':-'(_),_,_,_):- !,fail.
-neck_reduced_mhb(Op,M:HB,M,H,B):-!,neck_reduced_mhb(Op,HB,_,H,B).
-%neck_reduced_mhb(_Op,M:':-'(H,B),M,H,B):-!,
-neck_reduced_mhb(_Op,':-'((M:H),B),M,H,B):- !.
-neck_reduced_mhb(_Op,H,M,HH,true):- strip_module(H,M,HH).
 
 
 /*
@@ -535,9 +527,8 @@ fully_expand_warn(A,B,O):-
 %
 % Same Terms.
 %
-same_terms(A,B):-A==B,!.
-same_terms(A,B):-A=@=B,!,A=B.
-same_terms(A,B):- A = B,!,fail.
+same_terms(A,B):-A=@=B,!.
+same_terms(A,A):-!,fail.
 same_terms((A:-AA),(B:-BB)):-!,same_terms(A,B),same_terms(AA,BB).
 same_terms(M:A,B):-atom(M),!,same_terms(A,B).
 same_terms(A,M:B):-atom(M),!,same_terms(A,B).
@@ -635,19 +626,6 @@ expand_kif_string(I,O):- any_to_string(I,S),
   input_to_forms(string(S),O,Vs)->
   put_variable_names(Vs).
   
-make_head_as_type(M,F,A,Type):- must(ground(make_head_as_type(M,F,A,Type))).
-make_head_as_type(M,F,A,unknown):-ain(arity(F,A)), (M\==baseKB->ain(predicateConventionMt(F,M));true).
-make_head_as_type(M,F,A,Type):- 
-  ain(arity(F,A)), 
-  (M\==baseKB->ain(predicateConventionMt(F,M));true),
-  AIN=..[Type,F],
-  ain_expanded(AIN).
-
-
-get_pred_type_default(System,prologBuiltin):- system==System,!.
-get_pred_type_default(_M,prologHybrid):- in_dialect_pfc.
-get_pred_type_default(_M,prologBuiltin):- \+ is_user_module.
-get_pred_type_default(_M,prologBuiltin).
 
 %% fully_expand_clause( ++Op, :TermSent, -- SentO) is det.
 %
@@ -676,19 +654,7 @@ fully_expand_clause(Op,'=>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO)
 fully_expand_clause(Op,M:Sent,SentO):- is_stripped_module(M),!,fully_expand_clause(Op,Sent,SentO).
 
 fully_expand_clause(Op,(B/H),Out):- !,fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB),!,must(Out=(BB/HH)).
-fully_expand_clause(Op,(H:-B),HHBB):- is_true(B),!,must(fully_expand_head(Op, H,HHBB)).
 fully_expand_clause(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
-
-
-/*
-%fully_expand_clause(Op,HB,HB):- neck_reduced_mhb(Op,HB,_M,H,_B),var(H),!.
-fully_expand_clause(Op,HB,HHBB):- neck_reduced_mhb(Op,HB,M,H,B),!,
-%  must((functor(H,F,A),discover_head(Op,M,H,F,A,_Type))),
-  must((fully_expand_head(Op,M:H,HH),=(B,BB))) ->
-  reduce_clause(Op,(HH:-BB),HHBB) -> !.
-*/
-
-fully_expand_clause(_, (H:-B),HHBB):- HHBB=(H:-B),!.
 fully_expand_clause(Op, HB,HHBB):- 
   to_reduced_hb(Op,HB,H,B)-> 
   \+ is_true(B) ->
@@ -882,7 +848,6 @@ db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),(not_ftCompound(T)),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
 db_expand_final(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_final(Op,Sent,SentO).
-db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),cheaply_u(prologBuiltin(F)),!.
 db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),cheaply_u(argsQuoted(F)),!.
 db_expand_final(_, arity(F,A),arity(F,A)):- not_ftCompound(F),not_ftCompound(A),!.
 db_expand_final(_, tPred(V),tPred(V)):-!,fail, not_ftCompound(V),!.

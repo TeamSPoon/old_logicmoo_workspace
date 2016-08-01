@@ -806,6 +806,9 @@ is_ftVar('avar'(_)).
 is_ftVar('avar'(_,_)).
 %:- mpred_trace_nochilds(is_ftVar/1).
 
+ftVar(X):- is_ftVar(X).
+ftCompound(X):- is_ftCompound(X).
+ftNonvar(X):- is_ftNonvar(X).
 
 :- export(is_ftNonvar/1).
 

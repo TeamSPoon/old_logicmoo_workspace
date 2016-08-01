@@ -200,7 +200,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 %:- set_prolog_flag(logicmoo_debug,true).
 
 :- mpred_trace_exec.
-:- ain(isLoaded(iMudCode7)).
+:- ain(isLoaded(iSourceCode7)).
 :- mpred_notrace_exec.
 
 % ==============================
@@ -326,7 +326,8 @@ load_ckb:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)),logicmoo_i_cyc_kb:c
 :- assert_setting01(lmconf:eachRule_Preconditional(true)).
 :- assert_setting01(lmconf:eachFact_Preconditional(true)).
 
-:- ain(isLoaded(iWorldCode8)).
+tSourceData(iWorldData8).
+:- ain(isLoaded(iWorldData8)).
 :- ain(isRuntime).
 
 
@@ -340,9 +341,8 @@ load_ckb:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)),logicmoo_i_cyc_kb:c
 
 :- set_prolog_flag(unsafe_speedups,true).
 :- statistics.
-:- time(gripe_time(1.0,coerce(s,vtDirection,_))).
-%:- time(gripe_time(8.0, \+ coerce(l,vtDirection,_))).
-%:- time(gripe_time(1.0, \+ coerce(l,vtDirection,_))).
+:- gripe_time(1.0,coerce(s,vtDirection,_)).
+:- gripe_time(2.0, \+ coerce(l,vtDirection,_)).
 
 :- check_clause_counts.
 
