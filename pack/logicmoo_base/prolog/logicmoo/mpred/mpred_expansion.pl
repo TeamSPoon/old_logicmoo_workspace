@@ -527,8 +527,9 @@ fully_expand_warn(A,B,O):-
 %
 % Same Terms.
 %
-same_terms(A,B):-A=@=B,!.
-same_terms(A,A):-!,fail.
+same_terms(A,B):-A==B,!.
+same_terms(A,B):-A=@=B,!,A=B.
+same_terms(A,B):- A = B,!,fail.
 same_terms((A:-AA),(B:-BB)):-!,same_terms(A,B),same_terms(AA,BB).
 same_terms(M:A,B):-atom(M),!,same_terms(A,B).
 same_terms(A,M:B):-atom(M),!,same_terms(A,B).
@@ -848,6 +849,7 @@ db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),(not_ftCompound(T)),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
 db_expand_final(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_final(Op,Sent,SentO).
+db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),cheaply_u(prologBuiltin(F)),!.
 db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),cheaply_u(argsQuoted(F)),!.
 db_expand_final(_, arity(F,A),arity(F,A)):- not_ftCompound(F),not_ftCompound(A),!.
 db_expand_final(_, tPred(V),tPred(V)):-!,fail, not_ftCompound(V),!.
