@@ -362,9 +362,20 @@ prologHybrid(localityOfObject(tObj,tSpatialThing)).
 
 completelyAssertedCollection(Complete)==> {must(\+ ttExpressionType(Complete))}.
 
+
+tSourceCode(iSourceCode7,comment("PrologMUD Server code")).
+tSourceData(iSourceData8,comment("PrologMUD WorldState Data")).
+
+
+isLoadedType(tSourceCode) ==> (tPred(Toy),arity(Toy,A)/ ( \+ current_predicate(Toy/A)) ==> dynamic(Toy/A)).
+isLoadedType(tSourceCode) ==> (functorDeclares(Toy),prologArity(Toy,A)/( \+ current_predicate(Toy/A)) ==> dynamic(Toy/A)).
+
+
+functorDeclares(Toy),tFunction(Toy),arity(Toy,A),{A2 is A + 1}==>prologArity(Toy,A2).
+
 tCol(completelyAssertedCollection).
 tCol(completeIsaAsserted).
-% genls(completeIsaAsserted,tSpatialThing).
+genls(tSpatialThing,completeIsaAsserted).
 genls(completelyAssertedCollection,tCol).
 completelyAssertedCollection(tItem).
 completelyAssertedCollection(tRegion).
@@ -374,6 +385,11 @@ completelyAssertedCollection(tAgent).
 completelyAssertedCollection(tCarryAble).
 completelyAssertedCollection(vtVerb).
 % :-rnotrace.
+
+completeIsaAssertedType(Col) ==> (isa(I,Col) ==> completeIsaAsserted(I)).
+completeIsaAssertedType(tAgent).
+completeIsaAssertedType(tCarryAble).
+completeIsaAssertedType(tObj).
 
 tCol(ttTypeByAction).
 :-must(ain(tCol(ttTypeByAction))).
@@ -399,10 +415,38 @@ neg(isa(I,Super)) <- {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Supe
 
 tCol(ttSpatialType).
 
+
+% ===================================================================
+% MUD TMS - Type checker system / Never Assert / Retraction checks
+% ===================================================================
+/*
+never_assert_u(mudAtLoc(iArea1025, _),isa(iArea1025,tRegion)).
+never_assert_u(localityOfObject(iArea1025, iOfficeRoom7),isa(iArea1025,tRegion)).
+never_assert_u(localityOfObject(R,_),isa(R,tRegion)):- isa(R,tRegion).
+never_assert_u(mudFacing(R,_),isa(R,tRegion)):- isa(R,tRegion).
+never_assert_u(mudAtLoc(R,_),isa(R,tRegion)):- isa(R,tRegion).
+
+%deduce_facts_forward(localityOfObject(_,Region),isa(Region,tSpatialThing)).
+deduce_facts_forward(localityOfObject(Obj,_),isa(Obj,tObj)).
+fix_argIsa(F,N,vtDirection(Val),vtDirection):-ain(mpred_prop(F,argSingleValueDefault(N,Val))),!.
+
+*/
+
+typeCheckDecl(vtActionTemplate(ArgTypes),is_declarations(ArgTypes)).
+
 % Representations
 vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
 
-meta_argtypes(ArgTypes)/get_functor(ArgTypes,F),vtVerb(F)==>vtActionTemplate(ArgTypes).
+vtVerb(F),(meta_argtypes(ArgTypes)/get_functor(ArgTypes,F))==>vtActionTemplate(ArgTypes).
+
+tSet(vtAssertion).
+tSpec(vtAssertion).
+prologHybrid(ist(tMicrotheory,vtAssertion)).
+prologHybrid(istAsserted(vtAssertion)).
+
+resultIsa(aAssertionFn(tMicrotheory,ftAssertable),vtAssertion).
+
+mudEquals(aAssertionFn(MT,Sent),ist(MT,Sent)):-must(assert_if_new(MT:Sent)).
 
 
 
@@ -418,20 +462,8 @@ argIsa(mudFacing,2,vtDirection).
 argIsa(mudMemory,2,ftTerm).
 
 tCol(vtVerb).
-tCol(vtVerb).
 
-/*
-never_assert_u(mudAtLoc(iArea1025, _),isa(iArea1025,tRegion)).
-never_assert_u(localityOfObject(iArea1025, iOfficeRoom7),isa(iArea1025,tRegion)).
-never_assert_u(localityOfObject(R,_),isa(R,tRegion)):- isa(R,tRegion).
-never_assert_u(mudFacing(R,_),isa(R,tRegion)):- isa(R,tRegion).
-never_assert_u(mudAtLoc(R,_),isa(R,tRegion)):- isa(R,tRegion).
 
-%deduce_facts_forward(localityOfObject(_,Region),isa(Region,tSpatialThing)).
-deduce_facts_forward(localityOfObject(Obj,_),isa(Obj,tObj)).
-fix_argIsa(F,N,vtDirection(Val),vtDirection):-ain(mpred_prop(F,argSingleValueDefault(N,Val))),!.
-
-*/
 
 tCol(tChannel).
 tCol(tItem).
@@ -599,7 +631,7 @@ tCol(vtDirection).
 tCol(vtVerb).
 :- dynamic stat_total/2.
 :- dynamic(spawn_rate/2).
-tCol(tMonster).
+tCol(mobMonster).
 %prologDynamic(action_info(vtActionTemplate,ftText)).
 prologDynamic(agent_command(tAgent,ftAction)).
 :- ain(prologSideEffects(agent_command(tAgent,ftAction))).
@@ -747,7 +779,7 @@ genls(tEatAble,tItem).
 genls(tFurniture,tObj).
 genls(tFurniture,tPartofObj).
 genls(tHumanControlled,tAgent).
-genls(tMonster,ttAgentGeneric).
+genls(mobMonster,ttAgentGeneric).
 genls(tNpcPlayer,tAgent).
 genls(tPathway,tDoor).
 genls(tUseAble,tItem).
@@ -798,7 +830,7 @@ tCol(ttAgentType).
 prologHybrid(pathDirLeadsTo(tRegion,vtDirection,tRegion)).
 prologHybrid(bordersOn(tRegion,tRegion),tSymmetricRelation).
 
-ttAgentType(tMonster).
+ttAgentType(mobMonster).
 % instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 
 

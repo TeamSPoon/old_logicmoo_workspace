@@ -8,8 +8,8 @@
 
 % :- register_module_type (mtCommand).
 
-:-decl_mpred_prolog(nearest_reachable_object(tAgent,tObj)).
-:-decl_mpred_prolog(farthest_reachable_object(tAgent,tObj)).
+prologBuiltin(nearest_reachable_object(tAgent,tObj)).
+prologBuiltin(farthest_reachable_object(tAgent,tObj)).
 
 % ====================================================
 % the entire inventory system
@@ -29,7 +29,7 @@ tFarthestReachableItem(Obj):-
 nearest_reachable_object(Agent,Obj):- 
   with_no_modifications((findall(Obj,farthest_reachable_object(Agent,Obj),List),reverse(List,Reverse),!,member(Obj,Reverse))).
 
-:-decl_mpred_prolog(farthest_reachable_object(tAgent,tObj)).
+prologBuiltin(farthest_reachable_object(tAgent,tObj)).
 farthest_reachable_object(Agent,Obj):-with_no_modifications((farthest_reachable_object0(Agent,Obj))).
 farthest_reachable_object0(Agent,Obj):-
   test_exists(Obj),

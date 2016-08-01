@@ -20,18 +20,18 @@
 :- include(prologmud(mud_header)).
 % :- register_module_type (planning).
 
-ttAgentType(tPddlAgent).
+ttAgentType(mobPddlAgent).
 
 pddl_vette_idea(Agent,Act,Act):-var(Act),!,dmsg(pddl_vette_idea(Agent,Act)).
 pddl_vette_idea(_,actSit,actSit):-!.
 pddl_vette_idea(Agent,Act,Act):-dmsg(pddl_vette_idea(Agent,Act)).
 
 
-mudLabelTypeProps('oP',tPddlAgent,[]).
+mudLabelTypeProps('oP',mobPddlAgent,[]).
 
 world_agent_plan(_World,Agent,ActV):-
    tAgent(Agent),
-   % isa(Agent,tPddlAgent),
+   % isa(Agent,mobPddlAgent),
    pddl_idea(Agent,Act),
    pddl_vette_idea(Agent,Act,ActV).
 
@@ -66,7 +66,7 @@ pddl_idea(Agent,actMove(1,Dir)) :-
 
 pddl_idea(Agent,actMove(3,Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,tMonster,OppDir),
+	list_object_dir_sensed(_,List,mobMonster,OppDir),
 	reverse_dir(OppDir,Dir),
 	number_to_dir(N,Dir,vHere),
         nth1(N,List,What),
@@ -89,7 +89,7 @@ pddl_idea(Agent,actMove(5,Dir)) :-
 
 pddl_idea(Agent,actAttack(Dir)) :-
 	mudNearReach(Agent,List),
-	list_object_dir_near(List,tMonster,Dir).
+	list_object_dir_near(List,mobMonster,Dir).
 
 pddl_idea(Agent,actLook) :-
         req1(mudMemory(Agent,aDirectionsFn(Old))),

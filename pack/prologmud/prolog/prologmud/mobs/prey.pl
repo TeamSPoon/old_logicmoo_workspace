@@ -15,21 +15,21 @@
 :- include(prologmud(mud_header)).
 
 % Declare the module name and the exported (public) predicates.
-:-swi_module(tPrey,[]).
+:-swi_module(mobPrey,[]).
 
 :- include(prologmud(mud_header)).
 % :- register_module_type (planning).
 % :- register_module_type (mtCommand).
 
-ttAgentType(tPrey).
-resultIsa(aPreyFn(ftInt),tPrey).
+ttAgentType(mobPrey).
+resultIsa(aPreyFn(ftInt),mobPrey).
 
 % Predicates asserted during run.
 % :- dynamic memory/2. 
 %:- dynamic agent_list/1.
 
 world_agent_plan(_World,Self,Act):-
-   isa(Self,tPrey),
+   isa(Self,mobPrey),
    prey_idea(Self,Act).
    
 % Possible agent actions.
@@ -64,7 +64,7 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 vtActionTemplate(actSpawn(tCol)).
 
-agent_command(_Agent,actSpawn(tPrey)):-actSpawnPrey.
+agent_command(_Agent,actSpawn(mobPrey)):-actSpawnPrey.
 
 actSpawnPrey :-
 	% maybe(10),
@@ -81,7 +81,7 @@ spawn_prey(10) :-
 	!.
 spawn_prey(N) :-
        Prey = aPreyFn(N),
-       assert_isa(Prey,tPrey),
+       assert_isa(Prey,mobPrey),
        put_in_world(Prey),!.
 
        /*

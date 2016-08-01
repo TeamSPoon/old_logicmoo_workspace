@@ -404,7 +404,8 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :- ain('==>'(prologBuiltin(name_text_now(ftTerm,ftString)))).
 
-name_text(I,O):- nonvar(I),no_repeats(O,name_text_now(I,O)).
+name_text(I,O):- nonvar(O),!,name_text(I,M),string_equal_ci(M,O).
+name_text(I,O):- nonvar(I),no_repeats(O,(name_text_now(I,M),any_to_string(M,S), \+ empty_string(S), text_to_string(S,O))).
 
 :- export(name_text_now/2).
 
@@ -426,7 +427,7 @@ name_text_atomic("",_):-!,fail.
 name_text_atomic(Name,Text):-string(Name),!,Name=Text.
 name_text_atomic(Name,Text):-is_list(Name),!,maplist(name_text_atomic,Name,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text_atomic([F,A|List],Text).
-name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atom_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
+name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-to_case_breaks(Name,ListN),case_breaks_text(ListN,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
@@ -439,18 +440,35 @@ case_breaks_text(ListN,TextT):- maplist(as_atom,ListN,TextT),!.
 
 guess_mudDescription(Name,Desc):- isa(Name,tPred), \+ isa(Name,tCol),atomic(Name),make_summary([],Name,Desc).
 guess_mudDescription(Name,Desc):- atomic(Name),to_case_breaks(Name,ListN),!, maplist(as_atom,ListN,TextT),!,
-   maplist(to_descriptive_name,TextT,TextL),!,atomic_list_concat(TextL,' ',Desc).
+   maplist(to_descriptive_name(Name),TextT,TextL),!,atomic_list_concat(TextL,' ',Desc).
+
+
+to_untyped_name(Name,Desc):- to_case_breaks(Name,ListN),case_breaks_text_trim(ListN,TextL),atomic_list_concat(TextL,' ',Desc).
 
 guess_nameStrings(F,Txt):-once(name_text_atomic(F,Txt)).
 
-to_descriptive_name(t,'FirstOrder').
-to_descriptive_name(tt,'SecondOrder').
-to_descriptive_name(vt,'ValueType').
-to_descriptive_name('Col','Class').
-to_descriptive_name(Pefix,Desc):-type_prefix(Pefix,Name),
-       to_case_breaks(Name,ListN),case_breaks_text_trim(ListN,TextL),atomic_list_concat(TextL,' ',Desc),!.
-to_descriptive_name(Desc,Atom):-longer_sumry(Desc,Atom),!.
-to_descriptive_name(Desc,Atom):-any_to_atom(Desc,Atom),!.
+type_descriptive_name(tPred,Desc,Atom):-longer_sumry(Desc,Atom).
+type_descriptive_name(tCol,t,'First-Order').
+type_descriptive_name(tCol,tt,'Second-Order').
+type_descriptive_name(tCol,vt,'Type-Class').
+type_descriptive_name(tCol,'Col','Class').
+type_descriptive_name(ftNonvar,'Fn','Function').
+type_descriptive_name(tFunction,'a','Prototypical').
+type_descriptive_name(tFunction,'i','Instance').
+type_descriptive_name(ftAtom,'i','Instance').
+type_descriptive_name(tCol,'Voprop','Verb-Object Properties').
+type_descriptive_name(ftNonvar,Pefix,Desc):-
+   type_prefix(Pefix,TypeName),
+   to_untyped_name(TypeName,Desc).
+
+
+to_descriptive_name(For,Desc,Atom):- type_descriptive_name(Type,Desc,Atom),isa(For,Type),!.
+
+to_descriptive_name(_For,Pefix,Desc):-
+   type_prefix(Pefix,TypeName),
+   to_untyped_name(TypeName,Desc).
+to_descriptive_name(_For,Desc,Atom):- longer_sumry(Desc,Atom),!.
+to_descriptive_name(_For,Desc,Atom):-any_to_atom(Desc,Atom),!.
 
 :-dynamic(baseKB:ttKeyworded/1).
 

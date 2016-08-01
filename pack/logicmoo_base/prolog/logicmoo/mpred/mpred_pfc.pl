@@ -893,12 +893,23 @@ mpred_post1(P,S):- gripe_time(0.6,mpred_post12(P,S)).
 :- module_transparent(mpred_post12/2).
 :- export(mpred_post12/2).
 
-mpred_post12(P, S):- compound(P), ( \+ P = argsQuoted(_) ), functor(P,F,N), ( F \==  action_rules, F \== (==>) ), (arg(N,P,A);arg(1,P,A)), member(A,['$VAR'('????????????'),'$VAR'(_)])->trace_or_throw(mpred_post1(P, S)).
+leave_some_vars_at_el(action_rules).
+leave_some_vars_at_el(agent_text_command).
+leave_some_vars_at_el(argsQuoted).
+leave_some_vars_at_el(==>).
+
+is_ftOpen(A):- member(A,['$VAR'('????????????'),'$VAR'(_)]).
+
+is_ftOpenSentence(P):- is_ftOpen(P).
+is_ftOpenSentence(P):- compound(P), functor(P,F,N), \+ leave_some_vars_at_el(F), 
+   (arg(N,P,A);(N\==1,arg(1,P,A))),is_ftOpen(A).
+
+mpred_post12(P, S):- is_ftOpenSentence(P)->trace_or_throw(var_mpred_post1(P, S)).
 
 mpred_post12( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 
 % TODO - FIGURE OUT WHY THIS IS NEEDED
-mpred_post12( ~ P,   S):- 
+mpred_post12( ~ P,   S):- sanity( \+ is_ftOpenSentence(P)),
    with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
 
 mpred_post12(P,S):- maybe_updated_value(P,RP,OLD),!,subst(S,P,RP,RS),mpred_post12(RP,RS),ignore(mpred_retract(OLD)).

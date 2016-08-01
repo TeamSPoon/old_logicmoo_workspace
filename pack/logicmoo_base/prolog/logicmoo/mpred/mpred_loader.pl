@@ -354,7 +354,7 @@ mpred_file_term_expansion0(Type,LoaderMod,I,O):-
   % \+ mpred_prolog_only_file(F),
   call_u(baseKB:mtCycL(MT1)),
   must((proper_source_mod([LoaderMod,MF,MT1],AM))),
-  b_getval('$source_term',TermWas), TermWas == I,
+  b_getval('$source_term',TermWas), TermWas =@= I,
   call_cleanup(
         w_tl(t_l:current_why_source(mfl(AM,F,L)),
         (( get_original_term_source(Orig), 

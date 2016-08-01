@@ -12,7 +12,7 @@
 */
 
 % Declare the module name and the exported (public) predicates.
-:-swi_module(tPredator,[]).
+:-swi_module(mobPredator,[]).
 
 % Predicates asserted during run.
 % :- dynamic memory/2.
@@ -22,9 +22,9 @@
 % :- register_module_type (planning).
 
 
-tCol(tPredator).
+tCol(mobPredator).
 world_agent_plan(_World,Agent,Act):-
-   isa(Agent,tPredator),
+   isa(Agent,mobPredator),
    predator_idea(Agent,Act).
 
 predator_idea(Agent,actEat(Corpse)) :-
@@ -41,13 +41,13 @@ predator_idea(Agent,actMove(Dir)) :-
 	list_object_dir_sensed(_,List,iCorpseFn(_),Dir).
 predator_idea(Agent,actAttack(Dir)) :-
 	mudNearReach(Agent,List),
-	list_object_dir_near(List,tPrey,Dir).
+	list_object_dir_near(List,mobPrey,Dir).
 
 % find something near and itnersting and go to it.. or find a dirrection and go that way.. or sit 
 
 predator_idea(Agent,actMove(Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,tPrey,Dir).
+	list_object_dir_sensed(_,List,mobPrey,Dir).
 
 predator_idea(Agent,Act) :- 
       move_or_sit_memory_idea(Agent,Act,[tNut]).

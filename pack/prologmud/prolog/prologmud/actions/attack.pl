@@ -84,19 +84,23 @@ damage_foe(Agent,What,hit) :-
 	ain(mudHealth(What,NewDam)).
 
 :- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
-:- must(prologBuiltin(damage_foe)).
-:- must(prologBuiltin(check_for_weapon)).
+:- must(prologBuiltin(damage_foe/3)).
+:- must(prologBuiltin(check_for_weapon/2)).
 
-prologBuiltin(upprop,1).
-prologBuiltin(upprop,2).
+%prologBuiltin(upprop/1).
+%prologBuiltin(upprop/2).
 
 :- endif.
 
+
+update_charge(A,B):-update_charge_0(A,B).
 % Record keeping
-update_charge(Agent,actAttack) :- upprop(Agent,mudEnergy(+ -5)).
-update_stats(Agent,actBash) :-  upprop(Agent,mudHealth(+ -2)),
+update_charge_0(Agent,actAttack) :- upprop(Agent,mudEnergy(+ -5)).
+
+update_stats(A,B):-update_stats_0(A,B).
+update_stats_0(Agent,actBash) :-  upprop(Agent,mudHealth(+ -2)),
 	(add_cmdfailure(Agent,actBash)).
-update_stats(Agent,wiff) :- 
+update_stats_0(Agent,wiff) :- 
 	del(mudHealth(Agent,Old)),
 	New is Old - 1,
 	ain(mudHealth(Agent,New)),

@@ -140,7 +140,7 @@ typeProps(tTeddybear,[mudColor(vNatural),mudShape(vUnique)]).
 mudLabelTypeProps(tr,tTree,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(rk,tRock,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(pt,tPit,[mudHeight(-1),mudWeight(4)]).
- mudLabelTypeProps(ot,tOutlet,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenStays),mudActAffect(actTake,mudEnergy(+50))]).
+ mudLabelTypeProps(ot,tPowerOutlet,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenStays),mudActAffect(actTake,mudEnergy(+50))]).
  mudLabelTypeProps(nt,tNut,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+40)),spawn_rate(10)]).
 mudLabelTypeProps(lw,tLowWall,[mudHeight(2),mudWeight(4)]).
 :- do_gc.

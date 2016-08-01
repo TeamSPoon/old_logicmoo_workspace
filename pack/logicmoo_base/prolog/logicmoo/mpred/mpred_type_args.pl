@@ -562,7 +562,7 @@ argIsa_call_6(F,N,Type):- grab_argsIsa(F,Types),maybe_argtypes(Types),arg(N,Type
 %
 % Maybe Argument Types.
 %
-maybe_argtypes(Types):- compound(Types), ground(Types), Types\=(_/_), Types\=(_:_/_), Types\='$VAR'(_).
+maybe_argtypes(TypesIn):- strip_module(TypesIn,_,Types), compound(Types), ground(Types), Types\=(_/_), Types\=(_:_/_), Types\='$VAR'(_).
 
 
 %= 	 	 

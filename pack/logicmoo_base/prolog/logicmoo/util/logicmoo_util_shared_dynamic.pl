@@ -184,6 +184,9 @@ baseKB:wrap_shared(agent_text_command,_,ereq).
 baseKB:wrap_shared(agent_command,_,ereq).
 baseKB:wrap_shared(coerce,_,ereq).
 
+baseKB:wrap_shared(F,_,_):- /*clause_b(arity(F,A)),*/ clause_b(prologBuiltin(F)),!,fail.
+% baseKB:wrap_shared(F,A,_):- clause_b(arity(F,A)),clause_b(mpred_prop(F,A,prologBuiltin)),!,fail.
+
 baseKB:wrap_shared(F,A,ereq):- atom(F),integer(A),
    functor(P,F,A),
    % member(MVis,[baseKB,lmcache,lmconfig]),

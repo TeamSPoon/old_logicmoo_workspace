@@ -10,7 +10,7 @@
 %
 % Declare the module name and the exported (public) predicates.
 */
-:-swi_module(tMonster,[]).
+:-swi_module(mobMonster,[]).
 
 % Predicates asserted during run.
 % :- dynamic memory/2. 
@@ -20,10 +20,10 @@
 % Possible agent actions.
 % :- register_module_type (planning).
 
-tCol(tMonster).
+tCol(mobMonster).
 
 world_agent_plan(_World,Agent,Act):-
-   isa(Agent,tMonster),
+   isa(Agent,mobMonster),
    monster_idea(Agent,Act).
    
 monster_idea(Agent,actEat(Food)) :-
@@ -64,7 +64,7 @@ prologHybrid(wearsClothing/2).
 
 % TODO fingure out why term_expansion is not working
 %:-visible(+all),leash(-all),trace.
-%instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
+%instTypeProps(Instance,mobMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
 %:-cnotrace.
 %:- prolog.
 

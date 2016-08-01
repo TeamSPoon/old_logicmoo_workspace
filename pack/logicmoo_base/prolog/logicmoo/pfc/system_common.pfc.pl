@@ -168,11 +168,25 @@ prologBuiltin(agent_text_command/4,prologDynamic).
 tSet(tNotForUnboundPredicates).
 
 
+==>tCol(vtVerb).
+
 :- sanity(fileAssertMt(baseKB)).
 :- sanity(defaultAssertMt(baseKB)).
 
 
 tNotForUnboundPredicates(member).
+
+
+
+
+
+% ===================================================================
+% Type checker system / Never Assert / Retraction checks
+% ===================================================================
+
+(sometimesTypeCheck, typeCheckDecl(Each,Must), Each, {\+ Must}) ==> failed_typeCheckDecl(Each,Must).
+
+failed_typeCheckDecl(Each,Must)==>{trace_or_throw(failed_typeCheckDecl(Each,Must))}.
 
 never_assert_u(vtVerb(BAD),vtVerbError):-fail,BAD=='[|]'.
 never_assert_u(prologSingleValued(BAD),var_prologSingleValued(BAD)):-is_ftVar(BAD).
@@ -191,10 +205,10 @@ never_retract_u(argQuotedIsa(thereExistAtLeast, 1, ftPositiveInteger),sanity_tes
 
 % P/never_assert_u(P,Why) ==> conflict(never_assert_u(P,Why))
 
-tPred(arity/2,prologHybrid).
-tPred(is_never_type/1,prologDynamic).
-tPred(term_expansion/2,prologDynamic).
-tPred(var/1,prologBuiltin).
+prologHybrid(arity/2).
+prologDynamic(is_never_type/1).
+prologDynamic(term_expansion/2).
+prologBuiltin(var/1).
 
 completelyAssertedCollection(completelyAssertedCollection).
 completelyAssertedCollection(C)==>tCol(C).
@@ -411,8 +425,6 @@ tSet(C)==>
    pfcControlled(C),
    arity(C,1)).
 
-==>tCol(vtVerb).
-
 % :- call((system:rtrace)).
 ==>tCol(tCol).
 %:- notrace.
@@ -431,18 +443,17 @@ ttExpressionType(P) ==>
   completelyDecidableCollection(F),
   arity(F,1).
 
+
    
+==>tCol(vtVerb).
 arity(prologMacroHead,1).
-
-
-
 ttPredType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologHybrid,
   predCanHaveSingletons,prologDynamic,tPred,prologMacroHead,prologListValued,prologSingleValued)).
 prologMacroHead(prologMacroHead).
 ttPredType(X)==>functorDeclares(X).
 tCol(X)==>functorDeclares(X).
 % functorDeclares(X)==>tCol(X).
-% prologMacroHead(X)==>functorDeclares(X).
+prologMacroHead(X)==>functorDeclares(X).
 prologMacroHead(pddlSomethingIsa/2).
 tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 
@@ -718,7 +729,13 @@ prologMultiValued(predicateConventionMt(tRelation,ftAtom)).
 
 :- decl_mpred(argIsa/3).
 
-isa(Spec,tCol) ==> arity(Spec,1).
+prologBuiltin(col_arity/2).
+col_arity(Spec,A):-arity(Spec,A),!.
+col_arity(Spec,A):-atom(Spec),!,A=1.
+col_arity(Spec,A):-compound(Spec),functor(Spec,_,A).
+
+
+isa(Spec,tCol)/col_arity(Spec,A) ==> arity(Spec,A).
 
 % :-ain((mpred_isa(I,C)==>{ain((isa(I,tPred),mpred_isa(I,C),props(I,[C])))})).
 % :-ain((t(C,I)==>{ /* retract(hasInstance_dyn(C,I)), */ ain((isa(I,C))) , ain((props(I,C)))})).
@@ -775,7 +792,7 @@ prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/
 :- ain_expanded((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
 :- ain_expanded((prologMacroHead(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued)))).
 :- ain_expanded((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologDynamic,prologBuiltin,prologKIF,prologMacroHead,prologListValued,prologSingleValued),tPred))).
-:- assert_hasInstance(tCol,tCol).
+:- assert_isa(tCol,tCol).
 :- file_begin(pfc).
 
 %TODO FIX :- decl_mpred(tDeleted(ftID),[predIsFlag]).
@@ -1045,7 +1062,7 @@ subFormat(ftVoprop,ftTerm).
 
 subFormat(COL1,COL2)==>(ttExpressionType(COL1),ttExpressionType(COL2)).
 
-tCol(W)==>{guess_supertypes(W)}.
+tCol(W)==>{guess_genls(W)}.
 
 
 tSet(tNewlyCreated).
@@ -1128,7 +1145,7 @@ quotedDefnIff(ftRest(Type),is_rest_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftListFn(Type),is_list_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftCodeIs(SomeCode),SomeCode):- cwc, is_ftNonvar(SomeCode).
 
-(ttExpressionType(FT)/append_term(FT,Arg,Head)==> ((Head:- !, term_is_ft(Arg,FT)))).
+% (ttExpressionType(FT)/(var(Head),append_term(FT,Arg,Head)) ==> ((Head:- !, term_is_ft(Arg,FT)))).
 
 % tCol(Type),(ptBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G ==> relationMostInstance(Pred,Type,Value).
 

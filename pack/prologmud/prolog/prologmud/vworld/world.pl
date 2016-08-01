@@ -201,7 +201,7 @@ create_instance_0(SubType,tCol,List):-ain(tCol(SubType)),padd(SubType,List).
 
 ttSpatialType(tAgent).
 genls(tActor,tAgent).
-genls(tExplorer,tAgent).
+genls(mobExplorer,tAgent).
 
 :-decl_shared(predTypeMax/3).
 :-decl_shared(predInstMax/3).

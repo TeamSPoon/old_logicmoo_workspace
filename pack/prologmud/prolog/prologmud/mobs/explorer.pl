@@ -15,12 +15,12 @@
 
 
 % Declare the module name and the exported (public) predicates.
-:-swi_module(tExplorer,[]).
+:-swi_module(mobExplorer,[]).
 
 :- include(prologmud(mud_header)).
 % :- register_module_type (planning).
 
-tCol(tExplorer).
+tCol(mobExplorer).
 
 vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
 vette_idea(_,actSit,actSit):-!.
@@ -34,7 +34,7 @@ prologHybrid(mudLabelTypeProps/3).
 :- sanity(arity(mudLabelTypeProps,3)).
 
 prologHybrid(typeHasGlyph(tCol,ftString)).
-mudLabelTypeProps('Px',tExplorer,[]).
+mudLabelTypeProps('Px',mobExplorer,[]).
 
 world_agent_plan(_World,Agent,ActV):-
    tAgent(Agent),
@@ -73,7 +73,7 @@ explorer_idea(Agent,actMove(1,Dir)) :-
 
 explorer_idea(Agent,actMove(3,Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,tMonster,OppDir),
+	list_object_dir_sensed(_,List,mobMonster,OppDir),
 	reverse_dir(OppDir,Dir),
 	number_to_dir(N,Dir,vHere),
         nth1(N,List,What),
@@ -96,7 +96,7 @@ explorer_idea(Agent,actMove(5,Dir)) :-
 
 explorer_idea(Agent,actAttack(Dir)) :-
 	mudNearReach(Agent,List),
-	list_object_dir_near(List,tMonster,Dir).
+	list_object_dir_near(List,mobMonster,Dir).
 
 explorer_idea(Agent,actLook) :-
         req1(mudMemory(Agent,aDirectionsFn(Old))),

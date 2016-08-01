@@ -99,7 +99,7 @@ out.
 %= ````
 
 
-prologBuiltin(otherGender/2).
+mpred_prop(otherGender,2,prologBuiltin).
 otherGender(male,female).
 otherGender(female,male).
 

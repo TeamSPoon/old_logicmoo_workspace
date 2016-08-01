@@ -59,11 +59,12 @@ climbable(Agent,Dir) :-
 	ObjHt > 1.
 
 %Record keeping
-update_charge(Agent,actClimb) :- padd(Agent,mudEnergy(+ -5)).
+update_charge(Agent,actClimb) :- call(padd(Agent,mudEnergy(+ -5))).
 
+prologBuiltin(padd/2).
 update_stats(Agent,trip) :-  padd(Agent,mudHealth(+ -3)).
 
-update_stats(Agent,pulled) :- padd(Agent,mudHealth(+ -2)),
+update_stats(Agent,pulled) :- call(padd(Agent,mudHealth(+ -2))),
 	(add_cmdfailure(Agent,pulled)).
 
 

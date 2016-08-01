@@ -48,8 +48,8 @@ action_info(actCreate(ftListFn(ftTerm)), "Rezes a new 'tSpatialThing' or creates
 
 agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_new_object(Agent,SWhat))).
 
-:-decl_mpred_prolog(authorWas(ftTerm,ftTerm)).
-:-decl_mpred_prolog(current_pronoun(tAgent,ftString,ftTerm)).
+prologHybrid(authorWas(ftTerm,ftTerm)).
+prologHybrid(current_pronoun(tAgent,ftString,ftTerm)).
 
 :-export(create_new_object/2).
 

@@ -24,7 +24,7 @@ grid_key( lw='tLowWall').
 grid_key( hb='tHighBox').
 grid_key( lb='tLowBox').
 grid_key( dt=tDirt).
-grid_key( ot=tOutlet).
+grid_key( ot=tPowerOutlet).
 
 
 

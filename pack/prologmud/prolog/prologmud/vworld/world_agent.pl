@@ -295,7 +295,7 @@ get_dettached_npc(P):- random_instance_no_throw(tAgent,P, \+ isa(P,tHumanControl
 generate_new_player(P):- var(P),!,must_det_l([gensym(iExplorer,N), \+ ((isa_asserted(N,tAgent))),P=N,ensure_new_player(P)]),!.
 generate_new_player(P):- ensure_new_player(P),!.
 
-ensure_new_player(P):- must_det_l([nonvar(P),assert_isa(P,tExplorer),assert_isa(P,tHumanControlled),assert_isa(P,tAgent)]),!.
+ensure_new_player(P):- must_det_l([nonvar(P),assert_isa(P,mobExplorer),assert_isa(P,tHumanControlled),assert_isa(P,tAgent)]),!.
 
 assumed_detached_player(P):- lmcache:agent_session(P,_),!,trace_or_throw(assumed_detached_player(P)).
 assumed_detached_player(_).

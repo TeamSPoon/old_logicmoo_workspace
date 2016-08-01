@@ -122,6 +122,7 @@ baseKB:mpred_skipped_module(eggdrop).
 
 base_clause_expansion(_,I,_):- var(I),!,fail.
 base_clause_expansion(_,I,_):-
+  % prolog_load_context(term,TermWas),
    b_getval('$source_term',TermWas),
    \+ same_terms(TermWas, I),!,
    fail.
@@ -129,21 +130,23 @@ base_clause_expansion(_,I,_):-
 base_clause_expansion(P1,end_of_file,O):- !, prolog_load_context(module,Module),mpred_te(term,Module,end_of_file,P1,O,_P2),!,fail.
 base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
 base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
-base_clause_expansion(_,I,':-'(ain_expanded(I))):- get_consequent_functor(I,F,_),
-   \+ (clause_b(prologBuiltin(F))),
-   (in_dialect_pfc;needs_pfc(I)),!.
+base_clause_expansion(_,I, O):- get_consequent_functor(I,F,A),base_clause_expansion_fa(I,O,F,A).
 base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.
-base_clause_expansion(_,I, _):- once(maybe_builtin(I)),fail.
+
+base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- needs_pfc(F,A),!.
+base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,_):- in_dialect_pfc,!,ain(prologBuiltin(F)).    % ain(hybrid_support(F,A)).
+base_clause_expansion_fa(_,_,F,_):- ain(prologBuiltin(F)),!,fail.
 
 
-needs_pfc(I) :- nonvar(I),get_consequent_functor(I,F,A),
-   \+ (clause_b(prologBuiltin(F))),
-   (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(hybrid_support(F,_));baseKB:wrap_shared(F,A,ereq)),!.
-
+needs_pfc(F,A):- 
+  (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(prologHybrid(F));
+  clause_b(hybrid_support(F,A));clause_b(wrap_shared(F,_,ereq))),!.
+/*
 maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
-   \+ (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(hybrid_support(F,_))),
+   \+ (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(hybrid_support(F,A))),
    ain(prologBuiltin(F/A)).
 
+*/
 
 
 

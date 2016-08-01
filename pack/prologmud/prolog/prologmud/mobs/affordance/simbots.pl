@@ -13,7 +13,7 @@
 :- include(prologmud(mud_header)).
 :- include(improve).
 
-tCol(tSimian).
+tCol(mobSimian).
 
 :- discontiguous(defined_affordance/1).
 
@@ -512,7 +512,7 @@ to_rel_value( + Val,+ Val):-!.
 to_rel_value(Val,+ Val).
 
 world_agent_plan(_World,Agent,Act):-
-   (isa(Agent,tSimian);isa(Agent,tAgent)),
+   (isa(Agent,mobSimian);isa(Agent,tAgent)),
    simian_idea(Agent,Act).
 
 :-export(simian_ideas_possible/2).

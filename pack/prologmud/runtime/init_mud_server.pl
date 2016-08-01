@@ -109,6 +109,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 :- set_prolog_flag(logicmoo_debug,true).
 %:- set_prolog_flag(unsafe_speedups,false).
+:- mpred_trace_exec.
 
 :- baseKB:assert_isa(iRR7,tRR).
 :- baseKB:ain(genls(tRR,tRRP)).
@@ -130,7 +131,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 :- statistics.
 
-:- must((statistics(cputime,X),X<52)).
+% :- must((statistics(cputime,X),X<65)).  % was 52
 
 %:- ensure_webserver(3020).
 :- initialization(ensure_webserver(3020)).
@@ -198,6 +199,9 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 %:- set_prolog_flag(logicmoo_debug,true).
 
+:- mpred_trace_exec.
+:- ain(isLoaded(iMudCode7)).
+:- mpred_notrace_exec.
 
 % ==============================
 % MUD SERVER CODE STARTS
@@ -213,6 +217,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 %:- set_prolog_flag(unsafe_speedups,false).
 
 
+
 % [Optional] Creates or suppliments a world
 
 tCol(tRegion).
@@ -225,16 +230,16 @@ genls(tOfficeRoom,tRegion).
 %genlsFwd(tOfficeRoom,tRegion).
 
 % create some seats
-tExplorer(iExplorer1).
-tExplorer(iExplorer2).
-tExplorer(iExplorer3).
-tExplorer(iExplorer4).
-tExplorer(iExplorer5).
-tExplorer(iExplorer6).
+mobExplorer(iExplorer1).
+mobExplorer(iExplorer2).
+mobExplorer(iExplorer3).
+mobExplorer(iExplorer4).
+mobExplorer(iExplorer5).
+mobExplorer(iExplorer6).
 
 (tHumanBody(skRelationAllExistsFn)==>{trace_or_throw(tHumanBody(skRelationAllExistsFn))}).
 
-genls(tExplorer,tHominid).
+genls(mobExplorer,tHominid).
 
 :- ain(localityOfObject(P,_)==>{put_in_world(P)}).
 
@@ -242,7 +247,7 @@ genls(tExplorer,tHominid).
 tRegion(iLivingRoom7).
 tRegion(iOfficeRoom7).
 
-tExplorer(iExplorer7).
+mobExplorer(iExplorer7).
 wearsClothing(iExplorer7,'iBoots773').
 wearsClothing(iExplorer7,'iCommBadge774').
 wearsClothing(iExplorer7,'iGoldUniform775').
@@ -255,8 +260,8 @@ pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObjec
 pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
-tMonster(iCommanderdata66).
-tExplorer(iCommanderdata66).
+mobMonster(iCommanderdata66).
+mobExplorer(iCommanderdata66).
 mudDescription(iCommanderdata66,txtFormatFn("Very scary looking monster named ~w",[iCommanderdata66])).
 tAgent(iCommanderdata66).
 tHominid(iCommanderdata66).
@@ -312,7 +317,7 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 :- must_det(argIsa(genlPreds,2,_)).
 
-load_ckb:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)),ltkb1.
+load_ckb:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)),logicmoo_i_cyc_kb:call(call,ltkb1).
 
 %:- initialization(ltkb1,load_ckb).
 
@@ -320,7 +325,10 @@ load_ckb:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)),ltkb1.
 
 :- assert_setting01(lmconf:eachRule_Preconditional(true)).
 :- assert_setting01(lmconf:eachFact_Preconditional(true)).
+
+:- ain(isLoaded(iWorldCode8)).
 :- ain(isRuntime).
+
 
 :- mpred_notrace_exec.
 

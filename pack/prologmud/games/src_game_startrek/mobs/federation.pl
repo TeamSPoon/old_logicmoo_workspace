@@ -63,7 +63,7 @@ federation_idea(Agent,actMove(1,Dir)) :-
 
 federation_idea(Agent,actMove(3,Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,tMonster,OppDir),
+	list_object_dir_sensed(_,List,mobMonster,OppDir),
 	reverse_dir(OppDir,Dir),
 	number_to_dir(N,Dir,vHere),
         nth1(N,List,What),
@@ -86,7 +86,7 @@ federation_idea(Agent,actMove(5,Dir)) :-
 
 federation_idea(Agent,actAttack(Dir)) :-
 	mudNearReach(Agent,List),
-	list_object_dir_near(List,tMonster,Dir).
+	list_object_dir_near(List,mobMonster,Dir).
 
 federation_idea(Agent,actLook) :-
         req(mudMemory(Agent,aDirectionsFn(Old))),

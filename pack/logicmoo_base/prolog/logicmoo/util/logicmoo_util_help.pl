@@ -1246,6 +1246,11 @@ longer_sumry(nots,'Negations').
 longer_sumry(o,'Output').
 longer_sumry(op,'Oper.').
 longer_sumry(p,'Pred').
+longer_sumry(neg,'Negative').
+longer_sumry(npc,'Automatic Character').
+longer_sumry(act,'Single Doer Action').
+longer_sumry(prep,'Proposition').
+
 longer_sumry(pfc,'Prolog Forward Chaining').
 longer_sumry(pi,'Predicate Indicator').
 longer_sumry(poss,'Possibility').

@@ -57,13 +57,12 @@ col_as_unary(mtCycL).
 col_as_unary(pfcLHS).
 col_as_unary(tPred).
 col_as_unary(tCol).
-:- mpred_trace_exec.
 % :- rtrace((ain_expanded(tCol(tCol)))).
 
-prologHybrid(C)==>{must(callable(C))}.
-pfcControlled(C)==>{must(callable(C))}.
-
-:- mpred_notrace_exec.
+%prologHybrid(C)==>{must(callable(C))}.
+%pfcControlled(C)==>{must(callable(C))}.
+typeCheckDecl(prologHybrid(C),callable(C)).
+typeCheckDecl(pfcControlled(C),callable(C)).
 
 % :- break.
 
@@ -77,6 +76,8 @@ col_as_isa(ttPredType).
 col_as_unary(completeExtentAsserted).
 col_as_unary(completelyAssertedCollection).
 
+col_as_unary(Col)==>tCol(Col).
+col_as_isa(Col)==>tCol(Col).
 
 
 % ((prologHybrid(C),{must(callable(C)),get_functor(C,F,A),C\=F}) ==> arity(F,A)).
@@ -94,6 +95,11 @@ t(completelyAssertedCollection,tMicrotheory).
 t(T,I):- cwc, I==T,completelyAssertedCollection==I,!.
 t(completelyAssertedCollection,mtCycL).
 t(T,I):- cwc, I==T,ttExpressionType==I,!,fail.
+completelyAssertedCollection(prologNegByFailure).
+completelyAssertedCollection(pm).
+completelyAssertedCollection(prologMacroHead).
+completelyAssertedCollection(tMicrotheory).
+completelyAssertedCollection(mtCycL).
 
 
 %% prologNegByFailure( ?VALUE1) is semidet.
@@ -139,6 +145,137 @@ baseKB:mtCycL(baseKB).
 %baseKB:mtExact(baseKB).
 
 :- nortrace.
+
+:-  abolish(yall:'/' / 2).
+
+tCol(tCol).  % = isa(tCol,tCol).
+tCol(tSet).
+
+(genls(C,SC)/ground(genls(C,SC))==>(tCol(C),tCol(SC))).
+
+
+mudIsaSkippedCollection(functorDeclares).
+mudIsaSkippedCollection(meta_argtypes).
+mudIsaSkippedCollection(completeIsaAsserted).
+
+%ttExpressionType(C)==>mudIsaSkippedCollection(C).
+%((completelyAssertedCollection(Sub) / (\+ mudIsaSkippedCollection(Sub)))) ==> ttMudIsaCol(Sub).
+%ttMudIsaCol(Sub) ==> (isa(I,Sub) ==> mudIsa(I,Sub)).
+%completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ mudIsaSkippedCollection(Sub))) ==> mudIsa(I,Sub)).
+
+pfcControlled(prologArity(tRelation,ftInt)).
+pfcControlled(isa(ftTerm,tCol)).
+
+tSet(tSet).
+tSet(tCol).
+tSet(ttModule).
+prologHybrid(ttModule).
+tFixedArityRelation(tSet).
+tFixedArityRelation(tCol).
+ttPredType(prologHybrid).
+
+%:- rtrace,trace.
+%:- notrace, nortrace.
+
+prologHybrid(mudToCyc(ftTerm,ftTerm)).
+
+:- must(arity(mudToCyc,2)).
+
+col_as_isa(X)==>tFixedArityRelation(X),arity(X,1).
+col_as_unary(X)==>tFixedArityRelation(X),arity(X,1).
+
+tSet(ttExpressionType).
+tSet(completelyAssertedCollection).
+
+%underkill - Though it is making bad things happen 
+%WEIRD ~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
+% EASIER
+% ~tCol(C) ==> ~completelyAssertedCollection(C).
+
+:- sanity(get_lang(pfc)).
+% tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
+tSet(C)/atom(C) ==>
+({must_det_l((
+  kb_dynamic(C/1),
+  dynamic(C/1),
+  wdmsg(c_tSet(C)),
+  ( \+ is_static_predicate(C/1)),
+  functor(Head,C,1), 
+  call(BHead=baseKB:Head),
+  ( \+(predicate_property(BHead,_))-> kb_dynamic(C/1); true),
+  (predicate_property(BHead,dynamic)->true;show_pred_info(BHead))))},
+   functorDeclares(C),
+   pfcControlled(C),
+   \+ ttExpressionType(C),
+   tCol(C),
+   arity(C,1)).
+
+ttExpressionType(C) ==> ( \+ completelyAssertedCollection(C), ~ tSet(C), tCol(C)).
+
+((tCol(C)/( \+ ttExpressionType(C))) ==> tSet(C)).
+
+
+:- mpred_trace_exec.
+
+tSet(tKnownID).
+:- xlisting(tKnownID).
+%?- isa(tKnownID,W).
+%:- break.
+tSet(tNotForUnboundPredicates).
+tSet(tPred).
+tSet(prologBuiltin).
+tSet(tFunction).
+tSet(tRelation).
+tSet(ttTemporalType).
+tSet(prologMacroHead).
+
+
+ttModule(tSourceCode,mudToCyc('ComputerCode'),comment("Source code files containing callable features")).
+ttModule(tSourceData,mudToCyc('PropositionalInformationThing'),comment("Source data files containing world state information")).
+
+prologHybrid(isLoadedType(ttModule),pfcControlled).
+prologHybrid(isLoaded(tMicrotheory),pfcControlled).
+
+isLoaded(Thing),isa(Thing,ModType)==> isLoadedType(ModType).
+
+:- mpred_notrace_exec.
+
+/*
+tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),
+ % mpred_univ(C,I,TCI),
+ {call_u((decl_type(C), 
+  ignore((
+   \+ is_static_predicate(C/1),
+   kb_dynamic(C/1),
+   \+ completelyAssertedCollection(C),
+   call_u(ain((
+   ((TCI :- 
+    ((cwc, call_u((
+      predicate_property(TCI,number_of_rules(1)),
+    lazy(( \+ call_u(~(TCI)))),
+    isa_backchaing(I,C))))))))))))))}).
+*/
+
+%overkill
+tSet(C)<==>completelyAssertedCollection(C).
+
+% :- call((system:rtrace)).
+==>tCol(tCol).
+%:- notrace.
+%:- nortrace.
+% :- dbreak.
+% (tCol(C)/atom(C) ==> ({Head=..[C,I]}, (isa(I,C)/ground(I:C)==>Head))).
+
+ttExpressionType(P) ==> 
+ {get_functor(P,F), functor(Head,F,1), call(BHead=baseKB:Head),
+  call((\+ predicate_property(BHead,defined) -> kb_dynamic(F/1); true)),
+  call((predicate_property(BHead,dynamic)->(ain(Head==>{ignore(retract(Head))}));show_pred_info(BHead)))},
+  ~prologMacroHead(F),
+  ~functorDeclares(F),
+  ~tSet(F),
+  notAssertibleCollection(F),
+  completelyDecidableCollection(F),
+  arity(F,1).
 
 
 %:- rtrace.
@@ -214,13 +351,6 @@ alwaysGaf(pfcLHS).
 tCol(A)/atom(A)==>{decl_type_unsafe(A), kb_dynamic(A/1)}.
 % tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
 
-tSet(tCol).
-tSet(tPred).
-tSet(tFunction).
-tSet(tRelation).
-tSet(ttTemporalType).
-tSet(ttExpressionType).
-tSet(prologMacroHead).
 prologMacroHead(ttModule).
 
 
@@ -248,9 +378,10 @@ arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(
 
 % mtCycL(baseKB).
 
-tCol(ttModule).
-tCol(ttModule).
 arity(tCol,1).
+
+tCol(ttModule,mudToCyc('MicrotheoryType')).
+
 arity(argsQuoted,1).
 arity(quasiQuote,1).
 
@@ -434,7 +565,8 @@ baseKB:predicateConventionMt(collectionConventionMt,baseKB).
 predicateConventionMt(genlMt,baseKB).
 predicateConventionMt(regression_test,baseKB).
 
-
+arity(tSet,1).
+tSet(tMicrotheory,mudToCyc('Microtheory')).
 
 baseKB:collectionConventionMt(tMicrotheory,baseKB).
 collectionConventionMt(mtCycL,baseKB).
@@ -443,10 +575,6 @@ collectionConventionMt(Col,Where) ==> predicateConventionMt(Col,Where).
 
 % mtExact(Mt)==>{kb_dynamic(Mt)}.
 
-tCol(tCol).  % = isa(tCol,tCol).
-tCol(tSet).
-tSet(tCol).
-tSet(tSet).
 
 mtProlog(Mt),predicateConventionMt(F,Mt)/(Mt\==baseKB)==>prologBuiltin(F).
 
