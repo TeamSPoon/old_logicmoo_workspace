@@ -41,6 +41,7 @@ nearestGenls(C1,C2)==>
 
 
 % mudIsaSkippedCollection(functorDeclares).
+mudIsaSkippedCollection(C):-compound(C).
 mudIsaSkippedCollection(meta_argtypes).
 % mudIsaSkippedCollection(completeIsaAsserted).
 

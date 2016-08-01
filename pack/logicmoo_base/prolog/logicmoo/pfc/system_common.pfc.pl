@@ -248,7 +248,7 @@ ttExpressionType(F)==>
 
 
 % relations are predsor functions
-completelyAssertedCollection(tRelation).
+~completelyAssertedCollection(tRelation).
 completelyAssertedCollection(tPred).
 completelyAssertedCollection(tFunction).
 

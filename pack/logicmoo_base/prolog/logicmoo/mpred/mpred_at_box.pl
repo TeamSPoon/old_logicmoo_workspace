@@ -257,9 +257,7 @@ box_type(_,_,abox).
 % within a knowledge base.
 %
 % not just user modules
-defaultAssertMt(ABox):- nonvar(ABox),defaultAssertMt(ABoxVar),!,ABox=@=ABoxVar.
-defaultAssertMt(ABox):- t_l:current_defaultAssertMt(ABox),!.
-defaultAssertMt(ABox):- fileAssertMt(ABox).
+defaultAssertMt(ABox):- (t_l:current_defaultAssertMt(BBox);fileAssertMt(BBox))->ABox=BBox.
 
 
 

@@ -334,9 +334,12 @@ cheaply_u(G):- quickly(quietly(Goal)).
 
 */
 
+% lookup_u/cheaply_u/call_u/clause_b
+
 cheaply_u(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
-cheaply_u(call(ereq,G)):- must(callable(G)),!,cheaply_u(G).
-cheaply_u(G):- quietly(call_u(G)).
+cheaply_u(call(ereq,G)):- sanity(callable(G)),!,cheaply_u(G).
+cheaply_u(G):- quietly(lookup_u(G)).
+
 %cheaply_u(G):- need_speed,!, (ground(G)->(quietly(baseKB:G),!);quietly(lookup_u(G))).
 %cheaply_u(G):- loop_check(cheaply_u(G),loop_check_term(cheaply_u(G),ilc2(G),fail)).
 %cheaply_u(G):- predicate_property(G,number_of_rules(N)),N=0,!,lookup_u(G).

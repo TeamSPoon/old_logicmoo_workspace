@@ -27,6 +27,7 @@
                    parseForTypes//2)).
 
 % :- register_module_type (utility).
+some_term_to_atom(Term,Atom):- sanity(\+ is_list(Term)), term_to_atom(Term,AtomTerm,Atom).
 
 % =====================================================================================================================
 % get_agent_text_command/4
@@ -93,13 +94,13 @@ parse_for(Type,StringM,Term,LeftOver):-
       fmt('Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
       fmt('No Success.~n',[])).
 
-meets_desc_spec(T,_L):- term_to_atom(T,S0),string_to_atom(S0,A),atomic_list_concat_catch([_,_|_],'mudBareHandDa',A),!,fail.
+meets_desc_spec(T,_L):- some_term_to_atom(T,S0),string_to_atom(S0,A),atomic_list_concat_catch([_,_|_],'mudBareHandDa',A),!,fail.
 meets_desc_spec(_,[]):-!.
 meets_desc_spec(S,[DS|SL]):-!,meets_desc_spec(S,DS),meets_desc_spec(S,SL),!.
 meets_desc_spec(S,From-To):-!, desc_len(S,Len),!, between(From,To,Len).
 meets_desc_spec(_,_).
 
-desc_len(S0,Region):- call(term_to_atom(S0,S)),
+desc_len(S0,Region):- call(some_term_to_atom(S0,S)),
    atomic_list_concat_catch(Words,' ',S),length(Words,Ws),atomic_list_concat_catch(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
 
 

@@ -503,11 +503,12 @@ convention_to_symbolic_mt_ec(Why,F,A,Mt):-convention_to_symbolic_mt(Why,F,A,Mt).
 convention_to_symbolic_mt(_Why,predicateConventionMt,2,baseKB):-!.
 convention_to_symbolic_mt(_Why,genlMt,2,baseKB):-!.
 convention_to_symbolic_mt(_Why,mtCycL,1,baseKB):-!.
+convention_to_symbolic_mt(_Why,tCol,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,mtProlog,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,functorDeclares,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,prologMacroHead,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,F,A,abox):- mpred_database_term(F,A,_).
-convention_to_symbolic_mt(_Why,F,_,Mt):-  call_u(predicateConventionMt(F,Mt)),!.
+convention_to_symbolic_mt(_Why,F,_,Mt):-  call(baseKB:predicateConventionMt(F,Mt)),!.
 convention_to_symbolic_mt(_Why,F,A,abox):- baseKB:wrap_shared(F,A,ereq).
 % convention_to_symbolic_mt(_Why,_,_,M):- atom(M),!.
 
@@ -582,8 +583,10 @@ clause_u(MH,B,R):- Why = clause(clause,clause_u),
 %
 %clause_u(pfc,H,B,Proof):-clause_u(H,B,Proof).
 
-lookup_u(SPFT):- current_prolog_flag(unsafe_speedups,true), !,baseKB:mtCycL(MT),call(MT:SPFT).
-lookup_u(H):-lookup_u(H,_).
+% lookup_u/cheaply_u/call_u/clause_b
+lookup_u(SPFT):- baseKB:call(SPFT).
+% lookup_u(SPFT):- current_prolog_flag(unsafe_speedups,true), !,baseKB:mtCycL(MT),call(MT:SPFT).
+% lookup_u(H):-lookup_u(H,_).
 
 
 lookup_u(MH,Ref):- nonvar(Ref),!,
@@ -1838,6 +1841,18 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 % 
 % call_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
 
+% :- table(call_u/1).
+
+call_u(G):- strip_module(G,M,P), call_u_t(G,M,P).
+
+
+call_u_t(_G,M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
+% call_u_t(mtCycL(P),_,mtCycL(P)):-!,baseKB:mtCycL(P).
+call_u_t((P),M,(P)):-!,catch(baseKB:call(P),E,(wdmsg(M:call_u_t(P)),wdmsg(E),dtrace)).
+% call_u_t(P,M,P):- !,catch(M:call(P),E,(wdmsg(M:call_u_t(P)),wdmsg(E),dtrace)).
+call_u_t(_G,M,P):- call((baseKB:mtExact(M)->call(P);baseKB:call(P))).
+
+/*
 call_u(G):- var(G),!,dtrace,defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,G)).
 call_u(M:G):- var(M),!,trace_or_throw(var_call_u(M:G)).
 call_u(M:G):- nonvar(M),var(G),!,sanity(mtCycL(M)),with_umt(M,mpred_fact_mp(M,G)).
@@ -1850,7 +1865,7 @@ call_u(G):- strip_module(G,M,P),
    CP=P
       ),
    with_umt(W, CP).
-
+*/
 
 /*
 call_u(G):- strip_module(G,M,P),
