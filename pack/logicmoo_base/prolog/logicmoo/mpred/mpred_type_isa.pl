@@ -126,7 +126,6 @@ transitive_P_r_l(3,?,?,?),
 :- discontiguous baseKB:prologBuiltin/1.
 :- dynamic baseKB:prologBuiltin/1.
 
-
 %% assert_hasInstance( ?T, ?I) is nondet.
 %
 % Assert Has Instance.
@@ -732,7 +731,7 @@ atom_type_prefix_other(Inst,Type,Suffix,Other):-atom(Inst),type_suffix(Suffix,Ty
 %
 % Whenever Load Prolog Forward Chaining Rule.
 %
-onLoadPfcRule('=>'(a(tCol,Inst), {isa_from_morphology(Inst,Type)} , isa(Inst,Type))).
+onLoadPfcRule('==>'(a(tCol,Inst), {isa_from_morphology(Inst,Type)} , isa(Inst,Type))).
 
 
 
@@ -1023,8 +1022,10 @@ guess_typetypes(W):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_t
 %
 % guess type Types  Primary Helper.
 %
-guess_typetypes_0(TtTypeType):-atom_concat(tt,TypeType,TtTypeType),atom_concat(Type,'Type',TypeType),
- atom_concat(t,Type,TType),ain((isa(T,TtTypeType)=>genls(T,TType))).
+guess_typetypes_0(TtTypeType):-
+   atom_concat(tt,TypeType,TtTypeType),
+   atom_concat(Type,'Type',TypeType),
+ atom_concat(t,Type,TType),ain((isa(T,TtTypeType)==>genls(T,TType))).
 
 /*
 system:term_expansion(isa(Compound,PredArgTypes),
@@ -1161,11 +1162,9 @@ assert_isa_rev(T,I):-
    sanity(ignore(show_failure(ground(T:I)))),
    expire_tabled_list(all),
    ain(isa(I,T)),
-   % ain(mudIsa(I,T)),
-   % assert_if_new(mudIsa(I,T)),
    sanity(call_u(isa(I,T))),
    sanity(isa_asserted(I,T)),
-   sanity(call_u(mudIsa(I,T))),
+   % sanity(call_u(mudIsa(I,T))),
    expire_tabled_list(all))).
 
 

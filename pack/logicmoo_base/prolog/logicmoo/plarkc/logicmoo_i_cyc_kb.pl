@@ -851,9 +851,7 @@ checkCycAvailablity:- catchv((current_predicate(invokeSubL/2),ignore((invokeSubL
 :- disable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,false).
 :- (include(logicmoo(plarkc/'logicmoo_i_cyc_kb_preds.pfc'))).
-
 :- ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc')).
-
 :- enable_mpred_expansion.
 :- gripe_time(60,ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_xform.pfc'))).
 %:-must(forall(retract(at_eof_action(CALL)),must(CALL))).

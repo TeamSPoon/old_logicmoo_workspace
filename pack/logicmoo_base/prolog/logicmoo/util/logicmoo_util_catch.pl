@@ -329,12 +329,12 @@ is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
 %
 % Using Main Error Converted To Output.
 %
-with_main_error_to_output(Goal):- trace,
+with_main_error_to_output(Goal):-
  current_output(Out),
   w_tl(t_l:thread_local_error_stream(Out),Goal).
    
 
-with_current_io(Goal):- trace,
+with_current_io(Goal):-
   current_input(IN),current_output(OUT),get_thread_current_error(Err),  
   setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,Err)).
 

@@ -138,8 +138,8 @@ arity(comment,2).
 :- asserta(baseKB:spft(7,7,7)).
 :- compile_predicates([mpred_kb_ops:spft/3]).
 :- compile_predicates([baseKB:spft/3]).
-:- listing(spft/3).
 */
+:- listing(spft/3).
 baseKB:mtCycL(baseKB).
 :- mpred_run.
 %baseKB:mtExact(baseKB).
@@ -147,135 +147,6 @@ baseKB:mtCycL(baseKB).
 :- nortrace.
 
 :-  abolish(yall:'/' / 2).
-
-tCol(tCol).  % = isa(tCol,tCol).
-tCol(tSet).
-
-(genls(C,SC)/ground(genls(C,SC))==>(tCol(C),tCol(SC))).
-
-
-mudIsaSkippedCollection(functorDeclares).
-mudIsaSkippedCollection(meta_argtypes).
-mudIsaSkippedCollection(completeIsaAsserted).
-
-%ttExpressionType(C)==>mudIsaSkippedCollection(C).
-%((completelyAssertedCollection(Sub) / (\+ mudIsaSkippedCollection(Sub)))) ==> ttMudIsaCol(Sub).
-%ttMudIsaCol(Sub) ==> (isa(I,Sub) ==> mudIsa(I,Sub)).
-%completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ mudIsaSkippedCollection(Sub))) ==> mudIsa(I,Sub)).
-
-pfcControlled(prologArity(tRelation,ftInt)).
-pfcControlled(isa(ftTerm,tCol)).
-
-tSet(tSet).
-tSet(tCol).
-tSet(ttModule).
-functorDeclares(ttModule).
-tFixedArityRelation(tSet).
-tFixedArityRelation(tCol).
-ttPredType(prologHybrid).
-
-%:- rtrace,trace.
-%:- notrace, nortrace.
-
-prologHybrid(mudToCyc(ftTerm,ftTerm)).
-
-:- must(arity(mudToCyc,2)).
-
-col_as_isa(X)==>tFixedArityRelation(X),arity(X,1).
-col_as_unary(X)==>tFixedArityRelation(X),arity(X,1).
-
-tSet(ttExpressionType).
-tSet(completelyAssertedCollection).
-
-%underkill - Though it is making bad things happen 
-%WEIRD ~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
-% EASIER
-% ~tCol(C) ==> ~completelyAssertedCollection(C).
-
-:- sanity(get_lang(pfc)).
-% tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
-tSet(C)/atom(C) ==>
-({must_det_l((
-  kb_dynamic(C/1),
-  dynamic(C/1),
-  wdmsg(c_tSet(C)),
-  ( \+ is_static_predicate(C/1)),
-  functor(Head,C,1), 
-  call(BHead=baseKB:Head),
-  ( \+(predicate_property(BHead,_))-> kb_dynamic(C/1); true),
-  (predicate_property(BHead,dynamic)->true;show_pred_info(BHead))))},
-   functorDeclares(C),
-   pfcControlled(C),
-   \+ ttExpressionType(C),
-   tCol(C),
-   arity(C,1)).
-
-ttExpressionType(C) ==> ( \+ completelyAssertedCollection(C), ~ tSet(C), tCol(C)).
-
-((tCol(C)/( \+ ttExpressionType(C))) ==> tSet(C)).
-
-
-:- mpred_trace_exec.
-
-tSet(tKnownID).
-:- xlisting(tKnownID).
-%?- isa(tKnownID,W).
-%:- break.
-tSet(tNotForUnboundPredicates).
-tSet(tPred).
-tSet(prologBuiltin).
-tSet(tFunction).
-tSet(tRelation).
-tSet(ttTemporalType).
-tSet(prologMacroHead).
-
-
-ttModule(tSourceCode,mudToCyc('ComputerCode'),comment("Source code files containing callable features")).
-ttModule(tSourceData,mudToCyc('PropositionalInformationThing'),comment("Source data files containing world state information")).
-
-prologHybrid(isLoadedType(ttModule),pfcControlled).
-prologHybrid(isLoaded(tMicrotheory),pfcControlled).
-
-isLoaded(Thing),isa(Thing,ModType)==> isLoadedType(ModType).
-
-:- mpred_notrace_exec.
-
-/*
-tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),
- % mpred_univ(C,I,TCI),
- {call_u((decl_type(C), 
-  ignore((
-   \+ is_static_predicate(C/1),
-   kb_dynamic(C/1),
-   \+ completelyAssertedCollection(C),
-   call_u(ain((
-   ((TCI :- 
-    ((cwc, call_u((
-      predicate_property(TCI,number_of_rules(1)),
-    lazy(( \+ call_u(~(TCI)))),
-    isa_backchaing(I,C))))))))))))))}).
-*/
-
-%overkill
-tSet(C)<==>completelyAssertedCollection(C).
-
-% :- call((system:rtrace)).
-==>tCol(tCol).
-%:- notrace.
-%:- nortrace.
-% :- dbreak.
-% (tCol(C)/atom(C) ==> ({Head=..[C,I]}, (isa(I,C)/ground(I:C)==>Head))).
-
-ttExpressionType(P) ==> 
- {get_functor(P,F), functor(Head,F,1), call(BHead=baseKB:Head),
-  call((\+ predicate_property(BHead,defined) -> kb_dynamic(F/1); true)),
-  call((predicate_property(BHead,dynamic)->(ain(Head==>{ignore(retract(Head))}));show_pred_info(BHead)))},
-  ~prologMacroHead(F),
-  ~functorDeclares(F),
-  ~tSet(F),
-  notAssertibleCollection(F),
-  completelyDecidableCollection(F),
-  arity(F,1).
 
 
 %:- rtrace.
@@ -348,10 +219,17 @@ alwaysGaf(pfcRHS).
 alwaysGaf(pfcLHS).
 
 
-tCol(A)/atom(A)==>{decl_type_unsafe(A), kb_dynamic(A/1)}.
+tSet(A)/atom(A)==>{decl_type_unsafe(A), kb_dynamic(A/1)}.
 % tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
 
-prologMacroHead(ttModule).
+tCol(tCol).
+tCol(tPred).
+tCol(tFunction).
+tCol(tRelation).
+tCol(ttTemporalType).
+tCol(ttExpressionType).
+tCol(functorDeclares).
+functorDeclares(ttModule).
 
 
 %:- sanity((fix_mp(clause(assert,sanity),arity(apathFn,2),M,O),M:O=baseKB:arity(apathFn,2))).
@@ -378,6 +256,7 @@ arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(
 
 % mtCycL(baseKB).
 
+tCol(ttModule).
 arity(tCol,1).
 
 tCol(ttModule,mudToCyc('MicrotheoryType')).
@@ -426,8 +305,9 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
  arity(F,A)/
   (is_ftNameArity(F,A),A>1, 
       \+ prologBuiltin(F), 
-      sanity(\+ tCol(F))) 
-                   ==> (~(tCol(F)),support_hilog(F,A))))).
+      % sanity(mpred_must(\+ arity(F,1))),
+      sanity(mpred_must(\+ tCol(F)))))) 
+   ==> (~(tCol(F)),support_hilog(F,A))).
 
 :- kb_dynamic(support_hilog/2).
 
@@ -487,7 +367,7 @@ type_checking, mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
 
 %'==>'((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A), ==>(isa(F,S1))))).
 % ((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A),t(S1,F)))).
-((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A),{ASSERT=..[S1,F]},ASSERT))).
+((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A),A==1)==>((tCol(S1),arity(F,A),{ASSERT=..[S1,F]},ASSERT)))).
 
 mpred_mark(pfcPosTrigger,F, A)/(\+ ground(F/A))==>{trace_or_throw(mpred_mark(pfcPosTrigger,F, A))}.
 mpred_mark(pfcPosTrigger,F, A)==>marker_supported(F,A).
@@ -499,8 +379,6 @@ mpred_mark(pfcCreates,F, A)==>
   {functor(P,F,A),make_dynamic(P),kb_dynamic(P),
     create_predicate_istAbove(abox,F,A)},
     marker_supported(F,A).
-
-:- do_gc.
 
 mpred_mark(pfcCallCode,F, A)/predicate_is_undefined_fa(F,A)
     ==> marker_supported(F,A).
@@ -600,7 +478,7 @@ tCol(Decl)==>functorDeclares(Decl).
 
 :- ain_expanded(ttModule(mtCycL,
   comment("mtCycL(?Mt) Mts like baseKB that contain mainly assertions written in CycL"),
-   genlsFwd(tMicrotheory))).
+  genlsFwd(tMicrotheory))).
 
 :- ain_expanded(
  ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),

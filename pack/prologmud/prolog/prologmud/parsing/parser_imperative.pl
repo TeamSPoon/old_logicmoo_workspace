@@ -27,7 +27,7 @@
                    parseForTypes//2)).
 
 % :- register_module_type (utility).
-some_term_to_atom(Term,Atom):- sanity(\+ is_list(Term)), term_to_atom(Term,AtomTerm,Atom).
+some_term_to_atom(Term,Atom):- must(\+ is_list(Term)), term_to_atom(Term,Atom).
 
 % =====================================================================================================================
 % get_agent_text_command/4

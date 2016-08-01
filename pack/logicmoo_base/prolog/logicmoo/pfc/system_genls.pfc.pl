@@ -1,7 +1,7 @@
 
 
 % to load this files use  ?- ensure_mpred_file_loaded('logicmoo/pfc/system_genls.pfc').
-
+:- dynamic(mudIsa/2).
 :- file_begin(pfc).
 
 :- set_fileAssertMt(baseKB).
@@ -40,53 +40,24 @@ nearestGenls(C1,C2)==>
 
 
 
-% mudIsaSkippedCollection(functorDeclares).
-mudIsaSkippedCollection(C):-compound(C).
-mudIsaSkippedCollection(meta_argtypes).
-% mudIsaSkippedCollection(completeIsaAsserted).
+% tAvoidForwardChain(functorDeclares).
+tAvoidForwardChain(C):-compound(C).
+tAvoidForwardChain(meta_argtypes).
+% tAvoidForwardChain(completeIsaAsserted).
 
-ttExpressionType(C)==>mudIsaSkippedCollection(C).
+ttExpressionType(C)==>tAvoidForwardChain(C).
 
-((completelyAssertedCollection(Sub) / (\+ mudIsaSkippedCollection(Sub)))) ==> ttMudIsaCol(Sub).
+((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, 
+   \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 
-ttMudIsaCol(Sub) ==> (isa(I,Sub) ==> mudIsa(I,Sub)).
-
-completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ mudIsaSkippedCollection(Sub))) ==> mudIsa(I,Sub)).
-
-% isRuntime ==> 
-(mudIsa(I,Sub)/(ground(mudIsa(I,Sub)), \+ mudIsaSkippedCollection(Sub))) ==> isa(I,Sub).
-
-((completeIsaAsserted(I),mudIsa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ mudIsaSkippedCollection(Super))) ==> mudIsa(I,Super).
-((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
-
-
-
+completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ tAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
 /*
 
-Taxinomic Pair Caching
-
-000 C->I + C->C + I->C     no index
-001 C->I + C->C + I->>C      
-010 C->I + C->>C + I->C       
-011 C->I + C->>C + I->>C     Index2A
-100 C->>I + C->C + I->C      
-101 C->>I + C->C + I->>C   Index2B
-
-110 C->>I + C->>C + I->C    Index2C
-
-111 C->>I + C->>C + I->>C  Fully indexed
-
-
-predicate types 101
-expression types 010
-in world types 101
-
-
-100 < top down >
-
-011 < bottem up >
-
-
+% isRuntime ==> 
+% (mudIsa(I,Sub)/(ground(mudIsa(I,Sub)), \+ tAvoidForwardChain(Sub))) ==> isa(I,Sub).
+((completelyAssertedCollection(Sub) / (\+ tAvoidForwardChain(Sub)))) ==> ttMudIsaCol(Sub).
+ttMudIsaCol(Sub) ==> (isa(I,Sub) ==> mudIsa(I,Sub)).
+((completeIsaAsserted(I),mudIsa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ tAvoidForwardChain(Super))) ==> mudIsa(I,Super).
 */
 
 %(isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, 
@@ -106,11 +77,13 @@ in world types 101
 */
 
 (genls(C,P)/(C\=P)), completelyAssertedCollection(P)  ==> genlsFwd(C,P).
-(genls(C,P)/(C\=P, \+ ttExpressionType(C) , \+ ttExpressionType(P) )) ==> genlsFwd(C,P).
+(genls(C,P)/(C\=P, \+ ttExpressionType(C) , \+ ttExpressionType(P) , \+ tAvoidForwardChain(P) )) ==> genlsFwd(C,P).
 
 genlsFwd(C,P)/(C\=P) ==> (isa(I,C) ==> isa(I,P)).
 
-((genls(C1,C2), ( \+ genlsFwd(C2)))==>
+
+
+((genls(C1,C2), ( \+ genlsFwd(C1,C2)))==>
  ({get_functor(C1,F1),get_functor(C2,F2),
    P1 =.. [F1,X],
     P2 =.. [F2,X],

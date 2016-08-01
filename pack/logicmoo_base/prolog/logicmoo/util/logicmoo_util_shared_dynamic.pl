@@ -204,7 +204,7 @@ baseKB:wrap_shared(F,A,ereq):- atom(F),integer(A),
 %clause_b(G):-  !,clause(baseKB:G,true).
 
 % lookup_u/cheaply_u/call_u/clause_b
-clause_b(G):-  baseKB:clause(G,true).
+clause_b(G):-  baseKB:call(call,G).
 % clause_b(G):-  baseKB:clause(G,B),baseKB:call(B).
 
 %clause_b(G):-  baseKB:clause(G,B)*->call(B);clause_b0(G).

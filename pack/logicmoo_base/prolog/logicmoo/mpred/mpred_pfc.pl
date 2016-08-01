@@ -173,7 +173,7 @@ push_current_choice/1,
   do_assumpts/2,mpred_do_fcnt/2,mpred_do_fcpt/2,mpred_fwc1/1,mpred_do_rule/1,mpred_descendant1/3,mpred_eval_rhs1/2,mpred_nf1/2,
   mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,
   mpred_remove/2,mpred_post1/2,
-  mpred_pp_db_justification1/2,mpred_pp_db_justifications2/3,mpred_spy1/3,
+  mpred_pp_db_justification1/3,mpred_pp_db_justifications2/4,mpred_spy1/3,
   mpred_unfwc_check_triggers0/1,mpred_unfwc1/1,mpred_why1/1,mpred_blast/1
   % trigger_trigger1/2  , trigger_trigger/3,
   ]).
@@ -584,7 +584,7 @@ clause_u(MH,B,R):- Why = clause(clause,clause_u),
 %clause_u(pfc,H,B,Proof):-clause_u(H,B,Proof).
 
 % lookup_u/cheaply_u/call_u/clause_b
-lookup_u(SPFT):- baseKB:call(SPFT).
+lookup_u(SPFT):- baseKB:call(call,SPFT).
 % lookup_u(SPFT):- current_prolog_flag(unsafe_speedups,true), !,baseKB:mtCycL(MT),call(MT:SPFT).
 % lookup_u(H):-lookup_u(H,_).
 
@@ -885,6 +885,8 @@ mpred_post(P, S):- fully_expand_now(post,P,P0),each_E(mpred_post1,P0,[S]).
 % It always succeeds.
 %
 mpred_post1( isa(_,_,_),   _):- dumpST,dtrace.
+mpred_post1( tCol(','),   _):- dumpST,dtrace.
+
 mpred_post1( P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post1( P0,   S).
 
 mpred_post1(Fact, _):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(One,_Two),Three is One * 3, filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
@@ -2850,6 +2852,9 @@ why_was_true(P):- dmsg(justfied_true(P)),!.
 mpred_test_fok(\+ G):-!, ( \+ call_u(G) -> wdmsg(passed_mpred_test(\+ G)) ; (log_failure(failed_mpred_test(\+ G)),!,ignore(why_was_true(G)),!,fail)).
 mpred_test_fok(G):- (call_u(G) -> ignore(sanity(why_was_true(G))) ; (log_failure(failed_mpred_test(G))),!,fail).
 
+mpred_must(\+ G):-!, ( \+ call_u(G) -> true ; (log_failure(failed_mpred_test(\+ G)),!,ignore(why_was_true(G)),!,dtrace,break)).
+mpred_must(G):- (call_u(G) -> true ; (ignore(sanity(why_was_true(\+ G))),(log_failure(failed_mpred_test(G))),!,dtrace,break)).
+
 
 mpred_load_term(:- module(_,L)):-!, mpred_call_no_bc(maplist(export,L)).
 mpred_load_term(:- TermO):- mpred_call_no_bc(TermO).
@@ -3210,12 +3215,24 @@ mpred_why(N):-
   lookup_u(why_buffer(P,Js)),
   mpred_handle_why_command(N,P,Js).
 
-mpred_why(M:P):-atom(M),!,call_from_module(M,mpred_why(P)).
-mpred_why(P):-
+mpred_why(M:P):-atom(M),!,call_from_module(M,mpred_why_sub(P)).
+mpred_why(P):-mpred_why_sub(P).
+
+
+mpred_why_sub(P):-
   justifications(P,Js),
   retractall_u(why_buffer(_,_)),
   assert_u_no_dep(why_buffer(P,Js)),
   mpred_whyBrouse(P,Js).
+
+
+mpred_why_sub_sub(P):-
+  justifications(P,Js),
+  % retractall_u(why_buffer(_,_)),
+  assert_u_no_dep(why_buffer(P,Js)),
+  b_getval('last_printed',LP),
+  ((mpred_pp_db_justification1(LP,Js,1),fmt('~N~n',[]))).
+  
 
 mpred_why1(P):-
   justifications(P,Js),
@@ -3264,24 +3281,27 @@ mpred_unhandled_command(X,_,_):-
   
 mpred_pp_db_justifications(P,Js):-
  must(mnotrace(( format("~NJustifications for ~p:",[P]),
-  mpred_pp_db_justification1(Js,1)))).
+  mpred_pp_db_justification1('',Js,1)))).
 
-mpred_pp_db_justification1([],_).
+mpred_pp_db_justification1(_Prefix,[],_).
 
-mpred_pp_db_justification1([J|Js],N):-
+mpred_pp_db_justification1(Prefix,[J|Js],N):-
   % show one justification and recurse.
   nl,
-  mpred_pp_db_justifications2(J,N,1),
+  mpred_pp_db_justifications2(Prefix,J,N,1),
   N2 is N+1,
-  mpred_pp_db_justification1(Js,N2).
+  mpred_pp_db_justification1(Prefix,Js,N2).
 
-mpred_pp_db_justifications2([],_,_).
+mpred_pp_db_justifications2(_Prefix,[],_,_).
 
-mpred_pp_db_justifications2([C|Rest],JustNo,StepNo):- 
+mpred_pp_db_justifications2(Prefix,[C|Rest],JustNo,StepNo):- 
  (StepNo==1->fmt('~N~n',[]);true),
-  format("~N    ~p.~p ~p",[JustNo,StepNo,C]),
-  StepNext is 1+StepNo,
-  mpred_pp_db_justifications2(Rest,JustNo,StepNext).
+  sformat(LP,' ~w.~p.~p',[Prefix,JustNo,StepNo]),
+  nb_setval('last_printed',LP),
+  format("~N  ~w ~p",[LP,C]),
+  ignore(mpred_why_sub_sub(C)),
+  StepNext is 1+StepNo,    
+  mpred_pp_db_justifications2(Prefix,Rest,JustNo,StepNext).
 
 mpred_prompt_ask(Info,Ans):-
   format("~N~p",[Info]),

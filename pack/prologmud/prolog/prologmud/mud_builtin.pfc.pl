@@ -371,7 +371,7 @@ tSourceData(iSourceData8,comment("PrologMUD WorldState Data")).
 %isLoadedType(tSourceCode) ==> (functorDeclares(Toy),prologArity(Toy,A)/( \+ current_predicate(Toy/A)) ==> dynamic(Toy/A)).
 
 
-functorDeclares(Toy),tFunction(Toy),arity(Toy,A),{A2 is A + 1}==>prologArity(Toy,A2).
+% functorDeclares(Toy),tFunction(Toy),arity(Toy,A),{A2 is A + 1}==>prologArity(Toy,A2).
 
 tCol(completelyAssertedCollection).
 tCol(completeIsaAsserted).
@@ -410,7 +410,7 @@ dividesBetween(tAgent,tHumanControlled,tNpcPlayer).
 % slow... ttObjectType(Col1) ==> ~ttExpressionType(Col1).
 
 neg(isa(I,Super)) <- {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Super)).
-% disjointWith(P1,P2) ==> {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <==> isa(C,P2)).
+% disjointWith(P1,P2) ==> {\+(isa(P1,tAvoidForwardChain)),\+(isa(P2,tAvoidForwardChain))},(neg(isa(C,P1)) <==> isa(C,P2)).
 
 
 tCol(ttSpatialType).

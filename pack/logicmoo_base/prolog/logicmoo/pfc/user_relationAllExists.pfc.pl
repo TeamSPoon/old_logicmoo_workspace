@@ -307,10 +307,6 @@ have to confirm how *most* works
 
 isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),tCol(C).
 
-:- compile_predicates([isa/2]).
-:- compile_predicates(baseKB:[isa/2]).
-
-:- listing(isa/2).
 
 end_of_file.
 

@@ -185,6 +185,9 @@ baseKB:logicmoo_scan_autoloads:-false.
 % :- system:use_module(library('logicmoo/util/logicmoo_util_structs.pl')).
 % :- system:use_module(library('logicmoo/util/logicmoo_util_supp.pl')).
 */
+:- multifile baseKB:prologBuiltin/1.
+:- discontiguous baseKB:prologBuiltin/1.
+:- dynamic baseKB:prologBuiltin/1.
 
 :- set_prolog_flag(lm_expanders,true).
 :- lcme:reset_modules.
