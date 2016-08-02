@@ -58,12 +58,13 @@ do_agent_action(_,'',_):-!, npc_tick_tock.
 do_agent_action(P,C,O):- do_gc,with_session(O,agent_call_unparsed(P, C)),!.
 do_agent_action(P,C,_):-wdmsg("skipping_unknown_player_action(~q,~q).~n",[P,C]),!.
 
+check_verb(SVERB):-var(SVERB),!,freeze(SVERB,check_verb(SVERB)).
+check_verb(SVERB):-atom(SVERB),atom_concat('[',_,SVERB),trace_or_throw(bad_parse_agent_text_command(SVERB)).
+check_verb(_).
 
 :-export(parse_agent_text_command_checked/5).
-parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
-  freeze(ARGS,sanity(is_list(ARGS))),
-  % freeze(CMD,sanity(compound(CMD))),
-   catch(( parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD),
+parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- check_verb(VERB), 
+  catch(( parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD),
          nonvar(CMD),must(nonvar(NewAgent))),'$aborted',true),
          ignore((CMD=actTick)),ignore((NewAgent=Agent)).
 
@@ -118,7 +119,7 @@ agent_call_unparsed_0(A,Atom):-to_word_list(Atom,List),must(is_list(List)),!,age
 
 agent_call_words(_,Words):- Words==[],!.
 agent_call_words(A,Words):- (\+ is_list(Words)),must(agent_call_unparsed(A,Words)),!.
-agent_call_words(Agent,Text):- text_to_string_safe(Text,String),Text\=@=String,!,agent_call_unparsed(Agent,String).
+agent_call_words(Agent,Text):- text_to_string_safe(Text,String)->Text\=@=String,!,agent_call_unparsed(Agent,String).
 
 
 % remove period at end
@@ -128,6 +129,9 @@ agent_call_words(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,agent_call_word
 agent_call_words(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,agent_call_words(Ag,[C|REST]).
 
 agent_call_words(Agent,[VERB|ARGS]):-
+  sanity(freeze(ARGS,must(is_list(ARGS)))),
+  must((var(VERB),sanity(freeze(VERB,must(check_verb(VERB)))))),
+  sanity(freeze(CMD,sanity(callable(CMD)))),
       must(on_x_debug(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD))),
       must_ac(agent_call_command_now(NewAgent,CMD)),!.
 
@@ -143,9 +147,9 @@ where_atloc(Agent,'OffStage'):-fail,nonvar(Agent).
 
 % All Actions must be called from here!
 agent_call_command_now(Agent,CMD  ):- var(CMD),trace_or_throw(var_agent_call_command_now(Agent,CMD)).
-agent_call_command_now(Agent,Text ):- text_to_string_safe(Text,String),show_call(loop_check(agent_call_unparsed(Agent,String))).
-agent_call_command_now(Agent,Words):- is_list(Words),loop_check(agent_call_words(Agent,Words)).
+agent_call_command_now(Agent,Text ):- text_to_string_safe(Text,String)->show_call(loop_check(agent_call_unparsed(Agent,String))).
 agent_call_command_now(Agent,CMD  ):- subst(CMD,isSelfAgent,Agent,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
+agent_call_command_now(Agent,Words):- is_list(Words),maplist(check_verb,Words),loop_check(agent_call_words(Agent,Words)).
 agent_call_command_now(Agent,CMD  ):- correctCommand(Agent,CMD,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
 agent_call_command_now(Agent,CMD  ):- \+ where_atloc(Agent,_),!, agent_call_command_now_2(Agent,CMD),!.
 agent_call_command_now(Agent,CMD  ):- where_atloc(Agent,Where),

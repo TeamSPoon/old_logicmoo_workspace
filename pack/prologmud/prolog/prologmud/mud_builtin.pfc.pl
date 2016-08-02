@@ -259,7 +259,10 @@ typeGenls(ttSpatialType,tSpatialThing).
 genls(tSpatialThing,tTemporalThing).
 genls(ttSpatialType,ttTemporalType).
  
-ttUnverifiableType(ftDiceFn(ftInt,ftInt,ftInt)).
+% ttUnverifiableType(ftListFn(ftTerm)).
+ttUnverifiableType(ftListFn).
+% ttUnverifiableType(ftDiceFn(ftInt,ftInt,ftInt)).
+ttUnverifiableType(ftDice).
 ttUnverifiableType(vtDirection).
 
 

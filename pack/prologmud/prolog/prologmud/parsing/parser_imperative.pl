@@ -252,7 +252,6 @@ dmsg_parserm(F,A):-ignore((debugging_logicmoo(logicmoo(parser)),dmsg(F,A))).
 
 must_atomics(A):-must(atomic(A)).
 
-
 parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- destringify(SVERB,AVERB),SVERB \=@= AVERB,!,
    parse_agent_text_command(Agent,AVERB,Args,NewAgent,GOAL).
 parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- is_list(Args),maplist(destringify,Args,AArgs),AArgs \=@= Args,!,
@@ -473,7 +472,7 @@ to_descriptive_name(_For,Desc,Atom):-any_to_atom(Desc,Atom),!.
 
 :-dynamic(baseKB:ttKeyworded/1).
 
-:- mpred_trace_exec.
+% :- mpred_trace_exec.
 :-ain((tCol(ttKeyworded))).
 :-ain((completelyAssertedCollection(ttKeyworded))).
 :-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).

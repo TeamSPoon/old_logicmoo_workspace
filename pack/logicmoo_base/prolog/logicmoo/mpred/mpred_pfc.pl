@@ -1845,14 +1845,14 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 
 % :- table(call_u/1).
 
-call_u(G):- strip_module(G,M,P), call_u_t(G,M,P).
+call_u(G):- strip_module(G,M,P), call_u_mp(G,M,P).
 
 
-call_u_t(_G,M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
-% call_u_t(mtCycL(P),_,mtCycL(P)):-!,baseKB:mtCycL(P).
-call_u_t((P),M,(P)):-!,catch(baseKB:call(P),E,(wdmsg(M:call_u_t(P)),wdmsg(E),dtrace)).
-% call_u_t(P,M,P):- !,catch(M:call(P),E,(wdmsg(M:call_u_t(P)),wdmsg(E),dtrace)).
-call_u_t(_G,M,P):- call((baseKB:mtExact(M)->call(P);baseKB:call(P))).
+call_u_mp(_G,M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
+% call_u_mp(mtCycL(P),_,mtCycL(P)):-!,baseKB:mtCycL(P).
+call_u_mp((P),M,(P)):-!,catch(baseKB:call(P),E,(wdmsg(M:call_u_mp(P)),wdmsg(E),dtrace)).
+% call_u_mp(P,M,P):- !,catch(M:call(P),E,(wdmsg(M:call_u_mp(P)),wdmsg(E),dtrace)).
+call_u_mp(_G,M,P):- call((baseKB:mtExact(M)->call(P);baseKB:call(P))).
 
 /*
 call_u(G):- var(G),!,dtrace,defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,G)).
@@ -3077,9 +3077,20 @@ mpred_rem_support(P,S):-
   ignore((Fact,Trigger)=S).
 
 
+
 closest_u(Was,WasO):-clause_asserted_u(Was),!,Was=WasO.
-closest_u(Was,WasO):-lookup_u(Was),Was=WasO,!.
+closest_u(Was,WasO):-lookup_u(Was),!,Was=WasO,!.
 closest_u(Was,WasO):-lookup_u(WasO),ignore(Was=WasO),!.
+
+closest_u(H,HH):- ref(_) = Result,closest_u(H,H,HH,Result),ref(Ref)= Result,
+  (H==HH -> true ; nonvar(Ref)),!.
+closest_u(H,P,PP):- copy_term(H+P,HH+PP),
+      ((lookup_u(HH)*-> (=@=(P,PP)->(!,HH=H);(fail));(!,fail));(true)).
+closest_u(H,P,PP,Result):- sanity(Result=@=ref(Ref)),copy_term(H+P,HH+PP),
+      ((lookup_u(HH,Ref)*-> (=@=(P,PP)->(!,HH=H);(nb_setarg(1,Result,Ref),fail));(!,fail));((clause(HH,B,Ref),must(B)))).
+
+/*
+*/
 
 mpred_collect_supports(Tripples):-
   bagof_or_nil(Tripple, mpred_support_relation(Tripple), Tripples).

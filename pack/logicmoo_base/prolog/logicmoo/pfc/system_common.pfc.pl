@@ -140,18 +140,6 @@ conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 {type_suffix(_Suffix,Type)}==>tCol(Type).
 tSet(completelyAssertedCollection).
 
-%WEIRD ~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
-% EASIER
-% ~tCol(C) ==> ~completelyAssertedCollection(C).
-
-% (tCol(C),\+ ttExpressionType(C)) ==> tSet(C).
-
-((tCol(P), \+ ttExpressionType(P)) <==> tSet(P)).
-
-(ttExpressionType(P) ==> ( ~ tSet(P), tCol(P))).
-
-
-%= 	 	 
 
 %% prologBuiltin( ?ARG1, ?ARG2) is semidet.
 %
@@ -419,27 +407,35 @@ ttExpressionType(C) ==> ( \+ completelyAssertedCollection(C), ~ tSet(C), tCol(C)
 ((tCol(C)/( \+ ttExpressionType(C))) ==> tSet(C)).
 
 :- sanity(get_lang(pfc)).
+%WEIRD ~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
+% EASIER
+% ~tCol(C) ==> ~completelyAssertedCollection(C).
+% (tCol(C),\+ ttExpressionType(C)) ==> tSet(C).
+% ((tCol(P), \+ ttExpressionType(P)) <==> tSet(P)).
 % tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
-tSet(C)/atom(C) ==>
-({must_det_l((
-  kb_dynamic(C/1),
-  dynamic(C/1),
-  wdmsg(c_tSet(C)),
+
+tSet(C) ==>
+({ignore((
+  % kb_dynamic(C/1),
+  % dynamic(C/1),
+  % wdmsg(c_tSet(C)),
+  atom(C),
   ( \+ is_static_predicate(C/1)),
-  functor(Head,C,1), 
+  functor(Head,C,1),
   call(BHead=baseKB:Head),
   ( \+(predicate_property(BHead,_))-> kb_dynamic(C/1); true),
-  (predicate_property(BHead,dynamic)->true;show_pred_info(BHead))))},
-   functorDeclares(C),
-   pfcControlled(C),
-   \+ ttExpressionType(C),
-   tCol(C),
-   arity(C,1)).
+  nop(predicate_property(BHead,dynamic)->true;show_pred_info(BHead))))},
+  functorDeclares(C),
+  pfcControlled(C),
+  \+ ttExpressionType(C),
+  tCol(C),
+  arity(C,1)).
+
 /*
 tSet(C)==>
  ( {atom(C), functor(Head,C,1), call(BHead=baseKB:Head),
-  ( \+(predicate_property(BHead,_))-> kb_dynamic(C/1); true),
-    (predicate_property(BHead,dynamic)->true;show_pred_info(BHead))},
+   ( \+(predicate_property(BHead,_))-> kb_dynamic(C/1); true),
+    nop(predicate_property(BHead,dynamic)->true;show_pred_info(BHead))},
    functorDeclares(C),
    pfcControlled(C),
    arity(C,1)).
@@ -461,7 +457,7 @@ tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),
     lazy(( \+ call_u(~(TCI)))),
     isa_backchaing(I,C))))))))))))))}).
 */
-
+/*
 ttExpressionType(P) ==> 
  {get_functor(P,F), functor(Head,F,1), call(BHead=baseKB:Head),
   call((\+ predicate_property(BHead,defined) -> kb_dynamic(F/1); true)),
@@ -472,6 +468,7 @@ ttExpressionType(P) ==>
   notAssertibleCollection(F),
   completelyDecidableCollection(F),
   arity(F,1).
+*/
 
 :- mpred_trace_exec.
 
@@ -1122,7 +1119,7 @@ subFormat(ftVar,ftProlog).
 subFormat(ftVoprop,ftRest(ftVoprop)).
 subFormat(ftVoprop,ftTerm).
 
-subFormat(COL1,COL2)==>(ttExpressionType(COL1),ttExpressionType(COL2)).
+subFormat(COL1,COL2)/atom(COL1)==>(ttExpressionType(COL1),ttExpressionType(COL2)).
 
 tCol(W)==>{guess_supertypes(W)}.
 
@@ -1152,9 +1149,10 @@ typeGenls(ttTypeType,tCol).
 
 
 ttTypeFacet(ttUnverifiableType).
-ttUnverifiableType(ftDiceFn(ftInt,ftInt,ftInt)).
 ttUnverifiableType(ftID).
-ttUnverifiableType(ftListFn(ftTerm)).
+% ttUnverifiableType(ftListFn(ftTerm)).
+ttUnverifiableType(ftListFn).
+% ttUnverifiableType(ftDiceFn(ftInt,ftInt,ftInt)).
 ttUnverifiableType(ftDice).
 ttUnverifiableType(ftString).
 ttUnverifiableType(ftTerm).

@@ -109,7 +109,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 :- set_prolog_flag(logicmoo_debug,true).
 %:- set_prolog_flag(unsafe_speedups,false).
-:- mpred_trace_exec.
+% :- mpred_trace_exec.
 
 :- baseKB:assert_isa(iRR7,tRR).
 :- baseKB:ain(genls(tRR,tRRP)).
@@ -199,7 +199,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 %:- set_prolog_flag(logicmoo_debug,true).
 
-:- mpred_trace_exec.
+% :- mpred_trace_exec.
 :- ain(isLoaded(iSourceCode7)).
 :- mpred_notrace_exec.
 
@@ -210,7 +210,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- file_begin(pfc).
 :- set_prolog_flag(dialect_pfc,false).
 
-:- mpred_trace_exec.
+% :- mpred_trace_exec.
 
 :- set_prolog_flag(dialect_pfc,true).
 %:- set_prolog_flag(logicmoo_debug,true).

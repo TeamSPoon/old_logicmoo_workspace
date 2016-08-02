@@ -59,7 +59,7 @@ somtimesBuggyBackChaining ==> (((singleValuedInArgDefault(F, N, Q_SLOT)/is_ftNon
 somtimesBuggy==>((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) <==> relationMostInstance(P,Most,V)).
 
 
-:- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity);current_prolog_flag(logicmoo_debug,true)).
+:- if(true;(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity);current_prolog_flag(logicmoo_debug,true))).
 
 :- dynamic(someSV_testeed/3).
 arity(someSV_testeed,3).
