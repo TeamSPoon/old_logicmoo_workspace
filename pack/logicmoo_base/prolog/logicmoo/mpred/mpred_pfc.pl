@@ -1863,9 +1863,13 @@ call_u(G):- strip_module(G,M,P), call_u_mp(M,P).
 
 
 call_u_mp(M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
-call_u_mp(_,mtCycL(P)):-!,clause(baseKB:mtCycL(P),true).
 call_u_mp(M,(P1,P2)):-!,call_u_mp(M,P1),call_u_mp(M,P2).
 call_u_mp(M,( \+ P1)):-!, \+ call_u_mp(M,P1).
+call_u_mp(M,must(P1)):-!, must( call_u_mp(M,P1)).
+call_u_mp(M,call(call,P1)):-!, call_u_mp(M,P1).
+call_u_mp(M,call(ereq,P1)):-!, call_u_mp(M,P1).
+call_u_mp(M,call(P1)):-!, call_u_mp(M,P1).
+call_u_mp(_,mtCycL(P)):-!,clause(baseKB:mtCycL(P),true).
 call_u_mp(M,P):- current_predicate(_,M:P),!,catch(M:call(P),E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
 call_u_mp(M,P):- \+ clause(baseKB:mtCycL(M),true),!,clause(baseKB:mtCycL(MT),true),call_u_mp(MT,P).
 call_u_mp(M,P):- current_predicate(_,M:P),!,catch(M:call(P),E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).

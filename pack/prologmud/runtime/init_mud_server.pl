@@ -8,7 +8,7 @@
  prolog_stack:stack_guard(none).
 :- endif.
 % :- set_prolog_flag(logicmoo_debug,true).
-
+:- '$set_source_module'(baseKB).
 /*
 :- set_prolog_flag(access_level,system).
 :- use_module(library(prolog_history)).
