@@ -172,10 +172,8 @@ baseKB:logicmoo_scan_autoloads:-false.
 
 
 :- thread_local logicmoo_utils_test_tl/0.
-% :- rtrace.
-%:- trace.
-% :- w_tl((( logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[]))),logicmoo_utils_test_tl).
-%:- break.
+:- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
+
 /*
 % the next are loaded idomaticalyl later (if needed)
 % :- system:use_module(library('logicmoo/util/logicmoo_util_ctx_frame.pl')).

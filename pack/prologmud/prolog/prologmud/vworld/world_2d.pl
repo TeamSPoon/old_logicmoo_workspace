@@ -257,7 +257,7 @@ singleValuedInArgDefault(localityOfObject, 2, isMissing).
 
 mudAtLoc(Who,xyzFn(Loc,_,_,_))==>localityOfObject(Who,Loc).
 
-genls(tAgent,tHominid).
+genls(tHominid,tAgent).
 genls(tHumanBody,tBodyPart).
 
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).

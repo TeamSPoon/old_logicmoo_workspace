@@ -463,7 +463,7 @@ last_arg_ground(_,A,HEAD):-arg(A,HEAD,Arg),!,ground(Arg).
 %
 % Call Provided Managed Predicate Storage Oper..
 %
-call_provided_mpred_storage_op(call(_),H,true):-was_isa(H,I,C),!,isa_asserted(I,C).
+call_provided_mpred_storage_op(call(_),H,true):-was_mpred_isa(H,I,C),!,isa_asserted(I,C).
 call_provided_mpred_storage_op(Op,H,true):-!,no_repeats_old(loop_check(may_storage_op(Op,H),clause_u(H))).
 
 
@@ -730,7 +730,7 @@ mpred_t_storage_op(Op,(:-(Body))):-!,loop_check(mpred_op(Op,(:-(Body))),true),!.
 
 % HOOK for ISA alt-forms
 mpred_t_storage_op(_,isa(_,_)):- !,fail. % <- keeps u out of isa hybrids hairs
-mpred_t_storage_op(Op,X):- was_isa(X,I,C),!,mpred_op(Op,isa(I,C)).
+mpred_t_storage_op(Op,X):- was_mpred_isa(X,I,C),!,mpred_op(Op,isa(I,C)).
 
 % HOOK MOST ALL CALLS
 mpred_t_storage_op(Op,HeadBodyI):- hotrace(((expand_term(HeadBodyI,HeadBodyM)),HeadBodyI\=@=HeadBodyM)),!,mpred_t_storage_op(Op,HeadBodyM).
@@ -811,7 +811,7 @@ wff_check_mpred_t_throw(_).
 % Managed Predicate True Structure Call Oper..
 %
 mpred_t_call_op(_,isa(_,_)):- !,fail.
-mpred_t_call_op(Op,X):- was_isa(X,I,C),!,mpred_op(Op,isa(I,C)).
+mpred_t_call_op(Op,X):- was_mpred_isa(X,I,C),!,mpred_op(Op,isa(I,C)).
 
 % FACT CALL HOOK
 mpred_t_call_op(_,FACT):- get_functor(FACT, F,A), !,

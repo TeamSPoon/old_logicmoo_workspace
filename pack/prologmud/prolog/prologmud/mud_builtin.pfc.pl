@@ -222,9 +222,10 @@ predicateConventionMt(agent_call_command,baseKB).
 
 tCol(tCol).
 tCol(tSet).
+:- debug.
 tCol(meta_argtypes).
-% tCol(prologMacroHead).
-tCol(functorDeclares).
+% tCol(prologMacroHead)
+tSet(functorDeclares).
 tCol(prologMultiValued).
 tCol(prologSingleValued).
 tCol(tFunction).
@@ -238,6 +239,10 @@ tCol(ttTypeType).
 tCol(tWorld).
 tWorld(iWorld7).
 
+/*
+:- rtrace.
+:- trace.
+*/
 ttExpressionType(ftProlog).
 
 % ==> neg(arity(bordersOn,1)).
@@ -249,6 +254,11 @@ ttExpressionType(ftProlog).
 
 typeGenls(ttAgentType,tAgent).
 typeGenls(ttExpressionTypeType,ttExpressionType).
+:- dynamic(tItem/1).
+:- dynamic(ttItemType/1).
+tSet(ttItemType).
+ttTypeType(ttItemType).
+tSet(tItem).
 typeGenls(ttItemType,tItem).
 typeGenls(ttObjectType,tObj).
 typeGenls(ttPredType,tPred).
@@ -310,7 +320,7 @@ tCol(tCol).
 %:-export(repl_writer/2).
 %prologHybrid(typeProps(tCol,ftVoprop)).
 dividesBetween(tHominid,tMale,tFemale).
-dividesBetween(tAgent,tHumanControlled,tNpcPlayer).
+dividesBetween(tAgent,tHumanControlled,tNpcAgent).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tItem,tMassfull,tMassless).
 disjointdividesBetween(tObj,tMassfull,tMassless).
@@ -355,6 +365,15 @@ tCol(tFly).
 
 prologHybrid(localityOfObject(tObj,tSpatialThing)).
 
+
+persistInMudIsa(tItem).
+persistInMudIsa(tAgent).
+persistInMudIsa(tRegion).
+
+sometimesHack(genls).
+
+typeGenls(ttAgentType,tAgent).
+typeGenls(ttAgentType,tAgent).
 
 (sometimesSlow, tCol(Inst), {isa_from_morphology(Inst,Type)}) ==> isa(Inst,Type).
 
@@ -404,7 +423,7 @@ dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
-dividesBetween(tAgent,tHumanControlled,tNpcPlayer).
+dividesBetween(tAgent,tHumanControlled,tNpcAgent).
 
 ((sometimesBuggy,genls(A,B)/ground(genls(A,B)))==>{call((call((trace,baseKB:(must(ain(baseKB:tCol(A))),must(ain(baseKB:tCol(B))))))))}).
 
@@ -569,7 +588,7 @@ prologSingleValued(spawn_rate(tCol,ftInt)).
 prologSingleValued(stat_total(tAgent,ftInt)).
 prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
 resultIsa(apathFn,tPathway).
-% '<==>'(isa(Whom,tNpcPlayer),whenAnd(isa(Whom,tAgent),naf(isa(Whom,tHumanControlled)))).
+% '<==>'(isa(Whom,tNpcAgent),whenAnd(isa(Whom,tAgent),naf(isa(Whom,tHumanControlled)))).
 '<==>'(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 '<==>'(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 
@@ -783,7 +802,7 @@ genls(tFurniture,tObj).
 genls(tFurniture,tPartofObj).
 genls(tHumanControlled,tAgent).
 genls(mobMonster,ttAgentGeneric).
-genls(tNpcPlayer,tAgent).
+genls(tNpcAgent,tAgent).
 genls(tPathway,tDoor).
 genls(tUseAble,tItem).
 genls(tWearAble,tItem).
@@ -871,7 +890,7 @@ prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
 % defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 dividesBetween(tAgent,tMale,tFemale).
-dividesBetween(tAgent,tHumanControlled,tNpcPlayer).
+dividesBetween(tAgent,tHumanControlled,tNpcAgent).
 dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).

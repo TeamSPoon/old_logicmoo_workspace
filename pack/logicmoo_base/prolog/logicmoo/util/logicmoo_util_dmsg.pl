@@ -233,9 +233,9 @@ dmsg000/1,
 
 :- use_module(system:library(memfile)).
 :- system:use_module(logicmoo_util_first).
+:- system:use_module(logicmoo_util_rtrace).
 :- system:use_module(logicmoo_util_with_assertions).
 :- system:use_module(logicmoo_util_loop_check).
-
 
 
 :- meta_predicate with_output_to_each(+,0).
@@ -1196,10 +1196,10 @@ ansicall0(Out,Ctrl,Call):-if_color_debug(ansicall1(Out,Ctrl,Call),keep_line_pos_
 % Ansicall Secondary Helper.
 %
 ansicall1(Out,Ctrl,Call):-
-   must(sgr_code_on_off(Ctrl, OnCode, OffCode)),!,
+   notrace((must(sgr_code_on_off(Ctrl, OnCode, OffCode)),!,
      keep_line_pos_w_w(Out, (format(Out, '\e[~wm', [OnCode]))),
 	call_cleanup(Call,
-           keep_line_pos_w_w(Out, (format(Out, '\e[~wm', [OffCode])))).
+           keep_line_pos_w_w(Out, (format(Out, '\e[~wm', [OffCode])))))).
 /*
 ansicall(S,Set,Call):-
      call_cleanup((

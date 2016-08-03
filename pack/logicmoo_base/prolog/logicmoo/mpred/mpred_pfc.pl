@@ -918,6 +918,21 @@ mpred_post12( ~ P,   S):- sanity( \+ is_ftOpenSentence(P)),
 
 mpred_post12(P,S):- maybe_updated_value(P,RP,OLD),!,subst(S,P,RP,RS),mpred_post12(RP,RS),ignore(mpred_retract(OLD)).
 
+
+
+% this simplides code and maybe speeds up
+mpred_post12(P,S):- 
+ ignore(( %  db mpred_ain_db_to_head(P,P2),
+  % mpred_remove_old_version(P),  
+  mpred_add_support(P,S),
+  (mpred_unique_u(P)->
+     assert_u_confirmed_was_missing(P);
+     (fail,assert_u_confirm_if_missing(P))), 
+  mpred_trace_op(add,P,S),
+  !,
+  mpred_enqueue(P,S))),
+  !.
+
 % Two versions exists of this function one expects for a clean database (fresh_mode) and adds new information.
 % tries to assert a fact or set of fact to the database.
 % The other version is if the program is been running before loading this module.
@@ -1766,7 +1781,7 @@ mpred_eval_rhs1( P,Support):-
   mpred_unnegate( P , PN),
   %TODO Shouldn''t we be mpred_withdrawing the Positive version?  (We are)
   % perhaps we aready negated here from mpred_nf1_negation?!
-  mpred_trace_msg('~n\t\tWithdrawing Negation: ~p \n\tSupport: ~p~n',[P,Support]),
+  mpred_trace_msg('~N~n~n\t\tRHS-Withdrawing-Negation: ~p \n\tSupport: ~p~n',[P,Support]),
   !,
   mpred_withdraw(PN).
 
@@ -1775,7 +1790,7 @@ mpred_eval_rhs1( P,Support):-
   \+ \+ mpred_negated_literal( P),
   %TODO Shouldn''t we be mpred_withdrawing the Positive version?  
   % perhaps we aready negated here dirrent nf1_*
-  mpred_trace_msg('~N~n =pred_eval_rhs1= ~n\t\tWithdrawing: ~p \n\tSupport: ~p~n',[P,Support]),
+  mpred_trace_msg('~N~n~n\t\tRHS-Withdrawing: ~p \n\tSupport: ~p~n',[P,Support]),
   !,
   mpred_withdraw(P).
 
@@ -1786,7 +1801,7 @@ mpred_eval_rhs1([X|Xrest],Support):-
 
 mpred_eval_rhs1(Assertion,Support):- !,
  % an assertion to be added.
- mpred_trace_msg('~N~n =pred_eval_rhs1= ~n~n\tPost1: ~p \n\tSupport: ~p~n',[Assertion,Support]),!,
+ mpred_trace_msg('~N~n~n\tRHS-Post1: ~p \n\tSupport: ~p~n',[Assertion,Support]),!,
  (must_det(mpred_post(Assertion,Support)) *->
     true;
     mpred_warn("\n\t\t\n\t\tMalformed rhs of a rule (mpred_post1 failed)\n\t\tPost1: ~p\n\t\tSupport=~p.",[Assertion,Support])).
@@ -1844,21 +1859,24 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 
 % :- table(call_u/1).
 
-call_u(G):- strip_module(G,M,P), call_u_mp(G,M,P).
+call_u(G):- strip_module(G,M,P), call_u_mp(M,P).
 
 
-call_u_mp(_G,M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
-% call_u_mp(mtCycL(P),_,mtCycL(P)):-!,baseKB:mtCycL(P).
-call_u_mp((P),M,(P)):-!,catch(baseKB:call(P),E,(wdmsg(M:call_u_mp(P)),wdmsg(E),dtrace)).
-% call_u_mp(P,M,P):- !,catch(M:call(P),E,(wdmsg(M:call_u_mp(P)),wdmsg(E),dtrace)).
-call_u_mp(_G,M,P):- call((baseKB:mtExact(M)->call(P);baseKB:call(P))).
+call_u_mp(M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
+call_u_mp(_,mtCycL(P)):-!,clause(baseKB:mtCycL(P),true).
+call_u_mp(M,(P1,P2)):-!,call_u_mp(M,P1),call_u_mp(M,P2).
+call_u_mp(M,( \+ P1)):-!, \+ call_u_mp(M,P1).
+call_u_mp(M,P):- current_predicate(_,M:P),!,catch(M:call(P),E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
+call_u_mp(M,P):- \+ clause(baseKB:mtCycL(M),true),!,clause(baseKB:mtCycL(MT),true),call_u_mp(MT,P).
+call_u_mp(M,P):- current_predicate(_,M:P),!,catch(M:call(P),E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
+call_u_mp(M,P):- wdmsg(dynamic(M:P)),dynamic(M:P),multifile(M:P),!,fail.
 
 /*
 call_u(G):- var(G),!,dtrace,defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,G)).
 call_u(M:G):- var(M),!,trace_or_throw(var_call_u(M:G)).
 call_u(M:G):- nonvar(M),var(G),!,sanity(mtCycL(M)),with_umt(M,mpred_fact_mp(M,G)).
 call_u(G):- current_prolog_flag(unsafe_speedups,true),!,baseKB:call(G).
-call_u(M:G):- clause_b(mtProlog(M)),predicate_property(M:G,defined),!,call(M:G).
+call_u(M,G):- clause_b(mtProlog(M)),predicate_property(M:G,defined),!,call(M:G).
 call_u(G):- strip_module(G,M,P),
   (clause_b(mtCycL(M))-> W=M;defaultAssertMt(W)),!,
    (var(P)->CP=mpred_fact_mp(W,P);
@@ -1903,7 +1921,7 @@ mpred_BC_CACHE0(_,P):-
 mpred_call_no_bc(P0):- strip_module(P0,_,P), sanity(stack_check),var(P),!, mpred_fact(P).
 mpred_call_no_bc(baseKB:true):-!.
 
-mpred_call_no_bc(P):- no_repeats(loop_check(mpred_call_no_bc0(P),mpred_METACALL(call, P))).
+mpred_call_no_bc(P):- no_repeats(loop_check(mpred_call_no_bc0(P),call_u(P))).
 
 % mpred_call_no_bc0(P):- lookup_u(P).
 % mpred_call_no_bc0(P):-  defaultAssertMt(Mt), Mt:lookup_u(P).
@@ -1913,14 +1931,14 @@ mpred_call_no_bc(P):- no_repeats(loop_check(mpred_call_no_bc0(P),mpred_METACALL(
 % TODO .. mpred_call_no_bc0(P):-  defaultAssertMt(Mt), clause_b(genlMt(Mt,SuperMt)), call_umt(SuperMt,P).
 %mpred_call_no_bc0(P):- mpred_call_with_no_triggers(P).
 % mpred_call_no_bc0(P):- nonvar(P),predicate_property(P,defined),!, P.
-mpred_call_no_bc0(P):- current_prolog_flag(unsafe_speedups,true),!,baseKB:call(P).
+mpred_call_no_bc0(P):- current_prolog_flag(unsafe_speedups,true),!,call_u(P).
 mpred_call_no_bc0(P):- loop_check(mpred_METACALL(ereq, P)).
 
 pred_check(A):- var(A),!.
 % catch module prefix issues
 pred_check(A):- nonvar(A),must(atom(A)).
 
-mpred_METACALL(How,P):- current_prolog_flag(unsafe_speedups,true),!,baseKB:call(How,P).
+mpred_METACALL(How,P):- current_prolog_flag(unsafe_speedups,true),!,append_term(How,P,CALL),call_u(CALL).
 mpred_METACALL(How,P):- mpred_METACALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);mpred_call_no_bc(Cut))).
 
 mpred_METACALL(How, Cut, Var):- var(Var),!,trace_or_throw(var_mpred_METACALL_MI(How,Cut,Var)).
@@ -2822,7 +2840,7 @@ with_no_mpred_trace_exec(P):-
 %
 :- meta_predicate(show_if_debug(0)).
 % show_if_debug(A):- !,show_call(why,A).
-show_if_debug(A):-  get_mpred_is_tracing(A) -> show_call(A) ; A.
+show_if_debug(A):-  get_mpred_is_tracing(A) -> show_call(call_u(A)) ; call_u(A).
 
 :- thread_local(t_l:mpred_debug_local/0).
 

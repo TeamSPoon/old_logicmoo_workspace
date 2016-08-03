@@ -1472,8 +1472,9 @@ hide_trace(G):-
 on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
 
 :- meta_predicate quietly(0).
-quietly(G):- !, G.
-quietly(G):- \+ tracing,!,call(G).
+
+quietly(G):- notrace( \+ tracing),!,call(G).
+quietly(G):- notrace(ground(G)),!, notrace(G).
 quietly(G):- skipWrapper,!,call(G).
 % quietly(G):- !, on_x_f((G),setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),fail).
 quietly(G):- on_x_f(hide_trace(G),
@@ -1498,11 +1499,11 @@ is_recompile:-fail.
 %
 
 /*
-sanity(Goal):- \+ current_prolog_flag(logicmoo_debug,true), current_prolog_flag(unsafe_speedups,true), \+ tracing,!, (1 is random(10)-> must(Goal) ; true).
-sanity(_):- \+ current_prolog_flag(logicmoo_debug,true), notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
+sanity(_):- \+ current_prolog_flag(logicmoo_debug,true), notrace((is_release, \+ is_recompile)),!.
 */
-sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
+% sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
+sanity(Goal):- \+ current_prolog_flag(logicmoo_debug,true), current_prolog_flag(unsafe_speedups,true), \+ tracing,!, (1 is random(10)-> must(Goal) ; true).
 sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
 sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:dbreak).
@@ -1587,7 +1588,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
-must(Goal):- current_prolog_flag(unsafe_speedups,true),!,call(Goal).
+% must(Goal):- \+ current_prolog_flag(logicmoo_debug,true),current_prolog_flag(unsafe_speedups,true),!,call(Goal).
 must(Goal):- skipWrapper,!, (Goal *-> true;trace_or_throw(failed_must(Goal))).
 must(Goal):-  notrace((get_must(Goal,MGoal),!)),call(MGoal).
 

@@ -133,8 +133,9 @@ base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
 base_clause_expansion(_,I, O):- get_consequent_functor(I,F,A),base_clause_expansion_fa(I,O,F,A).
 base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.
 
+base_clause_expansion_fa(_,_,F,_):- prologBuiltin(F),!,fail.
 base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- needs_pfc(F,A),!.
-base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,_):- in_dialect_pfc,!,ain(prologBuiltin(F)).    % ain(hybrid_support(F,A)).
+base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- in_dialect_pfc,!,ain(hybrid_support(F,A)),ain(prologHybrid(F)).
 base_clause_expansion_fa(_,_,F,_):- ain(prologBuiltin(F)),!,fail.
 
 

@@ -1722,8 +1722,15 @@ save_in_code_buffer(Why,HB):- simp_code(HB,SIMP),assert(t_l:in_code_Buffer(HB,Wh
 use_was_isa_h(_,ftTerm,true):- !.
 use_was_isa_h(_,argi(mudEquals,_),true):- !.
 use_was_isa_h(_,argi(skolem,_),true):- !.
-use_was_isa_h(I,T,ISA):- to_isa_out(I,T,ISA),!.
+use_was_isa_h(I,T,ISA):- to_isa_form(I,T,ISA),!.
 
+%% to_isa_form( ?I, ?C, ?OUT) is nondet.
+%
+% Converted To  (isa/2) out.
+%
+to_isa_form(I,C,isa(I,C)).
+to_isa_form(I,C,t(C,I)).
+to_isa_form(I,C,OUT):- atom(C)->OUT=..[C,I].
 
 %= 	 	 
 

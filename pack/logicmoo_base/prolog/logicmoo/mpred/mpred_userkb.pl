@@ -375,14 +375,13 @@ current_world(current).
 :- use_module(logicmoo(mpred/'mpred_stubs.pl')).
 :- use_module(logicmoo(mpred/'mpred_*.pl')).
 
+*/
+
 resolveConflict(C):- cwc, must((resolveConflict0(C),
   show_if_debug(is_resolved(C)),mpred_remove(conflict(C)))).
 resolveConflict(C) :- cwc,
   wdmsg("Halting with conflict ~p", [C]),   
   must(mpred_halt(conflict(C))),fail.
-*/
-
-
 
 
 %% resolveConflict0( ?C) is semidet.

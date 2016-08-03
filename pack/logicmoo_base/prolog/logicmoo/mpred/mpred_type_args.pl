@@ -270,7 +270,7 @@ is_rest_of(_Type,[_|Term]):-not(is_list(Term)).
 %
 % If Is A List Of.
 %
-is_list_of(Type,Term):- is_rest(Term),!,Type=ftRest.
+is_list_of(Type,Term):- is_rest(Term),!,Type=ftTerm.
 is_list_of(Type,[T|Term]):-term_is_ft(T,Type),maplist(is_list_of(Type),Term).
 
 /*

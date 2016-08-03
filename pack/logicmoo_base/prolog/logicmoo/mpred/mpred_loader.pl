@@ -1124,7 +1124,7 @@ clause_count(Mask,N):-
          flag(clause_count,X,X), must(X=0),
          flag(clause_count,X,X+Count),fail)),flag(clause_count,N,0),!.
 
-check_clause_counts:- notrace((forall(checked_clause_count(Mask),check_clause_count(Mask)))),fail.
+check_clause_counts:- notrace((forall(checked_clause_count(Mask),sanity(check_clause_count(Mask))))),fail.
 check_clause_counts.
 
 :- dynamic(checked_clause_count/2).
@@ -1720,8 +1720,8 @@ make_dynamic_ilc(C):- trace_or_throw(make_dynamic_ilc(C)),
 
 % once(baseKB:mpred_is_impl_file(F);asserta(baseKB:mpred_is_impl_file(F))).
 
-%user:goal_expansion(G,OUT):- \+  t_l:disable_px, G\=isa(_,_),(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
-%user:term_expansion(G,OUT):- \+  t_l:disable_px, hotrace(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
+%user:goal_expansion(G,OUT):- \+  t_l:disable_px, G\=isa(_,_),(use_was_isa(G,I,C)),!,to_isa_form(I,C,OUT).
+%user:term_expansion(G,OUT):- \+  t_l:disable_px, hotrace(use_was_isa(G,I,C)),!,to_isa_form(I,C,OUT).
 %user:term_expansion(I,O):- \+ t_l:disable_px, t_l:consulting_sources, wno_tl(t_l:consulting_sources,ain(I)),O=true.
 
 

@@ -219,7 +219,7 @@ match_object(S,Obj):-var(S),!,freeze(S,match_object(S,Obj)).
 match_object(S,Obj):-var(Obj),!,freeze(Obj,match_object(S,Obj)).
 match_object(S,Obj):-number(S),atom_number(A,S),!,match_object(A,Obj).
 match_object(S,Obj):-same_ci(S,Obj),!.
-match_object(S,Obj):-atomic(S),string_to_atom(S,ID),call_u(tIndividual(ID)),!,(var(Obj)->Obj=ID;same_ci(ID,Obj)).
+match_object(S,Obj):-atomic(S),string_to_atom(S,ID),call_u(tKnownID(ID)),!,(var(Obj)->Obj=ID;same_ci(ID,Obj)).
 match_object(S,Obj):-name_text(Obj,S),!.
 match_object(S,Obj):-i_name(Obj,S),!.
 match_object([S],Obj):-!,match_object(S,Obj).

@@ -7,6 +7,7 @@
 :- system:use_module(library(prolog_stack)).
  prolog_stack:stack_guard(none).
 :- endif.
+% :- set_prolog_flag(logicmoo_debug,true).
 
 /*
 :- set_prolog_flag(access_level,system).
@@ -107,11 +108,11 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 :- system:ensure_loaded(logicmoo_repl).
 
-:- set_prolog_flag(logicmoo_debug,true).
-%:- set_prolog_flag(unsafe_speedups,false).
-% :- mpred_trace_exec.
-
-:- baseKB:assert_isa(iRR7,tRR).
+:- set_prolog_flag(unsafe_speedups,true).
+:- mpred_trace_exec.
+:- debug.
+% :- rtrace.
+:- baseKB:ain(isa(iRR7,tRR)).
 :- baseKB:ain(genls(tRR,tRRP)).
 :- must( baseKB:isa(iRR7,tRRP) ).
 :- must( baseKB:tRRP(iRR7) ).
@@ -197,7 +198,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
 %:- lcme:reset_modules.
 
-%:- set_prolog_flag(logicmoo_debug,true).
+:- set_prolog_flag(logicmoo_debug,true).
 
 % :- mpred_trace_exec.
 :- ain(isLoaded(iSourceCode7)).
@@ -212,16 +213,20 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 % :- mpred_trace_exec.
 
-:- set_prolog_flag(dialect_pfc,true).
-%:- set_prolog_flag(logicmoo_debug,true).
+
+:- set_prolog_flag(logicmoo_debug,true).
 %:- set_prolog_flag(unsafe_speedups,false).
 
+:- sanity(functorDeclares(tSourceData)).
+:- sanity(functorDeclares(mobExplorer)).
 
 
 % [Optional] Creates or suppliments a world
+:- set_prolog_flag(dialect_pfc,true).
 
-tCol(tRegion).
-tCol(tLivingRoom).
+tSet(tRegion).
+tSet(tLivingRoom).
+tSet(mobExplorer).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
 
@@ -230,6 +235,7 @@ genls(tOfficeRoom,tRegion).
 %genlsFwd(tOfficeRoom,tRegion).
 
 % create some seats
+:- trace.
 mobExplorer(iExplorer1).
 mobExplorer(iExplorer2).
 mobExplorer(iExplorer3).

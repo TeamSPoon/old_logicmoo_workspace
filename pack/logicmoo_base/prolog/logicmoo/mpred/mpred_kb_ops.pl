@@ -2293,7 +2293,7 @@ repropagate(F/A):- is_ftNameArity(F,A),!,functor(P,F,A),!,repropagate(P).
 repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 
 repropagate(P):-  \+ predicate_property(_:P,_),dmsg(undefined_repropagate(P)),dumpST,dtrace,!,fail.
-repropagate(P):-  repropagate_0(P).
+repropagate(P):-  call_u(repropagate_0(P)).
 
 
 predicate_to_goal(P,Goal):-atom(P),get_arity(P,F,A),functor(Goal,F,A).
@@ -2327,8 +2327,8 @@ repropagate_1(P):- call_u(repropagate_2(P)).
 % repropagate  Extended Helper.
 %
 repropagate_2(P):-
- doall((no_repeats((mpred_facts_and_universe(P))),
-    w_tl(t_l:is_repropagating(P),ignore((once(show_failure(fwd_ok(P))),show_call(mpred_fwc(P))))))).
+ call_u(doall((no_repeats((mpred_facts_and_universe(P))),
+    w_tl(t_l:is_repropagating(P),ignore((once(show_failure(fwd_ok(P))),show_call(mpred_fwc(P)))))))).
 
 % repropagate_meta_wrapper_rule(P==>_):- !, repropagate(P).
 

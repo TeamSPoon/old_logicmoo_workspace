@@ -43,10 +43,10 @@
 
 :- asserta_if_new(baseKB:mtCycL(baseKB)).
 
-col_as_unary(col_as_isa).
-col_as_unary(col_as_unary).
+ttTypeType(col_as_isa).
+ttTypeType(col_as_unary).
+ttTypeType(col_as_static).
 col_as_unary(col_as_static).
-col_as_unary(argsQuoted).
 col_as_unary(tPred).
 
 %col_as_isa(mtProlog).
@@ -219,8 +219,12 @@ alwaysGaf(pfcRHS).
 alwaysGaf(pfcLHS).
 
 
-tSet(A)/atom(A)==>{decl_type_unsafe(A), kb_dynamic(A/1)}.
-% tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
+tCol(C)/atom(C)==> functorDeclares(C), ~tRelation(C),{decl_type_unsafe(C), kb_dynamic(C/1),\+ ttExpressionType(C)},tSet(C).
+ttExpressionType(C)==>col_as_unary(C).
+col_as_unary(C)==> \+ col_as_isa(C).
+col_as_isa(C)==> \+ col_as_unary(C).
+
+col_as_isa(C)/( is_never_type(C) ; decided_not_was_isa(C,W)) ==> (conflict((col_as_isa(C)/( decided_not_was_isa(C,W);is_never_type(C))))).
 
 tCol(tCol).
 tCol(tPred).
@@ -245,19 +249,17 @@ arity(xyzFn,4).
 arity(arity,2).
 arity(is_never_type,1).
 arity(argIsa, 3).
-arity(Prop,1):- cwc, clause_b(ttPredType(Prop)).
 arity(meta_argtypes,1).
 arity(arity,2).
 arity(is_never_type,1).
 arity(prologSingleValued,1).
 arity('<=>',2).
-arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
-arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(Z,1))), arity(F,Z))).
+arity(F,A):- cwc, freeze(F,tRelation(F)), is_ftNameArity(F,A), current_predicate(F/A),A>1.
+arity(F,1):- cwc, freeze(F,(tRelation(F),\+ tCol(F))), is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(Z,1))), arity(F,Z))).
 
 % mtCycL(baseKB).
 
 tCol(ttModule).
-arity(tCol,1).
 
 tCol(ttModule,mudToCyc('MicrotheoryType')).
 
@@ -320,6 +322,8 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
     CL = arity(F,A)
     },
    (CL))).
+
+(tCol(Col),arity(Col,1))==>warn_arity(Col).
 
 
 %:- kb_dynamic(hybrid_support/2).
@@ -443,7 +447,7 @@ baseKB:predicateConventionMt(collectionConventionMt,baseKB).
 predicateConventionMt(genlMt,baseKB).
 predicateConventionMt(regression_test,baseKB).
 
-arity(tSet,1).
+functorDeclares(tSet).
 tSet(tMicrotheory,mudToCyc('Microtheory')).
 
 baseKB:collectionConventionMt(tMicrotheory,baseKB).
@@ -484,7 +488,7 @@ tCol(Decl)==>functorDeclares(Decl).
  ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
   genls(tMicrotheory))).
 
-:- sanity(arity(ttModule,1)).
+:- sanity(functorDeclares(ttModule)).
 :- sanity(\+ arity(ttModule,3)).
 :- sanity(\+ predicate_property(ttModule(_,_,_),_)).
 
@@ -515,7 +519,7 @@ genls(mtCore,tMicrotheory).
 
 mtCycL(O)==>({call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
 
-:- sanity(arity(ttModule,1)).
+:- sanity(functorDeclares(ttModule)).
 
 :- sanity(\+ arity(ttModule,3)).
 :- sanity(\+ predicate_property(ttModule(_,_,_),_)).

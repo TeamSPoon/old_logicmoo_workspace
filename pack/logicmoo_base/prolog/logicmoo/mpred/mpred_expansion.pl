@@ -185,7 +185,9 @@
 
 :- style_check(+singleton).
 
-%= 	 	 
+:- multifile baseKB:prologBuiltin/1.
+:- discontiguous baseKB:prologBuiltin/1.
+:- dynamic baseKB:prologBuiltin/1.
 
 %% default_te( ?IF, ?VAR, ?VAL) is semidet.
 %
@@ -282,7 +284,7 @@ disabled a(T,I):- rdf_x(I,rdf:type,T).
 %
 :- meta_predicate a(+,?).
 % WANT (but will loop) a(C,I):- !, quietly((atom(C),G=..[C,I], no_repeats_old(call_u(G)))).
-a(C,I):- quietly((atom(C),G=..[C,I], no_repeats_old(lookup_u(G)))).
+a(C,I):- call(quietly(t(C,I))).
 
 
 %=  :- was_export(alt_calls/1).
@@ -1038,7 +1040,7 @@ db_expand_0(Op,(H:-B),OUT):- temp_comp(H,B,db_expand_0(Op),OUT).
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_0(Op,INot,O).
 db_expand_0(Op,isa(I,O),INot):-Not== ( \+ ) ,!,INot =.. [Not,I],!,db_expand_0(Op,INot,O).
-%db_expand_0(_,THOLDS,ISA):- was_mpred_isa(THOLDS,I,C),!,to_isa(I,C,ISA).
+%db_expand_0(_,THOLDS,ISA):- was_mpred_isa(THOLDS,I,C),to_isa_form(I,C,ISA).
 db_expand_0(Op,THOLDS,OUT):- THOLDS=..[t,P|ARGS],atom(P),!,HOLDS=..[P|ARGS],db_expand_0(Op,HOLDS,OUT).
 db_expand_0(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(from_univ(_,Op,[V,S,O],OUT)).
 db_expand_0(Op,G,OUT):- G=..[Pred,InstFn,VO],compound(InstFn),InstFn=isInstFn(Type),is_ftNonvar(Type),from_univ(relationMostInstance,Op,[Pred,Type,VO],OUT).
@@ -1586,14 +1588,22 @@ into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,
 
 :- expire_tabled_list(all).
 
+% ========================================
+% was_mpred_isa(Goal,I,C) recognises isa/2 and its many alternative forms
+% ========================================
+:- was_dynamic decided_not_was_isa/2.
+baseKB:prologBuiltin(was_mpred_isa/3).
+
 %= 	 	 
 
-%% was_mpred_isa( ?G, ?VALUE2, ?VALUE3) is semidet.
+%% was_mpred_isa( +G, -INST, -COL) is semidet.
 %
 % was  (isa/2) syntax.
 %
 was_mpred_isa(G,_,_):-is_ftVar(G),!,fail.
+was_mpred_isa(G,_,_):- \+compound(G),!,fail.
 was_mpred_isa(isa(I,C),I,C):-!.
+was_mpred_isa(t(P,I,C),I,C):-!,P==isa.
 was_mpred_isa(t(C,I),I,C):-!.
 was_mpred_isa(a(C,I),I,C):-!.
 was_mpred_isa(G,I,C):-was_isa(G,I,C).

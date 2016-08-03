@@ -365,7 +365,7 @@ when_debugging(_,_).
 
 :- asserta(t_l:disable_px).
 
-% user:goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
+% user:goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_form(I,C,OUT),G=no_repeats(OUT).
 :- meta_predicate(mpred_expander0(?,?,?,?)).
 :- meta_predicate(lmbase_record_transactions_maybe(?,?)).
 :- meta_predicate(mpred_file_expansion(?,?)).
