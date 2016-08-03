@@ -294,7 +294,7 @@ baseKB:cyc_to_plarkc('rangeSubclass', 'resultGenl').
 baseKB:cyc_to_plarkc('instance', 'isa').
 baseKB:cyc_to_plarkc(subrelation,genlPreds).
 baseKB:cyc_to_plarkc(documentation,comment).
-baseKB:cyc_to_plarkc('Class',tCol).
+baseKB:cyc_to_plarkc('Class','tCol').
 baseKB:cyc_to_plarkc('SetOrClass', 'tCol').
 
 
@@ -407,7 +407,7 @@ notFormatType(tThing).
 notFormatType(tIndividual).
 notFormatType(tInferenceSupportedFunction).
 
-:- forall(notFormatType(NFT),ain(tCol(NFT))).
+:- forall(notFormatType(NFT),ain(tSet(NFT))).
 
 
 expT('SubLExpressionType').

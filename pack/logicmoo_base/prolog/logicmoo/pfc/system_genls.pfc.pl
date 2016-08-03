@@ -50,7 +50,13 @@ ttExpressionType(C)==>tAvoidForwardChain(C).
 ((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, 
    \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 
+(genls(C,vtValue) ==> (isa(I,C) /* /( \+ mudIsa(I,C)) */ ==> mudIsa(I,C))).
+(genls(C,vtValue) ==> (isa(I,C) /* /( \+ completeIsaAsserted(I)) */ ==> completeIsaAsserted(I))).
 completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ tAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
+genls(O,vtValue) ==> completelyAssertedCollection(O).
+
+(isa(Inst,_) ==> ({atom(Inst),isa_from_morphology(Inst,Type)} , mudIsa(Inst,Type))).
+
 /*
 
 % isRuntime ==> 
@@ -88,5 +94,4 @@ genlsFwd(C,P)/(C\=P) ==> (isa(I,C) ==> isa(I,P)).
    P1 =.. [F1,X],
     P2 =.. [F2,X],
     asserta_if_new(baseKB:((P2:-loop_check(P1))))})).
-
 

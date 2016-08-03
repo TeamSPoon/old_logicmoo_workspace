@@ -24,8 +24,7 @@
  op(300,fx,'-') */ ]).
 % restore entry state
 :- lcme:reset_modules.
-
-
+:- current_prolog_flag(unsafe_speedups,_)->true;set_prolog_flag(unsafe_speedups,true).
 :- use_module(library(logicmoo_utils)).
 :- use_module(library(logicmoo_base)).
 

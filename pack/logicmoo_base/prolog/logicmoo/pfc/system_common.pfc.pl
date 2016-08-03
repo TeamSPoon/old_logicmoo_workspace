@@ -311,15 +311,25 @@ tCol(tSet).
 
 % :- prolog.
 % tPred
-ttPredType(isEach(pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,prologMultiValued,
- pfcBcTrigger,
- prologSingleValued,prologMacroHead,notAssertable,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,prologEquality,prologPTTP,
+ttPredType(isEach(
+ pfcBcTrigger,pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,
+ pfcLHS,pfcRHS,pfcLHS,pfcBcTrigger,pfcPosTrigger,pfcNegTrigger,
+ pfcCreates,pfcCallCode,
+ predIsFlag,prologMultiValued,
+ prologSingleValued,prologMacroHead,notAssertable,
+ prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,
+ prologPTTP,prologKIF,prologEquality,prologPTTP,
  prologSideEffects,prologHybrid,prologListValued)).
 
 completelyAssertedCollection(isEach(tCol,tPred,pfcControlled)).
 ttPredType(C)==>completelyAssertedCollection(C).
 
 % genls(meta_argtypes,ftSpec).
+
+:- dynamic(baseKB:mudWielding/2).
+
+prologMultiValued(P)==> \+ prologSingleValued(P).
+prologSingleValued(P)==> \+ prologMultiValued(P).
 
 ~(ttExpressionType(prologEquality)).
 ttPredType(prologEquality).
@@ -472,9 +482,18 @@ ttExpressionType(P) ==>
 
 :- mpred_trace_exec.
 
-tSet(tKnownID).
-:- xlisting(tKnownID).
-%?- isa(tKnownID,W).
+tSet(tIndividual).
+:- xlisting(tIndividual).
+
+
+
+tCol(X)==>tKnownID(X).
+tIndividual(X)==>tKnownID(X).
+
+tCol(X)==> \+ tIndividual(X).
+% tIndividual(X)==> ~ tCol(X).
+
+%?- isa(tIndividual,W).
 %:- break.
 
 :- mpred_notrace_exec.

@@ -122,9 +122,11 @@ w_tl(_:scce(WM:THeadWM),CM:Call):- !,w_tl_e(WM:THeadWM,CM:Call).
 w_tl(WM:THeadWM,CM:Call):-w_tl_e(WM:THeadWM,CM:Call).
 
 w_tl_e(WM:THeadWM,CM:Call):-
- notrace(( 
+ clause_asserted(WM:THeadWM)-> CM:Call;
+ 
+ (notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     scce_orig2(key_asserta(M:HAssert),CM:Call,key_erase).
+     scce_orig2(key_asserta(M:HAssert),CM:Call,key_erase)).
 
 
 key_asserta(M:HAssert):- asserta(M:HAssert,REF),(nb_current('$w_tl_e',Was)->nb_setval('$w_tl_e',[REF|Was]);nb_setval('$w_tl_e',[REF])).
@@ -136,9 +138,9 @@ key_erase:- once((nb_current('$w_tl_e',[REF|Was]),nb_setval('$w_tl_e',Was),erase
 %
 % Wno Thread Local.
 %
-wno_tl(UHead,Call):- w_tl((UHead :- !,fail),Call).
+wno_tl(UHead,Call):- \+ UHead -> Call ; w_tl((UHead :- !,fail),Call).
 
-wno_tl_e(UHead,Call):- w_tl_e((UHead :- !,fail),Call).
+wno_tl_e(UHead,Call):- \+ UHead -> Call ; w_tl_e((UHead :- !,fail),Call).
 
 
 

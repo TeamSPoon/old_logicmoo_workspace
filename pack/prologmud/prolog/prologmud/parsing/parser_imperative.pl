@@ -23,7 +23,7 @@
                    % coerce/3,
                    parseIsa//2,
                    phrase_parseForTypes_9//2,
-                   name_text_atomic/2,
+                   guess_nameStrings/2,
                    parseForTypes//2)).
 
 % :- register_module_type (utility).
@@ -219,12 +219,12 @@ match_object(S,Obj):-var(S),!,freeze(S,match_object(S,Obj)).
 match_object(S,Obj):-var(Obj),!,freeze(Obj,match_object(S,Obj)).
 match_object(S,Obj):-number(S),atom_number(A,S),!,match_object(A,Obj).
 match_object(S,Obj):-same_ci(S,Obj),!.
-match_object(S,Obj):-atomic(S),string_to_atom(S,ID),call_u(tKnownID(ID)),!,(var(Obj)->Obj=ID;same_ci(ID,Obj)).
+match_object(S,Obj):-atomic(S),string_to_atom(S,ID),call_u(tIndividual(ID)),!,(var(Obj)->Obj=ID;same_ci(ID,Obj)).
 match_object(S,Obj):-name_text(Obj,S),!.
 match_object(S,Obj):-i_name(Obj,S),!.
 match_object([S],Obj):-!,match_object(S,Obj).
 match_object([S1|S],Obj):-match_object(S1,Obj),match_object(S,Obj),!.
-% match_object(S,Obj):-atomic(S),string_to_atom(S,ID),call_u(tKnownID(ID)),!,(var(Obj)->Obj=ID;same_ci(ID,Obj)).
+% match_object(S,Obj):-atomic(S),string_to_atom(S,ID),call_u(tIndividual(ID)),!,(var(Obj)->Obj=ID;same_ci(ID,Obj)).
 match_object(S,Obj):-to_case_breaks(Obj,List)->member(t(Str,_),List),string_equal_ci(S,Str),!.
 match_object(S,Obj):-ground(S:Obj),match_object_exp(S,Obj),!.
 
@@ -415,38 +415,37 @@ name_text(I,O):- nonvar(I),no_repeats(O,(name_text_now(I,M),any_to_string(M,S), 
 :-export(name_text_now/2).
 name_text_now(Name,Text):-clause_b(nameStrings(Name,Text)).
 name_text_now(Name,Text):-clause_b(mudKeyword(Name,Text)).
-name_text_now(Name,Text):-nonvar(Text),!,name_text_now(Name,TextS)->string_equal_ci(Text,TextS),!.
-name_text_now(Name,Text):-atomic(Name),name_text_atomic(Name,Text).
-% name_text_now(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),t(N,Name,Text).
-name_text_now(Name,Text):-is_list(Name),!,case_breaks_text(Name,Text).
-name_text_now(Name,Text):-compound(Name),!,Name=..[F,A|List],!,F\='[|]',case_breaks_text([F,A|List],Text).
+name_text_now(Name,Text):-must(guess_nameStrings(Name,Text)).
 
-name_text_atomic([],_):-!,fail.
-name_text_atomic('',_):-!,fail.
-name_text_atomic("",_):-!,fail.
-name_text_atomic(Name,Text):-string(Name),!,Name=Text.
-name_text_atomic(Name,Text):-is_list(Name),!,maplist(name_text_atomic,Name,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
-name_text_atomic(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text_atomic([F,A|List],Text).
-name_text_atomic(Name,Text):-i_name_lc(Name,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
-name_text_atomic(Name,Text):-to_case_breaks(Name,ListN),case_breaks_text(ListN,TextL),atomic_list_concat(TextL,' ',TextN),atom_string(TextN,Text).
-name_text_atomic(Name,Text):-atom_string(Name,Text).
-
-case_breaks_text_trim([t(TextL,Type)|ListN],Text):- 
- must((as_atom(TextL,Atom),type_prefix(Atom,_)) -> maplist(as_atom,ListN,Text);
-    maplist(as_atom,[t(TextL,Type)|ListN],Text)),!.
-
-case_breaks_text(ListN,TextT):- case_breaks_text_trim(ListN,TextT),!.
-case_breaks_text(ListN,TextT):- maplist(as_atom,ListN,TextT),!.
-
+guess_mudDescription([],_):-!,fail.
+guess_mudDescription('',_):-!,fail.
+guess_mudDescription("",_):-!,fail.
+guess_mudDescription(Name,Text):-string(Name),!,Name=Text.
+guess_mudDescription(Name,Text):-is_list(Name),!,
+    maplist(as_atom,Name,RealName),atomic_list_concat(RealName,Obj),!,guess_mudDescription(Obj,Text).
 guess_mudDescription(Name,Desc):- isa(Name,tPred), \+ isa(Name,tCol),atomic(Name),make_summary([],Name,Desc).
-guess_mudDescription(Name,Desc):- atomic(Name),to_case_breaks(Name,ListN),!, maplist(as_atom,ListN,TextT),!,
-   maplist(to_descriptive_name(Name),TextT,TextL),!,atomic_list_concat(TextL,' ',Desc).
+guess_mudDescription(Name,Desc):- atomic(Name),to_case_breaks(Name,TextT),
+   maplist(to_descriptive_name(Name),TextT,TextL),!,atomics_to_string(TextL,' ',Desc).
 
+guess_nameStrings([],_):-!,fail.
+guess_nameStrings('',_):-!,fail.
+guess_nameStrings("",_):-!,fail.
+guess_nameStrings(Name,Text):-string(Name),!,Name=Text.
+guess_nameStrings(Name,Text):-is_list(Name),!,
+    maplist(as_atom,Name,RealName),atomic_list_concat(RealName,Obj),!,guess_nameStrings(Obj,Text).
+guess_nameStrings(Name,Text):-compound(Name),!,Name=..[F,A|List],!,guess_nameStrings([F,A|List],Text).
+guess_nameStrings(Name,Text):-atom(Name),to_case_breaks(Name,ListN),to_case_breaks_trimed(Name,ListN,Text).
 
-to_untyped_name(Name,Desc):- to_case_breaks(Name,ListN),case_breaks_text_trim(ListN,TextL),atomic_list_concat(TextL,' ',Desc).
+to_case_breaks_trimed(Name,[t(TextL,Class),t(TextR,Class)|ListN],Text):-  
+    maplist(to_descriptive_name(Name),[t(TextL,Class),t(TextR,Class)|ListN],Desc),
+    atomics_to_string(Desc,' ',Text),!.
 
-guess_nameStrings(F,Txt):-once(name_text_atomic(F,Txt)).
+to_case_breaks_trimed(Name,[_|ListN],Text):- is_list(ListN),!,
+    maplist(to_descriptive_name(Name),ListN,Desc),
+    atomics_to_string(Desc,' ',Text).
 
+type_descriptive_name(_,Str,Str):-string(Str),!.
+type_descriptive_name(Name,t(Atom,_Class),Out):-!,type_descriptive_name(Name,Atom,Out).
 type_descriptive_name(tCol,t,'First-Order').
 type_descriptive_name(tPred,Desc,Atom):-longer_sumry(Desc,Atom).
 type_descriptive_name(tCol,tt,'Second-Order').
@@ -458,15 +457,12 @@ type_descriptive_name(tFunction,'i','Instance').
 type_descriptive_name(ftAtom,'i','Instance').
 type_descriptive_name(tCol,'Voprop','Verb-Object Properties').
 type_descriptive_name(ftNonvar,Pefix,Desc):-
-   type_prefix(Pefix,TypeName),
-   to_untyped_name(TypeName,Desc).
+   type_prefix(Pefix,TypeName),guess_nameStrings(TypeName,Desc).
 
 
 to_descriptive_name(For,Desc,Atom):- type_descriptive_name(Type,Desc,Atom),isa(For,Type),!.
-
-to_descriptive_name(_For,Pefix,Desc):-
-   type_prefix(Pefix,TypeName),
-   to_untyped_name(TypeName,Desc).
+to_descriptive_name(_For,Pefix,Desc):- type_prefix(Pefix,TypeName), guess_nameStrings(TypeName,Desc).
+to_descriptive_name(For,t(Pefix,lower),Desc):-!,to_descriptive_name(For,Pefix,Desc).
 to_descriptive_name(_For,Desc,Atom):- longer_sumry(Desc,Atom),!.
 to_descriptive_name(_For,Desc,Atom):-any_to_atom(Desc,Atom),!.
 

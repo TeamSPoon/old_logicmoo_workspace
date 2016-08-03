@@ -219,7 +219,6 @@ push_current_choice/1,
       with_fc_mode(+,0),
       bagof_or_nil(?,^,-).
 
-:- current_prolog_flag(unsafe_speedups,_)->true;set_prolog_flag(unsafe_speedups,true).
 :- meta_predicate mpred_retract_i_or_warn(+).
 :- meta_predicate mpred_retract_i_or_warn_0(+).
 :- meta_predicate mpred_retract_i_or_warn_1(+).

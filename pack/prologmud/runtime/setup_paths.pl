@@ -62,9 +62,9 @@ system:pmrt_file_search_path(games, '../games').
 system:pmrt_file_search_path(library, LIB):- system:pmrt_file_search_path_library(LIB).
 
 system:pmrt_file_search_path_library(pack('logicmoo_base/prolog')).
-system:pmrt_file_search_path_library(pack('logicmoo_nlu/prolog')).
-system:pmrt_file_search_path_library(pack('logicmoo_packages/prolog')).
-system:pmrt_file_search_path_library(pack('logicmoo_planner/prolog')).
+system:pmrt_file_search_path_library(pack('logicmoo_nlu/prolog')):-exists_source(pack('logicmoo_nlu/pack.pl')).
+system:pmrt_file_search_path_library(pack('logicmoo_packages/prolog')):-exists_source(pack('logicmoo_packages/pack.pl')).
+system:pmrt_file_search_path_library(pack('logicmoo_planner/prolog')):-exists_source(pack('logicmoo_planner/pack.pl')).
 % system:pmrt_file_search_path_library(pack('MUD_ircbot/prolog')).
 
 

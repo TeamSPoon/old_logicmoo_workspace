@@ -1502,6 +1502,7 @@ sanity(Goal):- \+ current_prolog_flag(logicmoo_debug,true), current_prolog_flag(
 sanity(_):- \+ current_prolog_flag(logicmoo_debug,true), notrace((is_release, \+ is_recompile)),!.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
 */
+sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
 sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
 sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:dbreak).
@@ -1586,6 +1587,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
+must(Goal):- current_prolog_flag(unsafe_speedups,true),!,call(Goal).
 must(Goal):- skipWrapper,!, (Goal *-> true;trace_or_throw(failed_must(Goal))).
 must(Goal):-  notrace((get_must(Goal,MGoal),!)),call(MGoal).
 

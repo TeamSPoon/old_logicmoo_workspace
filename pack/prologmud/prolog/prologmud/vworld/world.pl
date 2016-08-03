@@ -15,8 +15,7 @@
 % general assistance Dr. Donald Nute
 %
 */
-%:- set_prolog_flag(logicmoo_debug,true).
-%:- set_prolog_flag(unsafe_speedups,false).
+
 mtProlog(world).
 % :-ain(hybrid_support(agent_call_command,2)).
 :-export((
