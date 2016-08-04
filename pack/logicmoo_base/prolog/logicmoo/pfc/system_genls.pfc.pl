@@ -50,25 +50,7 @@ ttExpressionType(C)==>tAvoidForwardChain(C).
 ((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, 
    \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 
-persistInMudIsa(vtValue).
-persistInMudIsa(tSpatialThing).
-
-persistInMudIsa(TCOL) ==> (genls(C,TCOL) ==> (isa(I,C) /* /( \+ mudIsa(I,C)) */ ==> mudIsa(I,C))).
-persistInMudIsa(TCOL) ==> (genls(C,TCOL) ==> (isa(I,C) /* /( \+ completeIsaAsserted(I)) */ ==> completeIsaAsserted(I))).
-
 completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ tAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
-persistInMudIsa(TCOL) ==> (genls(O,TCOL) ==> persistInMudIsa(O)).
-persistInMudIsa(TCOL) ==> (genls(TCOL,O) ==> persistInMudIsa(O)).
-persistInMudIsa(TCOL) ==> (isa(I,TCOL) ==> mudIsa(I,TCOL)).
-
-cachePredicate(genls) ==> ((genls(Sub,M),genls(M,Super))==> genls(Sub,Super)).
-cachePredicate(genls).
-
-
-persistInMudIsa(TCOL) ==> (isa(I,TCOL) ==> completeIsaAsserted(I)).
-
-tKnownID(Inst)/atom(Inst),{isa_from_morphology(Inst,Type)} ==> mudIsa(Inst,Type).
-
 /*
 
 % isRuntime ==> 
@@ -99,12 +81,12 @@ ttMudIsaCol(Sub) ==> (isa(I,Sub) ==> mudIsa(I,Sub)).
 
 genlsFwd(C,P)/(C\=P) ==> (isa(I,C) ==> isa(I,P)).
 
-cachePredicate(mudIsa) ==> (tSet(C) ==> (isa(I,C)==>mudIsa(I,C))).
-cachePredicate(mudIsa).
+
 
 ((genls(C1,C2), ( \+ genlsFwd(C1,C2)))==>
  ({get_functor(C1,F1),get_functor(C2,F2),
    P1 =.. [F1,X],
     P2 =.. [F2,X],
     asserta_if_new(baseKB:((P2:-loop_check(P1))))})).
+
 

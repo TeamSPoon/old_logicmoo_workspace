@@ -238,6 +238,7 @@ dmsg000/1,
 :- system:use_module(logicmoo_util_loop_check).
 
 
+
 :- meta_predicate with_output_to_each(+,0).
 
 with_output_to_each(Output,Goal):- Output= atom(A),!,

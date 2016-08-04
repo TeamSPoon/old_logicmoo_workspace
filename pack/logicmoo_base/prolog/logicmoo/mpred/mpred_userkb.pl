@@ -384,6 +384,7 @@ resolveConflict(C) :- cwc,
   must(mpred_halt(conflict(C))),fail.
 
 
+
 %% resolveConflict0( ?C) is semidet.
 %
 % Resolve Conflict Primary Helper.

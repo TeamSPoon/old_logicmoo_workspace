@@ -284,7 +284,7 @@ disabled a(T,I):- rdf_x(I,rdf:type,T).
 %
 :- meta_predicate a(+,?).
 % WANT (but will loop) a(C,I):- !, quietly((atom(C),G=..[C,I], no_repeats_old(call_u(G)))).
-a(C,I):- call(quietly(t(C,I))).
+a(C,I):- quietly((atom(C),G=..[C,I], no_repeats_old(lookup_u(G)))).
 
 
 %=  :- was_export(alt_calls/1).
@@ -996,10 +996,8 @@ db_expand_0(Op,pkif(SentI),SentO):- nonvar(SentI),!,must((any_to_string(SentI,Se
   fully_expand_clause_now(Op,SentM,SentO))).
 db_expand_0(_Op,kif(Sent),SentO):- nonvar(Sent),!, must(expand_kif_string(Sent,SentO)).
 
-db_expand_0(Op,Sent,SentO):- string(Sent),!,((expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause_now(Op,SentM,SentO));SentO=Sent),!.
-db_expand_0(Op,M:Sent,SentO):- db_expand_0(Op,Sent,SentM),!,(is_stripped_module(M)->SentM=SentO;SentO=M:SentM).
-
-db_expand_0(_,isa(I,C),SentO):- atom(C),SentO=..[C,I].
+db_expand_0(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause_now(Op,SentM,SentO).
+db_expand_0(Op,M:Sent,SentO):- is_stripped_module(M),!,db_expand_0(Op,Sent,SentO).
 db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.
 
 
