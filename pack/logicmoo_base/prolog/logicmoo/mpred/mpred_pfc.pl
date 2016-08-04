@@ -918,6 +918,21 @@ mpred_post12( ~ P,   S):- sanity( \+ is_ftOpenSentence(P)),
 
 mpred_post12(P,S):- maybe_updated_value(P,RP,OLD),!,subst(S,P,RP,RS),mpred_post12(RP,RS),ignore(mpred_retract(OLD)).
 
+
+
+% this simplides code and maybe speeds up
+mpred_post12(P,S):- !,
+ ignore(( %  db mpred_ain_db_to_head(P,P2),
+  % mpred_remove_old_version(P),  
+  mpred_add_support(P,S),
+  (mpred_unique_u(P)->
+     assert_u_confirmed_was_missing(P);
+     (fail,assert_u_confirm_if_missing(P))), 
+  mpred_trace_op(add,P,S),
+  !,
+  mpred_enqueue(P,S))),
+  !.
+
 % Two versions exists of this function one expects for a clean database (fresh_mode) and adds new information.
 % tries to assert a fact or set of fact to the database.
 % The other version is if the program is been running before loading this module.

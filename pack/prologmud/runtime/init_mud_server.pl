@@ -235,7 +235,7 @@ genls(tOfficeRoom,tRegion).
 %genlsFwd(tOfficeRoom,tRegion).
 
 % create some seats
-:- trace.
+% :- trace.
 mobExplorer(iExplorer1).
 mobExplorer(iExplorer2).
 mobExplorer(iExplorer3).

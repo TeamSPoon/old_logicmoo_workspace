@@ -1124,7 +1124,7 @@ clause_count(Mask,N):-
          flag(clause_count,X,X), must(X=0),
          flag(clause_count,X,X+Count),fail)),flag(clause_count,N,0),!.
 
-check_clause_counts:- notrace((forall(checked_clause_count(Mask),check_clause_count(Mask)))),fail.
+check_clause_counts:- notrace((forall(checked_clause_count(Mask),sanity(check_clause_count(Mask))))),fail.
 check_clause_counts.
 
 :- dynamic(checked_clause_count/2).
