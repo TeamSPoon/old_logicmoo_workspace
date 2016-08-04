@@ -109,7 +109,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- system:ensure_loaded(logicmoo_repl).
 
 :- set_prolog_flag(unsafe_speedups,true).
-:- mpred_trace_exec.
+%:- mpred_trace_exec.
 :- debug.
 % :- rtrace.
 :- baseKB:ain(isa(iRR7,tRR)).

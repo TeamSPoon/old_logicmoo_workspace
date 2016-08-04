@@ -253,7 +253,7 @@ tCol(tHumanBody).
 genls(tHumanBody,tBodyPart).
 
 
-:- mpred_trace_exec.
+%:- mpred_trace_exec.
 :- mpred_trace.
 :- mpred_warn.
 

@@ -84,7 +84,7 @@ someSV_testing(a,b,1).
 someSV_testing(a,b,2).
 someSV_testing(a,c,3).
 
-:- mpred_trace_exec.
+%:- mpred_trace_exec.
 singleValuedInArg(someSV_testing,3).
 someSV_testing(a,c,4).
 

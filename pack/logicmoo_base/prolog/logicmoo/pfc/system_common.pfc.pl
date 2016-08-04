@@ -534,7 +534,7 @@ arity(argIsa,3).
 
 % prologHybrid(F/A)/(atom(F),number(A)) ==> arity(F,A),{must(dynamic_safe(F/A))}.
 
-:-mpred_trace_exec.
+%:-mpred_trace_exec.
 
 % Functions
 tFunction(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes),{get_functor(ArgTypes,F)},tFunction(F).
