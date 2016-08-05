@@ -9,7 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_type_args,
           [ any_to_number/2,
             any_to_relation/2,
@@ -82,7 +82,7 @@
             trans_subft/2,
             mpred_type_args_file/0
           ]).
-%:- endif.
+:- endif.
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
 % % :- '$set_source_module'(mpred_type_args).
 

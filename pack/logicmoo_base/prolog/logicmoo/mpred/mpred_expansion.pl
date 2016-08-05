@@ -53,7 +53,7 @@
 % clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2,  (==>)/1,  (==>)/2, (<-)/1,  (<-)/2, (<==>)/2, fact/1
 %
 */
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_expansion,
           [ a/2,
             acceptable_xform/2,
@@ -161,7 +161,7 @@
          try_expand_head/3,
          is_elist_functor/1
           ]).
-%:- endif.
+:- endif.
 
 :- meta_predicate 
    % mpred_expansion

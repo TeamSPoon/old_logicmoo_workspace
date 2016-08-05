@@ -12,7 +12,7 @@
 
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_stubs_file_module,
           [ 
 agenda_rescan_mpred_props/0,
@@ -72,7 +72,7 @@ wff_check_mpred_t_throw/1,
 mpred_stubs_file/0
           ]).
 
-%:- endif.
+:- endif.
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -730,7 +730,7 @@ mpred_t_storage_op(Op,(:-(Body))):-!,loop_check(mpred_op(Op,(:-(Body))),true),!.
 
 % HOOK for ISA alt-forms
 mpred_t_storage_op(_,isa(_,_)):- !,fail. % <- keeps u out of isa hybrids hairs
-mpred_t_storage_op(Op,X):- was_isa(X,I,C),!,mpred_op(Op,isa(I,C)).
+mpred_t_storage_op(Op,X):- was_mpred_isa(X,I,C),!,mpred_op(Op,isa(I,C)).
 
 % HOOK MOST ALL CALLS
 mpred_t_storage_op(Op,HeadBodyI):- hotrace(((expand_term(HeadBodyI,HeadBodyM)),HeadBodyI\=@=HeadBodyM)),!,mpred_t_storage_op(Op,HeadBodyM).

@@ -1,5 +1,5 @@
 
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(common_logic_kb_hooks,
  [kbp_t/1,with_el_holds_disabled/1,noGenlPreds/1,cyckb_t/3,link_to_holds2/2,
    assert_next_queue/1,
@@ -57,7 +57,7 @@ noGenlPreds/1,
   with_kb_assertions_matching/3,
   write_assertions/0
   ]).
-%:- endif.
+:- endif.
 
 % :- dynamic_multifile kbp_t_list_prehook/2.
 % % :- '$set_source_module'(common_logic_kb_hooks).
