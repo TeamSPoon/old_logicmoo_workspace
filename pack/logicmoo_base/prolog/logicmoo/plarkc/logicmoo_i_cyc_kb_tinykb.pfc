@@ -16,7 +16,7 @@
 % ===================================================================
 % OPERATOR PRECEDANCE
 % ===================================================================
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
+:- if(current_prolog_flag(logicmoo_modules,default)).
 :- module(plarkc_cyc_kb_tinykb,[]).
 :- endif.
 

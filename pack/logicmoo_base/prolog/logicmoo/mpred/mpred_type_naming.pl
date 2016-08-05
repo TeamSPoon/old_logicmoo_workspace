@@ -9,7 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_naming.pl
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_type_naming,
           [ convertOneSpawnArg/4,
             convertSpawnArgs/4,
@@ -42,7 +42,7 @@
 
 
 :- include('mpred_header.pi').
-:- endif.
+%:- endif.
 
 :- decl_shared(genls/2).
 

@@ -4,18 +4,18 @@
 % Douglas Miles
 
 */
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
-:- module(logicmoo_base_file,[]).
+:- if(( system:use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
+:- module(logicmoo_base_file,[]).
 % restore entry state
-:- lmce:reset_modules.
+:- lcme:reset_modules.
 
 
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_supp.pl')).
+:- use_module(system:library('logicmoo/util/logicmoo_util_supp.pl')).
 :- endif.
 
-:- ensure_loaded(library(logicmoo_utils)).
+:- use_module(library(logicmoo_utils)).
 
 /*
 % baseKB:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
@@ -58,12 +58,12 @@ baseKB:mpred_skipped_module(eggdrop).
 % DBASE_T System
 % ================================================    
 
-:-ensure_loaded(library('logicmoo/mpred/mpred_at_box.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_expansion.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_loader.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_pfc.pl')). % except([op(_,_,_)]).
-:-ensure_loaded(library('logicmoo/mpred/mpred_prolog_file.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_props.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_at_box.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_expansion.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_loader.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_pfc.pl'),except([op(_,_,_)])).
+:-use_module(system:library('logicmoo/mpred/mpred_prolog_file.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_props.pl')).
 
 :-multifile( baseKB:predicateConventionMt/2).
 :-dynamic( baseKB:predicateConventionMt/2).
@@ -73,47 +73,47 @@ baseKB:mpred_skipped_module(eggdrop).
 :-dynamic( baseKB:argsQuoted/1).
 
 
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_isa.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_kb_ops.pl')).
-:- dynamic(lmcache:loaded_external_kbs/1).
-:- dynamic(baseKB:mpred_skipped_module/1).
+:-use_module(system:library('logicmoo/mpred/mpred_type_isa.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_kb_ops.pl')).
+:- kb_dynamic(lmcache:loaded_external_kbs/1).
+:- kb_dynamic(baseKB:mpred_skipped_module/1).
 
 
-:-ensure_loaded(library('logicmoo/mpred/mpred_agenda.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_storage.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_userkb.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_agenda.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_storage.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_userkb.pl')).
 :- dynamic(baseKB:argsQuoted/1).
 :- dynamic(baseKB:resolveConflict/1).
 :- dynamic(baseKB:agent_call_command/2).
 :- baseKB:import(baseKB:agent_call_command/2).
 
-:-ensure_loaded(library('logicmoo/snark/common_logic_sexpr.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_listing.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_stubs.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_constraints.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_naming.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_wff.pl')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_args.pl')).
+:-use_module(system:library('logicmoo/snark/common_logic_sexpr.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_listing.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_stubs.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_type_constraints.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_type_naming.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_type_wff.pl')).
+:-use_module(system:library('logicmoo/mpred/mpred_type_args.pl')).
 
-% :-ensure_loaded(library('logicmoo/mpred/mpred_*.pl')).
+% :-use_module(system:library('logicmoo/mpred/mpred_*.pl')).
 
-:-ensure_loaded(library('logicmoo/snark/common_logic_snark.pl')). %except([op(_,_,_)]).
-:-ensure_loaded(library('logicmoo/mpred/mpred_hooks.pl')).
+:-use_module(system:library('logicmoo/snark/common_logic_snark.pl'),except([op(_,_,_)])).
+:-use_module(system:library('logicmoo/mpred/mpred_hooks.pl')).
 
-:-ensure_loaded(library('logicmoo/snark/common_logic_boxlog.pl')).
-:-ensure_loaded(library('logicmoo/snark/common_logic_skolem.pl')).
-:-ensure_loaded(library('logicmoo/snark/common_logic_kb_hooks.pl')).
-:-ensure_loaded(library('logicmoo/snark/common_logic_compiler.pl')). % ,except([op(_,_,_)])). % ,arity/2,mpred_is_tracing_exec/0, (~)/1
+:-use_module(system:library('logicmoo/snark/common_logic_boxlog.pl')).
+:-use_module(system:library('logicmoo/snark/common_logic_skolem.pl')).
+:-use_module(system:library('logicmoo/snark/common_logic_kb_hooks.pl')).
+:-use_module(system:library('logicmoo/snark/common_logic_compiler.pl'),except([op(_,_,_)])). % ,arity/2,mpred_is_tracing_exec/0, (~)/1
 
 
 
-:-ensure_loaded(library('logicmoo/mpred_online/mpred_www.pl')).
+:-use_module(system:library('logicmoo/mpred_online/mpred_www.pl')).
 
 
 
 
 :- thread_local t_l:side_effect_ok/0.
-:- lmce:reset_modules.
+:- lcme:reset_modules.
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
 :- enable_mpred_expansion.
@@ -257,4 +257,4 @@ system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),no
 % :- set_prolog_flag(read_attvars,false).
 :- set_prolog_flag(mpred_te,false).
 
-:- lmce:reset_modules.
+:- lcme:reset_modules.

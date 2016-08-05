@@ -46,7 +46,10 @@
 ttTypeType(col_as_isa).
 ttTypeType(col_as_unary).
 ttTypeType(col_as_static).
+col_as_unary(col_as_isa).
+col_as_unary(col_as_unary).
 col_as_unary(col_as_static).
+col_as_unary(argsQuoted).
 col_as_unary(tPred).
 
 %col_as_isa(mtProlog).
@@ -128,11 +131,9 @@ ttPredType(X)==>completelyAssertedCollection(X).
 arity(comment,2).
 
 :- dynamic(decided_not_was_isa/2).
-/*
 :- kb_dynamic(baseKB:mtCycL/1).
 :- kb_dynamic(baseKB:mtExact/1).
 :- kb_dynamic(baseKB:predicateConventionMt/2).
-*/
 :- dynamic(baseKB:mtCycL/1).
 :- dynamic(baseKB:mtExact/1).
 :- dynamic(baseKB:predicateConventionMt/2).
@@ -222,18 +223,9 @@ alwaysGaf(alwaysGaf).
 alwaysGaf(pfcRHS).
 alwaysGaf(pfcLHS).
 
-:- mpred_notrace_exec.
 
-% tCol(C)/atom(C)==> functorDeclares(C), ~tRelation(C),{nop(decl_type_unsafe(C)), nop(kb_dynamic(C/1)),\+ ttExpressionType(C)},tSet(C).
-
-/*
-Unneeded yet
-
-ttExpressionType(C)==>col_as_unary(C).
-col_as_unary(C)==> \+ col_as_isa(C).
-col_as_isa(C)==> \+ col_as_unary(C).
-col_as_isa(C)/( is_never_type(C) ; decided_not_was_isa(C,W)) ==> (conflict((col_as_isa(C)/( decided_not_was_isa(C,W);is_never_type(C))))).
-*/
+tSet(A)/atom(A)==> tCol(A),{decl_type_unsafe(A), kb_dynamic(A/1)}.
+% tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
 
 tCol(tCol).
 tCol(tPred).
@@ -258,17 +250,19 @@ arity(xyzFn,4).
 arity(arity,2).
 arity(is_never_type,1).
 arity(argIsa, 3).
+arity(Prop,1):- cwc, clause_b(ttPredType(Prop)).
 arity(meta_argtypes,1).
 arity(arity,2).
 arity(is_never_type,1).
 arity(prologSingleValued,1).
 arity('<=>',2).
-arity(F,A):- cwc, freeze(F,call_u(tRelation(F))), is_ftNameArity(F,A), current_predicate(F/A),A>1.
-arity(F,1):- cwc, freeze(F,(call_u(tRelation(F)),\+ call_u(tCol(F)))), is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(Z,1))), call_u(arity(F,Z)))).
+arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
+arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(Z,1))), arity(F,Z))).
 
 % mtCycL(baseKB).
 
 tCol(ttModule).
+arity(tCol,1).
 
 tCol(ttModule,mudToCyc('MicrotheoryType')).
 
@@ -332,8 +326,6 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
     },
    (CL))).
 
-(tCol(Col),arity(Col,1))==>warn_arity(Col).
-
 
 %:- kb_dynamic(hybrid_support/2).
 %prologBuiltin(resolveConflict/1).
@@ -349,10 +341,10 @@ bt(P,_)/nonvar(P) ==> (P:- mpred_bc_only(P)).
 % ((mpred_mark(_,F,A)/(A\=0)) ==> {shared_multifile(F/A)}).
 
 
-%(pass2,pfcControlled(X)/get_pifunctor(X,C))==>({nop(kb_dynamic(C)),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
+(pass2,pfcControlled(X)/get_pifunctor(X,C))==>({kb_dynamic(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
 %pfcControlled(X)/get_pifunctor(X,C)==>({shared_multifile(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
 
-%(pass2,prologHybrid(X)/get_pifunctor(X,C))==>({\+ is_static_predicate(C), shared_multifile(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
+(pass2,prologHybrid(X)/get_pifunctor(X,C))==>({\+ is_static_predicate(C), shared_multifile(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
 %prologHybrid(X)/get_pifunctor(X,C)==>({\+ is_static_predicate(C), kb_dynamic(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
 
 
@@ -389,7 +381,7 @@ mpred_mark(pfcBcTrigger,F, A)==>marker_supported(F,A).
 mpred_mark(pfcRHS,F, A)==>marker_supported(F,A).
 mpred_mark(pfcLHS,F, A)==>arity(F,A),prologMacroHead(F).
 mpred_mark(pfcCreates,F, A)==>
-  {functor(P,F,A),make_dynamic(P), nop(kb_dynamic(P)),
+  {functor(P,F,A),make_dynamic(P),kb_dynamic(P),
     create_predicate_istAbove(abox,F,A)},
     marker_supported(F,A).
 
@@ -418,7 +410,7 @@ mpred_mark_C(G) ==> {map_mpred_mark_C(G)}.
 map_mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),ain([isa(F,pfcControlled),arity(F,A)]))),G).
 mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfcControlled(F).
 
-% (hybrid_support(F,A) ==>{\+ is_static_predicate(F/A), must(nop(kb_dynamic(F/A)))}).
+% (hybrid_support(F,A) ==>{\+ is_static_predicate(F/A), must(kb_dynamic(F/A))}).
 
 
 %:- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
@@ -497,6 +489,7 @@ tCol(Decl)==>functorDeclares(Decl).
  ttModule(mtProlog,comment("Real Prolog modules loaded with :-use_module/1 such as 'lists' or 'apply'"),
   genls(tMicrotheory))).
 
+:- sanity(arity(ttModule,1)).
 :- sanity(functorDeclares(ttModule)).
 :- sanity(\+ arity(ttModule,3)).
 :- sanity(\+ predicate_property(ttModule(_,_,_),_)).
@@ -529,6 +522,7 @@ genls(mtCore,tMicrotheory).
 mtCycL(O)==>({call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
 
 :- sanity(functorDeclares(ttModule)).
+:- sanity(arity(ttModule,1)).
 
 :- sanity(\+ arity(ttModule,3)).
 :- sanity(\+ predicate_property(ttModule(_,_,_),_)).
@@ -592,10 +586,7 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 
 % :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
 
-/*
-Unneeded yet
 :-ain(pass2).
-*/
 
 % :- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
 

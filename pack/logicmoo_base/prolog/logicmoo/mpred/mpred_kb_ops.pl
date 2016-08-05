@@ -12,7 +12,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_kb_ops.pl
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_kb_ops,
           [ deducedSimply/1,
 
@@ -266,7 +266,7 @@ attvar_op/2,
 mpred_facts_and_universe/1
             
           ]).
-:- endif.
+%:- endif.
 
 :- module_transparent retract_mu/1,
                assert_mu/4,
@@ -1833,7 +1833,7 @@ pfcBC_Cache(F) :- mpred_call_only_facts(pfcBC_Cache,F),
 %
 maybeSupport(P,_):-mpred_ignored(P),!.
 maybeSupport(P,S):-( \+ ground(P)-> true;
-  (predicate_property(P,dynamic)->mpred_post(P,S);true)).
+  (predicate_property(P,dynamic)->mpred_ain(P,S);true)).
 
 
 %% mpred_ignored( :TermC) is semidet.

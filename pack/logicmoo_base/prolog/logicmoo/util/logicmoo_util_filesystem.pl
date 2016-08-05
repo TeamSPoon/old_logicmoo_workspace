@@ -151,7 +151,7 @@
 :- else.
 :- include('logicmoo_util_header.pi').
 :- endif.
-:- ensure_loaded('logicmoo_util_no_repeats').
+
 
 :- if(exists_source(library(filesex))).
 %:- set_prolog_flag(generate_debug_info, true).=

@@ -165,8 +165,8 @@
 			<F
 				N="../logicmoo_base/*.*"
 				Recurse="1"
-				Refilter="0"
-				Excludes=".git/;*.*~;*~/;.*/"/>
+				Refilter="1"
+				Excludes=".git/;.svn/;*~/;.*/"/>
 		</Folder>
 		<Folder Name="../logicmoo_nlu">
 			<Folder Name="prolog">

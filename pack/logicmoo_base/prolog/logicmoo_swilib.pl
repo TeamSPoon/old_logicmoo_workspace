@@ -15,11 +15,11 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
-:- module(logicmoo_swilib,[]).
+:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
+:- module(logicmoo_swilib,[]).
 % restore entry state
-%:- lmce:reset_modules.
+:- lcme:reset_modules.
 
 
 % ======================================================
@@ -234,14 +234,13 @@ system:'$term_in_file'(In, Read, RLayout, Term, TLayout, Stream, Parents, Option
 
 
 
-
-:- forall((expand_file_search_path(swi('library/*.pl'),O),expand_file_name(O,S),member(M,S)),
+:- forall(filematch(swi(('library/*.pl')),M),
  ignore((
    \+ (member(C,['/terms.pl','/backcomp.pl','/r.pl','/index.pl',rdf,pengi,win_men,swicli,'swicli.pl',
      swicffi,quintus,solution_sequences,metaterm,coind,drac,'INDEX',
-     jpl,nb_set,yall,settings]), atomic_list_concat([_,_|_],C,M)),
-   \+ (member(C,[persistency,chr,rewrite,bdb,check,xpath,record]),atomic_list_concat([_,_|_],C,M)),
-   catch(system:use_module(M,except([op(_,_,_)])),E,(ddmsg(E),trace))))).
+     jpl,nb_set,yall,settings]), atom_contains(M,C)),
+   \+ (member(C,[persistency,chr,rewrite,bdb,check,xpath,record]),atom_contains(M,C)),
+   catch(system:use_module(M,except([op(_,_,_)])),E,(wdmsg(E),trace))))).
 
 :- include(library(pldoc/hooks)).
 
@@ -293,7 +292,7 @@ system:'$term_in_file'(In, Read, RLayout, Term, TLayout, Stream, Parents, Option
    functor(PI,F,A),import(F/A),fail)).
 */
 
-:- lmce:reset_modules.
+:- lcme:reset_modules.
 
 :- autoload.
 

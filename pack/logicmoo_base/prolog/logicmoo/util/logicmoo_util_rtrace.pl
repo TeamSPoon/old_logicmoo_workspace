@@ -315,9 +315,7 @@ rtrace(Goal):-
 */
 :- '$set_predicate_attribute'(hotrace(_), trace, 0).
 :- '$set_predicate_attribute'(hotrace(_), hide_childs, 1).
-:- '$set_predicate_attribute'(notrace(_), trace, 0).
-:- '$set_predicate_attribute'(notrace(_), hide_childs, 1).
-:- '$set_predicate_attribute'(rtrace(_), trace, 0).
+:- '$set_predicate_attribute'(rtrace(_), trace, 1).
 :- '$set_predicate_attribute'(rtrace(_), hide_childs, 0).
 :- '$set_predicate_attribute'(rtrace, trace, 0).
 :- '$set_predicate_attribute'(rtrace, hide_childs, 1).
@@ -327,7 +325,7 @@ rtrace(Goal):-
 :- '$set_predicate_attribute'(pop_tracer, hide_childs, 1).
 :- '$set_predicate_attribute'(tlbugger:rtracing, trace, 0).
 :- '$set_predicate_attribute'(system:tracing, trace, 0).
-:- '$set_predicate_attribute'(system:notrace, trace, 0).
+:- '$set_predicate_attribute'(system:hotrace, trace, 0).
 :- '$set_predicate_attribute'(system:trace, trace, 0).
 %= :- meta_predicate  ftrace(0).
 
@@ -351,23 +349,23 @@ ftrace(Goal):- restore_trace((
 % :- mpred_trace_less(nortrace/0).
 % :- mpred_trace_less(rtrace/0).
 
-:- unlock_predicate(system:notrace/1).
-% :- mpred_trace_less(system:notrace/1).
+:- unlock_predicate(system:hotrace/1).
+% :- mpred_trace_less(system:hotrace/1).
 :- '$set_predicate_attribute'(hotrace(_), trace, 0).
 %:- '$set_predicate_attribute'(hotrace(_), hide_childs, 1).
 % :- if_may_hide('$set_predicate_attribute'(hotrace(_), trace, 0)).
-% :- if_may_hide('$set_predicate_attribute'(system:notrace(_), hide_childs, 1)).
-% :- if_may_hide('$set_predicate_attribute'(system:notrace(_), trace, 0)).
-:- lock_predicate(system:notrace/1).
+% :- if_may_hide('$set_predicate_attribute'(system:hotrace(_), hide_childs, 1)).
+% :- if_may_hide('$set_predicate_attribute'(system:hotrace(_), trace, 0)).
+:- lock_predicate(system:hotrace/1).
 
 % :- mpred_trace_childs(hotrace/1).
 
 % :- mpred_trace_none(system:trace/0).
-% :- mpred_trace_none(system:notrace/0).
+% :- mpred_trace_none(system:hotrace/0).
 
 % :- mpred_trace_none(system:tracing/0).
 
-%:- ( listing(hotrace/1),redefine_system_predicate(system:notrace(_)), mpred_trace_none(hotrace(0)) ).
+%:- ( listing(hotrace/1),redefine_system_predicate(system:hotrace(_)), mpred_trace_none(hotrace(0)) ).
 % :- if_may_hide('$set_predicate_attribute'(hotrace(_), trace, 0)).
 % :- if_may_hide('$set_predicate_attribute'(hotrace(_), hide_childs, 1)).
 

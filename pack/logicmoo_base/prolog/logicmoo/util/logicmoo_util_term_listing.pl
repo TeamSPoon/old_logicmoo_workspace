@@ -255,7 +255,7 @@ blob_info(A,blob(T),blob(A,T)).
 
 :- export(tlbugger:saved_current_atom/2).
 :- dynamic(tlbugger:saved_current_atom/2).
-:- export(new_atoms/2).
+:- export(tlbugger:new_atoms/2).
 
 %= 	 	 
 

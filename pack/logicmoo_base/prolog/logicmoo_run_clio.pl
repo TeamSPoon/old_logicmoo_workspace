@@ -7,11 +7,11 @@
 % Dec 13, 2035
 %
 */
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
 :- endif.
 :- module(logicmoo_run_clio,[]).
 % restore entry state
-:- lmce:reset_modules.
+:- lcme:reset_modules.
 
 % :- use_module(logicmoo_base).
 

@@ -859,11 +859,8 @@ module_predicates_are_exported0(ModuleName):-
       not(member(F/A,List))), Private),
    module_predicates_are_not_exported_list(ModuleName,Private).
 
-:- export(export_if_noconflict_mfa/2).
-:- export(export_if_noconflict_mfa/3).
+:- export(export_if_noconflict/2).
 :- module_transparent(export_if_noconflict/2).
-:- module_transparent(export_if_noconflict_mfa/2).
-:- module_transparent(export_if_noconflict_mfa/3).
 
 %= 	 	 
 
@@ -871,22 +868,11 @@ module_predicates_are_exported0(ModuleName):-
 %
 % Export If Noconflict.
 %
-
-system:export_if_noconflict(M,FA):- export_if_noconflict_mfa(M,FA).
-
-export_if_noconflict_mfa(SM,Var):- var(Var),throw(var(export_if_noconflict_mfa(SM,Var))).
-export_if_noconflict_mfa(_,  M:FA):-!,export_if_noconflict_mfa(M,FA).
-export_if_noconflict_mfa(SM,(A,B)):-!,export_if_noconflict_mfa(SM,A),export_if_noconflict_mfa(SM,B).
-export_if_noconflict_mfa(SM,[A]):-  !,export_if_noconflict_mfa(SM,A).
-export_if_noconflict_mfa(SM,[A|B]):-!,export_if_noconflict_mfa(SM,A),export_if_noconflict_mfa(SM,B).
-export_if_noconflict_mfa(SM,F/A):- !,export_if_noconflict_mfa(SM,F,A).
-export_if_noconflict_mfa(SM,P):-functor(P,F,A),export_if_noconflict_mfa(SM,F,A).
-
-export_if_noconflict_mfa(M,F,A):- current_module(M2),M2\=M,module_property(M2,exports(X)),
-   member(F/A,X),ddmsg(skipping_export(M2=M:F/A)),!,
+export_if_noconflict(M,F/A):- current_module(M2),M2\=M,module_property(M2,exports(X)),
+   member(F/A,X),dmsg(skipping_export(M2=M:F/A)),!,
    must(M:export(M:F/A)),
    ((M2==system;M==baseKB)->true;must(M2:import(M:F/A))).
-export_if_noconflict_mfa(M,F,A):-M:export(F/A).
+export_if_noconflict(M,F/A):-M:export(F/A).
 
 % module_predicates_are_not_exported_list(ModuleName,Private):- once((length(Private,Len),dmsg(module_predicates_are_not_exported_list(ModuleName,Len)))),fail.
 
@@ -964,5 +950,5 @@ quiet_all_module_predicates_are_transparent(ModuleName):-
 :- multifile(user:term_expansion/2).
 :- dynamic(user:term_expansion/2).
 :- module_transparent(user:term_expansion/2).
-user:term_expansion( (:-export(FA) ),(:- export_if_noconflict(M,FA))):- prolog_load_context(module,M).
+user:term_expansion( (:-export(F/A) ),(:- export_if_noconflict(M,F/A))):- atom(F), prolog_load_context(module,M).
 

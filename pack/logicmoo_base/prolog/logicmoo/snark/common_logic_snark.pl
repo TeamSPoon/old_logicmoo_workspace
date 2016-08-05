@@ -9,7 +9,7 @@
 */
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(common_logic_snark,
           [ add_nesc/2,
             add_poss/2,
@@ -124,7 +124,7 @@
           op(500,yfx,'v')
            
           ]).
-:- endif.
+%:- endif.
 
 :-
             op(1150,fx,(was_dynamic)),
@@ -1387,7 +1387,7 @@ kif_ask_sent(Wff):-
    kif_add_boxes1(Why,QueryAsserts),!,
    call_cleanup(
      kif_ask(Query),
-     find_and_call(retractall_wid(Why))).
+     retractall_wid(Why)).
 
 
 :- public(kif_ask/1).

@@ -198,7 +198,7 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
 
-kb_dynamic_m(E):- with_source_module(baseKB,ignore(decl_shared(kb_dynamic,E))).
+kb_dynamic_m(E):- with_source_module(baseKB,decl_shared(kb_dynamic,E)).
 
 :- multifile(baseKB:predicateConventionMt/2).
 :- dynamic(baseKB:predicateConventionMt/2).
@@ -206,7 +206,7 @@ kb_dynamic_m(E):- with_source_module(baseKB,ignore(decl_shared(kb_dynamic,E))).
 % :- kb_dynamic(mpred_online:semweb_startup/0).
 
 % :- baseKB:base_kb_pred_list([A,B|_List]),rtrace(call(must_maplist(kb_dynamic_m,[A,B]))).
-% :- baseKB:base_kb_pred_list(List),call(must_maplist(kb_dynamic_m,List)).
+:- baseKB:base_kb_pred_list(List),call(must_maplist(kb_dynamic_m,List)).
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -228,9 +228,9 @@ kb_dynamic_m(E):- with_source_module(baseKB,ignore(decl_shared(kb_dynamic,E))).
       resolverConflict_robot(+).
 
 
-:- dynamic(arity/2).
-:- forall(between(1,11,A),dynamic(t/A)).
-:- dynamic(meta_argtypes/1).
+:- kb_dynamic(arity/2).
+:- forall(between(1,11,A),kb_dynamic(t/A)).
+:- kb_dynamic(meta_argtypes/1).
 
 %:- import_module_to_user(logicmoo_user).
 
@@ -471,7 +471,7 @@ never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
 %:- rtrace.
 %:- dtrace.
 %:- ignore(delete_import_module(baseKB,user)).
-%% UNDO % :- add_import_module(baseKB,lmcode,start).
+%:- add_import_module(baseKB,lmcode,start).
 %:- nortrace.
 %:- cnotrace.
 

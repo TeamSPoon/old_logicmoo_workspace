@@ -50,7 +50,7 @@ system:scce_orig(Setup,Goal,Cleanup):-
 :- endif.
 
 :- if(\+ current_predicate(system:nop/1)).
-:- system:ensure_loaded(system:logicmoo_util_supp).
+:- system:ensure_loaded(systyem:logicmoo_util_supp).
 :- endif.
 
 

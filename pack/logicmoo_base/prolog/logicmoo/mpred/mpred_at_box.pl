@@ -15,7 +15,8 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if(( false, \+ ((current_prolog_flag(logicmoo_include,Call),Call)))). 
+% :- if((\+ current_prolog_flag(common_logic_at_box_true,true),set_prolog_flag(common_logic_at_box_true,true))).
+%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
 :- module(mpred_at_box,[
          assert_setting01/1,
          create_predicate_istAbove/3,
@@ -73,7 +74,6 @@
 
          which_file/1
     ]).
-:- endif.
 
 :- module_transparent((         baseKB_hybrid_support/2,
          uses_predicate/2,
@@ -94,6 +94,7 @@
 
 :-dynamic(unused_predicate/4).
 
+%:- endif.
 :- set_prolog_flag(retry_undefined,false).
 
 :- include('mpred_header.pi').
@@ -108,7 +109,7 @@ user_m_check(_Out).
 
 :- meta_predicate transitive_path(2,*,*).
 
-:- ensure_loaded(mpred_pfc).
+:- use_module(mpred_pfc).
 
 % add_abox_module(baseKB):-!.
 add_abox_module(ABox):- must(atom(ABox)),
@@ -269,7 +270,7 @@ defaultAssertMt(ABox):- (t_l:current_defaultAssertMt(BBox);fileAssertMt(BBox))->
 %
 % not just user modules
 fileAssertMt(ABox):- nonvar(ABox), fileAssertMt(ABoxVar),!,ABox=@=ABoxVar.
-fileAssertMt(Module):- mpred_loader:(loading_source_file(File),get_file_type(File,pfc)),prolog_load_context(module,Module),Module\==user.
+fileAssertMt(Module):- loading_source_file(File),get_file_type(File,pfc),prolog_load_context(module,Module),Module\==user.
 fileAssertMt(ABox):- 
   (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);'$current_typein_module'(ABox)),mtCanAssert(ABox)))),!.
@@ -287,7 +288,7 @@ mtCanAssert(abox):- !,dumpST,fail.
 mtCanAssert(Module):- clause_b(mtCycL(Module)).
 mtCanAssert(Module):- clause_b(mtExact(Module)).
 mtCanAssert(Module):-  module_property(Module,file(_)),!,fail.
-mtCanAssert(Module):- mpred_loader:(loading_source_file(File),get_file_type(File,pfc),prolog_load_context(module,Module)).
+mtCanAssert(Module):- loading_source_file(File),get_file_type(File,pfc),prolog_load_context(module,Module).
 mtCanAssert(Module):- clause_b(mtProlog(Module)),!,fail.
 mtCanAssert(_).
 
@@ -310,9 +311,9 @@ makeConstant(_Mt).
 %:- (system:dtrace, rtrace, dtrace,cls ).
 %:- (dbreak,cnotrace,nortrace).
 
-% :- export(get_current_default_tbox/1).
-system:get_current_default_tbox(TBox):- defaultAssertMt(ABox),clause(ABox:defaultTBoxMt(TBox),B),B,!.
-system:get_current_default_tbox(baseKB).
+
+get_current_default_tbox(TBox):- defaultAssertMt(ABox),clause(ABox:defaultTBoxMt(TBox),B),B,!.
+get_current_default_tbox(baseKB).
 
 %% set_defaultAssertMt( ?ABox) is semidet.
 %
@@ -325,7 +326,7 @@ set_defaultAssertMt(ABox):-
     asserta_new(TBox:mtCycL(ABox)),
     asserta_new(ABox:defaultTBoxMt(TBox)),
     assert_setting(t_l:current_defaultAssertMt(ABox)),
-    mpred_pfc:ensure_abox(ABox),
+    ensure_abox(ABox),
     '$set_source_module'(ABox),
     '$set_typein_module'(ABox),
     nop(inherit_into_module(ABox,TBox))))),
@@ -749,8 +750,8 @@ retry_undefined(CallerMt,F,A):-
        (PredMt:ensure_loaded(PredMt:File),add_import_module(CallerMt,PredMt,start))),!.
 */
 
-%retry_undefined(PredMt:must/1) % UNDO % :- add_import_module(PredMt,logicmoo_util_catch,start),!.
-%retry_undefined(PredMt:debugm/2) % UNDO % :- add_import_module(PredMt,logicmoo_util_dmsg,start),!.
+%retry_undefined(PredMt:must/1) :- add_import_module(PredMt,logicmoo_util_catch,start),!.
+%retry_undefined(PredMt:debugm/2) :- add_import_module(PredMt,logicmoo_util_dmsg,start),!.
 
 
 :- module_transparent(make_shared_multifile/3).

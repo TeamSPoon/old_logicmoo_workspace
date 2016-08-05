@@ -194,7 +194,7 @@ relationMostInstance(BP,TCol,_)==>ptBinaryPredicate(BP),tCol(TCol).
 relationMostInstance(Pred,Type,Value) ==> mdefault(isa(Inst,Type) ==> t(Pred,Inst,Value)).
 % relationMostInstance(Pred,Type,Value) ==> mdefault( isa(Inst,Type) ==> ?Pred(Inst,Value) ).
 
-% ptBinaryPredicate(P)<==>(tPred(P),arity(P,2)).
+ptBinaryPredicate(P)<==>(tPred(P),arity(P,2)).
 
 prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
 relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
