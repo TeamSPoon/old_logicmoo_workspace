@@ -1387,7 +1387,7 @@ kif_ask_sent(Wff):-
    kif_add_boxes1(Why,QueryAsserts),!,
    call_cleanup(
      kif_ask(Query),
-     retractall_wid(Why)).
+     find_and_call(retractall_wid(Why))).
 
 
 :- public(kif_ask/1).

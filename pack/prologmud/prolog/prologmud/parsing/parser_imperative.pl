@@ -1,6 +1,6 @@
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
-:- module(parser_imperative, []).
-:- endif.
+%:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+%:- module(parser_imperative, []).
+%:- endif.
 /* module
 % Imperitive Sentence Parser (using DCG)
 %

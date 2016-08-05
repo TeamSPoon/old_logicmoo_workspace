@@ -1,6 +1,6 @@
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+%:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(simple_decl_parser, []).
-:- endif.
+%:- endif.
 
 /* module
 % an example of simple parsing of an inform7 like language.

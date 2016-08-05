@@ -2691,7 +2691,7 @@ traceIf(_Call):-!.
 traceIf(Call):-ignore((Call,dtrace)).
 
 %getWordTokens(WORDS,TOKENS):-concat_atom(TOKENS,' ',WORDS).
-is_string(S):- string(S).
+is_string(S):- pce_expansion:is_string(S).
 
 
 

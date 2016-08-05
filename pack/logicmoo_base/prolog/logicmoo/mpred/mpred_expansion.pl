@@ -850,6 +850,7 @@ is_parse_type('pkif'(NV)):-nonvar(NV).
 % db_expand_final(Op,Sent,Sent):- Sent=..[_,A],atom(A),!.
 db_expand_final(_ ,NC,NC):-as_is_term(NC),!.
 db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
+db_expand_final(_,In,In):- (In=@=t(_);In=@=t(_,_,_);In=@=t(_,_,_,_);In=@=t(_,_,_,_,_);In=@=t(_,_,_,_,_,_)),!.
 %db_expand_final(_,PARSE,ISA):- PARSE=..[t,C,I],atom(C),atom(I),ISA=..[C,I],!.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),(not_ftCompound(T)),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
@@ -996,8 +997,10 @@ db_expand_0(Op,pkif(SentI),SentO):- nonvar(SentI),!,must((any_to_string(SentI,Se
   fully_expand_clause_now(Op,SentM,SentO))).
 db_expand_0(_Op,kif(Sent),SentO):- nonvar(Sent),!, must(expand_kif_string(Sent,SentO)).
 
-db_expand_0(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause_now(Op,SentM,SentO).
-db_expand_0(Op,M:Sent,SentO):- is_stripped_module(M),!,db_expand_0(Op,Sent,SentO).
+db_expand_0(Op,Sent,SentO):- string(Sent),((expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause_now(Op,SentM,SentO));SentO=Sent),!.
+db_expand_0(Op,M:Sent,SentO):- db_expand_0(Op,Sent,SentM),!,(is_stripped_module(M)->SentM=SentO;SentO=M:SentM).
+
+%db_expand_0(_,isa(I,C),SentO):- atom(C),SentO=..[C,I].
 db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.
 
 

@@ -137,7 +137,7 @@ pp_items(Type,H) :- ignore(pp_item(Type,H)).
 %
 pp_item(_M,H):-pp_filtered(H),!.
 pp_item(MM,(H:-B)):- B ==true,pp_item(MM,H).
-pp_item(MM,H):- flag(show_asserions_offered,X,X+1),get_print_mode(html), ( \+ \+ if_defined(pp_item_html(MM,H))),!.
+pp_item(MM,H):- flag(show_asserions_offered,X,X+1),find_and_call(get_print_mode(html)), ( \+ \+ if_defined(pp_item_html(MM,H))),!.
 
 
 pp_item(MM,spft(W0,U,ax)):- W = (_KB:W0),!,pp_item(MM,U:W).

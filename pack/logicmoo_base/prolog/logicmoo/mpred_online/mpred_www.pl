@@ -8,6 +8,7 @@
 %
 */
 % :-module(mpred_www,[ensure_webserver/0,search4term/0]).
+%:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(mpred_www,
           [ action_menu_applied/3,
             action_menu_item/2,
@@ -157,7 +158,7 @@
             user:file_search_path/2
             */
           ]).
-
+% :- endif. 
  :- meta_predicate 
         edit1term(0),
         handler_logicmoo_cyclone(+),
@@ -177,8 +178,8 @@
    foobar/1, lmcache:last_http_request/1, lmcache:last_item_offered/1, system:'$init_goal'/3, user:file_search_path/2)).
 
 %:- include(logicmoo(mpred/'mpred_header.pi')).
-:- system:use_module(library(logicmoo_utils)).
-:- system:use_module(library(logicmoo_swilib)).
+%:- ensure_loaded(library(logicmoo_utils)).
+%:- ensure_loaded(library(logicmoo_swilib)).
 
 
 :-
@@ -864,7 +865,7 @@ as_ftVars(N='$VAR'(N)):-atomic(N),!.
 as_ftVars(_N=_V).
 as_ftVars(_).
 
-% :- system:use_module(library(logicmoo/util/logicmoo_util_varnames)).
+% :- ensure_loaded(library(logicmoo/util/logicmoo_util_varnames)).
 
 % :- use_listing_vars.
 
@@ -1791,7 +1792,146 @@ section_open(Type):-  once(shown_subtype(Type)->true;((get_print_mode(html)->for
 %
 section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(get_print_mode(html)->format('</font>\n</pre><hr/><pre>',[]);draw_line));true.
 
+:- export((action_menu_applied/3,
+            action_menu_item/2,
+            add_form_script/0,
+            register_logicmoo_browser/0,
+            as_ftVars/1,
+            call_for_terms/1,
+            classify_alpha_tail/1,
+            classify_name/2,
+            classify_other_tail/1,
+            current_form_var/1,
+            current_line_position/1,
+            current_line_position/2,
+            cvt_param_to_term/2,
+            cvt_param_to_term/3,
+            do_guitracer/0,
+            edit1term/0,
+            edit1term/1,
+            ensure_webserver/1,
+            get_print_mode/1,               
+            ensure_webserver/0,
+            find_cl_ref/2,
+            find_ref/2,
+            fmtimg/2,
+            'functor spec'/4,
+            functor_to_color/2,
+            functor_to_color/4,
+            
+            get_http_current_request/1,
+            get_http_session/1,
+            get_nv_session/3,
+            get_param_req/2,
+            get_param_sess/2,
+            get_param_sess/3,
+            get_request_vars/1,
+            handler_logicmoo_cyclone/1,
+            head_functor_sort/3,
+            must_run/1,
+            human_language/1,
+            i2tml_hbr/3,
+            if_html/2,
+            indent_nbsp/1,
+            indent_nbsp/2,
+            indent_nl/0,
+            is_cgi_stream/0,
+            is_context/2,
+            is_goog_bot/0,
+            'list clauses'/4,
+            'list magic'/2,
+            'list magic'/3,
+            'list magic'/4,
+            logic_lang_name/2,
+            make_page_pretext_obj/1,
+            make_quotable/2,
+            make_session/1,
+            maybe_paren/5,
+            maybe_space/2,
+            member_open/2,
+            merge_key_vals/3,
+            name_the_var/5,
+            nl_same_pos/0,
+            numberlist_at/2,
+            object_sub_page/4,
+            param_default_value/2,
+            param_matches/2,
+            parameter_names/2,
+            partOfSpeech/2,
+            portable_display/1,
+            portable_listing/0,
+            portable_listing/1,
+            portable_print/1,
+            portable_write/1,
+            portable_writeq/1,
+            pp_i2tml/1,
+            pp_i2tml_now/1,
+            pp_i2tml_save_seen/1,
+            pp_i2tml_saved_done/1,
+            pp_i2tml_v/1,
+            pp_item_html/2,
+            pp_item_html_if_in_range/2,
+            pp_item_html_now/2,
+            pp_now/0,
+            print_request/1,
+            prover_name/2,
+            put_string/1,
+            put_string/2,
+            reply_object_sub_page/1,
+            reset_assertion_display/0,
+            return_to_pos/1,
+            rok_portray_clause/1,
+            save_in_session/1,
+            save_in_session/2,
+            save_in_session/3,
+            save_request_in_session/1,
+            search4term/0,
+            search_filter_name_comment/3,
+            section_close/1,
+            section_open/1,
+            sensical_nonvar/1,
+            session_checkbox/3,
+            session_checked/1,
+            set_line_pos/1,
+            set_line_pos/2,
+            show_clause_ref/1,
+            show_clause_ref_now/1,
+            show_edit_term/3,
+               show_http_session/0,
+            show_iframe/1,
+            show_iframe/3,
+            show_pcall_footer/0,
+            show_search_filters/1,
+            show_search_filtersTop/1,
+            term_to_pretty_string/2,
+            this_listing/1,
+            tmw/0,
+            tovl/3,
+            url_decode/2,
+            url_decode_term/2,
+            url_encode/2,
+            url_encode_term/3,
+            with_search_filters/1,
+            with_search_filters0/1,
+            write_VAR/4,
+            write_args/5,
+            write_as_url_encoded/2,
+            write_atom/4,
+            write_atom_link/1,
+            write_atom_link/2,
+            write_atom_link/3,
+            write_begin_html/3,
+            write_end_html/0,
+            write_oper/5,
+            write_out/5,
+            write_out/7,
+            write_tail/2,
+            write_term_to_atom_one/2,
+            write_variable/1,
+          
+          mpred_www_file/0)).
 
+:- export(get_print_mode/1).
 get_print_mode(Text):-thread_self(main),!,Text=text.
 get_print_mode(html).
 
@@ -2828,7 +2968,7 @@ test_bind([X='$VAR'(X)|L]) :-
 
 
 
-%:- endif. 
+
 
 
 :- dynamic user:portray/1.
@@ -2871,7 +3011,7 @@ baseKB:my_portray(A) :- \+compound(A),fail.
 %
 % Optional Sanity Checking test  Primary Helper Primary Helper Primary Helper.
 %
-sanity_test_000:- rok_portray_clause((
+sanity_test_000:- find_and_call((rok_portray_clause((
 pkif :-
 
         [ implies,
@@ -2891,7 +3031,7 @@ pkif :-
               [ex([A]), [isa(A, ftInt), arity(F, A)]]
             ]
           ]
-        ])),nl,nl,nl.
+        ])))),nl,nl,nl.
 
 
 

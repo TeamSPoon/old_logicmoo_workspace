@@ -224,8 +224,10 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 % [Optional] Creates or suppliments a world
 :- set_prolog_flag(dialect_pfc,true).
 
+:- ain(tCol(tLivingRoom)).
 tSet(tRegion).
 tSet(tLivingRoom).
+
 tSet(mobExplorer).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).

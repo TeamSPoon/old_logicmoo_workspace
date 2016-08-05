@@ -556,7 +556,6 @@ prologMacroHead(tCol).
 
 completelyAssertedCollection(prologSingleValued).
 completelyAssertedCollection(tCol).
-completelyAssertedCollection(tCol).
 completelyAssertedCollection(ttExpressionType).
 completelyAssertedCollection(ttValueType).
 completelyAssertedCollection(ttTemporalType).

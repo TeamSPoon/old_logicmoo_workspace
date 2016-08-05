@@ -2369,7 +2369,7 @@ really_mpred_mark(_  ,Type,F,A):- mpred_call_no_bc(mpred_mark(Type,F,A)),!.
 really_mpred_mark(Sup,Type,F,A):- 
   MARK = mpred_mark(Type,F,A),
   check_never_assert(MARK),
-  with_no_mpred_trace_exec(with_fc_mode(direct,mpred_ain(MARK,(s(Sup),ax)))).
+  with_no_mpred_trace_exec(with_fc_mode(direct,mpred_post1(MARK,(s(Sup),ax)))).
   % with_no_mpred_trace_exec(with_fc_mode(direct,mpred_fwc1(MARK,(s(Sup),ax)))),!.
    
 
@@ -2803,13 +2803,13 @@ mpred_nowatch:-  retractall_u(mpred_is_tracing_exec).
 %
 
 % with_mpred_trace_exec(P):- wno_tl_e(t_l:hide_mpred_trace_exec,w_tl_e(t_l:mpred_debug_local, must(show_if_debug(P)))).
+
+with_mpred_trace_exec(P):- lookup_u(mpred_is_tracing_exec),!,show_if_debug(P).
 with_mpred_trace_exec(P):- 
- ((\+ lookup_u(mpred_is_tracing_exec),mpred_trace_exec)
-      -> Exit = mpred_notrace_exec; Exit = true),
    wno_tl_e(t_l:hide_mpred_trace_exec,
        w_tl_e(t_l:mpred_debug_local, 
-           must(show_if_debug(P)))),
-        call(Exit).
+           must(show_if_debug(P)))).
+        
 
 %% with_mpred_trace_exec( +P) is semidet.
 %

@@ -1,8 +1,8 @@
-:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- endif.
 :- module(logicmoo_run_pldoc,[]).
 % restore entry state
-:- lcme:reset_modules.
+:- lmce:reset_modules.
 
 :- use_module(library(settings)).
 
@@ -380,6 +380,6 @@ when_debugging(_,_).
 :-  call(with_mfa_of( (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
 :- retractall(t_l:disable_px).
 
-:- lcme:reset_modules.
+:- lmce:reset_modules.
 
 :- list_undefined.

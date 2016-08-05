@@ -1833,7 +1833,7 @@ pfcBC_Cache(F) :- mpred_call_only_facts(pfcBC_Cache,F),
 %
 maybeSupport(P,_):-mpred_ignored(P),!.
 maybeSupport(P,S):-( \+ ground(P)-> true;
-  (predicate_property(P,dynamic)->mpred_ain(P,S);true)).
+  (predicate_property(P,dynamic)->mpred_post(P,S);true)).
 
 
 %% mpred_ignored( :TermC) is semidet.

@@ -1561,7 +1561,7 @@ nonegate(KB,Fml,OutZ):- must((unbuiltin_negate(KB,Fml,Out),!,defunctionalize(Out
 % Unbuiltin Negate.
 %
 unbuiltin_negate(_Neg,_, Fml,Fml):- is_ftVar(Fml),!.
-unbuiltin_negate(_Neg,_, Fml,Out):- get_functor(Fml,F,A),pttp_builtin(F,A),!,must(Out=Fml).
+unbuiltin_negate(_Neg,_, Fml,Out):- get_functor(Fml,F,A),find_and_call(pttp_builtin(F,A)),!,must(Out=Fml).
 
 %= 	 	 
 

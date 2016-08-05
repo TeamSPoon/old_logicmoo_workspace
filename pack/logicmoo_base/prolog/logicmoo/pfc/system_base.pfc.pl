@@ -226,6 +226,18 @@ alwaysGaf(pfcLHS).
 
 tSet(A)/atom(A)==> tCol(A),{decl_type_unsafe(A), kb_dynamic(A/1)}.
 % tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
+:- mpred_notrace_exec.
+
+% tCol(C)/atom(C)==> functorDeclares(C), ~tRelation(C),{nop(decl_type_unsafe(C)), nop(kb_dynamic(C/1)),\+ ttExpressionType(C)},tSet(C).
+
+/*
+Unneeded yet
+
+ttExpressionType(C)==>col_as_unary(C).
+col_as_unary(C)==> \+ col_as_isa(C).
+col_as_isa(C)==> \+ col_as_unary(C).
+col_as_isa(C)/( is_never_type(C) ; decided_not_was_isa(C,W)) ==> (conflict((col_as_isa(C)/( decided_not_was_isa(C,W);is_never_type(C))))).
+*/
 
 tCol(tCol).
 tCol(tPred).
@@ -586,7 +598,10 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 
 % :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
 
-:-ain(pass2).
+
+% Unneeded yet
+% pass2
+
 
 % :- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
 

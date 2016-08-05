@@ -412,7 +412,7 @@ maybe_define_if_not_static(M,PI):-
               asserta_if_new(baseKB:wrap_shared(F,A,ereq)),
               M:multifile(M:F/A),
               M:public(M:F/A),
-              on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
+            %   on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
               M:discontiguous(M:F/A),
               M:module_transparent(M:F/A),      
       (is_static_predicate(M:PI) -> true ;
