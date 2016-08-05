@@ -8,7 +8,7 @@
 */
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_loader.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if(( \+ ((current_prolog_flag(logicmoo_include,Call),Call)))). 
 :- module(mpred_loader,
           [ add_from_file/1,
           % unused_assertion/1,
@@ -201,7 +201,7 @@
             transform_opers_0/2, transform_opers_1/2,
             mpred_loader_file/0
           ]).
-%:- endif.
+:- endif.
 
  :- module_transparent((load_file_term_to_command_1b/3,pfc_dcg/0, mpred_term_expansion_by_pred_class/3,
    must_expand_term_to_command/2, pl_to_mpred_syntax0/2, 

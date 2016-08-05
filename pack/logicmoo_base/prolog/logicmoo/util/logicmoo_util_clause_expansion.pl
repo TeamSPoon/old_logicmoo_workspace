@@ -256,15 +256,16 @@ push_modules:- current_smt(SM,M),
   prolog_load_context(source,F),
   system:asserta(baseKB:source_typein_modules(SM,M,F)).
 
+reset_modules:- !.
 reset_modules:- 
-  prolog_load_context(source,F),
+  ignore((prolog_load_context(source,F),
   once(baseKB:source_typein_modules(SM,M,F)),
-  '$set_source_module'(SM),'$set_typein_module'(M),!.
+  '$set_source_module'(SM),'$set_typein_module'(M))),!.
 
 pop_modules:- 
-  prolog_load_context(source,F),
+  ignore((prolog_load_context(source,F),
   once(system:retract(baseKB:source_typein_modules(SM,M,F))),
-  '$set_source_module'(SM),'$set_typein_module'(M),!.
+  '$set_source_module'(SM),'$set_typein_module'(M))),!.
 
 
 maybe_add_import_module(A,B):-maybe_add_import_module(A,B,start).
@@ -384,4 +385,4 @@ system:term_expansion(I,P,O,P2):- current_prolog_flag(lm_special_expanders,true)
 :- initialization(nb_setval( '$term_e',[]),restore).
 
 :- all_source_file_predicates_are_transparent.
-
+:- push_modules.

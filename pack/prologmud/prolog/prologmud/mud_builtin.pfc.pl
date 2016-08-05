@@ -291,7 +291,10 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 ptBinaryPredicate(arity).
 
-(arity(Pred,2),tPred(Pred)) <==> ptBinaryPredicate(Pred).
+%ptBinaryPredicate(Pred) ==> arity(Pred,2),tPred(Pred).
+%arity(Pred,2),tPred(Pred) ==> ptBinaryPredicate(Pred).
+
+% () <==> ptBinaryPredicate(Pred).
 prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
 %relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),ptRolePredicate(BP)).
 prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).

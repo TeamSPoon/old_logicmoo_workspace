@@ -3,7 +3,7 @@
 :- module(attvar_01,[]).
 
 :- use_module(library(logicmoo_utils)).
-:- system:use_module(library(logicmoo_base)).
+:- system:ensure_loaded(library(logicmoo_base)).
 :- set_prolog_flag(assert_attvars,true).
 
 :-export(demo_nb_linkval/1).

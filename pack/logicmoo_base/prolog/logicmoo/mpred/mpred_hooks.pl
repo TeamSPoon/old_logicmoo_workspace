@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_hooks.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo_hooks,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(mpred_hooks,[
 /*
 lmcache:agent_session/2,
@@ -154,7 +154,7 @@ same_vars/2,
 update_value/3
 ]).
 
-%:- endif.
+:- endif.
 /*
 add_arg_parts_of_speech/4,
 agent_action_queue/3,

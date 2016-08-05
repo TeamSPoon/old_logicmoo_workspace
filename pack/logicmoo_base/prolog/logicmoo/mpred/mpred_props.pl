@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_props.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(mpred_props,
           [ add_mpred_prop_gleaned/2,
             add_mpred_prop_gleaned_4/4,
@@ -58,10 +58,10 @@
             pred_type_test2/2,
             mpred_props_file/0
           ]).
-%:- endif.
+:- endif.
 
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
-:- meta_predicate(kb_dynamic(:,+,+,+,+)).
+:- meta_predicate(system_kb_dynamic(:,+,+,+,+)).
 :- meta_predicate(decl_mpred_prolog(:,+,+,+,+)).
 
 :- module_transparent((
@@ -75,13 +75,13 @@
 :- include('mpred_header.pi').
 /*
  :- meta_predicate decl_mpred_prolog(?,1).
- :- meta_predicate kb_dynamic(?,1).
+ :- meta_predicate system:kb_dynamic(?,1).
  :- meta_predicate decl_mpred(?,1).
  :- meta_predicate decl_mpred_0(?,1).
  :- meta_predicate decl_mpred(+,+,+).
 */
 :- meta_predicate decl_mpred_0(?,+).
-:- meta_predicate kb_dynamic(?,+).
+:- meta_predicate system:kb_dynamic(?,+).
 :- meta_predicate add_mpred_prop_gleaned(?,1).
 :- meta_predicate add_mpred_prop_gleaned_4(?,*,*,1).
 :- meta_predicate decl_mpred(*,?,+).
@@ -137,7 +137,7 @@ pred_type_test(H,F,A):- THFA=..[H,F/A],HF=..[H,F],(clause(THFA,true);clause(HF,t
 % Declare Managed Predicate Predicate Indicator.
 %
 decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
-:- was_export(decl_mpred_mfa/3).
+:- export(decl_mpred_mfa/3).
 
 %= 	 	 
 
@@ -167,7 +167,7 @@ decl_mpred_mfa(M,FF,A):-
 % ========================================
 :- op(0,fx,(decl_mpred_prolog)).
 
-:- was_export((decl_mpred_prolog)/1).
+:- export((decl_mpred_prolog)/1).
 
 :- meta_predicate(decl_mpred_prolog(?)).
 
@@ -194,7 +194,7 @@ decl_mpred_prolog(F/A):- var(A),atom(F),
 decl_mpred_prolog(P):- must(call_u(with_pi(P,decl_mpred_prolog))).
 
 
-:- was_export((decl_mpred_prolog)/3).
+:- export((decl_mpred_prolog)/3).
 
 %= 	 	 
 
@@ -220,7 +220,7 @@ decl_mpred_prolog(F,Other):-
      functor(F0A,F0,A),
      decl_mpred_prolog(F0A).
 
-:- was_export((decl_mpred_prolog)/4).
+:- export((decl_mpred_prolog)/4).
 
 
 %% decl_mpred_prolog( ?CM, ?M, ?PIN, :TermF) is semidet.
@@ -287,65 +287,66 @@ define_maybe_prolog(M,PI,F,A):-
 
 
 % ========================================
-% (kb_dynamic)/1/2/3
+% (system:kb_dynamic)/1/2/3
 % ========================================
-:- op(0,fx,(kb_dynamic)).
+% :- op(0,fx,(system:kb_dynamic)).
 
-:- was_export((kb_dynamic)/1).
+:- export((kb_dynamic)/1).
 
-:- meta_predicate(kb_dynamic(?)).
+:- meta_predicate(system:kb_dynamic(?)).
 
 %= 	 	 
 
-%% kb_dynamic( ?A) is semidet.
+%% system_kb_dynamic( ?A) is semidet.
 %
 % Declare Managed Predicate Hybrid.
 %
 
-% kb_dynamic(A):- \+(compound(A)),!,ain00(prologHybrid(A)).
+% system_kb_dynamic(A):- \+(compound(A)),!,ain00(prologHybrid(A)).
 % ain_expanded(love(isEach(a/1,b/2,c/1,d),mother)).
 % ain_expanded(loves(isElement(a/1,b/2,c/1,d),mother)).
-kb_dynamic(M):- var(M),!,trace_or_throw(var_kb_dynamic(M)).
-kb_dynamic(M):- M =.. [isEach|List],!,must_maplist(kb_dynamic,List).
-kb_dynamic(F/A):- var(F),!,trace_or_throw(var_kb_dynamic(F/A)).
-kb_dynamic([H|List]):- is_list(List),!,kb_dynamic(H),must_maplist(kb_dynamic,List).
+system_kb_dynamic(M):- var(M),!,trace_or_throw(var_kb_dynamic(M)).
+system_kb_dynamic(M):- M =.. [isEach|List],!,must_maplist(system_kb_dynamic,List).
+system_kb_dynamic(F/A):- var(F),!,trace_or_throw(var_kb_dynamic(F/A)).
+system_kb_dynamic([H|List]):- is_list(List),!,system_kb_dynamic(H),must_maplist(system_kb_dynamic,List).
 
-% kb_dynamic(MPI):- must(decl_shared(MPI)),must(dynamic(MPI)),!.
-kb_dynamic(MPI):- must(decl_shared(MPI)),must((with_pfa(m_fa_to_m_p_fa(kb_dynamic),MPI))),!.
+% system_kb_dynamic(MPI):- must(decl_shared(MPI)),must(dynamic(MPI)),!.
+system_kb_dynamic(MPI):- must(decl_shared(MPI)),must((with_pfa(m_fa_to_m_p_fa(system_kb_dynamic),MPI))),!.
 
-kb_dynamic(F/A):- var(A),atom(F),!,
+system_kb_dynamic(F/A):- var(A),atom(F),!,
  must(call_u((must(current_smt(SM,CM)),!,
-   forall(between(1,11,A),must((functor(PI,F,A),kb_dynamic(CM,SM,PI,F,A))))))),!.
-kb_dynamic(P):- must(call_u(with_pi(P,kb_dynamic))).
+   forall(between(1,11,A),must((functor(PI,F,A),system_kb_dynamic(CM,SM,PI,F,A))))))),!.
+system_kb_dynamic(P):- must(call_u(with_pi(P,system_kb_dynamic))).
 
 
-:- was_export((kb_dynamic)/3).
-
-%= 	 	 
-
-%% kb_dynamic( ?M, ?F, ?A) is semidet.
-%
-% Declare Managed Predicate Hybrid.
-%
-kb_dynamic(M,F,A):-integer(A),!,must(functor(PI,F,A)),kb_dynamic(M,PI,F/A).
-kb_dynamic(M,PI,FA):- prolog_load_context(module,CM),must(kb_dynamic(CM,M,PI,FA)).
-
+:- export((system_kb_dynamic)/3).
 
 %= 	 	 
 
-%% kb_dynamic( ?F, ?A) is semidet.
+%% system_kb_dynamic( ?M, ?F, ?A) is semidet.
 %
 % Declare Managed Predicate Hybrid.
 %
-kb_dynamic(F,A):- integer(A),!,functor(FA,F,A),kb_dynamic(FA).
-kb_dynamic(F,Other):- 
+system_kb_dynamic(M,F,A):-integer(A),!,must(functor(PI,F,A)),system_kb_dynamic(M,PI,F/A).
+system_kb_dynamic(M,PI,FA):- prolog_load_context(module,CM),must(system_kb_dynamic(CM,M,PI,FA)).
+
+system:system_kb_dynamic(M,F,A):- mpred_props:system_kb_dynamic(M,F,A).
+
+%= 	 	 
+
+%% system_kb_dynamic( ?F, ?A) is semidet.
+%
+% Declare Managed Predicate Hybrid.
+%
+system_kb_dynamic(F,A):- integer(A),!,functor(FA,F,A),system_kb_dynamic(F/A).
+system_kb_dynamic(F,Other):- 
      decl_mpred(F,Other),     
      get_functor(F,F0),
      must(arity_no_bc(F0,A)),
      functor(F0A,F0,A),
-     kb_dynamic(F0A).
+     system_kb_dynamic(F0A).
 
-:- was_export((kb_dynamic)/4).
+:- export((system_kb_dynamic)/4).
 
 
 no_need_to_import(baseKB).
@@ -354,40 +355,46 @@ no_need_to_import(t_l).
 no_need_to_import(system).
 no_need_to_import(baseKB).
 
+system:kb_dynamic(A):- loop_check(system_kb_dynamic(A)).
+system:kb_dynamic(A,B):-system_kb_dynamic(A,B).
+system:kb_dynamic(A,B,C):- loop_check(system_kb_dynamic(A,B,C)).
+system:kb_dynamic(A,B,C,D):-system_kb_dynamic(A,B,C,D).
+system:kb_dynamic(A,B,C,D,E):-ignore(system_kb_dynamic(A,B,C,D,E)).
 
-%% kb_dynamic( ?CM, ?M, ?PIN, :TermF) is semidet.
+
+%% system_kb_dynamic( ?CM, ?M, ?PIN, :TermF) is semidet.
 %
 % Declare Managed Predicate Hybrid Inside Of Loop Checking.
 %
-kb_dynamic(Any,M,PI,MFAIn):-
+system_kb_dynamic(Any,M,PI,MFAIn):-
   must_det_l(( 
     pi_to_head_l(MFAIn,MFA),
     strip_module(MFA,_,FA),
     functor(FA,F,A),
-    kb_dynamic(Any,M,PI,F,A))).
+    system_kb_dynamic(Any,M,PI,F,A))).
 
 
-kb_dynamic(_:CM,M,PI,F,A):-var(A),!,
-   forall(between(1,11,A),kb_dynamic(CM,M,PI,F,A)),!.
+system_kb_dynamic(_:CM,M,PI,F,A):-var(A),!,
+   forall(between(1,11,A),system_kb_dynamic(CM,M,PI,F,A)),!.
 
-kb_dynamic(CM:OM,M,PI,F,A):-M==OM,kb_dynamic(CM,M,PI,F,A).
+system_kb_dynamic(CM:OM,M,PI,F,A):-M==OM,system_kb_dynamic(CM,M,PI,F,A).
 
-kb_dynamic(CM:Imp,M,PI,F,A):-M==CM,
-   kb_dynamic(CM,M,PI,F,A),
+system_kb_dynamic(CM:Imp,M,PI,F,A):-M==CM,
+   system_kb_dynamic(CM,M,PI,F,A),
    (CM==baseKB->true;((   CM:export(CM:F/A),dmsg(Imp:import(CM:F/A)), Imp:import(CM:F/A)))).
 
-% kb_dynamic(CM,M,PI,F,A):- dmsg(kb_dynamic(CM,M,PI,F,A)),fail.
+% system_kb_dynamic(CM,M,PI,F,A):- dmsg(system_kb_dynamic(CM,M,PI,F,A)),fail.
 
-% kb_dynamic(CM:M,baseKB,PI,F,A):- M\==baseKB, must(kb_dynamic(CM:baseKB,baseKB,PI,F,A)).
+% system_kb_dynamic(CM:M,baseKB,PI,F,A):- M\==baseKB, must(system_kb_dynamic(CM:baseKB,baseKB,PI,F,A)).
 
-kb_dynamic(CM:baseKB,M,PI,F,A):- M==abox, defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic(CM:baseKB,Mt,PI,F,A)).
+system_kb_dynamic(CM:baseKB,M,PI,F,A):- M==abox, defaultAssertMt(Mt)-> M\==Mt,!,must(system_kb_dynamic(CM:baseKB,Mt,PI,F,A)).
 
-kb_dynamic(CM:baseKB,M,PI,F,A):- defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic(CM:baseKB,Mt,PI,F,A)).
-kb_dynamic(_:CM,    M,PI,F,A):- atom(PI),A==0,get_arity(PI,F,A),
+system_kb_dynamic(CM:baseKB,M,PI,F,A):- defaultAssertMt(Mt)-> M\==Mt,!,must(system_kb_dynamic(CM:baseKB,Mt,PI,F,A)).
+system_kb_dynamic(_:CM,    M,PI,F,A):- atom(PI),A==0,get_arity(PI,F,A),
    \+(is_static_predicate(F/A)),!,
    must((forall((arity_no_bc(F,AA),AA\=0),
-   (functor(PIA,F,AA),kb_dynamic(CM,M,PIA,F,AA))))).
-kb_dynamic(_:CM,M,PI,F,A):-
+   (functor(PIA,F,AA),system_kb_dynamic(CM,M,PIA,F,AA))))).
+system_kb_dynamic(_:CM,M,PI,F,A):-
    must_det_l((    
       ((var(CM),nonvar(M))->CM=M;true),
       ((var(PI),integer(A))->functor(PI,F,A);true),
@@ -412,14 +419,14 @@ maybe_define_if_not_static(M,PI):-
               asserta_if_new(baseKB:wrap_shared(F,A,ereq)),
               M:multifile(M:F/A),
               M:public(M:F/A),
-              on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
+            %   on_f_throw( (M:F/A)\== (baseKB:loaded_external_kbs/1)),
               M:discontiguous(M:F/A),
               M:module_transparent(M:F/A),      
       (is_static_predicate(M:PI) -> true ;
        (predicate_property(M:PI,dynamic) -> true ; icatch(M:dynamic(M:PI)))))),!.
 
 
-:- op(1120,fx,(kb_dynamic)).
+% :- op(1120,fx,(kb_dynamic)).
 
 %prologHybrid(X,Y):-dtrace(prologHybrid(X,Y)).
 %:- was_dynamic(prologHybrid(_,_)).
@@ -458,7 +465,7 @@ get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
 %
 get_mpred_prop(F,P):- mreq(mpred_isa(F,P)).
 
-:- was_export(listprolog/0).
+:- export(listprolog/0).
 
 %= 	 	 
 
@@ -552,7 +559,7 @@ bad_pred_relation_name1(F,A):-arity_no_bc(F,AO), A \= AO.
 % decl_mpred database
 % ========================================
 
-:- was_export(((decl_mpred)/1)).
+:- export(((decl_mpred)/1)).
 
 :- meta_predicate(decl_mpred(?)).
 
@@ -563,7 +570,7 @@ bad_pred_relation_name1(F,A):-arity_no_bc(F,AO), A \= AO.
 % Declare Managed Predicate.
 %
 decl_mpred((A,B)):-decl_mpred(A),decl_mpred(B).
-decl_mpred(M):-!,kb_dynamic(M).
+decl_mpred(M):-!,system:kb_dynamic(M).
 decl_mpred(M):-loop_check(with_pi(M,decl_mpred_4),true).
 
 
@@ -581,7 +588,7 @@ decl_mpred_3(M,PI,F/A):-
    ignore((ground(PI),compound(PI),call(call,GG=meta_argtypes(PI)),decl_mpred(F,GG))),
    nop(ain(predicateConventionMt(F,M))).
 
-:- was_export((decl_mpred)/2).
+:- export((decl_mpred)/2).
 
 %= 	 	 
 
@@ -627,7 +634,7 @@ decl_mpred_0(F,T):-doall(( decl_mpred_2(F,T) )).
 decl_mpred_2(F,meta_argtypes(FARGS)):- functor(FARGS,_,A),decl_mpred(F,A),fail.
 decl_mpred_2(_,meta_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(Arg),!.
 
-% decl_mpred_2(F,prologHybrid):- kb_dynamic(F).
+% decl_mpred_2(F,prologHybrid):- system:kb_dynamic(F).
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_mt_why(F,A).
 
 decl_mpred_2(F,A):-once(baseKB:mpred_provide_write_attributes(F,A)).
@@ -664,7 +671,7 @@ decl_mpred_4(_CM,M,PI,FA):- decl_mpred_3(M,PI,FA).
 functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase,user]),!,functor_check_univ(G1,F,List),!.
 functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_det(G1 \= _/_),G1=..[F|List],!.
 
-:- was_export(glean_pred_props_maybe/1).
+:- export(glean_pred_props_maybe/1).
 
 %= 	 	 
 

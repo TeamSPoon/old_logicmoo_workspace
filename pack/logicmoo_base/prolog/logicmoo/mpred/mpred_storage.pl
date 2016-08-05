@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_storage.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(mpred_storage,
           [ % ain/1,
           %  add_0/1,
@@ -101,7 +101,7 @@
             world_clear/1,
             mpred_storage_file/0
           ]).
-%:- endif.
+:- endif.
 
 :- meta_predicate 
         % ain(-),

@@ -1,4 +1,4 @@
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(common_logic_skolem,
 	  [ form_sk/2,
 	    sk_form/2,
@@ -22,7 +22,7 @@
 % Dec 13, 2035
 %
 */
-%:- endif.
+:- endif.
 
 :- meta_predicate skolem_test(0).
 :- meta_predicate skolem_unify(*,0).

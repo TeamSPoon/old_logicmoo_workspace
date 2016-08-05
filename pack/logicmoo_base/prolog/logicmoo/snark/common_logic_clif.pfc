@@ -20,7 +20,7 @@ vim: set filetype=md:
 
 :-dynamic((if/2,iif/2)).
 
-:- if(current_prolog_flag(logicmoo_modules,default)).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
 :- module(common_logic_clif,[]).
 :- endif.
 
@@ -79,7 +79,7 @@ pfclog(PROLOG) ==> PROLOG.
 
 
 % we create code syntax listeners for [if,iff,clif_forall,all,exists]/2s
-({is_clif(CLIF),kb_dynamic(CLIF)} ==>
+({is_clif(CLIF)} ==>
   (CLIF/is_clif(CLIF) ==> clif(CLIF))).
 
 % (CLIF/is_kif_clause(CLIF) ==> clif(CLIF)).

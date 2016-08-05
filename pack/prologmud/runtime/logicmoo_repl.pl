@@ -8,14 +8,14 @@
 :- set_prolog_stack(local, limit(16*10**9)).
 :- set_prolog_stack(trail, limit(16*10**9)).
 
-:- user:ensure_loaded(setup_paths).
+:- ensure_loaded(setup_paths).
 
 % ==============================
 % Load logicmoo REPL Base
 % ==============================
 :- asserta(baseKB:load_mud_www).
-:- system:ensure_loaded(library(logicmoo_utils)).
-:- gripe_time(60,system:ensure_loaded(library(logicmoo_user))).
+:- ensure_loaded(library(logicmoo_utils)).
+:- gripe_time(60,ensure_loaded(library(logicmoo_user))).
 
 :- statistics.
 
@@ -45,14 +45,14 @@ setup_rl_read_history_0:-
 :- endif.
 
 % [Required] Load the Logicmoo Base System
-%USER :- time(system:ensure_loaded(logicmoo_user)).
+%USER :- time(ensure_loaded(logicmoo_user)).
 % :- meta_predicate testml(//).
 
 
 
 % [Optionaly] Load the Logicmoo WWW System
 :- if(if_defined(baseKB:load_mud_www)).
-:- system:use_module(library(logicmoo/mpred_online/mpred_www)).
+:- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 /*
 :- (if_file_exists(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www)))).
 :- (if_file_exists(ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).

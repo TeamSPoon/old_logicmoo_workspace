@@ -21,7 +21,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if(current_prolog_flag(logicmoo_modules,default)).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
 :- module(plarkc_cyc_xform,[]).
 :- endif.
 

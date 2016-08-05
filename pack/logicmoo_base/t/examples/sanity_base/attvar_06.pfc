@@ -7,7 +7,7 @@
 
 :- module(sanity_attvar_06 ,[]).
 
-:- system:use_module(library(logicmoo_base)).
+:- system:ensure_loaded(library(logicmoo_base)).
 :- set_prolog_flag(assert_attvars,true).
 
 :- fileAssertMt(Mt),wdmsg(fileAssertMt(Mt)).

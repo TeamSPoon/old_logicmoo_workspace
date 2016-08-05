@@ -33,6 +33,14 @@
 :- use_module(library(codesio)).
 % :- use_module(library(logicmoo_utils)).
 */
+% :- if( \+ current_op(_,_,system:'==>')).
+
+:- prolog_load_context(source,S),prolog_load_context(module,M),ddmsg(M=S).
+
+:- if( \+ prolog_load_context(module,system)).
+:- if(prolog_load_context(module,system)).
+:- set_prolog_flag(access_level,system).
+:- endif.
 :-
  op(1199,fx,('==>')), 
  op(1190,xfx,('::::')),
@@ -48,7 +56,22 @@
  op(300,fx,'~'),
  op(300,fx,'-').
 
+
+:-        op(1150,fx,(was_dynamic)),
+          op(1150,fx,(was_multifile)),
+          op(1150,fx,(was_module_transparent)),
+          op(1150,fx,(was_export)),
+          op(1150,fx,(shared_multifile)).
+
+
+
 :- op(1100,fx,(shared_multifile)).
+:- if(prolog_load_context(module,system)).
+:- set_prolog_flag(access_level,user).
+:- endif.
+:- endif.
+
+
 
 
 :- prolog_load_context(module,M),
@@ -188,12 +211,6 @@ user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_
 :- style_check(-singleton).
 :- set_prolog_flag(generate_debug_info, true).
 
-
-:-        op(1150,fx,(was_dynamic)),
-          op(1150,fx,(was_multifile)),
-          op(1150,fx,(was_module_transparent)),
-          op(1150,fx,(was_export)),
-          op(1150,fx,(shared_multifile)).
 
 :- decl_shared(mtExact/1).
 :- decl_shared(mpred_f/3).

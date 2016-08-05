@@ -9,7 +9,7 @@
 % Dec 13, 2035
 %
 */
-:- if(current_prolog_flag(logicmoo_modules,default)).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
 :- module(mpred_pttp,[]).
 :- endif.
 

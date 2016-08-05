@@ -1,4 +1,4 @@
-:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(simple_decl_parser, []).
 :- endif.
 

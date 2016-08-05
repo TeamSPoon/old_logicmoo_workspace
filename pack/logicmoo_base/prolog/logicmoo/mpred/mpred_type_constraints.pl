@@ -18,7 +18,7 @@
 
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(mpred_type_constraints,
           [ add_iza/2,
             arg_to_var/3,
@@ -61,7 +61,7 @@
             weaken/1,weaken_goal/2,thaw/1,
             mpred_type_constraints_file/0
           ]).
-%:- endif.
+:- endif.
  :- meta_predicate isa_pred_l(2,*,*),
               isa_pred_l(2,*,*,*),
               map_subterms(2,?,?),

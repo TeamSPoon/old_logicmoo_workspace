@@ -26,7 +26,7 @@ in_logicmoo_repl_source_file.
 :- initialization(attach_packs).
 
 :- if((exists_source(library(logicmoo_utils)))).
-:- system:ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(library(logicmoo_utils)).
 %:- ensure_loaded(logicmoo(mpred/mpred_pfc)).
 %USER :- ensure_loaded(library(logicmoo_user)).
 
@@ -75,7 +75,7 @@ system:pmrt_expand_file_search_path(T,O):- system:pmrt_file_search_path(T,A), on
 :-asserta((user:library_directory(R):- system:pmrt_expand_file_search_path(library,R))).
 
 :- attach_packs.
-:- system:ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(library(logicmoo_utils)).
 :- endif.
 
 :- attach_packs.

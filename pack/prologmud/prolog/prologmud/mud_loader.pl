@@ -14,24 +14,24 @@
 %
 */
 
-%:- if(( use_module(system:library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
-%:- endif.
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+:- endif.
 % :- module(mud_loader,[]).
 % restore entry state
-%:- lcme:reset_modules.
+%:- lmce:reset_modules.
 
 
-%:- add_import_module(mpred_storage,baseKB,end).
-%:- add_import_module(mud_telnet,world,end).
+%% UNDO % :- add_import_module(mpred_storage,baseKB,end).
+%% UNDO % :- add_import_module(mud_telnet,world,end).
 
-:- add_import_module(baseKB,world,end).
-% :- add_import_module(baseKB,baseKB,end).
-:- add_import_module(baseKB,mud_testing,end).
-:- add_import_module(baseKB,mud_telnet,end).
-:- add_import_module(mud_testing,mud_telnet,end).
-:- add_import_module(mud_telnet,world,end).
-:- add_import_module(baseKB,lmcache,end).
-% :- add_import_module(baseKB,world,end).
+% UNDO % :- add_import_module(baseKB,world,end).
+% % UNDO % :- add_import_module(baseKB,baseKB,end).
+% UNDO % :- add_import_module(baseKB,mud_testing,end).
+% UNDO % :- add_import_module(baseKB,mud_telnet,end).
+% UNDO % :- add_import_module(mud_testing,mud_telnet,end).
+% UNDO % :- add_import_module(mud_telnet,world,end).
+% UNDO % :- add_import_module(baseKB,lmcache,end).
+% % UNDO % :- add_import_module(baseKB,world,end).
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
@@ -209,7 +209,7 @@ if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Go
 
 start_boxer:-
    threads,
-   system:ensure_loaded(logicmoo(candc/parser_boxer)),
+   ensure_loaded(logicmoo(candc/parser_boxer)),
    % make,   
    at_start(prolog_repl).
 
@@ -221,8 +221,8 @@ hard_work:-
    with_no_mpred_expansions(wno_tl(op(200,fy,'@'),
    ((
  %  use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
-  % system:ensure_loaded(logicmoo(launchcliopatria)),
-  % system:ensure_loaded(logicmoo(testwebconsole)),
+  % ensure_loaded(logicmoo(launchcliopatria)),
+  % ensure_loaded(logicmoo(testwebconsole)),
   % kill_term_expansion, 
    ensure_loaded(swish(logicmoo_run_swish))
    )))),!.
@@ -432,7 +432,7 @@ Proof end.
 
 
 
-:- ensure_loaded(library(logicmoo_user)).
+:- user:ensure_loaded(library(logicmoo_user)).
 
 
 % :- ensure_loaded(('/root/lib/swipl/pack/prologmud/prolog/prologmud/actions/eat.pl')).
@@ -514,7 +514,7 @@ make_qlfs:-
 :-export(ensure_nl_loaded/1).
 system:ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 
-% :- system:ensure_loaded(logicmoo(pldata/tiny_kb)).
+% :- ensure_loaded(logicmoo(pldata/tiny_kb)).
 /*
 :- system:ensure_nl_loaded(logicmoo(pldata/nldata_freq_pdat)).
 :- system:ensure_nl_loaded(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
@@ -523,17 +523,17 @@ system:ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(au
 :- system:ensure_nl_loaded(logicmoo(pldata/nldata_dictionary_some01)).
 :- system:ensure_nl_loaded(logicmoo(pldata/nldata_talk_db_pdat)).
 */
-% :- system:ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
-% :- system:ensure_loaded(logicmoo(pldata/hl_holds)).
-% :- system:ensure_loaded(logicmoo(pldata/mworld0)).
+% :- ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
+% :- ensure_loaded(logicmoo(pldata/hl_holds)).
+% :- ensure_loaded(logicmoo(pldata/mworld0)).
 % :- system:ensure_nl_loaded(logicmoo(pldata/transform_dump)).
-% :- catch(system:ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
+% :- catch(ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
 download_and_install_el:-
   shell('wget -N http://logicmoo.org/devel/LogicmooDeveloperFramework/TEMP~/www.logicmoo.org/downloads/datafiles/PlDataBinary.zip',_),
   shell('unzip -u -d ../src_assets/pldata/ PlDataBinary.zip'),
-  catch(system:ensure_loaded(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
+  catch(ensure_loaded(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
 
-%:- xperimental_big_data->catch(system:ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
+%:- xperimental_big_data->catch(ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
 
 % :- asserta(lmcache:loaded_external_kbs(mud)),show_call(kbp_to_mpred_t).
 
@@ -542,14 +542,14 @@ download_and_install_el:-
 :- dynamic(baseKB:mudStowing/2).
 
 /*
-:- system:ensure_loaded(logicmoo(parsing/parser_talk)). 
-:- system:ensure_loaded(logicmoo(parsing/parser_e2c)). 
-:- system:ensure_loaded(logicmoo(parsing/parser_CURT)). 
-:- system:ensure_loaded(logicmoo(parsing/parser_chat80)). 
+:- ensure_loaded(logicmoo(parsing/parser_talk)). 
+:- ensure_loaded(logicmoo(parsing/parser_e2c)). 
+:- ensure_loaded(logicmoo(parsing/parser_CURT)). 
+:- ensure_loaded(logicmoo(parsing/parser_chat80)). 
 */
 
-%:- system:ensure_loaded(logicmoo(dbase/mpred_ext_lisp)).
-%:- system:ensure_loaded(logicmoo(dbase/mpred_ext_chr)).
+%:- ensure_loaded(logicmoo(dbase/mpred_ext_lisp)).
+%:- ensure_loaded(logicmoo(dbase/mpred_ext_chr)).
 
 
 :-wdmsg(loading_mobs).
@@ -678,7 +678,7 @@ lundef :- A = [],
 
 %:-mred_untrace.
 %:-mred_no_spy_all.
-%:- lcme:reset_modules.
+%:- lmce:reset_modules.
 
 tSourceCode(iSourceCode7).
 :- set_prolog_flag(pfc_booted,true).

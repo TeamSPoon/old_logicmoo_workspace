@@ -284,7 +284,7 @@ loop_check(Call, TODO):- parent_goal(ParentCall,1)->(loop_check_term_key(Call,Ca
 %
 % Loop Check Term Key.
 %
-loop_check_term_key(Call,_,_):- current_prolog_flag(unsafe_speedups,true), 1 is random(4),!,call(Call).
+loop_check_term_key(Call,_,_):- current_prolog_flag(unsafe_speedups,true), 1 is random(2),!,call(Call).
 loop_check_term_key(Call,KeyIn,TODO):- notrace(make_key(KeyIn,Key)) -> loop_check_term(Call,Key,TODO).
 
 
@@ -324,7 +324,7 @@ no_loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> wno_tl(lmcache:
 % Loop Check Term 50% of the time
 %
 % loop_check_term(Call,_Key,_TODO):- 1 is random(2) ,!,call(Call).
-loop_check_term(Call,_Key,_TODO):-current_prolog_flag(unsafe_speedups,true), 1 is random(4),!,call(Call).
+loop_check_term(Call,_Key,_TODO):-current_prolog_flag(unsafe_speedups,true), 1 is random(2),!,call(Call).
 loop_check_term(Call,Key,TODO):- notrace(TT = lmcache:ilc(Key)),
  ( notrace( \+(TT)) -> (setup_call_cleanup(notrace(asserta(TT,REF)), Call, 
    erase(REF))) ; 
@@ -689,8 +689,8 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 % Hook To [system:goal_expansion/2] For Module Logicmoo_util_loop_check.
 % Goal Expansion.
 %
-
-system:body_expansion(LC,PIn,LCOO,PIn):- 
+% system:goal_expansion(LC,PIn,LCOO,PIn):- 
+system:body_expansion(LC,PIn,LCOO,PIn):-
    notrace((source_location(_,_),
       compound(LC),
       must(var(LCOO)),

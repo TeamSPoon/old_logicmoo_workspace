@@ -11,7 +11,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_list_triggers.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(mpred_listing,
           [ draw_line/0,
             loop_check_just/1,
@@ -47,7 +47,7 @@
             show_pred_info_0/1,
             mpred_listing_file/0
           ]).
-%:- endif.
+:- endif.
 
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
@@ -137,7 +137,7 @@ pp_items(Type,H) :- ignore(pp_item(Type,H)).
 %
 pp_item(_M,H):-pp_filtered(H),!.
 pp_item(MM,(H:-B)):- B ==true,pp_item(MM,H).
-pp_item(MM,H):- flag(show_asserions_offered,X,X+1),get_print_mode(html), ( \+ \+ if_defined(pp_item_html(MM,H))),!.
+pp_item(MM,H):- flag(show_asserions_offered,X,X+1),find_and_call(get_print_mode(html)), ( \+ \+ if_defined(pp_item_html(MM,H))),!.
 
 
 pp_item(MM,spft(W0,U,ax)):- W = (_KB:W0),!,pp_item(MM,U:W).

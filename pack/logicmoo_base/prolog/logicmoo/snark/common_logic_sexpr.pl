@@ -1,4 +1,4 @@
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :-module(common_logic_sexpr,[
   codelist_to_forms/2,svar_fixvarname/2,input_to_forms/2,input_to_forms/3,
   sexpr_sterm_to_pterm_list/2,
@@ -6,7 +6,7 @@
   fixvars/4,
   to_untyped/2,ok_varname/1,svar_fixvarname/2,
   sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
-%:- endif.
+:- endif.
 
 
 :- dynamic user:file_search_path/2.
@@ -883,6 +883,6 @@ process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure):-
 
 */
 
-% :- add_import_module(baseKB,common_logic_sexpr,end).
+% % UNDO % :- add_import_module(baseKB,common_logic_sexpr,end).
 
 

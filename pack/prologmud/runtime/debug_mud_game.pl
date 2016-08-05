@@ -15,7 +15,7 @@
 % (and Default Daemons/inference engine)
 % ==============================
 
-:- system:ensure_loaded(logicmoo_repl).
+:- ensure_loaded(logicmoo_repl).
 
 % ==============================
 % Now start the profiler

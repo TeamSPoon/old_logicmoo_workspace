@@ -1,4 +1,4 @@
-:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(mud_telnet, [
          telnet_server/2,
          setup_streams/2,
@@ -39,7 +39,7 @@
 
 
 :- ain(mtProlog(mud_telnet)).
-:- add_import_module(mud_telnet,world,end).
+% UNDO % :- add_import_module(mud_telnet,world,end).
 
 % learnLaterWhenToCallProceedure(What):- ... code ...
 

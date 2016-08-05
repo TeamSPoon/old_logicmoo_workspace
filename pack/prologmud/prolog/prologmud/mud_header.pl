@@ -13,7 +13,7 @@
 % :- include(logicmoo(mpred/'mpred_header.pi')).
 :- set_prolog_flag(access_level,system).
 
-:- '$current_source_module'(M),once(M==baseKB;on_x_log_cont(add_import_module(baseKB,M,end))).
+% :- '$current_source_module'(M),once(M==baseKB;on_x_log_cont(add_import_module(baseKB,M,end))).
 
 :- 
  op(1190,xfx,('::::')),

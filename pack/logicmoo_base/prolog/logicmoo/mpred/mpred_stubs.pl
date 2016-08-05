@@ -12,7 +12,7 @@
 
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(mpred_stubs_file_module,
           [ 
 agenda_rescan_mpred_props/0,
@@ -72,7 +72,7 @@ wff_check_mpred_t_throw/1,
 mpred_stubs_file/0
           ]).
 
-%:- endif.
+:- endif.
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -554,15 +554,15 @@ no_rescans.
 agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
 
 %= 
-:- use_module(system:library(statistics)).
-% :- reconsult(library(statistics)).
+:- use_module(library(statistics)).
+:- reconsult(library(statistics)).
 %% rescan_mpred_props_ilc is semidet.
 %
 % Rescan Managed Predicate Props Inside Of Loop Checking.
 %
 rescan_mpred_props_ilc:-no_rescans,!.
 rescan_mpred_props_ilc:-rescan_duplicated_facts(user,local_q_mpred_isa(_,_)),fail.
-rescan_mpred_props_ilc:- prolog_statistics:time(forall(mpred_prop_ordered(Pred,Prop),ain(local_q_mpred_isa(Pred,Prop)))),fail.
+rescan_mpred_props_ilc:- call(prolog_statistics:time,forall(mpred_prop_ordered(Pred,Prop),ain(local_q_mpred_isa(Pred,Prop)))),fail.
 rescan_mpred_props_ilc.
 
 
@@ -730,7 +730,7 @@ mpred_t_storage_op(Op,(:-(Body))):-!,loop_check(mpred_op(Op,(:-(Body))),true),!.
 
 % HOOK for ISA alt-forms
 mpred_t_storage_op(_,isa(_,_)):- !,fail. % <- keeps u out of isa hybrids hairs
-mpred_t_storage_op(Op,X):- was_isa(X,I,C),!,mpred_op(Op,isa(I,C)).
+mpred_t_storage_op(Op,X):- was_mpred_isa(X,I,C),!,mpred_op(Op,isa(I,C)).
 
 % HOOK MOST ALL CALLS
 mpred_t_storage_op(Op,HeadBodyI):- hotrace(((expand_term(HeadBodyI,HeadBodyM)),HeadBodyI\=@=HeadBodyM)),!,mpred_t_storage_op(Op,HeadBodyM).

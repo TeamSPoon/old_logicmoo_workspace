@@ -17,7 +17,7 @@
 % Setup Runtime paths
 % ==============================
 
-:- system:ensure_loaded(setup_paths).
+:- ensure_loaded(setup_paths).
 
 :- test_for_release(setup_paths).
 

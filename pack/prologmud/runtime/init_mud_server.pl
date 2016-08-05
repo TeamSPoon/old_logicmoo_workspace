@@ -2,13 +2,11 @@
 /* * module  MUD server startup script in SWI-Prolog
 
 */
-
+:- set_prolog_flag(autoload_logicmoo,false).
 :- if( \+ current_module(prolog_stack)).
 :- system:use_module(library(prolog_stack)).
  prolog_stack:stack_guard(none).
 :- endif.
-% :- set_prolog_flag(logicmoo_debug,true).
-:- '$set_source_module'(baseKB).
 /*
 :- set_prolog_flag(access_level,system).
 :- use_module(library(prolog_history)).
@@ -21,14 +19,17 @@
 :- set_prolog_flag(generate_debug_info,true).
 :- profile(true).
 
-%:- user:ensure_loaded(setup_paths).
-%:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
-%:- endif.
+:- ensure_loaded(setup_paths).
+:- ensure_loaded(library(logicmoo_utils)).
 % :- module(init_mud_server,[]).
 % restore entry state
-%:- lcme:reset_modules.
 
 :- set_prolog_flag(access_level,system).
+:- lmce:current_smt(SM,M),writeln(current_smt(SM,M)).
+
+:- op(300,fx,'-').
+
+:- set_prolog_flag(access_level,user).
 
 :- 
  op(1190,xfx,('::::')),
@@ -44,8 +45,6 @@
  op(300,fx,'~'),
  op(300,fx,'-'),
  op(1199,fx,('==>')).
-
-:- set_prolog_flag(access_level,user).
 
 :- multifile
         prolog:message//1,
@@ -65,14 +64,12 @@
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
 
-:- user:ensure_loaded(setup_paths).
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+%:- lmce:reset_modules.
+:- endif.
 
-
-:- system:ensure_loaded(library(prolog_server)).
+:- ensure_loaded(library(prolog_server)).
 :- prolog_server(4023, [allow(_)]).
-:- system:ensure_loaded(library(logicmoo_utils)).
-
-:- set_prolog_flag(access_level,system).
 
 :- shell('./hmud/policyd').
 
@@ -98,7 +95,6 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- dmsg("the halting problem is now solved!").
 :- set_prolog_flag(access_level,user).
 
-
 :- if(exists_source(library(eggdrop))).
 :- ensure_loaded(library(eggdrop)).
 :- egg_go.
@@ -106,14 +102,18 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 %:- use_listing_vars.
 % :- [run].
 
-:- system:ensure_loaded(logicmoo_repl).
+% Loaded LogicMOO Code!!!
+:- ensure_loaded(logicmoo_repl).
 
 :- set_prolog_flag(unsafe_speedups,true).
 %:- mpred_trace_exec.
 :- debug.
 % :- rtrace.
+
 :- baseKB:ain(isa(iRR7,tRR)).
 :- baseKB:ain(genls(tRR,tRRP)).
+:- xlisting(iRR7),xlisting(tRRP).
+:- must( baseKB:isa(iRR7,tRR) ).
 :- must( baseKB:isa(iRR7,tRRP) ).
 :- must( baseKB:tRRP(iRR7) ).
 
@@ -134,10 +134,10 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 % :- must((statistics(cputime,X),X<65)).  % was 52
 
-%:- ensure_webserver(3020).
-:- initialization(ensure_webserver(3020)).
-:- initialization(ensure_webserver(3020),now).
-:- initialization(ensure_webserver(3020),restore).
+ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
+:- initialization(ensure_webserver_3020).
+:- initialization(ensure_webserver_3020,now).
+:- initialization(ensure_webserver_3020,restore).
 
 :- assert_setting01(lmconf:eachRule_Preconditional(true)).
 
@@ -196,7 +196,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 % [Required] load the mud system
 % :- with_mpred_trace_exec(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
 :- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
-%:- lcme:reset_modules.
+%:- lmce:reset_modules.
 
 :- set_prolog_flag(logicmoo_debug,true).
 
@@ -310,7 +310,7 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
 lar:- login_and_run.
 
-:- initialization(ensure_webserver(3020),now).
+:- initialization(ensure_webserver_3020,now).
 
 % :- assert_setting01(lmconf:eachFact_Preconditional(isRuntime)).
 
