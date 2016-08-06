@@ -880,6 +880,8 @@ export_if_noconflict_mfa(SM,(A,B)):-!,export_if_noconflict_mfa(SM,A),export_if_n
 export_if_noconflict_mfa(SM,[A]):-  !,export_if_noconflict_mfa(SM,A).
 export_if_noconflict_mfa(SM,[A|B]):-!,export_if_noconflict_mfa(SM,A),export_if_noconflict_mfa(SM,B).
 export_if_noconflict_mfa(SM,F/A):- !,export_if_noconflict_mfa(SM,F,A).
+export_if_noconflict_mfa(SM,F//A):- A2 is A + 2, !,export_if_noconflict_mfa(SM,F,A2).
+export_if_noconflict_mfa(_,SM:F//A):- A2 is A + 2, !,export_if_noconflict_mfa(SM,F,A2).
 export_if_noconflict_mfa(SM,P):-functor(P,F,A),export_if_noconflict_mfa(SM,F,A).
 
 export_if_noconflict_mfa(M,F,A):- current_module(M2),M2\=M,module_property(M2,exports(X)),

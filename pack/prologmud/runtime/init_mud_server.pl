@@ -112,7 +112,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 
 :- baseKB:ain(isa(iRR7,tRR)).
 :- baseKB:ain(genls(tRR,tRRP)).
-:- xlisting(iRR7),xlisting(tRRP).
+:- \+ baseKB:tRRP(iRR7) -> (xlisting(iRR7),xlisting(tRRP)) ; true.
 :- must( baseKB:isa(iRR7,tRR) ).
 :- must( baseKB:isa(iRR7,tRRP) ).
 :- must( baseKB:tRRP(iRR7) ).
@@ -208,7 +208,6 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 % MUD SERVER CODE STARTS
 % ==============================
 
-:- file_begin(pfc).
 :- set_prolog_flag(dialect_pfc,false).
 
 % :- mpred_trace_exec.
@@ -223,14 +222,15 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 
 % [Optional] Creates or suppliments a world
 :- set_prolog_flag(dialect_pfc,true).
+:- file_begin(pfc).
 
-:- ain(tCol(tLivingRoom)).
-tSet(tRegion).
-tSet(tLivingRoom).
+:- ain((tCol(tLivingRoom),
+tSet(tRegion),
+tSet(tLivingRoom),
 
-tSet(mobExplorer).
-genls(tLivingRoom,tRegion).
-genls(tOfficeRoom,tRegion).
+tSet(mobExplorer),
+genls(tLivingRoom,tRegion),
+genls(tOfficeRoom,tRegion),
 
 
 %genlsFwd(tLivingRoom,tRegion).
@@ -238,54 +238,54 @@ genls(tOfficeRoom,tRegion).
 
 % create some seats
 % :- trace.
-mobExplorer(iExplorer1).
-mobExplorer(iExplorer2).
-mobExplorer(iExplorer3).
-mobExplorer(iExplorer4).
-mobExplorer(iExplorer5).
-mobExplorer(iExplorer6).
+mobExplorer(iExplorer1),
+mobExplorer(iExplorer2),
+mobExplorer(iExplorer3),
+mobExplorer(iExplorer4),
+mobExplorer(iExplorer5),
+mobExplorer(iExplorer6),
 
-(tHumanBody(skRelationAllExistsFn)==>{trace_or_throw(tHumanBody(skRelationAllExistsFn))}).
+(tHumanBody(skRelationAllExistsFn)==>{trace_or_throw(tHumanBody(skRelationAllExistsFn))}),
 
-genls(mobExplorer,tHominid).
+genls(mobExplorer,tHominid))).
 
 :- ain(localityOfObject(P,_)==>{put_in_world(P)}).
 
+:- ain((
+tRegion(iLivingRoom7),
+tRegion(iOfficeRoom7),
 
-tRegion(iLivingRoom7).
-tRegion(iOfficeRoom7).
-
-mobExplorer(iExplorer7).
-wearsClothing(iExplorer7,'iBoots773').
-wearsClothing(iExplorer7,'iCommBadge774').
-wearsClothing(iExplorer7,'iGoldUniform775').
-mudStowing(iExplorer7,'iPhaser776').
+mobExplorer(iExplorer7),
+wearsClothing(iExplorer7,'iBoots773'),
+wearsClothing(iExplorer7,'iCommBadge774'),
+wearsClothing(iExplorer7,'iGoldUniform775'),
+mudStowing(iExplorer7,'iPhaser776'))).
 
 :-onSpawn(localityOfObject(iExplorer7,tLivingRoom)).
 
-pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
-pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
+:- ain((
+pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']),
+pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']),
+pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']),
+pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']),
 
-mobMonster(iCommanderdata66).
-mobExplorer(iCommanderdata66).
-mudDescription(iCommanderdata66,txtFormatFn("Very scary looking monster named ~w",[iCommanderdata66])).
-tAgent(iCommanderdata66).
-tHominid(iCommanderdata66).
-wearsClothing(iCommanderdata66,'iBoots673').
-wearsClothing(iCommanderdata66,'iCommBadge674').
-wearsClothing(iCommanderdata66,'iGoldUniform675').
-mudStowing(iCommanderdata66,'iPhaser676').
+mobMonster(iCommanderdata66),
+mobExplorer(iCommanderdata66),
+mudDescription(iCommanderdata66,txtFormatFn("Very scary looking monster named ~w",[iCommanderdata66])),
+tAgent(iCommanderdata66),
+tHominid(iCommanderdata66),
+wearsClothing(iCommanderdata66,'iBoots673'),
+wearsClothing(iCommanderdata66,'iCommBadge674'),
+wearsClothing(iCommanderdata66,'iGoldUniform675'),
+mudStowing(iCommanderdata66,'iPhaser676'),
 
-pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iCommBadge674',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
-pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
+pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWearAble']),
+pddlSomethingIsa('iCommBadge674',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']),
+pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']),
+pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']))).
 :-onSpawn(localityOfObject(iCommanderdata66,tOfficeRoom)).
   
-
-mpred_argtypes(bordersOn(tRegion,tRegion)).
+:- ain((mpred_argtypes(bordersOn(tRegion,tRegion)))).
 
 
 :- call_u(onSpawn(bordersOn(tLivingRoom,tOfficeRoom))).
@@ -356,4 +356,33 @@ tSourceData(iWorldData8).
 
 :- initialization(lar,restore).
 % :- initialization(lar).
+
+
+end_of_file.
+
+Warning: at runtime using assert/1, use :- dynamic Name/Arity.
+Warning:
+Warning: baseKB:assert_text/2, which is referenced by
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/server/mud_telnet.pl:232:61: 1-st clause of baseKB:enqueue_session_action/3
+Warning: baseKB:mobPrey/1, which is referenced by
+Warning:        6-th clause of baseKB:world_agent_plan/3: 6-th clause of baseKB:world_agent_plan/3
+Warning: baseKB:mudContains/2, which is referenced by
+Warning:        2-nd clause of baseKB:mudInsideOf/2: 2-nd clause of baseKB:mudInsideOf/2
+Warning: baseKB:on_command_show/3, which is referenced by
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/actions/look.pl:81:14: 1-st clause of baseKB:cmdLook_proc_0/2
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/vworld/world_text.pl:20:15: 1-st clause of baseKB:when_command_show/2
+Warning: baseKB:parserVars/3, which is referenced by
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/parser_imperative.pl:577:24: 2-nd clause of baseKB:to_arg_value/2
+Warning: simple_decl_parser:argIsa/3, which is referenced by
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:133: 1-st clause of simple_decl_parser:attribute/6
+Warning: simple_decl_parser:foc_current_agent/1, which is referenced by
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:58: 1-st clause of simple_decl_parser:asserta_parserVars/3
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:59:23: 1-st clause of simple_decl_parser:parserVars/3
+Warning: simple_decl_parser:isa/2, which is referenced by
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:133: 1-st clause of simple_decl_parser:attribute/6
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:81:58: 1-st clause of simple_decl_parser:toCol_0/3
+Warning: simple_decl_parser:mudKeyword/2, which is referenced by
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:117:23: 1-st clause of simple_decl_parser:collection00/3
+Warning: simple_decl_parser:tag_pos/2, which is referenced by
+Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:254:106: 1-st clause of simple_decl_parser:translation_for/5
 

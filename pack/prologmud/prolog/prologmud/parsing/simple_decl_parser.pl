@@ -14,8 +14,6 @@
 
 :- include(prologmud(mud_header)).
 
-:- system:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
-
 :-discontiguous((translation_spo/6,parserTest/2,parserTest/3,translation_w//1)).
 :-dynamic((translation_spo/6,parserTest/2,parserTest/3,translation_w//1)).
 :-thread_local(loosePass/0).
@@ -30,16 +28,8 @@ toCamelAtom(List,O):-((\+((member(IS,List),glue_words(IS))),toCamelAtom00(List,O
 % toCamelAtom00(I,O):-toCamelAtom0(I,O).
 toCamelAtom00(I,O):-toCamelcase(I,O).
 
+:- set_prolog_flag(lm_expanders,true).
 
-
-asserta_parserVars(N,V,Type):-foc_current_agent(A),asserta(parserVars(A,N,V,Type)).
-parserVars(N,V,Type):- foc_current_agent(A),
-   (parserVars_local(A,N,V,Type)*->true;parserVars_falback(global,N,V,Type)).
-
-parserVars_local(A,(N1;N2),V,Type):-!,parserVars_local(A,N1,V,Type);parserVars_local(A,N2,V,Type).
-parserVars_local(A,N,V,Type):-parserVars(A,N,V,Type).
-
-parserVars_falback(_,N,V,Type):-parserVars_local(global,N,V,Type).
 
 vtColor(vRed).
 
@@ -52,8 +42,6 @@ completelyAssertedCollection(vtValue).
 
 isa(vtValue,ttValueType).
 
-:- show_call(_,get_lang(_)).
-% :- break.
 
 typeGenls(ttValueType,vtValue).
 
@@ -61,12 +49,27 @@ typeGenls(ttValueType,vtValue).
 :-must(vtColor(vRed)).
 :-must((isa(vRed,REDISA),genls(REDISA,vtValue))).
 
+
+:- set_prolog_flag(lm_expanders,false).
+
+:- user:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
+
+
+asserta_parserVars(N,V,Type):-foc_current_agent(A),asserta(parserVars(A,N,V,Type)).
+parserVars(N,V,Type):- foc_current_agent(A),
+   (parserVars_local(A,N,V,Type)*->true;parserVars_falback(global,N,V,Type)).
+
+parserVars_local(A,(N1;N2),V,Type):-!,parserVars_local(A,N1,V,Type);parserVars_local(A,N2,V,Type).
+parserVars_local(A,N,V,Type):-parserVars(A,N,V,Type).
+
+parserVars_falback(_,N,V,Type):-parserVars_local(global,N,V,Type).
+
 toCol(Txt,I,TCOL):-member(TCOL,[tCol,tObj,tSpatialThing,vtValue,ttTypeType]),show_success(toCol_0(Txt,I,TCOL)),!.
 
 toCol_0(Txt,O,TCOL):-member(Pfx-Sfx- _ISACISA, 
          [
           ''-''-_,
-          't'-''-'tSpec',
+          't'-''-'tCol',
           'tt'-'Type'-'ttTypeType',
           'vt'-''-'ttValueTypeType',
           'v'-''-'vtValue',
@@ -151,6 +154,9 @@ predicate0(isa)-->is_a.
 predicate0(mudRelates)-->is_was.
 predicate0(isa)-->[is].
 
+:- set_prolog_flag(lm_expanders,true).
+
+
 tCol('tRoom').
 
 % :-ignore(show_call(phrase(collection(I,T,More),[red,room]))).
@@ -203,8 +209,8 @@ tCol('tTvGuide').
 
 :-assertz_if_new(parserTest(iWorld7,"A tv guide is a type of book.")).
 
-toplevel_type(CtxISA):-member(CtxISA,[tWorld,tRegion,tAgent,tItem,tObj,tSpec,tCol,ftTerm]).
-% toplevel_type(CtxISA):-tSpec(CtxISA).
+toplevel_type(CtxISA):-member(CtxISA,[tWorld,tRegion,tAgent,tItem,tObj,ftSpec,tCol,ftTerm]).
+% toplevel_type(CtxISA):-ftSpec(CtxISA).
 
 
 get_ctx_isa(CtxISA,Ctx,CtxISA):- toplevel_type(CtxISA),must((isa(Ctx,CtxISA))),!.

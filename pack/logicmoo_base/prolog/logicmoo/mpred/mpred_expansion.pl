@@ -400,12 +400,12 @@ functor_declares_instance_0(P,tPred):-isa_from_morphology(P,ttPredType).
 functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,ftFunctional).
 functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,O)->O=tFunction.
 
-functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttExpressionType),P).
+functor_declares_instance_0(P,tCol):- arg(_,s(tCol,ftSpec,ttExpressionType),P).
 functor_declares_instance_0(P,ttModule):- arg(_,s(tCol,tModule),P).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
-functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttExpressionType),P).
+functor_declares_instance_0(P,tCol):- arg(_,s(tCol,ftSpec,ttExpressionType),P).
 
 functor_declares_instance_0(P,P):- cheaply_u(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
 functor_declares_instance_0(COL,COL):- call_u(tCol(COL)).

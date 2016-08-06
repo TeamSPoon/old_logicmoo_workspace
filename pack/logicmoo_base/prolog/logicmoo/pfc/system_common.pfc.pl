@@ -108,6 +108,8 @@ prologHybrid(genls/2).
 
 :- ain((never_retract_u(~(X),is_ftVar(X)):- cwc,is_ftVar(X))).
 
+/*
+Unneeded yet
 
 % These next 2 might be best as builtins?
 ((~(P)/(mpred_non_neg_literal(P),copy_term(P,PP))) ==> \+ PP ).
@@ -117,7 +119,10 @@ prologHybrid(genls/2).
 % :- nortrace,cnotrace.
 % a pretty basic conflict (disabled for now)
 %(~(P)/mpred_non_neg_literal(P), P) ==> conflict(~(P)).
+(~(P)/mpred_non_neg_literal(P), P) ==> conflict(~(P)).
 %(P/mpred_non_neg_literal(P), ~(P)) ==> conflict(P).
+
+*/
 
 %:- rtrace,dtrace.
 ==>(prologBuiltin(mpred_select/2)).
@@ -125,7 +130,7 @@ prologHybrid(genls/2).
 
 :- kb_dynamic(conflict/1).
 % a conflict triggers a Prolog action to resolve it.
-conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
+conflict(C) ==> {must(with_mpred_trace_exec((resolveConflict(C),\+conflict(C))))}.
 
 % :- kb_dynamic(ttTypeType/1).
 
@@ -209,10 +214,22 @@ completelyDecidableCollection(ftSpec). % A specification is sort of a type
 :- dynamic ftSpec/1.
 :- discontiguous ftSpec/1.
 tCol(ftSpec).
-ftSpec(tCol).  % A specification may be a type
-ftSpec(meta_argtypes).  % A specification may be a syntactic description
+ttExpressionType(ftSpec).
+~meta_argtypes(ftSpec(ftString)). % A string may not be considered a legal specification
+functorForFtSpec(prologEquality).
 
+resultIsa(_F,C)/ground(C)==>ftSpec(C).
+ftSpec(vtActionTemplate).
 
+% ftSpec(ftSpec).
+meta_argtypes(ftSpec(meta_argtypes(ftSpec))).  % An argtype specification is considered to be a legal specification
+
+genls(ttExpressionType, ftSpec).
+
+genls(tCol, ftSpec).
+meta_argtypes(ftSpec(tCol)).  % A typeclass is considered to be a legal specification
+
+~tIndividual(tIndividual).
 
 pfcControlled(P),arity(P,A)==>hybrid_support(P,A).
 
@@ -304,7 +321,7 @@ mpred_univ(C,I,Head):- cwc,atom(C),!,Head=..[C,I],predicate_property(Head,number
 tCol(tCol).  % = isa(tCol,tCol).
 tCol(tSet).
 
-(genls(C,SC)/ground(genls(C,SC))==>(tCol(C),tCol(SC))).
+(genls(C,SC)==>(tCol(C),tCol(SC))).
 
 % tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),mpred_univ(C,I,TCI),
 
@@ -321,9 +338,13 @@ ttPredType(C)==>completelyAssertedCollection(C).
 
 % genls(meta_argtypes,ftSpec).
 
+:- dynamic(baseKB:mudWielding/2).
+
+prologMultiValued(P)==> \+ prologSingleValued(P).
+prologSingleValued(P)==> \+ prologMultiValued(P).
+
 ~(ttExpressionType(prologEquality)).
 ttPredType(prologEquality).
-ftSpec(prologEquality).
 prologEquality(mudEquals).
 prologEquality(('=')).
 prologEquality(('==')).
@@ -388,6 +409,8 @@ tFixedArityRelation(tSet).
 tFixedArityRelation(tCol).
 ttPredType(prologHybrid).
 
+:- check_clause_counts.
+
 %:- rtrace,trace.
 %:- notrace, nortrace.
 
@@ -395,7 +418,7 @@ prologHybrid(mudToCyc(ftTerm,ftTerm)).
 
 :- must(arity(mudToCyc,2)).
 
-col_as_isa(X)==>tFixedArityRelation(X),arity(X,1).
+% col_as_isa(X)==>tFixedArityRelation(X),arity(X,1).
 col_as_unary(X)==>tFixedArityRelation(X),arity(X,1).
 
 tSet(ttExpressionType).
@@ -412,7 +435,6 @@ ttExpressionType(C) ==> ( \+ completelyAssertedCollection(C), ~ tSet(C), tCol(C)
 % ~tCol(C) ==> ~completelyAssertedCollection(C).
 % (tCol(C),\+ ttExpressionType(C)) ==> tSet(C).
 % ((tCol(P), \+ ttExpressionType(P)) <==> tSet(P)).
-% tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
 
 tSet(C) ==>
 ({ignore((
@@ -456,24 +478,27 @@ tSet(C)/(atom(C),TCI=..[C,I]) ==> (arity(C,1),
       predicate_property(TCI,number_of_rules(1)),
     lazy(( \+ call_u(~(TCI)))),
     isa_backchaing(I,C))))))))))))))}).
+
+
 */
 /*
 ttExpressionType(P) ==> 
  {get_functor(P,F), functor(Head,F,1), call(BHead=baseKB:Head),
   call((\+ predicate_property(BHead,defined) -> kb_dynamic(F/1); true)),
   call((predicate_property(BHead,dynamic)->(ain(Head==>{ignore(retract(Head))}));show_pred_info(BHead)))},
-  /*~prologMacroHead(F),*/
+  ~prologMacroHead(F),
   ~functorDeclares(F),
   ~tSet(F),
   notAssertibleCollection(F),
+  tCol(F),
   completelyDecidableCollection(F),
   arity(F,1).
 */
 
-:- mpred_trace_exec.
+%:- mpred_trace_exec.
 
 tSet(tKnownID).
-:- xlisting(tKnownID).
+% :- xlisting(tKnownID).
 %?- isa(tKnownID,W).
 %:- break.
 
@@ -511,7 +536,7 @@ ttPredType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,
   predCanHaveSingletons,prologDynamic,tPred,prologMacroHead,prologListValued,prologSingleValued)).
 prologMacroHead(prologMacroHead).
 ttPredType(X)==>functorDeclares(X).
-tCol(X)==>functorDeclares(X).
+% tCol(X)==>functorDeclares(X).
 % functorDeclares(X)==>tCol(X).
 % prologMacroHead(X)==>functorDeclares(X).
 prologMacroHead(pddlSomethingIsa/2).
@@ -570,7 +595,7 @@ completeExtentAsserted(functorDeclares).
 completeExtentAsserted(completeExtentAsserted).
 arity(completeExtentAsserted,1).
 
-tSet(completeExtentAsserted).
+% tSet(completeExtentAsserted).
 argIsa(completeExtentAsserted,1,tPred).
 meta_argtypes(genlPreds(tPred,tPred)).
 :- must_det(argIsa(genlPreds,2,_)).
@@ -634,7 +659,7 @@ isa(tRelation,ttAbstractType).
 
 
 %:-rtrace.
-(tCol(Inst), {isa_from_morphology(Inst,Type)}) ==> (isa(Inst,Type)).
+% (tCol(Inst), {isa_from_morphology(Inst,Type)}) ==> (isa(Inst,Type)).
 
 % HOW TO MAKE THIS FAST?  isa(Inst,Type) <= {isa_from_morphology(Inst,Type)}.
 
@@ -893,10 +918,10 @@ tSet(ttTypeType).
 genls(tFunction,tRelation).
 
 tSet(ttValueType).
-ftSpec(vtActionTemplate).
+
 ttExpressionType(ftString).
 ttExpressionType(ftVar).
-ttExpressionType(ftSpec).
+
 
 ttExpressionType(ftCallable).
 ttExpressionType(ftPercent).
@@ -1043,10 +1068,7 @@ completelyAssertedCollection(completelyAssertedCollection).
 ttExpressionType(ftVar).
 ttExpressionType(ftVoprop).
 
-tCol(ftSpec).
-:- asserta(ftSpec(ftSpec)).
 
-resultIsa(_F,C)/ground(C)==>ftSpec(C).
 
 % resultIsa(F,C)==>(ftSpec(C),'tFunction'(F)).
 % ( meta_argtypes(FT)/dif(FT,COL), genls(FT, COL),tCol(COL),{\+ (isa(COL,ttExpressionType))}) ==> formatted_resultIsa(FT,COL).
@@ -1100,7 +1122,6 @@ prologMultiValued('==>'(ftAskable,ftAssertable)).
 prologNegByFailure(predArgMulti(prologMultiValued,ftInt)).
 prologNegByFailure(tDeleted(ftID)).
 
-genls(ttExpressionType, ftSpec).
 %= 	 	 
 
 %% prologSingleValued( ?ARG1, ?ARG2) is semidet.

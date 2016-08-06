@@ -11,7 +11,7 @@
 % ===================================================================
 */
 
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+%:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(mpred_pfc, [
   ensure_abox/1,
   mpred_call_no_bc/1,%fix_mp/3,
@@ -28,6 +28,7 @@
   lookup_m_g/3,
   head_to_functor_name/2,
   mpred_post1_rem/2,
+  mpred_post1/1,
   mpred_post1_rem1/2,
   fwc1s_post1s/2,
   mpred_mark_as_ml/3,
@@ -126,7 +127,7 @@
           asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,
           retract_u0/1,retractall_u0/1,
   clause_u/1,clause_u/2,clause_u/3,
-  clause_i/3,
+  % clause_ii/3,
 
   lookup_u/1,
 
@@ -265,7 +266,7 @@ mpred_database_term(bt,2,trigger).
 
 % transient state
 mpred_database_term(actn,1,state).
-mpred_database_term(que,1,state).
+mpred_database_term(que,2,state).
 mpred_database_term(hs,1,state).
 
 % forward,backward settings
@@ -284,6 +285,7 @@ get_head_term(Form,Form):-var(Form),!.
 get_head_term(F/A,Form):- integer(A),functor(Form0,F,A),!,get_consequent(Form0,Form).
 get_head_term(Form0,Form):- get_consequent(Form0,Form).
 
+:- dynamic(baseKB:que/2).
 % % :- '$set_source_module'(mpred_pfc).
 
 :- op(700,xfx,'=@@=').
@@ -378,7 +380,10 @@ get_first_user_reason(P,(F,T)):-
     (((lookup_u(spft(P,F,T))), \+ is_user_fact(UU))*-> true ; 
        (clause_asserted_u(P),get_source_ref(UU),is_user_fact(UU)))),!.
 get_first_user_reason(P,UU):-get_source_ref_stack(UU),is_user_fact(UU),!.
-get_first_user_reason(P,UU):-must(get_source_ref_stack(UU)),!.
+get_first_user_reason(P,UU):- get_source_ref_stack(UU),!.
+get_first_user_reason(P,UU):- must(ignore(((get_first_user_reason0(P,UU))))),!.
+get_first_user_reason0(P,(M,ax)):-get_source_ref10(M).
+
 %get_first_user_reason(_,UU):- get_source_ref(UU),\+is_user_fact(UU). % ignore(get_source_ref(UU)).
 
 %% get_source_ref1(+Mt) is semidet.
@@ -621,7 +626,6 @@ with_umt(M,P):-
      call_from_module(W,P)).
 
 
-%:- else
 /*
 listing_u(P):- (listing(P)).
 assert_u(A):- assert(A).
@@ -634,7 +638,6 @@ clause_u(H,B):- clause_u(H,B,_).
 clause_u(H,B,R):- clause_i(H,B,R).
 mpred_call_no_bc(G):- G.
 */
-%:- endif.
 
 %% each_E(+P2,+HT,+S) semidet.
 %
@@ -784,7 +787,8 @@ mpred_ain(MTP :- B,S):- strip_module(MTP,MT,P),P\==MTP,!,
 mpred_ain(PIn,S):- 
   must(add_eachRulePreconditional(PIn,P)),
   must(full_transform(ain,P,P0)),!,
-  must(ain_fast(P0,S)),!.
+  must(full_transform(ain,S,S0)),!,
+  must(ain_fast(P0,S0)),!.
 
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
 
@@ -794,11 +798,14 @@ ain_fast(P):- call_u((( get_source_ref(UU), ain_fast(P,UU)))).
 
 ain_fast(P,S):- maybe_updated_value(P,RP,OLD),subst(S,P,RP,RS),!,ain_fast(RP,RS),ignore(mpred_retract(OLD)).
 
+% ain_fast(P,S):- loop_check_term(ain_fast0(P,S),ain_fast123(P),(trace,ain_fast0(P,S))).
+
 ain_fast(P,S):- 
+  retractall(t_l:busy(_P)),
   fwc1s_post1s(One,Two),
   filter_buffer_trim('$last_mpred_fwc1s',One),
   filter_buffer_trim('$last_mpred_post1s',Two),
-  each_E(mpred_post1,P,[S]),
+  each_E(mpred_post1,P,[S]),!,
   mpred_run.
 
 :- dynamic(lmconf:eachRule_Preconditional/1).
@@ -836,11 +843,11 @@ remove_negative_version(P):-
   once((get_source_ref_stack(S),!,
   must(mpred_ain(\+ (~(P)), S)))))),!.
 
+fwc1s_post1s(3,0):-!.     
+%fwc1s_post1s(1,2):-!.     
+%fwc1s_post1s(1,2):- current_prolog_flag(unsafe_speedups,false),!.
      
-fwc1s_post1s(1,2):-!.     
-fwc1s_post1s(1,2):- current_prolog_flag(unsafe_speedups,false),!.
-    
-fwc1s_post1s(100,200):- fresh_mode,!.
+fwc1s_post1s(1,3):- fresh_mode,!.
 fwc1s_post1s(1,2):- current_prolog_flag(pfc_booted,true),!.
 % fwc1s_post1s(10,20):- defaultAssertMt(Mt)->Mt==baseKB,!.
 fwc1s_post1s(1,2).
@@ -874,8 +881,10 @@ maybe_updated_value(UP,R,OLD):-
 % tries to assert a fact or set of fact to the database.  For
 % each fact (or the singleton) mpred_post1 is called. It always succeeds.
 %
-mpred_post(P, S):- fully_expand_now(post,P,P0),each_E(mpred_post1,P0,[S]).
+mpred_post(P, S):- fully_expand_now(post,P,P0),fully_expand_now(post,S,S0),each_E(mpred_post1,P0,[S0]).
 
+mpred_post( P):- get_source_ref(UU), mpred_post( P,   UU).
+mpred_post1( P):- get_source_ref(UU), mpred_post1( P,   UU).
 
 %% mpred_post1(+P,+S) is det.
 %
@@ -886,11 +895,14 @@ mpred_post(P, S):- fully_expand_now(post,P,P0),each_E(mpred_post1,P0,[S]).
 mpred_post1( isa(_,_,_),   _):- dumpST,dtrace.
 mpred_post1( tCol(','),   _):- dumpST,dtrace.
 
-mpred_post1( P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post1( P0,   S).
+mpred_post1(P, S):- subst(P:S,completelyAssertedCollection,tSet,P1:S1),mpred_post2(P1, S1).
 
-mpred_post1(Fact, _):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(One,_Two),Three is One * 3, filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
+mpred_post2( P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post2( P0,   S).
 
-mpred_post1(P,S):- gripe_time(0.6,mpred_post12(P,S)).
+mpred_post2(Fact, _):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(One,_Two),Three is One * 1, 
+   filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
+
+mpred_post2(P,S):- gripe_time(0.6,mpred_post12(P,S)).
 
 
 :- module_transparent(mpred_post1/2).
@@ -913,7 +925,7 @@ mpred_post12(P, S):- is_ftOpenSentence(P)->trace_or_throw(var_mpred_post1(P, S))
 mpred_post12( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 
 % TODO - FIGURE OUT WHY THIS IS NEEDED
-mpred_post12( ~ P,   S):- sanity( \+ is_ftOpenSentence(P)),
+mpred_post12( ~ P,   S):- sanity( \+ is_ftOpenSentence(P)), \+ mpred_unique_u(P),
    with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
 
 mpred_post12(P,S):- maybe_updated_value(P,RP,OLD),!,subst(S,P,RP,RS),mpred_post12(RP,RS),ignore(mpred_retract(OLD)).
@@ -996,10 +1008,10 @@ mpred_post12(P,S):- !,
   gripe_time(0.6, must(mpred_post_update4(WasA,P,S,Was))),!.
   
 
-get_mpred_assertion_status(P,PP,WasO):-
+get_mpred_assertion_status(P,PP,Was):- 
   (clause_asserted_u(P)-> Was=identical;
-    (lookup_u(PP,Ref)*-> must((lookup_u(HB,Ref),Was= partial(HB)));Was= unique)) ,
-  !,WasO=Was.
+      (clause_u(PP)-> Was= partial(PP);
+          Was= unique)).
 
 % The cyclic_break is when we have regressions arouind ~ ~ ~ ~ ~
 get_mpred_support_status(P,_S, PP,(FF,TT),Was):- 
@@ -1036,11 +1048,13 @@ mpred_post_update4(identical,P,S,none):-!,mpred_add_support_fast(P,S),
 
 mpred_post_update4(identical,P,S,simular(_)):- !,mpred_add_support_fast(P,S).
 
+/*
 mpred_post_update4(Was,P,S,What):- 
   not_not_ignore_mnotrace(( \+ (get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
   fix_mp(clause(assert,post),P,M,PP),
   must(S=(F,T)),wdmsg(mpred_post_update4:- (Was,post1=M:PP,fact=F,trig=T,What)))),
   fail.
+*/
 
 mpred_post_update4(partial(_Other),P,S,none):-!,
   mpred_add_support_fast(P,S),
@@ -1153,11 +1167,15 @@ set_fc_mode(Mode):- asserta(t_l:mpred_fc_mode(Mode)).
 %
 
 % mpred_enqueue(P,S):- get_fc_mode(P,S,Mode), must(Mode=direct),fail.
+mpred_enqueue(P,_):- lookup_u(que(P,_)),!.
+%mpred_enqueue(P,_):- clause_asserted(t_l:current_local_why(_,P)),!.
+mpred_enqueue(P,_):- clause_asserted(t_l:busy(P)),!.
+% mpred_enqueue(P,S):- !, assert_u_confirm_if_missing(que(P,S)).
 mpred_enqueue(P,S):-
  ( (must(get_fc_mode(P,S,Mode))
     -> (Mode=direct  -> loop_check_term(mpred_fwc(P),mpred_enqueueing(P),true) ;
-	Mode=depth   -> mpred_asserta_w_support(que(P),S) ;
-	Mode=breadth -> mpred_assert_w_support(que(P),S) ;
+	Mode=depth   -> mpred_asserta_w_support(que(P,S),S) ;
+	Mode=breadth -> mpred_assert_w_support(que(P,S),S) ;
 	true         -> mpred_error("Unrecognized pm mode: ~p", Mode))
      ; mpred_error("No pm mode"))),!.
 
@@ -1200,6 +1218,7 @@ mpred_run.
 
 % mpred_step removes one entry from the queue and reasons from it.
 
+:-dynamic(t_l:busy/1).
 
 mpred_step:-  
   % if hs/1 is true, reset it and fail, thereby stopping inferencing. (hs=halt_signal)
@@ -1212,8 +1231,10 @@ mpred_step:-
 mpred_step:-
   % draw immediate conclusions from the next fact to be considered.
   % fails iff the queue is empty.
-  mnotrace(get_next_fact(P)),
+  get_next_fact(P),
+  asserta(t_l:busy(P)),
   pfcl_do(mpred_fwc(P)),
+  ignore(retract(t_l:current_local_why(_,P))),
   !.
 
 get_next_fact(P):-
@@ -1244,7 +1265,7 @@ select_next_fact(P):-
   !.  
 
 % the default selection predicate takes the item at the froint of the queue.
-defaultmpred_select(P):- lookup_u(que(P)),!.
+defaultmpred_select(P):- lookup_u(que(P,_)),!.
 
 % mpred_halt stops the forward chaining.
 mpred_halt:-  mpred_halt(anonymous(mpred_halt)).
@@ -1294,7 +1315,7 @@ mpred_ain_trigger_reprop(nt(Trigger,Test,Body),Support):-
 
 mpred_ain_trigger_reprop(BT,Support):- 
   BT = bt(Trigger,Body),!,
-  ain_fast((Trigger:-mpred_bc_only(Trigger))),
+  mpred_post1((Trigger:-mpred_bc_only(Trigger))),
   mpred_mark_as(Support,Trigger,pfcBcTrigger),
   % if_defined(kb_dynamic(Trigger),true), 
   mpred_trace_msg('~N~n\tAdding backwards~n\t\ttrigger: ~p~n\t\tbody: ~p~n\t Support: ~p~n',[Trigger,Body,Support]),
@@ -1571,7 +1592,7 @@ mpred_fwc(Ps):- each_E(mpred_fwc0,Ps,[]).
 %  Avoid loop while calling mpred_fwc1(P)
 % 
 % this line filters sequential (and secondary) dupes
-mpred_fwc0(Fact):- fail, ground(Fact),fwc1s_post1s(_One,Two),Six is Two * 3,filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
+mpred_fwc0(Fact):- ground(Fact),fwc1s_post1s(_One,Two),Six is Two * 1, filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
 mpred_fwc0(Fact):- copy_term_vn(Fact,FactC),
       mpred_fwc1(FactC).
 
@@ -1844,8 +1865,24 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 
 % :- table(call_u/1).
 
+% call_u(G):- strip_module(G,M,P), call_u_mp(M,P).
 call_u(G):- strip_module(G,M,P), call_u_mp(G,M,P).
 
+
+call_u_mp(user, P1 ):-!,  call_u_mp(baseKB,P1).
+call_u_mp(M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
+call_u_mp(M,(P1,P2)):-!,call_u_mp(M,P1),call_u_mp(M,P2).
+call_u_mp(M,( \+ P1)):-!, \+ call_u_mp(M,P1).
+call_u_mp(M,must(P1)):-!, must( call_u_mp(M,P1)).
+call_u_mp(M,call(call,P1)):-!, call_u_mp(M,P1).
+call_u_mp(M,call(ereq,P1)):-!, call_u_mp(M,P1).
+call_u_mp(M,call(P1)):-!, call_u_mp(M,P1).
+call_u_mp(_,mtCycL(P)):-!,clause(baseKB:mtCycL(P),true).
+call_u_mp(_,is_string(P)):- !, logicmoo_util_bugger:is_string(P).
+call_u_mp(M,P):- current_predicate(_,M:P),!,catch(M:call(P),E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
+call_u_mp(M,P):- \+ clause(baseKB:mtCycL(M),true),!,clause(baseKB:mtCycL(MT),true),call_u_mp(MT,P).
+call_u_mp(M,P):- current_predicate(_,M:P),!,catch(M:call(P),E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
+call_u_mp(M,P):- wdmsg(dynamic(M:P)),dynamic(M:P),multifile(M:P),!,fail.
 
 call_u_mp(_G,M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
 % call_u_mp(mtCycL(P),_,mtCycL(P)):-!,baseKB:mtCycL(P).

@@ -600,16 +600,19 @@ parser_imperative:phrase_parseForTypes_9([isOptional(region, isRandom(region))],
 
 
 */
+:- set_prolog_flag(lm_expanders,false).
+
 
 parseIsa(_T, _, [AT|_], _):- var(AT),!,fail.
 parseIsa(FT, B, C, D):- var(FT),trace_or_throw(var_parseIsa(FT, B, C, D)).
 parseIsa(Str,A,B,C) :-string(Str),!, parseIsa(exactStr(Str),A,B,C).
 
 % this parseIsa(isNot(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
-
-parseIsa(isNot(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
+:- call(call,assert((parseIsa(isNot(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D)))).
 
 parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(isSelfAgent,Goal,Left,Right),parseFmt_vp2(isSelfAgent,Goal,Left,Right)).
+
+:- user:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
 
 parseIsa(t(P,S,O),TermV) -->{!},parseIsa(call(t(P,S,O)),TermV).
 parseIsa(call(Call),TermV) --> {!,subst(Call,isThis,TermV,NewCall)},theText(TermT), {req1(NewCall),match_object(TermT,TermV)}.
@@ -624,7 +627,6 @@ parseIsa(isOptional(_Type,Default), DefaultV, D, D2):- !,D=D2,to_arg_value(Defau
 %  parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]),'NpcCol1000-Geordi684'),isOptionalStr("to"),isOptional(region, isRandom(region))], [food], GOODARGS,[]).
 %  parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]),'NpcCol1000-Geordi684'),isOptionalStr("to"),isOptional(region, isRandom(region))], [food,to,'Turbolift'], GOODARGS,[]).
 %  parser_imperative:phrase_parseForTypes_9([region], ['Turbolift'], GOODARGS,[]).
-
 
 parseIsa(ftString,String)--> {!}, theString(String).
 parseIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["the","a","an"]),parseIsa(FT, B, C, D).
@@ -694,6 +696,8 @@ instances_sortable0(tWieldAble,distance_to_current_avatar(Agent)):-current_agent
 instances_sortable0(tWearAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 
 distance_to_current_avatar(Agent,ORDEROUT,L,R):-mudDistance(Agent,L,L1),mudDistance(Agent,R,R1),compare(ORDER,L1,R1),!, (ORDER == '=' -> naming_order(ORDEROUT,L,R) ; ORDEROUT=ORDER).
+
+:- set_prolog_flag(lm_expanders,true).
 
 mudDistance(Agent,_Obj,(-1)):- var(Agent),!.
 mudDistance(Agent,Obj,0):- mudWielding(Agent,Obj),!.

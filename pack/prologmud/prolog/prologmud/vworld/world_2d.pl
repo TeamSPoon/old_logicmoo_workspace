@@ -200,7 +200,7 @@ same_regions(Agent,Obj):-inRegion(Agent,Where1),dif(Agent,Obj),inRegion(Obj,Wher
 
 
 % compute the most specific location description
-mostSpecificLocalityOfObject(Obj,Where):-
+mosftSpecificLocalityOfObject(Obj,Where):-
    one_must(is_asserted(mudAtLoc(Obj,Where)),one_must(is_asserted(localityOfObject(Obj,Where)),is_asserted(inRegion(Obj,Where)))).
 
 % :- (rtrace,trace).

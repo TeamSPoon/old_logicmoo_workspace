@@ -15,11 +15,11 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-:- if(( system:use_module(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), push_modules)). 
-:- endif.
+:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(logicmoo_swilib,[]).
+:- endif.
 % restore entry state
-:- lcme:reset_modules.
+%:- lmce:reset_modules.
 
 
 % ======================================================

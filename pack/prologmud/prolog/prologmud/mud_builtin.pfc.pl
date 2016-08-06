@@ -334,24 +334,39 @@ formatted_resultIsa(ftDiceFn(ftInt,ftInt,ftInt),ftInt).
 
 % isa(Col1, ttObjectType) ==> neg(isa(Col1, ttExpressionType)).
 
-tSet(tCol).
-tSet(tPred).
-tSet(tFunction).
-tSet(tRelation).
-tSet(ttSpatialType).
-tSet(ttExpressionType).
-tCol(prologMacroHead).
+
+
+
+%  tCol(prologMacroHead).
 % tCol(ArgsIsa):-mpred_is_trigger(ArgsIsa).
+% tCol(ArgsIsa):-ttPredType(ArgsIsa).
 % TODO decide if OK
-%tCol(F):-t(functorDeclares,F).
-tCol(ttExpressionType).
-tSpec(vtActionTemplate).
-tSet(tRegion).
-tSet(tContainer).
-
 %(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) ==> meta_argtypes(ArgTypes).
+%tCol(F):-t(functorDeclares,F).
+%tCol(F):-t(prologMacroHead,F).
+
+tSet(COL)==>tCol(COL).
+ttExpressionType(COL)==>tCol(COL).
 
 
+tCol(prologMacroHead).
+tCol(tCol).
+tCol(tFunction).
+tCol(tPred).
+tCol(tRelation).
+tCol(ttExpressionType).
+tCol(ttSpatialType).
+tCol(vtActionTemplate).
+tSet(tCol).
+tSet(tContainer).
+tSet(tFunction).
+tSet(tPred).
+tSet(tRegion).
+tSet(tRelation).
+tSet(ttExpressionType).
+tSet(ttSpatialType).
+
+ftSpec(vtActionTemplate).
 
 isa(tRegion,ttSpatialType).
 isa(tRelation,ttAbstractType).
@@ -465,7 +480,7 @@ vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes)
 vtVerb(F),(meta_argtypes(ArgTypes)/get_functor(ArgTypes,F))==>vtActionTemplate(ArgTypes).
 
 tSet(vtAssertion).
-tSpec(vtAssertion).
+ftSpec(vtAssertion).
 prologHybrid(ist(tMicrotheory,vtAssertion)).
 prologHybrid(istAsserted(vtAssertion)).
 
@@ -859,7 +874,7 @@ ttAgentType(mobMonster).
 % instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 
 
-==> tSpec(vtActionTemplate).
+==> ftSpec(vtActionTemplate).
 
 disjointWith(tObj,tRegion).
 disjointWith(tRegion,tObj).
@@ -1009,19 +1024,6 @@ genls(tPartofObj,tItem).
 
 % disjointWith(P1,P2) ==> (not(isa(C,P1)) <==> isa(C,P2)).
 
-
-tCol(tCol).
-tCol(tPred).
-tCol(tFunction).
-tCol(tRelation).
-tCol(ttSpatialType).
-tCol(ttExpressionType).
-%  tCol(prologMacroHead).
-% tCol(ArgsIsa):-ttPredType(ArgsIsa).
-% TODO decide if OK
-%tCol(F):-t(prologMacroHead,F).
-tCol(ttExpressionType).
-tSpec(vtActionTemplate).
 
 isa(tRegion,ttSpatialType).
 isa(tRelation,ttAbstractType).

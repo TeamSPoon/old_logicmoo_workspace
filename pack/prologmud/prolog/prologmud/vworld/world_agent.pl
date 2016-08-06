@@ -58,8 +58,8 @@ do_agent_action(_,'',_):-!, npc_tick_tock.
 do_agent_action(P,C,O):- do_gc,with_session(O,agent_call_unparsed(P, C)),!.
 do_agent_action(P,C,_):-wdmsg("skipping_unknown_player_action(~q,~q).~n",[P,C]),!.
 
-check_verb(SVERB):-var(SVERB),!,freeze(SVERB,check_verb(SVERB)).
-check_verb(SVERB):-atom(SVERB),atom_concat('[',_,SVERB),trace_or_throw(bad_parse_agent_text_command(SVERB)).
+check_verb(SVERB):-var(SVERB),!,freeze(SVERB,check_verb(SVERB)),!.
+check_verb(SVERB):-atom(SVERB), atom_concat('[',_,SVERB),trace_or_throw(bad_parse_agent_text_command(SVERB)).
 check_verb(_).
 
 :-export(parse_agent_text_command_checked/5).
@@ -102,7 +102,7 @@ with_session(ID,CALL):-w_tl(t_l:session_id(ID),CALL).
 
 agent_call_unparsed(C):-foc_current_agent(A),!,agent_call_unparsed(A,C).
 
-agent_call_unparsed(A,C):-  w_tl(tlbugger:old_no_repeats, agent_call_unparsed_0(A,C)).
+agent_call_unparsed(A,C):-  w_tl(tlbugger:old_no_repeats, must(agent_call_unparsed_0(A,C))).
 
 agent_call_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_unparsed(Agent,Var)).
 
@@ -129,9 +129,11 @@ agent_call_words(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,agent_call_word
 agent_call_words(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,agent_call_words(Ag,[C|REST]).
 
 agent_call_words(Agent,[VERB|ARGS]):-
-  sanity(freeze(ARGS,must(is_list(ARGS)))),
-  must((var(VERB),sanity(freeze(VERB,must(check_verb(VERB)))))),
+
+  check_verb(VERB),
+  sanity(freeze(ARGS,must(is_list(ARGS)))),  
   sanity(freeze(CMD,sanity(callable(CMD)))),
+
       must(on_x_debug(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD))),
       must_ac(agent_call_command_now(NewAgent,CMD)),!.
 

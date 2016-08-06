@@ -36,19 +36,22 @@ nearestGenls(C1,C2)==>
 
 :- sanity(get_lang(pfc)).
 
-(genls(C,SC)/ground(genls(C,SC))==>(tCol(C),tCol(SC))).
+% TODO (genls(C,SC)/ground(genls(C,SC))==>(tCol(C),tCol(SC))).
+
+
+% TODO (genls(C,SC)==>(tCol(C),tCol(SC))).
 
 
 
 % tAvoidForwardChain(functorDeclares).
-tAvoidForwardChain(C):-compound(C).
+tAvoidForwardChain(C):-tCol(C),compound(C).
 tAvoidForwardChain(meta_argtypes).
 % tAvoidForwardChain(completeIsaAsserted).
 
 ttExpressionType(C)==>tAvoidForwardChain(C).
 
-((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, 
-   \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
+% TODO ((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ genls/*Fwd*/(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
+%    \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 
 completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ tAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
 /*

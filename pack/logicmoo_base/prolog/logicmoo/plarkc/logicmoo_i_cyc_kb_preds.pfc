@@ -841,7 +841,7 @@ is_cyckb_t_pred('residentialRegion-Role', 2).
 is_cyckb_t_pred('residents-Role', 2).
 is_cyckb_t_pred('response-of', 2).
 is_cyckb_t_pred('restaurantOfTheDay-Cycorp', 2).
-is_cyckb_t_pred('restaurantSpecializingInCuisine-Pred', 2).
+is_cyckb_t_pred('restauranftSpecializingInCuisine-Pred', 2).
 is_cyckb_t_pred('result-of', 2).
 is_cyckb_t_pred('rhs-assertion-of', 2).
 is_cyckb_t_pred('rhs-class-of', 2).
@@ -2494,7 +2494,7 @@ is_cyckb_t_pred(defaultReformulatorModePrecedence, 3).
 is_cyckb_t_pred(defaultSemanticsForString, 2).
 is_cyckb_t_pred(defaultSKSForDatabaseServerProgram, 2).
 is_cyckb_t_pred(defaultSoftwareParameterValueInSoftwareObject, 3).
-is_cyckb_t_pred(defaultSpecializedType, 2).
+is_cyckb_t_pred(defaulftSpecializedType, 2).
 is_cyckb_t_pred(defaultStrategyConfidence, 2).
 is_cyckb_t_pred(defaultTask, 2).
 is_cyckb_t_pred(defaultValueForParameter, 3).
@@ -4365,7 +4365,7 @@ is_cyckb_t_pred(mostNotableIsa, 2).
 is_cyckb_t_pred(mostNotableIsaInContext, 3).
 is_cyckb_t_pred(mostRecentImportantConceptEvent, 2).
 is_cyckb_t_pred(mostRecentReferenceToWRTPeg, 3).
-is_cyckb_t_pred(mostSpecificSpeechPartPreds, 2).
+is_cyckb_t_pred(mosftSpecificSpeechPartPreds, 2).
 is_cyckb_t_pred(mother, 2).
 is_cyckb_t_pred(motivesForAction, 4).
 is_cyckb_t_pred(movementHasLeaders, 2).
@@ -5653,11 +5653,11 @@ is_cyckb_t_pred(reportHasVariant, 2).
 is_cyckb_t_pred(reportID, 2).
 is_cyckb_t_pred(reportLFIHasFieldName, 3).
 is_cyckb_t_pred(reportPFIHasFieldName, 3).
-is_cyckb_t_pred(reportSpecificationClobberMultipleValues, 2).
-is_cyckb_t_pred(reportSpecificationDelimiterCharacter, 2).
-is_cyckb_t_pred(reportSpecificationFields, 2).
-is_cyckb_t_pred(reportSpecificationSelectionSentence, 2).
-is_cyckb_t_pred(reportSpecificationTemplate, 2).
+is_cyckb_t_pred(reporftSpecificationClobberMultipleValues, 2).
+is_cyckb_t_pred(reporftSpecificationDelimiterCharacter, 2).
+is_cyckb_t_pred(reporftSpecificationFields, 2).
+is_cyckb_t_pred(reporftSpecificationSelectionSentence, 2).
+is_cyckb_t_pred(reporftSpecificationTemplate, 2).
 is_cyckb_t_pred(reportTime, 2).
 is_cyckb_t_pred(representationalImageForTermImagePathname, 2).
 is_cyckb_t_pred(represents, 2).
@@ -5819,7 +5819,7 @@ is_cyckb_t_pred(scheduledBy, 2).
 is_cyckb_t_pred(scheduledEventTypeWhereWhen, 3).
 is_cyckb_t_pred(scheduledQueryFolderOfUserForTask, 3).
 is_cyckb_t_pred(scheduledQuerySpecification, 2).
-is_cyckb_t_pred(scheduledReportSpecification, 2).
+is_cyckb_t_pred(scheduledReporftSpecification, 2).
 is_cyckb_t_pred(scheduledStartDateOfSitOfTypeInScriptedSitOfType, 4).
 is_cyckb_t_pred(scheduledStartingDate, 2).
 is_cyckb_t_pred(scheduleTypeForProcess, 2).

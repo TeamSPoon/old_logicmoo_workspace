@@ -1041,7 +1041,8 @@ ltrim(X,X).
 %
 % Any Converted To String.
 %
-any_to_string(Atom,String):- with_err_to_pred(nop, (must(any_to_string1(Atom,StringS)),!,StringS=String)),!.
+any_to_string(Atom,String):-  (must(any_to_string1(Atom,StringS)),!,must(StringS=String)),!.
+% any_to_string(Atom,String):- with_err_to_pred(nop, (must(any_to_string1(Atom,StringS)),!,must(StringS=String))),!.
 
 
 %= 	 	 
@@ -1051,8 +1052,10 @@ any_to_string(Atom,String):- with_err_to_pred(nop, (must(any_to_string1(Atom,Str
 % Any Converted To String Secondary Helper.
 %
 any_to_string1(Atom,String):- string(Atom),!,Atom=String.
-any_to_string1(O,O):-stack_depth(X),X>2000,!,sanity(fail).
-any_to_string1(Atom,String):-var(Atom),!,term_string(Atom,String).
+% any_to_string1(Atom,String):- is_string(Atom),!,text_to_string(String).
+
+any_to_string1(_,_):-stack_depth(X),X>2000,!,sanity(fail),fail.
+any_to_string1(Atom,String):- var(Atom),show_call((term_string(Atom,String))),!.
 any_to_string1(Atom,String):- var(Atom),!,=(Atom,String).
 any_to_string1(Atom,String):- number(Atom),!,number_string(Atom,String).
 any_to_string1("",String):- !,""=String.
@@ -1066,11 +1069,13 @@ any_to_string1(Atom,String):-atom(Atom),!,atom_string(Atom,String).
 any_to_string1([Atom],String):-nonvar(Atom),!,any_to_string1(Atom,String).
 any_to_string1(A,""):-nonvar(A),member(A,[[],'',"",``]),!.
 any_to_string1(List,String):- text_to_string_safe(List,String),!.
-%any_to_string1(List,String):- fail, dtrace, is_list(List), (on_x_fail(atomics_to_string(List, ' ', String)); ((list_to_atomics_list0(List,AList),on_x_fail(atomics_to_string(AList, ' ', String))))),!.
-any_to_string1(List,String):- on_x_fail(format(string(String),'~s',[List])).
-any_to_string1(Term,String):- on_x_fail(term_string(Term,String)).
-any_to_string1(List,String):- on_x_fail(format(string(String),'~p',[List])).
+any_to_string1(List,String):- is_list(List),!,must_maplist(any_to_string1,List,StringList), 
+    must(atomics_to_string(StringList, ' ', String)),!.
+any_to_string1(List,String):- on_x_debug(format(string(String),'~s',[List])).
+any_to_string1(Term,String):- show_call(on_x_debug(term_string(Term,String))).
+any_to_string1(List,String):- on_x_debug(format(string(String),'~p',[List])).
 any_to_string1(List,String):- format(string(String),'~q',[List]).
+
 /*
 list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
 list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
