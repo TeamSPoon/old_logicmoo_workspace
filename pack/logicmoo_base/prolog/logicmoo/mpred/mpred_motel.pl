@@ -86,6 +86,8 @@ SICSTUS Prolog as described the appendix of the MOTEL user manual.
  *
  */
 
+:- multifile(call_u_lm/1).
+:- dynamic(call_u_lm/1).
 
 % !! Remember: Any changes to the following list should be carefully
 %              reflected in     clearEnvironment
@@ -105,6 +107,9 @@ SICSTUS Prolog as described the appendix of the MOTEL user manual.
 :- dynamic(rel/5).
 % The following predicates are used for additional informations about
 % the terminology and the world description.
+:- multifile(attribute/5).
+:- dynamic(attribute/5).
+
 :- multifile(axiom/3).
 :- dynamic(axiom/3).
 :- multifile(closed/5).
@@ -119,6 +124,12 @@ SICSTUS Prolog as described the appendix of the MOTEL user manual.
 :- dynamic(conceptHierarchy/3).
 :- multifile(conceptName/4).
 :- dynamic(conceptName/4).
+
+
+:- multifile(conceptName1/4).
+:- dynamic(conceptName1/4).
+
+
 :- multifile(conceptSubsets/6).
 :- dynamic(conceptSubsets/6).
 :- multifile(environment/3).
@@ -145,16 +156,22 @@ SICSTUS Prolog as described the appendix of the MOTEL user manual.
 :- dynamic(roleHierarchy/3).
 :- multifile(roleName/4).
 :- dynamic(roleName/4).
+:- multifile(roleName1/4).
+:- dynamic(roleName1/4).
 :- multifile(roleNr/5).
 :- dynamic(roleNr/5).
 :- multifile(roleRange/4).
 :- dynamic(roleRange/4).
 :- multifile(roleSubsets/6).
 :- dynamic(roleSubsets/6).
-:- multifile(sub/4).
-:- dynamic(sub/4).
-:- multifile(succ/4).
-:- dynamic(succ/4).
+
+:- multifile(sub/5).
+:- dynamic(sub/5).
+:- multifile(succ/5).
+:- dynamic(succ/5).
+:- multifile(nsub/5).
+:- dynamic(nsub/5).
+
 % The following predicates are used during computations only.
 :- multifile(abductiveDerivation/3).
 :- dynamic(abductiveDerivation/3).
@@ -164,24 +181,79 @@ SICSTUS Prolog as described the appendix of the MOTEL user manual.
 :- dynamic(hypothesis/1).
 :- multifile(inconsistencyCheck/3).
 :- dynamic(inconsistencyCheck/3).
-:- multifile(option/2).
-:- dynamic(option/2).
-:- multifile(nsub/4).
-:- dynamic(nsub/4).
+:- multifile(motel_option/2).
+:- dynamic(motel_option/2).
 :- multifile(nsub3/2).
 :- dynamic(nsub3/2).
 :- multifile(sub3/2).
 :- dynamic(sub3/2).
 :- multifile(succ3/2).
 :- dynamic(succ3/2).
-:- multifile(value/2).
-:- dynamic(value/2).
+%:- multifile(value/2).
+%:- dynamic(value/2).
 % Predicates which are no longer needed
 %:- multifile(falsum/2).
 %:- dynamic(falsum/2).
 %:- multifile(numb/1).
 %:- dynamic(numb/1).
 :- op(1200,xfx,<==).
+
+ :- meta_predicate doFileGoal(0).
+ :- meta_predicate performQuery(*,0,0).
+ :- meta_predicate setofOrNil(?,^,-).
+ :- meta_predicate bagofOrNil(?,^,-).
+ :- meta_predicate tryGoal(0).
+ :- meta_predicate doClashTest(0).
+ :- meta_predicate runTest(*,0).
+ :- meta_predicate mapGoal(0,*,*).
+ :- meta_predicate doboth(0,0).
+ :- meta_predicate assert2(0).
+ :- meta_predicate callList(0).
+ :- meta_predicate assert1(0).
+ :- meta_predicate try(0).
+ :- meta_predicate unexpand_role(*,*,0,*).
+
+
+:- multifile( clause/1).
+:- multifile( conceptElement/6).
+:- multifile( conceptEqualSets/5).
+:- multifile( conceptSubsets/5).
+:- multifile( constructEqHead/20).
+:- multifile( constructMLHead/20).
+:- multifile( cont1a/5).
+:- multifile( convertInConsequence/10).
+:- multifile( default_change/3).
+:- multifile( eq/19).
+:- multifile( noDouble/2).
+:- multifile( prolog_flag/3).
+:- multifile( roleAll/9).
+:- multifile( roleEqualSets/5).
+:- multifile( roleName1/4).
+:- multifile( roleSubsets/5).
+:- multifile( roleTripel/6).
+
+:- dynamic( clause/1).
+:- dynamic( conceptElement/6).
+:- dynamic( conceptSubsets/5).
+
+:- dynamic( conceptEqualSets/5).
+:- dynamic( conceptSubsets/4).
+
+
+:- dynamic( constructEqHead/20).
+:- dynamic( constructMLHead/20).
+:- dynamic( cont1a/5).
+:- dynamic( convertInConsequence/10).
+:- dynamic( default_change/3).
+:- dynamic( eq/19).
+:- dynamic( noDouble/2).
+
+:- dynamic( roleAll/9).
+:- dynamic( roleEqualSets/5).
+:- dynamic( roleName1/4).
+:- dynamic( roleSubsets/5).
+:- dynamic( roleTripel/6).
+
 /**********************************************************************
  *
  * @(#) sets.pl 1.1@(#)
@@ -192,13 +264,13 @@ SICSTUS Prolog as described the appendix of the MOTEL user manual.
 %   is true when Set is a list, and Element occurs in it.  It may be used
 %   to test for an element or to enumerate all the elements by backtracking.
 %   Indeed, it may be used to generate the Set!
-
+/*
 member(X, [X|_]    ).
 member(X, [_,X|_]  ).
 member(X, [_,_,X|_]).
 member(X, [_,_,_|L]) :-
         member(X, L).
-
+*/
 %   reverseList(+List1,-List2
 %   reverses the list List1 to get List2
 
@@ -212,7 +284,7 @@ reverseList([H|T],L2) :-
 %   means the same thing, but may only be used to test whether a known
 %   Element occurs in a known Set.  In return for this limited use, it
 %   is more efficient than member/2 when it is applicable.
-
+/*
 memberchk(X, L) :- 
 	nonvar(X), 
 	nonvar(L),
@@ -223,7 +295,7 @@ memberchk1(X, [_,X|_]  ) :- !.
 memberchk1(X, [_,_,X|_]) :- !.
 memberchk1(X, [_,_,_|L]) :-
 	memberchk1(X, L).
-
+*/
 %   nonmember(+Element, +Set)
 %   means that Element does not occur in Set.  It does not make sense
 %   to instantiate Element in any way, as there are infinitely many
@@ -237,14 +309,14 @@ memberchk1(X, [_,_,_|L]) :-
 nonmember(Element, Set) :-
 	nonvar(Element),
 	nonvar(Set),
-	not(member(Element, Set)).
+	\+ (member(Element, Set)).
 
-%   intersection(+Set1, +Set2, ?Intersection)
+%   intersection_motel(+Set1, +Set2, ?Intersection)
 %   is true when all three arguments are lists representing sets,
 %   and Intersection contains every element of Set1 which is also
 %   an element of Set2, the order of elements in Intersection
 %   being the same as in Set1.  That is, Intersection represents
-%   the intersection of the sets represented by Set1 and Set2.
+%   the intersection_motel of the sets represented by Set1 and Set2.
 %   If Set2 is a partial list, Intersection will be empty, which
 %   is not, of course, correct.  If Set1 is a partial list, this
 %   predicate will run away on backtracking.  Set1 and Set2 should
@@ -252,24 +324,24 @@ nonmember(Element, Set) :-
 %   Set1 may survive in Intersection.  It is worthy of note that
 %   if Set1 is an ordset, Intersection is an ordset, despite Set2.
 
-intersection([], _, []).
-intersection([Element|Elements], Set, Intersection) :-
+intersection_motel([], _, []).
+intersection_motel([Element|Elements], Set, Intersection) :-
 	memberchk(Element, Set),
 	!,
 	Intersection = [Element|Rest],
-	intersection(Elements, Set, Rest).
-intersection([_|Elements], Set, Intersection) :-
-	intersection(Elements, Set, Intersection).
+	intersection_motel(Elements, Set, Rest).
+intersection_motel([_|Elements], Set, Intersection) :-
+	intersection_motel(Elements, Set, Intersection).
 
 
 
-%   intersection(+ListOfSets, ?Intersection)
-%   is true when Intersection is the intersection of all the sets in
+%   intersection_motel(+ListOfSets, ?Intersection)
+%   is true when Intersection is the intersection_motel of all the sets in
 %   ListOfSets.  The order of elements in Intersection is taken from
 %   the first set in ListOfSets.  This has been turned inside out to
 %   minimise the storage turnover.
 
-intersection([Set|Sets], Intersection) :-
+intersection_motel([Set|Sets], Intersection) :-
 	intersection1(Set, Sets, Intersection).
 
 intersection1([], _, []).
@@ -286,40 +358,40 @@ memberchk_all([Set|Sets], Element) :-
 	memberchk(Element, Set),
 	memberchk_all(Sets, Element).
 
-%   subtract(+Set1, +Set2, ?Difference)
+%   motel_subtract(+Set1, +Set2, ?Difference)
 %   is like intersect, but this time it is the elements of Set1 which
 %   *are* in Set2 that are deleted.  Note that duplicated Elements of
 %   Set1 which are not in Set2 are retained in Difference.
 
-subtract([], _, []).
-subtract([Element|Elements], Set, Difference) :-
+motel_subtract([], _, []).
+motel_subtract([Element|Elements], Set, Difference) :-
 	memberchk(Element, Set),
 	!,
-	subtract(Elements, Set, Difference).
-subtract([Element|Elements], Set, [Element|Difference]) :-
-	subtract(Elements, Set, Difference).
+	motel_subtract(Elements, Set, Difference).
+motel_subtract([Element|Elements], Set, [Element|Difference]) :-
+	motel_subtract(Elements, Set, Difference).
 
-%   union(+Set1, +Set2, ?Union)
-%   is true when subtract(Set1,Set2,Diff) and append(Diff,Set2,Union),
+%   motel_union(+Set1, +Set2, ?Union)
+%   is true when motel_subtract(Set1,Set2,Diff) and append(Diff,Set2,Union),
 %   that is, when Union is the elements of Set1 that do not occur in
 %   Set2, followed by all the elements of Set2.
 
-union([], Union, Union).
-union([Element|Elements], Set, Union) :-
+motel_union([], Union, Union).
+motel_union([Element|Elements], Set, Union) :-
 	memberchk(Element, Set),
 	!,
-	union(Elements, Set, Union).
-union([Element|Elements], Set, [Element|Union]) :-
-	union(Elements, Set, Union).
+	motel_union(Elements, Set, Union).
+motel_union([Element|Elements], Set, [Element|Union]) :-
+	motel_union(Elements, Set, Union).
 
-%   union(+ListOfSets, ?Union)
-%   is true when Union is the union of all sets in ListOfSets.
+%   motel_union(+ListOfSets, ?Union)
+%   is true when Union is the motel_union of all sets in ListOfSets.
 
-union([],[]).
-union([Set1],Set1).
-union([Set1,Set2|Sets],Union) :-
-	union(Set1,Set2,Set),
-	union([Set|Sets],Union).
+motel_union([],[]).
+motel_union([Set1],Set1).
+motel_union([Set1,Set2|Sets],Union) :-
+	motel_union(Set1,Set2,Set),
+	motel_union([Set|Sets],Union).
 
 
 %   list_to_set(+List, ?Set)
@@ -332,7 +404,7 @@ union([Set1,Set2|Sets],Union) :-
 %   copy of X is retained.  If you want to convert a List to a Set,
 %   retaining the FIRST copy of repeated elements, call
 %	symdiff([], List, Set)
-
+/*
 list_to_set([], []).
 list_to_set([Head|Tail], Set) :-
 	memberchk(Head, Tail),
@@ -340,7 +412,7 @@ list_to_set([Head|Tail], Set) :-
 	list_to_set(Tail, Set).
 list_to_set([Head|Tail], [Head|Set]) :-
 	list_to_set(Tail, Set).
-
+*/
 
 %   deleteInList(+List, +Kill, ?Residue)
 %   is true when List is a list, in which Kill may or may not occur, and
@@ -358,23 +430,25 @@ deleteInList([Head|Tail], Kill, [Head|Residue]) :-
 	deleteInList(Tail, Kill, Residue).
 
 
-subset([],_S2) :- !.
-subset([E1|S1],S2) :-
-	not(not(member(E1,S2))),
-	subset(S1,S2),
+
+motel_subset([],_S2) :- !.
+motel_subset([E1|S1],S2) :-
+	\+(\+(member(E1,S2))),
+	motel_subset(S1,S2),
 	!.
 
 equalset(S1,S2) :-
-	subset(S1,S2),
-	subset(S2,S1),
+	motel_subset(S1,S2),
+	motel_subset(S2,S1),
 	!.
+
 
 %----------------------------------------------------------------------	
 %   Module : lists
 %   Authors: Bob Welham, Lawrence Byrd, and Richard A. O'Keefe
 %   Updated: 10/25/90
 %   Defines: list processing utilities
-%   SeeAlso: library(flatten)
+%   SeeAlso: library(motel_flatten)
 
 %   Adapted from shared code written by the same authors; all changes
 %   Copyright (C) 1987, Quintus Computer Systems, Inc.  All rights reserved.
@@ -382,20 +456,20 @@ equalset(S1,S2) :-
 %   perm(+List, ?Perm)
 %   is true when List and Perm are permutations of each other.  The main
 %   use of perm/2 is to generate permutations.  You should not use this
-%   predicate in new programs; use permutation/2 instead.  List must be
+%   predicate in new programs; use permutation_motel/2 instead.  List must be
 %   a proper list.  Perm may be partly instantiated.
 
 perm([], []).
 perm([X|Xs], Ys1) :-
 	perm(Xs, Ys),
-	insert(Ys, X, Ys1).
+	motel_insert(Ys, X, Ys1).
 
 
-insert(L, X, [X|L]).
-insert([H|T], X, [H|L]) :-
-	insert(T, X, L).
+motel_insert(L, X, [X|L]).
+motel_insert([H|T], X, [H|L]) :-
+	motel_insert(T, X, L).
 
-%   permutation(?List, ?Perm)
+%   permutation_motel(?List, ?Perm)
 %   is true when List and Perm are permuations of each other.
 %   Unlike perm/2, it will work even when List is not a proper list.
 %   It even acts in a marginally sensible way when Perm isn't proper
@@ -403,13 +477,13 @@ insert([H|T], X, [H|L]) :-
 %   Be careful: this is quite efficient, but the number of permutations of an
 %   N-element list is N!, and even for a 7-element list that is 5040.
 
-permutation(List, Perm) :-
-	permutation(List, Perm, Perm).
+permutation_motel(List, Perm) :-
+	permutation_motel(List, Perm, Perm).
 
-permutation([], [], []).
-permutation([X|Xs], Ys1, [_|Zs]) :-
-	permutation(Xs, Ys, Zs),
-	insert(Ys, X, Ys1).
+permutation_motel([], [], []).
+permutation_motel([X|Xs], Ys1, [_|Zs]) :-
+	permutation_motel(Xs, Ys, Zs),
+	motel_insert(Ys, X, Ys1).
 
 
 
@@ -447,9 +521,7 @@ permutation([X|Xs], Ys1, [_|Zs]) :-
  *
  */
 
-setCounter(Counter,N) :-
-        asserta(value(Counter,N)),
-        !.
+setCounter(Counter,N) :- flag(Counter,_,N).
 
 /**********************************************************************
  *
@@ -458,11 +530,7 @@ setCounter(Counter,N) :-
  *
  */
  
-addCounter(Counter,N) :-
-        retract(value(Counter,M)),
-        Sum is N + M,
-        asserta(value(Counter,Sum)),
-        !.
+addCounter(Counter,N) :-  flag(Counter,M,M+N).
 
 /**********************************************************************
  *
@@ -471,9 +539,8 @@ addCounter(Counter,N) :-
  *
  */
 
-getCounter(Counter,N) :-
-        value(Counter,N),
-        !.
+getCounter(Counter,N) :- flag(Counter,N,N).
+      
 
 /**********************************************************************
  *
@@ -492,6 +559,9 @@ writes([H|T]) :- put(H), writes(T).
  * Only available for SICStus Prolog and Quintus Prolog.
  *
  */
+
+:- meta_predicate printTime(0).
+:- meta_predicate printTime(0,*).
 
 printTime(G) :-
 	(currentProlog(poplog) ; currentProlog(macprolog)),
@@ -607,12 +677,12 @@ loadLibraries(swiprolog) :-
 	statistics(cputime,RT1), RT is (ceil(RT1 * 100000)) mod 100000, statistics(atoms,CT))),
 	assertz((getRuntime(RT) :-
 	statistics(cputime,RT1), RT is ceil(RT1 * 1000))),
-	index(kb_in(1,0,0,0,1,1,0,0,0,0)),
-	index(eq(1,0,0,1,1,0,0,0,0)),
-	index(constraint(1,0,0,1,0,0,0,0)),
-	assertz((retractall(Head) :- retract(Head), fail)),
-	assertz((retractall(Head) :- retract((Head :- _Body)), fail)),
-	assertz((retractall(_))),
+	%index(kb_in(1,0,0,0,1,1,0,0,0,0)),
+	%index(eq(1,0,0,1,1,0,0,0,0)),
+	%index(constraint(1,0,0,1,0,0,0,0)),
+	assertz((retractall_head(Head) :- retract(Head), fail)),
+	assertz((retractall_head(Head) :- retract((Head :- _Body)), fail)),
+	assertz((retractall_head(_))),
 	!.
 loadLibraries(poplog) :-
 	op(600,xfy,':'),
@@ -687,6 +757,7 @@ getLibraries :-
 	asserta(currentProlog(macprolog)),
 	version('MOTEL-0.4 Tue Aug 04 15:00:00 MET 1992'),
 	loadLibraries(macprolog).
+:- if(false).
 getLibraries :-
 	current_op(1190,fx,delay),
 	!,
@@ -694,6 +765,7 @@ getLibraries :-
 	asserta(currentProlog(eclipse)),
 	set_flag(variable_names,off),
 	loadLibraries(eclipse).
+:- endif.
 getLibraries :-
 	current_op(_X,_Y,?),
 	style_check(-singleton),
@@ -738,13 +810,13 @@ getLibraries :-
 /***********************************************************************
  *
  * setOption(+Option,+Set)
- * set option Option to value Set.
+ * set motel_option Option to value Set.
  *
  */
 
 setOption(Option,Set) :-
-	retractall(option(Option,_)),
-	asserta(option(Option,Set)),
+	retractall_head(motel_option(Option,_)),
+	asserta(motel_option(Option,Set)),
 	!.
 
 /**********************************************************************
@@ -755,8 +827,9 @@ setOption(Option,Set) :-
  *
  */
 
+:- meta_predicate ifOption(*,*,0).
 ifOption(Option,Set,Goal) :-
-	option(Option,Set),
+	motel_option(Option,Set),
 	call(Goal),
 	!.
 ifOption(_,_,_) :-
@@ -764,10 +837,12 @@ ifOption(_,_,_) :-
 
 retractallEnv(Env,Pred/Arity) :-
 	constructHead(Env,Pred/Arity,Head),
-	retractall(Head), 
+	retractall_head(Head), 
 	!.
 
-:- rtrace,getLibraries.
+:- ensure_loaded('/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo_utils').
+
+:- getLibraries.
 
 
 
@@ -781,7 +856,7 @@ retractallEnv(Env,Pred/Arity) :-
 
 % MOTEL is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 1, or (at your option)
+% the Free Software Foundation; either version 1, or (at your motel_option)
 % any later version.
 
 % MOTEL is distributed in the hope that it will be useful,
@@ -1639,7 +1714,7 @@ buildTree1(NewConcept,N,below([]),beside(NL2),above(NL3),
 	!.
 buildTree1(_NewConcept,N,below(NL1),beside(NL2),above(_),
 	node(N,NL)) :-
-	union(NL1,NL2,NL),
+	motel_union(NL1,NL2,NL),
 	!.
 buildTree1(_NewConcept,_N,_,_,_,_) :-
 	!,
@@ -1662,7 +1737,7 @@ continue1(Type,Env,MS,NewConcept,N,NL1,[Node1|NL2],
 continue1(Type,Env,MS,NewConcept,N,NL1,[Node1|NL2],
          below(NL3),beside(NL4),above(NL5),
          node([NewConcept],[N1|NL]),beside,NewTree) :-
-	union(NL5,[N1|NL],NL6),
+	motel_union(NL5,[N1|NL],NL6),
 	tfsList1(Type,Env,MS,NewConcept,N,[Node1|NL1],NL2,
                 below(NL3),beside([Node1|NL4]),above(NL6),NewTree),
 	!.
@@ -1676,7 +1751,7 @@ continue1(_Type,_,_MS,_NewConcept,N,NL1,[_Node1|NL2],
          Tree,in,node(N,NL)) :-
         % NL3, NL4 and NL5 can be non-empty
 	reverseList(NL1,NL6),
-	union(NL6,[Tree|NL2],NL),
+	motel_union(NL6,[Tree|NL2],NL),
 	!.
 
 tfsList2(_Type,_,_MS,NewConcept,N,_NL1,[],
@@ -1948,14 +2023,14 @@ init_succ(MS) :-
 	!.
 init_succ(MS).
 init_succ(Env,MS) :- 
-	retractall(succ(_,Env,MS,_,_)),
+	retractall_head(succ(_,Env,MS,_,_)),
 	!.
 init_sub(MS) :-
 	currentEnvironment(Env),
 	init_sub(Env,MS).
 init_sub(MS).
 init_sub(Env,MS) :- 
-	retractall(sub(_,Env,MS,_,_)),
+	retractall_head(sub(_,Env,MS,_,_)),
 	!.
 
 init_nsub(MS) :-
@@ -1963,7 +2038,7 @@ init_nsub(MS) :-
 	init_nsub(Env,MS).
 init_nsub(MS).
 init_nsub(Env,MS) :-
-	retractall(nsub(_,Env,MS,_,_)),
+	retractall_head(nsub(_,Env,MS,_,_)),
 	!.
 
 /********************************************************************/
@@ -2029,7 +2104,7 @@ test3(MS) :-
 	roleSubsets(Env,user,MS,Concept,CT,_),
 	clause(roleName(Env,_MS1,_W1,Concept),_),
 	roleSubsets(Env,user,MS,CT,Concept1,_),
-%	not(roleName(Env,MS,Concept)),
+%	not(roleName(Env,_,MS,Concept)),
 	print(Concept),print(" "),
 	print(CT),print(" "),
 	print(Concept1),
@@ -2062,8 +2137,8 @@ testa(Env,MS) :-
 	initStat,
 	testb(Env,MS),
 	buildOrdering(Env,MS,CTree,RTree),
-	retractall(conceptHierarchy(Env,MS,_)),
-	retractall(roleHierarchy(Env,MS,_)),
+	retractall_head(conceptHierarchy(Env,MS,_)),
+	retractall_head(roleHierarchy(Env,MS,_)),
 	assert(conceptHierarchy(Env,MS,CTree)),
 	assert(roleHierarchy(Env,MS,RTree)),
 	ifOption(testOutput,yes,printStat),
@@ -2306,7 +2381,7 @@ find_concept3(Env,MS,Concept,[],Z,Z) :-
 	!.
 find_concept3(Env,MS,Concept,[L|R],Z,K) :-
 	L = and(L1),
-	intersection(Z,L1,Z1),
+	intersection_motel(Z,L1,Z1),
 	find_concept3(Env,MS,Concept,R,Z1,K),
 	!.
 
@@ -2405,7 +2480,7 @@ find_pconcept3(Env,MS,Primconcept,[],Z,Z) :-
 	!.
 find_pconcept3(Env,MS,Primconcept,[L|R],Z,K) :-
 	L = and(L1),
-	intersection(Z,L1,Z1),
+	intersection_motel(Z,L1,Z1),
 	find_pconcept3(Env,MS,Primconcept,R,Z1,K),
 	!.
 
@@ -2541,7 +2616,7 @@ find_role30(Env,MS,Role,[],Z,Z) :-
 	!.
 find_role30(Env,MS,Role,[L|R],Z,K) :-
 	L = and(L1),
-	intersection(Z,L1,Z1),
+	intersection_motel(Z,L1,Z1),
 	find_role30(Env,MS,Role,R,Z1,K),
 	!.
 
@@ -2701,7 +2776,7 @@ find_prole3(Env,MS,Primrole,[],Z,Z) :-
 	!.
 find_prole3(Env,MS,Primrole,[L|R],Z,K) :-
 	L = and(L1),
-	intersection(Z,L1,Z1),
+	intersection_motel(Z,L1,Z1),
 	find_prole3(Env,MS,Primrole,R,Z1,K),
 	!.
 
@@ -2793,7 +2868,7 @@ check1(Type,Env,MS,Done,[Y|L],NewConcept,L1) :-
 	setofOrNil(Z,succ1(Type,Env,MS,Y,Z),L2),
 	check1(Type,Env,MS,[Y|Done],L2,NewConcept,L3),
 	check1(Type,Env,MS,[Y|Done],L,NewConcept,L4),
-	union(L3,L4,L5),
+	motel_union(L3,L4,L5),
 	deleteInList(L5,top,L1),
 	!.
 check1(Type,Env,MS,Done,[Y|L],NewConcept,L1) :-
@@ -2874,25 +2949,26 @@ delete1(X,top,Z) :-
 
 union1([],[],[]).
 union1([X|R],[Y|R1],Z):-
-	union([X|R],[Y|R1],Z),
+	motel_union([X|R],[Y|R1],Z),
 	!.
 union1([X|R],Y,Z) :-
-	union([X|R],[Y],Z),
+	motel_union([X|R],[Y],Z),
 	!.
 union1([X],Y,Z) :-
-	union([X],[Y],Z),
+	motel_union([X],[Y],Z),
 	!.
 union1(X,[Y],Z) :-
-	union([X],[Y],Z),
+	motel_union([X],[Y],Z),
 	!.
 union1(X,[Y|R],Z) :-
-	union([X],[Y|R],Z),
+	motel_union([X],[Y|R],Z),
 	!.
 union1(X,Y,Z) :-
-	union([X],[Y],Z),
+	motel_union([X],[Y],Z),
 	!.
+
 assert1(G) :- 
-	not(G),
+	\+ (G),
 	assert(G),
 	!.
 assert1(G) :-
@@ -3075,9 +3151,9 @@ compileEnvironment(FileName,EnvName) :-
 	write((:- dynamic(conceptElement/7))), write('.'), nl,
 	write((:- dynamic(roleElement/8))), write('.'), nl,
 	write((:- dynamic(closed/5))), write('.'), nl,
-	write((:- dynamic(sub/4))), write('.'), nl,
-	write((:- dynamic(succ/4))), write('.'), nl,
-	write((:- dynamic(nsub/4))), write('.'), nl,
+	write((:- dynamic(sub/5))), write('.'), nl,
+	write((:- dynamic(succ/5))), write('.'), nl,
+	write((:- dynamic(nsub/5))), write('.'), nl,
 	write((:- dynamic(sub3/2))), write('.'), nl,
 	write((:- dynamic(succ3/2))), write('.'), nl,
 	write((:- dynamic(nsub3/2))), write('.'), nl,
@@ -3092,8 +3168,8 @@ compileEnvironment(FileName,EnvName) :-
 	write((:- dynamic(roleAttributes/5))), write('.'), nl,
 %	write((:- dynamic(given_inflLink/4))), write('.'), nl,
 %	write((:- dynamic(given_change/4))), write('.'), nl,
-	write((:- dynamic(value/2))), write('.'), nl,
-	write((:- dynamic(option/2))), write('.'), nl,
+%       write((:- dynamic(value/2))), write('.'), nl,
+	write((:- dynamic(motel_option/2))), write('.'), nl,
 %	write((:- dynamic(environment/3))), write('.'), nl,
 %	write((:- dynamic(conceptHierarchy/3))), write('.'), nl,
 %	write((:- dynamic(roleHierarchy/3))), write('.'), nl,
@@ -3101,7 +3177,7 @@ compileEnvironment(FileName,EnvName) :-
 %	write((:- dynamic(rel/5))), write('.'), nl,
 	write((:- dynamic(compiledPredicate/2))), write('.'), nl,
 	writeq((:- asserta(environment(EnvName,Env,Comment)))), write('.'), nl,
-	writeq((:- retractall(currentEnvironment(_)))), write('.'), nl,
+	writeq((:- retractall_head(currentEnvironment(_)))), write('.'), nl,
 	writeq((:- asserta(currentEnvironment(Env)))), write('.'), nl,
 	writeCompiledPredicateFactsToFile(Env,CPList),
 	expand_term((in(Env,Name,modal(MS),CN,CON,hyp(HYP),
@@ -3366,47 +3442,47 @@ normalizeInverse(R1,R1).
 
 /***********************************************************************
  *
- * flatten(+C1,-C2)
+ * motel_flatten(+C1,-C2)
  * deletes unnecessary occurrences of `and' and `or' in C1 to get C2.
  *
  */
 
-flatten(and(L1),and(L2)) :-
+motel_flatten(and(L1),and(L2)) :-
 	!,
-	hop_map(flatten,L1,L3),
+	hop_map(motel_flatten,L1,L3),
 	flattenAnd([],L3,L2).
-flatten(or(L1),or(L2)) :-
+motel_flatten(or(L1),or(L2)) :-
 	!,
-	hop_map(flatten,L1,L3),
+	hop_map(motel_flatten,L1,L3),
 	flattenOr([],L3,L2).
-flatten(set(L1),set(L1)) :-
+motel_flatten(set(L1),set(L1)) :-
 	!.
-flatten(all(R1,C1),all(R2,C2)) :-
-	flatten(R1,R2),
-	flatten(C1,C2).
-flatten(some(R1,C1),some(R2,C2)) :-
-	flatten(R1,R2),
-	flatten(C1,C2).
-flatten(atleast(N,R1),atleast(N,R2)) :-
-	flatten(R1,R2).
-flatten(atmost(N,R1),atmost(N,R2)) :-
-	flatten(R1,R2).
-flatten(b(O,P,C1),b(O,P,C2)) :-
-	flatten(C1,C2).
-flatten(d(O,P,C1),d(O,P,C2)) :-
-	flatten(C1,C2).
-flatten(bc(O,P,C1),bc(O,P1,C2)) :-
-	flatten(P,P1),
-	flatten(C1,C2).
-flatten(dc(O,P,C1),dc(O,P1,C2)) :-
-	flatten(P,P1),
-	flatten(C1,C2).
-flatten(not(C1),not(C2)) :-
+motel_flatten(all(R1,C1),all(R2,C2)) :-
+	motel_flatten(R1,R2),
+	motel_flatten(C1,C2).
+motel_flatten(some(R1,C1),some(R2,C2)) :-
+	motel_flatten(R1,R2),
+	motel_flatten(C1,C2).
+motel_flatten(atleast(N,R1),atleast(N,R2)) :-
+	motel_flatten(R1,R2).
+motel_flatten(atmost(N,R1),atmost(N,R2)) :-
+	motel_flatten(R1,R2).
+motel_flatten(b(O,P,C1),b(O,P,C2)) :-
+	motel_flatten(C1,C2).
+motel_flatten(d(O,P,C1),d(O,P,C2)) :-
+	motel_flatten(C1,C2).
+motel_flatten(bc(O,P,C1),bc(O,P1,C2)) :-
+	motel_flatten(P,P1),
+	motel_flatten(C1,C2).
+motel_flatten(dc(O,P,C1),dc(O,P1,C2)) :-
+	motel_flatten(P,P1),
+	motel_flatten(C1,C2).
+motel_flatten(not(C1),not(C2)) :-
 	!,
-	flatten(C1,C2).
-flatten(inverse(R1),inverse(R2)) :-
-	flatten(R1,R2).
-flatten(C1,C1).
+	motel_flatten(C1,C2).
+motel_flatten(inverse(R1),inverse(R2)) :-
+	motel_flatten(R1,R2).
+motel_flatten(C1,C1).
 
 
 /***********************************************************************
@@ -3547,10 +3623,10 @@ deMorgan(C1,C1) :-
 
 cnf(C1,C6) :-
 	normalizeNot(C1,C2),
-	flatten(C2,C3),
+	motel_flatten(C2,C3),
 	normalizeInverse(C3,C4),
 	deMorgan(C4,C5),
-	flatten(C5,C6).
+	motel_flatten(C5,C6).
 
 /**********************************************************************
  *
@@ -3769,7 +3845,7 @@ testSubConcept(EnvName,MS,Concept1,Concept2,Concept) :-
 
 getCommonSuperConcepts(EnvName,MS,CL1,CL2) :-
 	hop_map(getAllSuperConcepts,[EnvName,MS],CL1,CLL1),
-	intersection(CLL1,CL2).
+	intersection_motel(CLL1,CL2).
 
 /***********************************************************************
  *
@@ -3785,7 +3861,7 @@ getCommonSuperConcepts(EnvName,MS,CL1,CL2) :-
 
 getCommonSubConcepts(EnvName,MS,CL1,CL2) :-
 	hop_map(getAllSubConcepts,[EnvName,MS],CL1,CLL1),
-	intersection(CLL1,CL2).
+	intersection_motel(CLL1,CL2).
 
 /***********************************************************************
  *
@@ -3799,8 +3875,8 @@ getAllObjects(EnvName,MS,O13) :-
 	setofOrNil(X1,[C1,AX1]^(conceptElement(Env,MS,_,user,X1,C1,AX1)),O1),
 	setofOrNil(X2,[R2,Y2,AX2]^roleElement(Env,MS,_,user,X2,Y2,R2,AX2),O2),
 	setofOrNil(Y3,[R3,X3,AX3]^roleElement(Env,MS,_,user,X3,Y3,R3,AX3),O3),
-	union( O1,O2,O12),
-	union(O12,O3,O13),
+	motel_union( O1,O2,O12),
+	motel_union(O12,O3,O13),
 	!.
 /**********************************************************************
  *
@@ -4522,7 +4598,7 @@ getDirectSuperElements(_Element,[],[]) :-
 getDirectSuperElements(Element,CL,[N1|NL]) :-
 	getDirectSuperElements(Element,CL1,N1),
 	getDirectSuperElements(Element,CL2,NL),
-	union(CL1,CL2,CL).
+	motel_union(CL1,CL2,CL).
 
 /***********************************************************************
  *
@@ -4542,7 +4618,7 @@ getAllSuperElements(Element,CL1,CL1,node(CL,_NL)) :-
 	member(Element,CL),
 	!.
 getAllSuperElements(Element,CL3,CL1,node(CL,NL)) :-
-	union(CL,CL1,CL2),
+	motel_union(CL,CL1,CL2),
 	getAllSuperElements(Element,CL3,CL2,NL).
 
 getAllSuperElements(_Element,[],_CL1,[]) :-
@@ -4550,7 +4626,7 @@ getAllSuperElements(_Element,[],_CL1,[]) :-
 getAllSuperElements(Element,CL2,CL1,[N1|NL]) :-
 	getAllSuperElements(Element,CL3,CL1,N1),
 	getAllSuperElements(Element,CL4,CL1,NL),
-	union(CL3,CL4,CL2).
+	motel_union(CL3,CL4,CL2).
 
 
 /***********************************************************************
@@ -4576,13 +4652,13 @@ getDirectSubElements(_Element,[],[]) :-
 getDirectSubElements(Element,CL,[N1|NL]) :-
 	getDirectSubElements(Element,CL1,N1),
 	getDirectSubElements(Element,CL2,NL),
-	union(CL1,CL2,CL).
+	motel_union(CL1,CL2,CL).
 
 getSubElements([],[]) :-
 	!.
 getSubElements(CL,[node(CL1,_)|NL]) :-
 	getSubElements(CL2,NL),
-	union(CL1,CL2,CL).
+	motel_union(CL1,CL2,CL).
 
 
 /***********************************************************************
@@ -4609,7 +4685,7 @@ getAllSubElements(_Element,[],[]) :-
 getAllSubElements(Element,CL,[N1|NL1]) :-
 	getAllSubElements(Element,CL2,N1),
 	getAllSubElements(Element,CL3,NL1),
-	union(CL2,CL3,CL).
+	motel_union(CL2,CL3,CL).
 
 /***********************************************************************
  *
@@ -4622,13 +4698,13 @@ getAllSubElements(Element,CL,[N1|NL1]) :-
 
 getElements(CL,node(CL1,NL)) :-
 	getElements(CL2,NL),
-	union(CL1,CL2,CL).
+	motel_union(CL1,CL2,CL).
 getElements([],[]) :-
 	!.
 getElements(CL,[N1|NL]) :-
 	getElements(CL1,N1),
 	getElements(CL2,NL),
-	union(CL1,CL2,CL).
+	motel_union(CL1,CL2,CL).
 
 
 /***********************************************************************
@@ -4742,7 +4818,7 @@ testSubElement(Element1,Element2,Element2,node(CL,NL)) :-
 
 getCommonSuperElements(CL1,CL2,Dag) :-
 	hop_map(getAllSuperElements,[Dag],CL1,CLL1),
-	intersection(CLL1,CL2).
+	intersection_motel(CLL1,CL2).
 
 /***********************************************************************
  *
@@ -4757,7 +4833,7 @@ getCommonSuperElements(CL1,CL2,Dag) :-
 
 getCommonSubElements(CL1,CL2,Dag) :-
 	hop_map(getAllSubElements,[Dag],CL1,CLL1),
-	intersection(CLL1,CL2).
+	intersection_motel(CLL1,CL2).
 
 
 
@@ -4800,7 +4876,7 @@ makeEnvironment(Name,Comment) :-
 	name(Runtime,RTChars),
 	name(EnvIdentifier,[FirstChar|RTChars]),
 	asserta(environment(Name,env(EnvIdentifier),Comment)),
-	retractall(currentEnvironment(_)),
+	retractall_head(currentEnvironment(_)),
 	asserta(currentEnvironment(env(EnvIdentifier))),
 	!.
 
@@ -4909,7 +4985,7 @@ removeEnvironment :-
 
 removeEnvironment(Name) :-
 	clearEnvironment(Name),
-	retractall(environment(Name,_,_)),
+	retractall_head(environment(Name,_,_)),
 	retract(currentEnvironment(Name)),
 	asserta(currentEnvironment(env(e0))),
 	!.
@@ -4964,7 +5040,7 @@ clearEnvironment(EnvName) :-
 	retractallEnv(Env,consistencyDerivation/3),
 	retractallEnv(Env,hypothesis/1),
 	retractallEnv(Env,inconsistencyCheck/3),
-	retractallEnv(Env,option/2),
+	retractallEnv(Env,motel_option/2),
 	retractallEnv(Env,nsub/4),
 	retractallEnv(Env,nsub3/2),
 	retractallEnv(Env,sub3/2),
@@ -5281,20 +5357,20 @@ assertInRule(Env,6,AN6) :-
 	assertz((Consequence4 :- cCS(CALLS,AxiomHead4), Antecedent3)),
 	!.
 assertInRule(Env,7,AN7) :-
-	% For all X: X in set(S2) and subset(S2,S1) => X in S1
+	% For all X: X in set(S2) and motel_subset(S2,S1) => X in S1
 	% Priority 1 (low priority)
 	gensym(rule,RN8),
 	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,set(S1),X,
 	                HYPS,D,CALLS,PT2,Consequence1),
 	constructMLCall(Env,rn(AN7,_RN2,_S2,_O2),bodyMC(MS),headMC(MS),
 			set(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
-	L1 = subset(S2,S1),
+	L1 = motel_subset(S2,S1),
 	constructMLMark(Consequence1,AxiomHead1),
 	assertz((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent2, L1))),
 	!.
 assertInRule(Env,8,AN7) :-
 	% For all X: X in set(S2) and X in set(S3) and 
-	%            intersection(S2,S3,S1) => X in S1
+	%            intersection_motel(S2,S3,S1) => X in S1
 	% Priority 1 (low priority)
 	gensym(rule,RN8),
 	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,set(S1),X,
@@ -5303,13 +5379,13 @@ assertInRule(Env,8,AN7) :-
 			set(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
 	constructMLCall(Env,rn(AN7,_RN3,_S3,_O3),bodyMC(MS),headMC(MS),
 			set(S3),X,HYPS,D,CALLS,PT3,Antecedent3),
-	L1 = intersection([S2,S3],S1),
+	L1 = intersection_motel([S2,S3],S1),
 	constructMLMark(Consequence1,AxiomHead1),
 	assertz((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
 	!.
 assertInRule(Env,9,AN7) :-
 	% For all X: X in set(S2) and X in set(S3) and 
-	%            intersection(S2,S3,S1) => X in S1
+	%            intersection_motel(S2,S3,S1) => X in S1
 	% Priority 1 (low priority)
 	gensym(rule,RN8),
 	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,not(set(S1)),X,
@@ -5318,7 +5394,7 @@ assertInRule(Env,9,AN7) :-
 			set(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
 	constructMLCall(Env,rn(AN7,_RN3,_S3,_O3),bodyMC(MS),headMC(MS),
 			set(S3),X,HYPS,D,CALLS,PT3,Antecedent3),
-	L1 = subtract(S2,S3,S1),
+	L1 = motel_subtract(S2,S3,S1),
 	constructMLMark(Consequence1,AxiomHead1),
 	assertz((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
 	!.
@@ -5357,7 +5433,7 @@ assertAbductionRule(Env,2) :-
 
 switchToEnvironment(Name) :-
 	environment(Name,Env,_),
-	retractall(currentEnvironment(_)),
+	retractall_head(currentEnvironment(_)),
 	asserta(currentEnvironment(Env)),
 	!.
 
@@ -5544,7 +5620,7 @@ copyEnvironment(Name1,Name2) :-
 	copyAll(Env1,Env2,roleSubsets/6),
 %	copyAll(Env1,Env2,sub/4),
 %	copyAll(Env1,Env2,succ/4),
-%	copyAll(Env1,Env2,option/2),
+%	copyAll(Env1,Env2,motel_option/2),
 %	copyAll(Env1,Env2,nsub/4),
 	term_expansion(copy,off,Env1,Env2),
 	!.
@@ -6908,15 +6984,15 @@ initFuncdep :-
 
 /***********************************************************************
  *
- * initialize, initialise
+ * initializeMotel, initialiseMotel
  *
- *	Similar to initialize in
+ *	Similar to initializeMotel in
  *	~hustadt/pop/motel/motel-0.0.6/userInterface.pl
  */
 
 % For those of us who prefer the alternative spelling
-initialise :-
-	initialize.
+initialiseMotel :-
+	initializeMotel.
 
 /***********************************************************************
  *
@@ -7406,7 +7482,7 @@ skolem(exists(X,P),P2,Vars) :-
 	skolem(P,P1,Vars),
 	gensym(f,F),
 	Sk =.. [F|Vars],
-	subst(P1,P2,X,Sk).
+	motel_subst(P1,P2,X,Sk).
 skolem(and(L),and(L1),Vars) :-
 	!,
 	map(skolem,[Vars],L,L1).
@@ -7417,7 +7493,7 @@ skolem(P,P,_).
 
 
 %----------------------------------------------------------------------
-% subst(+F1,-F2,+X,+Sk)
+% motel_subst(+F1,-F2,+X,+Sk)
 % Parameter: F1     First-order formula
 %            F2     First-order formula
 %            X      Variable that will be substituted
@@ -7426,41 +7502,41 @@ skolem(P,P,_).
 % 
 % Author: Ullrich Hustadt
 
-subst(T1,T2,X,Sk) :-
+motel_subst(T1,T2,X,Sk) :-
 	(atomic(T1) ; var(T1)),
 	T1 == X,
 	!,
 	T2 = Sk.
-subst(T1,T2,X,_Sk) :-
+motel_subst(T1,T2,X,_Sk) :-
 	(atomic(T1) ; var(T1)),
 	not(T1 == X),
 	!,
 	T2 = T1.
-subst(forall(Y,P),forall(Y,P),X,_Sk) :-
+motel_subst(forall(Y,P),forall(Y,P),X,_Sk) :-
 	X == Y,
 	!.
-subst(forall(Y,P),forall(Y,P1),X,Sk) :-
+motel_subst(forall(Y,P),forall(Y,P1),X,Sk) :-
 	!,
-	subst(P,P1,X,Sk).
-subst(exists(Y,P),exists(Y,P),X,_Sk) :-
+	motel_subst(P,P1,X,Sk).
+motel_subst(exists(Y,P),exists(Y,P),X,_Sk) :-
 	X == Y,
 	!.
-subst(exists(Y,P),exists(Y,P1),X,Sk) :-
+motel_subst(exists(Y,P),exists(Y,P1),X,Sk) :-
 	!,
-	subst(P,P1,X,Sk).
-subst(and(L),and(L1),X,Sk) :-
+	motel_subst(P,P1,X,Sk).
+motel_subst(and(L),and(L1),X,Sk) :-
 	!,
-	map(subst,[X,Sk],L,L1).
-subst(or(L),or(L1),X,Sk) :-
+	map(motel_subst,[X,Sk],L,L1).
+motel_subst(or(L),or(L1),X,Sk) :-
 	!,
-	map(subst,[X,Sk],L,L1).
-subst(not(P),not(P1),X,Sk) :-
+	map(motel_subst,[X,Sk],L,L1).
+motel_subst(not(P),not(P1),X,Sk) :-
 	!,
-	subst(P,P1,X,Sk).
-subst(T1,T2,X,Sk) :-
+	motel_subst(P,P1,X,Sk).
+motel_subst(T1,T2,X,Sk) :-
 	!,
 	T1 =.. [F|Args],
-	map(subst,[X,Sk],Args,Args1),
+	map(motel_subst,[X,Sk],Args,Args1),
 	T2 =.. [F|Args1].
 
 %----------------------------------------------------------------------
@@ -8093,17 +8169,17 @@ noChange(Env,World,Y) :-
 
 /***********************************************************************
  *
- * wellDefined_attribute(+EnvName,+World,+X)
+ * wellDefined_attribute(+EnvName,+World,+RoleName)
  *
  *	Is X an attribute?
  *
- *	Note: At the moment this clause succeeds if X is an atom. We
+ *	Note: At the moment this clause succeeds if RoleName is an atom. We
  *	may want to do more verifying here.
  */
 
-wellDefined_attribute(Env,World,X) :-
-	atom(X),
-	roleName(Env,World,X),
+wellDefined_attribute(Env,World,RoleName) :-
+	atom(RoleName),
+	roleName(Env,_MS,World,RoleName),
 	!.
 
 /***********************************************************************
@@ -8219,14 +8295,14 @@ weightOf_ChainedInfl(W1,W2,W) :-
  * weightOf_TotalInfl(+Ws,+-W)
  *
  *	computes the the total weight W from the Ws. 
- *	Here, W is the sum of the Ws.
+ *	Here, W is the motel_sum of the Ws.
  *	We could have just as well chosen W to be the arithmetic
  *	mean of the Ws.
  *	Which is better remains open for the moment.
  */
 
 weightOf_TotalInfl(Ws,W) :-
-	sum(Ws,W,wellDefined_InflWeight).
+	motel_sum(Ws,W,wellDefined_InflWeight).
 %	arithm_Mean(Ws,W,wellDefined_InflWeight).
 
 /***********************************************************************
@@ -8235,14 +8311,14 @@ weightOf_TotalInfl(Ws,W) :-
  *
  *	computes the weight W of a list of simultaneous influences from
  *	different attributes with weights specified in Ws.
- *	Here, W is the sum of the Ws.
+ *	Here, W is the motel_sum of the Ws.
  *	We could have just as well chosen W to be the arithmetic
  *	mean of the Ws.
  *	Which is better remains open for the moment.
  */
 
 weightOf_SimultInfl(Ws,W) :-
-	sum(Ws,W,wellDefined_InflWeight).
+	motel_sum(Ws,W,wellDefined_InflWeight).
 %	arithm_Mean(Ws,W,wellDefined_InflWeight).
 
 /***********************************************************************
@@ -8278,11 +8354,11 @@ weightOf_change(Wx,Wxy,Wy) :-
  *
  *	computes the weight W of the change resulting from
  *	simultaneous changes with weights Ws.
- *	W is the sum over the Ws.
+ *	W is the motel_sum over the Ws.
  */
 
 weightOf_SimultChange(Ws,W) :-
-	sum(Ws,W,wellDefined_ChangeWeight).
+	motel_sum(Ws,W,wellDefined_ChangeWeight).
 
 /***********************************************************************
  *
@@ -8302,38 +8378,38 @@ arithm_Mean([Value|Values],Mean,IsWellDefName) :-
 	!,
 	length([Value|Values],N),
 	Sum is Mean * N,
-	sum([Value|Values],Sum,IsWellDefName).
+	motel_sum([Value|Values],Sum,IsWellDefName).
 
 arithm_Mean(Values,Mean,IsWellDefName) :-
-	sum(Values,Sum,IsWellDefName),
+	motel_sum(Values,Sum,IsWellDefName),
 	length(Values,N),
 	Mean is Sum / N.
 
 /***********************************************************************
  *
- * sum([+-Value|+Values],+-Sum,+IsWellDefName)
+ * motel_sum([+-Value|+Values],+-Sum,+IsWellDefName)
  *
  *	Given a list of values (Values) and a predicate name 
  *	(IsWellDefName) for checking whether each of the values is 
- *	well-defined this clause computes the sum (Sum) of the values.
+ *	well-defined this clause computes the motel_sum (Sum) of the values.
  *	Provided Sum is given the first value may be a variable.
  */
 
-sum([Value|Values],Sum,IsWellDefName) :-
+motel_sum([Value|Values],Sum,IsWellDefName) :-
 	var(Value),
 	!,
 	IsWellDef =.. [IsWellDefName,Sum],
 	IsWellDef,
-	sum(Values,VSum,IsWellDefName),
+	motel_sum(Values,VSum,IsWellDefName),
 	Value is Sum - VSum.
 
-sum([Value|Values],Sum,IsWellDefName) :-
+motel_sum([Value|Values],Sum,IsWellDefName) :-
 	IsWellDef =.. [IsWellDefName,Value],
 	IsWellDef,
-	sum(Values,VSum,IsWellDefName),
+	motel_sum(Values,VSum,IsWellDefName),
 	Sum is Value + VSum.
 
-sum([],0.0,_).
+motel_sum([],0.0,_).
 
 /***********************************************************************
  *
@@ -8501,7 +8577,7 @@ defprimconcept(MS,Left,Right) :-
  * defprimconcept(+Environment,+Left,+Right)
  * Parameter: ConceptName       concept name
  *            ConceptTerm       concept term
- * defines the concept ConceptName to be a subset of the concept
+ * defines the concept ConceptName to be a motel_subset of the concept
  * ConceptTerm in modal context [].
  *
  */
@@ -8516,7 +8592,7 @@ defprimconcept(EnvName,Left,Right) :-
  * Parameter: ModalSequence     modal context
  *            ConceptName       concept name
  *            ConceptTerm       concept term
- * defines the concept ConceptName to be a subset of the concept
+ * defines the concept ConceptName to be a motel_subset of the concept
  * ConceptTerm in modal context ModalSequence.
  *
  */
@@ -8816,7 +8892,7 @@ defprimrole(R1,R2) :-
  * defprimrole(+RN,+Role)
  * Parameter: RN        role name
  *            Role      role term
- * defines the role RN to be a subset of the role Role in modal
+ * defines the role RN to be a motel_subset of the role Role in modal
  * context [].
  * 
  */
@@ -8840,7 +8916,7 @@ defprimrole(MS,RN,Role) :-
  * Parameter: MS        modal context
  *            RN        role name
  *            Role      role term
- * defines the role RN to be a subset of the role Role in modal
+ * defines the role RN to be a motel_subset of the role Role in modal
  * context MS.
  *
  */
@@ -9026,11 +9102,11 @@ assertName((role,CN1),newAsserted,Env,MS,W1,G1) :-
 
 namesInTerm(and(CTL),CNL,Type) :-
 	hop_map(namesInTerm,[Type],CTL,CNLL),
-	union(CNLL,CNL),
+	motel_union(CNLL,CNL),
 	!.
 namesInTerm(or(CTL),CNL,Type) :-
 	hop_map(namesInTerm,[Type],CTL,CNLL),
-	union(CNLL,CNL),
+	motel_union(CNLL,CNL),
 	!.
 namesInTerm(some(R,C),L,_) :-
 	namesInTerm(R,L1,role),
@@ -9429,9 +9505,9 @@ clauseToSequent(cl([],TL),HL1,[]) :-
 clauseToSequent(cl(HL,TL),HL,TL) :-
 	!.
 
-negateLiterals(~L,L) :-
+negateLiterals( '~'(L),L) :-
 	!.
-negateLiterals(L,~L) :-
+negateLiterals(L, '~'(L)) :-
 	!.
 
 literalsToLOP(antecedent,[H1,H2|HL],(H1,HL2)) :-
@@ -9591,6 +9667,9 @@ genclass(_,_,A,A,some,true) :-
  *
  */
 
+ assertMA(Class,Head,Goal):- assertMA(Class,Head,_WorldGoal,Goal).
+
+
 assertMA(A1,rel(Env,every,m(MOp,A1),X,Y), WG, G) :-
 	var(A1),
 	asserta((rel(Env,every,m(MOp,A1),X,Y) :- (WG, G))),
@@ -9626,8 +9705,8 @@ modalAxioms(EnvName,MS,k,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	retractall_head(rel(Env,C,m(MOp,A),_,_)),
+	retractall_head(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
                  rel(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),U)), 
 		 (not(not(world(Env,m(MOp,A),U,V)))), 
@@ -9638,8 +9717,8 @@ modalAxioms(EnvName,MS,kd45,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	retractall_head(rel(Env,C,m(MOp,A),_,_)),
+	retractall_head(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
 	         rel(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),V)), 
 		 (not(not(world(Env,m(MOp,A),U,V)))), 
@@ -9656,8 +9735,8 @@ modalAxioms(EnvName,MS,kd5,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	retractall_head(rel(Env,C,m(MOp,A),_,_)),
+	retractall_head(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
 	         rel(Env,C,m(MOp,A),app(_F1:m(MOp,A),U),app(_F2:m(MOp,A),V)), 
 		 ((world(Env,m(MOp,A),U,V), not(U == []))), 
@@ -9672,9 +9751,9 @@ modalAxioms(EnvName,MS,kd4,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
-	assertMA(A1,rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),U)), Goal),
+	retractall_head(rel(Env,C,m(MOp,A),_,_)),
+	retractall_head(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	assertMA(A1, rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),U)), Goal),
 	assertMA(A1,rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),V)), (world(Env,m(MOp,A),U,V), (rel(Env,_,m(MOp,A),U,V), Goal))),
 	asserta(modalAxioms(Env,MS,user,k4,A1,MOp,A)),
 	!.
@@ -9682,8 +9761,8 @@ modalAxioms(EnvName,MS,kt,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	retractall_head(rel(Env,C,m(MOp,A),_,_)),
+	retractall_head(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),U)), Goal),
 	assertMA(A1,rel(Env,C,m(MOp,A),U,U), Goal),
 	asserta(modalAxioms(Env,MS,user,kt,A1,MOp,A)),
@@ -9893,7 +9972,7 @@ testSonRole(Env,MS,Role1,Role2,Role) :-
 
 getCommonFatherRoles(EnvName,MS,RL1,RL2) :-
 	hop_map(getAllFatherRoles,[EnvName,MS],RL1,RLL1),
-	intersection(RLL1,RL2).
+	intersection_motel(RLL1,RL2).
 
 /***********************************************************************
  *
@@ -9909,7 +9988,7 @@ getCommonFatherRoles(EnvName,MS,RL1,RL2) :-
 
 getCommonSonRoles(EnvName,MS,RL1,RL2) :-
 	hop_map(getAllSonRoles,[EnvName,MS],RL1,RLL1),
-	intersection(RLL1,RL2).
+	intersection_motel(RLL1,RL2).
 
 /**********************************************************************
  *
@@ -9958,16 +10037,16 @@ undefconcept(EnvName,MS,CN,CT) :-
 	environment(EnvName,Env,_),
 	
 	conceptEqualSets(Env,_user,MS,CN,CT,AX),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
- 	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retractall_all(query(Env,MS,CN,_CT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall_head(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+ 	motel_retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(query(Env,MS,CN,_CT,_PT,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,CN,CT),
 	retract(conceptEqualSets(Env,_user,MS,CN,CT,AX)),
 	!.
@@ -9975,46 +10054,46 @@ undefconcept(EnvName,MS,CN,CT) :-
 undefConcept(Env,MS,CN) :-
 	conceptEqualSets(Env,user,_,CN,_,Ax),
 	
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
- 	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
-   	retract_all(query(Env,MS,CN,_CT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+%	retractall_head(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+ 	motel_retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+   	motel_retract_all(query(Env,MS,CN,_CT,_PT,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,CN,CT),
-	retractall(conceptEqualSets(Env,user,MS,CN,_CT,Ax)),
+	retractall_head(conceptEqualSets(Env,user,MS,CN,_CT,Ax)),
 	fail,
 	!.
 undefConcept(_Env,_MS,_CN) :-
 	!.
 
-retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
+motel_retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
 	clause(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_)),_),
 	member(rn(AX,_,_,_),[Name]),	
-	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall_head(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
 	fail.
-retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
+motel_retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
 
-retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
+motel_retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
 	clause(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_)),_),
 	member(rn(AX,_,_,_),[Name]),	
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
 	fail.
-retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
-	retractall(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(in(_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
+motel_retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
+	retractall_head(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(in(_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
 
-retract_all(query(Env,MS,CN,_CT,_PT,_PT1)) :-
+motel_retract_all(query(Env,MS,CN,_CT,_PT,_PT1)) :-
 	query(Env,MS,CN1,CT,PT,PT1),
 	collect(PT,Liste),
 	member(CN,Liste),
-	retractall(query(Env,MS,CN1,CT,PT,PT1)),
+	retractall_head(query(Env,MS,CN1,CT,PT,PT1)),
 	fail.
-retract_all(query(Env,MS,CN,_CT,_PT,_PT1)).
+motel_retract_all(query(Env,MS,CN,_CT,_PT,_PT1)).
 
 /**********************************************************************
  *
@@ -10054,35 +10133,35 @@ undefrole(EnvName,MS,RN,RT) :-
 	environment(EnvName,Env,_),
 
 	roleEqualSets(Env,_user,MS,RN,RT,AX),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
- 	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(query(Env,MS,CN,_CT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall_head(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+ 	motel_retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(query(Env,MS,CN,_CT,_PT,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,RT),
 	retract(roleEqualSets(Env,_user,MS,RN,RT,AX)),
 	!.
 undefRole(Env,MS,RN) :-
 	roleEqualSets(Env,user,MS,RN,_,Ax),
 
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-% 	retract_all(query(Env,MS,RN,_RT,_PT,_)),
- 	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+%	retractall_head(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+% 	motel_retract_all(query(Env,MS,RN,_RT,_PT,_)),
+ 	motel_retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,_),
-	retractall(roleEqualSets(Env,user,MS,RN,_RT,Ax)),
+	retractall_head(roleEqualSets(Env,user,MS,RN,_RT,Ax)),
 	fail,
 	!.
 undefRole(_Env,_MS,_RN) :-
@@ -10116,16 +10195,16 @@ undefprimconcept(EnvName,MS,CN,CT) :-
 	environment(EnvName,Env,_),
 
 	conceptSubsets(Env,_user,MS,CN,CT,AX),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
- 	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(query(Env,MS,CN,_CT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall_head(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+ 	motel_retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(query(Env,MS,CN,_CT,_PT,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,CN,CT),
 	retract(conceptSubsets(Env,_user,MS,CN,CT,AX)),
 	!.
@@ -10167,38 +10246,38 @@ undefprimrole(EnvName,MS,RN,RT) :-
 	environment(EnvName,Env,_),
 
 	roleSubsets(Env,_user,MS,RN,RT,AX),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
- 	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(query(Env,MS,RN,_RT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall_head(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+ 	motel_retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(query(Env,MS,RN,_RT,_PT,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,RT),
 	retract(roleSubsets(Env,_user,MS,RN,RT,AX)),
 	!.
 undefprimRole(Env,MS,RN) :-
 	roleSubsets(Env,user,MS,RN,_,Ax),
 
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
- 	retract_all(query(Env,MS,RN,_RT,_PT,_)),
- 	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+	retractall_head(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+ 	motel_retract_all(query(Env,MS,RN,_RT,_PT,_)),
+ 	motel_retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+ 	motel_retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall_head(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall_head(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,_),
-	retractall(roleSubsets(Env,user,MS,RN,_RT,Ax)),
+	retractall_head(roleSubsets(Env,user,MS,RN,_RT,Ax)),
 	fail,
 	!.
 
-/** ist in arbeit    */
+/*  ist in arbeit    */
 
 
 delete_ind(X,C) :-
@@ -10228,10 +10307,10 @@ delete_ind(EnvName,MS,X,C) :-
  	 retract((InHead :- call(G1)))))),
 	not(not((retract((conceptElement(Env,_,W1,_,X,C,_) :- call(user:G1))) ;
 	 retract((conceptElement(Env,_,W1,_,X,C,_) :- call(G1)))))),
-	 retractall((InHead :- call(user:G1))),
-	 retractall((InHead :- call(G1))),
-	 retractall((conceptElement(Env,_,W1,_,X,C,_) :- call(user:G1))),
-	 retractall((conceptElement(Env,_,W1,_,X,C,_) :- call(G1))).
+	 retractall_head((InHead :- call(user:G1))),
+	 retractall_head((InHead :- call(G1))),
+	 retractall_head((conceptElement(Env,_,W1,_,X,C,_) :- call(user:G1))),
+	 retractall_head((conceptElement(Env,_,W1,_,X,C,_) :- call(G1))).
 delete_ind(P1,X,Y,R) :-
 	completeParameter([(X,Y,R)],EnvName,MS,_,_),
 	delete_ind(EnvName,MS,X,Y,R).
@@ -10248,10 +10327,10 @@ delete_ind(EnvName,MS,X,Y,R) :-
 	 retract((EqLiteral :- (cCS(CALLS,true), call(G1))))))),
 	not(not((retract((roleElement(Env,_,W1,X,Y,R,_) :- call(user:G1))) ;
 	 retract((roleElement(Env,_,W1,X,Y,R,_) :- call(G1)))))),
-	retractall((EqLiteral :- (cCS(CALLS,true), call(user:G1)))),
-	retractall((EqLiteral :- (cCS(CALLS,true), call(G1)))),
-	retractall((roleElement(Env,_,W1,X,Y,R,_) :- call(user:G1))),
-	retractall((roleElement(Env,_,W1,X,Y,R,_) :- call(G1))).
+	retractall_head((EqLiteral :- (cCS(CALLS,true), call(user:G1)))),
+	retractall_head((EqLiteral :- (cCS(CALLS,true), call(G1)))),
+	retractall_head((roleElement(Env,_,W1,X,Y,R,_) :- call(user:G1))),
+	retractall_head((roleElement(Env,_,W1,X,Y,R,_) :- call(G1))).
 
 	
 /***
@@ -10328,12 +10407,12 @@ delete_hierarchy(Type,Env,MS,CR) :-
 	assert_succ(Type,Env,MS,PC,SC),
 	fail.
 delete_hierarchy(Type,Env,MS,CR) :-
-	retractall(succ(Type,Env,MS,CR,_)),
-	retractall(succ(Type,Env,MS,_,CR)),
-	retractall(sub(Type,Env,MS,CR,_)),
-	retractall(sub(Type,Env,MS,_,CR)),
-	retractall(nsub(Type,Env,MS,CR,_)),
-	retractall(nsub(Type,Env,MS,_,CR)),
+	retractall_head(succ(Type,Env,MS,CR,_)),
+	retractall_head(succ(Type,Env,MS,_,CR)),
+	retractall_head(sub(Type,Env,MS,CR,_)),
+	retractall_head(sub(Type,Env,MS,_,CR)),
+	retractall_head(nsub(Type,Env,MS,CR,_)),
+	retractall_head(nsub(Type,Env,MS,_,CR)),
 	!.
 	
 /*****************************************************************************
@@ -11432,7 +11511,7 @@ sb_attributes(A1,A2,CN,AList) :-
 	!,
 	sb_assert_attributes(concept,A1,A2,CN,AList).
 sb_attributes(EnvName,CN,RN,AList) :-
-	sb_assert_Attributes(role,EnvName,[],[CN,RN],AList).
+	sb_assert_attributes(role,EnvName,[],[CN,RN],AList).
 sb_attributes(EnvName,MS,CN,RN,AList) :-	
 	sb_assert_attributes(role,EnvName,MS,[CN,RN],AList).
 
@@ -11908,7 +11987,7 @@ sb_fact(P1,P2,P3) :-
 	sb_fact(EnvName,MS,Query,Proof).
 
 sb_fact(EnvName,MS,isa(X,C),Exp) :-
-	retractall(hypothesis(_)),
+	retractall_head(hypothesis(_)),
  	environment(EnvName,Env,_),
  	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
  	getNegatedConcept(C,C1),
@@ -11926,7 +12005,7 @@ sb_fact(EnvName,MS,(attributes(CN,Attribute,Value)),proved(fact,basedOn(tbox))) 
 sb_fact(EnvName,MS,(attributes(CN,RN,Attribute,Value)),proved(fact,basedOn(tbox))) :-
 	attribute(role,EnvName,MS,[CN,RN],[Attribute,Value]).
 sb_fact(EnvName,MS,irole(R,X,Y),Exp) :-
-	retractall(hypothesis(_)),
+	retractall_head(hypothesis(_)),
 	environment(EnvName,Env,_),
 	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
 	getFactQuery(Env,W1,Y,R,X,Exp,Goal),
@@ -13005,9 +13084,13 @@ roleBody(Env,MS,and([R1|RL]),X,Y,HYPS,AB,CALLS,AN,(EqLiteral, Body),[PT1|PTL]) :
  *
  */
 
+runTest(N,Body):- dmsg(running_test(N)),must(call(Body)),fail.
+
+
 testMotel :-
-	testAllMotelExamples(1),
+       time(testAllMotelExamples(1)),
 	!.
+
 
 testMotel(N) :-
 	testAllMotelExamples(N),
@@ -13017,10 +13100,11 @@ testAllMotelExamples(64) :-
 	print('Test complete'), nl, nl,
 	!.
 testAllMotelExamples(N) :-
-	initialize,
+	initializeMotel,
 	print('Example '), print(N), nl, example(N),
-	once(testMotelExample(N)),
+	must(time(once(testMotelExample(N)))),
 	M is N + 1,
+        forall(clause(example(N),Body),runTest(N,Body)),
 	testAllMotelExamples(M).
 
 testMotelExample(1) :-	
@@ -13054,7 +13138,7 @@ testMotelExample(12) :-
 testMotelExample(13) :-
 	tryGoal(subsumes([],c1,c2)).
 testMotelExample(14) :-
-%	initialize, print('Example 14'), nl, example(14),
+%	initializeMotel, print('Example 14'), nl, example(14),
 %	tryGoal(subsumes([],c2,c1)),
 	!.
 testMotelExample(15) :-
@@ -13256,6 +13340,10 @@ verifySolution(TestSol,ExpectedSol) :-
 	print(TestSol),
 	print(', while expected solution is '),
 	print(ExpectedSol).
+
+
+
+
 
 /**********************************************************************
  *
@@ -13491,53 +13579,53 @@ unfoldSetToConcept(set([E1|L1]),or(L2)) :-
 
 /***********************************************************************
  *
- * initialize
+ * initializeMotel
  * cleans TBox, ABox, hierarchies, ...
  *
  */
 
-initialize :-
+initializeMotel :-
 	retractCompiledPredicates(_),
-	retractall(_,in/9),
-	retractall(_,kb_in/10),
-	retractall(_,eq/9),
-	retractall(_,constraint/8),
-	retractall(_,rel/5),
-	retractall(_,closed/5),
-	retractall(_,compiledPredicate/2),
-	retractall(_,conceptElement/7),
-	retractall(_,conceptEqualSets/6),
-	retractall(_,conceptHierarchy/3),
-	retractall(_,conceptName/4),
-	retractall(_,conceptSubsets/6),
-	retractall(_,environment/3),
-	retractall(_,given_change/4),
-	retractall(_,given_inflLink/4),
-	retractall(_,modalAxioms/6),
-	retractall(_,roleAttributes/5),
-	retractall(_,roleDefault/4),
-	retractall(_,roleDefNr/4),
-	retractall(_,roleDomain/4),
-	retractall(_,roleElement/8),
-	retractall(_,roleEqualSets/6),
-	retractall(_,roleHierarchy/3),
-	retractall(_,roleName/4),
-	retractall(_,roleNr/4),
-	retractall(_,roleRange/4),
-	retractall(_,roleSubsets/6),
-	retractall(_,sub/4),
-	retractall(_,succ/4),
-	retractall(_,abductiveDerivation/3),
-	retractall(_,consistencyDerivation/3),
-	retractall(_,hypothesis/1),
-	retractall(_,inconsistencyCheck/3),
-	retractall(_,option/2),
-	retractall(_,nsub/4),
-	retractall(_,nsub3/2),
-	retractall(_,sub3/2),
-	retractall(_,succ3/2),
-	retractall(_,value/2),
-	retractall(_,query/6),
+	retractallEnv(_,in/9),
+	retractallEnv(_,kb_in/10),
+	retractallEnv(_,eq/9),
+	retractallEnv(_,constraint/8),
+	retractallEnv(_,rel/5),
+	retractallEnv(_,closed/5),
+	retractallEnv(_,compiledPredicate/2),
+	retractallEnv(_,conceptElement/7),
+	retractallEnv(_,conceptEqualSets/6),
+	retractallEnv(_,conceptHierarchy/3),
+	retractallEnv(_,conceptName/4),
+	retractallEnv(_,conceptSubsets/6),
+	retractallEnv(_,environment/3),
+	retractallEnv(_,given_change/4),
+	retractallEnv(_,given_inflLink/4),
+	retractallEnv(_,modalAxioms/6),
+	retractallEnv(_,roleAttributes/5),
+	retractallEnv(_,roleDefault/4),
+	retractallEnv(_,roleDefNr/4),
+	retractallEnv(_,roleDomain/4),
+	retractallEnv(_,roleElement/8),
+	retractallEnv(_,roleEqualSets/6),
+	retractallEnv(_,roleHierarchy/3),
+	retractallEnv(_,roleName/4),
+	retractallEnv(_,roleNr/4),
+	retractallEnv(_,roleRange/4),
+	retractallEnv(_,roleSubsets/6),
+	retractallEnv(_,sub/4),
+	retractallEnv(_,succ/4),
+	retractallEnv(_,abductiveDerivation/3),
+	retractallEnv(_,consistencyDerivation/3),
+	retractallEnv(_,hypothesis/1),
+	retractallEnv(_,inconsistencyCheck/3),
+	retractallEnv(_,motel_option/2),
+	retractallEnv(_,nsub/4),
+	retractallEnv(_,nsub3/2),
+	retractallEnv(_,sub3/2),
+	retractallEnv(_,succ3/2),
+        retractallEnv(_,query/6),
+        % retractallEnv(_,value/2),
 	asserta(environment(initial,env(e0),'Initial Environment')),
 	asserta(currentEnvironment(env(e0))),
 	initEnvironment(initial),
@@ -13546,7 +13634,7 @@ initialize :-
 retractRoles(Env) :-
  	clause(roleName(Env,_MS,_,RN),_),
  	Head =.. [RN,_,_],
- 	retractall(Head),
+ 	retractall_head(Head),
 	fail.
 retractRoles(_).
 
@@ -13601,9 +13689,11 @@ getKB(Set) :-
 
 getKB(EnvName,Set08) :-
 	environment(EnvName,Name,_Comment),
+        rtrace,
 	bagofOrNil(Clause1,
                    [K1,C1,MOp1,A1]^(modalAxioms(Name,user,K1,C1,MOp1,A1), 
                    Clause1 = modalAxioms(K1,MOp1,A1)),Set1),
+        nortrace,
 	bagofOrNil(Clause2,
                    [MS2,W1,G1,A2,C2,Ax2]^(clause(conceptElement(Name,MS2,W1,user,A2,C2,Ax2),G1),
                    Clause2 = assert_ind(MS2,A2,C2)),Set2),
@@ -13709,19 +13799,19 @@ deduce(P1,P2,P3) :-
 	deduce(EnvName,MS,Query,Proof).
 
 deduce(EnvName,MS,elementOf(X,C),Exp) :-
-	option(useSetheo,yes),
+	motel_option(useSetheo,yes),
 	!,
 	deduceSetheo(EnvName,MS,elementOf(X,C),Exp).
 deduce(EnvName,MS,elementOf(X,C),Exp) :-
 	deduceMOTEL(EnvName,MS,elementOf(X,C),Exp).
 
 deduceMOTEL(EnvName,MS,elementOf(X,C),Exp) :-
-	retractall(hypothesis(_)),
+	retractall_head(hypothesis(_)),
  	environment(EnvName,Env,_),
  	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
 	clause(query(Env,W1,C,X,Exp,Goal),_).
 deduceMOTEL(EnvName,MS,elementOf(X,C),Exp) :-
-	retractall(hypothesis(_)),
+	retractall_head(hypothesis(_)),
  	environment(EnvName,Env,_),
  	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
  	getNegatedConcept(C,C1),
@@ -13733,7 +13823,7 @@ deduceMOTEL(EnvName,MS,elementOf(X,C),Exp) :-
 % 	anlegen einer clausel die in undefconcept wieder geloescht wird...
  	setQuery(Env,W1,C,X,Exp,Goal).
 deduceMOTEL(EnvName,MS,roleFiller(X,R,L,N),Exp) :-
-	retractall(hypothesis(_)),
+	retractall_head(hypothesis(_)),
 	environment(EnvName,Env,_),
 	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
 	call(G1),
@@ -14463,20 +14553,19 @@ completeParameter([P1,P2,P3,P4],P1,P2,P3,P4) :-
  *
  */
 
-:- nl, nl.
-:- write('Welcome to MOTEL (Version 0.8 July 1993)').
-:- nl.
-:- write('Copyright (c) 1993, Patrick Brandmeier, Ullrich Hustadt').
-:- nl.
-:- write('                    Renate Schmidt, Jan Timm. All rights preserved.').
-:- nl, nl.
-:- write('MOTEL is distributed in the hope that it will be useful, but').
-:- nl.
-:- write('WITHOUT ANY WARRANTY;  without even the implied warranty of,').
-:- nl.
-:- write('MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.').
-:- nl, nl.
-:- initialize.
+motelBanner:-
+ dmsg('Welcome to MOTEL (Version 0.8 July 1993)'),
+ dmsg('Copyright (c) 1993, Patrick Brandmeier, Ullrich Hustadt'),
+ dmsg('                    Renate Schmidt, Jan Timm. All rights preserved.'),
+ dmsg('MOTEL is distributed in the hope that it will be useful, but'),
+ dmsg('WITHOUT ANY WARRANTY;  without even the implied warranty of,'),
+ dmsg('MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.'),
+ dmsg('Hacked for logicmoo').
+ 
+:- initialization(motelBanner,restore).
+:- initialization(motelBanner).
+:- initialization(initializeMotel,restore).
+:- initialization(initializeMotel).
 
 %- fss.load.kb
 %  This is the translation of fss.sb-one into MOTEL syntax.
@@ -14491,7 +14580,7 @@ completeParameter([P1,P2,P3,P4],P1,P2,P3,P4) :-
  *
  */
 
-testMotel :-
+testMotel0 :-
 	testAllMotelExamples(1),
 	!.
 
@@ -14503,7 +14592,7 @@ testAllMotelExamples(61) :-
 	print('Test complete'), nl, nl,
 	!.
 testAllMotelExamples(N) :-
-	initialize,
+	initializeMotel,
 	print('Example '), print(N), nl, example(N),
 	once(testMotelExample(N)),
 	M is N + 1,
@@ -14540,7 +14629,7 @@ testMotelExample(12) :-
 testMotelExample(13) :-
 	tryGoal(subsumes([],c1,c2)).
 testMotelExample(14) :-
-%	initialize, print('Example 14'), nl, example(14),
+%	initializeMotel, print('Example 14'), nl, example(14),
 %	tryGoal(subsumes([],c2,c1)),
 	!.
 testMotelExample(15) :-
@@ -15512,13 +15601,16 @@ example(60) :-
 	defprimconcept([b(believe,peter)],doctor,richPerson),
 	assert_ind([b(believe,peter)],tom,doctor).
 
+end_of_file.
 
-
+term_expansion(G, (:-G)):- compound(G),functor(G,F,A),call_u_lm(prologBuiltin(F)).
+term_expansion(G, (:-G)):- predicate_property(G,static).
+term_expansion(G, (G)):- compound(G),functor(G,F,A),dynamic(G),ain(prologDynamic(F)).
 
 %- fss.save.kb
 %  This is what you get if you save the knowledge base fss.
 
-makeEnvironment(fssKB,What means fss?).
+makeEnvironment(fssKB,"What means fss?").
 defconcept(fssKB,[],bot,not(top)).
 defconcept(fssKB,[],taeglich,and([daily,lexicon])).
 defconcept(fssKB,[],monat,and([monthly,lexicon])).
@@ -16180,6 +16272,7 @@ assert(roleRange(env(t4259),[],worth_mod,worth)).
 %- fss.load.kb
 %  This is the translation of fss.sb-one into MOTEL syntax.
 
+end_of_file.
 
 'sb_defenv'('fssKB','What means fss?').
 'sb_initenv'('fssKB').
