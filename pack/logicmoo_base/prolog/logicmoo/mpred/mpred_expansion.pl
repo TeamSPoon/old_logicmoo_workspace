@@ -613,12 +613,8 @@ is_stripped_module(abox).
 %
 % Expand isEach/Ns.
 
-/*
-expand_isEach_or_fail(Sent,SentO):- get_lang(pfc),quietly_must(demodulize(clause(_,_),
-   Sent,SentM)),Sent\=@=SentM,!,bagof(O,do_expand_args(isEach,SentM,O),SentO),!.
-*/
-expand_isEach_or_fail(Sent,SentO):-
-    notrace((bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L)).
+expand_isEach_or_fail(Sent,SentO):- compound(Sent),
+    ((Sent=..[_,I],atomic(I))->fail; notrace((bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L))).
 
 %% expand_kif_string_or_fail( ++Op, ++Sent, --SentO) is semidet.
 %
@@ -657,7 +653,8 @@ fully_expand_clause(_,Sent,SentO):- t_l:infSkipFullExpand,!,must(Sent=SentO).
 
 
 fully_expand_clause(Op,Sent,SentO):- (not_ftCompound(Sent)),!,fully_expand_head(Op,Sent,SentO).
-
+fully_expand_clause(_,aNoExpansionFn(Sent),Sent):- !.
+fully_expand_clause(Op,aExpansionFn(Sent),SentO):- fully_expand_clause(Op,Sent,SentO).
 fully_expand_clause(Op,'==>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,'=>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,M:Sent,SentO):- is_stripped_module(M),!,fully_expand_clause(Op,Sent,SentO).
@@ -677,7 +674,7 @@ fully_expand_clause(Op,Sent,SentO):- must(fully_expand_head(Op,Sent,SentO)).
 %
 % Fully Expand Goal.
 %
-fully_expand_goal(Op,Sent,SentO):- % must(functor(Op,_,2)),
+fully_expand_goal(Op,Sent,SentO):- 
  must((
   w_tl(t_l:into_form_code,fully_expand_head(Op,Sent,SentM)),
     recommify(SentM,SentO))).
@@ -991,6 +988,8 @@ temp_comp(H,B,PRED,OUT):- nonvar(H),term_variables(B,Vs1),Vs1\==[], term_attvars
 % Database expand  Primary Helper.
 %
 
+:- discontiguous db_expand_0/3.
+
 %% db_expand_0( ++Op, +:Sent, -SentO) is det.
 %
 % Database Expand Term Primary Helper.
@@ -1043,7 +1042,7 @@ db_expand_0(_Op,P,PO):-
   PO=..[AE,FF,NN,AA],!.
 
 
-db_expand_0(Op,(H:-B),OUT):- temp_comp(H,B,db_expand_0(Op),OUT).
+db_expand_0(Op,(H:-B),OUT):- temp_comp(H,B,db_expand_0(Op),OUT),!.
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_0(Op,INot,O).
 db_expand_0(Op,isa(I,O),INot):-Not== ( \+ ) ,!,INot =.. [Not,I],!,db_expand_0(Op,INot,O).

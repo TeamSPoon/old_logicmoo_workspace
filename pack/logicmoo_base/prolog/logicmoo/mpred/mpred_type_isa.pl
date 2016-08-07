@@ -1164,6 +1164,7 @@ assert_isa_rev(T,I):-
    ain(isa(I,T)),
    sanity(call_u(isa(I,T))),
    sanity(isa_asserted(I,T)),
+   % sanity(call_u(installedMotelHook) -> must(call_motel(isa(I,T))) ; true),
    % sanity(call_u(mudIsa(I,T))),
    expire_tabled_list(all))).
 
