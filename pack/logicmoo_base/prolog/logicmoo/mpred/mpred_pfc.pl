@@ -799,7 +799,7 @@ mpred_ain(PIn,S):-
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
 
 
-
+ain_fast(P):- clause_asserted(P),!.
 ain_fast(P):- call_u((( get_source_ref(UU), ain_fast(P,UU)))).
 
 ain_fast(P,S):- maybe_updated_value(P,RP,OLD),subst(S,P,RP,RS),!,ain_fast(RP,RS),ignore(mpred_retract(OLD)).

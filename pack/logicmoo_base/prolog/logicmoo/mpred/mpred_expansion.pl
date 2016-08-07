@@ -400,17 +400,15 @@ functor_declares_instance_0(P,tPred):-isa_from_morphology(P,ttPredType).
 functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,ftFunctional).
 functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,O)->O=tFunction.
 
-functor_declares_instance_0(P,tCol):- arg(_,s(tCol,ftSpec,ttExpressionType),P).
-functor_declares_instance_0(P,ttModule):- arg(_,s(tCol,tModule),P).
+functor_declares_instance_0(P,tCol):- arg(_,s(tCol,ftSpec),P).
+functor_declares_instance_0(P,P):- arg(_,s(ttExpressionType,ttModule,tSet,tFunction),P).
+functor_declares_instance_0(P,P):- cheaply_u(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
+%functor_declares_instance_0(COL,COL):- call_u(isa(COL,tCol)).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
-functor_declares_instance_0(P,tCol):- arg(_,s(tCol,ftSpec),P).
-functor_declares_instance_0(P,ttExpressionType):- arg(_,s(ttExpressionType),P).
 
 
-functor_declares_instance_0(P,P):- cheaply_u(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
-functor_declares_instance_0(COL,COL):- call_u(isa(COL,tCol)).
 
 
 %= 	 	 
@@ -1015,6 +1013,11 @@ db_expand_0(_,Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
 db_expand_0(Op,Sent,SentO):- arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F),fail,
   asserted_argIsa_known(F,2,_),!,
   correctArgsIsa(Op,Sent,SentO),!.
+
+db_expand_0(Op,tCol(I),isa(I,tCol)):- \+ compound(I).
+db_expand_0(Op,tSet(I),isa(I,tSet)):- \+ compound(I).
+db_expand_0(Op,tPred(I),isa(I,tPred)):- \+ compound(I).
+db_expand_0(Op,{Sent},{Sent}):-!.
 
 db_expand_0(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
 
