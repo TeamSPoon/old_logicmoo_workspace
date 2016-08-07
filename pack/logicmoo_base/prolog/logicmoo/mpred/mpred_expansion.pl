@@ -732,6 +732,8 @@ as_is_term(A):-atomic(A),!.
 as_is_term(argsQuoted(Atom)):- !, \+ compound(Atom).
 as_is_term(prologMacroHead(Atom)):- !, \+ compound(Atom).
 as_is_term(functorDeclares(Atom)):- !, \+ compound(Atom).
+as_is_term(not_undoable(_)).
+%as_is_term(isa(I,C)):- \+ compound(I),atom(C), clause_asserted(baseKB:col_as_isa(C)),!.
 as_is_term('$VAR'(_)).
 as_is_term(PARSE):-is_parse_type(PARSE),!,fail.
 as_is_term('$was_imported_kb_content$'(_,_)):-dtrace.
@@ -1281,6 +1283,8 @@ is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_pro
 % Converted From Univ.
 %
 from_univ(Prefix,Op,[T|MORE],Out):-T==t,!,from_univ(Prefix,Op,MORE,Out).
+% MAYBE from_univ(Prefix,Op,[C,I],Out):- is_tspec(C),!,to_isa_form(I,C,Out).
+
 from_univ(Prefix,Op,[PROP,Obj|MORE],Out):-PROP==props,!,expand_props(Prefix,Op,props(Obj,MORE),Out).
 from_univ(Prefix,Op,MORE,Out):-atom(Prefix),!,from_univ(_,Op,[Prefix|MORE],Out).
 from_univ(Prefix,Op,[PROP|MORE],Out):-atom(PROP),!,Mid=..[PROP|MORE],db_expand_up(Prefix,Op,Mid,Out).

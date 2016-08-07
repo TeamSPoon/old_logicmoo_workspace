@@ -30,16 +30,32 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-
+:- initEnvironment.
 :- dynamic(baseKB:col_as_isa/1).
 :- dynamic(baseKB:col_as_unary/1).
 :- dynamic(baseKB:col_as_static/1).
+
+col_as_isa(tCol).
+col_as_isa(ttPredType).
+col_as_isa(tSet).
+col_as_isa(ttSpatialType).
+col_as_isa(ttExpressionType).
 
 :- set_prolog_flag(lm_expanders,true).
 % :- set_prolog_flag(read_attvars,false).
 %:- set_prolog_flag(mpred_te,true).
 
+:- set_prolog_flag(logicmoo_motel,false).
+
 :- '$set_source_module'(baseKB).
+:- defprimconcept(naf(tDeleted),tExisting).
+:- abolish(isa,2).
+
+do_and_undo(A,U):-atom(A),atom_concat('assert',Suffix,A),!,atom_concat('delete',Suffix,U),current_predicate(U/_).
+do_and_undo(A,U):-atom(A),atom_concat('def',_,A),atom_concat('un',A,U),current_predicate(U/_).
+do_and_undo(A,U):-strip_module(A,M,P),compound(P),P=..[F|ARGS],lookup_u(do_and_undo(F,UF)),UA=..[UF|ARGS], U = (M:UA).
+ll:- listing([isa/2,mtCycL/1,col_as_unary,col_as_isa,tRRP2/1,tRR/1,tRRP/1]).
+
 
 :- asserta_if_new(baseKB:mtCycL(baseKB)).
 
