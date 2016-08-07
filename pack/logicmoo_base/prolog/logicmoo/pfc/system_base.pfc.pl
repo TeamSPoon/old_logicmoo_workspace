@@ -50,16 +50,10 @@ col_as_unary(col_as_isa).
 col_as_unary(col_as_unary).
 col_as_unary(col_as_static).
 col_as_unary(argsQuoted).
-col_as_unary(tPred).
-
-%col_as_isa(mtProlog).
-%col_as_isa(mtCycL).
 col_as_unary(mtProlog).
 col_as_unary(mtExact).
 col_as_unary(mtCycL).
-col_as_unary(pfcLHS).
-col_as_unary(tPred).
-col_as_unary(tCol).
+
 % :- rtrace((ain_expanded(tCol(tCol)))).
 
 %prologHybrid(C)==>{must(callable(C))}.
@@ -73,6 +67,10 @@ typeCheckDecl(pfcControlled(C),callable(C)).
 :- ain_expanded(baseKB:mtCycL(baseKB)).
 col_as_isa(tSet).
 col_as_isa(ttSpatialType).
+
+tSet(ttPredType).
+% ~ ttPredType(col_as_unary).
+
 col_as_isa(ttPredType).
 %col_as_isa(completelyAssertedCollection).
 
@@ -118,7 +116,7 @@ prologNegByFailure(prologNegByFailure).
 
 % :- break.
 
-ttPredType(X)==>completelyAssertedCollection(X).
+genls(ttPredType,completelyAssertedCollection).
 
 :- do_gc.
 
@@ -269,14 +267,14 @@ arity(is_never_type,1).
 arity(prologSingleValued,1).
 arity('<=>',2).
 arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
-arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1),\+((call((dif:dif(Z,1))), arity(F,Z))).
+arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1), (col_as_unary(F);col_as_isa(F)), \+((call((dif:dif(Z,1))), arity(F,Z))).
 
 % mtCycL(baseKB).
 
 tCol(ttModule).
 arity(tCol,1).
 
-tCol(ttModule,mudToCyc('MicrotheoryType')).
+tSet(ttModule,mudToCyc('MicrotheoryType')).
 
 arity(argsQuoted,1).
 arity(quasiQuote,1).
@@ -318,7 +316,7 @@ argsQuoted(second_order).
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
-:- ain(((tPred(F),
+(((isa(F,tPred),
  arity(F,A)/
   (is_ftNameArity(F,A),A>1, 
       \+ prologBuiltin(F), 
@@ -390,9 +388,8 @@ mpred_mark(pfcPosTrigger,F, A)/(\+ ground(F/A))==>{trace_or_throw(mpred_mark(pfc
 mpred_mark(pfcPosTrigger,F, A)==>marker_supported(F,A).
 mpred_mark(pfcNegTrigger,F, A)==>marker_supported(F,A).
 mpred_mark(pfcBcTrigger,F, A)==>marker_supported(F,A).
-mpred_mark(pfcRHS,F, A)==>marker_supported(F,A).
 mpred_mark(pfcLHS,F, A)==>arity(F,A),prologMacroHead(F).
-mpred_mark(pfcCreates,F, A)==>
+mpred_mark(pfcRHS,F, A)==>
   {functor(P,F,A),make_dynamic(P),kb_dynamic(P),
     create_predicate_istAbove(abox,F,A)},
     marker_supported(F,A).
@@ -420,7 +417,7 @@ mpred_mark(pfcRHSF,1)/(fail,atom(F),functor(Head,F,1),
 
 mpred_mark_C(G) ==> {map_mpred_mark_C(G)}.
 map_mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),ain([isa(F,pfcControlled),arity(F,A)]))),G).
-mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfcControlled(F).
+mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>(isa(F,tPred),arity(F,A),isa(F,pfcControlled)).
 
 % (hybrid_support(F,A) ==>{\+ is_static_predicate(F/A), must(kb_dynamic(F/A))}).
 

@@ -19,7 +19,8 @@
   mpred_fwc/1,
   get_mpred_is_tracing/1,
   show_if_debug/1,
-  full_transform/3,
+  full_transform_warn/5,
+  full_transform/5,
   maybe_mpred_break/1,
   each_E/3,
   call_m_g/3,
@@ -39,7 +40,7 @@
   log_failure/1,
   code_sentence_op/1,
   mnotrace/1,
-  build_consequent/3,
+  mpred_compile_rhs_term_consquent/3,
   with_fc_mode/2,
   filter_buffer_n_test/3,
   filter_buffer_get_n/3,
@@ -516,6 +517,8 @@ convention_to_symbolic_mt(_Why,F,_,Mt):-  call(baseKB:predicateConventionMt(F,Mt
 convention_to_symbolic_mt(_Why,F,A,abox):- baseKB:wrap_shared(F,A,ereq).
 % convention_to_symbolic_mt(_Why,_,_,M):- atom(M),!.
 
+full_transform_warn(Why,MH,MHH):- full_transform(Why,MH,MHH),must(MH=@=MHH).
+
 full_transform(Why,MH,MHH):-
    must(fully_expand(clause(Why,full_transform),MH,MHH)),!,
    sanity(same_modules(MH,MHH)).
@@ -528,8 +531,8 @@ same_modules(MH,MHH):- strip_module(MH,HM,_),strip_module(MHH,HHM,_),!,
 listing_u(P):-mpred_call_no_bc(listing(P)).
 
 attvar_op_fully(Why,MH):- !, attvar_op(Why,MH).
-attvar_op_fully(Why,M:H):- must_notrace_pfc(fully_expand(change(Why,attvar_op_fully),H,HH)),!,each_E(attvar_op(Why),M:HH,[]).
-attvar_op_fully(Why,MH):- full_transform(Why, MH,MHH),each_E(attvar_op(Why),MHH,[]).
+%attvar_op_fully(Why,M:H):- must_notrace_pfc(full_transform_warn(change(Why,attvar_op_fully),H,true,HH,true)),!,each_E(attvar_op(Why),M:HH,[]).
+%attvar_op_fully(Why,MH):- full_transform_warn(Why, MH,MHH),each_E(attvar_op(Why),MHH,[]).
 
 throw_depricated:- trace_or_throw(throw_depricated).
 
@@ -785,10 +788,13 @@ mpred_ain(MTP :- B,S):- strip_module(MTP,MT,P),P\==MTP,!,
   with_umt(MT,mpred_ain(P :- B,S)),!.
 
 mpred_ain(PIn,S):- 
+   if_defined(is_motel(PIn),fail),
+   with_current_why(S, motel_ain(PIn,S)),!.
+
+mpred_ain(PIn,S):- 
   must(add_eachRulePreconditional(PIn,P)),
   must(full_transform(ain,P,P0)),!,
-  must(full_transform(ain,S,S0)),!,
-  must(ain_fast(P0,S0)),!.
+  must(ain_fast(P0,S)),!.
 
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
 
@@ -1338,6 +1344,7 @@ mpred_bt_pt_combine(_,_,_):- !.
 
 % 
 %  predicates for manipulating action traces.
+%   (Undoes side-effects)
 % 
 
 mpred_ain_actiontrace(Action,Support):- 
@@ -1820,7 +1827,10 @@ mpred_eval_rhs1(Assertion,Support):- !,
 %  evaluate an action found on the rhs of a rule.
 % 
 
-fc_eval_action(Action,Support):-
+fc_eval_action(CALL,Support):- 
+  mpred_METACALL(fc_eval_action_rev(Support),CALL).
+
+fc_eval_action_rev(Support,Action):-
   mpred_call_no_bc(Action), 
   (action_is_undoable(Action) 
      -> mpred_ain_actiontrace(Action,Support) 
@@ -1984,16 +1994,18 @@ mpred_METACALL(How, Cut, (C1;C2)):-!,(mpred_METACALL(How, Cut, C1);mpred_METACAL
 
 mpred_METACALL(How, Cut, M):- mpred_expansion:fixed_negations(M,O),!,mpred_METACALL(How, Cut, O).
 mpred_METACALL(How, Cut, U:X):-U==user,!,mpred_METACALL(How, Cut, X).
-mpred_METACALL(How, Cut, t(A,B)):-(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).
-mpred_METACALL(How, Cut, isa(B,A)):-(atom(A)->true;(no_repeats(tCol(A)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).
+% mpred_METACALL(How, Cut, t(A,B)):-(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).
+% mpred_METACALL(How, Cut, isa(B,A)):-(atom(A)->true;(no_repeats(tCol(A)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).
 %mpred_METACALL(How, Cut, t(A,B)):-!,(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).
 mpred_METACALL(How, Cut, t(A,B,C)):-!,(atom(A)->true;(no_repeats(arity(A,2)),atom(A))),ABC=..[A,B,C],mpred_METACALL(How, Cut, ABC).
 mpred_METACALL(How, Cut, t(A,B,C,D)):-!,(atom(A)->true;(no_repeats(arity(A,3)),atom(A))),ABC=..[A,B,C,D],mpred_METACALL(How, Cut, ABC).
 mpred_METACALL(How, Cut, t(A,B,C,D,E)):-!,(atom(A)->true;(no_repeats(arity(A,4)),atom(A))),ABC=..[A,B,C,D,E],mpred_METACALL(How, Cut, ABC).
 mpred_METACALL(How, Cut, call(X)):- !, mpred_METACALL(How, Cut, X).
 mpred_METACALL(How, Cut, call_u(X)):- !, mpred_METACALL(How, Cut, X).
+mpred_METACALL(How, Cut, once(X)):- !, once(mpred_METACALL(How, Cut, X)).
+mpred_METACALL(How, Cut, must(X)):- !, must(mpred_METACALL(How, Cut, X)).
 mpred_METACALL(How, Cut, \+(X)):- !, \+ mpred_METACALL(How, Cut, X).
-mpred_METACALL(How, Cut, call_u(X)):- !, mpred_METACALL(How, Cut, X).
+mpred_METACALL(How, Cut, not(X)):- !,\+ mpred_METACALL(How, Cut, X).
 mpred_METACALL(_How, _Cut, clause(H,B,Ref)):-!,clause_u(H,B,Ref).
 mpred_METACALL(_How, _Cut, clause(H,B)):-!,clause_u(H,B).
 mpred_METACALL(_How, _Cut, clause(HB)):-expand_to_hb(HB,H,B),!,clause_u(H,B).
@@ -2003,13 +2015,15 @@ mpred_METACALL(_How, _Cut, assert(X)):- !, mpred_ain(X).
 mpred_METACALL(_How, _Cut, retract(X)):- !, mpred_remove(X).
 % TODO: test removal
 %mpred_METACALL(How, Cut, prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
-%mpred_METACALL(How, Cut, HB):-hotrace((fully_expand_warn(mpred_call_0,HB,HHBB))),!,mpred_METACALL(How, Cut, HHBB).
+% mpred_METACALL(How, Cut, HB):-hotrace((fully_expand_warn(mpred_METACALL,HB,HHBB))),!,mpred_METACALL(How, Cut, HHBB).
 %mpred_METACALL(How, Cut, argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(mpred_METACALL(How, Cut, argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
 % TODO: test removal
 % mpred_METACALL(How, Cut, isa(H,B)):-!,isa_asserted(H,B).
 mpred_METACALL(_How, _Cut, (H:-B)):- !, clause_u((H :- B)).
 mpred_METACALL(_How, _Cut, M:(H:-B)):- !, clause_u((M:H :- B)).
+
 % TODO: mpred_METACALL(_How, _Cut, M:HB):- current_prolog_flag(unsafe_speedups,true),!, call(M:HB).
+
 mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call(P).
 %mpred_METACALL(How, Cut, (H)):- is_static_pred(H),!,show_pred_info(H),dtrace(mpred_METACALL(How, Cut, (H))).
 mpred_METACALL( How,   Cut, P) :- fail, predicate_property(P,number_of_clauses(_)),!,
@@ -2188,17 +2202,13 @@ mpred_compile_rhs_term(Sup, \+ ( P / C), COMPILED) :- nonvar(C), !,
   mpred_compile_rhs_term(Sup, ( \+ P ) / C , COMPILED).
 
 % dmiles added this to get PFC style lazy BCs
-mpred_compile_rhs_term(Sup,(P/C),((P0 <- C0))) :- !,mpred_compile_rhs_term(Sup,P,P0),
+mpred_compile_rhs_term(Sup,(P/C),((P0 <- C0))) :- fail, !,mpred_compile_rhs_term(Sup,P,P0),
    build_code_test(Sup,C,C0),!.
 
 mpred_compile_rhs_term(Sup,(P/C),((P0 :- C0))) :- !,mpred_compile_rhs_term(Sup,P,P0),
    build_code_test(Sup,C,C0),!.
 
-mpred_compile_rhs_term(Sup,I,OO):- 
-  fully_expand(compile_rhs,I,O),
-  must(\+ \+ mpred_mark_as(Sup,O,pfcRHS)),!,build_consequent(Sup,O,OO).
-
-mpred_compile_rhs_term(Sup,I,O):- build_consequent(Sup,I,O).
+mpred_compile_rhs_term(Sup,I,O):- mpred_compile_rhs_term_consquent(Sup,I,O).
 
 
 
@@ -2275,7 +2285,7 @@ build_rule(Lhs,Rhs,Support):-
   doall(mpred_eval_lhs(Trigger,Support)).
 
 build_trigger(WS,[],Consequent,ConsequentO):-
-   build_consequent(WS,Consequent,ConsequentO).
+   mpred_compile_rhs_term_consquent(WS,Consequent,ConsequentO).
 
 build_trigger(WS,[V|Triggers],Consequent,pt(V,X)):-
   var(V),
@@ -2441,20 +2451,22 @@ build_code_test(WS,Test,Test):- must(mpred_mark_as(WS,Test,pfcCallCodeTst)),!.
 build_code_test(_,Test,Test).
 
 
-%% build_consequent(+Support, +TestIn, -TestOut) is semidet.
+%% mpred_compile_rhs_term_consquent(+Support, +TestIn, -TestOut) is semidet.
 %
 % Build Consequent.
 %
-build_consequent(_      ,Test,Test):- is_ftVar(Test),!.
-build_consequent(_      ,Test,TestO):-is_ftVar(Test),!,TestO=added(Test).
-build_consequent(_Sup,!,{cut_c}):-!.
-build_consequent(WS,'{}'(Test),'{}'(TestO)) :- !,build_code_test(WS,Test,TestO).
-build_consequent(WS,rhs(Test),rhs(TestO)) :- !,build_consequent(WS,Test,TestO).
-build_consequent(WS,Test,TestO):- is_list(Test),must_maplist(build_consequent(WS),Test,TestO).
-build_consequent(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],
-   must_maplist(build_consequent(WS),TestL,TestLO),TestO=..[F|TestLO],!.
-build_consequent(WS,Test,Test):-must(mpred_mark_as(WS,Test,pfcCreates)),!.
-build_consequent(_ ,Test,Test).
+mpred_compile_rhs_term_consquent(_      ,Test,Test):- is_ftVar(Test),!.
+mpred_compile_rhs_term_consquent(_      ,Test,TestO):-is_ftVar(Test),!,TestO=added(Test).
+mpred_compile_rhs_term_consquent(_Sup,!,{cut_c}):-!.
+mpred_compile_rhs_term_consquent(WS,'{}'(Test),'{}'(TestO)) :- !,build_code_test(WS,Test,TestO).
+mpred_compile_rhs_term_consquent(WS,rhs(Test),rhs(TestO)) :- !,mpred_compile_rhs_term_consquent(WS,Test,TestO).
+mpred_compile_rhs_term_consquent(WS,Test,TestO):- is_list(Test),must_maplist(mpred_compile_rhs_term_consquent(WS),Test,TestO).
+
+mpred_compile_rhs_term_consquent(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],
+   must_maplist(mpred_compile_rhs_term_consquent(WS),TestL,TestLO),TestO=..[F|TestLO],!.
+mpred_compile_rhs_term_consquent(Sup,I,O):-
+    full_transform(compile_rhs,I,O),
+    must(mpred_mark_as(Sup,O,pfcRHS)),!.
 
 
 %% code_sentence_op( :TermVar) is semidet.
@@ -2538,7 +2550,7 @@ clause_asserted_call(H,B):-clause_asserted(H,B).
 
 
 clause_asserted_u(MH):- sanity((nonvar(MH), ignore(show_failure(\+ is_static_predicate(MH))))),fail.
-%clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
+%clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(full_transform(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
 clause_asserted_u((MH:-B)):- must(nonvar(MH)), !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,
               (current_prolog_flag(unsafe_speedups,true) -> 
                  (clause_asserted_ii((M:H , B )))
