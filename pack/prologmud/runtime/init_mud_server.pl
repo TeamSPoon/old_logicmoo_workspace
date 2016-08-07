@@ -78,6 +78,8 @@ unsafe_preds_init(M,F,A):-M=files_ex,current_predicate(M:F/A),member(X,[delete,c
 unsafe_preds_init(M,F,A):-M=process,current_predicate(M:F/A),member(X,[kill,create]),atom_contains(F,X).
 unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 
+:- if(\+ compiling).
+:- set_prolog_flag(access_level,system).
 
 % [Optionaly] Solve the Halting problem
 :-unlock_predicate(system:halt/0).
@@ -91,7 +93,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :-abolish(system:halt,1).
 :-asserta((system:halt(_) :- format('the halting problem is now solved!'))).
 :-lock_predicate(system:halt/1).
-
+kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level,system),forall(unsafe_preds_init(M,F,A),bugger:remove_pred(M,F,A)))).
 :- dmsg("the halting problem is now solved!").
 :- set_prolog_flag(access_level,user).
 
@@ -101,6 +103,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :- endif.
 %:- use_listing_vars.
 % :- [run].
+:- endif.
 
 % Loaded LogicMOO Code!!!
 :- ensure_loaded(logicmoo_repl).
@@ -167,8 +170,10 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 % :- set_prolog_flag(gc,false).
 
 :- doall(printAll(current_prolog_flag(_N,_V))).
-:-forall(unsafe_preds_init(M,F,A),bugger:remove_pred(M,F,A)).
-
+:- initialization(kill_unsafe_preds,restore).
+:- if(\+ compiling).
+:- initialization(kill_unsafe_preds).
+:- endif.
 % ==========================================================
 % Regression tests that first run whenever a person stats the MUD on the public server
 % ==========================================================

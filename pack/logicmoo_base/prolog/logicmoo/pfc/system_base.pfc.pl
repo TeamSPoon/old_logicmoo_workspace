@@ -238,7 +238,7 @@ alwaysGaf(pfcRHS).
 alwaysGaf(pfcLHS).
 
 
-tSet(A)/atom(A)==> tCol(A),{decl_type_unsafe(A), kb_dynamic(A/1)}.
+tSet(A)/atom(A)==> tCol(A),{decl_type(A), kb_dynamic(A/1)}.
 % tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
 :- mpred_notrace_exec.
 

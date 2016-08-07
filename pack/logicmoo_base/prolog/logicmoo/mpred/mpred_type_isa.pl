@@ -670,7 +670,7 @@ not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 %
 % True Structure Col Gen.
 %
-tCol_gen(T):- no_repeats(T,call_u(atom(T);ttTemporalType(T);completelyAssertedCollection(T);tSet(T);tCol(T))). % ,atom(T).
+tCol_gen(T):- no_repeats(T,call_u(baseKB:(atom(T);ttTemporalType(T);completelyAssertedCollection(T);tSet(T);tCol(T)))). % ,atom(T).
 % ==========================
 % isa_backchaing(i,c)
 % ==========================

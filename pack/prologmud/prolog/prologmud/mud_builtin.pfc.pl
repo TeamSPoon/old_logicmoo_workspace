@@ -400,6 +400,7 @@ typeGenls(ttAgentType,tAgent).
 %((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) ==>    disjointWith(C1,P2)).
 % (disjointWith(C1,P2) <- (genls(C1,P1), {dif:dif(C1,P1)}, disjointWith(P1,P2))).
 
+% :- rtrace.
 completelyAssertedCollection(Complete)==> {must(\+ ttExpressionType(Complete))}.
 
 

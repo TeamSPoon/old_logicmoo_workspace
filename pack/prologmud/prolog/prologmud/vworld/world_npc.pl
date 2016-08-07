@@ -1,13 +1,16 @@
+/*
 :-swi_module(toploop_npc, [
           move_or_sit_memory_idea/3,
           npc_tick/0,
           join_npcs_long_running/0,npc_tick_tock/0,npc_tick_tock_time/1,
           command_actTick/1,
           npc_controller/2,   
-          warnOnError/1,
+          %warnOnError/1,
           get_world_agent_plan/3,
           tick_controller/2]).
-/* * <module> 
+*/
+
+/* * module> 
 % Uses timers to make sure all Agents get a chance to do their things
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog

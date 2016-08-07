@@ -872,8 +872,10 @@ module_predicates_are_exported0(ModuleName):-
 % Export If Noconflict.
 %
 
+:- module_transparent(system:export_if_noconflict/2).
 system:export_if_noconflict(M,FA):- export_if_noconflict_mfa(M,FA).
 
+:- module_transparent(export_if_noconflict_mfa/2).
 export_if_noconflict_mfa(SM,Var):- var(Var),throw(var(export_if_noconflict_mfa(SM,Var))).
 export_if_noconflict_mfa(_,  M:FA):-!,export_if_noconflict_mfa(M,FA).
 export_if_noconflict_mfa(SM,(A,B)):-!,export_if_noconflict_mfa(SM,A),export_if_noconflict_mfa(SM,B).
@@ -884,12 +886,32 @@ export_if_noconflict_mfa(SM,F//A):- A2 is A + 2, !,export_if_noconflict_mfa(SM,F
 export_if_noconflict_mfa(_,SM:F//A):- A2 is A + 2, !,export_if_noconflict_mfa(SM,F,A2).
 export_if_noconflict_mfa(SM,P):-functor(P,F,A),export_if_noconflict_mfa(SM,F,A).
 
+:- module_transparent(export_if_noconflict_mfa/3).
+export_if_noconflict_mfa(M,F,A):- functor(P,F,A),
+   predicate_property(M:P,imported_from(Other)),
+   (Other==system->unlock_predicate(Other:P);true),
+   Other:export(Other:F/A),
+   (Other==system->lock_predicate(Other:P);true),
+   M:import(Other:F/A),!,
+   M:export(Other:F/A), writeln(rexporting(M=Other:F/A)).
+export_if_noconflict_mfa(M,F,A):- 
+  functor(P,F,A),
+ findall(import(Real:F/A),
+  (current_module(M2),module_property(M2,exports(X)),member(F/A,X),
+    (predicate_property(M2:P,imported_from(Real))->true;Real=M2),
+    Real\=M,
+    writeln(should_be_skipping_export(M:Real=M2:F/A)),
+    Real:export(Real:F/A),
+    Real\==M),List),
+ (List==[]->(M:export(M:F/A));
+  (maplist(call,List)),(M:export(M:F/A))).
+/*
 export_if_noconflict_mfa(M,F,A):- current_module(M2),M2\=M,module_property(M2,exports(X)),
    member(F/A,X),ddmsg(skipping_export(M2=M:F/A)),!,
    must(M:export(M:F/A)),
    ((M2==system;M==baseKB)->true;must(M2:import(M:F/A))).
 export_if_noconflict_mfa(M,F,A):-M:export(F/A).
-
+*/
 % module_predicates_are_not_exported_list(ModuleName,Private):- once((length(Private,Len),dmsg(module_predicates_are_not_exported_list(ModuleName,Len)))),fail.
 
 %= 	 	 

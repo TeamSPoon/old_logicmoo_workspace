@@ -40,9 +40,13 @@ do_social(Agent,Say,Whom,Text):-
    asInvoked(Cmd,[Say,Agent,Whom,Text]),
    raise_location_event(Where,actNotice(reciever,Cmd)).
 
-:- module_predicates_are_exported.
 
+:- if(current_module(chat)).
 :- module_meta_predicates_are_transparent(chat).
+:- module_predicates_are_exported.
+:- endif.
+
+
 
 :- include(prologmud(mud_footer)).
 

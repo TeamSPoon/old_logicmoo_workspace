@@ -297,8 +297,10 @@ baseKB:mud_test_local :- at_start(must_det(run_mud_tests)).
 
 
 
-:- module_predicates_are_exported.
 
+:- if(current_module(mud_testing)).
 :- module_meta_predicates_are_transparent(mud_testing).
+:- module_predicates_are_exported.
+:- endif.
 
 

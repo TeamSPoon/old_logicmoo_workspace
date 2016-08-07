@@ -305,8 +305,6 @@ get_head_term(Form0,Form):- get_consequent(Form0,Form).
 :- thread_local(t_l:no_mpred_breaks/0).
 
 
-user:current_abox(M):-prolog_load_context(module,user:M).
-system:current_abox(M):-prolog_load_context(module,system:M).
 
 :- module_transparent((ensure_abox)/1).
 :- multifile(lmcache:has_pfc_database_preds/1).
@@ -319,7 +317,6 @@ ensure_abox(M):-
    asserta(lmcache:has_pfc_database_preds(M)),
    assert_if_new(baseKB:mtCycL(M)),
    retractall(baseKB:mtProlog(M)),
-   assert_if_new(M:current_abox(M)),
    setup_module_ops(M),
    set_prolog_flag(M:unknown,error),
    forall(mpred_database_term(F,A,_),
@@ -1875,8 +1872,8 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 
 % :- table(call_u/1).
 
-% call_u(G):- strip_module(G,M,P), call_u_mp(M,P).
-call_u(G):- strip_module(G,M,P), call_u_mp(G,M,P).
+call_u(G):- strip_module(G,M,P), call_u_mp(M,P).
+% call_u(G):- strip_module(G,M,P), call_u_mp(G,M,P).
 
 
 call_u_mp(user, P1 ):-!,  call_u_mp(baseKB,P1).
@@ -1952,7 +1949,7 @@ mpred_BC_CACHE0(_,P):-
 mpred_call_no_bc(P0):- strip_module(P0,_,P), sanity(stack_check),var(P),!, mpred_fact(P).
 mpred_call_no_bc(baseKB:true):-!.
 
-mpred_call_no_bc(P):- no_repeats(loop_check(mpred_call_no_bc0(P),mpred_METACALL(call, P))).
+mpred_call_no_bc(P):- no_repeats(loop_check(mpred_METACALL(call_u, P))).
 
 % mpred_call_no_bc0(P):- lookup_u(P).
 % mpred_call_no_bc0(P):-  defaultAssertMt(Mt), Mt:lookup_u(P).
