@@ -78,7 +78,6 @@ unsafe_preds_init(M,F,A):-M=files_ex,current_predicate(M:F/A),member(X,[delete,c
 unsafe_preds_init(M,F,A):-M=process,current_predicate(M:F/A),member(X,[kill,create]),atom_contains(F,X).
 unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 
-:-forall(unsafe_preds_init(M,F,A),bugger:remove_pred(M,F,A)).
 
 % [Optionaly] Solve the Halting problem
 :-unlock_predicate(system:halt/0).
@@ -87,6 +86,7 @@ unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/
 :-asserta((system:halt :- format('the halting problem is now solved!'))).
 :-lock_predicate(system:halt/0).
 
+:-unlock_predicate(system:halt/1).
 :-redefine_system_predicate(system:halt/1).
 :-abolish(system:halt,1).
 :-asserta((system:halt(_) :- format('the halting problem is now solved!'))).
@@ -167,6 +167,7 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 % :- set_prolog_flag(gc,false).
 
 :- doall(printAll(current_prolog_flag(_N,_V))).
+:-forall(unsafe_preds_init(M,F,A),bugger:remove_pred(M,F,A)).
 
 % ==========================================================
 % Regression tests that first run whenever a person stats the MUD on the public server

@@ -73,6 +73,7 @@ baseKB:mpred_skipped_module(eggdrop).
 :-dynamic( baseKB:argsQuoted/1).
 
 
+:-ensure_loaded(library('logicmoo/mpred/mpred_motel.pl')).
 :-ensure_loaded(library('logicmoo/mpred/mpred_type_isa.pl')).
 :-ensure_loaded(library('logicmoo/mpred/mpred_kb_ops.pl')).
 :- dynamic(lmcache:loaded_external_kbs/1).
@@ -120,15 +121,17 @@ baseKB:mpred_skipped_module(eggdrop).
 % system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
 %system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
 
-base_clause_expansion(_,I,_):- var(I),!,fail.
+base_clause_expansion(_,I,_):- \+ compound(I), \+ string(I), !, fail.
 base_clause_expansion(_,I,_):-
   % prolog_load_context(term,TermWas),
    b_getval('$source_term',TermWas),
    \+ same_terms(TermWas, I),!,
    fail.
 
-base_clause_expansion(P1,end_of_file,O):- !, prolog_load_context(module,Module),mpred_te(term,Module,end_of_file,P1,O,_P2),!,fail.
 base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
+
+base_clause_expansion(P1,end_of_file,O):- !, prolog_load_context(module,Module),mpred_te(term,Module,end_of_file,P1,O,_P2),!,fail.
+base_clause_expansion(_,':-'(ain_expanded(I)),':-'(ain_expanded(I))):-!.
 base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
 base_clause_expansion(_,I, O):- get_consequent_functor(I,F,A),base_clause_expansion_fa(I,O,F,A).
 base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.

@@ -881,7 +881,7 @@ maybe_updated_value(UP,R,OLD):-
 % tries to assert a fact or set of fact to the database.  For
 % each fact (or the singleton) mpred_post1 is called. It always succeeds.
 %
-mpred_post(P, S):- fully_expand_now(post,P,P0),fully_expand_now(post,S,S0),each_E(mpred_post1,P0,[S0]).
+mpred_post(P, S):- full_transform(post,P,P0),each_E(mpred_post1,P0,[S]).
 
 mpred_post( P):- get_source_ref(UU), mpred_post( P,   UU).
 mpred_post1( P):- get_source_ref(UU), mpred_post1( P,   UU).
@@ -895,7 +895,7 @@ mpred_post1( P):- get_source_ref(UU), mpred_post1( P,   UU).
 mpred_post1( isa(_,_,_),   _):- dumpST,dtrace.
 mpred_post1( tCol(','),   _):- dumpST,dtrace.
 
-mpred_post1(P, S):- subst(P:S,completelyAssertedCollection,tSet,P1:S1),mpred_post2(P1, S1).
+mpred_post1(P, S):- each_E(mpred_post2,P,[S]).
 
 mpred_post2( P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post2( P0,   S).
 
@@ -1344,9 +1344,9 @@ mpred_ain_actiontrace(Action,Support):-
   % adds an action dtrace and it''s support.
   mpred_add_support(actn(Action),Support).
 
-mpred_undo_action(actn(A)):-
-  lookup_u(do_and_undo(A,M)),
-  mpred_call_no_bc(M),
+mpred_undo_action(actn(Did)):-
+  (clause_asserted_u(do_and_undo(Did,Undo))->true;lookup_u(do_and_undo(Did,Undo))),
+  mpred_call_no_bc(Undo),
   !.
 
 
@@ -2024,11 +2024,12 @@ mpred_METACALL(How, _SCut, P):- call(How,P).
 
 
 
-%% action_is_undoable(?A) 
+%% action_is_undoable(+G) 
 %
 % an action is action_is_undoable if there exists a method for undoing it.
 %
-action_is_undoable(A):- lookup_u(do_and_undo(A,_)).
+action_is_undoable(G):- lookup_u(do_and_undo(G,_)).
+action_is_undoable(G):- functor(G,F,_),lookup_u(do_and_undo(F,Undo)),atom(Undo).
 
 
 

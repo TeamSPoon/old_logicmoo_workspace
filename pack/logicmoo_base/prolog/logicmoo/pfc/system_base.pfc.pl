@@ -440,6 +440,39 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 % mtExact(Mt)/module_predicate(Mt,F,A)==>predicateConventionMt(F,Mt),arity(F,A).
 
 
+% NAUTs
+tSet(tUnreifiableFunction,
+genls(tFunction),
+comment("
+A specialization of Function-Denotational instances of which are such that their values 
+are not reified in the Cyc system. More precisely, an instance of UnreifiableFunction 
+is such that closed \"NA[R|U]Ts\" (see CycLNonAtomicTerm) 
+built from its standard CycL name are _not_ instances of #$HLReifiedDenotationalTerm. 
+Constrast with ReifiableFunction. Usually it is more efficient to make functions reifiable; 
+but it is not desirable to reify every non-atomic term, such as those built from (names of) 
+instances of MathematicalFunctionOnScalars. For example, it would be cumbersome to
+ reify every term of the form (Inch N) that happened to appear in a CycL assertion."
+)).
+
+% NARTs
+tSet(tReifiableFunction,comment("A specialization of Function-Denotational. Each instance of ReifiableFunction is denoted by a 
+CycL constant that can stand in the 0th (or \"arg0\") position in a CycLReifiableNonAtomicTerm (q.v.). For example, GovernmentFn is a 
+reifiable function, so the term `(GovernmentFn France)' is a reifiable non-atomic term (or \"NAT\"). And since this particular 
+term actually _is_ reified in the Cyc Knowledge Base, it is, more specifically, a CycLNonAtomicReifiedTerm 
+(or \"NART\"). The NART `(GovernmentFn France)' is treated more or less the same as if it were a CycL constant 
+(named, say, `GovernmentOfFrance'). Similary, the constant for GovernmentFn can be applied to the constant (or other reified or 
+reifiable term) for _any_ instance of GeopoliticalEntity to form a reifiable NAT that denotes that region's government; and should 
+ this NAT appear in a sentence that is asserted to the KB, it will thereby become a NART. Note, however, that not all NATs are such that it 
+is desireable that they should become reified (i.e. become NARTs) if they appear in assertions; for more on this see UnreifiableFunction."),
+genls(tFunction)).
+
+
+tSet(vtLinguisticObject).
+vtLinguisticObject(vtVerb).
+
+tReifiableFunction(aVerbFn).
+conceptuallyRelated("go",actMove).
+resultIsa(aVerbFn(ftString),vtVerb).
 
 
 
