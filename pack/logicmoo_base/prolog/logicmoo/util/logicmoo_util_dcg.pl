@@ -42,8 +42,8 @@
 	 ]).
 
 :- include('logicmoo_util_header.pi').
-% :- use_module(logicmoo(logicmoo_utils)).
-% :- use_module(logicmoo_util_strings).
+% :- ensure_loaded(logicmoo(logicmoo_utils)).
+% :- ensure_loaded(logicmoo_util_strings).
 
  
 :- meta_predicate dcgLeftOfMid(?,//,?,?).

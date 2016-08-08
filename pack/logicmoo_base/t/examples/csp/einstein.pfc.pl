@@ -34,7 +34,7 @@
 
 :- module(zebra,[]).
 
-:- use_module(library(logicmoo_user)).
+:- ensure_loaded(library(logicmoo_user)).
 
 :- op(600,xfy, (/\)).
 :- op(0,xfx,'=>').

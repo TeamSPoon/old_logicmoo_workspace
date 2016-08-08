@@ -1,6 +1,6 @@
 #!/usr/bin/env swipl
 
-:- use_module(library(logicmoo_utils)).
+:- ensure_loaded(library(logicmoo_utils)).
 
 :- use_listing_vars.
 

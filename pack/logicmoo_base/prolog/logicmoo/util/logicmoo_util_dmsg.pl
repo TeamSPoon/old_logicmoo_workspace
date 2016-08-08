@@ -232,10 +232,10 @@ dmsg000/1,
 :- endif.
 
 :- use_module(system:library(memfile)).
-:- system:use_module(logicmoo_util_first).
-:- system:use_module(logicmoo_util_rtrace).
-:- system:use_module(logicmoo_util_with_assertions).
-:- system:use_module(logicmoo_util_loop_check).
+:- system:ensure_loaded(logicmoo_util_first).
+:- system:ensure_loaded(logicmoo_util_rtrace).
+:- system:ensure_loaded(logicmoo_util_with_assertions).
+:- system:ensure_loaded(logicmoo_util_loop_check).
 
 
 
@@ -1597,8 +1597,8 @@ writeFailureLog(E,X):-
 cls:- shell(cls).
 
 :- use_module(library(random)).
-:- use_module(logicmoo_util_varnames).
-:- use_module(logicmoo_util_catch).
+:- ensure_loaded(logicmoo_util_varnames).
+:- ensure_loaded(logicmoo_util_catch).
 % :- autoload([verbose(false)]).
 
 /*

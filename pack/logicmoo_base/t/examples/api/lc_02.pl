@@ -7,7 +7,7 @@
 */
 :- module(sanity_neg,[]).
 
-:- use_module(library(logicmoo_utils)).
+:- ensure_loaded(library(logicmoo_utils)).
 
 icatch(G):-catch(G,_,true).
 

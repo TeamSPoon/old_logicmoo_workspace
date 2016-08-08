@@ -1,9 +1,9 @@
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_pttp_static,[]).
 :- endif.
 
-:- use_module(library(logicmoo_base)).
-:- use_module(logicmoo(mpred/'mpred_header.pi')).
+:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 
 :- 
  %swi_module(mpred_pttp_statics,[ 

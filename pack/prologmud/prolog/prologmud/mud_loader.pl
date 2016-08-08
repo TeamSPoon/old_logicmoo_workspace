@@ -61,7 +61,7 @@
 
 
 % [Optionaly] load the mpred_online system
-% :- if_file_exists(system:ensure_loaded(library(logicmoo/mpred_online))).
+% :- if_file_exists(ensure_loaded(library(logicmoo/mpred_online))).
 
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
 
@@ -202,7 +202,7 @@ within_user(Call):- '@'(Call,'user').
 if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
 
 % set to false because we don't want to use the mudconsole
-:- if_flag_true(false, if_version_greater(70109,user:use_module(logicmoo('mudconsole/mudconsolestart')))).
+:- if_flag_true(false, if_version_greater(70109,user:ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
 %:- set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').
@@ -622,7 +622,7 @@ download_and_install_el:-
 :- include(prologmud(mud_footer)).
 /*
 % Load datalog
-:- if_flag_true(fullStart, ((use_module(logicmoo('des/des.pl')),
+:- if_flag_true(fullStart, ((ensure_loaded(logicmoo('des/des.pl')),
   flush_output,
   init_des,
   display_status,
@@ -634,13 +634,13 @@ download_and_install_el:-
 
 
 % GOLOG SYSTEM WITHOUT FLUX (Default Commented Out)
-%:- if_flag_true(fullStart,use_module(logicmoo('indigolog/indigolog_main_swi.pl'))).
+%:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/indigolog_main_swi.pl'))).
 
 % FLUX AGENT SYSTEM WITHOUT GOLOG (Default Commented Out)
-%:- if_flag_true(fullStart,use_module(logicmoo('indigolog/flux_main_swi.pl'))).
+%:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/flux_main_swi.pl'))).
 
 % FLUX AGENT SYSTEM WITH GOLOG
-% :- if_flag_true(true,use_module(logicmoo('indigolog/indigolog_main_swi_flux.pl'))).
+% :- if_flag_true(true,ensure_loaded(logicmoo('indigolog/indigolog_main_swi_flux.pl'))).
 
 
 % when we import new and awefull code base (the previous )this can be helpfull

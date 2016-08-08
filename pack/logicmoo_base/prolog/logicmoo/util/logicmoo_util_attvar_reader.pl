@@ -43,7 +43,7 @@
 :- dynamic(lmcache:use_attvar_expander/1).
 :- dynamic(lmcache:never_use_attvar_expander/1).
 
-:- use_module(logicmoo_util_dmsg).
+:- ensure_loaded(logicmoo_util_dmsg).
 
 :- prolog_load_context(file,F),call(assert_if_new,baseKB:mpred_is_impl_file(F)).
 :- current_prolog_flag(read_attvars,Was)->asserta(restore_attvar_reader(Was));asserta(restore_attvar_reader(false)).

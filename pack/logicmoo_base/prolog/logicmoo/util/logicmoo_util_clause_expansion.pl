@@ -104,8 +104,8 @@ appear in the source-code.
 
 
 :- module_transparent((is_user_module/0,without_lm_expanders/1,lmce_system_term_expansion/5,lmce_system_goal_expansion/5,functor_non_colon/3)).
-:- use_module(logicmoo_util_dmsg).
-:- use_module(logicmoo_util_rtrace).
+:- ensure_loaded(logicmoo_util_dmsg).
+:- ensure_loaded(logicmoo_util_rtrace).
 
 :- multifile(system:goal_expansion/4).
 :- dynamic(system:goal_expansion/4).
@@ -262,6 +262,7 @@ reset_modules:-
   once(baseKB:source_typein_modules(SM,M,F)),
   '$set_source_module'(SM),'$set_typein_module'(M))),!.
 
+pop_modules:- !.
 pop_modules:- 
   ignore((prolog_load_context(source,F),
   once(system:retract(baseKB:source_typein_modules(SM,M,F))),

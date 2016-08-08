@@ -2,8 +2,8 @@
 
 :- module(attvar_01,[]).
 
-:- use_module(library(logicmoo_utils)).
-:- system:ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(library(logicmoo_base)).
 :- set_prolog_flag(assert_attvars,true).
 
 :-export(demo_nb_linkval/1).

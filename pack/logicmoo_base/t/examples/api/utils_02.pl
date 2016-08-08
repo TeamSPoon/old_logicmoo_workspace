@@ -3,7 +3,7 @@
 % :- guitracer.
 
 
-:- use_module(library(logicmoo_user)).
+:- ensure_loaded(library(logicmoo_user)).
 % :- autoload.
 
 

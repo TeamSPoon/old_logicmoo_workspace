@@ -773,7 +773,7 @@ module_predicate(ModuleName,P,F,A):-current_predicate(ModuleName:F/A),functor_ca
 user_ensure_loaded(What):- !, '@'(ensure_loaded(What),'user').
 
 :- module_transparent user_use_module/1.
-% user_use_module(logicmoo(What)):- !, '@'(use_module(logicmoo(What)),'user').
+% user_ensure_loaded(logicmoo(What)):- !, '@'(ensure_loaded(logicmoo(What)),'user').
 % user_use_module(library(What)):- !, use_module(library(What)).
 
 %= 	 	 

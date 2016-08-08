@@ -72,9 +72,9 @@
 :- dynamic(baseKB:col_as_unary/1).
 :- dynamic(baseKB:col_as_static/1).
 
-:- use_module(logicmoo_util_clause_expansion).
-:- use_module(logicmoo_util_dmsg).
-:- use_module(logicmoo_util_rtrace).
+:- ensure_loaded(logicmoo_util_clause_expansion).
+:- ensure_loaded(logicmoo_util_dmsg).
+:- ensure_loaded(logicmoo_util_rtrace).
 
 
 :- dynamic(ereq/1).

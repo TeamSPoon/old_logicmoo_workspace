@@ -173,7 +173,7 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
         must(0),
         must_det(0),
         must_det(0, 0),
-        must_det_l(0),
+        must_det_l(:),
         must_l(0),
         one_must(0, 0),
         one_must_det(0, 0),
@@ -743,7 +743,7 @@ show_source_location:- current_source_file(FL),sanity(nonvar(FL)),!,show_new_src
 show_source_location:- dumpST,dtrace.
 
 
-% % :- use_module(logicmoo_util_database).
+% % :- ensure_loaded(logicmoo_util_database).
 
 :-export( as_clause_no_m/3).
 

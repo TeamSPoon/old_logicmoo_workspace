@@ -158,7 +158,7 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 
 
 % [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
-% :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_u_cyc_api)))).
+% :- with_no_mpred_expansions(if_file_exists(ensure_loaded(library(logicmoo/logicmoo_u_cyc_api)))).
 
 % [Optional] NOT YET Load the Logicmoo RDF/OWL Browser System
 % % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/mpred_rdf)))).

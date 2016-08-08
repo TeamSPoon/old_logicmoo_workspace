@@ -9,12 +9,12 @@
 % Dec 13, 2035
 %
 */
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_pttp,[]).
 :- endif.
 
-:- use_module(library(logicmoo_base)).
-:- use_module(logicmoo(mpred/'mpred_header.pi')).
+:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 
 ainz_pttp(A):-if_defined(ainz(A),assertz_new(A)).
 %:- was_export(internal_functor/1).

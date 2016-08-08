@@ -7,7 +7,7 @@
 */
 :- module(sanity_neg,[]).
 
-:- use_module(library(logicmoo_base)).
+:- ensure_loaded(library(logicmoo_base)).
 
 :- begin_pfc.
 

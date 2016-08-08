@@ -117,7 +117,7 @@
 
 :- include('logicmoo_util_header.pi').
 
-:- use_module(logicmoo_util_shared_dynamic).
+:- ensure_loaded(logicmoo_util_shared_dynamic).
 
 %% with_source_module( +NewModule, :GoalGoal) is semidet.
 %
@@ -127,7 +127,7 @@
 with_source_module(OldSModule, Goal ):- '$current_source_module'(OldSModule),!,OldSModule:Goal.
 with_source_module(NewModule,Goal):-  
    '$current_source_module'(OldModule),
-    NewModule:setup_call_cleanup_each(
+   NewModule:setup_call_cleanup_each(
       '$set_source_module'(NewModule),
           Goal, 
       '$set_source_module'(OldModule)).

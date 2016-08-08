@@ -1,4 +1,4 @@
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_pttp_compile,[]).
 :- endif.
 :- abolish(pttp_prove,6).

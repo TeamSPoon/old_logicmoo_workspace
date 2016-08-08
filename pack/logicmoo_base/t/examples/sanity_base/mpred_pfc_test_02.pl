@@ -1,16 +1,7 @@
 
-:- use_module(library(logicmoo_base)).
+:- ensure_loaded(library(logicmoo_base)).
 
 % :- use_listing_vars.
-
-% :- set_prolog_flag(umt_local,true).
-
-
-% :- set_prolog_flag(umt_local,false).
-% :- use_module(library(logicmoo/mpred/mpred_pfc)).
-%:- use_module(library(logicmoo_base)).
-% :- use_module(library(logicmoo_base)).
-%:- use_module(library(pfc)).
 
 :- use_module('mpred_pfc_test_04').
 

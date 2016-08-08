@@ -1403,7 +1403,7 @@ maybe_record_scanned_file:-ignore((  source_location(F,_), \+ varname_cache:varn
 % Init Varname Storages.
 %
 init_varname_stores(_):- !.
-% init_varname_stores(M):- M:use_module(logicmoo_util_with_assertions), M:use_module(logicmoo_util_varnames).
+% init_varname_stores(M):- M:ensure_loaded(logicmoo_util_with_assertions), M:ensure_loaded(logicmoo_util_varnames).
 
 
 :- initialization(maybe_scan_for_varnames).

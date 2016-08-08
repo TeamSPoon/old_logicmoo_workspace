@@ -124,7 +124,7 @@ go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(C
 
 
 :- include('logicmoo_util_header.pi').
-:- system:use_module(logicmoo_util_catch).
+:- system:ensure_loaded(logicmoo_util_catch).
 
 %= 	 	 
 

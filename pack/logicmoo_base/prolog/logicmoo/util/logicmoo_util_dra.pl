@@ -39,7 +39,7 @@ end_of_file.
 :- det(ffooo).
 :- htb_nb_setcopy(ffooo,oldt,1).
 
-% :- use_module(library(logicmoo_utils)).
+% :- ensure_loaded(library(logicmoo_utils)).
 
 :- dra_call interp
     ffooo/0,

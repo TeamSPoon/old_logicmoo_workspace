@@ -521,4 +521,4 @@ scce(S,G,C):-
 key_call(Key,Arg):- nb_current(Key,In),arg(Arg,In,Goal),Goal,nb_setval(Key,In).
 scce_key(In,Key):- format(atom(Key),'~q',[In]),nb_setval(Key,In).
 
-:- '$set_source_module'(system_scce).
+% :- '$set_source_module'(system_scce).
