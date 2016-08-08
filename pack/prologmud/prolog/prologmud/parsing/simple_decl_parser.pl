@@ -1,8 +1,6 @@
-%:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
-:- module(simple_decl_parser, []).
-%:- endif.
-
-/* module
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
+%:- module(simple_decl_parser, []).
+/*  module
 % an example of simple parsing of an inform7 like language.
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
@@ -10,6 +8,7 @@
 % Dec 13, 2035
 %
 */
+:- endif.
 
 
 :- include(prologmud(mud_header)).

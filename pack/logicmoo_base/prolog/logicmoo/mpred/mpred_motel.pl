@@ -1464,7 +1464,7 @@ subsumes(concepts,Env,MS,_C,D) :-
 	fail.
 subsumes(roles,Env,MS,R,S) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensym(skolem,SF),
+	gensym(mskolem,SF),
 	constructEqHead(Env,_RN1,W1,bbb,SF,S,aaa,_HYPS,noAb,_CALLS,abox,InHeadS),
 	asserta((InHeadS :- call(G1))),
 	constructEqHead(Env,_RN2,W1,bbb,_FF,R,aaa,[or([]),rl([]),fl(_DML1)],
@@ -7376,7 +7376,7 @@ get_Env_World(EnvName,MS,Env,World) :-
 translate(X,Clauses) :-
 	implout(X,X1),
 	negin(X1,X2),
-	skolem(X2,X3,[]),
+	mskolem(X2,X3,[]),
 	univout(X3,X4),
 	conjn(X4,X5),
 	clausify(X5,Clauses,[]).
@@ -7466,7 +7466,7 @@ neg(or(L),and(L1)) :-
 neg(P,not(P)).
 
 %----------------------------------------------------------------------
-% skolem(+F1,-F2,*Vars)
+% mskolem(+F1,-F2,*Vars)
 % Parameter: F1     First-order formula
 %            F2     First-order formula
 %            Vars   List of variables
@@ -7474,22 +7474,22 @@ neg(P,not(P)).
 %
 % Author: Ullrich Hustadt
 
-skolem(forall(X,P),forall(X,P1),Vars) :-
+mskolem(forall(X,P),forall(X,P1),Vars) :-
 	!,
-	skolem(P,P1,[X|Vars]).
-skolem(exists(X,P),P2,Vars) :-
+	mskolem(P,P1,[X|Vars]).
+mskolem(exists(X,P),P2,Vars) :-
 	!,
-	skolem(P,P1,Vars),
+	mskolem(P,P1,Vars),
 	gensym(f,F),
 	Sk =.. [F|Vars],
 	motel_subst(P1,P2,X,Sk).
-skolem(and(L),and(L1),Vars) :-
+mskolem(and(L),and(L1),Vars) :-
 	!,
-	map(skolem,[Vars],L,L1).
-skolem(or(L),or(L1),Vars) :-
+	map(mskolem,[Vars],L,L1).
+mskolem(or(L),or(L1),Vars) :-
 	!,
-	map(skolem,[Vars],L,L1).
-skolem(P,P,_).
+	map(mskolem,[Vars],L,L1).
+mskolem(P,P,_).
 
 
 %----------------------------------------------------------------------
@@ -7602,18 +7602,18 @@ inclause(or([P,Q]),A,A1,B,B1) :-
 inclause(not(P),A,A,B1,B) :-
 	!,
 	not(memq(P,A)),
-	putin(P,B,B1).
+	motel_putin(P,B,B1).
 inclause(P,A1,A,B,B) :-
 	not(memq(P,B)),
-	putin(P,A,A1).
+	motel_putin(P,A,A1).
 
-putin(X,[],[X]) :-
+motel_putin(X,[],[X]) :-
 	!.
-putin(X,[Y|L],L) :-
+motel_putin(X,[Y|L],L) :-
 	X == Y,
 	!.
-putin(X,[Y|L],[Y|L1]) :-
-	putin(X,L,L1).
+motel_putin(X,[Y|L],[Y|L1]) :-
+	motel_putin(X,L,L1).
 
 
 	
@@ -8833,7 +8833,7 @@ assert_ind(EnvName,MS,X,Y,R) :-
 	Role1 =.. [R,X,Y],
 	asserta(Role1),
 %	Role2 =.. [R,X,Y],
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(mskolem,[X,Y],SF),
 	gensym(axiom,AX),
 	gensym(rule,RN),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -12436,8 +12436,8 @@ convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,
 convertInAntecedent(Env,rn(AX,S1,_O1),MC1,MC2,
 	            all(R,D),X,HYPS,AB,CALLS,or([and([PT2,PT1]),PT3]),
                     ((EqLiteral, Body); (InHead2; (C1, (C2, C3))))) :-
-	% create a new skolem constant 
-	gensymbol(skolem,[X,Y],SF),
+	% create a new mskolem constant 
+	gensymbol(mskolem,[X,Y],SF),
 	% construct equational literal
 	constructEqCall(Env,rn(AX,_RN1,_S2,_O2),MC1,MC2,Y,SF,R,X,HYPS,AB,CALLS,PT2,EqLiteral),
 	convertInAntecedent(Env,rn(AX,S1,_O3),MC1,MC2,D,Y,HYPS,AB,CALLS,PT1,Body),
@@ -12543,7 +12543,7 @@ convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,D,X,HYPS,AB,CALLS,PT1,InHead) :
 convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,some(R,D),X,
                      HYPS,AB,CALLS,PT1,(EqLiteral, InHead)) :-
 	% construct equational literal
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(mskolem,[X,Y],SF),
 	constructEqCall(Env,rn(AX,_RN2,_S2,_O2),bodyMC(W1),headMC(W1),
 	                Y,SF,R,X,HYPS,AB,CALLS,PT2,EqLiteral),
 	typeOfDefinition(Env,MS,D,S2),
@@ -12704,14 +12704,14 @@ assertRoleLInR(Env,MS,R1,restr(R2,C),AN) :-
 assertRoleLInR(Env,MS,R1,R2,AN) :-
 	!,
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensymbol(skolem,[X,Y],SF1),
+	gensymbol(mskolem,[X,Y],SF1),
 	gensym(rule,RN1),
 	ruleName(AN,RN1,user,lInR,Name1),
 	constructEqHead(Env,Name1,W1,Y,SF1,R2,X,HYPS,AB,CALLS,PT1,EqLiteral2),
 	constructEqMark(rn(AN,RN1,_S2,_O2),W1,Y,SF1,R2,X,HYPS,AB,CALLS,EqMark2),
 	constructEqCall(Env,rn(AN,RN1,_S3,_O3),bodyMC(W1),headMC(W1),Y,_FF,R1,X,HYPS,AB,CALLS,PT1,EqLiteral1),
 	asserta((EqLiteral2 :- (cCS(CALLS,EqMark2), (call(G1), EqLiteral1)))),
-	gensymbol(skolem,[X,Y],SF2),
+	gensymbol(mskolem,[X,Y],SF2),
 	gensym(rule,RN2),
 	constructConHead(Env,rn(AN,RN2,user,lInR),W1,SF2,R2,X,'>=',N,
                          HYPS,AB,CALLS,PT1,C2),
@@ -12720,7 +12720,7 @@ assertRoleLInR(Env,MS,R1,R2,AN) :-
 	C1 = solveConstraint(Env,W1,(card,app((_FF:R1),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark1|CALLS]),PT1),
 	asserta((C2 :- (cCS(CALLS,Mark2), (call(G1), C1)))),
 	gensym(rule,RN5),
-	gensym(skolem,SF3),
+	gensym(mskolem,SF3),
 	constructConHead(Env,rn(AN,RN5,user,lInR),W1,SF3,R1,X,'=<',N,
                          HYPS,AB,CALLS,PT1,C4),
 	constructConMark(C4,Mark4),
@@ -12746,7 +12746,7 @@ assertRoleLInRRestr1(Env,MS,R1,restr(R2,C),AN) :-
 	constructEqCall(Env,rn(AN,RN1,_S2,_O2),bodyMC(W1),headMC(W1),
 	                Y,F,R1,X,HYPS,AB,[InMark|CALLS],PT1,EqLiteral11),
 	asserta((InHead :- (cCS(CALLS,InMark), (call(G1), (EqLiteral11, ground(Y,true)))))),
-	gensym(skolem,SF),
+	gensym(mskolem,SF),
 	gensym(rule,RN2),
 	typeOfDefinition(Env,MS,C,S2),
 	constructEqHead(Env,rn(AN,RN2,S2,lInR),W1,Y,SF,R2,X,
@@ -12815,7 +12815,7 @@ assertAndRoleLInR(_,_MS,_,and([]),_AN) :-
 	!.
 assertAndRoleLInR(Env,MS,R1,and([R2|RL]),AN) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensym(skolem,SF),
+	gensym(mskolem,SF),
 	gensym(rule,RN),
 	constructEqHead(Env,rn(AN,RN,user,lInR),
                         W1,Y,SF,R2,X,HYPS,AB,CALLS,PT1,EqLiteral2),
@@ -12840,7 +12840,7 @@ assertAndConstraintLInR(Env,MS,R1,and([R2|RL]),AN) :-
 	constructConHead(Env,Name,W1,_FF,R1,X,Rel,N,HYPS,AB,CALLS,PT2,C1),
 	constructConMark(C1,Mark1),
 	constructSolveConMark(rn(AN,RN,_S1,_O1),W1,_FF2,R2,X,Rel,N,HYPS,AB,CALLS,Mark2),	
-	gensymbol(skolem,[X],SF),
+	gensymbol(mskolem,[X],SF),
 	C2 = solveConstraint(Env,W1,(card,app((SF:R2),X),Rel,N),_,hyp(HYPS),ab(AB),call([Mark2|CALLS]),PT2),
 	asserta((C1 :- cCS(CALLS,Mark1), (call(G1), C2))),
 	assertAndConstraintLInR(Env,MS,R1,and(RL),AN).
@@ -12860,7 +12860,7 @@ assertAndConstraintRInL(Env,MS,R1,and([R2|RL]),AN) :-
 	                 HYPS,AB,CALLS,PT2,C1),
 	constructConMark(C1,Mark1),
 	constructSolveConMark(rn(AN,RN,_S1,_O1),W1,_FF1,R1,X,'>=',N,HYPS,AB,CALLS,Mark2),
-	gensymbol(skolem,[X],SF),
+	gensymbol(mskolem,[X],SF),
 	C2 = solveConstraint(Env,W1,(card,app((SF:R1),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark2|CALLS]),PT2),
 	asserta((C1 :- cCS(CALLS,Mark1), (call(G1), C2))),
 	assertAndConstraintRInL(Env,MS,R1,and(RL),AN).
@@ -12907,7 +12907,7 @@ assertRoleRInL(Env,MS,R1,restr(R2,C), AN) :-
 assertRoleRInL(Env,MS,R1,and(RL),AN) :-
 	!,
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(mskolem,[X,Y],SF),
 	gensym(rule,RN1),
 	roleBody(Env,W1,and(RL),X,Y,HYPS,AB,CALLS,AN,Body,PTL),
 	constructEqHead(Env,rn(AN,RN1,user,rInL),
@@ -12918,7 +12918,7 @@ assertRoleRInL(Env,MS,R1,and(RL),AN) :-
 assertRoleRInL(Env,MS,R1,R2,AN) :-
 	!,
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(mskolem,[X,Y],SF),
 	gensym(rule,RN1),
 	constructEqHead(Env,rn(AN,RN1,user,rInL),W1,X,SF,R1,Y,
 	                HYPS,AB,CALLS,PT1,EqLiteral1),
@@ -12934,7 +12934,7 @@ assertRoleRInL(Env,MS,R1,R2,AN) :-
 	C1 = solveConstraint(Env,W1,(card,app((_FF:R2),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark1|CALLS]),PT1),
 	asserta((C2 :- (cCS(CALLS,Mark2), (call(G1), C1)))),
 	gensym(rule,RN5),
-	gensym(skolem,SF3),
+	gensym(mskolem,SF3),
 	constructConHead(Env,rn(AN,RN5,user,rInL),W1,SF3,R2,X,'=<',N,
 	                 HYPS,AB,CALLS,PT5,C4),
 	constructConMark(C4,Mark4),
@@ -12984,7 +12984,7 @@ getComplementRole(Env,MS,_R1,restr(R2,C),R3,restr(R2,CNF)) :-
 
 assertRoleRInLRestr1(Env,MS,R1,restr(R2,C),AN) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(mskolem,[X,Y],SF),
 	gensym(rule,RN),
 	constructEqHead(Env,rn(AN,RN,user,rInL),
                         W1,Y,SF,R1,X,HYPS,AB,CALLS,and([PTEq2,PTIn]),EqLiteral1),
@@ -14560,7 +14560,7 @@ motelBanner:-
  dmsg('MOTEL is distributed in the hope that it will be useful, but'),
  dmsg('WITHOUT ANY WARRANTY;  without even the implied warranty of,'),
  dmsg('MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.'),
- dmsg('Hacked for logicmoo').
+ dmsg('Hacked for logicmoo'),nop(prolog).
  
 :- initialization(motelBanner,restore).
 :- initialization(motelBanner).

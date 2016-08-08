@@ -13,8 +13,6 @@ end_of_file.
 
 % ==============================================================================
 
-:- user:ensure_loaded_no_mpreds(library(logicmoo/util/logicmoo_util_all)).
-:- user:ensure_loaded_no_mpreds(library(logicmoo/logicmoo_base)).
 :- asserta(t_l:disable_px).
 
 :- multifile(lmconf:type_action_info/3).

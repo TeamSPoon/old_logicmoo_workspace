@@ -5,9 +5,10 @@
 % Douglas Miles
 
 */
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
-:- module(logicmoo_user,
- [ /*
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( current_prolog_flag(xref,true)) )).
+:- module(logicmoo_user_module,
+ [ 
  op(1199,fx,('==>')), 
  op(1190,xfx,('::::')),
  op(1180,xfx,('==>')),
@@ -20,7 +21,8 @@
  op(600,yfx,'v'),
  op(350,xfx,'xor'),
  op(300,fx,'~'),
- op(300,fx,'-') */ ]).
+ op(300,fx,'-')  ]).
+:- endif.
 :- endif.
 
 % restore entry state
@@ -49,13 +51,14 @@
 :- set_prolog_flag(access_level,user).
 :- endif.
 
+:- set_prolog_flag(pfc_booted,false).
 :- current_prolog_flag(unsafe_speedups,_)->true;set_prolog_flag(unsafe_speedups,true).
 :- ensure_loaded(library(logicmoo_utils)).
 :- ensure_loaded(library(logicmoo_base)).
 
 :- set_prolog_flag(pfc_booted,false).
 :-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
-% :- forall(baseKB:wrap_shared(F,A,ereq),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
+:- set_prolog_flag(pfc_booted,true).
 
 /*
 :- set_prolog_flag(report_error,true).

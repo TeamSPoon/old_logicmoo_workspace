@@ -1,4 +1,4 @@
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 :- endif.
 :- module(logicmoo_run_pldoc,[]).
 % restore entry state
@@ -10,7 +10,7 @@
 :- was_dynamic http:location/3.
 
 :- use_module(library(memfile)).
-:- use_module(logicmoo_base).
+:- ensure_loaded(logicmoo_base).
 %:- use_module(server).
 
 /*
@@ -357,7 +357,7 @@ when_debugging(_,_).
 % ================================================
 % DBASE_T System
 % ================================================
-:- gripe_time(40,use_module(logicmoo(mpred_online/mpred_www))).
+:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))).
 % user:term_expansion((:-module(Name,List)), :-maplist(export,List)):- atom(Name),atom_concat(mpred_,_,Name).
 % user:term_expansion((:-use_module(Name)), :-true):- atom(Name),atom_concat(mpred_,_,Name).
 

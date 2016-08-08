@@ -31,8 +31,9 @@
 :- include(prologmud(mud_header)).
 
 
-:- file_begin(pfc).
 :- set_defaultAssertMt(baseKB).
+:- file_begin(pfc).
+
 
 :- retractall(t_l:disable_px).
 
@@ -206,7 +207,7 @@
 
 predicateConventionMt(agent_call_command,baseKB).
 
-:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/pfc/autoexec.pfc')).
+:- ensure_loaded('logicmoo/pfc/autoexec.pfc').
 
 % baseKB:isa(iPerson99,tPerson).
 

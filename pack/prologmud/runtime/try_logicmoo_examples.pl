@@ -45,7 +45,7 @@ If we obeyed the limitations set forth upon Horn clauses only being "positive" t
 % :- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
 :- endif.
 
-:- use_module(logicmoo(snark/common_logic_snark)).
+:- ensure_loaded(logicmoo(snark/common_logic_snark)).
 :- ensure_loaded(logicmoo('snark/common_logic_clif.pfc')).
 
 :- debug_logicmoo(logicmoo(_)).

@@ -173,6 +173,7 @@
    transitive_lc_nr(2,*,*),
    simply_functors(2,*,*).
           
+%:- ((prolog_load_context(file,F),  prolog_load_context(source,F))-> throw(prolog_load_context(source,F)) ; true). 
 :- include('mpred_header.pi').
 
 :- use_module(library(apply)).
@@ -1014,15 +1015,18 @@ db_expand_0(Op,Sent,SentO):- arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F
   asserted_argIsa_known(F,2,_),!,
   correctArgsIsa(Op,Sent,SentO),!.
 
+/*
 db_expand_0(Op,tCol(I),isa(I,tCol)):- \+ compound(I).
 db_expand_0(Op,tSet(I),isa(I,tSet)):- \+ compound(I).
 db_expand_0(Op,tPred(I),isa(I,tPred)):- \+ compound(I).
-db_expand_0(Op,{Sent},{Sent}):-!.
+*/
+db_expand_0(_,{Sent},{Sent}):-!.
+db_expand_0(_,not_undoable(Sent),not_undoable(Sent)):-!.
+db_expand_0(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
 
 db_expand_0(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
 
 db_expand_0(Op,t(Sent),SentO):- is_ftNonvar(Sent),!,fully_expand_head(Op,Sent,SentO).
-db_expand_0(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
 %==SKIPPED==%  db_expand_0(_ ,NC,NC):- as_is_term(NC),!.
 
 db_expand_0(_,Sent,SentO):- is_ftNonvar(Sent),copy_term(Sent,NoVary),get_ruleRewrite(Sent,SentO),must(Sent\=@=NoVary),SentO \=@= Sent.

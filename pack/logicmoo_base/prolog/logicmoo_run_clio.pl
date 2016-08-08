@@ -7,15 +7,15 @@
 % Dec 13, 2035
 %
 */
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 :- endif.
 :- module(logicmoo_run_clio,[]).
 % restore entry state
 :- lmce:reset_modules.
 
-% :- use_module(logicmoo_base).
+% :- ensure_loaded(logicmoo_base).
 
-% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
+% :- ensure_loaded(logicmoo(util/logicmoo_util_preddefs)).
 
 :- shared_multifile(mpred_online:semweb_startup/0).
 

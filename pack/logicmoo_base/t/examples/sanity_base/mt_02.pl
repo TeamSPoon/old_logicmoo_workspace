@@ -9,7 +9,7 @@
 */
 :- module(mt_01,[]).
 
-:- use_module(library(logicmoo_base)).
+:- ensure_loaded(library(logicmoo_base)).
 
 :- set_defaultAssertMt(myMt).
 

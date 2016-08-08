@@ -2,7 +2,7 @@
 	  [
 	  ]).
 
-% % :- use_module(logicmoo_base).
+% % :- ensure_loaded(logicmoo_base).
 
 
 :- volatile(swish_trace:installed/1).
@@ -44,7 +44,7 @@ logicmoo_set_swish_path :-
 :- use_module(swish(swish)).
 
 % load rendering modules
-:- swish:use_module(logicmoo(swish_lib/render/html),	[]).
+:- swish:ensure_loaded(logicmoo(swish_lib/render/html),	[]).
 
 
 :- retractall((http:location(swish, _, _))).
