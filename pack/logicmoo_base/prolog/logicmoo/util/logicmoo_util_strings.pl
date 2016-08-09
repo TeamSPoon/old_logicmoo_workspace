@@ -1063,10 +1063,11 @@ any_to_string1(``,String):- !,""=String.
 any_to_string1('',String):- !,""=String.
 any_to_string1([],String):- !,""=String.
 any_to_string1('[]',String):- !,""=String.
-any_to_string1(fmt(Fmt,Args),String):-!,sformat(String,Fmt,Args).
-any_to_string1(txtFormatFn(Fmt,Args),String):-!,sformat(String,Fmt,Args).
 any_to_string1(Atom,String):-atom(Atom),!,atom_string(Atom,String).
 any_to_string1([Atom],String):-nonvar(Atom),!,any_to_string1(Atom,String).
+any_to_string1(string(Atom),String):- !, any_to_string1(Atom,String). 
+any_to_string1(fmt(Fmt,Args),String):-!,must(sformat(String,Fmt,Args)).
+any_to_string1(txtFormatFn(Fmt,Args),String):-!,must(sformat(String,Fmt,Args)).
 any_to_string1(A,""):-nonvar(A),member(A,[[],'',"",``]),!.
 any_to_string1(List,String):- text_to_string_safe(List,String),!.
 any_to_string1(List,String):- is_list(List),!,must_maplist(any_to_string1,List,StringList), 

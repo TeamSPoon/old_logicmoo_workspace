@@ -12,7 +12,7 @@
 
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_stubs_file_module,
           [ 
 agenda_rescan_mpred_props/0,
@@ -71,6 +71,8 @@ wff_check_failed/3,
 wff_check_mpred_t_throw/1,
 mpred_stubs_file/0
           ]).
+
+:- include('mpred_header.pi').
 
 :- endif.
 
@@ -149,9 +151,6 @@ renumbervarZ/2,
 test_call_cut/0,
 wff_check_failed/3,
 wff_check_mpred_t_throw/1.
-
-:- include('mpred_header.pi').
-
 
 
 %= 	 	 

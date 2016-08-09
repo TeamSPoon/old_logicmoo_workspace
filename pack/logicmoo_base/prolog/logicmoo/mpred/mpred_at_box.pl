@@ -15,7 +15,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-%:- if(( false, \+ ((current_prolog_flag(logicmoo_include,Call),Call)))). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 :- module(mpred_at_box,[
          assert_setting01/1,
          create_predicate_istAbove/3,
@@ -73,7 +73,10 @@
 
          which_file/1
     ]).
-%:- endif.
+
+:- include('mpred_header.pi').
+
+:- endif.
 
 :- module_transparent((         baseKB_hybrid_support/2,
          uses_predicate/2,
@@ -96,8 +99,6 @@
 
 :- set_prolog_flag(retry_undefined,false).
 
-:- include('mpred_header.pi').
-
 user_m_check(_Out).
 
 :- meta_predicate make_shared_multifile(+,+,+).
@@ -108,8 +109,6 @@ user_m_check(_Out).
 
 :- meta_predicate transitive_path(2,*,*).
 
-:- ensure_loaded(mpred_pfc).
-
 % add_abox_module(baseKB):-!.
 add_abox_module(ABox):- must(atom(ABox)),
   must(mtCanAssert(ABox)),
@@ -117,6 +116,9 @@ add_abox_module(ABox):- must(atom(ABox)),
 
 :- dynamic(baseKB:mtProlog/1).
 :- dynamic(baseKB:mtNoPrologCode/1).
+:- multifile(baseKB:mtProlog/1).
+:- dynamic(baseKB:mtProlog/1).
+
 baseKB:mtNoPrologCode(mpred_userkb).
 
 baseKB:mtProlog(Mt):- var(Mt),!,current_module(Mt),\+ clause_b(mtCycL(Mt)).
@@ -124,67 +126,7 @@ baseKB:mtProlog(Mt):- \+ atom(Mt),!,fail.
 baseKB:mtProlog(Mt):- \+ current_module(Mt),!,fail.
 baseKB:mtProlog(Mt):- clause_b(mtCycL(Mt)),!,fail.
 baseKB:mtProlog(Mt):- module_property(Mt,class(library)).
-baseKB:mtProlog(Mt):-
-      arg(_,v( 
-         common_logic_boxlog,
-         common_logic_compiler,
-         common_logic_kb_hooks,
-         common_logic_sexpr,
-         common_logic_skolem,
-         common_logic_snark,
-         baseKB,
-         lmcache,
-         t_l,
-         
-         logicmoo_base_file,
-         logicmoo_user_file,
-         logicmoo_util_attvar_reader,
-         logicmoo_util_bugger,
-         logicmoo_util_catch,
-         logicmoo_util_ctx_frame,
-         logicmoo_util_database,
-         logicmoo_util_dmsg,
-         logicmoo_util_dra,
-         logicmoo_util_dumpst,
-         logicmoo_util_engines,
-         logicmoo_util_filestreams,
-         logicmoo_util_first,
-         logicmoo_util_help,
-         logicmoo_util_loop_check,
-         logicmoo_util_no_repeats,
-         logicmoo_util_preddefs,
-         logicmoo_util_prolog_frames,
-         logicmoo_util_prolog_streams,
-         logicmoo_util_rtrace,
-         logicmoo_util_shared_dynamic,
-         logicmoo_util_strings,
-         logicmoo_util_term_listing,
-         logicmoo_util_terms,
-         logicmoo_util_varnames,
-         logicmoo_util_with_assertions,
-         logicmoo_utils_file,
-         system,
-         mpred_agenda,
-         mpred_at_box,
-         mpred_expansion,
-         mpred_hooks,
-         mpred_kb_ops,
-         mpred_listing,
-         mpred_loader,
-         mpred_pfc,
-         mpred_props,
-         mpred_storage,
-         mpred_stubs,
-         mpred_stubs_file_module,
-         mpred_type_args,
-         mpred_type_constraints,
-         mpred_type_isa,
-         mpred_type_naming,
-         mpred_type_wff,
-         prolog_statistics,
-         system,
-         user
-       ),Mt).
+baseKB:mtProlog(Mt):- arg(_,v(lmcache,t_l,system,user),Mt).
 
 :- multifile(lmcache:has_pfc_database_preds/1).
 :- dynamic(lmcache:has_pfc_database_preds/1).
@@ -256,11 +198,11 @@ box_type(_,_,abox).
 % within a knowledge base.
 %
 % not just user modules
-defaultAssertMt(ABox):- (t_l:current_defaultAssertMt(BBox);fileAssertMt(BBox))->ABox=BBox.
+defaultAssertMt(ABox):- (t_l:current_defaultAssertMt(BBox);find_and_call(fileAssertMt(BBox)))->ABox=BBox.
 
 
 
-:- '$hide'(defaultAssertMt(_)).
+% :- '$hide'(defaultAssertMt(_)).
 
 %% fileAssertMt(-ABox) is det.
 %
@@ -269,7 +211,7 @@ defaultAssertMt(ABox):- (t_l:current_defaultAssertMt(BBox);fileAssertMt(BBox))->
 %
 % not just user modules
 fileAssertMt(ABox):- nonvar(ABox), fileAssertMt(ABoxVar),!,ABox=@=ABoxVar.
-fileAssertMt(Module):- mpred_loader:(loading_source_file(File),get_file_type(File,pfc)),prolog_load_context(module,Module),Module\==user.
+fileAssertMt(Module):- (loading_source_file(File),get_file_type(File,pfc)),prolog_load_context(module,Module),Module\==user.
 fileAssertMt(ABox):- 
   (t_l:current_defaultAssertMt(ABox);
     ((('$current_source_module'(ABox);'$current_typein_module'(ABox)),mtCanAssert(ABox)))),!.
@@ -287,7 +229,7 @@ mtCanAssert(abox):- !,dumpST,fail.
 mtCanAssert(Module):- clause_b(mtCycL(Module)).
 mtCanAssert(Module):- clause_b(mtExact(Module)).
 mtCanAssert(Module):-  module_property(Module,file(_)),!,fail.
-mtCanAssert(Module):- mpred_loader:(loading_source_file(File),get_file_type(File,pfc),prolog_load_context(module,Module)).
+mtCanAssert(Module):- (loading_source_file(File),get_file_type(File,pfc),prolog_load_context(module,Module)).
 mtCanAssert(Module):- clause_b(mtProlog(Module)),!,fail.
 mtCanAssert(_).
 
@@ -305,6 +247,29 @@ mtCanAssert(_).
 
 
 makeConstant(_Mt).
+
+
+%:- module_transparent((ensure_abox)/1).
+:- multifile(lmcache:has_pfc_database_preds/1).
+:- volatile(lmcache:has_pfc_database_preds/1).
+:- dynamic(lmcache:has_pfc_database_preds/1).
+ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
+ensure_abox(user):- setup_module_ops(user),!,ensure_abox(baseKB),!.
+ensure_abox(M):- 
+   asserta(lmcache:has_pfc_database_preds(M)),
+   assert_if_new(baseKB:mtCycL(M)),
+   retractall(baseKB:mtProlog(M)),
+   setup_module_ops(M),
+   set_prolog_flag(M:unknown,error),
+   forall(mpred_database_term(F,A,_),
+       (((
+        M:multifile(M:F/A),
+        M:dynamic(M:F/A),
+        M:discontiguous(M:F/A),
+        create_predicate_istAbove(M,F,A),        
+        M:module_transparent(M:F/A))))),!.
+
+
 
 
 %:- (system:dtrace, rtrace, dtrace,cls ).
@@ -325,13 +290,13 @@ set_defaultAssertMt(ABox):-
     asserta_new(TBox:mtCycL(ABox)),
     asserta_new(ABox:defaultTBoxMt(TBox)),
     assert_setting(t_l:current_defaultAssertMt(ABox)),
-    mpred_pfc:ensure_abox(ABox),
+    ensure_abox(ABox),
     '$set_source_module'(ABox),
     '$set_typein_module'(ABox),
     nop(inherit_into_module(ABox,TBox))))),
   ain(baseKB:mtCycL(ABox)).
 
-:- '$hide'(set_defaultAssertMt(_)).
+% :- '$hide'(set_defaultAssertMt(_)).
 
 %% set_fileAssertMt( ABox) is semidet.
 %
@@ -438,7 +403,7 @@ ensure_imports_tbox(M,TBox):-
 ensure_imports_tbox(M,TBox):-
   asserta(lmcache:is_ensured_imports_tbox(M,TBox)),
   
-  must_det((
+  must_det_l((
    skip_user(TBox),
    ignore(maybe_delete_import_module(M,TBox)),
    ignore(maybe_delete_import_module(TBox,M)),
@@ -473,7 +438,6 @@ fixup_modules:-
 % :- fixup_modules.
 
 
-% :- endif.
 
 
 

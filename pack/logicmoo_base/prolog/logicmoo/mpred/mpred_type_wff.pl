@@ -7,7 +7,7 @@
 %
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_wff.pl
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_type_wff,
           [ 
             head_singletons/2, head_singles0/2,head_singles01/2,
@@ -94,13 +94,15 @@
 
             mpred_type_wff_file/0
           ]).
+
+:- include('mpred_header.pi').
+
 :- endif.
 
 :- meta_predicate 
         call_last_is_var(0).
 
 
-:- include('mpred_header.pi').
 
 
 
@@ -713,7 +715,7 @@ not_log_op(OP):- not(is_log_op(OP)).
 %
 is_log_op(OP):- atomic(OP),to_dlog_ops(OPS),!,(member(OP=_,OPS);member(_=OP,OPS)).
 
-% % :- use_module(logicmoo(plarkc/mpred_kif)).
+% % :- ensure_loaded(logicmoo(plarkc/mpred_kif)).
 
 
 

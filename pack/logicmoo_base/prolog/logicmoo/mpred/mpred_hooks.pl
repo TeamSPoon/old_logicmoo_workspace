@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_hooks.pl
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_hooks,[
 /*
 lmcache:agent_session/2,
@@ -154,6 +154,9 @@ same_vars/2,
 update_value/3
 ]).
 
+
+:- include('mpred_header.pi').
+
 :- endif.
 /*
 add_arg_parts_of_speech/4,
@@ -177,9 +180,6 @@ verb_after_arg/3
         mpred_fa_call(?, ?, 0).
         
 
-
-
-% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 :- meta_predicate 
       % common_logic_kb_hooks
@@ -1184,7 +1184,7 @@ assertion_t(Call):- baseKB:use_cyc_database,!,w_tl(t_l:useOnlyExternalDBs,kb_t(C
 % end holds_t
 % ================================================================================
 
-% % :- use_module(logicmoo(plarkc/mpred_cyc_kb)).
+% % :- ensure_loaded(logicmoo(plarkc/mpred_cyc_kb)).
 
 % ================================================================================
 % begin holds_f

@@ -1,6 +1,6 @@
 % dcg_pfc: translation of dcg-like grammar rules into pfc rules.
 
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(pfc_dcg,[]).
 :- endif.
 

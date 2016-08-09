@@ -1,6 +1,6 @@
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 % :- module(world, []).
-:- endif.
+%:- endif.
 /* * module  
 % Common place to reduce redundancy World utility prediates
 %

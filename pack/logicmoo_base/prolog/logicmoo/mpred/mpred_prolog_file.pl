@@ -15,7 +15,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_prolog_file,[
           guess_file_type_loader/2,
           process_this_script/0,
@@ -138,6 +138,7 @@ never_load_special(_Module:_Spec, Options) :- member(if(not_loaded),Options),mem
 
 % :- use_module(library(logicmoo/util/logicmoo_util_filesystem)).
 :- dynamic(prolog_load_file_loop_checked/2).
+:- export(prolog_load_file_loop_checked/2).
 
 % probably an autoload (SKIP)
 

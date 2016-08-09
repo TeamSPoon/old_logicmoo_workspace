@@ -9,7 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_naming.pl
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_type_naming,
           [ convertOneSpawnArg/4,
             convertSpawnArgs/4,
@@ -38,8 +38,6 @@
             typename_to_iname0/3,
             mpred_type_naming_file/0
           ]).
-% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
-
 
 :- include('mpred_header.pi').
 :- endif.
@@ -133,7 +131,7 @@ i_name(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
 % Typename Converted To Iname Primary Helper.
 %
 typename_to_iname0(I, [], O):- trace_or_throw(bad_typename_to_iname0(I, [], O)).
-typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
+typename_to_iname0(I,OType,IType):- call_u(type_prefix(Prefix,_)),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
 typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
 
 :- was_export(split_name_type/3).

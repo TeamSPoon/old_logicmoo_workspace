@@ -248,9 +248,9 @@
         on_f_log_ignore(0),
         meta_interp(:, +),
         must_each(0),
-        must_maplist(1, ?),
-        must_maplist(2, ?, ?),
-        must_maplist(3, ?, ?, ?),
+        must_maplist(:, ?),
+        must_maplist(:, ?, ?),
+        must_maplist(:, ?, ?, ?),
         nodebugx(0),
         once_if_ground(0),
         once_if_ground(0, -),
@@ -532,9 +532,9 @@ ignore_each((A,B)):-ignore_each(A),ignore_each(B),!.
 ignore_each(A):-ignore(A).
 
 :- meta_predicate 
-	must_maplist(1, ?),
-	must_maplist(2, ?, ?),
-        must_maplist(3, ?, ?, ?).
+	must_maplist(:, ?),
+	must_maplist(:, ?, ?),
+        must_maplist(:, ?, ?, ?).
 
 %% 	must_maplist(:Goal, ?List)
 %
@@ -1118,13 +1118,15 @@ meta_interp(CE,A):- hotrace((var(A); \+ if_defined(stack_check,fail))),!, throw(
 meta_interp(_CE,A):- thread_leash(+all),meta_interp_signal(A),!,fail.
 meta_interp(CE,M:X):- atom(M),!,meta_interp(CE,X).
 meta_interp(_,true):-!.
-meta_interp(CE,A):- call(CE, meta_callable(A,NewA)),!,NewA.
-meta_interp(CE,not(A)):-!,not(meta_interp(CE,A)).
+meta_interp(CE,A):- call(CE, meta_callable(A,NewA)),!,call(NewA).
+meta_interp(CE,\+(A)):-!,\+(meta_interp(CE,A)).
+meta_interp(CE,not(A)):-!,\+(meta_interp(CE,A)).
 meta_interp(CE,once(A)):-!,once(meta_interp(CE,A)).
-meta_interp(CE,(A;B)):-!,meta_interp(CE,A);meta_interp(CE,B).
-meta_interp(CE,(A->B)):-!,meta_interp(CE,A)->meta_interp(CE,B).
+meta_interp(CE,must(A)):-!,must(meta_interp(CE,A)).
 meta_interp(CE,(A->B;C)):-!,(meta_interp(CE,A)->meta_interp(CE,B);meta_interp(CE,C)).
 meta_interp(CE,(A*->B;C)):-!,(meta_interp(CE,A)*->meta_interp(CE,B);meta_interp(CE,C)).
+meta_interp(CE,(A;B)):-!,meta_interp(CE,A);meta_interp(CE,B).
+meta_interp(CE,(A->B)):-!,meta_interp(CE,A)->meta_interp(CE,B).
 meta_interp(CE,(A,!)):-!,meta_interp(CE,A),!.
 meta_interp(CE,(A,B)):-!,meta_interp(CE,A),meta_interp(CE,B).
 %meta_interp(_CE,!):- !, cut_block(!).

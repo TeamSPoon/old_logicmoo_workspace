@@ -2,7 +2,6 @@
 
 :- file_begin(pfc).
 
-:- set_fileAssertMt(baseKB).
 
 pfcControlled(if_missing(ftAskable,ftAssertable)).
 

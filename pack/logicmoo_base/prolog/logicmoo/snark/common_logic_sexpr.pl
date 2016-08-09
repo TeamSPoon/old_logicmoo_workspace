@@ -1,4 +1,4 @@
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :-module(common_logic_sexpr,[
   codelist_to_forms/2,svar_fixvarname/2,input_to_forms/2,input_to_forms/3,
   sexpr_sterm_to_pterm_list/2,
@@ -25,7 +25,7 @@
 % [Required] Load the Logicmoo Library Utils
 % = % :- ensure_loaded(logicmoo(logicmoo_utils)).
 
-% % :- use_module(logicmoo(plarkc/mpred_cyc_api)).
+% % :- ensure_loaded(logicmoo(plarkc/mpred_cyc_api)).
 
 
 :- export(fixvars/4).

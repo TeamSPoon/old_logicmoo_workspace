@@ -115,7 +115,6 @@ tSet(tKnownID).
 :- dynamic(mudIsa/2).
 :- file_begin(pfc).
 
-:- set_fileAssertMt(baseKB).
 
 ((genls(X,Y),genls(Y,X),{X\==Y}) ==> {mpred_withdraw(genls(Y,X))}).
 % (genls(C,SC)==>(tCol(SC),tCol(C),{repropagate(SC)})).

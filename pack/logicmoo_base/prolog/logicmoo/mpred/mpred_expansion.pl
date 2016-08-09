@@ -53,7 +53,7 @@
 % clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2,  (==>)/1,  (==>)/2, (<-)/1,  (<-)/2, (<==>)/2, fact/1
 %
 */
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_expansion,
           [ a/2,
             acceptable_xform/2,
@@ -72,6 +72,7 @@
             db_expand_0/3,
             db_expand_chain/3,
             db_expand_final/3,
+            in_dialect_pfc/0,
             db_expand_maplist/5,
             db_expand_up/4,
             db_op_sentence/4,
@@ -114,6 +115,7 @@
             functor_declares_instance/2,
             functor_declares_instance_0/2,
             holds_args/2,
+            same_terms/2,
             %if_expands_on/3,
             infix_op/2,
             instTypePropsToType/2,
@@ -159,8 +161,13 @@
          to_predicate_isas/2,
          append_as_first_arg/3,
          try_expand_head/3,
+         expand_isEach_or_fail/2,
+         expand_kif_string_or_fail/3,
          is_elist_functor/1
           ]).
+
+:- include('mpred_header.pi').
+
 :- endif.
 
 :- meta_predicate 
@@ -173,8 +180,6 @@
    transitive_lc_nr(2,*,*),
    simply_functors(2,*,*).
           
-%:- ((prolog_load_context(file,F),  prolog_load_context(source,F))-> throw(prolog_load_context(source,F)) ; true). 
-:- include('mpred_header.pi').
 
 :- use_module(library(apply)).
 %= :- shared_multifile(was_chain_rule/1).
@@ -1089,8 +1094,10 @@ db_expand_0(Op,pddlSorts(I,EL),O):- listToE(EL,E),fully_expand_clause_now(Op,gen
 db_expand_0(Op,pddlTypes(EL),O):- listToE(EL,E),fully_expand_clause_now(Op,isa(E,tCol),O).
 db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),fully_expand_clause_now(Op,prologHybrid(E),O).
 
+/*
 db_expand_0(Op,DECL,O):- arg(_,DECL,S),string(S),DECL=..[F|Args],maplist(destringify,Args,ArgsO),
   ArgsO\=@=Args,!,DECLM=..[F|ArgsO],db_expand_0(Op,DECLM,O).
+*/
 
 % db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
 db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],is_ftNameArity(F,A),functor_declares_instance(D,TPRED),

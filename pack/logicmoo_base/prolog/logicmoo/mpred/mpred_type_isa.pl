@@ -12,9 +12,9 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_isa.pl
-%:- if(((current_prolog_flag(xref,true),current_prolog_flag(pldoc_x,true));current_prolog_flag(autoload_logicmoo,true))).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_type_isa,
-          [ /*
+          [ 
             assert_isa/2,
             assert_isa_rev/2,
             assert_isa_safe/2,
@@ -47,7 +47,7 @@
             is_Template/1,
             is_known_false/1,
             is_known_false0/1,
-            is_known_true0/1,
+            % is_known_true0/1,
             is_known_true/1,
             is_never_type/1,
             is_non_skolem/1,
@@ -88,10 +88,13 @@
          % isa_pred_now_locked/0,
          
           type_prefix/2,
-          type_suffix/2, */
+          type_suffix/2, 
           mpred_type_isa_file/0
           ]).
-%:- endif.
+
+:- include('mpred_header.pi').
+
+:- endif.
 
 :-
             op(1150,fx,(was_dynamic)),
@@ -108,7 +111,7 @@ transitive_P_l_r(3,?,?,?),
 transitive_P_r_l(3,?,?,?),
         assert_isa(+, +).
 
-:- include('mpred_header.pi').
+
 
 :- module_transparent((
             guess_supertypes/1,
@@ -823,8 +826,8 @@ isa_asserted_0(I,C):- (atom(I);atom(C)),type_isa(I,C).
 isa_asserted_0(I,C):- var(C),!,tCol_gen(C),nonvar(C),isa_asserted_0(I,C).
 isa_asserted_0(I,C):- sanity(tCol(C)), call_u(mpred_univ(C,I,CI)),call_u(CI).
 isa_asserted_0(ttPredType, completelyAssertedCollection):-!.
-isa_asserted_0(I,C):- nonvar(I),sanity(\+ is_ftVar(I)), clause_b(completeIsaAsserted(I)),!,fail.
-isa_asserted_0(I,C):- sanity(\+ is_ftVar(C)), clause_b(completelyAssertedCollection(C)),!,fail.
+isa_asserted_0(I,_):- nonvar(I),sanity(\+ is_ftVar(I)), clause_b(completeIsaAsserted(I)),!,fail.
+isa_asserted_0(_,C):- sanity(\+ is_ftVar(C)), clause_b(completelyAssertedCollection(C)),!,fail.
 isa_asserted_0(I,C):-  not_mud_isa(I,C),!,fail.
 % isa_asserted_0(I,C):- I == ttTypeByAction, C=ttTypeByAction,!,fail.
 % isa_asserted_0(I,C):- HEAD= isa(I, C),ruleBackward(HEAD,BODY),dtrace,call_mpred_body(HEAD,BODY).
@@ -1111,7 +1114,7 @@ baseKB:prologBuiltin(assert_isa/2).
 %
 % assert  (isa/2) Safely Paying Attention To Corner Cases.
 %
-assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),isa_asserted(tT,Col),assert_isa(O,T))).
+assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),isa_asserted(T,tCol),assert_isa(O,T))).
 
 %% assert_isa( ?I, ?T) is nondet.
 %
@@ -1138,10 +1141,10 @@ assert_isa_rev(T,I):- map_list_conj(assert_isa_rev(T),I).
 assert_isa_rev(T,I):- map_list_conj(assert_isa(I),T).
 
 assert_isa_rev(T,I):- is_ftCompound(I),is_non_skolem(I),!,must((get_functor(I,F),assert_compound_isa(I,T,F))),!.
-assert_isa_rev(T,I):- \+(call_u(isa(I,_))), \+(a(tCol,I)), ain(tKnownID(I)), fail.
+assert_isa_rev(_,I):- \+(call_u(isa(I,_))), \+(a(tCol,I)), ain(tKnownID(I)), fail.
 assert_isa_rev(T,I):- hotrace(chk_ft(T)),(is_ftCompound(I)->dmsg(once(dont_assert_c_is_ft(I,T)));dmsg(once(dont_assert_is_ft(I,T)))),rtrace((chk_ft(T))).
 assert_isa_rev(T,_):- once(decl_type(T)),fail.
-assert_isa_rev(T,I):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_asserted(I,T)))),!,fail.
+assert_isa_rev(T,I):- stack_depth(Level),Level>1650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_asserted(I,T)))),!,fail.
 %OLD baseKB:decl_database_hook(_,genls(_,_)):-retractall(a(_,isa,_,_)),retractall(a(_,genls,_,_)).
 %OLD baseKB:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(isa_asserted_sanely(I,T))).
 %OLD baseKB:decl_database_hook(change(assert,_),isa(I,T)):- assert_isa_rev(T,I),fail.

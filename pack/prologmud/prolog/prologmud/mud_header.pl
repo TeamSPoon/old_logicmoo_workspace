@@ -10,6 +10,8 @@
 %
 */
 
+:- '$set_source_module'(baseKB).
+
 % :- include(logicmoo(mpred/'mpred_header.pi')).
 :- set_prolog_flag(access_level,system).
 
@@ -33,6 +35,6 @@
 :- set_prolog_flag(access_level,user).
 
 
-:- enable_mpred_expansion.
+:- baseKB:enable_mpred_expansion.
 
 

@@ -1,4 +1,4 @@
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(xray_xray,[]).
 :- endif.
 
@@ -31,7 +31,7 @@
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-% :- use_module(logicmoo(logicmoo_utils)).
+% :- ensure_loaded(logicmoo(logicmoo_utils)).
 :- initialization(attach_packs).
 prove_query:-query.
 

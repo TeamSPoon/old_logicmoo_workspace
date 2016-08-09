@@ -64,7 +64,7 @@
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
 
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 %:- lmce:reset_modules.
 :- endif.
 
@@ -120,10 +120,13 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 :- must( baseKB:isa(iRR7,tRRP) ).
 :- must( baseKB:tRRP(iRR7) ).
 
+:- '$set_source_module'(baseKB).
+:- '$set_typein_module'(baseKB).
 
-:-kb_dynamic(baseKB:sanity_test/0).
-:-kb_dynamic(baseKB:regression_test/0).
-:-kb_dynamic(baseKB:feature_test/0).
+:- listing((kb_dynamic)/1).
+:- kb_dynamic(baseKB:sanity_test/0).
+:- kb_dynamic(baseKB:regression_test/0).
+:- kb_dynamic(baseKB:feature_test/0).
 :- kb_dynamic((        
         baseKB:feature_test/0,
         baseKB:mud_test/2,
@@ -134,6 +137,8 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
         type_action_info/3)).
 
 :- statistics.
+
+:- set_prolog_flag(logicmoo_include,'$set_source_module'(baseKB)).
 
 % :- must((statistics(cputime,X),X<65)).  % was 52
 
@@ -335,7 +340,7 @@ load_ckb:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)),logicmoo_i_cyc_kb:c
 
 %:- initialization(ltkb1,load_ckb).
 
-% :- break.
+%% :- break.
 
 :- assert_setting01(lmconf:eachRule_Preconditional(true)).
 :- assert_setting01(lmconf:eachFact_Preconditional(true)).

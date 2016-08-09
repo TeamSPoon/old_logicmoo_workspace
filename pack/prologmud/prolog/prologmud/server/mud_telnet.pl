@@ -1,4 +1,5 @@
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
+/*
 :- module(mud_telnet, [
          telnet_server/2,
          setup_streams/2,
@@ -14,7 +15,6 @@
          start_prolog_telnet/1,
          run_session/0,
          run_session/2,
-         correct_o_stream/0,
          login_and_run/0,
          login_and_run/2,
          session_loop/2,
@@ -26,7 +26,8 @@
          login_and_run_nodebug/0,
          on_telnet_restore/0
       ]).
-:- endif.
+*/
+%  endif.
 /* * module   
 % Initial Telnet/Text console 
 % ALL telnet client business logic is here (removed from everywhere else!)
@@ -37,6 +38,19 @@
 %
 */ 
 
+:- dynamic((lmcache:agent_session/2,
+      lmcache:session_agent/2,
+      lmcache:session_io/4,
+      lmcache:agent_session/2,
+      lmcache:session_agent/2,
+      lmcache:session_io/4)).
+
+:- volatile((lmcache:agent_session/2,
+      lmcache:session_agent/2,
+      lmcache:session_io/4,
+      lmcache:agent_session/2,
+      lmcache:session_agent/2,
+      lmcache:session_io/4)).
 
 :- ain(mtProlog(mud_telnet)).
 % UNDO % :- add_import_module(mud_telnet,world,end).
@@ -101,7 +115,6 @@ service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
    get_main_thread_error_stream(Err),
    'format'(Err,'~n~n~q~n~n',[service_client_call(Call, Id, Slave, In, Out, Host, Peer, Options)]),
    call(Call).
-
 
 get_session_io(In,Out):-
   must(get_session_id_local(O)),
@@ -196,7 +209,7 @@ session_loop(In,Out):-
 
 :-export(register_player_stream_local/3).
 register_player_stream_local(P,In,Out):-
- call_u((must_det_l((
+ ((((
    set_player_telnet_options(P),
    get_session_id_local(O),thread_self(Id),
    retractall(lmcache:session_io(_,_,_,Id)),
@@ -365,9 +378,9 @@ merge_elements(V,V).
 
 write_pretty([]).
 write_pretty(Percepts) :-
-	write_pretty_aux(Percepts, Rest, 0),
+	write_pretty_aux(Percepts, Rest, 0),!,
 	nl,
-	write_pretty(Rest).
+	write_pretty(Rest),!.
 
 write_pretty_aux(Rest,Rest,5).
 write_pretty_aux([[]|Tail],Return,Column) :-
@@ -422,7 +435,7 @@ door_label(R,Dir,'  '):- pathBetween_call(R,Dir,SP),atomic(SP).
 asserted_atloc_for_map(O,L):-asserted_atloc(O,L),O\=apathFn(_,_).
 asserted_atloc(O,L):-is_asserted(mudAtLoc(O,L)).
 
-show_room_grid_single(Room, xyzFn(Room,X,Y,Z),OutsideTest):- call(OutsideTest), doorLocation(Room,X,Y,Z,Dir),door_label(Room,Dir,Label),write(Label),!.
+show_room_grid_single(Room, xyzFn(Room,X,Y,Z),OutsideTest):- call_u((call(OutsideTest), doorLocation(Room,X,Y,Z,Dir),door_label(Room,Dir,Label))),write(Label),!.
 show_room_grid_single(_Room,_LOC,OutsideTest):- call(OutsideTest),!,write('[]'),!.
 show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc_for_map(Obj,LOC),inst_label(Obj,Label), write(Label), !.
 show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc_for_map(_Obj,LOC),write('..'), !.
@@ -478,8 +491,8 @@ cmdShowRoomGrid(Room,Y,X,N) :-
 cmdShowRoomGrid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
-        prop(Obj,isa,Class),
-	typeHasGlyph(Label,Class),
+        (isa(Obj,Class),
+	typeHasGlyph(Label,Class)),!,
 	write(Label), write(' '),
 	XX is X + 1,
 	!,
@@ -487,7 +500,7 @@ cmdShowRoomGrid(Room,Y,X,N) :-
 cmdShowRoomGrid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Agent,LOC),
-	isa(Agent,tAgent),
+	isa(Agent,tAgent),!,
 	write('Ag'), write(' '),
 	XX is X + 1,
 	!,

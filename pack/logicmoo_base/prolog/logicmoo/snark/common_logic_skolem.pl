@@ -1,4 +1,4 @@
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(common_logic_skolem,
 	  [ form_sk/2,
 	    sk_form/2,

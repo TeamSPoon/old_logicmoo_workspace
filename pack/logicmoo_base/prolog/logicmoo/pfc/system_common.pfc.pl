@@ -35,9 +35,6 @@
 
 :- begin_pfc.
 
-:- set_fileAssertMt(baseKB).
-:- set_defaultAssertMt(baseKB).
-
 :- prolog_load_context(module,Mod),sanity(Mod==baseKB),writeq(prolog_load_context(module,Mod)),nl.
 
 

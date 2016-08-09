@@ -55,7 +55,6 @@
 :- current_prolog_flag(unsafe_speedups,_)->true;set_prolog_flag(unsafe_speedups,true).
 :- ensure_loaded(library(logicmoo_utils)).
 :- ensure_loaded(library(logicmoo_base)).
-
 :- set_prolog_flag(pfc_booted,false).
 :-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
 :- set_prolog_flag(pfc_booted,true).
@@ -73,10 +72,9 @@
 :- debug.
 */
 :- at_start((Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)))).
-:- at_start((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, call_u(G))))).
-:- at_start((ignore((logicmoo_util_shared_dynamic:call(retract,(ereq(G):- find_and_call(G))),fail)))).
+:- at_start((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, baseKB:call_u(G))))).
+% :- at_start((ignore((logicmoo_util_shared_dynamic:call(retract,(ereq(G):- find_and_call(G))),fail)))).
 
 :- set_prolog_flag(pfc_booted,true).
-:- lmce:reset_modules.
 :- set_prolog_flag(retry_undefined,true).
 

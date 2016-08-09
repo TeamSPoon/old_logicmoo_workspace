@@ -8,7 +8,7 @@
 */
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_loader.pl
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_loader,
           [ add_from_file/1,
           % unused_assertion/1,
@@ -16,6 +16,7 @@
           assert_until_eof/1,
           mpred_ops/0,setup_module_ops/1,
           set_file_lang/1,
+          mpred_te/6,
           pfc_dcg/0,
           get_original_term_source/1,
 
@@ -201,6 +202,9 @@
             transform_opers_0/2, transform_opers_1/2,
             mpred_loader_file/0
           ]).
+
+:- include('mpred_header.pi').
+
 :- endif.
 
  :- module_transparent((load_file_term_to_command_1b/3,pfc_dcg/0, mpred_term_expansion_by_pred_class/3,
@@ -257,8 +261,6 @@
    baseKB:registered_module_type/2)).
 
 
-:- include('mpred_header.pi').
-
 
 % TODO uncomment the next line without breaking it all!
 % baseKB:use_cyc_database.
@@ -292,10 +294,10 @@ mpred_prolog_only_file(File):- file_name_extension(File,_,pfc),!,fail.
 mpred_prolog_only_file(File):- lmcache:mpred_directive_value(File,language,pfc),!,fail.
 mpred_prolog_only_file(_).
 
-% :- use_module(library(logicmoo_utils)).
+% :- ensure_loaded(library(logicmoo_utils)).
 %:- use_module(mpred_expansion).
-%:- use_module(library(logicmoo/util/logicmoo_util_attvar_reader)).
-%:- use_module(library(logicmoo/util/logicmoo_util_varnames)).
+%:- ensure_loaded(library(logicmoo/util/logicmoo_util_attvar_reader)).
+%:- ensure_loaded(library(logicmoo/util/logicmoo_util_varnames)).
 
 % mpred_te(_,_,I,OO):-thread_self(X),X\==main,!,I=OO.
 % not actual function
@@ -1245,7 +1247,7 @@ file_begin(WIn):-
    simplify_language_name(WIn,W),
    set_lang(W),
    set_file_lang(W),   
-   fileAssertMt(Mt),
+   find_and_call(fileAssertMt(Mt)),
    set_fileAssertMt(Mt),
    wdmsg(fileAssertMt(Mt)),
    op_lang(W),

@@ -4,7 +4,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 :- endif.
 :- module(logicmoo_webbot_file,[]).
 % restore entry state
@@ -20,8 +20,8 @@
 :- set_prolog_flag(lm_expanders,true).
 :- set_prolog_flag(mpred_te,true).
 
-:- use_module(library(logicmoo_utils)).
-:- use_module(library(logicmoo_base)).
+:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(library(logicmoo_base)).
 %:- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 %:- ensure_loaded(library(logicmoo/mpred_online/mpred_pldoc_util)).
 
@@ -56,7 +56,7 @@ size666_stacks:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_
 :- at_start(size666_stacks).
 
 
-:- user:use_module(library(logicmoo_user),except([op(_,_,_)])).
+:- user:ensure_loaded(library(logicmoo_user),except([op(_,_,_)])).
 %
 %:- initialization(set_prolog_flag(mpred_te,false)).
 %:- initialization(set_prolog_flag(mpred_te,false),restore).

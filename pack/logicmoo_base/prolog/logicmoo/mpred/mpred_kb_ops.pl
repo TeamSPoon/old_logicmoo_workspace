@@ -12,7 +12,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_kb_ops.pl
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_kb_ops,
           [ deducedSimply/1,
 
@@ -266,6 +266,10 @@ attvar_op/2,
 mpred_facts_and_universe/1
             
           ]).
+
+
+:- include('mpred_header.pi').
+
 :- endif.
 
 :- module_transparent retract_mu/1,
@@ -285,7 +289,7 @@ mpred_facts_and_universe/1
       physical_side_effect(+),
       oncely(0),
       naf(0),
-      
+      call_s2(0),
       mpred_update_literal(*,*,0,*),
       mpred_retry(0),
       mpred_op(?, ?),
@@ -315,11 +319,6 @@ mpred_facts_and_universe/1
  :- meta_predicate trigger_supporters_list(0,*).
  :- meta_predicate repropagate_meta_wrapper_rule(0).
  :- meta_predicate repropagate_0(0).
-
-:- include('mpred_header.pi').
-
-% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
-
 
 
 % oncely later will throw an error if there where choice points left over by call
@@ -511,7 +510,6 @@ get_consequent(\+ P,PP):-compound(P),!,get_consequent(P,PP).
 get_consequent(P,P).
 
 
-:- include('mpred_header.pi').
 :- style_check(+singleton).
 
 % TODO READD
@@ -719,10 +717,12 @@ call_s2(G0):-
   strip_module(G0,WM,G),
   defaultAssertMt(U),  
   must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
+  call(call,(
  '$set_source_module'(S,U),'$module'(M,U),
-  setup_call_cleanup_each(
-    ('$set_source_module'(U),'$set_typein_module'(U)),CALL,
-     ('$set_source_module'(S),'$set_typein_module'(M))).
+  setup_call_cleanup( % _each
+    ('$set_source_module'(U),'$set_typein_module'(U)),
+       call(CALL),
+     ('$set_source_module'(S),'$set_typein_module'(M))))).
 
 /*
 attvar_op(Op,Data):-
@@ -1222,7 +1222,7 @@ map_first_arg(Pred,(H;T),S):-!, map_first_arg(Pred,H,S) ; map_first_arg(Pred,T,S
 map_first_arg(Pred,[H|T],S):-!, apply(Pred,[H|S]), map_first_arg(Pred,T,S).
 map_first_arg(Pred,H,S):-apply(Pred,[H|S]). 
 
-% % :- use_module(logicmoo(util/rec_lambda)).
+% % :- ensure_loaded(logicmoo(util/rec_lambda)).
 
 %example pfcVerifyMissing(mpred_isa(I,D), mpred_isa(I,C), ((mpred_isa(I,C), {D==C});-mpred_isa(I,C))). 
 %example pfcVerifyMissing(mudColor(I,D), mudColor(I,C), ((mudColor(I,C), {D==C});-mudColor(I,C))). 
@@ -1647,7 +1647,7 @@ mpred_call_0(Var):-is_ftVar(Var),!,mpred_call_with_no_triggers(Var).
 mpred_call_0(M):-fixed_negations(M,O),!,mpred_call_0(O).
 mpred_call_0(U:X):-U==user,!,mpred_call_0(X).
 mpred_call_0(t(A,B)):-(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_call_0(ABC).
-mpred_call_0(isa(B,A)):-(atom(A)->true;(no_repeats(tCol(A)),atom(A))),ABC=..[A,B],mpred_call_0(ABC).
+mpred_call_0(isa(B,A)):-(atom(A)->true;(call_u(tCol(A)),atom(A))),ABC=..[A,B],mpred_call_0(ABC).
 %mpred_call_0(t(A,B)):-!,(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_call_0(ABC).
 mpred_call_0(t(A,B,C)):-!,(atom(A)->true;(no_repeats(arity(A,2)),atom(A))),ABC=..[A,B,C],mpred_call_0(ABC).
 mpred_call_0(t(A,B,C,D)):-!,(atom(A)->true;(no_repeats(arity(A,3)),atom(A))),ABC=..[A,B,C,D],mpred_call_0(ABC).
@@ -1880,7 +1880,7 @@ baseKB:hook_one_minute_timer_tick:-mpred_cleanup.
 %
 % PFC Cleanup.
 %
-mpred_cleanup:- forall((no_repeats(F-A,(mpred_mark(pfcRHS,F,A),A>1))),mpred_cleanup(F,A)).
+mpred_cleanup:- forall((no_repeats(F-A,(call_u(mpred_mark(pfcRHS,F,A)),A>1))),mpred_cleanup(F,A)).
 
 
 %% mpred_cleanup( +F, ?A) is semidet.
@@ -2365,7 +2365,7 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 
 :- was_dynamic(baseKB:module_local_init/0).
 :- discontiguous(baseKB:module_local_init/0).
-% :- include('mpred_header.pi').
+% :- ((prolog_load_context(file,F),  prolog_load_context(source,F))-> throw(prolog_load_context(source,F)) ; true). :- include('mpred_header.pi').
 :- style_check(+singleton).
 
 % TODO READD

@@ -182,7 +182,7 @@ baseKB:wrap_shared(<==>,_,ereq).
 baseKB:wrap_shared((<--),2,ereq).
 baseKB:wrap_shared(agent_text_command,_,ereq).
 baseKB:wrap_shared(agent_command,_,ereq).
-baseKB:wrap_shared(coerce,_,ereq).
+baseKB:wrap_shared(coerce_hook,_,ereq).
 
 baseKB:wrap_shared(F,_,_):- /*clause_b(arity(F,A)),*/ clause_b(prologBuiltin(F)),!,fail.
 
@@ -241,8 +241,8 @@ could_safe_wrap:- prolog_load_context(module,M),\+ clause_b(mtCycL(M)),
        (source_location(F,_W),( atom_concat(_,'.pfc.pl',F);atom_concat(_,'.plmoo',F);atom_concat(_,'.pfc',F))))).
 
 
-really_safe_wrap(Type,I,O):- callable(I),
-   system_goal_expansion_safe_wrap(I,O)->I\=@=O,nop(dmsg(really_safe_wrap(Type,I,O))).
+really_safe_wrap(Type,I,O):- callable(I), 
+   system_goal_expansion_safe_wrap(I,O)->I\=@=O,(dmsg(really_safe_wrap(Type,I,O))),must(acyclic_term(O:I)).
 
 
 %% safe_wrap( Term, +How, -Wrapped) is semidet.

@@ -461,7 +461,7 @@ type_descriptive_name(ftNonvar,Pefix,Desc):-
 
 
 to_descriptive_name(For,Desc,Atom):- type_descriptive_name(Type,Desc,Atom),isa(For,Type),!.
-to_descriptive_name(_For,Pefix,Desc):- type_prefix(Pefix,TypeName), guess_nameStrings(TypeName,Desc).
+to_descriptive_name(_For,Pefix,Desc):- call_u(type_prefix(Pefix,TypeName)), guess_nameStrings(TypeName,Desc).
 to_descriptive_name(For,t(Pefix,lower),Desc):-!,to_descriptive_name(For,Pefix,Desc).
 to_descriptive_name(_For,Desc,Atom):- longer_sumry(Desc,Atom),!.
 to_descriptive_name(_For,Desc,Atom):-any_to_atom(Desc,Atom),!.

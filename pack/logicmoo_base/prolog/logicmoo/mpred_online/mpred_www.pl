@@ -8,7 +8,7 @@
 %
 */
 % :-module(mpred_www,[ensure_webserver/0,search4term/0]).
-%:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 :- module(mpred_www,
           [ action_menu_applied/3,
             action_menu_item/2,
@@ -158,7 +158,10 @@
             user:file_search_path/2
             */
           ]).
-% :- endif. 
+
+:- include(logicmoo(mpred/'mpred_header.pi')).
+:- endif.
+
  :- meta_predicate 
         edit1term(0),
         handler_logicmoo_cyclone(+),
@@ -177,7 +180,7 @@
 :- multifile((lmcache:last_item_offered/1, http:location/3, http_dispatch:handler/4, http_session:session_data/2, http_session:urandom_handle/1,
    foobar/1, lmcache:last_http_request/1, lmcache:last_item_offered/1, system:'$init_goal'/3, user:file_search_path/2)).
 
-%:- include(logicmoo(mpred/'mpred_header.pi')).
+
 %:- ensure_loaded(library(logicmoo_utils)).
 %:- ensure_loaded(library(logicmoo_swilib)).
 

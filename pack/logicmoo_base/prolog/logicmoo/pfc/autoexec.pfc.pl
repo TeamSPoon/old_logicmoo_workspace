@@ -103,20 +103,20 @@
 
 :- set_fileAssertMt(baseKB).
 
+el(X):- logicmoo_util_filesystem:filematch(X,Y),ensure_loaded(Y).
 
-:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_common.pfc')).
+:- el(('system_common.pfc')).
 
-:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_if_missing.pfc')).
+:- el(('system_if_missing.pfc')).
 
-:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_mdefault.pfc')).
+:- el(('system_mdefault.pfc')).
 
-:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_singleValued.pfc')).
+:- el(('system_singleValued.pfc')).
 
-:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/snark/common_logic_clif.pfc')).
+:- el(('logicmoo/snark/common_logic_clif.pfc')).
 
-:- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('user_relationAllExists.pfc')).
+:- el(('user_relationAllExists.pfc')).
 
-:- set_fileAssertMt(baseKB).
 
 :- multifile(baseKB:locked_baseKB/0).
 :- dynamic(baseKB:locked_baseKB/0).

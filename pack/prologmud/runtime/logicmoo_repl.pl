@@ -52,8 +52,8 @@ setup_rl_read_history_0:-
 
 % [Optionaly] Load the Logicmoo WWW System
 :- if(if_defined(baseKB:load_mud_www)).
-:- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 /*
+:- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 :- (if_file_exists(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www)))).
 :- (if_file_exists(ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).
 :- (if_file_exists(ensure_loaded(library(logicmoo/logicmoo_run_swish)))).

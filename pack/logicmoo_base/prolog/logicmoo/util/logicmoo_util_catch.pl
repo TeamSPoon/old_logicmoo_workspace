@@ -1405,12 +1405,12 @@ must_det_l(MGoal):- strip_module(MGoal,M,Goal),!, must_det_lm(M,Goal).
 %
 must_det_lm(M,Goal):-var(Goal),trace_or_throw(var_must_det_l(M:Goal)),!.
 must_det_lm(M,[Goal]):-!,must_det_lm(M,Goal).
-must_det_lm(M,[Goal|List]):-!,must(M:Goal),!,must_det_lm(M,List).
-must_det_lm(M,Goal):-tlbugger:skip_bugger,!,M:Goal.
-must_det_lm(M,(Goal,List)):-!,must(M:Goal),!,must_det_lm(M,List).
-must_det_lm(M,Goal):- must(M:Goal),!.
-must_det_lm(_,[]):-!.
-must_det_lm(M,[Goal|List]):-!,must(M:Goal),!,must_det_lm(M,List).
+must_det_lm(M,[Goal|List]):-!,must_find_and_call(M:Goal),!,must_det_lm(M,List).
+must_det_lm(M,Goal):-tlbugger:skip_bugger,!,find_and_call(M:Goal).
+must_det_lm(M,(Goal,List)):-!,must_find_and_call(M:Goal),!,must_det_lm(M,List).
+must_det_lm(M,Goal):- must_find_and_call(M:Goal),!.
+
+must_find_and_call(G):-must(find_and_call(G)).
 
 :- module_transparent(det_lm/2).
 

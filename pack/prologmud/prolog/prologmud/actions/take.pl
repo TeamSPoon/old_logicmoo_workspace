@@ -19,7 +19,7 @@ vtActionTemplate(actTake(tCarryAble)).
 
 % Command Hook
 agent_call_command(Agent,actTake(Obj)) :- 
-  \+ action_verb_useable(actTake,_,_,_,_),
+  \+ call_u(action_verb_useable(actTake,_,_,_,_)),
   must(agent_call_take(Agent,Obj)).
 
 % Successfully

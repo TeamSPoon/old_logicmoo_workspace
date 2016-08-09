@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_storage.pl
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_storage,
           [ % ain/1,
           %  add_0/1,
@@ -101,6 +101,9 @@
             world_clear/1,
             mpred_storage_file/0
           ]).
+
+:- include('mpred_header.pi').
+
 :- endif.
 
 :- meta_predicate 
@@ -141,7 +144,6 @@
 % ========================================
 % Shared Preds
 % ========================================
-:- include('mpred_header.pi').
 
 
 

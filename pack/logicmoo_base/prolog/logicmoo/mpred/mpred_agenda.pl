@@ -9,7 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_agenda.pl
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_agenda,
           [ 
             add_later/1,
@@ -70,6 +70,9 @@
             wfAssert/1,
             mpred_agenda_file/0
           ]).
+
+:- include('mpred_header.pi').
+
 :- endif.
 
 :- meta_predicate 

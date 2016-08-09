@@ -11,9 +11,10 @@
 % ===================================================================
 */
 
-%:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
+
 :- module(mpred_pfc, [
-  ensure_abox/1,
+  
   mpred_call_no_bc/1,%fix_mp/3,
   fix_mp/4, %fix_mp/3,
   mpred_fwc/1,
@@ -28,6 +29,7 @@
   throw_depricated/0,
   lookup_m_g/3,
   head_to_functor_name/2,
+  get_consequent_functor/3,
   mpred_post1_rem/2,
   mpred_post1/1,
   mpred_post1_rem1/2,
@@ -64,7 +66,6 @@
   get_source_ref/1,
   get_source_ref1/1,
   get_source_ref10/1,
-  ensure_abox/1, 
   is_source_ref1/1,
   get_source_ref_stack/1,
   set_fc_mode/1,
@@ -179,11 +180,11 @@ push_current_choice/1,
   mpred_unfwc_check_triggers0/1,mpred_unfwc1/1,mpred_why1/1,mpred_blast/1
   % trigger_trigger1/2  , trigger_trigger/3,
   ]).
-%:- endif.
-
-% :- '$set_source_module'(logicmoo_utils).
 
 :- include('mpred_header.pi').
+
+:- endif.
+
 
 :- meta_predicate 
       each_E(+,+,+),
@@ -287,13 +288,12 @@ get_head_term(F/A,Form):- integer(A),functor(Form0,F,A),!,get_consequent(Form0,F
 get_head_term(Form0,Form):- get_consequent(Form0,Form).
 
 :- dynamic(baseKB:que/2).
-% % :- '$set_source_module'(mpred_pfc).
 
 :- op(700,xfx,'=@@=').
 
 '=@@='(A,B):-variant_u(A,B).
 
-% :- use_module(library(logicmoo_utils)).
+% :- ensure_loaded(library(logicmoo_utils)).
 
 :- module_transparent((assert_u_confirmed_was_missing/1,mpred_trace_exec/0,pfcl_do/1,
   mpred_post1/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
@@ -303,29 +303,6 @@ get_head_term(Form0,Form):- get_consequent(Form0,Form).
   mpred_trace_op/3)).
 
 :- thread_local(t_l:no_mpred_breaks/0).
-
-
-
-:- module_transparent((ensure_abox)/1).
-:- multifile(lmcache:has_pfc_database_preds/1).
-:- volatile(lmcache:has_pfc_database_preds/1).
-:- dynamic(lmcache:has_pfc_database_preds/1).
-ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
-ensure_abox(user):- setup_module_ops(user),!,ensure_abox(baseKB),!.
-ensure_abox(M):- 
- must_det_l((
-   asserta(lmcache:has_pfc_database_preds(M)),
-   assert_if_new(baseKB:mtCycL(M)),
-   retractall(baseKB:mtProlog(M)),
-   setup_module_ops(M),
-   set_prolog_flag(M:unknown,error),
-   forall(mpred_database_term(F,A,_),
-       must_det_l(((
-        M:multifile(M:F/A),
-        M:dynamic(M:F/A),
-        M:discontiguous(M:F/A),
-        create_predicate_istAbove(M,F,A),        
-        M:module_transparent(M:F/A))))))),!.
 
 
 mnotrace(G):- (no_trace(G)),!.
@@ -377,10 +354,10 @@ get_first_user_reason(P,(F,T)):-
   (((lookup_u(spft(P,F,T))),is_user_fact(UU))*-> true;
     (((lookup_u(spft(P,F,T))), \+ is_user_fact(UU))*-> true ; 
        (clause_asserted_u(P),get_source_ref(UU),is_user_fact(UU)))),!.
-get_first_user_reason(P,UU):-get_source_ref_stack(UU),is_user_fact(UU),!.
-get_first_user_reason(P,UU):- get_source_ref_stack(UU),!.
+get_first_user_reason(_,UU):-get_source_ref_stack(UU),is_user_fact(UU),!.
+get_first_user_reason(_,UU):- get_source_ref_stack(UU),!.
 get_first_user_reason(P,UU):- must(ignore(((get_first_user_reason0(P,UU))))),!.
-get_first_user_reason0(P,(M,ax)):-get_source_ref10(M).
+get_first_user_reason0(_,(M,ax)):-get_source_ref10(M).
 
 %get_first_user_reason(_,UU):- get_source_ref(UU),\+is_user_fact(UU). % ignore(get_source_ref(UU)).
 
@@ -535,7 +512,7 @@ throw_depricated:- trace_or_throw(throw_depricated).
 
 assert_u(MH):- assert_u_no_dep(MH).
 assert_u_no_dep(MH):- fix_mp(clause(assert,assert_u),MH,MHA),
-    attvar_op_fully(assert_i, MHA),expire_tabled_list(H).
+    attvar_op_fully(assert_i, MHA),expire_tabled_list(MHA).
 asserta_u(MH):- throw_depricated, fix_mp(clause(assert,asserta_u),MH,MHA),attvar_op_fully(asserta_i,MHA).
 assertz_u(MH):- throw_depricated, fix_mp(clause(assert,assertz_u),MH,MHA),attvar_op_fully(assertz_i,MHA).
 retract_u(H):- retract_u0(H) *-> true; attvar_op_fully(retract_u0,H).
@@ -1881,14 +1858,14 @@ call_u_mp(M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAs
 call_u_mp(M,(P1,P2)):-!,call_u_mp(M,P1),call_u_mp(M,P2).
 call_u_mp(M,( \+ P1)):-!, \+ call_u_mp(M,P1).
 call_u_mp(M,must(P1)):-!, must( call_u_mp(M,P1)).
-call_u_mp(M,call(call,P1)):-!, call_u_mp(M,P1).
-call_u_mp(M,call(ereq,P1)):-!, call_u_mp(M,P1).
+call_u_mp(M,call(O,P1)):- atom(O), arg(_,v(call,ereq),O), !, call_u_mp(M,P1).
 call_u_mp(M,call(P1)):-!, call_u_mp(M,P1).
 call_u_mp(_,mtCycL(P)):-!,clause(baseKB:mtCycL(P),true).
 call_u_mp(_,is_string(P)):- !, logicmoo_util_bugger:is_string(P).
 call_u_mp(M,P):- current_predicate(_,M:P),!,catch(M:call(P),E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
 call_u_mp(M,P):- \+ clause(baseKB:mtCycL(M),true),!,clause(baseKB:mtCycL(MT),true),call_u_mp(MT,P).
 call_u_mp(M,P):- current_predicate(_,M:P),!,catch(M:call(P),E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
+call_u_mp(R,P):- find_module(R:P,M),dmsg(find_module(R:P,M)),!,catch(M:call(P),E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
 call_u_mp(M,P):- wdmsg(dynamic(M:P)),dynamic(M:P),multifile(M:P),!,fail.
 
 call_u_mp(_G,M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
@@ -2822,9 +2799,12 @@ log_failure_red:- cnotrace(doall((between(1,3,_),wdmsg(color(red,"%%%%%%%%%%%%%%
 maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(logicmoo(pfc))->dtrace(dmsg(Info));(dmsg(Info)))).
 
 % if the correct flag is set, dtrace exection of Pfc
-mpred_trace_msg(Info):- not_not_ignore_mnotrace(((((clause_asserted_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)))).
-mpred_trace_msg(Format,Args):- not_not_ignore_mnotrace((((clause_asserted_u(mpred_is_tracing_exec);tracing)-> wdmsg(Format,Args)))),!.
+mpred_trace_msg(Info):- not_not_ignore_mnotrace(((((clause_asserted_u(mpred_is_tracing_exec);tracing)->(show_wdmsg(Info));true)))).
+mpred_trace_msg(Format,Args):- not_not_ignore_mnotrace((((clause_asserted_u(mpred_is_tracing_exec);tracing)-> (show_wdmsg(Format,Args))))),!.
 % mpred_trace_msg(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_trace_msg(Info))))).
+
+show_wdmsg(A,B):- current_prolog_flag(mpred_pfc_silent,true)-> true; wdmsg(A,B).
+show_wdmsg(A):- current_prolog_flag(mpred_pfc_silent,true)-> true; wdmsg(A).
 
 mpred_warn(Info):- not_not_ignore_mnotrace((((lookup_u(mpred_warnings(true));tracing) -> 
   wdmsg(warn(logicmoo(pfc),Info)) ; mpred_trace_msg('WARNING/PFC:  ~p ',[Info])),
@@ -2835,10 +2815,10 @@ mpred_warn(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Ar
 mpred_error(Info):- not_not_ignore_mnotrace(((tracing -> wdmsg(error(logicmoo(pfc),Info)) ; mpred_warn(error(Info))))).
 mpred_error(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_error(Info))))).
 
-mpred_trace_exec:- assert_u_no_dep(mpred_is_tracing_exec).
+mpred_trace_exec:- assert_u_no_dep(mpred_is_tracing_exec),set_prolog_flag(mpred_pfc_silent,false).
 mpred_watch:- mpred_trace_exec.
 mpred_trace_all:- mpred_trace_exec,mpred_trace,mpred_set_warnings(true).
-mpred_notrace_exec:- retractall_u(mpred_is_tracing_exec).
+mpred_notrace_exec:- retractall_u(mpred_is_tracing_exec),set_prolog_flag(mpred_pfc_silent,true).
 
 mpred_nowatch:-  retractall_u(mpred_is_tracing_exec).
 

@@ -6,7 +6,7 @@
             ainz/1,
 
             if_flag_true/2,
-            current_modules_from/2,
+            current_module_from/2,
             attributes_equal/3,
 
             attr_bind/2,attr_bind/1,
@@ -22,6 +22,8 @@
             ainz_clause/1,ainz_clause/2,
             simple_var/1,
             append_term/3,
+          find_module/2,
+          module_of/2,
             expand_to_hb/3,
             assert_if_new/1,
             asserta_if_new/1,
@@ -87,6 +89,8 @@
         debugCallWhy(?, 0),
         eraseall(+, +),
         find_and_call(+, +, ?),
+        module_of(+, ?),
+        find_module(+, ?),
         mpred_mop(+, 1, ?),
         mpred_op_prolog(?, :),
         mpred_op_prolog0(1,?),
@@ -94,6 +98,9 @@
         dont_make_cyclic(0).
 
 :- module_transparent
+         find_module/2,
+         module_of/2,
+            
         append_term/3,
         modulize_head/2,
         modulize_head_fb/4,
@@ -106,7 +113,7 @@
         clausify_attributes/2,
         clausify_attributes4/4,
         erase_safe/2,
-        current_modules_from/2,
+        current_module_from/2,
         find_and_call/1,
         baseKB:first_std_provider/3,
         std_provider/3,
@@ -124,7 +131,7 @@
             ainz/1,
 
             if_flag_true/2,
-            current_modules_from/2,
+            current_module_from/2,
             attributes_equal/3,
 
             attr_bind/2,attr_bind/1,
@@ -287,7 +294,9 @@ find_and_call(_,_,  G):-current_predicate(_,C:G),!,find_and_call(C,G).
 find_and_call(C,M,  G):-dtrace,C:on_x_rtrace(M:G).
 
 
-
+current_module_ordered(user).
+current_module_ordered(baseKB).
+current_module_ordered(X):-current_module(X).
 %= 	 	 
 
 %% find_and_call( :TermG) is semidet.
@@ -298,6 +307,13 @@ find_and_call(C:G):-current_predicate(_,C:G),!,find_and_call(C,G).
 find_and_call(_:G):-current_predicate(_,R:G),!,find_and_call(R:G).
 find_and_call(G):-current_predicate(_,G),!,loop_check(on_x_rtrace(G)).
 find_and_call(G):-current_predicate(_,R:G),!,find_and_call(R:G).
+
+module_of(G,M):-predicate_property(G,imported_from(M)),!.
+module_of(G,M):-predicate_property(G,defined), \+ predicate_property(G,imported_from(M)).
+
+find_module(G,M):-module_of(G,M),!.
+find_module(_:G,R):-!,module_of(G,R),!.
+find_module(G,M):-current_module_ordered(C),module_of(C:G,M),!.
 
 
 %% somehow_callable( :TermG) is semidet.
@@ -661,8 +677,8 @@ clause_asserted(M:H,B,R):- copy_term(M:H:B,MHB),system:clause(M:H,B,R),variant(M
 
 :-meta_predicate(modulize_head(?,?)).
 
-current_modules_from(Cm,M):- default_module(Cm,M).
-current_modules_from(Cm,M):- current_module(M), \+ default_module(Cm,M).
+current_module_from(Cm,M):- default_module(Cm,M).
+current_module_from(Cm,M):- current_module_ordered(M), \+ default_module(Cm,M).
 
 %% modulize_head( +HEAD, -ModulePlusHead) is semidet.
 %
@@ -673,7 +689,7 @@ modulize_head(MH,M:H):- strip_module(MH,Cm,H),!,
 
 modulize_head_fb(From,H,Fallback,M:H):- 
  cnotrace((findall(M:H,
-  ((no_repeats(M, ((current_modules_from(From,M),current_predicate(_,M:H),\+ predicate_property(M:H,imported_from(_))))))->true;
+  ((no_repeats(M, ((current_module_from(From,M),current_predicate(_,M:H),\+ predicate_property(M:H,imported_from(_))))))->true;
   M=Fallback),List))),
  member(M:H,List).
 
@@ -810,8 +826,8 @@ retractall_i(H):-expand_to_hb(H,HH,_),forall(clause_i(HH,_,Ref),erase(Ref)).
 %
 clause_true(G):- !, clause_b(G).
 
-clause_true(M:G):-!,system:clause(M:G,true)*->true;(current_module(M2),system:clause(M2:G,true)).
-clause_true(G):- cnotrace((current_module(M), \+ \+  system:clause(M:G,_,_))),!, system:clause(M:G,true).
+clause_true(M:G):-!,system:clause(M:G,true)*->true;(current_module_ordered(M2),system:clause(M2:G,true)).
+clause_true(G):- cnotrace((current_module_ordered(M), \+ \+  system:clause(M:G,_,_))),!, system:clause(M:G,true).
 %clause_true(M:G):- predicate_property(M:G,number_of_clauses(_)),!,system:clause(M:G,true).
 %clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).
 %clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).
@@ -819,7 +835,7 @@ clause_true(G):- cnotrace((current_module(M), \+ \+  system:clause(M:G,_,_))),!,
 clause_true_anywhere(G):- strip_module(G,M,S),!,
   functor(S,F,A),
   functor(P,F,A),
-  ((M2=M; M2=baseKB ;(current_module(M2),M2\=M)),
+  ((M2=M; M2=baseKB ;(current_module_ordered(M2),M2\=M)),
     current_predicate(M2:P)),!,
     system:clause(M2:S,B,Ref),
      (B==true->! ;

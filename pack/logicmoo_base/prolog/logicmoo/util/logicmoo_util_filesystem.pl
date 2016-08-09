@@ -146,11 +146,10 @@
 :- module(logicmoo_util_filesystem,
 [  % when the predciates are not being moved from file to file the exports will be moved here
        ]).
-
-
 :- else.
 :- include('logicmoo_util_header.pi').
 :- endif.
+
 :- ensure_loaded('logicmoo_util_no_repeats').
 
 :- if(exists_source(library(filesex))).
@@ -183,7 +182,7 @@ resolve_dir(Path,Dir):-
 %	  :- add_file_search_path(all_utils, '../*/util/').
 %	  ==
 
-add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
+add_file_search_path(Name,Path):-  must(resolve_dir(Path,Dir)),
    is_absolute_file_name(Dir), (( \+ user:file_search_path(Name,Dir)) ->asserta(user:file_search_path(Name,Dir));true).
    
 %%	add_library_search_path(+Dir, +Patterns:list(atom)) is det.
@@ -200,7 +199,8 @@ add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
 add_library_search_path(Path,Masks):- 
    forall(resolve_dir(Path,Dir), 
       (make_library_index(Dir, Masks), 
-        (user:library_directory(Dir) -> true ; (asserta(user:library_directory(Dir)), reload_library_index)))).
+        (user:library_directory(Dir) -> true ; (asserta(user:library_directory(Dir)), 
+          reload_library_index)))).
 
 
 :- meta_predicate(with_filematch(0)).

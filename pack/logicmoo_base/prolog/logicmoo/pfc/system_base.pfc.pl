@@ -30,7 +30,10 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- initEnvironment.
+:- if(current_predicate(initEnvironment/0)).
+% :- must(initEnvironment).
+:- endif.
+
 :- dynamic(baseKB:col_as_isa/1).
 :- dynamic(baseKB:col_as_unary/1).
 :- dynamic(baseKB:col_as_static/1).
@@ -47,8 +50,8 @@ col_as_isa(ttExpressionType).
 
 :- set_prolog_flag(logicmoo_motel,false).
 
-:- '$set_source_module'(baseKB).
-:- defprimconcept(naf(tDeleted),tExisting).
+% :- '$set_source_module'(baseKB).
+% :- defprimconcept(naf(tDeleted),tExisting).
 :- abolish(isa,2).
 
 do_and_undo(A,U):-atom(A),atom_concat('assert',Suffix,A),!,atom_concat('delete',Suffix,U),current_predicate(U/_).
@@ -136,7 +139,7 @@ genls(ttPredType,completelyAssertedCollection).
 
 :- do_gc.
 
-:- set_fileAssertMt(baseKB).
+%:- set_fileAssertMt(baseKB).
 
 :- dynamic(baseKB:agent_call_command/2).
 :- export(baseKB:agent_call_command/2).
@@ -152,12 +155,7 @@ arity(comment,2).
 :- dynamic(baseKB:mtExact/1).
 :- dynamic(baseKB:predicateConventionMt/2).
 
-/*
-:- asserta(mpred_kb_ops:spft(6,6,6)).
-:- asserta(baseKB:spft(7,7,7)).
-:- compile_predicates([mpred_kb_ops:spft/3]).
-:- compile_predicates([baseKB:spft/3]).
-*/
+
 :- listing(spft/3).
 baseKB:mtCycL(baseKB).
 :- mpred_run.
@@ -577,7 +575,7 @@ mtCore(inferencePCS).
 genls(mtCore,tMicrotheory).
 
 
-mtCycL(O)==>({call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
+mtCycL(O)==>({find_and_call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
 
 :- sanity(functorDeclares(ttModule)).
 :- sanity(arity(ttModule,1)).

@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_props.pl
-:- if((true; (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_props,
           [ add_mpred_prop_gleaned/2,
             add_mpred_prop_gleaned_4/4,
@@ -58,9 +58,11 @@
             pred_type_test2/2,
             mpred_props_file/0
           ]).
+
+:- include('mpred_header.pi').
+
 :- endif.
 
-% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 :- meta_predicate(kb_dynamic(:,+,+,+,+)).
 :- meta_predicate(decl_mpred_prolog(:,+,+,+,+)).
 
@@ -72,7 +74,7 @@
    (kb_dynamic)/5)).
 
 
-:- include('mpred_header.pi').
+
 /*
  :- meta_predicate decl_mpred_prolog(?,1).
  :- meta_predicate kb_dynamic(?,1).
@@ -367,20 +369,21 @@ kb_dynamic(Any,M,PI,MFAIn):-
     kb_dynamic(Any,M,PI,F,A))).
 
 
-kb_dynamic(_:CM,M,PI,F,A):-var(A),!,
-   forall(between(1,11,A),kb_dynamic(CM,M,PI,F,A)),!.
+kb_dynamic(CM:baseKB,M,PI,F,A):- M==abox, defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic(CM:baseKB,Mt,PI,F,A)).
 
-kb_dynamic(CM:OM,M,PI,F,A):-M==OM,kb_dynamic(CM,M,PI,F,A).
+kb_dynamic(W:CM,M,PI,F,A):-var(A),!,
+   forall(between(1,11,A),kb_dynamic(W:CM,M,PI,F,A)),!.
 
+% kb_dynamic(CM:OM,M,PI,F,A):-M==OM,CM\==OM,kb_dynamic(CM,M,PI,F,A).
+/*
 kb_dynamic(CM:Imp,M,PI,F,A):-M==CM,
    kb_dynamic(CM,M,PI,F,A),
    (CM==baseKB->true;((   CM:export(CM:F/A),dmsg(Imp:import(CM:F/A)), Imp:import(CM:F/A)))).
-
+*/
 % kb_dynamic(CM,M,PI,F,A):- dmsg(kb_dynamic(CM,M,PI,F,A)),fail.
 
 % kb_dynamic(CM:M,baseKB,PI,F,A):- M\==baseKB, must(kb_dynamic(CM:baseKB,baseKB,PI,F,A)).
 
-kb_dynamic(CM:baseKB,M,PI,F,A):- M==abox, defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic(CM:baseKB,Mt,PI,F,A)).
 
 kb_dynamic(CM:baseKB,M,PI,F,A):- defaultAssertMt(Mt)-> M\==Mt,!,must(kb_dynamic(CM:baseKB,Mt,PI,F,A)).
 kb_dynamic(_:CM,    M,PI,F,A):- atom(PI),A==0,get_arity(PI,F,A),

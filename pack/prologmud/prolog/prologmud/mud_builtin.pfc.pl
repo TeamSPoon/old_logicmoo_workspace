@@ -21,9 +21,15 @@
 % Douglas Miles
 */
 
+/*
+:- dynamic lmcache:wants_logout/1.
+:- dynamic   lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
+:- dynamic lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 
-:- dynamic(baseKB:agent_call_command/2).
-:- baseKB:import(baseKB:agent_call_command/2).
+*/
+
+:- dynamic(agent_call_command/2).
+:- import(agent_call_command/2).
 
 :- assert_until_eof(infSupertypeName).
 :- onEndOfFile(dmsg(infSupertypeName)).
@@ -40,14 +46,9 @@
 :- file_begin(code).
 :- op(1150,fx,kb_dynamic).
 
-:- kb_dynamic(  baseKB:irc_event_hooks/3).
-:- kb_dynamic(  baseKB:deliver_event_hooks/2).
-:- kb_dynamic   baseKB:irc_user_plays/3.
-
-:- kb_dynamic lmcache:wants_logout/1.
-
-:- kb_dynamic   lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
-:- kb_dynamic lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
+:- kb_dynamic(  irc_event_hooks/3).
+:- kb_dynamic(  deliver_event_hooks/2).
+:- kb_dynamic   irc_user_plays/3.
 
 :- kb_dynamic   mudDescription/1.
 :- kb_dynamic   term_specifier_text/2.
@@ -57,12 +58,12 @@
 :- kb_dynamic   use_usable/4.
 :- kb_dynamic   verb_alias/2.
 :- kb_dynamic   vtActionTemplate/1.
-% :- kb_dynamic   baseKB:mud_test/0.
-:- kb_dynamic  baseKB:mud_test/1.
-:- kb_dynamic  baseKB:mud_test/2.
-:- kb_dynamic  baseKB:mud_test_local/0.
-:- kb_dynamic  baseKB:mud_test_local/1.
-:- kb_dynamic  baseKB:mud_test_local/2.
+% :- kb_dynamic   mud_test/0.
+:- kb_dynamic  mud_test/1.
+:- kb_dynamic  mud_test/2.
+:- kb_dynamic  mud_test_local/0.
+:- kb_dynamic  mud_test_local/1.
+:- kb_dynamic  mud_test_local/2.
 :- kb_dynamic   world_agent_plan/3.
 :- kb_dynamic   action_info/2.
 :- kb_dynamic   action_rules/4.
@@ -80,8 +81,9 @@
 :-op(0,fy,  ('enabled')).
 % :- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
-:- kb_dynamic(user_db:grant_openid_server/2).
-:- kb_dynamic(user_db:grant_openid_server/2).
+:- multifile(user_db:grant_openid_server/2).
+:- dynamic(user_db:grant_openid_server/2).
+
 :- kb_dynamic '$was_imported_kb_content$'/2.
 :- discontiguous('$was_imported_kb_content$'/2).
 :- kb_dynamic(  disabled/1).
@@ -119,17 +121,17 @@
 :- kb_dynamic(  tChannel/1).
 
 
-:- kb_dynamic baseKB:pfcManageHybrids/0.
-:- kb_dynamic t_l:infMustArgIsa/0.
-:- thread_local t_l:into_form_code/0.
-:- thread_local t_l:current_local_why/2.
+:- kb_dynamic pfcManageHybrids/0.
 :- kb_dynamic   defnSufficient/2.
+% :- kb_dynamic   lmcache:loaded_external_kbs/1.
+%:- kb_dynamic t_l:infMustArgIsa/0.
 :- thread_local   t_l:repl_to_string/2.
 :- thread_local   t_l:repl_writer/2.
-:- kb_dynamic   lmcache:loaded_external_kbs/1.
+:- thread_local t_l:into_form_code/0.
+:- thread_local t_l:current_local_why/2.
 % :- break.
 :- kb_dynamic   loading_module_h/1.
-:- kb_dynamic   baseKB:registered_module_type/2.
+:- kb_dynamic   registered_module_type/2.
 :- kb_dynamic   must_compile_special_clause_file/1.
 
 % HOOKS
@@ -162,16 +164,16 @@
 % :- kb_dynamic   is_never_type/1.
 
 % DYN FOR CODE
-:- kb_dynamic lmcache:after_mpred_load/0.
-:- thread_local baseKB:use_cyc_database/0.
-:- kb_dynamic baseKB:use_cyc_database/0.
+:- dynamic lmcache:after_mpred_load/0.
+:- thread_local use_cyc_database/0.
+:- kb_dynamic use_cyc_database/0.
 
 :- kb_dynamic   fact_is_false/2.
 % :- kb_dynamic(kbp_t_list_prehook/2).
 
 
 % DYN KB
-:- kb_dynamic   baseKB:only_if_pttp/0.
+:- kb_dynamic   only_if_pttp/0.
 :- kb_dynamic   use_kif/2.
 :- kb_dynamic   is_mpred_prop/2.
 %:- kb_dynamic   hasInstance_dyn/2.
@@ -191,12 +193,12 @@
 :- kb_dynamic   use_usable/4.
 :- kb_dynamic   verb_alias/2.
 :- kb_dynamic   vtActionTemplate/1.
-:- kb_dynamic  baseKB:mud_test/0.
-:- kb_dynamic  baseKB:mud_test/1.
-:- kb_dynamic  baseKB:mud_test/2.
-:- kb_dynamic  baseKB:mud_test_local/0.
-:- kb_dynamic  baseKB:mud_test_local/1.
-:- kb_dynamic  baseKB:mud_test_local/2.
+:- kb_dynamic  mud_test/0.
+:- kb_dynamic  mud_test/1.
+:- kb_dynamic  mud_test/2.
+:- kb_dynamic  mud_test_local/0.
+:- kb_dynamic  mud_test_local/1.
+:- kb_dynamic  mud_test_local/2.
 :- kb_dynamic   world_agent_plan/3.
 :- kb_dynamic   action_info/2.
 :- kb_dynamic   action_rules/4.
@@ -207,9 +209,9 @@
 
 predicateConventionMt(agent_call_command,baseKB).
 
-:- ensure_loaded('logicmoo/pfc/autoexec.pfc').
+% :- ensure_loaded('logicmoo/pfc/autoexec.pfc').
 
-% baseKB:isa(iPerson99,tPerson).
+% isa(iPerson99,tPerson).
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('=>')).
@@ -445,7 +447,7 @@ dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tAgent,tHumanControlled,tNpcAgent).
 
-((sometimesBuggy,genls(A,B)/ground(genls(A,B)))==>{call((call((trace,baseKB:(must(ain(baseKB:tCol(A))),must(ain(baseKB:tCol(B))))))))}).
+((sometimesBuggy,genls(A,B)/ground(genls(A,B)))==>{call((call((trace,(must(ain(tCol(A))),must(ain(tCol(B))))))))}).
 
 ((sometimesBuggy,dividesBetween(S,C1,C2),{ground(S:C1:C2)}) ==> ((disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
 
@@ -855,7 +857,7 @@ vtBasicDirPlusUpDown(vUp).
 %localityOfObject(Above,HasSurface):- mudLocOnSurface(Above,HasSurface).
 %localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
 %localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
-%localityOfObject(Inner,Outer):- baseKB:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+%localityOfObject(Inner,Outer):- only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
 meta_argtypes(mudMaterial(tSpatialThing,vtMaterial)).
 meta_argtypes(mudTexture(tSpatialThing,vtTexture)).

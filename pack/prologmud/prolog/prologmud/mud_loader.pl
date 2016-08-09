@@ -14,9 +14,9 @@
 %
 */
 
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
-:- endif.
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 % :- module(mud_loader,[]).
+%:- endif.
 % restore entry state
 %:- lmce:reset_modules.
 
@@ -432,9 +432,6 @@ Proof end.
 
 
 
-:- user:ensure_loaded(library(logicmoo_user)).
-
-
 % :- ensure_loaded(('/root/lib/swipl/pack/prologmud/prolog/prologmud/actions/eat.pl')).
 
 
@@ -683,4 +680,4 @@ lundef :- A = [],
 tSourceCode(iSourceCode7).
 :- set_prolog_flag(pfc_booted,true).
 :- ain(isLoaded(iSourceCode7)).
-:- set_prolog_flag(assert_attvars,true).
+% :- set_prolog_flag(assert_attvars,true).

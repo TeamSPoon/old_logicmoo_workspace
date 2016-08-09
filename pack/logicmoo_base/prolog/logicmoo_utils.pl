@@ -25,7 +25,7 @@
 :- if((set_prolog_flag(logicmoo_utils_file,(exists_source(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), 
        ensure_loaded(library('logicmoo/util/logicmoo_util_clause_expansion.pl')))))).
 :- endif.
-:- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 :- module(logicmoo_utils_file,[]).
 :- endif.
 % restore entry state
@@ -104,7 +104,7 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 
 :- ensure_loaded(library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
 
-:- ensure_loaded(library(logicmoo_swilib)).
+:- user:ensure_loaded(library(logicmoo_swilib)).
 :- forall((current_module(M),M\==baseKB),assert_if_new(baseKB:mtProlog(M))).
 
 
@@ -131,6 +131,7 @@ baseKB:logicmoo_pre_release.
 /*
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000)]).
 :- set_prolog_flag(verbose_load,true).
+:- set_prolog_flag(verbose_autoload, true).
 */
 :- set_prolog_flag(debug, true).
 :- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_error,true).
@@ -173,7 +174,7 @@ baseKB:logicmoo_scan_autoloads:-false.
 
 
 :- thread_local logicmoo_utils_test_tl/0.
-:- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
+logicmoo_utils_test_msg:- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
 
 /*
 % the next are loaded idomaticaly later (if needed)
@@ -191,7 +192,7 @@ baseKB:logicmoo_scan_autoloads:-false.
 :- multifile baseKB:prologBuiltin/1.
 :- discontiguous baseKB:prologBuiltin/1.
 :- dynamic baseKB:prologBuiltin/1.
-
+:- logicmoo_utils_test_msg.
 :- set_prolog_flag(lm_expanders,true).
 % :- lmce:reset_modules.
 
