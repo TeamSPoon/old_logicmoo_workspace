@@ -241,9 +241,12 @@ baseKB:sanity_check:- doall((baseKB:mtProlog(M),
 :-multifile(logicmoo_util_database:ain/1).
 :-multifile(logicmoo_util_database:aina/1).
 :-multifile(logicmoo_util_database:ainz/1).
-:- asserta_new((logicmoo_util_database:ainz(G):- !, baseKB:call(mpred_ainz,G))).
-:- asserta_new((logicmoo_util_database:ain(G):- !, baseKB:mpred_ain(G))).
-:- asserta_new((logicmoo_util_database:aina(G):- !, baseKB:mpred_aina(G))).
+:-dynamic(logicmoo_util_database:ain/1).
+:-dynamic(logicmoo_util_database:aina/1).
+:-dynamic(logicmoo_util_database:ainz/1).
+:- asserta_new((logicmoo_util_database:ainz(G):- !, find_and_call(call_u(mpred_ainz(G))))).
+:- asserta_new((logicmoo_util_database:ain(G):- !, find_and_call(call_u(mpred_aina(G))))).
+:- asserta_new((logicmoo_util_database:aina(G):- !, find_and_call(call_u(mpred_aina(G))))).
 
 % Load boot base file
 user:lmbf:- 
@@ -291,4 +294,3 @@ system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),no
 :- ensure_loaded(library(logicmoo/pfc/'system_base.pfc')).
 
 :- set_prolog_flag(read_attvars,false).
-

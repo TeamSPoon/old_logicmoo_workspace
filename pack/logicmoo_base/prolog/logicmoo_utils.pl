@@ -102,7 +102,7 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 :- ensure_loaded(library('logicmoo/util/logicmoo_util_engines.pl')).
 :- ensure_loaded(library('logicmoo/util/logicmoo_util_help.pl')).
 
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
+:- system:ensure_loaded(library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
 
 :- user:ensure_loaded(library(logicmoo_swilib)).
 :- forall((current_module(M),M\==baseKB),assert_if_new(baseKB:mtProlog(M))).

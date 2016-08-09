@@ -73,7 +73,9 @@
 
 :- shell('./hmud/policyd').
 
-unsafe_preds_init('$syspreds',shell,1).
+unsafe_preds_init(W,shell,2):-predicate_property(shell(_,_),imported_from(W)).
+unsafe_preds_init(W,shell,1):-predicate_property(shell(_),imported_from(W)).
+unsafe_preds_init(W,shell,0):-predicate_property(shell,imported_from(W)).
 unsafe_preds_init(M,F,A):-M=files_ex,current_predicate(M:F/A),member(X,[delete,copy]),atom_contains(F,X).
 unsafe_preds_init(M,F,A):-M=process,current_predicate(M:F/A),member(X,[kill,create]),atom_contains(F,X).
 unsafe_preds_init(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
@@ -139,6 +141,9 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 :- statistics.
 
 :- set_prolog_flag(logicmoo_include,'$set_source_module'(baseKB)).
+:- set_prolog_flag(pfc_booted,true).
+:- set_prolog_flag(retry_undefined,true).
+:- set_prolog_flag(read_attvars,false).
 
 % :- must((statistics(cputime,X),X<65)).  % was 52
 
@@ -219,13 +224,14 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 % MUD SERVER CODE STARTS
 % ==============================
 
+
 :- set_prolog_flag(dialect_pfc,false).
+:- set_prolog_flag(retry_undefined,true).
+:- set_prolog_flag(logicmoo_debug,true).
+:- set_prolog_flag(unsafe_speedups,false).
 
 % :- mpred_trace_exec.
 
-
-:- set_prolog_flag(logicmoo_debug,true).
-%:- set_prolog_flag(unsafe_speedups,false).
 
 :- sanity(functorDeclares(tSourceData)).
 :- sanity(functorDeclares(mobExplorer)).
@@ -340,8 +346,6 @@ load_ckb:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)),logicmoo_i_cyc_kb:c
 
 %:- initialization(ltkb1,load_ckb).
 
-%% :- break.
-
 :- assert_setting01(lmconf:eachRule_Preconditional(true)).
 :- assert_setting01(lmconf:eachFact_Preconditional(true)).
 
@@ -351,6 +355,7 @@ tSourceData(iWorldData8).
 
 
 :- mpred_notrace_exec.
+
 
 /*
 :- ain(isa(iFooRez2,tFood)).
@@ -365,6 +370,7 @@ tSourceData(iWorldData8).
 
 :- check_clause_counts.
 
+:- make.
 :- initialization(lar,restore).
 % :- initialization(lar).
 

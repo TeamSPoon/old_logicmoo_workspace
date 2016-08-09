@@ -14,6 +14,9 @@ module  Initial IRC/Text console
 :- include(prologmud(mud_header)).
 
 
+:- multifile baseKB:agent_action_queue/3.
+:- dynamic baseKB:agent_action_queue/3.
+
 :-ain_expanded(( prologDynamic(baseKB:irc_user_plays(tAgent,ftAtom,ftAtom)))).
 :-ain_expanded(( prologOrdered(agent_action_queue(tAgent,ftTerm,ftTerm)))).
 

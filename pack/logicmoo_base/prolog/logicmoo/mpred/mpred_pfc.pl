@@ -341,8 +341,8 @@ setup_mpred_ops:-
 % Get Source Ref (Current file or User)
 %
 :- module_transparent((get_source_ref)/1).
-get_source_ref(O):- cnotrace((current_why(U),(U=(_,_)->O=U;O=(U,ax)))),!.
-get_source_ref(O):- cnotrace((get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)))),!.
+get_source_ref(O):- notrace((current_why(U),(U=(_,_)->O=U;O=(U,ax)))),!.
+get_source_ref(O):- notrace((get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)))),!.
 
 get_source_ref_stack(O):- findall(U,current_why(U),Whys),Whys\==[],!, U=(_,_),(Whys=[U]->O=U;O=(Whys,ax)),!.
 get_source_ref_stack(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
@@ -768,7 +768,8 @@ mpred_ain(PIn,S):-
 mpred_ain(PIn,S):- 
   must(add_eachRulePreconditional(PIn,P)),
   must(full_transform(ain,P,P0)),!,
-  must(ain_fast(P0,S)),!.
+  must(ain_fast(P0,S)),!,
+  ignore((P\=@=P0, mpred_db_type(P,fact(_)),show_call(mpred_fwc(P)))).
 
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
 
@@ -1966,7 +1967,7 @@ mpred_METACALL(How, Cut, (C1;C2)):-!,(mpred_METACALL(How, Cut, C1);mpred_METACAL
 % mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call(P).
 
 
-mpred_METACALL(How, Cut, M):- mpred_expansion:fixed_negations(M,O),!,mpred_METACALL(How, Cut, O).
+mpred_METACALL(How, Cut, M):- fixed_negations(M,O),!,mpred_METACALL(How, Cut, O).
 mpred_METACALL(How, Cut, U:X):-U==user,!,mpred_METACALL(How, Cut, X).
 % mpred_METACALL(How, Cut, t(A,B)):-(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).
 % mpred_METACALL(How, Cut, isa(B,A)):-(atom(A)->true;(no_repeats(tCol(A)),atom(A))),ABC=..[A,B],mpred_METACALL(How, Cut, ABC).

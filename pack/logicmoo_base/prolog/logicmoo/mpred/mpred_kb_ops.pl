@@ -734,7 +734,7 @@ attvar_op(Op,MData):-
    cnotrace((strip_module(Op,_,OpA), sanity((atom(OpA))),
    fix_mp(clause(assert,OpA),MData,M,Data),
    add_side_effect(OpA,M:Data),
-   (set_prolog_flag(assert_attvars,true)->deserialize_attvars(Data,Data0);Data=Data0))),
+   (current_prolog_flag(assert_attvars,true)->deserialize_attvars(Data,Data0);Data=Data0))),
    (==(Data,Data0)->
      physical_side_effect(call(M:OpA,M:Data0));
 

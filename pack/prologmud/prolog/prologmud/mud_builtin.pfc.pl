@@ -20,9 +20,10 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+:- multifile baseKB:agent_action_queue/3.
+:- dynamic baseKB:agent_action_queue/3.
 
 /*
-:- dynamic lmcache:wants_logout/1.
 :- dynamic   lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 :- dynamic lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 

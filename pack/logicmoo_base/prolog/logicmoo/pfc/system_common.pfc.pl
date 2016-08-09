@@ -809,6 +809,7 @@ meta_argtypes(predicateConventionMt(tPred,tMicrotheory)).
 prologHybrid(predicateConventionMt, 2).
 prologMultiValued(predicateConventionMt(tRelation,ftAtom)).
 
+prologHybrid(Compound)/get_arity(Compound,F,A)==>{kb_dynamic(F/A)}.
 
 % pddlObjects(Type,EList)==>  isa(isEach(EList),Type).
 % pddlSorts(Type,EList)==> genls(isEach(EList),Type).

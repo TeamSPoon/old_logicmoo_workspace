@@ -14,6 +14,7 @@
 
 % :- register_module_type (mtCommand).
 :- multifile lmcache:wants_logout/1.
+:- dynamic lmcache:wants_logout/1.
 
 % rename
 action_info(actRename(ftString),"Rename your player").

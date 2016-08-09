@@ -598,6 +598,10 @@ uses_predicate(_CallerMt,baseKB,predicateConventionMt,2,retry):-
   create_predicate_istAbove(baseKB,predicateConventionMt,2).
   
 
+uses_predicate(BaseKB,System, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),
+   loop_check_term(must(uses_predicate(System,BaseKB,F,A,R)),
+                   term(uses_predicate(System,BaseKB,F,A,R)),fail),!.
+
 uses_predicate(_CallerMt, baseKB, F, A,retry):-
   create_predicate_istAbove(baseKB,F,A),
    nop(system:import(baseKB:F/A)),!.
@@ -712,6 +716,9 @@ retry_undefined(CallerMt,F,A):-
        -> add_import_module(CallerMt,PredMt,start) ;
        (PredMt:ensure_loaded(PredMt:File),add_import_module(CallerMt,PredMt,start))),!.
 */
+
+retry_undefined(CallerMt,F,A):-functor(P,F,A),find_module(P,M),show_call(CallerMt:import(F/A)),!.
+
 
 %retry_undefined(PredMt:must/1) % UNDO % :- add_import_module(PredMt,logicmoo_util_catch,start),!.
 %retry_undefined(PredMt:debugm/2) % UNDO % :- add_import_module(PredMt,logicmoo_util_dmsg,start),!.

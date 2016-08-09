@@ -23,7 +23,8 @@
             simple_var/1,
             append_term/3,
           find_module/2,
-          module_of/2,
+          module_of/3,
+          callable_module/2,
             expand_to_hb/3,
             assert_if_new/1,
             asserta_if_new/1,
@@ -89,7 +90,8 @@
         debugCallWhy(?, 0),
         eraseall(+, +),
         find_and_call(+, +, ?),
-        module_of(+, ?),
+        module_of(+,+,?),
+        callable_module(:,-),
         find_module(+, ?),
         mpred_mop(+, 1, ?),
         mpred_op_prolog(?, :),
@@ -99,7 +101,8 @@
 
 :- module_transparent
          find_module/2,
-         module_of/2,
+         module_of/3,
+         callable_module/2,
             
         append_term/3,
         modulize_head/2,
@@ -308,13 +311,15 @@ find_and_call(_:G):-current_predicate(_,R:G),!,find_and_call(R:G).
 find_and_call(G):-current_predicate(_,G),!,loop_check(on_x_rtrace(G)).
 find_and_call(G):-current_predicate(_,R:G),!,find_and_call(R:G).
 
-module_of(G,M):-predicate_property(G,imported_from(M)),!.
-module_of(G,M):-predicate_property(G,defined), \+ predicate_property(G,imported_from(M)).
+module_of(O,G,M):-predicate_property(O:G,imported_from(M)),!.
+module_of(M,G,M):-predicate_property(M:G,defined), \+ predicate_property(M:G,imported_from(_)).
 
-find_module(G,M):-module_of(G,M),!.
-find_module(_:G,R):-!,module_of(G,R),!.
-find_module(G,M):-current_module_ordered(C),module_of(C:G,M),!.
+find_module(G,R):- strip_module(G,M,P),module_of(M,P,R),!.
+find_module(G,M):- current_module_ordered(C),module_of(C,G,M),!.
 
+callable_module(G,R):- strip_module(G,R,P),predicate_property(R:P,defined),!.
+callable_module(G,R):- strip_module(G,_,P),current_module_ordered(R),predicate_property(R:P,defined),!.
+callable_module(G,R):- strip_module(G,M,P),module_of(M,P,R).
 
 %% somehow_callable( :TermG) is semidet.
 %

@@ -93,29 +93,6 @@
 :- has_gui_debug -> true ; remove_pred(pce_principal,new,2).
 
 
-unsafe_preds(M,F,A):-M=files_ex,current_predicate(M:F/A),member(X,[delete,copy]),atom_contains(F,X).
-unsafe_preds(M,F,A):-M=process,current_predicate(M:F/A),member(X,[kill,create]),atom_contains(F,X).
-unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
-
-:- set_prolog_flag(access_level,system).
-
-:-forall(unsafe_preds(M,F,A),bugger:remove_pred(M,F,A)).
-
-% [Optionaly] Solve the Halting problem
-:-unlock_predicate(system:halt/0).
-:-redefine_system_predicate(system:halt/0).
-:-abolish(system:halt,0).
-:-asserta((system:halt :- format('the halting problem is now solved!'))).
-:-lock_predicate(system:halt/0).
-
-:-redefine_system_predicate(system:halt/1).
-:-abolish(system:halt,1).
-:-asserta((system:halt(_) :- format('the halting problem is now solved!'))).
-:-lock_predicate(system:halt/1).
-
-:- dmsg("the halting problem is now solved!").
-:- set_prolog_flag(access_level,user).
-
 :- asserta(t_l:disable_px).
 
 :- export(add_game_dir/2).
@@ -229,6 +206,7 @@ hard_work:-
 
 % [Required] load the mud PFCs
 :- set_prolog_flag(pfc_booted,false).
+
 :- show_entry(gripe_time(40,force_reload_mpred_file(prologmud('mud_builtin.pfc')))).
 
 slow_work:- wno_tl( set_prolog_flag(lm_expanders,false) , within_user(at_start(hard_work))).
@@ -257,6 +235,7 @@ run_setup:- within_user(at_start(run_setup_now)).
 %:- at_start(start_servers).
 % commented out except on run
 
+
 debug_repl_w_cyc(Module,CallFirst):- !,         
           wno_tl(t_l:useOnlyExternalDBs,
             w_tl(baseKB:use_cyc_database,
@@ -265,7 +244,6 @@ debug_repl_w_cyc(Module,CallFirst):- !,
                 module(Module),
                 show_call(CallFirst), 
                 prolog_repl)))).
-
 debug_repl_wo_cyc(Module,CallFirst):- !,         
           w_tl(t_l:useOnlyExternalDBs,
             wno_tl(baseKB:use_cyc_database,

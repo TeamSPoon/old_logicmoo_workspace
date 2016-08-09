@@ -1249,9 +1249,8 @@ file_begin(WIn):-
    set_file_lang(W),   
    find_and_call(fileAssertMt(Mt)),
    set_fileAssertMt(Mt),
-   wdmsg(fileAssertMt(Mt)),
+   wdmsg(set_fileAssertMt(Mt->W)),
    op_lang(W),
-   set_prolog_flag(retry_undefined,true),
    enable_mpred_expansion)),!,
    must(get_lang(W)).
 
@@ -1710,7 +1709,7 @@ make_dynamic((H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(H)).
 make_dynamic(M:(H:-_)):- sanity(nonvar(H)),!,must(make_dynamic(M:H)).
 make_dynamic(C):- loop_check(make_dynamic_ilc(C),true).
 
-make_dynamic_ilc(C):- trace_or_throw(make_dynamic_ilc(C)),
+make_dynamic_ilc(C):- % trace_or_throw(make_dynamic_ilc(C)),
    compound(C),strip_module(C,MIn,_),get_functor(C,F,A),quietly_must(F\=='$VAR'),
   (\+ a(mtCycL,MIn) -> must(defaultAssertMt(M)) ; MIn =M),
   functor(P,F,A),

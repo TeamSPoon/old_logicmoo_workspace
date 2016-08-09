@@ -77,4 +77,4 @@
 
 :- set_prolog_flag(pfc_booted,true).
 :- set_prolog_flag(retry_undefined,true).
-
+:- set_prolog_flag(read_attvars,false).

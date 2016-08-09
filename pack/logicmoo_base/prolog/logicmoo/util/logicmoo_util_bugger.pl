@@ -1428,7 +1428,7 @@ set_gui_debug(true):- dmsg("Warning: no GUI").
 % Set Yes Debug.
 %
 set_yes_debug:- 
-  must_det_l([
+  must_det_l((
    set_prolog_flag(generate_debug_info, true),
    set_prolog_flag(report_error,true),   
    set_prolog_flag(debug_on_error,true),
@@ -1438,7 +1438,7 @@ set_yes_debug:-
    thread_leash(+all),
    thread_leash(+exception),
    visible(+cut_call),
-   cnotrace, debug]),!.
+   cnotrace, debug)),!.
 
 
 %= 	 	 

@@ -17,12 +17,13 @@
           [
           decl_shared/1,
           decl_shared/2,
-          system_goal_expansion_safe_wrap/2,
+          virtualize_source/3,
+          virtualize_code/3,
+          virtualize_code_fa/5,
           ereq/1,
           dbreq/1,
           swc/0,
           clause_b/1,
-          really_safe_wrap/3,
           warn_if_static/2]).
 
 
@@ -53,7 +54,7 @@
               system:sub_call_expansion/4)).
 
 :- module_transparent((decl_shared/1,
-          system_goal_expansion_safe_wrap/2,
+          virtualize_code/2,
           ereq/1,
           dbreq/1,
           warn_if_static/2)).
@@ -61,7 +62,7 @@
 :- meta_predicate decl_shared(1,+).
 :- meta_predicate decl_shared(+).
 
-:- dynamic(baseKB:wrap_shared/3).
+:- dynamic(baseKB:safe_wrap/3).
 
 
 
@@ -86,113 +87,173 @@ ereq(C):- find_and_call(C).
 dbreq(C):- ereq(C).
 
 
-never_wrap(apply,_).
-never_wrap(call,_).
-never_wrap(ereq,_).
-
-%% baseKB:wrap_shared( ?VALUE1, :Wrapper, ?VALUE3) is semidet.
+%% baseKB:safe_wrap( ?VALUE1, :Wrapper, ?VALUE3) is semidet.
 %
-% Wrap Shared.
+% Virtualizer Shared Code.
 %
 
-% baseKB:wrap_shared(_,_,_):-!,fail.
-baseKB:wrap_shared(F,A,ereq):- never_wrap(F,A),!,fail.
-baseKB:wrap_shared(assert,1,dbreq):- is_user_module.
-baseKB:wrap_shared(assert,2,dbreq):- is_user_module.
-baseKB:wrap_shared(asserta,1,dbreq):- is_user_module.
-baseKB:wrap_shared(asserta,2,dbreq):- is_user_module.
-baseKB:wrap_shared(assertz,1,dbreq):- is_user_module.
-baseKB:wrap_shared(assertz,2,dbreq):- is_user_module.
-baseKB:wrap_shared(clause,2,dbreq):- is_user_module.
-baseKB:wrap_shared(clause,3,dbreq):- is_user_module.
-baseKB:wrap_shared(retract,1,dbreq):- is_user_module.
-baseKB:wrap_shared(retractall,1,dbreq):- is_user_module.
+get_virtualizer_mode(ge,F,A,HowIn):- baseKB:safe_wrap(F,A,HowOut),!,must(HowIn=HowOut).
+
+% baseKB:safe_wrap(_,_,_):-!,fail.
+baseKB:safe_wrap(O,_,_):- bad_functor_check(O),!,fail.
+baseKB:safe_wrap(F,A,T):- virtualize_safety(F,A0),A==A0,arg(_,v(on_x_rtrace,on_x_debug),T),current_predicate(T/1).
+baseKB:safe_wrap(F,_,ereq):- never_virtualize(F),!,fail.
+baseKB:safe_wrap(F,A,dbreq):- is_user_module, virtualize_dbreq(F,A).
+baseKB:safe_wrap(F,A,ereq):- virtualize_ereq(F,A).
+baseKB:safe_wrap(COL,_,ereq):- clause_b(col_as_isa(COL)).
+%baseKB:safe_wrap(F,A,on_x_log_throw):- virtualize_safety(F,A0),A==A0.
+baseKB:safe_wrap(F,_,_):- clause_b(prologBuiltin(F)),!,fail.
+baseKB:safe_wrap(F,A,call_u):- find_and_call(hybrid_support(F,A)).
+baseKB:safe_wrap(COL,_,ereq):- clause_b(col_as_unary(COL)).
+
+baseKB:safe_wrap(F,A,ereq):- atom(F),integer(A),
+   functor(Goal,F,A),
+   % member(M,[baseKB,lmcache,lmconf]),
+   baseKB = M,
+   predicate_property(M:Goal,defined),
+   \+ predicate_property(M:Goal,static),
+   \+ predicate_property(M:Goal,imported_from(_)),!.
+
+% Preds that we''d like to know a little more than "instanciation exception"s
 
 
-baseKB:wrap_shared(isa,2,ereq).
-baseKB:wrap_shared(t,_,ereq).
-baseKB:wrap_shared(mtCore,1,ereq).
-baseKB:wrap_shared(mtProlog,1,ereq).
-baseKB:wrap_shared(tAgent,1,ereq).
-baseKB:wrap_shared(mtCycL,1,ereq).
-baseKB:wrap_shared(mtExact,1,ereq).
-baseKB:wrap_shared(mtGlobal,1,ereq).
-baseKB:wrap_shared(nameStrings,1,ereq).
+bad_functor_check(O):-var(O).
+bad_functor_check(:):- !,dumpST,dtrace.
+%bad_functor_check(/):- !,dumpST,dtrace.
+%bad_functor_check(//):- !,dumpST,dtrace.
 
 
-%baseKB:wrap_shared(lmcache:loaded_external_kbs,1,ereq).
-baseKB:wrap_shared(argQuotedIsa,3,ereq).
+virtualize_safety(O):- bad_functor_check(O),!,fail.
+virtualize_safety((=..),2).
+virtualize_safety(functor,3).
+virtualize_safety(arg,3).
+virtualize_safety(is,2).
 
-baseKB:wrap_shared(arity,2,ereq).
-baseKB:wrap_shared(functorDeclares,1,ereq).
+% Preds that we assume indicate we''d already passed over it
 
-baseKB:wrap_shared(call_OnEachLoad,1,ereq).
-baseKB:wrap_shared(completeExtentEnumerable,1,ereq).
-baseKB:wrap_shared(completelyAssertedCollection,1,ereq).
-baseKB:wrap_shared(constrain_args_pttp,2,ereq).
-baseKB:wrap_shared(cycPlus2,2,ereq).
-baseKB:wrap_shared(cycPred,2,ereq).
-baseKB:wrap_shared(decided_not_was_isa,2,ereq).
-baseKB:wrap_shared(genls,2,ereq).
-baseKB:wrap_shared(isa,2,ereq).
-baseKB:wrap_shared(lambda,5,ereq).
 
-baseKB:wrap_shared(meta_argtypes,1,ereq).
-baseKB:wrap_shared(mpred_f,4,ereq).
-baseKB:wrap_shared(mpred_f,5,ereq).
-baseKB:wrap_shared(mpred_f,6,ereq).
-baseKB:wrap_shared(mpred_f,7,ereq).
-baseKB:wrap_shared(props,2,ereq).
+never_virtualize(O):- bad_functor_check(O),!,fail.
+never_virtualize(ereq).
+never_virtualize(call_u).
+never_virtualize(clause_u).
+never_virtualize(lookup_u).
+never_virtualize(dbreq).
+never_virtualize(clause_b).
+never_virtualize(('.')).
+never_virtualize(('[]')).
+never_virtualize(('[|]')).
+never_virtualize((/)).
+never_virtualize((//)).
+never_virtualize(add).
+never_virtualize(del).
+never_virtualize(clr).
+never_virtualize(ain).
+never_virtualize(aina).
+never_virtualize(decl_shared).
 
-baseKB:wrap_shared(mpred_mark,3,ereq).
-baseKB:wrap_shared(mudKeyword,2,ereq).
-baseKB:wrap_shared(pfcControlled,1,ereq).
-baseKB:wrap_shared(pfcRHS,1,ereq).
+never_virtualize(ainz).
+never_virtualize(apply).
+never_virtualize(call).
+never_virtualize(F):- ereq(mpred_mark(pfcBuiltin,F,_)).
 
-baseKB:wrap_shared(predicateConventionMt,2,ereq).
-baseKB:wrap_shared(prologBuiltin,1,ereq).
-baseKB:wrap_shared(prologDynamic,1,ereq).
-baseKB:wrap_shared(prologHybrid,1,ereq).
-baseKB:wrap_shared(prologKIF,1,ereq).
-baseKB:wrap_shared(prologMacroHead,1,ereq).
-baseKB:wrap_shared(prologPTTP,1,ereq).
-baseKB:wrap_shared(prologSideEffects,1,ereq).
+% operations to transactionalize
+virtualize_dbreq(O,_):- bad_functor_check(O),!,fail.
+virtualize_dbreq(assert,1).
+virtualize_dbreq(assert,2).
+virtualize_dbreq(asserta,1).
+virtualize_dbreq(asserta,2).
+virtualize_dbreq(assertz,1).
+virtualize_dbreq(assertz,2).
+virtualize_dbreq(clause,2).
+virtualize_dbreq(clause,3).
+virtualize_dbreq(retract,1).
+virtualize_dbreq(retractall,1).
 
-baseKB:wrap_shared(resultIsa,2,ereq).
-baseKB:wrap_shared(singleValuedInArg,2,ereq).
-baseKB:wrap_shared(spft,3,ereq).
-baseKB:wrap_shared(support_hilog,2,ereq).
-baseKB:wrap_shared(t,3,ereq).
-baseKB:wrap_shared(tCol,1,ereq).
-baseKB:wrap_shared(tNotForUnboundPredicates,1,ereq).
-baseKB:wrap_shared(tPred,1,ereq).
-baseKB:wrap_shared(tRelation,1,ereq).
-baseKB:wrap_shared(tCol,1,ereq).
+virtualize_dbreq(recorda,_).
+virtualize_dbreq(recordz,_).
+virtualize_dbreq(recorded,_).
+virtualize_dbreq(erase,1).
 
-baseKB:wrap_shared(ttExpressionType,1,ereq).
-baseKB:wrap_shared(ttPredType,1,ereq).
-baseKB:wrap_shared(ttTemporalType,1,ereq).
 
-baseKB:wrap_shared(COL,1,ereq):- clause_b(col_as_isa(COL)).
-baseKB:wrap_shared(COL,1,ereq):- clause_b(col_as_unary(COL)).
 
-baseKB:wrap_shared(use_ideep_swi,0,ereq).
-baseKB:wrap_shared(==>,_,ereq).
-baseKB:wrap_shared(<==>,_,ereq).
-baseKB:wrap_shared((<--),2,ereq).
-baseKB:wrap_shared(agent_text_command,_,ereq).
-baseKB:wrap_shared(agent_command,_,ereq).
-baseKB:wrap_shared(coerce_hook,_,ereq).
 
-baseKB:wrap_shared(F,_,_):- /*clause_b(arity(F,A)),*/ clause_b(prologBuiltin(F)),!,fail.
+virtualize_ereq(O,_):- bad_functor_check(O),!,fail.
 
-baseKB:wrap_shared(F,A,ereq):- atom(F),integer(A),
-   functor(P,F,A),
-   % member(MVis,[baseKB,lmcache,lmconfig]),
-   baseKB = MVis,
-   predicate_property(MVis:P,defined),
-   \+ predicate_property(MVis:P,static),
-   \+ predicate_property(MVis:P,imported_from(_)),!.
+%virtualize_ereq(lmcache:loaded_external_kbs,1).
+
+
+virtualize_ereq(isa,2).
+virtualize_ereq(genls,2).
+virtualize_ereq(t,_).
+virtualize_ereq(t,3).
+
+virtualize_ereq(functorDeclares,1).
+
+virtualize_ereq(mtCore,1).
+virtualize_ereq(mtProlog,1).
+virtualize_ereq(mtCycL,1).
+virtualize_ereq(mtExact,1).
+virtualize_ereq(mtGlobal,1).
+virtualize_ereq(nameStrings,1).
+
+
+virtualize_ereq(arity,2).
+virtualize_ereq(argIsa,3).
+virtualize_ereq(argQuotedIsa,3).
+
+
+
+virtualize_ereq(call_OnEachLoad,1).
+virtualize_ereq(completeExtentEnumerable,1).
+virtualize_ereq(completelyAssertedCollection,1).
+virtualize_ereq(constrain_args_pttp,2).
+virtualize_ereq(cycPlus2,2).
+virtualize_ereq(cycPred,2).
+virtualize_ereq(decided_not_was_isa,2).
+virtualize_ereq(lambda,5).
+
+virtualize_ereq(meta_argtypes,1).
+virtualize_ereq(mpred_f,4).
+virtualize_ereq(mpred_f,5).
+virtualize_ereq(mpred_f,6).
+virtualize_ereq(mpred_f,7).
+virtualize_ereq(props,2).
+
+virtualize_ereq(mpred_mark,3).
+virtualize_ereq(mudKeyword,2).
+
+virtualize_ereq(pfcControlled,1).
+virtualize_ereq(pfcRHS,1).
+virtualize_ereq(predicateConventionMt,2).
+virtualize_ereq(prologBuiltin,1).
+virtualize_ereq(prologDynamic,1).
+virtualize_ereq(prologHybrid,1).
+virtualize_ereq(prologKIF,1).
+virtualize_ereq(prologMacroHead,1).
+virtualize_ereq(prologPTTP,1).
+virtualize_ereq(prologSideEffects,1).
+
+virtualize_ereq(resultIsa,2).
+virtualize_ereq(singleValuedInArg,2).
+virtualize_ereq(spft,3).
+virtualize_ereq(support_hilog,2).
+virtualize_ereq(tCol,1).
+virtualize_ereq(tNotForUnboundPredicates,1).
+virtualize_ereq(tPred,1).
+virtualize_ereq(tRelation,1).
+virtualize_ereq(tAgent,1).
+virtualize_ereq(tCol,1).
+
+virtualize_ereq(ttExpressionType,1).
+virtualize_ereq(ttPredType,1).
+virtualize_ereq(ttTemporalType,1).
+virtualize_ereq(use_ideep_swi,0).
+virtualize_ereq(==>,_).
+virtualize_ereq(<==>,_).
+virtualize_ereq((<--),2).
+virtualize_ereq(agent_text_command,_).
+virtualize_ereq(agent_command,_).
+virtualize_ereq(coerce_hook,_).
 
 :- dynamic(baseKB:t/2).
 
@@ -200,97 +261,145 @@ baseKB:wrap_shared(F,A,ereq):- atom(F),integer(A),
 %
 % Clause User Microtheory.
 %
-%clause_b(M:G):-  !,clause(M:G,true).
-%clause_b(G):-  !,clause(baseKB:G,true).
+%clause_b(M:Goal):-  !,clause(M:Goal,true).
+%clause_b(Goal):-  !,clause(baseKB:Goal,true).
 
 % lookup_u/cheaply_u/call_u/clause_b
-clause_b(G):-  baseKB:call(call,G).
-% clause_b(G):-  baseKB:clause(G,B),baseKB:call(B).
+clause_b(Goal):-  baseKB:call(call,Goal).
+% clause_b(Goal):-  baseKB:clause(Goal,B),baseKB:call(B).
 
-%clause_b(G):-  baseKB:clause(G,B)*->call(B);clause_b0(G).
-%clause_b(G):-  baseKB:clause(G,true)*->true;clause_b0(G).
+%clause_b(Goal):-  baseKB:clause(Goal,B)*->call(B);clause_b0(Goal).
+%clause_b(Goal):-  baseKB:clause(Goal,true)*->true;clause_b0(Goal).
 
-clause_b0(G):- if_defined(to_was_isa(clause_b,G,P0),fail),!,
-           G\=P0,baseKB:clause(P0,true).
+% clause_b0(Goal):- if_defined(to_was_isa(clause_b,Goal,P0),fail),!,Goal\=P0,baseKB:clause(P0,true).
 
 %clause_b(M:C):-!,clause(M:C,true).
 %clause_b(C):- call_u(clause(C,true)).
 %clause_b(C):-!,clause(_:C,true).
-%clause_b(G):-  G=..[C,I],!,baseKB:t(C,I).
-%clause_b(G):-  current_predicate(_,baseKB:G),!,loop_check(baseKB:G).
-% clause_b(G):- clause(baseKB:G,Body),(Body==true->true;call_u(Body)).
+%clause_b(Goal):-  Goal=..[C,PART],!,baseKB:t(C,PART).
+%clause_b(Goal):-  current_predicate(_,baseKB:Goal),!,loop_check(baseKB:Goal).
+% clause_b(Goal):- clause(baseKB:Goal,Body),(Body==true->true;call_u(Body)).
 
 
-%% system_goal_expansion_safe_wrap( :TermT, :TermARG2) is semidet.
+%% virtualize_code(X, :TermT, :TermARG2) is semidet.
 %
-% System Goal Expansion Sd.
+% System Goal Expansion Sd.f$
 %
 
-%system_goal_expansion_safe_wrap(Goal,_):- functor(Goal,F,_),arg(_,v(call_u,call,(/),(',')),F),!,fail.
-%system_goal_expansion_safe_wrap(MT:Goal,(call_u(genlMt(abox,GMt)),with_umt(GMt,Goal))):- MT==tbox.
+%virtualize_code(X,Goal,_):- functor(Goal,F,_),arg(_,v(call_u,call,(/),(',')),F),!,fail.
+%virtualize_code(X,M:Goal,(call_u(genlMt(abox,GMt)),with_umt(GMt,Goal))):- M==tbox.
+
+virtualize_args_as(Goal,Args):- sanity((arg(1,Goal,Var),var(Var))), predicate_property(Goal,meta_predicate(Args)).
+virtualize_args_as(Goal,_):-predicate_property(Goal,built_in),!,fail.
+virtualize_args_as(Goal,Goal):-predicate_property(Goal,transparent),!.
+virtualize_args_as(Which,Args):- descend_ge(Which),Args=Which.
+
+descend_ge(':-'((-),0)).
+descend_ge(( :- 0)).
+descend_ge('{}'(0)).
+descend_ge('==>'(-,-)).
+descend_ge('==>'(-)).
+descend_ge('<--'(-,-)).
+descend_ge(z(if)).
+descend_ge(z(_)):-!,fail.
+descend_ge(Which):-functor(Which,F,_),!,descend_ge(z(F)),!.
 
 
+cannot_decend_expansion(_,In):- \+ compound(In),!.
+cannot_decend_expansion(X,_:In):-!,cannot_decend_expansion(X,In).
+cannot_decend_expansion(ge,In):- functor(In,F,_),never_virtualize(F).
 
-system_goal_expansion_safe_wrap(T,_):- \+ callable(T),!,fail.
-system_goal_expansion_safe_wrap(MT:Goal,call_u(Goal)):- MT==abox,!.
-system_goal_expansion_safe_wrap(M:T,O):- callable(T),!,functor(T,F,A),baseKB:wrap_shared(F,A,How),!,safe_wrap(M:T,How,O).
-system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),baseKB:wrap_shared(F,A,How),!,safe_wrap(T,How,I).
 
-could_safe_wrap:- prolog_load_context(module,M),\+ clause_b(mtCycL(M)),
+virtualize_code(X,In,_):- cannot_decend_expansion(X,In),!,fail.
+virtualize_code(ge,M:In,ereq(In)):- M==abox,!.
+virtualize_code(ge,M:In,M:In):- atom(M),callable(In),(predicate_property(M:In,volatile);predicate_property(M:In,thread_local)),!.
+virtualize_code(ge,(SWC,ALL),ereq((SWC,ALL))):- SWC==swc,!.
+virtualize_code(X,(G1,G2),(O1,O2)):-!,virtualize_code(X,G1,O1),!,virtualize_code(X,G2,O2),!.
+virtualize_code(X,M:In,Out):- functor(In,F,A),virtualize_code_fa(X,M:In,F,A,Out).
+virtualize_code(X,M:In,M:Out):-!, virtualize_code(X,In,Out).
+virtualize_code(X,In,PART):- functor(In,F,A),virtualize_code_fa(X,In,F,A,PART).
+
+virtualize_code_fa(X,In,F,A,PART):- get_virtualizer_mode(X,F,A,How),!,safe_virtualize(In,How,PART).
+virtualize_code_fa(X,M:In,F,A,M:PART):-!,virtualize_code_fa(X,In,F,A,PART).
+virtualize_code_fa(X,In,F,A,PART):- X==ge, functor(ArgModes,F,A),
+  Args=ArgModes,
+  virtualize_args_as(Args,ArgModes),!, 
+  map_compound_args(virtualize_code_each(X),ArgModes,In,PART),!.
+
+% virtualize_code(X,In,Out):- compound(In), virtualize_special_outside(X,In),!,Out=ereq(In).
+
+virtualize_special_outside(X,In):- functor(In,F,A),get_virtualizer_mode(X,F,A,_How),!.
+virtualize_special_outside(X,In):- arg(_,In,Arg), \+cannot_decend_expansion(X,Arg),virtualize_special_outside(X,In).
+
+virtualize_code_each(X,Arg,In,Out):- var(Arg),!,virtualize_code_each(X,(+),In,Out).
+virtualize_code_each(X,Arg,In,Out):- (integer(Arg); Arg == + ) -> virtualize_code(X,In,Out),!.
+virtualize_code_each(X,-,In,Out):- if_defined(fully_expand_head(X,In,Out)),!.
+virtualize_code_each(_,_,In,Out):- must(Out=In).
+
+map_compound_args(Pred,Args,In,Out):- must(( compound(Args), compound(In), Args=..[_|ArgsL],In=..[F|InL],maplist(Pred,ArgsL,InL,OutL),Out=..[F|OutL])).
+
+could_safe_virtualize:- prolog_load_context(module,M),\+ clause_b(mtCycL(M)),
      \+ ((current_prolog_flag(dialect_pfc,true); 
        (source_location(F,_W),( atom_concat(_,'.pfc.pl',F);atom_concat(_,'.plmoo',F);atom_concat(_,'.pfc',F))))).
 
+virtualize_source(X,In,Out):-  current_prolog_flag(unsafe_speedups,true),!, 
+   (virtualize_code(X,In,Out)->In\=@=Out,dmsg(virtualize_source(X,(In))-->Out)).
 
-really_safe_wrap(Type,I,O):- callable(I), 
-   system_goal_expansion_safe_wrap(I,O)->I\=@=O,(dmsg(really_safe_wrap(Type,I,O))),must(acyclic_term(O:I)).
+virtualize_source(X,In,Out):- callable(In),
+ term_variables(In,List),
+  (List==[] -> (virtualize_code(X,In,Out)->In\=@=Out,dmsg(virtualize_source(X,(In))-->Out));
+ setup_call_cleanup(maplist(lock_vars,List),
+   (virtualize_code(X,In,Out)->In\=@=Out,dmsg(virtualize_source(X,In)-->Out)),
+   maplist(unlock_vars,List))).
 
 
-%% safe_wrap( Term, +How, -Wrapped) is semidet.
+%% safe_virtualize( Term, +How, -Wrapped) is semidet.
 %
 % Safely Paying Attention To Corner Cases Wrap.
 %
 
-safe_wrap(A,B,C):-safe_wrap0(A,B,C).
-safe_wrap0(M:I,M:How,call(How,M:I)):-!.
-safe_wrap0(M:I,How,call(How,M:I)):-!.
-safe_wrap0(I,M:How,call(How,M:I)):-!.
-safe_wrap0(I,How,call(How,I)):-!.
+safe_virtualize(Goal,How,Out):- must(safe_virtualize_0(Goal,How,Out)).
+
+safe_virtualize_0(M:Goal,M:How,call(How,M:Goal)).
+safe_virtualize_0(M:Goal,How,call(How,M:Goal)).
+safe_virtualize_0(Goal,M:How,call(How,M:Goal)).
+safe_virtualize_0(Goal,How,call(How,Goal)).
 
 warn_if_static(F,A):- 
  ignore((F\={},
-  functor(P,F,A),
+  functor(Goal,F,A),
   is_static_predicate(F/A),
-  listing(P),
-  trace_or_throw(warn(pfcPosTrigger,P,static)))).
+  listing(Goal),
+  trace_or_throw(warn(pfcPosTrigger,Goal,static)))).
 
 
-decl_shared(Var):- decl_shared(nop,Var),!.
+decl_shared(Expr):- decl_shared(nop,Expr),!.
 
-%% decl_shared_plus(Plus, :TermM) is semidet.
+%% decl_shared_plus(Cl, TermM) is semidet.
 %
 % Declare Shared.
 %
-decl_shared(Plus,Var):-var(Var),!,trace_or_throw(var_decl_shared(Plus,Var)).
-decl_shared(Plus,baseKB:FA):-!,decl_shared(Plus,FA),!.
-decl_shared(Plus,abox:FA):-!,decl_shared(Plus,FA),!.
+decl_shared(Cl,Var):-var(Var),!,trace_or_throw(var_decl_shared(Cl,Var)).
+decl_shared(Cl,baseKB:FA):-!,decl_shared(Cl,FA),!.
+decl_shared(Cl,abox:FA):-!,decl_shared(Cl,FA),!.
 
-decl_shared(Plus,(A,B)):-!,decl_shared(Plus,A),!,decl_shared(Plus,B),!.
-decl_shared(Plus,[A]):-!,decl_shared(Plus,A),!.
-decl_shared(Plus,[A|B]):-!,decl_shared(Plus,A),!,decl_shared(Plus,B),!.
-decl_shared(Plus,M:(A,B)):-!,decl_shared(Plus,M:A),!,decl_shared(Plus,M:B),!.
-decl_shared(Plus,M:[A]):-!,decl_shared(Plus,M:A),!.
-decl_shared(Plus,M:[A|B]):-!,decl_shared(Plus,M:A),!,decl_shared(Plus,M:B),!.
-decl_shared(Plus,_:M:A):-!,decl_shared(Plus,M:A),!.
-decl_shared(Plus,F):-atom(F),!,decl_shared(Plus,F/_).
-decl_shared(Plus,M:F):-atom(F),!,decl_shared(Plus,M:F/_).
+decl_shared(Cl,(G1,G2)):-!,decl_shared(Cl,G1),!,decl_shared(Cl,G2),!.
+decl_shared(Cl,[G1]):-!,decl_shared(Cl,G1),!.
+decl_shared(Cl,[G1|G2]):-!,decl_shared(Cl,G1),!,decl_shared(Cl,G2),!.
+decl_shared(Cl,M:(G1,G2)):-!,decl_shared(Cl,M:G1),!,decl_shared(Cl,M:G2),!.
+decl_shared(Cl,M:[G1]):-!,decl_shared(Cl,M:G1),!.
+decl_shared(Cl,M:[G1|G2]):-!,decl_shared(Cl,M:G1),!,decl_shared(Cl,M:G2),!.
+decl_shared(Cl,_:M:G1):-!,decl_shared(Cl,M:G1),!.
+decl_shared(Cl,F):-atom(F),!,decl_shared(Cl,F/_).
+decl_shared(Cl,M:F):-atom(F),!,decl_shared(Cl,M:F/_).
 
-decl_shared(Plus,M:F/A):- M==baseKB,!,decl_shared(Plus,F/A).
+decl_shared(Cl,M:F/G1):- M==baseKB,!,decl_shared(Cl,F/G1).
 
-decl_shared(Plus,M:F/A):- check_never_decl_shared(Plus,M,F,A),fail.
-decl_shared(Plus,F/A):- check_never_decl_shared(Plus,baseKB,F,A),fail.
+decl_shared(Cl,M:F/G1):- check_never_decl_shared(Cl,M,F,G1),fail.
+decl_shared(Cl,F/G1):- check_never_decl_shared(Cl,baseKB,F,G1),fail.
 
-decl_shared(Plus,M:F/A):-must(atom(F)),!,
- asserta_if_new(baseKB:wrap_shared(F,A,M:ereq)),
+decl_shared(Cl,M:F/A):-must(atom(F)),!,
+ asserta_if_new(baseKB:safe_wrap(F,A,M:ereq)),
  ignore((integer(A),
    baseKB:multifile(M:F/A),
    baseKB:dynamic(M:F/A),
@@ -298,17 +407,17 @@ decl_shared(Plus,M:F/A):-must(atom(F)),!,
    baseKB:public(M:F/A),
    % on_f_throw( (M:F/A)\== (lmcache:loaded_external_kbs/1)),
    once((M==baseKB->true;ain(baseKB:predicateConventionMt(F,M)))),
-   functor(P,F,A),
+   functor(Goal,F,A),
       %once(on_f_throw( (M:F/A)\== (lmcache:loaded_external_kbs/1))),
       %once(on_f_throw( (M:F/A)\== (mpred_online:semweb_startup/0))),
       %once(on_f_throw( (M:F/A)\== (baseKB:irc_user_plays/3))),
-   call(Plus,M:P),
+   call(Cl,M:Goal),
    % (find_and_call(mtCycL(M))->ain(baseKB:prologHybrid(F));true),
    ain(baseKB:arity(F,A)) )).
 
 
-decl_shared(Plus,F/A):-atom(F),!,
- asserta_if_new(baseKB:wrap_shared(F,A,ereq)),
+decl_shared(Cl,F/A):-atom(F),!,
+ asserta_if_new(baseKB:safe_wrap(F,A,ereq)),
  ignore((integer(A),
    baseKB:multifile(F/A),
    baseKB:dynamic(F/A),
@@ -319,21 +428,21 @@ decl_shared(Plus,F/A):-atom(F),!,
      % once(on_f_throw( (F/A)\== (irc_user_plays/3))),
    
    ain(baseKB:arity(F,A)),
-   functor(P,F,A),
-   call(Plus,P))),!.
+   functor(Goal,F,A),
+   call(Cl,Goal))),!.
  
 
 
-decl_shared(Plus,M:P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared(Plus,M:F/A).
-decl_shared(Plus,P):-compound(P),!,functor(P,F,A),F\==(/),F\==(//),!,decl_shared(Plus,F/A).
+decl_shared(Cl,M:Goal):-compound(Goal),!,functor(Goal,F,A),F\==(/),F\==(//),!,decl_shared(Cl,M:F/A).
+decl_shared(Cl,Goal):-compound(Goal),!,functor(Goal,F,A),F\==(/),F\==(//),!,decl_shared(Cl,F/A).
 
 check_never_decl_shared(_Plus,baseKB,mudComfort,1).
 
 
 % loading_module 
-%:- decl_shared(Plus,arity/2).
-%:- decl_shared(Plus,t).
-%:- decl_shared(Plus,meta_argtypes/1).
+%:- decl_shared(Cl,arity/2).
+%:- decl_shared(Cl,t).
+%:- decl_shared(Cl,meta_argtypes/1).
 
 
 :- dynamic system:goal_expansion/4.
@@ -346,8 +455,9 @@ check_never_decl_shared(_Plus,baseKB,mudComfort,1).
 swc.
 
 
-%system:sub_body_expansion(I,O):-really_safe_wrap(be,I,O).
-%system:sub_body_expansion(I,O):- O\== true, O\=(swc,_),could_safe_wrap,really_safe_wrap(be,I,O).
-%system:sub_call_expansion(I,O):-really_safe_wrap(ce,I,O).
-system:goal_expansion(I,P,O,P):- I\== true, I\=(swc,_),current_prolog_flag(lm_expanders,true), really_safe_wrap(ge,I,O)-> I\=O.
+%system:sub_body_expansion(In,Out):-virtualize_source(be,In,Out).
+%system:sub_body_expansion(In,Out):- Out\== true, Out\=(cwc,_),could_safe_virtualize,virtualize_source(be,In,Out).
+%system:sub_call_expansion(In,Out):-virtualize_source(ce,In,Out).
+system:goal_expansion(In,Goal,Out,Goal):- callable(Goal), \+ current_prolog_flag(xref,true), In\== true, In\=(cwc,_),current_prolog_flag(lm_expanders,true), virtualize_source(ge,In,Out)-> In\=Out.
+%system:term_expansion(In,Goal,Out,Goal):- In\== true, In\=(cwc,_),current_prolog_flag(lm_expanders,true), virtualize_source(te,In,Out)-> In\=Out.
 

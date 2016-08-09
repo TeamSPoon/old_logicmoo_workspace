@@ -136,7 +136,7 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 % Hook To [lmcache:after_mpred_load/0] For Module Mpred_agenda.
 % After Managed Predicate Load.
 %
-lmcache:after_mpred_load:- \+(t_l:loading_mpred_file(_,_)),baseKB:loaded_mpred_file(_,_),!.
+lmcache:after_mpred_load:- baseKB:( \+(t_l:loading_mpred_file(_,_)),clause(baseKB:loaded_mpred_file(_,_),true)),!.
 
 % when all previous tasks have completed
 
