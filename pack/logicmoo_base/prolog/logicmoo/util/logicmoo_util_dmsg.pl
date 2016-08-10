@@ -936,7 +936,7 @@ always_show_dmsg:- tlbugger:tl_always_show_dmsg.
 % (debug)message Primary Helper Primary Helper Primary Helper.
 %
 dmsg000(V):-
-   notrace(format(string(K),'~p',V)),
+   notrace(format(string(K),'~p',[V])),
    (tlbugger:in_dmsg(K)-> dmsg5(V);  % format_to_error('~N% ~q~n',[dmsg0(V)]) ;
       asserta(tlbugger:in_dmsg(K),Ref),call_cleanup(dmsg1(V),erase(Ref))).
 

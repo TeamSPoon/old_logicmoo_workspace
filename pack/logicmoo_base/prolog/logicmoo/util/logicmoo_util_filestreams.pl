@@ -88,7 +88,7 @@ l_open_input(InS,In):-once(must(l_open_input0(InS,In))).
 %
 l_open_input0(In,InS):-l_open_input1(In,InS),!.
 l_open_input0(InS,In):-string(InS),!,open_string(InS,In).
-l_open_input0(Filename,In) :- \+ is_list(Filename),nonvar(Filename),filematch(Filename,File), catch(see(File),_,fail),current_input(In).
+l_open_input0(Filename,In) :- \+ is_list(Filename),nonvar(Filename),filematch(Filename,File), file_open_read(File,In).
 l_open_input0(InS,In):-!,open_string(InS,In).
 
 
@@ -100,7 +100,8 @@ l_open_input0(InS,In):-!,open_string(InS,In).
 %
 l_open_input1([V|_],_):-var(V),V=zzzzzzzzzzzzz,!,throw(error(l_open_input/2,'Arguments are not sufficiently instantiated (l_open_input)')).
 l_open_input1(InS,In):-is_stream(InS),!,In=InS.
-l_open_input1(file(Filename),In) :- filematch(Filename,File), catch(see(File),_,fail),current_input(In).
+l_open_input1(file(Filename),In) :- filematch(Filename,File), file_open_read(File,In).
+l_open_input1(alias(Name),In) :- stream_property(In,alias(Name)),!.
 l_open_input1(alias(Filename),In) :-  catch(see(Filename),_,fail),current_input(In).
 l_open_input1(string(string(InS)),In):-!,dmsg_text_to_string_safe(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In).
 l_open_input1(string(InS),In):-!,open_string(InS,In).
@@ -108,6 +109,10 @@ l_open_input1(atom(InS),In):-!,open_string(InS,In).
 l_open_input1(codes(InS),In):-!,open_string(InS,In).
 l_open_input1(chars(InS),In):-!,open_string(InS,In).
 
+
+file_open_read(File,In):-catch(see(File),_,fail),current_input(In).
+file_open_read(File,In):-catch(open(File,read,In,[]),_,fail),!,see(In),current_input(In).
+file_open_read(File,In):-open(File,read,In,[]),!,see(In),current_input(In).
 
 :- use_module(library(url)).
 
@@ -393,14 +398,19 @@ text_to_stream(Text,Stream):-text_to_string(Text,String),string_codes(String,Cod
 file_to_stream((StreamIn),Stream):-is_stream(StreamIn),!,copy_stream(StreamIn,Stream).
 file_to_stream(stream(StreamIn),Stream):-copy_stream(StreamIn,Stream).
 file_to_stream('$socket'(Sock),Stream):-tcp_open_socket('$socket'(Sock),StreamIn),copy_stream(StreamIn,Stream).
-file_to_stream(ftTerm(Text),Stream):-term_to_atom(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
+file_to_stream(term(Text),Stream):-term_to_atom(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
 file_to_stream(text(Text),Stream):-text_to_stream(Text,Stream).
 file_to_stream(codes(Text),Stream):-text_to_stream(Text,Stream).
 file_to_stream(chars(Text),Stream):-text_to_stream(Text,Stream).
 file_to_stream(atom(Text),Stream):-text_to_stream(Text,Stream).
 file_to_stream(string(Text),Stream):-text_to_stream(Text,Stream).
-file_to_stream(file(Spec),Stream):-file_to_stream(Spec,Stream).
-file_to_stream(exfile(File),Stream):-!,read_file_to_codes(File,Codes,[expand(true)]),open_codes_stream(Codes,Stream).
+file_to_stream(alias(Text),Stream):-stream_property(Stream,alias(Text)).
+file_to_stream(file(Spec),Stream):-file_to_stream(match(Spec),Stream).
+file_to_stream(exfile(File),Stream):- size_file(File,Size),Max is 2^20*64, 
+ (Size<Max->
+     (read_file_to_codes(File,Codes,[expand(true)]),open_codes_stream(Codes,Stream));
+      open(File,read,Stream,[])).
+
 file_to_stream(match(Spec),Stream):-!,filematch(Spec,File),exists_file(File),!,file_to_stream(exfile(File),Stream).
 file_to_stream(package(Pkg,LocalPath),Stream) :-!,
    package_path(Pkg,PkgPath),

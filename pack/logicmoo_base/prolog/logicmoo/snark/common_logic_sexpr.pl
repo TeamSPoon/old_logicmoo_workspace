@@ -8,6 +8,8 @@
   sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
 :- endif.
 
+see_seen(_):-!.
+see_seen(G):-call(G).
 
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
@@ -239,7 +241,7 @@ parse_sexpr(string(String), Expr) :- string_codes(String,Codes),parse_sexpr_code
 parse_sexpr(atom(String), Expr) :- string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
 parse_sexpr(text(String), Expr) :- string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
 parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
-
+parse_sexpr(Other, Expr) :- setup_call_cleanup(l_open_input(Other,In),parse_sexpr(In, Expr),true).
 
 %= 	 	 
 
@@ -544,7 +546,8 @@ lisp_read_from_input(Forms):-lisp_read_from_input(current_input,Forms),!.
 %
 % Lisp Read Converted From Input.
 %
-lisp_read_from_input(I,Forms):-stream_source_typed(I,Type),!,must(to_untyped(Type,Forms)).
+lisp_read_from_input(In,Forms):- is_stream(In), at_end_of_stream(In),!,end_of_file=Forms.
+lisp_read_from_input(In,Forms):- stream_source_typed(In,Type),stream_position(In,Pos,Pos),wdmsg(pos),must(to_untyped(Type,Forms)).
 
 
 %= 	 	 
@@ -553,9 +556,11 @@ lisp_read_from_input(I,Forms):-stream_source_typed(I,Type),!,must(to_untyped(Typ
 %
 % Stream Source Typed.
 %
-stream_source_typed(I,Expr):-   l_open_input(I,In),
-  see(In),
-   read_line_to_codes(current_input,AsciiCodes),(parse_sexpr(AsciiCodes,Expr);read_term_from_codes(AsciiCodes,Expr,[])),!,seen.
+stream_source_typed(In,Expr):- !,parse_sexpr(In,Expr).
+stream_source_typed(In,Expr):-
+ (read_line_to_codes(current_input,AsciiCodes),
+      (AsciiCodes==[]-> (at_end_of_stream(In) -> (Expr=end_of_file); stream_source_typed(In,Expr)); 
+        once(must(parse_sexpr(AsciiCodes,Expr);stream_source_typed(In,Expr));read_term_from_codes(AsciiCodes,Expr,[])))).
 
 
 
@@ -884,5 +889,42 @@ process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure):-
 */
 
 % % UNDO % :- add_import_module(baseKB,common_logic_sexpr,end).
+
+read_pending_whitespace(In):- repeat, peek_char(In,Code),
+   (( \+ char_type(Code,space), \+ char_type(Code,white))-> ! ; (get_char(In,_),fail)).
+
+with_lisp_translation(In,With):- 
+ is_stream(In),!,
+ repeat,
+  read_pending_whitespace(In)->
+   lisp_read_from_input(In,Lisp),   
+   once((call(With,Lisp,Next), dmsg(Next))),
+   Lisp==end_of_file.
+
+with_lisp_translation(Other,With):- 
+  l_open_input(Other,In),
+   setup_call_cleanup(true,(repeat,with_lisp_translation(In,With)),true).
+
+with_lisp_translation:-with_lisp_translation('dump.txt',=).
+wlt2(O):- 
+   open('dump.txt',read,I),see(I),repeat,current_input(I),baseKB:parse_sexpr(I,O),stream_property(I,position(POD)).
+
+wlt3(O):-
+  open('dump.txt',read,I),see(I),read_pending_whitespace(I),repeat,read_pending_whitespace(I),get_char(I,O),
+    nop((stream_to_lazy_list(I,LL),parse_sexpr_codes(LL, Expr))).
+
+wlt4(Expr):-
+  open('dump.txt',read,I),see(I),read_pending_whitespace(I),repeat,
+   read_pending_whitespace(I),stream_to_lazy_list(I,LL),repeat,parse_sexpr_codes(LL, Expr).
+
+wlt5(Expr):-
+  open('dump.txt',read,I),see(I),read_pending_whitespace(I),repeat,
+   read_pending_whitespace(I),read_line_to_codes(I,LL),parse_sexpr_codes(LL, Expr).
+
+wlt6(Expr):-
+   open('dump.txt',read,I),see(I),read_pending_whitespace(I),repeat,read_pending_whitespace(I),stream_to_lazy_list(I,LL),sexpr(Expr,LL,_).
+
+
+
 
 
