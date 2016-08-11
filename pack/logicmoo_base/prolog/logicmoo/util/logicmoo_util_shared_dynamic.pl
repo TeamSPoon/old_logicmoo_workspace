@@ -148,6 +148,9 @@ never_virtualize(add).
 never_virtualize(del).
 never_virtualize(clr).
 never_virtualize(ain).
+never_virtualize(props).
+never_virtualize(on_x_rtrace).
+never_virtualize(on_x_debug).
 never_virtualize(aina).
 never_virtualize(decl_shared).
 
@@ -358,7 +361,7 @@ virtualize_source(X,In,Out):- callable(In),
 % Safely Paying Attention To Corner Cases Wrap.
 %
 
-safe_virtualize(Goal,How,Out):- must(safe_virtualize_0(Goal,How,Out)).
+safe_virtualize(Goal,How,Out):- must(safe_virtualize_0(Goal,How,call(MHow,MGoal))),!, Out=..[MHow,MGoal].
 
 safe_virtualize_0(M:Goal,M:How,call(How,M:Goal)).
 safe_virtualize_0(M:Goal,How,call(How,M:Goal)).
