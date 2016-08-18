@@ -181,7 +181,7 @@ make_builtin(P):-
   (predicate_property(B,built_in) -> true ;
   (w_tl(set_prolog_flag(access_level,system),lock_predicate(F/A)),
   check_context_module,
-    ain(prologBuiltin(F)),ain(arity(F,A)))).
+    ain(mpred_prop(F,A,prologBuiltin)),ain(arity(F,A)))).
 
 
 /*

@@ -17,7 +17,6 @@
 */
 
 mtProlog(world).
-% :-ain(hybrid_support(agent_call_command,2)).
 :-export((
         % a_unparsed/2,
        % call_agent_action/2,

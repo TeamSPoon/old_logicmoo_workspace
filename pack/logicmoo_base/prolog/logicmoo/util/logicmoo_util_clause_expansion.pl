@@ -36,7 +36,6 @@
           get_named_value_goal/2,
           is_fbe/3,
           is_user_module/0,
-	      is_user_module/1,
           
           lmce_system_term_expansion/5,
           lmce_system_goal_expansion/5,
@@ -104,7 +103,7 @@ appear in the source-code.
               system:sub_call_expansion/2)).
 
 
-:- module_transparent((is_user_module/0,is_user_module/1,without_lm_expanders/1,lmce_system_term_expansion/5,lmce_system_goal_expansion/5,functor_non_colon/3)).
+:- module_transparent((is_user_module/0,without_lm_expanders/1,lmce_system_term_expansion/5,lmce_system_goal_expansion/5,functor_non_colon/3)).
 :- ensure_loaded(logicmoo_util_dmsg).
 :- ensure_loaded(logicmoo_util_rtrace).
 
@@ -115,11 +114,10 @@ appear in the source-code.
 
 :- meta_predicate get_named_value_goal(0,*).
 
-is_user_module :- prolog_load_context(module,M),is_user_module(M),!.
-is_user_module(_) :- prolog_load_context(source,F), baseKB:mpred_is_impl_file(F),!,fail.
-is_user_module(M) :- module_property(M,class(L)),L=library,!,fail.
-is_user_module(user).
-is_user_module(_).
+is_user_module :- prolog_load_context(source,F), baseKB:mpred_is_impl_file(F),!,fail.
+is_user_module :- prolog_load_context(module,M), module_property(M,class(L)),L=library,!,fail.
+is_user_module :- prolog_load_context(module,user). 
+is_user_module.
 
 
 get_named_value_goal(G,N=V):- functor_non_colon(G,N,_), ((\+ \+ G )-> V=true; V=false).

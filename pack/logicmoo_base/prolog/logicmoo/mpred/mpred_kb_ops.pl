@@ -513,7 +513,7 @@ get_consequent(P,P).
 :- style_check(+singleton).
 
 % TODO READD
-%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttRelationType,
+%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
 %     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),
 
 
@@ -1880,7 +1880,7 @@ baseKB:hook_one_minute_timer_tick:-mpred_cleanup.
 %
 % PFC Cleanup.
 %
-mpred_cleanup:- forall((no_repeats(F-A,(call_u(mpred_prop(F,A,pfcRHS)),A>1))),mpred_cleanup(F,A)).
+mpred_cleanup:- forall((no_repeats(F-A,(call_u(mpred_mark(pfcRHS,F,A)),A>1))),mpred_cleanup(F,A)).
 
 
 %% mpred_cleanup( +F, ?A) is semidet.
@@ -1978,7 +1978,7 @@ is_reprop_0(X):-get_functor(X,repropagate,_).
 mpred_non_neg_literal(X):- is_reprop(X),!,fail.
 mpred_non_neg_literal(X):- atom(X),!.
 mpred_non_neg_literal(X):- sanity(stack_check),
-    mpred_positive_literal(X), X \= ~(_), X \= mpred_prop(_,_,_), X \= conflict(_).
+    mpred_positive_literal(X), X \= ~(_), X \= mpred_mark(_,_,_), X \= conflict(_).
 
 % ======================= mpred_file('pfcsupport').	% support maintenance
 
@@ -2065,8 +2065,8 @@ should_call_for_facts(H):- get_functor(H,F,A),call_u(should_call_for_facts(H,F,A
 %
 should_call_for_facts(_,F,_):- a(prologSideEffects,F),!,fail.
 should_call_for_facts(H,_,_):- modulize_head(H,HH), \+ predicate_property(HH,number_of_clauses(_)),!.
-should_call_for_facts(_,F,A):- clause_b(mpred_mark(F,A,pfcRHS)),!,fail.
-should_call_for_facts(_,F,A):- clause_b(mpred_mark(F,A,pfcMustFC)),!,fail.
+should_call_for_facts(_,F,A):- clause_b(mpred_mark(pfcRHS,F,A)),!,fail.
+should_call_for_facts(_,F,A):- clause_b(mpred_mark(pfcMustFC,F,A)),!,fail.
 should_call_for_facts(_,F,_):- a(prologDynamic,F),!.
 should_call_for_facts(_,F,_):- \+ a(pfcControlled,F),!.
 
@@ -2369,7 +2369,7 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 :- style_check(+singleton).
 
 % TODO READD
-%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttRelationType,
+%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
 %     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),)
 
 %% get

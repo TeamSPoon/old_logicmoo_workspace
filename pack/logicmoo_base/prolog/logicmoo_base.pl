@@ -186,20 +186,20 @@ base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
 base_clause_expansion(_,I, O):- get_consequent_functor(I,F,A),base_clause_expansion_fa(I,O,F,A).
 base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.
 
-base_clause_expansion_fa(_,_,F,_):- prologBuiltin(F),!,fail.
+base_clause_expansion_fa(_,_,F,A):- clause_b(mpred_prop(F,A,prologBuiltin)),!,fail.
 base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- needs_pfc(F,A),!.
-base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- in_dialect_pfc,!,ain(hybrid_support(F,A)),ain(prologHybrid(F)).
-base_clause_expansion_fa(_,_,F,_):- ain(prologBuiltin(F)),!,fail.
+base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- in_dialect_pfc,!,ain(mpred_prop(F,A,prologHybrid)).
+base_clause_expansion_fa(_,_,F,A):- ain(mpred_prop(F,A,prologBuiltin)),!,fail.
 
 
 needs_pfc(F,A):- 
   (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(prologHybrid(F));
-  clause_b(hybrid_support(F,A));clause_b(wrap_shared(F,_,ereq))),!.
+  clause_b(mpred_prop(F,A,prologHybrid));clause_b(wrap_shared(F,_,ereq))),!.
 
 /*
 maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
-   \+ (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(hybrid_support(F,A))),
-   ain(prologBuiltin(F/A)).
+   \+ (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(mpred_prop(F,A,prologHybrid))),
+   ain(prologBui sltin(F/A)).
 
 */
 

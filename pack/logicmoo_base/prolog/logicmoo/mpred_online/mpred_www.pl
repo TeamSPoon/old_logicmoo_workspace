@@ -1666,7 +1666,7 @@ baseKB:shared_hide_data((_:-
 
 baseKB:shared_hide_data(saved_request/_):- !.
 baseKB:shared_hide_data(session_data/_):- !.
-baseKB:shared_hide_data(mpred_props/3):- !,listing_filter(hideMeta).
+baseKB:shared_hide_data(mpred_mark/3):- !,listing_filter(hideMeta).
 baseKB:shared_hide_data(last_item_offered/1):- !,listing_filter(hideMeta).
 baseKB:shared_hide_data(P0):- strip_module(P0,_,P), compound(P),functor(P,F,A),F\== (/) , !,baseKB:shared_hide_data(F/A).
 

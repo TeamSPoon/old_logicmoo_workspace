@@ -188,7 +188,7 @@ never_virtualize(apply).
 never_virtualize(call).
 never_virtualize(call).
 never_virtualize(thread_util:_/A):-integer(A). % prevents query
-%never_virtualize(F):- ereq(mpred_prop(F,_,pfcBuiltin)).
+%never_virtualize(F):- ereq(mpred_mark(pfcBuiltin,F,_)).
 
 % operations to transactionalize
 virtualize_dbreq(O,_):- bad_functor_check(O),!,fail.
@@ -253,7 +253,7 @@ virtualize_ereq(mpred_f,6).
 virtualize_ereq(mpred_f,7).
 virtualize_ereq(props,2).
 
-virtualize_ereq(mpred_prop,3).
+virtualize_ereq(mpred_mark,3).
 virtualize_ereq(mudKeyword,2).
 
 virtualize_ereq(pfcControlled,1).
@@ -341,7 +341,7 @@ descend_ge(Which):-functor(Which,F,_),!,descend_ge(z(F)),!.
 
 :- nb_linkval('$xform_arity',xform_arity(_C,_F,_A)).
 
-xform_arity(C,F,A):-var(C),!,sanity(F==C), nb_getval('$xform_arity',xform_arity(C,F,A)),!.
+xform_arity(C,F,A):-var(C),!,sanity(var(F)),must(var(A)), nb_getval('$xform_arity',xform_arity(C,F,A)),!.
 xform_arity(C,F,A):-atom(C),!,C=F,ignore(clause_b(arity(F,A))).
 xform_arity(F/A,F,A):-atom(F),!.
 xform_arity(F//Am2,F,A):- integer(Am2),!, A is Am2+2.
@@ -350,14 +350,13 @@ xform_arity(C,F,A):- compound(C), functor(C,F,A).
 xform(_,_):-!,fail.
 xform(Var,Out):- \+compound(Var),!,Out=Var.
 xform(Nonvar,Out):- \+ current_prolog_flag(lm_expanders,true),!,Nonvar=Out.
-%xform(isa(C,P),mpred_prop(F,A,P)):-nonvar(P),!,is_reltype(P),xform_arity(C,F,A).
-%xform(isa(C,P),(ttRelationType(P),mpred_prop(F,A,P))):-nonvar(C),xform_arity(C,F,A),is_reltype(P),!.
+xform(isa(C,P),mpred_prop(F,A,P)):-nonvar(P),!,is_reltype(P),xform_arity(C,F,A).
+xform(isa(C,P),(ttRelationType(P),mpred_prop(F,A,P))):-nonvar(C),xform_arity(C,F,A),is_reltype(P),!.
 xform(mpred_prop(C,P),mpred_prop(F,A,P)):- xform_arity(C,F,A),!.
 xform(hybrid_support(F,A),mpred_prop(F,A,prologHybrid)):-!.
 xform(arity(F,A),mpred_prop(F,A,arity)):-!.
-xform(mpred_mark(P,F,A),mpred_prop(F,A,P)):-trace_or_throw(bad_idea_use(mpred_prop(F,A,P))),!.
-xform(PC,mpred_prop(F,A,P)):- PC=..[P,C],is_reltype(P),nonvar(C),!,xform_arity(C,F,A).
-xform(PC,mpred_prop(F,A,P)):- PC=..[P,C],is_reltype(P),var(C),F=C,nb_getval('$xform_arity',xform_arity(C,F,A)),!,xform_arity(C,F,A).
+xform(mpred_mark(P,F,A),mpred_prop(F,A,P)):-!.
+xform(PC,mpred_prop(F,A,P)):- PC=..[P,C],is_reltype(P),!,xform_arity(C,F,A).
 xform(PFA,mpred_prop(F,A,P)):- PFA=..[P,F,A],is_reltype(P),!.
 xform(In,PART):- map_compound_args(xform,In,PART),!.
 
@@ -536,4 +535,4 @@ system:goal_expansion(In,Goal,Out,Goal):-
     virtualize_source(ge,In,Out)-> In\=Out.
 %system:term_expansion(In,Goal,Out,Goal):- In\== true, In\=(cwc,_),current_prolog_flag(lm_expanders,true), virtualize_source(te,In,Out)-> In\=Out.
 
-system:term_expansion(X,Y):- current_prolog_flag(logicmoo_mpred_props,true), compound(X),xform(X,Y).
+system:term_expansion(X,Y):- compound(X),xform(X,Y).
