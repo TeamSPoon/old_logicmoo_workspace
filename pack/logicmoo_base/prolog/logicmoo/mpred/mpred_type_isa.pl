@@ -25,7 +25,7 @@
             asserted_subclass/2,
             atom_prefix_other/3,
             atom_type_prefix_other/4,
-            
+            is_known_trew/1,
             callOr/3,
             chk_ft/1,
             compound_isa/3,

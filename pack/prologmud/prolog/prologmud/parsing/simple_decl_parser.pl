@@ -63,7 +63,7 @@ parserVars_local(A,N,V,Type):-parserVars(A,N,V,Type).
 
 parserVars_falback(_,N,V,Type):-parserVars_local(global,N,V,Type).
 
-toCol(Txt,I,TCOL):-member(TCOL,[tCol,tObj,tSpatialThing,vtValue,ttTypeType]),show_success(toCol_0(Txt,I,TCOL)),!.
+toCol(Txt,I,TCOL):-member(TCOL,[tCol,tObj,tSpatialThing,vtValue,ttTypeType]),show_success(toCol_0,toCol_0(Txt,I,TCOL)),!.
 
 toCol_0(Txt,O,TCOL):-member(Pfx-Sfx- _ISACISA, 
          [

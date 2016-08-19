@@ -65,7 +65,6 @@
 
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
 
-:- ensure_loaded(prologmud(server/mud_telnet)).
 
 % xyzFn(R,X,Y,Z):-dmsg(xyzFn(R,X,Y,Z)),trace_or_throw(xyzFn(R,X,Y,Z)).
 
@@ -407,7 +406,7 @@ Proof end.
 
 % logicmoo vworld mud server
 
-
+:- ensure_loaded(prologmud(server/mud_telnet)).
 
 
 % :- ensure_loaded(('/root/lib/swipl/pack/prologmud/prolog/prologmud/actions/eat.pl')).

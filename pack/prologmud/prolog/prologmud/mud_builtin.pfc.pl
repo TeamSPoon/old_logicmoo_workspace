@@ -38,6 +38,8 @@
 :- include(prologmud(mud_header)).
 
 
+:- gripe_time(60,user:ensure_loaded(library(logicmoo_user))).
+
 :- set_defaultAssertMt(baseKB).
 :- file_begin(pfc).
 

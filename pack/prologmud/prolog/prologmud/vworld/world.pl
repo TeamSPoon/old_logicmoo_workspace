@@ -201,8 +201,8 @@ ttSpatialType(tAgent).
 genls(tActor,tAgent).
 genls(mobExplorer,tAgent).
 
-:-decl_shared(predTypeMax/3).
-:-decl_shared(predInstMax/3).
+:-decl_mpred(predTypeMax/3).
+:-decl_mpred(predInstMax/3).
 
 %NEXT TODO predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),isa(I,AgentType).
 %predInstMax(I,mudHealth,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(I,AgentType).

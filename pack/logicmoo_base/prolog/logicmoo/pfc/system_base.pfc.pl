@@ -39,7 +39,7 @@
 :- dynamic(baseKB:col_as_static/1).
 
 col_as_isa(tCol).
-col_as_isa(ttPredType).
+col_as_isa(ttRelationType).
 col_as_isa(tSet).
 col_as_isa(ttSpatialType).
 col_as_isa(ttExpressionType).
@@ -87,10 +87,10 @@ typeCheckDecl(pfcControlled(C),callable(C)).
 col_as_isa(tSet).
 col_as_isa(ttSpatialType).
 
-tSet(ttPredType).
-% ~ ttPredType(col_as_unary).
+tSet(ttRelationType).
+% ~ ttRelationType(col_as_unary).
 
-col_as_isa(ttPredType).
+col_as_isa(ttRelationType).
 %col_as_isa(completelyAssertedCollection).
 
 col_as_unary(completeExtentAsserted).
@@ -135,7 +135,7 @@ prologNegByFailure(prologNegByFailure).
 
 % :- break.
 
-genls(ttPredType,completelyAssertedCollection).
+genls(ttRelationType,completelyAssertedCollection).
 
 :- do_gc.
 
@@ -263,7 +263,7 @@ functorDeclares(ttModule).
 
 %:- sanity((fix_mp(clause(assert,sanity),arity(apathFn,2),M,O),M:O=baseKB:arity(apathFn,2))).
 
-:- dynamic(ttPredType/1).
+:- dynamic(ttRelationType/1).
 
 arity(apathFn,2).
 arity(isKappaFn,2).
@@ -274,7 +274,7 @@ arity(xyzFn,4).
 arity(arity,2).
 arity(is_never_type,1).
 arity(argIsa, 3).
-arity(Prop,1):- cwc, clause_b(ttPredType(Prop)).
+arity(Prop,1):- cwc, clause_b(ttRelationType(Prop)).
 arity(meta_argtypes,1).
 arity(arity,2).
 arity(is_never_type,1).

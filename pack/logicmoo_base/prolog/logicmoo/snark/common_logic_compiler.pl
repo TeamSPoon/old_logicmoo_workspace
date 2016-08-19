@@ -145,6 +145,9 @@
             until_op/1,
             variants_are_equal/3
           ]).
+
+:- include('../mpred/mpred_header.pi').
+:- user:ensure_loaded(library(logicmoo_base)).
 :- endif.
 
   
@@ -172,7 +175,6 @@
         baseKB:regression_test/0,
         baseKB:sanity_test/0)).
 
-:- include('../mpred/mpred_header.pi').
 % % :- '$set_source_module'(common_logic_compiler).
 
 
@@ -200,8 +202,6 @@
 %=%    r(sk1(X)):- p(X).
 %=%    q(X,sk1(X)):- p(X).
 
-:- user:ensure_loaded(library(logicmoo_base)).
-:- include(logicmoo(mpred/'mpred_header.pi')).
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(source,File),file_directory_name(File,Dir),directory_file_path(_,Short,Dir),asserta_if_new(user:file_search_path(Short,Dir)).

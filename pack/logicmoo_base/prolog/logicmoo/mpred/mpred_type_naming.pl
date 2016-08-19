@@ -42,7 +42,6 @@
 :- include('mpred_header.pi').
 :- endif.
 
-:- decl_shared(genls/2).
 
 :- thread_local(baseKB:current_source_suffix/1).
 :- dynamic(baseKB:current_source_suffix/1).

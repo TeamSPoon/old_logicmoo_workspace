@@ -22,6 +22,7 @@
 % Dec 13, 2035
 %
 */
+:- include('../mpred/mpred_header.pi').
 :- endif.
 
 :- meta_predicate skolem_test(0).

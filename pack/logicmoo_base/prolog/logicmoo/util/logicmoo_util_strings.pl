@@ -490,7 +490,7 @@ list_replace(List,Char,Replace,NewList):-
 list_replace(List,_Char,_Replace,List):-!.
 
 
-:- export(atomic_concat/3).
+% :- export(atomic_concat/3).
 
 %= 	 	 
 

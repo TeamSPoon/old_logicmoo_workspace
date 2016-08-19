@@ -99,6 +99,8 @@
 
 :- set_prolog_flag(retry_undefined,false).
 
+:- set_prolog_flag(logicmoo_virtualize,true).
+
 user_m_check(_Out).
 
 :- meta_predicate make_shared_multifile(+,+,+).
@@ -233,13 +235,6 @@ mtCanAssert(Module):- (loading_source_file(File),get_file_type(File,pfc),prolog_
 mtCanAssert(Module):- clause_b(mtProlog(Module)),!,fail.
 mtCanAssert(_).
 
-:- decl_shared(baseKB:dynamic,genlMt/2).
-
-:- decl_shared(baseKB:dynamic,mtCore/1).
-:- decl_shared(baseKB:dynamic,mtProlog/1).
-:- decl_shared(baseKB:dynamic,mtCycL/1).
-:- decl_shared(baseKB:dynamic,mtExact/1).
-:- decl_shared(baseKB:dynamic,mtGlobal/1).
 
 % baseKB:mtGlobal
 % mtCore
@@ -558,7 +553,7 @@ has_parent_goal(F,G):-prolog_frame_attribute(F,goal, G);(prolog_frame_attribute(
 
 uses_predicate(_,CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
 uses_predicate(_,M,F,A,R):- 
-  prolog_current_frame(FR), functor(P,F,A),show_success(prolog_frame_attribute(FR,parent_goal,predicate_property(M:P,_))),!,R=error.
+  prolog_current_frame(FR), functor(P,F,A),(prolog_frame_attribute(FR,parent_goal,predicate_property(M:P,_))),!,R=error.
 uses_predicate(_,Module,Name,Arity,Action) :- 
       current_prolog_flag(autoload, true),
 	'$autoload'(Module, Name, Arity), !,
@@ -773,7 +768,7 @@ make_shared_multifile(_CallerMt,PredMt,F,A):-!,
   PredMt:( 
    sanity( \+ ((PredMt:F/A) = (qrTBox:p/1))),
    PredMt:check_never_assert(declared(PredMt:F/A)),
-   decl_shared(PredMt:F/A))).
+   decl_mpred(PredMt:F/A))).
 
 
 

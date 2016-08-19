@@ -885,7 +885,7 @@ call_for_literal_db2(_,_,HEAD):- clause_u(HEAD).
 call_for_literal_db2(F,_,   _):- (a(completelyAssertedCollection,F);a(completeExtentAsserted,F)),!,fail.
 call_for_literal_db2(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
 call_for_literal_db2(F,A,HEAD):- \+ call_u(baseKB:use_kif(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(clause_u(genlPreds(P2,P1)),gp(P1),fail),
-   call(t,P2,A1,A2).
+   call_u(t(P2,A1,A2)).
 
 
 

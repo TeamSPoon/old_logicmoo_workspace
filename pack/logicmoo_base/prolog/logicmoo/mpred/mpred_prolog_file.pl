@@ -313,8 +313,8 @@ load_file_some_type(M:File,Options):- call_from_module(M,must(load_files(M:File,
 
 user:prolog_load_file(Module:Spec, Options):-
    \+ exists_source(Spec),
-   \+ \+ (find_and_call(filematch(Module:Spec,O)),exists_file(O)),
-  doall((find_and_call(filematch(Module:Spec,SpecO)),load_files(Module:SpecO, Options))),!.
+   \+ \+ (logicmoo_util_filesystem:(filematch(Module:Spec,O)),exists_file(O)),
+  doall((logicmoo_util_filesystem:(filematch(Module:Spec,SpecO)),load_files(Module:SpecO, Options))),!.
 
 
 user:prolog_load_file(Module:Spec, Options):- fail,

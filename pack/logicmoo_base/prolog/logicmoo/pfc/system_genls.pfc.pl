@@ -49,7 +49,7 @@ genls(tSet,functorDeclares).
 col_as_unary(functorDeclares).
 genls(completelyAssertedCollection,tSet).
 
-isa(I,ttPredType):-I==col_as_unary,!,fail.
+isa(I,ttRelationType):-I==col_as_unary,!,fail.
 isa(I,ttRelationType):-I==col_as_unary,!,fail.
 isa(I,ttRelationType):-I==col_as_isa,!,fail.
 isa(I,C):- functorDeclares==C, I== (==>) ,!,fail.

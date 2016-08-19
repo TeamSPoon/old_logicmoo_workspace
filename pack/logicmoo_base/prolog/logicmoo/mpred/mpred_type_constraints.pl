@@ -65,9 +65,9 @@
 :- include('mpred_header.pi').
 
 :- endif.
- :- meta_predicate isa_pred_l(2,*,*),
-              isa_pred_l(2,*,*,*),
-              map_subterms(2,?,?),
+ :- meta_predicate isa_pred_l(+,*,*),
+              isa_pred_l(+,*,*,*),
+              map_subterms(+,?,?),
               dom_member(0),
               boxlog_goal_expansion(*,*).
 
@@ -267,7 +267,7 @@ isa_pred_l(Pred,List,ListO):-isa_pred_l(Pred,List,List,ListO).
 %  (isa/2) Predicate (List version).
 %
 isa_pred_l(_Pred,[],_List,[]).
-isa_pred_l(Pred,[X|L],List,O):-member(Y,List),X\=Y,call(Pred,X,Y),!,isa_pred_l(Pred,L,List,O).
+isa_pred_l(Pred,[X|L],List,O):-member(Y,List),X\=Y,call_u(call(Pred,X,Y)),!,isa_pred_l(Pred,L,List,O).
 isa_pred_l(Pred,[X|L],List,[X|O]):-isa_pred_l(Pred,L,List,O).
 
 

@@ -12,7 +12,7 @@
 prolog_stack:stack_guard(none).
 
 
-:- ensure_loaded(logicmoo_utils).
+:- user:ensure_loaded(logicmoo_utils).
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
 :- ensure_loaded(library('logicmoo/util/logicmoo_util_supp.pl')).
 :- endif.
@@ -52,7 +52,7 @@ prolog_stack:stack_guard(none).
 
 
 
-:- set_prolog_flag(logicmoo_autoload,false).
+:- set_prolog_flag(logicmoo_autoload,true).
 
 
 % must be xref-ing or logicmoo_autoload or used as include file
@@ -212,7 +212,7 @@ maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
 
 /*
 
-:- autoload. % ([verbose(false)]).
+% :- autoload. % ([verbose(false)]).
 
 bad_thing_to_do:- doall((clause(baseKB:wrap_shared(F,A,ereq),Body),
     retract(( baseKB:wrap_shared(F,A,ereq):- Body )), 
@@ -298,6 +298,8 @@ system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),no
 
 :- sanity((clause(baseKB:ignore_file_mpreds(_),B),compound(B))).
 
+% :- autoload([]).
+
 /*
 
 :- set_prolog_flag(retry_undefined,true).
@@ -312,3 +314,5 @@ system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),no
 :- set_prolog_flag(retry_undefined,false).
 
 */
+
+:- statistics.

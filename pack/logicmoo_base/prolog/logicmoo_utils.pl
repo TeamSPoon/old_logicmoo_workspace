@@ -194,5 +194,7 @@ logicmoo_utils_test_msg:- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/ut
 :- dynamic baseKB:prologBuiltin/1.
 :- logicmoo_utils_test_msg.
 :- set_prolog_flag(lm_expanders,true).
+:- set_prolog_flag(logicmoo_virtualize,true).
 % :- lmce:reset_modules.
+
 

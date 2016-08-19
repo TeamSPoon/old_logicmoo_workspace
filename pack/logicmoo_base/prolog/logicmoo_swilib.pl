@@ -152,7 +152,7 @@
 :- system:use_module(library(prolog_clause)).
 :- system:use_module(library(occurs)).
 :- system:use_module(library(listing)).
-:- user:use_module(library(clpfd)).
+:- system:use_module(library(clpfd),except([op(_,_,_)])).
 :- system:use_module(library(qsave)).
 :- system:use_module(library(apply)).
 :- system:use_module(library(debug)).
@@ -294,5 +294,5 @@ system:'$term_in_file'(In, Read, RLayout, Term, TLayout, Stream, Parents, Option
 
 :- lmce:reset_modules.
 
-:- autoload.
+% :- autoload.
 

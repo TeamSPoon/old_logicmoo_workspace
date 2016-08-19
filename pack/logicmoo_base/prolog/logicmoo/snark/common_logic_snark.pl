@@ -124,6 +124,7 @@
           op(500,yfx,'v')
            
           ]).
+:- include('../mpred/mpred_header.pi').
 :- endif.
 
 :-
@@ -190,8 +191,6 @@
 
 % :- dynamic(baseKB:(if/2,iif/2)).
 
-
-:- include('../mpred/mpred_header.pi').
 
 
 
@@ -1336,7 +1335,7 @@ kif_io(InS,Out):-
 %
 % Generation Of Proof Converted To Id.
 %
-why_to_id(Term,Wff,IDWhy):-  ~(atom(Term)),term_to_atom(Term,Atom),!,why_to_id(Atom,Wff,IDWhy).
+why_to_id(Term,Wff,IDWhy):-  \+ atom(Term),term_to_atom(Term,Atom),!,why_to_id(Atom,Wff,IDWhy).
 why_to_id(Atom,Wff,IDWhy):- call_u(wid(IDWhy,Atom,Wff)),!.
 why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhyI,IDWhy),assertz_if_new(wid(IDWhy,Atom,Wff)).
 

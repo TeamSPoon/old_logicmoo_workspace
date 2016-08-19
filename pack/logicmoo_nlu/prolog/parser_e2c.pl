@@ -9,21 +9,129 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
+:- asserta_new(user:file_search_path(pldata,'/opt/cyc/')).
+% expand_file_search_path(pldata(assertions),From),[module(baseKB),derived_from(From)]
+
+:-decl_shared((('abbreviationString-PN'/2),
+        ('adjSemTrans-Restricted'/5),
+        ('countryName-LongForm'/2),
+        ('countryName-ShortForm'/2),
+        ('lightVerb-TransitiveSemTrans'/3),
+        ('prepReln-Action'/4),
+        ('prepReln-Object'/4),
+        ('termPOS-Strings'/3),
+        ('termStrings-GuessedFromName'/2),
+        ('verbPrep-Passive'/3),
+        ('verbPrep-Transitive'/3),
+        ('verbPrep-TransitiveTemplate'/3),
+        (abbreviationForCompoundString/4),
+        (abbreviationForLexicalWord/3),
+        (abbreviationForMultiWordString/4),
+        (abbreviationForString/2),
+        (acronymString/2),
+        (adjSemTrans/4),
+        (adjSemTransTemplate/3),
+        (arg2Isa/2),
+        (balanceBinding/2),
+        (compoundSemTrans/5),
+        (compoundString/4),
+        (compoundVerbSemTrans/4),
+        (debugOnError/1),
+        (denotation/4),
+        (denotationPlaceholder/4),
+        (denotationRelatedTo/4),
+        (derivationalAffixBasePOS/2),
+        (formerName/2),
+        (genFormat/3),
+        (genPhrase/4),
+        (getSurfaceFromChars/3),
+        (headMedialString/5),
+        (hyphenString/4),
+        (initialismString/2),
+        (multiWordSemTrans/5),
+        (multiWordString/4),
+        (nicknames/2),
+        (nonCompositionalVerbSemTrans/3),
+        (nounPrep/3),
+        (partOfSpeech/3),
+        (phoneticVariantOfPrefix/3),
+        (phoneticVariantOfSuffix/3),
+        (posBaseForms/2),
+        (posForms/2),
+        (preferredGenUnit/3),
+        (preferredNameString/2),
+        (preferredTermStrings/2),
+        (prepSemTrans/4),
+        (prettyName/2),
+        (reduceWordList/2),
+        (regularSuffix/3),
+        (reorderBody/2),
+        (reorderBody/3),
+        (reorderBody/4),
+        (scientificName/2),
+        (stringToWords/2),
+        (termStrings/2),
+        (unitOfMeasurePrefixString/2),
+        (verbSemTrans/4),
+        (verbSemTransTemplate/3))).
+
+
+:- if(current_prolog_flag(logicmoo_simplify_te,true)).
+disable_current_module_expansion(M):-
+  system:forall((member(F/A,[term_expansion/2, term_expansion/4,goal_expansion/2, goal_expansion/4]),
+            functor(P,F,A),
+            predicate_property(M:P,clause_count(N)),
+            N>0,
+         \+ predicate_property(M:P,imported_from(_)),
+         \+ predicate_property(M:P,static)),
+     (( writeq(M:F/A),nl,M:multifile(M:F/A),
+        M:dynamic(M:F/A),
+        M:call(asserta,((P :- (!,fail))),Ref),
+        call(asserta,on_end(erase(Ref)))))).
+
+:- disable_current_module_expansion(baseKB).
+:- forall(current_module(M),disable_current_module_expansion(M)).
+:- endif.
+
+:- (current_prolog_flag(qcompile,PrevValue)->true;PrevValue=false),
+   call(assert,on_fin(set_prolog_flag(qcompile,PrevValue))),
+   set_prolog_flag(qcompile,large).
+
+
+:- ensure_loaded(pldata(cyc_export_utils)).
+
+:- use_module(pldata(kb_7166)).
+
+:- if(current_predicate(_,on_end(_))).
+:- forall(retract(on_end(CALL)),call(CALL)).
+:- endif.
+
+:- if(current_predicate(setup7166/0)).
+:- initialization(setup7166,after_load).
+:- initialization(setup7166,restore).
+:- endif.
+
+:- set_prolog_flag(logicmoo_virtualize,true).
+
+/*
 must_be_in_user:-module(parser_e2c,[
          e2c/1,
          e2c/2
          % idGen/1
          ]).
+*/
 
-:-multifile('prefixString'/2).
-:-multifile('suffixString'/2).
-:-multifile('variantOfSuffix'/2).
-:-multifile('nameString'/2).
+/*
+:- (rtrace,kb_dynamic(prefixString/2)).
+:-kb_dynamic('suffixString'/2).
+:-kb_dynamic('variantOfSuffix'/2).
+*/
+
+/*
 :-dynamic('prefixString'/2).
 :-dynamic('suffixString'/2).
 :-dynamic('variantOfSuffix'/2).
-:-dynamic('nameString'/2).
-
+*/
 
 % ==============================================================================
 %:- dynamic_multifile_exported kbp_t_list_prehook/2.
@@ -31,26 +139,32 @@ must_be_in_user:-module(parser_e2c,[
 :-export(reorderClause/2).
 :-meta_predicate(reorderClause(?,?)).
 
+cyckb_t_e2c(P,A,B):- fail,cyckb_t(P,A,B).
 cyckb_t_e2c(P,A,B,C):- fail,cyckb_t(P,A,B,C).
 
-:- dynamic_multifile_exported thglobal:use_cyc_database/0.
+% :- dynamic_multifile_exported thglobal:use_cyc_database/0.
 
 % :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all.pl')).
 
 :- meta_predicate do_dcg(?,?,?,?,?).
 :- meta_predicate isPOS(?,?,?,?,?).
 
-:- register_module_type(utility).
+% :- register_module_type(utility).
 
 :-thread_local t_l:allowTT/0.
 :-thread_local t_l:omitCycWordForms/0.
 
+/*
 
-%  (parse-a-question-completely "Did George W. Bush fall off a bicycle?" #$RKFParsingMt 
-% '(:wff-check? t)
-% )
+ (parse-a-question-completely "Did George W. Bush fall off a bicycle?" #$RKFParsingMt 
+ '(:wff-check? t)
+ )
+
+*/
 
 % idGen(X):-flag(idGen,X,X+1).
+
+:- ensure_loaded(logicmoo(mpred/mpred_loader)).
 
 :- file_begin(pl).
 
@@ -233,7 +347,7 @@ dm1:-
 
 doE2CTest(Text):- atomic(Text),atom_contains(Text,'  '),!.
 doE2CTest(Text):- clause(e2c_result(Text),_),!.
-doE2CTest(Text):- e2c(Text,F),asserta((e2c_result(Text):- F)),portray_clause(F),!.
+doE2CTest(Text):- e2c(Text,F),call(asserta,(e2c_result(Text):- F)),portray_clause(F),!.
 
 % dm1:-e2c("I"),e2c("I am happy"),e2c("I saw wood"),e2c("I see two books"), e2c("I see two books sitting on a shelf").
 dm2:-e2c("AnyTemplate1 affects the NPTemplate2").
@@ -323,7 +437,7 @@ posMeans(String,POS,Form,CycL):- posm_cached,!, posm_cached(_CycWord,String,POS,
 
 posMeans(String,POS,Form,CycL):-
       cache_the_posms,
-      asserta(posm_cached),
+      call(asserta,posm_cached),
       posMeans(String,POS,Form,CycL).
 
 
@@ -351,8 +465,8 @@ correctArgIsas(X, _ ,X).
 
 :-retractall(reorder_term_expansion).
 :-retractall(stringmatcher_term_expansion).
-% :-asserta(reorder_term_expansion).
-:-asserta(stringmatcher_term_expansion).
+% :-call(asserta,reorder_term_expansion).
+:-call(asserta,stringmatcher_term_expansion).
 
 multiStringMatch([W|List],[W|_]):-is_list(List),!.
 multiStringMatch(W,[W|_]):-atom(W),!.
@@ -463,8 +577,8 @@ posTT(_CycWord, _Phrase, _POS, _Form:_PosForms):- fail.
 
 %:-retractall(reorder_term_expansion).
 %:-retractall(stringmatcher_term_expansion).
-% :-asserta(reorder_term_expansion).
-% :-asserta(stringmatcher_term_expansion).
+% :-call(asserta,reorder_term_expansion).
+% :-call(asserta,stringmatcher_term_expansion).
 
 
 % ==========================================================
@@ -662,7 +776,7 @@ pos_0(String,CycWord,Form,POS):- speechPartPreds_transitive(POS, Form), meetsFor
 % speechPartPreds HACKS
 % ==========================================================
 is_speechPartPred_tt_ever(Form):- atom(Form),atom_concat(infl,_,Form),
-  call_tabled_can(findall_nodupes(F,((el_holds(isa,F,'Predicate','ThoughtTreasureMt',[amt('ThoughtTreasureMt')|_]),atom(F),atom_concat(infl,_,F))),Forms)),!,member(Form,Forms).
+  call_tabled(findall_nodupes(F,((el_holds(isa,F,'Predicate','ThoughtTreasureMt',[amt('ThoughtTreasureMt')|_]),atom(F),atom_concat(infl,_,F))),Forms)),!,member(Form,Forms).
 
 :-export(is_speechPartPred_tt/1).
 is_speechPartPred_tt(Form):- t_l:allowTT,!,is_speechPartPred_tt_ever(Form).
@@ -688,7 +802,7 @@ is_speechPartPred_any(Form):-is_speechPartPred_nontt_ever(Form).
 is_speechPartPred_any(Form):-is_speechPartPred_tt_ever(Form).
 
 is_speechPartPred_nontt(Form):- not(t_l:omitCycWordForms),!,is_speechPartPred_nontt_ever(Form).
-is_speechPartPred_nontt_ever(Form):- call_tabled_can(no_repeats(Form,(is_speechPartPred_0(Form),not(is_speechPartPred_tt_ever(Form))))).
+is_speechPartPred_nontt_ever(Form):- call_tabled(no_repeats(Form,(is_speechPartPred_0(Form),not(is_speechPartPred_tt_ever(Form))))).
 
 is_speechPartPred_0('baseForm').
 is_speechPartPred_0(Form):-speechPartPreds_asserted(_,Form).
@@ -1360,17 +1474,17 @@ get_wordage([of, the],_Props):-!,fail.
 
 get_wordage(A,Props):-atom(A),!,get_wordage([A],Props).
 get_wordage(Pre,Props):-is_wordage_cache(Pre,Props),!.
-get_wordage(Pre,Props):-do_get_wordage(Pre,Props),!,ignore((usefull_wordage(Props),asserta(is_wordage_cache(Pre,Props)))).
+get_wordage(Pre,Props):-do_get_wordage(Pre,Props),!,ignore((usefull_wordage(Props),call(asserta,is_wordage_cache(Pre,Props)))).
 do_get_wordage(Pre,wordage(Pre,More)):- 
-  must_det(( with_no_assertions(t_l:omitCycWordForms,
-     with_no_assertions(t_l:allowTT,
+  must_det(( wno_tl(t_l:omitCycWordForms,
+     wno_tl(t_l:allowTT,
         w_tl(t_l:useOnlyExternalDBs,(findall(Prop,string_props(1,Pre,Prop),UProps),get_more_props(Pre,UProps,More))))))).
    
 
 
 get_more_props(_,Props,Props):- memberchk(form(_,_,_),Props),memberchk(pos(_,_,_),Props),!.
 get_more_props(Pre,Props,More):-
- with_no_assertions(t_l:omitCycWordForms,
+ wno_tl(t_l:omitCycWordForms,
    w_tl(t_l:allowTT,
      w_tl(t_l:useOnlyExternalDBs,((findall(Prop,string_props(2,Pre,Prop),UProps),
       flatten([UProps,Props],UMore),list_to_set(UMore,More)))))).
@@ -1490,7 +1604,7 @@ burgandy,
 '$LightingDevice',
 '"']).
 
-:-decl_mpred_hybrid(properNameStrings,2).
+:-decl_shared(properNameStrings/2).
 properNames(['Geordi',
 'Guinan',
 'LaForge',
@@ -1588,8 +1702,8 @@ pred_contains_term(Pred, A, B) :- compound(A), (functor(A,C,_);arg(_, A, C)), pr
 
 %:-retractall(reorder_term_expansion).
 %:-retractall(stringmatcher_term_expansion).
-% :-asserta(reorder_term_expansion).
-% :-asserta(stringmatcher_term_expansion).
+% :-call(asserta,reorder_term_expansion).
+% :-call(asserta,stringmatcher_term_expansion).
 
 
 :-discontiguous(simplifyLF/2).
@@ -1897,7 +2011,7 @@ proper_object(CycL) --> pos_cycl(Noun,CycL), { goodStart(noun_phrase,Noun) } .
 
 poStr(CycL,String):- stringArg(String, poStr0(CycL,String)).
 poStr0(CycL,String):- strings_match,
-      'genlPreds'(FirstName,nameString),
+      'genlPreds'(FirstName,nameStrings),
        cyckb_t_e2c(FirstName,CycL,String).
 
 poStr0(CycL,String):- strings_match,
@@ -1915,7 +2029,6 @@ poStr0(CycL,String):- strings_match,
       'nicknames'(CycL,String);
       'preferredTermStrings'(CycL,String).
 
-'nameString'(CycL,String):-'nameStrings'(CycL,String).
 
 %possessive(Agent)-->pronoun(Agent),isCycWord('Have-Contracted'),{!}.
 possessive(Agent)-->pronoun(Agent),isCycWord('Be-Contracted').
@@ -2319,8 +2432,8 @@ frame_template('RegularAdjFrame',Subj,Result,Extras) -->noun_phrase(Subj,true,Ex
 
 :-retractall(reorder_term_expansion).
 :-retractall(stringmatcher_term_expansion).
-% :-asserta(reorder_term_expansion).
-% :-asserta(stringmatcher_term_expansion).
+% :-call(asserta,reorder_term_expansion).
+% :-call(asserta,stringmatcher_term_expansion).
 
 
 removeRepeats1([],[]):-!.
@@ -3974,3 +4087,63 @@ fp([N|_],N).
 % END OLD CODE
 % ==========================================================
 
+
+
+end_of_file.
+
+
+(ssz/2),
+(idioms/3),
+(dictionary/3),
+(form80/2),
+(wnS/6)
+(tag_pos/2),
+
+        common_logic_kb_hooks:t/1),
+        common_logic_sexpr:is_quantifier/1),
+        common_logic_snark:~/1),
+        cyckb_t/4),
+        do_dcg/5 is declared as meta_predicate do_dcg(?,?,?,?,?), but has no clauses
+        e2c_term_expansion/2),
+        isPOS/5 is declared as meta_predicate isPOS(?,?,?,?,?), but has no clauses
+        logicmoo_util_shared_dynamic:decl_as/1 is declared as meta_predicate decl_as(+), but has no clauses
+        mpred_agenda:arity/2),
+        mpred_agenda:call_OnEachLoad/1),
+        mpred_at_box:genlMt/2),
+        mpred_expansion:t/2),
+        mpred_hooks:arity/2),
+        mpred_hooks:mpred_f/5),
+        mpred_hooks:mpred_f/6),
+        mpred_hooks:mpred_f/7),
+        mpred_hooks:support_hilog/2),
+        mpred_hooks:t/1),
+        mpred_hooks:t/2),
+        mpred_hooks:tNotForUnboundPredicates/1),
+        mpred_kb_ops:arity/2),
+        mpred_kb_ops:support_hilog/2),
+        mpred_pfc:arity/2),
+        mpred_pfc:maybe_prepend_mt/3),
+        mpred_props:ttPredType/1),
+        mpred_storage:arity/2),
+        mpred_storage:is_known_trew/1),
+        mpred_storage:meta_argtypes/1),
+        mpred_storage:t/1),
+        mpred_storage:tCol/1),
+        mpred_storage:ttExpressionType/1),
+        mpred_stubs_file_module:constrain_args_pttp/2),
+        mpred_stubs_file_module:t/1),
+        mpred_type_args:genls/2),
+        mpred_type_args:resultIsa/2),
+        mpred_type_args:tCol/1),
+        mpred_type_args:tRelation/1),
+        mpred_type_constraints:genls/2),
+        mpred_type_constraints:lambda/5),
+        mpred_type_constraints:t/2),
+        tCol/1),
+        genls/2),
+        mpred_type_isa:isa/2),
+        mpred_type_isa:tCol/1),
+        mudKeyword/2),
+
+        reorderClause/2 is declared as meta_predicate reorderClause(?,?), but has no clauses
+Warning: /opt/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:

@@ -57,11 +57,14 @@ noGenlPreds/1,
   with_kb_assertions_matching/3,
   write_assertions/0
   ]).
+
+:- include('../mpred/mpred_header.pi').
 :- endif.
+
+:- user:ensure_loaded(library(logicmoo_base)).
 
 % :- dynamic_multifile kbp_t_list_prehook/2.
 % % :- '$set_source_module'(common_logic_kb_hooks).
-:- include('../mpred/mpred_header.pi').
 :-
   op(1150,fx,(was_export)),
   op(1150,fx,(dynamic_multifile)).

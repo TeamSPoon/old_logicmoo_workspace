@@ -76,7 +76,7 @@ dump_st:- prolog_current_frame(Frame),dumpST0(Frame,10).
 % Dump S True Stucture Primary Helper.
 %
 dumpST0:- dbreak, 
-   prolog_current_frame(Frame),(tracing->cnotrace((CU=dtrace,cnotrace));CU=true),dumpST0(Frame,800),!,CU.
+   prolog_current_frame(Frame),(tracing->notrace((CU=dtrace,notrace));CU=true),dumpST0(Frame,800),!,CU.
 
 %= 	 	 
 
@@ -112,7 +112,7 @@ dumpST0(Frame,MaxDepth):- ignore(MaxDepth=5000),Term = dumpST(MaxDepth),
 %
 % Dump S True Stucture.
 %
-dumpST:- cnotrace((prolog_current_frame(Frame),b_setval('$dump_frame',Frame),dumpST1)).
+dumpST:- notrace((prolog_current_frame(Frame),b_setval('$dump_frame',Frame),dumpST1)).
 
 %= 	 	 
 
@@ -131,7 +131,8 @@ dumpST1:- loop_check_early(dumpST9,dumpST0).
 %
 % Dump S True Stucture.
 %
-dumpST(Depth):- cnotrace((prolog_current_frame(Frame),b_setval('$dump_frame',Frame))),loop_check_early(dumpST9(Depth),dumpST0(Depth)).
+dumpST(Depth):- notrace((prolog_current_frame(Frame),b_setval('$dump_frame',Frame))),
+   loop_check_early(logicmoo_util_dumpst:dumpST9(Depth),dumpST0(Depth)).
 
 
 %= 	 	 
@@ -150,7 +151,7 @@ get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonva
 %
 % Dump S T9.
 %
-dumpST9:- cnotrace((once(nb_current('$dump_frame',Frame);prolog_current_frame(Frame)), dumpST9(Frame,5000))).
+dumpST9:- notrace((once(nb_current('$dump_frame',Frame);prolog_current_frame(Frame)), dumpST9(Frame,5000))).
 
 %= 	 	 
 
@@ -205,6 +206,7 @@ drain_framelist_ele(Opts):-
 %
 dumpST_now(FrameIn,Opts):-
   once(number(FrameIn);prolog_current_frame(FrameIn)),
+   nb_setval('$hide_rest_frames',false),
    b_setval('$current_stack_frame_depth',0),
    b_setval('$current_stack_frame_list',[]),
    get_m_opt(Opts,max_depth,100,MD),
@@ -220,27 +222,6 @@ dumpST_now(FrameIn,Opts):-
    drain_framelist(Opts),!.
 
 
-%= 	 	 
-
-%% dumpST_now_reversed( ?FrameIn, ?Opts) is semidet.
-%
-% Dump S True Stucture Now Reversed.
-%
-dumpST_now_reversed(FrameIn,Opts):-
-  once(number(FrameIn);prolog_current_frame(FrameIn)),
-   b_setval('$current_stack_frame_depth',0),
-   b_setval('$current_stack_frame_handle',FrameIn),
-  (repeat,  
-     nb_getval('$current_stack_frame_depth',N),
-     nb_getval('$current_stack_frame_handle',Frame),
-    (printFrame(N,Frame,Opts) -> 
-     ((prolog_frame_attribute(Frame,parent,ParentFrame)->
-       (nb_setval('$current_stack_frame_handle',ParentFrame),
-       NN is N +1,nb_setval('$current_stack_frame_depth',NN),fail); !));
-     (!))).
-
-
-%= 	 	 
 
 %% pushFrame( ?N, ?Frame, ?Opts) is semidet.
 %
@@ -255,6 +236,7 @@ pushFrame(N,Frame,_Opts):- nb_getval('$current_stack_frame_list',Current),nb_set
 %
 % Print Frame.
 %
+printFrame(_,_,_):- nb_current('$hide_rest_frames',true),!.
 printFrame(N,Frame,Opts):-
   ignore(((frame_to_fmsg(N,Frame,Opts,Out)),must(fmsg_rout(Out)))),!.
 
@@ -281,6 +263,7 @@ frame_to_fmsg(N,Frame,Opts,[nf(noFrame(N,Frame,Opts))]).
 % Functor Message Rout.
 %
 fmsg_rout([]):-!.
+fmsg_rout([fr(E)|_]):- member(goal=GG,E),end_dump(GG),!,ignore(fdmsg(fr(E))),!.
 fmsg_rout([fr(E)|_]):- member(goal=GG,E),end_dump(GG),!,ignore(fdmsg(fr(E))),!.
 fmsg_rout([E|RROut]):- ignore(fdmsg(E)),!,fmsg_rout(RROut).
 fmsg_rout(RROut):- show_call(why,forall(member(E,RROut),fdmsg(E))),!.
@@ -467,7 +450,7 @@ clauseST(ClRef,Goal = HB):- ignore(((clause(Head, Body, ClRef),copy_term(((Head 
 %
 end_dump(true):-!,fail.
 end_dump(_:GG):-!,end_dump(GG).
-end_dump(GG):-compound(GG),functor(GG,F,_),atom_concat(dump,_,F).
+end_dump(GG):-compound(GG),functor(GG,F,_),atom_concat(dump,_,F),nb_setval('$hide_rest_frames',true).
 
 % =====================
 % dtrace/0/1/2
@@ -494,9 +477,9 @@ system:dbreak:- wdmsg("DUMP_BREAK/0"), (thread_self(main)->dtrace(system:break);
 
 dtrace(G):- strip_module(G,_,dbreak),\+ thread_self(main),!.
 dtrace(G):- tlbugger:has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
-dtrace(G):- cnotrace((tracing,cnotrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dumptrace(G))),trace).
+dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dumptrace(G))),trace).
 
-dtrace(G):- cnotrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
+dtrace(G):- notrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
 dtrace(G):- dumptrace(G).
@@ -551,7 +534,7 @@ dumptrace(G):-
     w_tl(set_prolog_flag(retry_undefined, false),
      dumptrace0(G)))).
 
-dumptrace0(G):- notrace((tracing,notrace,wdmsg(tracing_dumptrace(G)))),!, catch(((dumptrace0(G) *-> trace ; (trace,fail))),_,true).
+dumptrace0(G):- notrace((tracing,notrace,wdmsg(tracing_dumptrace(G)))),!, catch(((dumptrace0(G) *-> dtrace ; (dtrace,fail))),_,true).
 dumptrace0(G):-   
   catch(attach_console,_,true),
     repeat, 
@@ -571,12 +554,12 @@ dumptrace0(G):-
 %
 dumptrace(_,0'h):- listing(dumptrace/2),!,fail.
 dumptrace(_,0'g):-!,dumpST,!,fail.
-dumptrace(_,0'G):-!,cnotrace(dumpST0(500000)),!,fail.
+dumptrace(_,0'G):-!,notrace(dumpST0(500000)),!,fail.
 dumptrace(_,0'D):-!,prolog_stack:backtrace(8000),!,fail.
 dumptrace(_,0'd):-!,prolog_stack:backtrace(800),!,fail.
 
 dumptrace(G,0'l):-!, 
-  restore_trace(( cnotrace(ggtrace),G)),!,cnotrace.
+  restore_trace(( notrace(ggtrace),G)),!,notrace.
 dumptrace(G,0's):-!,hotrace(ggtrace),!,(hotrace(G)*->true;true).
 dumptrace(G,0'S):-!, wdmsg(skipping(G)),!.
 dumptrace(G,0'x):-!, wdmsg(skipping(G)),!.
@@ -589,8 +572,8 @@ dumptrace(_,0'm):-!,make,fail.
 dumptrace(G,0'L):-!,xlisting(G),!,fail.
 dumptrace(G,0'l):-!,visible(+all),show_and_do(rtrace(G)).
 dumptrace(G,0'c):-!, show_and_do((G))*->true;true.
-dumptrace(G,0'r):-!, cnotrace,(rtrace((G,cnotrace))),!,fail.
-dumptrace(G,0'f):-!, cnotrace,(ftrace((G,cnotrace))),!,fail.
+dumptrace(G,0'r):-!, notrace,(rtrace((G,notrace))),!,fail.
+dumptrace(G,0'f):-!, notrace,(ftrace((G,notrace))),!,fail.
 dumptrace(G,0't):-!,visible(+all),leash(+all),trace,!,G.
 dumptrace(G,10):-!,dumptrace_ret(G).
 dumptrace(G,13):-!,dumptrace_ret(G).
@@ -607,6 +590,6 @@ dumptrace(_,C):-fmt(unused_keypress(C)),!,fail.
 %
 % Dump Trace Ret.
 %
-dumptrace_ret(G):- cnotrace((leash(+all),visible(+all),visible(+unify),trace)),G.
+dumptrace_ret(G):- notrace((leash(+all),visible(+all),visible(+unify),trace)),G.
 
 

@@ -64,6 +64,7 @@
             as_list/2,
             cheaply_u/1,
             cheaply_u/1,
+            maybe_prepend_mt/3,
             compare_op/4,
             comparitiveOp/1,
             compound_all_open/1,
@@ -84,6 +85,7 @@
             demodulize/3,
             remodulize/3,
             replaced_module/3,
+            fully_expand_clause_now/3,
             do_expand_args/3,
             ain_expanded/1,
             do_expand_args_l/3,
@@ -408,7 +410,7 @@ functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,O)->O=tFunction.
 
 functor_declares_instance_0(P,tCol):- arg(_,s(tCol,ftSpec),P).
 functor_declares_instance_0(P,P):- arg(_,s(ttExpressionType,ttModule,tSet,tFunction),P).
-functor_declares_instance_0(P,P):- cheaply_u(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
+functor_declares_instance_0(P,P):- cheaply_u(functorDeclares(P)). % arity_no_bc(P,1),\+((arity_no_bc(P,N),N>1)).
 %functor_declares_instance_0(COL,COL):- call_u(isa(COL,tCol)).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttRelationType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
@@ -954,7 +956,7 @@ fully_expand_head_throw_if_loop(A1,B1,C1):- must(loop_check_term(fully_expand_he
 % Database Expand A Noloop.
 %
 fully_expand_head(Op,Sent,SentO):-
-  memoize_on(fully_expand,Sent->SentO,fully_expand_head_now(Op,Sent,SentO)).
+  memoize_on(fully_expand,Sent->SentO,find_and_call(fully_expand_head_now(Op,Sent,SentO))).
 
 fully_expand_head_now(Why,Before,After):-
    subst(Before,mpred_isa,isa,Before1),
@@ -1191,7 +1193,7 @@ db_expand_0(Op,IN,OUT):-
 is_arity_pred(argIsa).
 is_arity_pred(arity).
 
-arity_zor(D,ZOR) :- atom(D),D\==isa, \+ (arity(D,N),!,N>ZOR).
+arity_zor(D,ZOR) :- atom(D),D\==isa, \+ (arity_no_bc(D,N),!,N>ZOR).
 
 %= 	 	 
 
@@ -1714,7 +1716,7 @@ transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),
 transform_holds_3(_,A,A):- (not_ftCompound(A)),!.
 transform_holds_3(_,props(Obj,Props),props(Obj,Props)):-!.
 %transform_holds_3(Op,Sent,OUT):-Sent=..[And|C12],is_sentence_functor(And),!,maplist(transform_holds_3(Op),C12,O12),OUT=..[And|O12].
-transform_holds_3(_,A,A):-compound(A),functor(A,F,N), predicate_property(A,_),arity(F,N),!.
+transform_holds_3(_,A,A):-compound(A),functor(A,F,N), predicate_property(A,_),arity_no_bc(F,N),!.
 transform_holds_3(HFDS,M:Term,M:OUT):-atom(M),!,transform_holds_3(HFDS,Term,OUT).
 transform_holds_3(HFDS,[P,A|ARGS],DBASE):- is_ftVar(P),!,DBASE=..[HFDS,P,A|ARGS].
 transform_holds_3(HFDS, ['[|]'|ARGS],DBASE):- trace_or_throw(list_transform_holds_3(HFDS,['[|]'|ARGS],DBASE)).

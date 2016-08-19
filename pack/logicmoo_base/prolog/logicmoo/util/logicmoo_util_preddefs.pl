@@ -889,7 +889,7 @@ pred_prop(PredMt:F/A, (dynamic(PredMt:F/A)) ,(dynamic), show_call(why,compile_pr
 %
 :- module_transparent(is_static_why/5).
 is_static_why(PredMt,P,_,_,_):- predicate_property(PredMt:P,dynamic),!,fail.
-is_static_why(PredMt,P,F,A,WHY):- show_success(predicate_property(PredMt:P,static)),!,WHY=static(PredMt:F/A).
+is_static_why(PredMt,P,F,A,WHY):- show_success(static,predicate_property(PredMt:P,static)),!,WHY=static(PredMt:F/A).
 
 defined_predicate(PredMt:P):- (current_module(PredMt),
    current_predicate(_,PredMt:P),( \+ predicate_property(PredMt:P,imported_from(_)))).

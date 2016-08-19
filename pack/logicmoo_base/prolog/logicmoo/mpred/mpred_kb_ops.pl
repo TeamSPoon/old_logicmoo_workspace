@@ -271,6 +271,7 @@ mpred_facts_and_universe/1
 :- include('mpred_header.pi').
 
 :- endif.
+:- ensure_loaded(library('logicmoo/util/logicmoo_util_bugger.pl')).
 
 :- module_transparent retract_mu/1,
                assert_mu/4,
@@ -287,6 +288,7 @@ mpred_facts_and_universe/1
 :- meta_predicate 
       pred_head(1,*),
       physical_side_effect(+),
+      call_s(0),
       oncely(0),
       naf(0),
       call_s2(0),
@@ -513,7 +515,7 @@ get_consequent(P,P).
 :- style_check(+singleton).
 
 % TODO READD
-%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
+%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttRelationType,
 %     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),
 
 
@@ -831,7 +833,7 @@ assert_eq_quitely(H):- attvar_op(assert_if_new,H).
 % PFC If Is A Tautology.
 %
 mpred_is_tautology(Var):-is_ftVar(Var).
-mpred_is_tautology(V):- copy_term_nat(V,VC),numbervars(VC),show_success(mpred_is_taut(VC)).
+mpred_is_tautology(V):- copy_term_nat(V,VC),numbervars(VC),mpred_is_taut(VC).
 
 
 %% mpred_is_taut( :TermA) is semidet.
@@ -1339,7 +1341,7 @@ if_missing_mask(Q,N,R,dif:dif(Was,NEW)):-
 which_missing_argnum(Q,N):-
  must((acyclic_term(Q),is_ftCompound(Q),get_functor(Q,F,A))),
  F\=t,
-  (singleValuedInArg(F,N) -> true;
+  (call_u(singleValuedInArg(F,N)) -> true;
     ((consequent_arg(N,Q,Was),is_ftNonvar(Was)) -> true; N=A)).
 mpred_run_pause:- asserta(t_l:mpred_run_paused).
 mpred_run_resume:- retractall(t_l:mpred_run_paused).
@@ -2369,7 +2371,7 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 :- style_check(+singleton).
 
 % TODO READD
-%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
+%:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttRelationType,
 %     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),)
 
 %% get

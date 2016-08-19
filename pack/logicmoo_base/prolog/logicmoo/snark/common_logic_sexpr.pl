@@ -6,7 +6,11 @@
   fixvars/4,
   to_untyped/2,ok_varname/1,svar_fixvarname/2,
   sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
+
 :- endif.
+
+ :- meta_predicate with_lisp_translation(*,2).
+ :- meta_predicate see_seen(0).
 
 see_seen(_):-!.
 see_seen(G):-call(G).
@@ -80,7 +84,7 @@ clip_qm(A,AO):-clip_us(A,AO).
 %
 sexpr_sterm_to_pterm(VAR,'$VAR'(V)):- atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
 sexpr_sterm_to_pterm(VAR,kw((V))):- atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
-sexpr_sterm_to_pterm([S,Vars|TERM],PTERM):- nonvar(S),is_quantifier(S),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[S,Vars|PLIST])),!.
+sexpr_sterm_to_pterm([S,Vars|TERM],PTERM):- nonvar(S),call_if_defined(common_logic_snark:is_quantifier(S)),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[S,Vars|PLIST])),!.
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['=>'|PLIST])),!.
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('<=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['<=>'|PLIST])),!.
 sexpr_sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
@@ -908,6 +912,9 @@ with_lisp_translation(Other,With):-
 with_lisp_translation:-with_lisp_translation('dump.txt',=).
 wlt2(O):- 
    open('dump.txt',read,I),see(I),repeat,current_input(I),baseKB:parse_sexpr(I,O),stream_property(I,position(POD)).
+
+wlt_w(O):- 
+   see('dump.txt'),repeat,current_input(I),baseKB:parse_sexpr(I,O),stream_property(I,position(POD)).
 
 wlt3(O):-
   open('dump.txt',read,I),see(I),read_pending_whitespace(I),repeat,read_pending_whitespace(I),get_char(I,O),

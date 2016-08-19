@@ -753,12 +753,15 @@ bad_idea:- current_prolog_flag(bad_idea,true).
 
 %= 	 	 
 
+
+:- ensure_loaded(logicmoo_util_dmsg).
+
 %% wdmsg( ?X) is semidet.
 %
 % Wdmsg.
 %
-wdmsg(X):- cnotrace(show_source_location),
-   cnotrace(ignore(hotrace(with_all_dmsg(dmsg(X))))).
+wdmsg(X):- notrace(show_source_location),
+   notrace(logicmoo_util_dmsg:with_all_dmsg(dmsg(X))).
 
 %= 	 	 
 

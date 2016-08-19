@@ -135,7 +135,7 @@ assert_predArgTypes_fa(F,ArgTs):- not(is_list(ArgTs)),ArgTs=..[_|ArgsL],!,assert
 %assert_predArgTypes_fa(F,ArgsList):- clause_b(ftAction(F),true),!,show_call(why,must(assert_predArgTypes_from_left(F,1,ArgsList))).
 assert_predArgTypes_fa(F,ArgsList):- length(ArgsList,L),assert_predArgTypes_l(F,L,ArgsList).
 
-%assert_predArgTypes_l(F,L,ArgsList):- arity(F,A),!,must( (A>=L) -> assert_predArgTypes_from_right(F,A,ArgsList);true).
+%assert_predArgTypes_l(F,L,ArgsList):- arity_no_bc(F,A),!,must( (A>=L) -> assert_predArgTypes_from_right(F,A,ArgsList);true).
 
 % % :- '$set_source_module'(mpred_type_args).
 
@@ -390,8 +390,8 @@ argIsa_known(F,N,Type):-  one_must(asserted_argIsa_known(F,N,Type),argIsa_call_7
 asserted_argIsa_known(F/_,N,Type):-nonvar(F),!,asserted_argIsa_known(F,N,Type).
 asserted_argIsa_known(F,N,Type):- argIsa_call_0(F,N,Type).
 asserted_argIsa_known(F,N,Type):- var(F),!,tRelation(F),asserted_argIsa_known(F,N,Type).
-asserted_argIsa_known(F,N,Type):- arity(F,1),!,N=1,Type=F.
-asserted_argIsa_known(F,N,Type):- var(N),arity(F,A),!,between(1,A,N),asserted_argIsa_known(F,N,Type).
+asserted_argIsa_known(F,N,Type):- arity_no_bc(F,1),!,N=1,Type=F.
+asserted_argIsa_known(F,N,Type):- var(N),arity_no_bc(F,A),!,between(1,A,N),asserted_argIsa_known(F,N,Type).
 asserted_argIsa_known(F,N,Type):- argIsa_call_6(F,N,Type),!.
 
 
@@ -489,7 +489,7 @@ argIsa_call_0(predicateConventionMt,2,ftAtom).
 % argIsa_call_0(baseKB:agent_text_command,_,ftTerm).
 argIsa_call_0('<=>',_,ftTerm).
 argIsa_call_0(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftListFn(ftVoprop)).
-argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),arity(Arity,A),number(A),number(N),N=<A,arg(N,vv(tPred,ftInt,tCol),T).
+argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),arity_no_bc(Arity,A),number(A),number(N),N=<A,arg(N,vv(tPred,ftInt,tCol),T).
 argIsa_call_0(F,2,ftString):-member(F,[descriptionHere,mudDescription,nameStrings,mudKeyword]),!.
 
 argIsa_call_0(F,N,Type):-a(functorDeclares,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
@@ -543,7 +543,7 @@ grab_argsIsa(F,Types):- grab_argsIsa_6(Types),get_functor(Types,F0),F0==F,!,asse
 %
 % grab Arguments  (isa/2) Helper number 6..
 %
-grab_argsIsa_6(Types):- meta_argtypes(Types).
+grab_argsIsa_6(Types):- call_u(meta_argtypes(Types)).
 grab_argsIsa_6(mudColor(tSpatialThing, vtColor)).
 grab_argsIsa_6(Types):- clause_b(quotedDefnIff(Types,_)),maybe_argtypes(Types).
 % grab_argsIsa_6(Types):- current_predicate(get_all_templates/1),get_all_templates(Types),maybe_argtypes(Types).
@@ -575,7 +575,7 @@ maybe_argtypes(TypesIn):- strip_module(TypesIn,_,Types), compound(Types), ground
 % Argument  (isa/2) call Helper number 7..
 %
 argIsa_call_7(Prop,N1,Type):- nonvar(Type),!,argIsa_call_7(Prop,N1,WType),!,genls(WType,Type).
-argIsa_call_7(Pred,N,ftVoprop):-number(N),arity(Pred,A),N>A,!.
+argIsa_call_7(Pred,N,ftVoprop):-number(N),arity_no_bc(Pred,A),N>A,!.
 argIsa_call_7(_,_,ftTerm):- argisa_nodebug,!.
 argIsa_call_7(F,_,ftTerm):-member(F/_, [argIsa/3,predProxyAssert/2,negate_wrapper0/2,mudFacing/_,registered_module_type/2,       
                                 ruleBackward/2,formatted_resultIsa/2,
@@ -590,7 +590,7 @@ argIsa_call_7(Prop,N1,Type):- argIsa_call_9(Prop,N1,Type).
 % Argument  (isa/2) call Helper number 9..
 %
 argIsa_call_9(_,_,Type):- argisa_nodebug,!,genls(ftTerm,Type).
-argIsa_call_9(Prop,N1,Type):- arity(Prop,Arity),dmsg(todo(define(argIsa_known_a(Prop,N1,'_TYPE')))),number(Arity),number(N1),must(N1=<Arity),Type=argIsaFn(Prop,N1),!.
+argIsa_call_9(Prop,N1,Type):- arity_no_bc(Prop,Arity),dmsg(todo(define(argIsa_known_a(Prop,N1,'_TYPE')))),number(Arity),number(N1),must(N1=<Arity),Type=argIsaFn(Prop,N1),!.
 argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known_b(Prop,N1,'_TYPE')))),dtrace,Type=argIsaFn(Prop,N1),!.
 argIsa_call_9(_,_,ftTerm).
 
@@ -721,7 +721,7 @@ discoverAndCorrectArgsIsa_from_left(Op,Prop,N1,[A|Args],Out):-
 % Managed Predicate Full Arity.
 %
 mpred_full_arity({},A):-trace_or_throw(crazy_mpred_full_arity({}, A)).
-mpred_full_arity(F,A):-arity(F,A),!.
+mpred_full_arity(F,A):-arity_no_bc(F,A),!.
 mpred_full_arity(F,A):-grab_argsIsa(F,Types),maybe_argtypes(Types),show_call(why,(functor(Types,F,A),assert_arity(F,A))),!.
 
 
@@ -974,7 +974,7 @@ correctType0(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],
    functor(Props,F,A),
    A2 is A+1,
-   clause_b(arity(F,A2)),
+   arity_no_bc(F,A2),
    C=..[F,Arg|TypesL],
    correctArgsIsa(Op,C,CC),
    CC=..[F,NewArg|_].

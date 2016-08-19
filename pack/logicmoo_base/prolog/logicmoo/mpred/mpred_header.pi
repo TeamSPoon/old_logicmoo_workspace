@@ -171,15 +171,17 @@ user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_
 :- multifile(baseKB:ignore_file_mpreds/1).
 :- dynamic(baseKB:ignore_file_mpreds/1).
 
-register_mpred_impl_file(F):- (current_prolog_flag(xref,true)->true;
+:- if(\+ current_predicate(lm_util:register_mpred_impl_file/1)).
+lm_util:register_mpred_impl_file(F):- (current_prolog_flag(xref,true)->true;
    must((((
     (baseKB:ignore_file_mpreds(F)->true;assertz(baseKB:ignore_file_mpreds(F))))),
    initialization((
    (if_defined(baseKB:ignore_file_mpreds(F),fail)->true;assertz(baseKB:ignore_file_mpreds(F))),
    ((baseKB:mpred_is_impl_file(F))->true;assertz(baseKB:mpred_is_impl_file(F)))),restore)))).
+:- endif.
 
-:- prolog_load_context(source,F),register_mpred_impl_file(F).
-:- prolog_load_context(file,F),register_mpred_impl_file(F).
+:- prolog_load_context(source,F),lm_util:register_mpred_impl_file(F).
+:- prolog_load_context(file,F),lm_util:register_mpred_impl_file(F).
 
 % ================================================
 % Thread Locals
@@ -245,9 +247,22 @@ register_mpred_impl_file(F):- (current_prolog_flag(xref,true)->true;
           op(1150,fx,(was_export)),
           op(1150,fx,(shared_multifile)).
 
-:- decl_shared(mtExact/1).
-:- decl_shared(mpred_f/3).
+          
+:- decl_shared(functorDeclares/1).
+:- decl_shared(genlMt/2).
+:- decl_shared(arity/2).
+:- decl_shared(genls/2).
 :- decl_shared(mpred_f/2).
+:- decl_shared(mpred_f/3).
+:- decl_shared(ttExpressionType/1).
+:- decl_shared(tCol/1).
+:- decl_shared(tSet/1).
+:- decl_shared(mtCore/1).
+:- decl_shared(mtCycL/1).
+:- decl_shared(mtExact/1).
+:- decl_shared(mtGlobal/1).
+:- decl_shared(mtProlog/1).
+
 
 :- decl_shared((
    argIsa/3,

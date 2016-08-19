@@ -202,7 +202,7 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
 
-kb_dynamic_m(E):- with_source_module(baseKB,decl_shared(kb_dynamic,E)).
+kb_dynamic_m(E):- with_source_module(baseKB,decl_as(kb_dynamic,E)).
 
 :- multifile(baseKB:predicateConventionMt/2).
 :- dynamic(baseKB:predicateConventionMt/2).

@@ -9,7 +9,7 @@
 end_of_file.
 :- module(logicmoo_run_old_pttp,[]).
 
-:- ensure_loaded(logicmoo(logicmoo_engine)).
+:- user:ensure_loaded(logicmoo(logicmoo_engine)).
 :- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
 

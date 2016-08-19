@@ -219,6 +219,8 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 :- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
 %:- lmce:reset_modules.
 
+% :- gripe_time(40,user:ensure_loaded(library(parser_e2c))).
+
 :- set_prolog_flag(logicmoo_debug,true).
 
 % :- mpred_trace_exec.
@@ -382,29 +384,79 @@ tSourceData(iWorldData8).
 
 end_of_file.
 
-Warning: at runtime using assert/1, use :- dynamic Name/Arity.
-Warning:
-Warning: baseKB:assert_text/2, which is referenced by
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/server/mud_telnet.pl:232:61: 1-st clause of baseKB:enqueue_session_action/3
-Warning: baseKB:mobPrey/1, which is referenced by
-Warning:        6-th clause of baseKB:world_agent_plan/3: 6-th clause of baseKB:world_agent_plan/3
-Warning: baseKB:mudContains/2, which is referenced by
-Warning:        2-nd clause of baseKB:mudInsideOf/2: 2-nd clause of baseKB:mudInsideOf/2
-Warning: baseKB:on_command_show/3, which is referenced by
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/actions/look.pl:81:14: 1-st clause of baseKB:cmdLook_proc_0/2
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/vworld/world_text.pl:20:15: 1-st clause of baseKB:when_command_show/2
-Warning: baseKB:parserVars/3, which is referenced by
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/parser_imperative.pl:577:24: 2-nd clause of baseKB:to_arg_value/2
-Warning: simple_decl_parser:argIsa/3, which is referenced by
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:133: 1-st clause of simple_decl_parser:attribute/6
-Warning: simple_decl_parser:foc_current_agent/1, which is referenced by
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:58: 1-st clause of simple_decl_parser:asserta_parserVars/3
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:59:23: 1-st clause of simple_decl_parser:parserVars/3
-Warning: simple_decl_parser:isa/2, which is referenced by
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:133: 1-st clause of simple_decl_parser:attribute/6
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:81:58: 1-st clause of simple_decl_parser:toCol_0/3
-Warning: simple_decl_parser:mudKeyword/2, which is referenced by
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:117:23: 1-st clause of simple_decl_parser:collection00/3
-Warning: simple_decl_parser:tag_pos/2, which is referenced by
-Warning:        /opt/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:254:106: 1-st clause of simple_decl_parser:translation_for/5
+% :- meta_predicate baseKB:random_instance_no_throw0(*,*,0).
+% :- meta_predicate baseKB:fmt_holds_tcall_pred_trans(4,3,?,?,?).
+% :- meta_predicate baseKB:dcgParse213(//,//,//,*,?).
+% :- meta_predicate baseKB:thread_signal_blocked(*,0).
+% :- meta_predicate baseKB:show_call_fmt(0).
+% :- meta_predicate baseKB:intersect(*,*,*,*,0,-).
+% :- meta_predicate baseKB:run_mud_test_clause(:,0).
+% :- meta_predicate baseKB:stringArgUC2(*,*,0).
+% :- meta_predicate baseKB:object_print_details0(2,*,*,*,*).
+% :- meta_predicate baseKB:call_close_and_detatch(*,*,*,0).
+% :- meta_predicate baseKB:get_sorted_instances(?,*,3).
+% :- meta_predicate baseKB:telnet_repl_writer(*,*,*,0).
+% :- meta_predicate baseKB:hooked_random_instance(*,*,0).
+% :- meta_predicate baseKB:punless(0,0).
+% :- meta_predicate baseKB:meetsForm80(0,0,*).
+% :- meta_predicate baseKB:test_call0(0).
+% :- meta_predicate baseKB:agent_coerce_for(2,*,?,?,?).
+% :- meta_predicate baseKB:parse_agent_text_command_0(*,0,*,*,*).
+% :- meta_predicate baseKB:nonvar_must_be(*,0).
+% :- meta_predicate baseKB:pred_contains_term(2,?,?).
+% :- meta_predicate baseKB:do_dcg(//,*,*,?,?).
+% :- meta_predicate baseKB:service_client_call(0,*,*,*,*,*,*).
+% :- meta_predicate baseKB:within_user(0).
+% :- meta_predicate baseKB:map_term(2,*,*).
+% :- meta_predicate baseKB:must_ac(0).
+% :- meta_predicate baseKB:now_try_game_dir(0).
+% :- meta_predicate logicmoo_util_dcg:dcgSeq(//,//,*,?).
+% Restarting analysis ...
+% autoloading logicmoo_util_ctx_frame:list_to_set_safe/2 from t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_terms
+% Found new meta-predicates in iteration 2 (2.647 sec)
+% :- meta_predicate baseKB:object_print_details(2,*,*,*,*).
+% :- meta_predicate baseKB:stringArgUC(*,*,0).
+% :- meta_predicate baseKB:fmt_holds_tcall_pred(4,3,?,?,?).
+% :- meta_predicate baseKB:fmt_holds_tcall(4,3,?,?,*).
+% :- meta_predicate baseKB:add_game_dir(*,0).
+% :- meta_predicate baseKB:merge_list_on_p(4,3,*,?,*,*,*).
+% Restarting analysis ...
+% Found new meta-predicates in iteration 3 (2.694 sec)
+% :- meta_predicate baseKB:show_kb_via_pred_fmt(4,3,*,?,*).
+% :- meta_predicate baseKB:show_kb_via_pred_3(4,3,*,?,*,*).
+% Restarting analysis ...
+
+
+        The predicates below are not defined. If these are defined
+        at runtime using assert/1, use :- dynamic Name/Arity.
+
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        baseKB:tag_pos/2, which is referenced by
+                t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl:253:106: 1-st clause of baseKB:translation_for/5
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        common_logic_sexpr:is_quantifier/1, which is referenced by
+                t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_sexpr.pl:87:54: 3-th clause of common_logic_sexpr:sexpr_sterm_to_pterm/2
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        common_logic_snark:~/1, which is referenced by
+                t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl:1338:29: 1-st clause of common_logic_snark:why_to_id/3
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        mpred_pfc:maybe_prepend_mt/3, which is referenced by
+                t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:410:51: 1-st clause of mpred_pfc:fix_mp/3
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        mpred_storage:is_known_trew/1, which is referenced by
+                t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_storage.pl:494:23: 3-th clause of mpred_storage:fact_checked/2
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        mpred_stubs_file_module:t/3, which is referenced by
+                t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl:888:8: 4-th clause of mpred_stubs_file_module:call_for_literal_db2/3
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        mpred_type_constraints:genls/2, which is referenced by
+                t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:250:34: 1-st clause of mpred_type_constraints:max_isa_l/2
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        mpred_type_constraints:lambda/5, which is referenced by
+                t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:242:34: 1-st clause of mpred_type_constraints:min_isa_l/2
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        mpred_type_constraints:t/2, which is referenced by
+                t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:603:56: 1-st clause of mpred_type_constraints:type_size/2
+Warning: t:/devel/LogicmooDeveloperFramework/PrologMUD/pack/prologmud/runtime/init_mud_server.pl:380:
+        logicmoo_util_shared_dynamic:decl_as/1 is declared as meta_predicate decl_as(+), but has no clauses
 

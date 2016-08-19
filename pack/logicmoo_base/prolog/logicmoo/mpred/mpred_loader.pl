@@ -1521,10 +1521,10 @@ expand_term_to_load_calls((H:-B),O):- B==true,!,quietly_must(expand_term_to_load
 
 expand_term_to_load_calls(HB,O):- strip_module(HB,M,(H:-B)),B==true,(H:-B)\=@=HB,!,quietly_must(expand_term_to_load_calls(M:H,O)).
 
-expand_term_to_load_calls(C,O):- fail,  hotrace((get_lang(LANG),show_success((quietly_must(transform_opers(LANG,C,M)),C\=@=M)))),!,
+expand_term_to_load_calls(C,O):- fail,  hotrace((get_lang(LANG),show_success(transform_opers,(quietly_must(transform_opers(LANG,C,M)),C\=@=M)))),!,
    quietly_must(expand_term_to_load_calls(M,O)).
 
-expand_term_to_load_calls(C,O):- fail,show_success(hotrace((compound(C), get_op_alias(OP,ALIAS),
+expand_term_to_load_calls(C,O):- fail,hotrace(show_success(load_calls,(compound(C), get_op_alias(OP,ALIAS),
   atom(OP),atom(ALIAS),C=..[OP|ARGS]))),CC=..[ALIAS|ARGS],quietly_must(loop_check(must_expand_term_to_command(CC,O))),!.
 
 expand_term_to_load_calls(C,O):- must_expand_term_to_command(C,O)->quietly_must(is_directive_form(O)).

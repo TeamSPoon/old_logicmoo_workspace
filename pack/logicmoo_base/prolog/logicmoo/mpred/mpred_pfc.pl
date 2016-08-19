@@ -33,6 +33,8 @@
   mpred_post1_rem/2,
   mpred_post1/1,
   mpred_post1_rem1/2,
+  mpred_post2/2,
+  mpred_post12/2,
   fwc1s_post1s/2,
   mpred_mark_as_ml/3,
   mpred_mark_fa_as/5,
@@ -60,6 +62,7 @@
   remove_negative_version/1,
   listing_u/1,
   
+  call_u_mp/2,
 
   '=@@='/2,
   op(700,xfx,'=@@='),
@@ -197,6 +200,7 @@ push_current_choice/1,
       clause_asserted_u(+),
       mpred_get_support(+,-),
       mpred_fact(?,0),
+      call_u_mp(+,*,+),
       mpred_test(+),
       mpred_test_fok(+),
       mpred_METACALL(1,-,+),
@@ -766,7 +770,8 @@ mpred_ain(PIn,S):-
    with_current_why(S, motel_ain(PIn,S)),!.
 
 mpred_ain(PIn,S):- 
-  must(add_eachRulePreconditional(PIn,P)),
+  % must(add_eachRulePreconditional(PIn,P)),
+  PIn=P,
   must(full_transform(ain,P,P0)),!,
   must(ain_fast(P0,S)),!,
   ignore((P\=@=P0, mpred_db_type(P,fact(_)),show_call(mpred_fwc(P)))).
@@ -1486,7 +1491,7 @@ mpred_undo1(pt(Key,Head,Body)):-
   % undo a positive trigger.
   %
   !,
-  (show_success(retract_u(pt(Key,Head,Body)))
+  (show_success(unfwc,retract_u(pt(Key,Head,Body)))
     -> mpred_unfwc(pt(Head,Body))
      ; mpred_warn("Trigger not found to undo: ~p",[pt(Head,Body)])).
 
@@ -1494,14 +1499,14 @@ mpred_undo1(pt(Head,Body)):- fail,
   % undo a positive trigger.
   %
   !,
-  (show_success(retract_u(pt(Head,Body)))
+  (show_success(unfwc,retract_u(pt(Head,Body)))
     -> mpred_unfwc(pt(Head,Body))
      ; mpred_warn("Trigger not found to undo: ~p",[pt(Head,Body)])).
 
 mpred_undo1(nt(Head,Condition,Body)):-  
   % undo a negative trigger.
   !,
-  (show_success(retract_u(nt(Head,Condition,Body)))
+  (show_success(unfwc,retract_u(nt(Head,Condition,Body)))
     -> mpred_unfwc(nt(Head,Condition,Body))
      ; mpred_warn("Trigger not found to undo: ~p",[nt(Head,Condition,Body)])).
 
@@ -1850,7 +1855,7 @@ lookup_m_g(To,_M,G):- clause(To:G,true).
 
 % :- table(call_u/1).
 
-call_u(G):- strip_module(G,M,P), gripe_time(0.3,call_u_mp(M,P)).
+call_u(G):- strip_module(G,M,P), gripe_time(5.3,call_u_mp(M,P)).
 % call_u(G):- strip_module(G,M,P), call_u_mp(G,M,P).
 
 
