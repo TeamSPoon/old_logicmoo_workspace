@@ -28,7 +28,8 @@ action_requires_states(Agent,Action,A):- action_rules(Agent,VERB,SENT,StateRules
 
 :- op(200,fy,'?').
 action_rules(Agent,actTestWield,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tUseAble),-mudStowing(Agent,Obj),+mudWielding(Agent,Obj)]).
-action_rules(Agent,actTestStow,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tStowAble),?genlPreds(Using,'mudControls'),- t(Using,Agent,Obj),+mudStowing(Agent,Obj)]).
+action_rules(Agent,actTestStow,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tStowAble),?genlPreds(Using,'mudControls'),
+  - t(Using,Agent,Obj),+mudStowing(Agent,Obj)]).
 
 guess_verb_template(Action):-
        action_rules(_Agent,Verb,Args,ListA),

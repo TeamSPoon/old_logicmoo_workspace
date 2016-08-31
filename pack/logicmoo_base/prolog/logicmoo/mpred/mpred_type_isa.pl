@@ -216,6 +216,7 @@ noncol_type('LogicalConnective').
 never_type_why(V,ftVar(isThis)):-is_ftVar(V),!.
 never_type_why(cheaply_u,cheaply_u(isThis)):-!.
 never_type_why(C,_):-a(tCol,C),!,fail. % already declared to be a type
+never_type_why(_,_):- \+ current_prolog_flag(logicmoo_debug,true),!,fail.
 never_type_why(C,noncol_type(T)):- noncol_type(T),a(T,C),!.
 never_type_why(F,decided_not_was_isa(F,W)):-call_u(decided_not_was_isa(F,W)),!.
 %never_type_why(C):- is_ftCompound(C),functor(C,F,1),isa_asserted(F,tCol).
@@ -629,8 +630,7 @@ not_mud_isa0(props,ttRelationType).
 not_mud_isa0(F, functorDeclares):- \+ (clause_asserted(functorDeclares(F))).
 not_mud_isa0(actGossup,tChannel).
 not_mud_isa0(_, blah):-!.
-not_mud_isa0(I,meta_argtypes):-!, \+ (is_ftCompound(I)).
-not_mud_isa0(I,meta_argtypes):-!, \+ (is_ftCompound(I)).
+not_mud_isa0(I,meta_argtypes):- \+ (is_ftCompound(I)).
 not_mud_isa0(_,prologHybrid):-!,fail.
 not_mud_isa0(prologMacroHead, ttExpressionType).
 not_mud_isa0(tAgent,ttExpressionType).

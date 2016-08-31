@@ -316,7 +316,8 @@ assumed_detached_player(_).
 become_player(P):- once(current_agent(Was)),Was=P,!.
 become_player(P):- get_session_id(O),retractall(lmcache:agent_session(_,O)),
   assert_isa(P,tHumanControlled),must(create_agent(P))->
-  assumed_detached_player(P),asserta_new(lmcache:agent_session(P,O)),!.
+  assumed_detached_player(P),asserta_new(lmcache:agent_session(P,O)),!,
+  put_in_world(P).
 
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).
@@ -334,14 +335,15 @@ tCol(tCorpse).
 % When an agent dies, it turns into a tCorpse.
 % corpse is defined as an object in the *.objects.pl files
 agent_into_corpse(Agent) :-
-	del(mudAtLoc(Agent,LOC)),
+        must(mudAtLoc(Agent,LOC)),
+        Newthing = iCorpseFn(Agent),
+        assert_isa(Newthing,tCorpse),
+	ain(mudAtLoc(Newthing,LOC)),
+        del(mudAtLoc(Agent,LOC)),
 	clr(mudStr(Agent,_)),
 	clr(mudHeight(Agent,_)),
 	clr(mudStm(Agent,_)),
-	clr(mudSpd(Agent,_)),
-        Newthing = iCorpseFn(Agent),
-        assert_isa(Newthing,tCorpse),
-	ain(mudAtLoc(Newthing,LOC)).
+	clr(mudSpd(Agent,_)).
 
 % Displays all the agents stats. Used at end of a run.
 display_stats(Agents) :-

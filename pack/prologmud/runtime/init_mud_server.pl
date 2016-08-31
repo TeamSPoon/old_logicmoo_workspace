@@ -391,7 +391,8 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 % :- make.
 lar:- ain(tSourceData(iWorldData8)),ain(isLoaded(iWorldData8)),ain(isRuntime), login_and_run.
 :- initialization(lar,restore).
-% :- initialization(lar).
+
+:- initialization(lar).
 
 
 end_of_file.

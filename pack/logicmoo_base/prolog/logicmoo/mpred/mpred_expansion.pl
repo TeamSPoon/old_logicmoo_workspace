@@ -856,6 +856,7 @@ is_parse_type('pkif'(NV)):-nonvar(NV).
 % Database Expand Final.
 %
 % db_expand_final(Op,Sent,Sent):- Sent=..[_,A],atom(A),!.
+db_expand_final(_ ,C,NC):- atomic(C),if_defined(best_rename(C,NC),fail),!.
 db_expand_final(_ ,NC,NC):-as_is_term(NC),!.
 db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
 db_expand_final(_,In,In):- (In=@=t(_);In=@=t(_,_,_);In=@=t(_,_,_,_);In=@=t(_,_,_,_,_);In=@=t(_,_,_,_,_,_)),!.
@@ -1054,6 +1055,36 @@ db_expand_0(_Op,P,PO):-
    atom_number(N,NN),
    atom_concat('arg',E,AE),
   PO=..[AE,FF,NN,AA],!.
+
+
+db_expand_0(_Op,P,PO):- 
+  compound(P),
+  P=..[ARE,FF,C1,C2],
+   atom_concat('interArg',REST,ARE),
+   member(E,['Isa','Genl','Format','QuotedIsa','GenlQuantity','NotIsa','SometimesIsa','NotQuotedIsa']),
+   atom_concat(E,Nums,REST),
+   (atomic_list_concat([A1,A2],'-',Nums);atomic_list_concat([A1,A2],'_',Nums)),!,
+   atom_number(A1,N1),
+   atom_number(A2,N2),
+   atom_concat(REST,E,AE),
+  PO=..[AE,FF,N1,C1,N2,C2],!.
+
+db_expand_0(_Op,P,PO):- 
+  compound(P),
+  P=..[ARE,FF,AA,RESULT],
+   atom_concat('interArg',REST,ARE),
+   member(E,['ResultGenl','ResultIsa','ResultNotIsa','ResultSometimesIsa','ResultFormat','ResultQuotedIsa','ResultNotQuotedIsa']),
+   atom_concat(N,E,REST),
+   atom_number(N,NN),
+   atom_concat('arg',E,AE),
+  PO=..[AE,FF,NN,AA,RESULT],!.
+
+
+db_expand_0(_Op,P,PO):- fail,
+  compound(P),
+  P=..[_TYPE,UNIT],
+  is_unit(UNIT),!,
+  PO=P.
 
 
 db_expand_0(Op,(H:-B),OUT):- temp_comp(H,B,db_expand_0(Op),OUT),!.

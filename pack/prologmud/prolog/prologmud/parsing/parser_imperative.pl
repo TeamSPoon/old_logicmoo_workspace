@@ -171,6 +171,7 @@ save_fmt_e(O,A):-atom(A),!,save_fmt_a(O,A),!.
 save_fmt_e(O,[E|L]):-!,save_fmt_e(O,E),!,save_fmt_e(O,L),!.
 save_fmt_e(O,isa(A)):-!,must(save_fmt_e(O,A)).
 save_fmt_e(O,t(A,_)):-!,must(save_fmt_e(O,A)).
+save_fmt_e(O,xti(A,_)):-!,must(save_fmt_e(O,A)).
 save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStub(_),cycPlus2(_),predStub(_),predicateConventionMt(_),arity(_),
 %save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
 save_fmt_e(O,E):- member_eq0(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
@@ -178,6 +179,7 @@ save_fmt_e(O,E):- member_eq0(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 save_fmt_a(P,A):-loop_check(save_fmt_a_0(P,A),true),!.
 
 save_fmt_a_0(_,E):-var(E),!.
+save_fmt_a_0(O,xti(E,_)):-!,save_fmt_a(O,E).
 save_fmt_a_0(O,t(E,_)):-!,save_fmt_a(O,E).
 save_fmt_a_0(O,E):-compound(O),arg(1,O,E),!,save_fmt_a(O,E).
 save_fmt_a_0(_,A):-atom(A),atom_length(A,L),L =< 1.
@@ -226,7 +228,7 @@ match_object(S,Obj):-i_name(Obj,S),!.
 match_object([S],Obj):-!,match_object(S,Obj).
 match_object([S1|S],Obj):-match_object(S1,Obj),match_object(S,Obj),!.
 % match_object(S,Obj):-atomic(S),string_to_atom(S,ID),call_u(tIndividual(ID)),!,(var(Obj)->Obj=ID;same_ci(ID,Obj)).
-match_object(S,Obj):-to_case_breaks(Obj,List)->member(t(Str,_),List),string_equal_ci(S,Str),!.
+match_object(S,Obj):-to_case_breaks(Obj,List)->member(xti(Str,_),List),string_equal_ci(S,Str),!.
 match_object(S,Obj):-ground(S:Obj),match_object_exp(S,Obj),!.
 
 match_object_exp(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).
@@ -318,6 +320,8 @@ verb_alias('lo',actLook).
 verb_alias('s',actMove(vSouth)).
 % verb_alias('go','go').
 verb_alias('where is',actWhere).
+
+% :- sanity((clause_u(verb_alias(S,actWhere)),argIsa(verb_alias,1,C),isa(S,C))).
 
 % pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
@@ -430,7 +434,7 @@ guess_mudDescription_0("",_):-!,fail.
 guess_mudDescription_0(Name,Text):-string(Name),!,Name=Text.
 guess_mudDescription_0(Name,Text):-is_list(Name),!,
     maplist(as_atom,Name,RealName),atomic_list_concat(RealName,Obj),!,guess_mudDescription_0(Obj,Text).
-guess_mudDescription_0(Name,Desc):- isa(Name,tPred), \+ isa(Name,tCol),atomic(Name),make_summary([],Name,Desc).
+guess_mudDescription_0(Name,Desc):- arity(Name,Int),integer(Int), \+ isa(Name,tCol),atomic(Name),make_summary([],Name,Desc).
 guess_mudDescription_0(Name,Desc):- atomic(Name),!,atom(Name),to_case_breaks(Name,TextT),
    maplist(to_descriptive_name(Name),TextT,TextL),!,atomics_to_string(TextL,' ',Desc).
 
@@ -444,8 +448,8 @@ guess_nameStrings_0(Name,Text):-is_list(Name),!,
 guess_nameStrings_0(Name,Text):-compound(Name),!, \+ is_ftVar(Name),Name=..[F,A|List],!,guess_nameStrings_0([F,A|List],Text).
 guess_nameStrings_0(Name,Text):-atom(Name),to_case_breaks(Name,ListN),to_case_breaks_trimed(Name,ListN,Text).
 
-to_case_breaks_trimed(Name,[t(TextL,Class),t(TextR,Class)|ListN],Text):-  
-    maplist(to_descriptive_name(Name),[t(TextL,Class),t(TextR,Class)|ListN],Desc),
+to_case_breaks_trimed(Name,[xti(TextL,Class),xti(TextR,Class)|ListN],Text):-  
+    maplist(to_descriptive_name(Name),[xti(TextL,Class),xti(TextR,Class)|ListN],Desc),
     atomics_to_string(Desc,' ',Text),!.
 
 to_case_breaks_trimed(Name,[_|ListN],Text):- is_list(ListN),!,
@@ -453,7 +457,7 @@ to_case_breaks_trimed(Name,[_|ListN],Text):- is_list(ListN),!,
     atomics_to_string(Desc,' ',Text).
 
 type_descriptive_name(_,Str,Str):-string(Str),!.
-type_descriptive_name(Name,t(Atom,_Class),Out):-!,type_descriptive_name(Name,Atom,Out).
+type_descriptive_name(Name,xti(Atom,_Class),Out):-!,type_descriptive_name(Name,Atom,Out).
 type_descriptive_name(tCol,t,'First-Order').
 type_descriptive_name(tPred,Desc,Atom):-longer_sumry(Desc,Atom).
 type_descriptive_name(tCol,tt,'Second-Order').
@@ -470,14 +474,14 @@ type_descriptive_name(ftNonvar,Pefix,Desc):-
 
 to_descriptive_name(For,Desc,Atom):- type_descriptive_name(Type,Desc,Atom),isa(For,Type),!.
 to_descriptive_name(_For,Pefix,Desc):- call_u(type_prefix(Pefix,TypeName)), guess_nameStrings(TypeName,Desc).
-to_descriptive_name(For,t(Pefix,lower),Desc):-!,to_descriptive_name(For,Pefix,Desc).
+to_descriptive_name(For,xti(Pefix,lower),Desc):-!,to_descriptive_name(For,Pefix,Desc).
 to_descriptive_name(_For,Desc,Atom):- longer_sumry(Desc,Atom),!.
 to_descriptive_name(_For,Desc,Atom):-any_to_atom(Desc,Atom),!.
 
 :-dynamic(baseKB:ttKeyworded/1).
 
 % :- mpred_trace_exec.
-:-ain((tCol(ttKeyworded))).
+:-ain((tSet(ttKeyworded))).
 :-ain((completelyAssertedCollection(ttKeyworded))).
 :-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
 :-onSpawn((ttKeyworded(T),{freeze(F,atomic(F))},isa(F,T),{ \+ call_u_no_bc(nameString(F,_)),once(guess_nameStrings(F,Txt))}==>(nameString(F,Txt)))).
@@ -487,12 +491,12 @@ to_descriptive_name(_For,Desc,Atom):-any_to_atom(Desc,Atom),!.
 % :-ain((ttKeyworded(tRelation))).
 :- mpred_notrace_exec.
 
-impl_coerce_hook(TextS,vtDirection,Dir):-
+impl_coerce_hook(TextS,vtDirection,Dir):- !,
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),
-  (name_text(Dir,TextS);TextS=Text;atom_string(TextS,Text)).
+  (name_text(Dir,TextS);string_equal_ci(TextS,Text)).
 
 impl_coerce_hook(Text,Subclass,X):- 
-    \+ (memberchk(Subclass,[vtDirection,tSpatialThing])),
+   \+ (memberchk(Subclass,[tSpatialThing])),!,
    once((isa_asserted(X,Subclass),
    arg_to_var(ftText,Text,TextVar),
    req1(mudKeyword(X,TextVar)),   
@@ -602,9 +606,9 @@ some tests
 
   phrase_parseForTypes([isOptional(tAgent, isRandom(tAgent))], ['Crush'], A, B).
 
-parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]), 'NpcCol1000-Geordi684'), isOptionalStr("to"), isOptional(region, isRandom(region))], [food, 'Turbolift'], GOODARGS,[]).
-parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]), 'NpcCol1000-Geordi684')], [food], GOODARGS,[]).
-parser_imperative:phrase_parseForTypes_9([isOptional(region, isRandom(region))], ['Turbolift'], GOODARGS,[]).
+parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(tRegion)]), 'NpcCol1000-Geordi684'), isOptionalStr("to"), isOptional(tRegion, isRandom(tRegion))], [food, 'Turbolift'], GOODARGS,[]).
+parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(tRegion)]), 'NpcCol1000-Geordi684')], [food], GOODARGS,[]).
+parser_imperative:phrase_parseForTypes_9([isOptional(tRegion, isRandom(tRegion))], ['Turbolift'], GOODARGS,[]).
 
 
 */
@@ -632,9 +636,9 @@ parseIsa(isOptional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {sam
 parseIsa(isOptional(Type, _), TermV, C, D) :- nonvar(Type),parseIsa(Type, TermV, C, D).
 parseIsa(isOptional(_Type,Default), DefaultV, D, D2):- !,D=D2,to_arg_value(Default,DefaultV).
 
-%  parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]),'NpcCol1000-Geordi684'),isOptionalStr("to"),isOptional(region, isRandom(region))], [food], GOODARGS,[]).
-%  parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]),'NpcCol1000-Geordi684'),isOptionalStr("to"),isOptional(region, isRandom(region))], [food,to,'Turbolift'], GOODARGS,[]).
-%  parser_imperative:phrase_parseForTypes_9([region], ['Turbolift'], GOODARGS,[]).
+%  parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(tRegion)]),'NpcCol1000-Geordi684'),isOptionalStr("to"),isOptional(tRegion, isRandom(tRegion))], [food], GOODARGS,[]).
+%  parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(tRegion)]),'NpcCol1000-Geordi684'),isOptionalStr("to"),isOptional(tRegion, isRandom(tRegion))], [food,to,'Turbolift'], GOODARGS,[]).
+%  parser_imperative:phrase_parseForTypes_9([tRegion], ['Turbolift'], GOODARGS,[]).
 
 parseIsa(ftString,String)--> {!}, theString(String).
 parseIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["the","a","an"]),parseIsa(FT, B, C, D).
@@ -662,9 +666,10 @@ parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String
 parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
-coerce_hook(A,B,C):- var(A),!,freeze(A,coerce_hook(A,B,C)).
+coerce_hook(A,B,C):- (var(A);var(B)),!,trace_or_throw(freeze(A,coerce_hook(A,B,C))).
 coerce_hook(A,B,C):- to_arg_value(A,AStr)->isa(AStr,B)->A=C.
-coerce_hook(AStr,B,C):- any_to_string(AStr,A), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
+coerce_hook(A,B,C):- no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
+% THIS SHOULD BEEN OK.. coerce_hook(AStr,B,C):- any_to_string(AStr,A), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 
 coerce0(String,Type,Inst):- var(Type),!,trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).

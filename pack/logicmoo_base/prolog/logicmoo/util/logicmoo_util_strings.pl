@@ -766,10 +766,14 @@ hide_char_type(punct).
 % Converted To Case Breaks.
 %
 to_case_breaks([      ],_WillBe,   [],_,     []):-!.
-to_case_breaks([       ],WillBe,SoFar,_NewType,[t(Left,WillBe)]):-breaked_codes(Left,SoFar),!.
-to_case_breaks([C|Codes],WillBe,SoFar,Upper,New):- ctype_continue(Upper,Lower), char_type(C,Lower),append(SoFar,[C],SoFarC),!,to_case_breaks(Codes,WillBe,SoFarC,Lower,New).
-to_case_breaks(C___Codes,WillBe,SoFar,Upper,OUT):- is_list(OUT),OUT=[t(Left,WillBe),t(New,RType)],!,to_first_break_w(C___Codes,SoFar,Upper,Left,New,RType).
-to_case_breaks([C|Codes],WillBe,SoFar,Upper,OUT):- ctype_switch(Upper,Digit), char_type(C,Digit),!, breaked_codes(Left,SoFar), to_case_breaks(Codes,Digit,[C],Digit,New),!,(hide_char_type(WillBe)->OUT=New;OUT=[t(Left,WillBe)|New]).
+to_case_breaks([       ],WillBe,SoFar,_NewType,[xti(Left,WillBe)]):-breaked_codes(Left,SoFar),!.
+to_case_breaks([C|Codes],WillBe,SoFar,Upper,New):- ctype_continue(Upper,Lower), char_type(C,Lower),append(SoFar,[C],SoFarC),!,
+      to_case_breaks(Codes,WillBe,SoFarC,Lower,New).
+to_case_breaks(C___Codes,WillBe,SoFar,Upper,OUT):- is_list(OUT),OUT=[xti(Left,WillBe),xti(New,RType)],!,
+  to_first_break_w(C___Codes,SoFar,Upper,Left,New,RType).
+to_case_breaks([C|Codes],WillBe,SoFar,Upper,OUT):- ctype_switch(Upper,Digit), char_type(C,Digit),!, 
+  breaked_codes(Left,SoFar), to_case_breaks(Codes,Digit,[C],Digit,New),!,
+  (hide_char_type(WillBe)->OUT=New;OUT=[xti(Left,WillBe)|New]).
 to_case_breaks([C|Codes],WillBe,SoFar,Upper,New):- append(SoFar,[C],SoFarC),to_case_breaks(Codes,WillBe,SoFarC,Upper,New).
 
 :- export(to_first_break/2).
@@ -789,7 +793,8 @@ to_first_break(Text,Left):-to_first_break(Text,_LeftType,Left,_Right,_NextType).
 %
 % Converted To First Break.
 %
-to_first_break(Text,LType,Left,Right,RType):- string_codes(Text,[C|Codes]), char_type_this(C,LType),!,to_first_break_w(Codes,[C],LType,Left,Right,RType).
+to_first_break(Text,LType,Left,Right,RType):- string_codes(Text,[C|Codes]), char_type_this(C,LType),!,
+           to_first_break_w(Codes,[C],LType,Left,Right,RType).
 to_first_break(Text,LType,Left,Right,RType):- string_codes(Text,[C|Codes]), !,to_first_break_w(Codes,[C],LType,Left,Right,RType).
 
 
@@ -1109,7 +1114,8 @@ convert_to_cycString_by_len(_,_,List,B):-convert_to_cycString_list(List,B).
 
 % convert_to_cycString_list(T,P)
 convert_to_cycString_list([],[]):-!.
-convert_to_cycString_list([T,-,P|List],B):-atomic_list_concat([T,P],-,TP),!,convert_to_cycString_list([TP|List],B).
+convert_to_cycString_list([T,'-',P|List],B):-atomic_list_concat([T,P],'-',TP),!,convert_to_cycString_list([TP|List],B).
+convert_to_cycString_list([T,J,P|List],B):-arg(_,v('_','@'),J),atomic_list_concat([T,P],J,TP),!,convert_to_cycString_list([TP|List],B).
 convert_to_cycString_list([T,P|List],B):-member(T,['#','~','#$','\'']),atom_concat(T,P,TP),!,convert_to_cycString_list([TP|List],B).
 convert_to_cycString_list([T|List],[P|BList]):-convert_to_1cycString(T,P),convert_to_cycString_list(List,BList).
 
@@ -1796,7 +1802,8 @@ str_contains_all0([A|Atoms],String):-
 atoms_of(Var,[]):- (var(Var);Var==[]),!.
 atoms_of(':',[]).
 atoms_of('moo',[]).
-atoms_of('t',[]).
+atoms_of('xti',[]).
+atoms_of('xxxxxxxxt',[]).
 atoms_of(',',[]).
 atoms_of(':-',[]).
 atoms_of('$VAR',[]):-!.

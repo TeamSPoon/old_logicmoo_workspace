@@ -191,10 +191,6 @@
 		</Folder>
 		<Folder Name="/opt">
 			<Folder Name="cyc">
-				<F N="/opt/cyc/cb-prolog.lisp"/>
-				<F N="/opt/cyc/cyc_export_utils.pl"/>
-				<F N="/opt/cyc/export.lisp"/>
-				<F N="/opt/cyc/kb_7166.pl"/>
 				<F N="/opt/cyc/kb_7166.pl-a1"/>
 				<F N="/opt/cyc/kb_7166.pl-a3"/>
 			</Folder>

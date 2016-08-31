@@ -97,7 +97,7 @@ action_info(actTick,"Makes *your* agent do something brilliant").
 action_info(actIdea(isOptional(tAgent,isSelfAgent)),"Makes some agent (or self) think of something brilliant").
 action_info(actProlog(ftCallable),"Call a ftCallable").
 
-agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=isRandom(ftCallable)).
+agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=ftCallable).
 agent_text_command(Agent,["prolog"],Agent,actProlog(prolog_repl)).
 % agent_text_command(Agent,["tlocals"],Agent,actProlog(tlocals)).
 

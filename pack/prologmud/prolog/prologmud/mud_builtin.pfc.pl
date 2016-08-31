@@ -53,7 +53,7 @@
 :- kb_dynamic(  deliver_event_hooks/2).
 :- kb_dynamic   irc_user_plays/3.
 
-:- kb_dynamic   mudDescription/1.
+:- kb_dynamic   mudDescription/2.
 :- kb_dynamic   term_specifier_text/2.
 :- kb_dynamic   type_action_info/3.
 :- kb_dynamic   update_charge/2.
@@ -1083,6 +1083,33 @@ mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 wearsClothing(A,I)==>tAgent(A),tClothing(I).
 
 
+% The verb to relate (he relates, they relate, he related, it is related, he is relating) implies the universal relation.
+rtBinaryPred(mudUniversallyRelated).
+
+synonomousExternalContext(conceptuallyRelated,iInform7System,mudUniversallyRelated).
+
+% The verb to incorporate (he incorporates, they incorporate, he incorporated, it is incorporated, he is incorporating) implies the incorporation relation. The verb to be part of implies the reversed incorporation relation.
+tSpatialTanability(mudIncorporationRelation).
+% The verb to provide (he provides, they provide, he provided, it is provided, he is providing) implies the provision relation.
+tSpatialTanability(mudProducesRelation).  % CreationEvent
+tSpatialTanability(mudSupportedBy).  % mudSupportedBy is not cycSupportedBy
+tSpatialTanability(mudEnclosedBy). % contains-Underspecified 
+
+meta_argtypes(inPermeates(tSolidTangibleThinh, tLiquidTangibleThing)).
+
+tSpatialTanability(P)==>argsIsa(P,tTangible).
+/*
+wearsClothing(A,I) ==> (isa(I,IType),
+   wornOnTypeType(IType,BType),
+    hasBodyPart(A,BPart),
+    isa(BPart,BType),
+      wornOn(I,BPart)).
+wornOn(I,BPart),hasBodypart(A,BPart) ==> wearsClothing(A,I).
+wornOn(I,BPart),isa(BPart,BType),isa(I,IType) ==> wornOnTypeType(IType,BType).
+*/
+
+
+
 genls(tBread, tFood).
 
 typeProps(tCrackers,
@@ -1110,15 +1137,17 @@ cachedPredicate(P)/predicate_to_goal(P,Goal)==>{forall(call_u(Goal),ain(Goal))}.
 
 cachedPredicate(vtActionTemplate(_)).
 
+
+/*
+
 % from inform7
 prologHybrid(mudRelating(ftID,ftID)).
 prologHybrid(mudProviding(ftID,ftID)).
-prologHybrid(mudContainment(ftID,ftID)).
 prologHybrid(mudSupportsSpatially(ftID,ftID)).
 prologHybrid(mudIncorporates(ftID,ftID)).
 prologHybrid(mudEncloses(ftID,ftID)).
+prologHybrid(mudContainment(ftID,ftID)).
 
-/*
 An object has a text called printed name.
 An object has a text called printed plural name.
 An object has a text called an indefinite article.
@@ -1198,7 +1227,7 @@ The carrying capacity of a supporter is usually 100.
 A supporter is usually fixed in place.
 Include (-
 has transparent supporter
--) when defining a supporte
+-) when defining a supporter
 
 A door can be open or closed. A door is usually closed.
 A door can be openable or unopenable. A door is usually openable.
@@ -1275,12 +1304,11 @@ normalAgentGoal(mudComfort,90).
 
 typeProps(tAgent,[mudStr(2),mudHeight(2),mudStm(2),mudSpd(2)]).
 
-
 %normalAgentGoal(Pred,Val)==>  (tAgent(A)==>agentGoals(A,Pred,((t(Pred,A,V),V>=Val)))).
 %agentGoals(A,About,State)/State ==> \+ agentTODO(A,actImprove(About)).
 
-prologHybrid(on_command_show(tAgent,vtActionType,ftTerm)).
-prologHybrid(agentTODO(tAgent,vtActionType)).
+prologHybrid(on_command_show(tAgent,vtActionTemplate,ftTerm)).
+prologHybrid(agentTODO(tAgent,vtActionTemplate)).
 prologHybrid(agentGOAL(tAgent,ftAssertable)).
 
 normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentTODO(A,actImprove(Pred))).

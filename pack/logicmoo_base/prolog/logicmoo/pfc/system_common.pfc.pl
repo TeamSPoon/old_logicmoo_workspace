@@ -724,6 +724,8 @@ isa('tThing',tAvoidForwardChain).
 % isa(I,C):- cwc, when(?=(I,C),\+ clause_b(isa(I,C))), (loop_check(visit_pred(I,C))*->true;loop_check(no_repeats(isa_backchaing(I,C)))).
 %isa(I,C):- cwc, loop_check(visit_pred(I,C)).
 %isa(I,C):- cwc, loop_check(visit_isa(I,C)).
+isa(I,C):-string(I),!,(C=ftString;C=ftText).
+isa(I,ftInt):-integer(I).
 isa(I,C):- cwc, no_repeats(loop_check((make_never_ft(C),(isa_backchaing(I,C);call_u(isa(I,C)))))).
 make_never_ft(C):- ignore((var(C),\+ attvar(C),freeze(C, \+ (atom(C),atom_concat('ft',_,C))))).
 
@@ -774,6 +776,138 @@ prologHybrid(argIsa/3).
 :- asserta(t_l:pfcExpansion).
 
 
+
+
+
+%% argIsa( ?F, ?N, ?Type) is semidet.
+%
+% asserted Argument  (isa/2) known.
+%
+argIsa(F/_,N,Type):- nonvar(F),!,argIsa(F,N,Type).
+argIsa(F,N,Type):- var(F),!,tRelation(F),argIsa(F,N,Type).
+argIsa(F,N,Type):- var(N),arity_no_bc(F,A),!,between(1,A,N),argIsa(F,N,Type).
+argIsa(F,1,F):- tCol(F), arity_no_bc(F,1),!.
+% Managed Arity Predicates.
+argIsa(Pred,N,ftVoprop) :- number(N),arity_no_bc(Pred,A),N>A,!.
+argIsa(isEach(arity,arityMax,arityMin),2,ftInt).
+/*
+argIsa(F,_,ftTerm):-member(F/_, [argIsa/3,predProxyAssert/2,negate_wrapper0/2,mudFacing/_,registered_module_type/2,       
+                                ruleBackward/2,formatted_resultIsa/2, pt/_,rhs/_,nt/_,bt/_,bracket/3]),!.
+argIsa(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,Type=argIsaFn(Prop,N1),!.
+*/
+
+
+%= 	 	 
+
+%% argQuotedIsa( ?F, ?N, ?FTO) is semidet.
+%
+% Argument  (isa/2) Format Type.
+%
+argQuotedIsa(F/_,N,Type):-nonvar(F),!,argQuotedIsa(F,N,Type).
+argQuotedIsa(F,N,FTO):- argIsa(F,N,FT), must(to_format_type(FT,FTO)),!.
+
+
+:- was_export(argIsa/3).
+
+%= 	 	 
+
+%% argIsa( ?F, ?N, ?Type) is semidet.
+%
+% Argument  (isa/2) call  Primary Helper.
+%
+argIsa(argIsa,1,tRelation).
+argIsa(argIsa,2,ftInt).
+argIsa(argIsa,3,tCol).  
+argIsa(comment,2,ftString).
+argIsa(isKappaFn,1,ftVar).
+argIsa(isKappaFn,2,ftAskable).
+%argIsa(isInstFn,1,tCol).
+
+
+argIsa(quotedDefnIff,1,tSpec).
+argIsa(quotedDefnIff,2,ftCallable).
+argIsa(meta_argtypes,1,tSpec).
+
+
+argIsa(isa,2,tCol).
+argIsa(mpred_isa,1,tPred).
+argIsa(mpred_isa,2,ftVoprop).
+% argIsa(mpred_isa,3,ftVoprop).
+
+argIsa(formatted_resultIsa,1,ttExpressionType).
+argIsa(formatted_resultIsa,2,tCol).
+
+argIsa(predicates,1,ftListFn(ftTerm)).
+argIsa(resultIsa,2,tCol).
+
+argIsa(predTypeMax,1,tPred).
+argIsa(predTypeMax,2,tCol).
+argIsa(predTypeMax,3,ftInt).
+
+argIsa(predInstMax,1,tObj).
+argIsa(predInstMax,2,tPred).
+argIsa(predInstMax,3,ftInt).
+
+argIsa(props,1,ftID).
+argIsa(props,N,ftVoprop):- integer(N), between(2,31,N).
+
+argIsa(apathFn,1,tRegion).
+argIsa(apathFn,2,vtDirection).
+argIsa(localityOfObject,1,tObj).
+argIsa(localityOfObject,2,tSpatialThing).
+
+argIsa(typeProps,1,tCol).
+argIsa(typeProps,N,ftVoprop):-between(2,31,N).
+
+argIsa(instTypeProps,1,ftProlog).
+argIsa(instTypeProps,2,tCol).
+argIsa(instTypeProps,N,ftVoprop):-between(3,31,N).
+
+
+argIsa(must,1,ftCallable).
+
+argsIsa(F,Type),arity(F,A),{between(1,A,N)}==>argIsa(F,N,Type).
+
+argIsa(predicateConventionMt,1,tPred).
+argIsa(predicateConventionMt,2,ftAtom).
+% argIsa(baseKB:agent_text_command,_,ftTerm).
+argIsa('<=>',_,ftTerm).
+argIsa(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftVoprop).
+argIsa(isEach(descriptionHere,mudDescription,nameString,mudKeyword),2,ftString).
+
+quotedArgIsa(F,N,Type):- functorDeclares(F),(N=1 -> Type=F ; Type=ftVoprop).
+%argIsa(F,N,Type):- t(tCol,F),!,(N=1 -> Type=F ; Type=ftVoprop).
+
+
+{current_predicate(F/A),functor(P,F,A), predicate_property(P,meta_predicate(P)), 
+  between(1,A,N),arg(N,P,Number),number(Number)} ==> argIsa(F,N,ftAskable).
+
+
+
+%= 	 	 
+
+%% argsIsa( ?WP, ?VALUE2) is semidet.
+%
+% Argument  (isa/2) call Helper number 3..
+%
+argsIsa(isEach(predProxyRetract,predProxyAssert,predProxyQuery,genlInverse),tPred).
+argsIsa(disjointWith,tCol).
+argsIsa(ftFormFn,ftTerm).
+argsIsa(mudTermAnglify,ftTerm).
+argsIsa(genls,tCol).
+argsIsa(subFormat,ttExpressionType).
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 :- ain(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
 :- ain(((baseKB:action_info(ArgTypes,_)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
@@ -783,6 +917,15 @@ prologHybrid(argIsa/3).
 
 */
 
+arity(F,A)/(atom(F),number(A),functor(P,F,A)), 
+  \+ meta_argtypes_guessed(P),   
+   argIsa(F,A,_),
+   argIsa(F,1,_),
+ {generateArgVars(P,argIsa(F),=(_))}
+==> meta_argtypes_guessed(P).
+
+meta_argtypes_guessed(P)==>meta_argtypes(P).
+   
 :- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
 

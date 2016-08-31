@@ -469,7 +469,7 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 :- kb_dynamic(argIsa/3).
 :- check_clause_counts.
 :- kb_dynamic(genls/2).
-:- kb_dynamic(mudActionMaxDistance(vtActionType,ttObjectType,ftInt)).
+:- kb_dynamic(mudActionMaxDistance(vtActionTemplate,ttObjectType,ftInt)).
 
 to_personal(mudEnergy,mudEnergy).
 to_personal(Pred,APred):-atom_concat('',Pred,APred).
