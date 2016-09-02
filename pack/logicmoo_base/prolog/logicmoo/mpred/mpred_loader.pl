@@ -492,6 +492,8 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 etrace:-leash(+all),leash(+exception),dtrace.
 
 
+el(X):- cwc,sanity(nonvar(X)),logicmoo_util_filesystem:filematch(X,Y),sanity(atom(Y)),ensure_loaded(Y).
+
 
 :- style_check(+singleton).
 :- style_check(-discontiguous).
@@ -2131,7 +2133,7 @@ finish_processing_world :- load_mpred_files, loop_check(w_tl(t_l:agenda_slow_op_
 % Loader Side Effect Verify Only.
 %
 loader_side_effect_verify_only(I,Supposed):-   
-   sanity(var(ActualSupposed)),
+   sanity(var(Supposed)),
     push_predicates(t_l:side_effect_buffer/3,STATE),
     prolog_load_context(module,M),
     mpred_expander_now_physically(M,I,Supposed),

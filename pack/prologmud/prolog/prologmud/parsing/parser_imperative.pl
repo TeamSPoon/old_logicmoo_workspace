@@ -323,6 +323,11 @@ verb_alias('where is',actWhere).
 
 % :- sanity((clause_u(verb_alias(S,actWhere)),argIsa(verb_alias,1,C),isa(S,C))).
 
+:- must((clause_u(verb_alias(S,actWhere)),argIsa(verb_alias,1,C),isa(S,C))).
+
+%:- listing(verb_alias/2).
+%:- break.
+
 % pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
 verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.

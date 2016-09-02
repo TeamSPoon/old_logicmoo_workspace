@@ -84,6 +84,7 @@
             trace_or_throw/1,
 
             must/1,
+            must3/3,
             must_det/1,
             %must_det_dead/2,
             must_det_l/1,
@@ -96,6 +97,7 @@
             one_must/2,
             one_must_det/2,
             sanity/1,
+            sanity3/3,
             save_streams/0,
             save_streams/1,
             set_block_exit/2,
@@ -170,6 +172,7 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
 		
 
         must(0),
+        must3(+,+,0),
         must_find_and_call(0),
         must_det(0),
         %must_det_dead(0, 0),
@@ -179,6 +182,7 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
         one_must_det(0, 0),
         unsafe_safe(0,0),
         sanity(0),
+        sanity3(+,+,0),
         slow_sanity(0),
         to_pi(?, ?),
         when_defined(:),
@@ -1494,6 +1498,10 @@ sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
 sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:dbreak).
 
+sanity3(F,L,Goal):- (( \+ \+ Goal)->true;( wdmsg(sanity_ge(F,L,Goal),dtrace(Goal)))).
+must3(F,L,Goal):- ( Goal *->true; ( wdmsg(must_ge(F,L,Goal),dtrace(Goal)))).
+
+
 compare_results(N+NVs,O+OVs):-
    NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).
 
@@ -1614,4 +1622,13 @@ get_must(Goal,CGoal):-
 %:- 'mpred_trace_none'(ddmsg(_)).
 %:- 'mpred_trace_none'(ddmsg(_,_)).
 
+system:goal_expansion(I,O):-compound(I),I=sanity(Goal),source_location(F,L),O= sanity3(F,L,Goal).
+system:goal_expansion(I,O):-compound(I),I=must(Goal),source_location(F,L), O= must3(F,L,Goal).
+
+:- dynamic(inlinedPred/1).
+
+system:goal_expansion(I,O):-compound(I),functor(I,F,A),inlinedPred(F/A),
+  source_location(File,L),clause(I,Body),O= (file_line(F,begin,File,L),Body,file_line(F,end,File,L)).
+
+file_line(F,What,File,L):- (debugging(F)->wdmsg(file_line(F,What,File,L));true).
 
