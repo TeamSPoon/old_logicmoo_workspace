@@ -23,8 +23,8 @@
             as_nc_str/2,
             atomSplit/2,
             atomSplit/3,
-            atomSplit2/3,
-            atomSplitEasy/2,
+            atomSplit2_unused/3,
+            atomSplitEasy_unused/2,
             atom_contains/2,
             atom_subst/4,
             atomic_concat/4,
@@ -46,7 +46,7 @@
             convert_members/3,
             convert_to_string/2,
             convert_to_cycString/2,
-            convert_to_1cycString/2,
+            delistify_single_element/2,
             ctype_continue/2,
             ctype_switch/2,
             ctype_switcher/1,
@@ -91,10 +91,13 @@
             replace_periods/2,
             replace_periods_string_list/2,
             sort_by_strlen/2,
-            splt_words/3,
+            /*splt_words/3,
             splt_words_0/3,
-            splt_words_0_atom/3,
+            splt_words_0_atom/3,*/
             starts_or_ends_with_icase/2,
+            convert_to_string_list/2,
+            convert_to_atoms_list/2,
+            
             starts_with_icase/2,
             str_contains_all/2,
             str_contains_all0/2,
@@ -122,8 +125,8 @@
             to_list_of_sents/2,
             to_titlecase/2,
             to_word_list/2,
-            to_word_list_0/2,
-            to_word_list_2/2,
+            unused_to_word_list_0/2,
+            unused_to_word_list_2/2,
             trim/2,
             trim2/2,
             unCamelcase/2,
@@ -155,8 +158,8 @@
         as_nc_str/2,
         atomSplit/2,
         atomSplit/3,
-        atomSplit2/3,
-        atomSplitEasy/2,
+        atomSplit2_unused/3,
+        atomSplitEasy_unused/2,
         atom_contains/2,
         atom_subst/4,
         atomic_concat/4,
@@ -248,8 +251,8 @@
         to_string_hook/3,
         to_titlecase/2,
         to_word_list/2,
-        to_word_list_0/2,
-        to_word_list_2/2,
+        unused_to_word_list_0/2,
+        unused_to_word_list_2/2,
         trim/2,
         trim2/2,
         unCamelcase/2,
@@ -406,7 +409,7 @@ atom_contains(F,X):- on_x_debug(sub_string(F,_,_,_,X)).
 % Any Converted To Atom.
 %
 any_to_atom(A,A):-atom(A),!.
-any_to_atom(T,A):-sformat(S,'~w',[T]),atom_string(A,S).
+any_to_atom(T,A):-format(atom(A),'~w',[T]).
 
 
 %= 	 	 
@@ -473,13 +476,14 @@ atomic_list_concat_safe([V],_Sep,V):-!.
 %
 % Convert Converted To String.
 %
+/*
 convert_to_string(I,ISO):-
                 logicmoo_util_first:term_to_string(I,IS),!,
 		string_to_list(IS,LIST),!,
 		list_replace(LIST,92,[92,92],LISTM),
 		list_replace(LISTM,34,[92,34],LISTO),!,
 		text_to_string(LISTO,ISO). % string_to_atom_safe(ISO,LISTO),!.
-
+*/
 
 %= 	 	 
 
@@ -661,7 +665,7 @@ rejoined(Rejoin,V,VV):-ignore(Rejoin=VV),ignore(V=VV),!.
 %
 % Empty Str.
 %
-empty_str(E):-ground(E),memberchk(E,[``,[],"",'']).
+empty_str(E):-nonvar(E),memberchk(E,[``,"",'']).
 
 
 
@@ -1068,25 +1072,22 @@ any_to_string1(_,_):-stack_depth(X),X>2000,!,sanity(fail),fail.
 any_to_string1(Atom,String):- var(Atom),show_call((term_string(Atom,String))),!.
 any_to_string1(Atom,String):- var(Atom),!,=(Atom,String).
 any_to_string1(Atom,String):- number(Atom),!,number_string(Atom,String).
-any_to_string1("",String):- !,""=String.
-any_to_string1(``,String):- !,""=String.
-any_to_string1('',String):- !,""=String.
-any_to_string1([],String):- !,""=String.
-any_to_string1('[]',String):- !,""=String.
-any_to_string1(Atom,String):-atom(Atom),!,atom_string(Atom,String).
-any_to_string1([Atom],String):-nonvar(Atom),!,any_to_string1(Atom,String).
+any_to_string1(Atom,String):- atomic(Atom),!,convert_to_string(Atom,String),!.
+any_to_string1(Empty,""):- empty_str(Empty),!.
 any_to_string1(string(Atom),String):- !, any_to_string1(Atom,String). 
 any_to_string1(fmt(Fmt,Args),String):-!,must(sformat(String,Fmt,Args)).
 any_to_string1(txtFormatFn(Fmt,Args),String):-!,must(sformat(String,Fmt,Args)).
-any_to_string1(A,""):-nonvar(A),member(A,[[],'',"",``]),!.
-any_to_string1(List,String):- text_to_string_safe(List,String),!.
+%any_to_string1(List,String):- text_to_string_safe(List,String),!.
 any_to_string1(List,String):- is_list(List),!,must_maplist(any_to_string1,List,StringList), 
     must(atomics_to_string(StringList, ' ', String)),!.
+
+
+/*
 any_to_string1(List,String):- on_x_debug(format(string(String),'~w',[List])).
 any_to_string1(Term,String):- show_call(on_x_debug(term_string(Term,String))).
 any_to_string1(List,String):- on_x_debug(format(string(String),'~p',[List])).
 any_to_string1(List,String):- format(string(String),'~q',[List]).
-
+*/
 /*
 list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
 list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
@@ -1098,27 +1099,32 @@ list_to_atomics_list0([],[]):-!.
 text_to_uq_atom(A,Sub):- atom_prefix(A,'"'),ifprolog:atom_suffix(A,1,'"'),sub_atom(A,1,_,1,Sub),!.
 text_to_uq_atom(A,A).
 
+convert_to_string_list(I,O):-convert_to_atoms_list(I,M),maplist(atom_string,M,O).
+convert_to_cycString(I,O):- convert_to_string_list(I,M),delistify_single_element(M,O).
 
-convert_to_cycString(A,B):- atom_length(A,L),tokenize_atom(A,T),!,convert_to_cycString_by_len(A,L,T,B),!.
-convert_to_cycString(A,B):- convert_to_1cycString(A,B),!.
+convert_to_string(I,O):- convert_to_atoms_list(I,M),(is_list(M)->atomics_to_string(M," ",O);atom_to_sting(M,O)).
 
+convert_to_atoms_list(A,B):- \+ atomic(A),!,A=B.
+convert_to_atoms_list(A,B):- atom_length(A,L),tokenize_atom(A,T),!,convert_to_atoms_by_len(A,L,T,B),!.
+convert_to_atoms_list(A,B):- text_to_atom(A,B).
 
-convert_to_1cycString(A,B):- atom_string(A,B).
+convert_to_atoms_by_len(_,0,_,['']):-!.
+convert_to_atoms_by_len(A,L,_,[A]):- L<3,!.
+convert_to_atoms_by_len(A,L,B,B):- L>3, \+ atom_contains(A,' '), \+ atom_contains(A,"'"),!.
+convert_to_atoms_by_len(A,_,[],[A]):-!.
+convert_to_atoms_by_len(_,_,[A],[A]):-!.
+convert_to_atoms_by_len(_,_,List,M):-convert_to_atoms_list_list(List,M).
 
-convert_to_cycString_by_len(_,0,_,""):-!.
-convert_to_cycString_by_len(A,L,_,B):- L<3,!,convert_to_1cycString(A,B).
-convert_to_cycString_by_len(A,L,_,B):- L>3, \+ atom_contains(A,' '), \+ atom_contains(A,"'"),!,convert_to_1cycString(A,B).
-convert_to_cycString_by_len(A,_,[],B):-!,convert_to_1cycString(A,B).
-convert_to_cycString_by_len(A,_,[_],B):-!,convert_to_1cycString(A,B).
-convert_to_cycString_by_len(_,_,List,B):-convert_to_cycString_list(List,B).
+% convert_to_atoms_list_list(T,P)
+convert_to_atoms_list_list([],[]):-!.
+convert_to_atoms_list_list([T,J,P|List],B):-arg(_,v('_','-','@'),J),atomic_list_concat([T,P],J,TP),!,convert_to_atoms_list_list([TP|List],B).
+convert_to_atoms_list_list(['\'',T|List],B):-member(T,['t','s','m','re','ll','d','ve']),atom_concat('\'',T,TP),!,convert_to_atoms_list_list([TP|List],B).
+convert_to_atoms_list_list([T,P|List],B):-member(T,['#','~','#$']),atom_concat(T,P,TP),!,convert_to_atoms_list_list([TP|List],B).
+convert_to_atoms_list_list([P|List],[P|BList]):-convert_to_atoms_list_list(List,BList).
+convert_to_atoms_list_list([P|List],[P|BList]):-convert_to_atoms_list_list(List,BList).
 
-% convert_to_cycString_list(T,P)
-convert_to_cycString_list([],[]):-!.
-convert_to_cycString_list([T,'-',P|List],B):-atomic_list_concat([T,P],'-',TP),!,convert_to_cycString_list([TP|List],B).
-convert_to_cycString_list([T,J,P|List],B):-arg(_,v('_','@'),J),atomic_list_concat([T,P],J,TP),!,convert_to_cycString_list([TP|List],B).
-convert_to_cycString_list([T,P|List],B):-member(T,['#','~','#$','\'']),atom_concat(T,P,TP),!,convert_to_cycString_list([TP|List],B).
-convert_to_cycString_list([T|List],[P|BList]):-convert_to_1cycString(T,P),convert_to_cycString_list(List,BList).
-
+delistify_single_element([M],M):-sanity(nonvar(M)),!.
+delistify_single_element(M,M).
 
 
 
@@ -1143,6 +1149,7 @@ atomic_list_concat_catch(List,Sep,Atom):-catch(atomic_list_concat_safe(List,Sep,
 catch_read_term_from_atom(Sub,Term,NewOnes):-
   on_x_fail(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)])),Term\==end_of_file.
 
+/*
 :- export(splt_words/3).
 
 %= 	 	 
@@ -1181,7 +1188,7 @@ splt_words_0_atom(Atom,[Term|List],Vars):- atom(Atom),atom_length(Atom,To),betwe
 splt_words_0_atom(Atom,[L0|ListO],Vars):-atomic_list_concat([L0,L1|List],' ',Atom),atomic_list_concat([L1|List],' ',Atom2),!,
       splt_words_0_atom(Atom2,ListO,Vars),!.
 
-
+*/
 
 
 %= 	 	 
@@ -1227,21 +1234,22 @@ vars_to_ucase_0([N=V|Vars],List):-
 %
 % Atom Split.
 %
-atomSplit(In,List):- hotrace(( ground(In),
- any_to_string(In,String),
-    splt_words(String,List,Vars),vars_to_ucase(Vars,List))),!.
+atomSplit(In,List):- convert_to_cycString(In,M),listify(M,List).
+%atomSplit(In,List):- hotrace(( ground(In),
+% any_to_string(In,String),
+%    splt_words(String,List,Vars),vars_to_ucase(Vars,List))),!.
 
-atomSplit(Atom,WordsO):-atomSplitEasy(Atom,WordsO),!.
+%atomSplit(Atom,WordsO):-atomSplitEasy_unused(Atom,WordsO),!.
 
-:- export(atomSplitEasy/2).
+:- export(atomSplitEasy_unused/2).
 
 %= 	 	 
 
-%% atomSplitEasy( ?Atom, ?WordsO) is semidet.
+%% atomSplitEasy_unused( ?Atom, ?WordsO) is semidet.
 %
 % Atom Split Easy.
 %
-atomSplitEasy(Atom,WordsO):-
+atomSplitEasy_unused(Atom,WordsO):-
    hotrace((atomSplit(Atom,WordsO,[' ','\t','\n','\v','\f','\r',' ','!','"','#','$','%','&','\'',
     '(',')','*','+',',','-','.','/',':',';','<',
     '=','>','?','@','[',\,']','^','_',
@@ -1257,26 +1265,26 @@ atomSplitEasy(Atom,WordsO):-
 %
 % Atom Split.
 %
-atomSplit(S,WordsO,List):- hotrace(( atomic(S),atomic_list_concat_safe(Words1,' ',S),!, atomSplit2(Words1,Words,List),!, Words=WordsO )).
-atomSplit(Atom,WordsO,List):- hotrace(( atom(Atom), atomic_list_concat_safe(Words1,' ',Atom),!, atomSplit2(Words1,Words,List),!, Words=WordsO )).
+atomSplit(S,WordsO,List):- hotrace(( atomic(S),atomic_list_concat_safe(Words1,' ',S),!, atomSplit2_unused(Words1,Words,List),!, Words=WordsO )).
+atomSplit(Atom,WordsO,List):- hotrace(( atom(Atom), atomic_list_concat_safe(Words1,' ',Atom),!, atomSplit2_unused(Words1,Words,List),!, Words=WordsO )).
 atomSplit(Atom,Words,[Space|AtomO]):-hotrace((var(Atom),ground(Words),!,atomic_list_concat_safe(Words,Space,AtomO),!,Atom=AtomO)).
 
 
 
 %= 	 	 
 
-%% atomSplit2( :TermARG1, :TermARG2, ?List) is semidet.
+%% atomSplit2_unused( :TermARG1, :TermARG2, ?List) is semidet.
 %
 % Atom Split Extended Helper.
 %
-atomSplit2([],[],_List):-!.
-atomSplit2([Mark|S],[Mark|Words],List):- member(Mark,List),!,atomSplit2(S,Words,List),!.
-atomSplit2([W|S],[A,Mark|Words],List):- member(Mark,List),atom_concat(A,Mark,W),!,atomSplit2(S,Words,List),!.
-atomSplit2([W|S],[Mark,A|Words],List):- member(Mark,List),atom_concat(Mark,A,W),!,atomSplit2(S,Words,List),!.
-atomSplit2([Word|S],Words,List):- member(Space,List),Atoms=[_,_|_],atomic_list_concat_safe(Atoms,Space,Word),!,
+atomSplit2_unused([],[],_List):-!.
+atomSplit2_unused([Mark|S],[Mark|Words],List):- member(Mark,List),!,atomSplit2_unused(S,Words,List),!.
+atomSplit2_unused([W|S],[A,Mark|Words],List):- member(Mark,List),atom_concat(A,Mark,W),!,atomSplit2_unused(S,Words,List),!.
+atomSplit2_unused([W|S],[Mark,A|Words],List):- member(Mark,List),atom_concat(Mark,A,W),!,atomSplit2_unused(S,Words,List),!.
+atomSplit2_unused([Word|S],Words,List):- member(Space,List),Atoms=[_,_|_],atomic_list_concat_safe(Atoms,Space,Word),!,
                   interleave(Atoms,Space,Left),
-                  atomSplit2(S,Right,List),append(Left,Right,WordsM),!,atomSplit2(WordsM,Words,List),!.
-atomSplit2([W|S],[W|Words],List):-atomSplit2(S,Words,List),!.
+                  atomSplit2_unused(S,Right,List),append(Left,Right,WordsM),!,atomSplit2_unused(WordsM,Words,List),!.
+atomSplit2_unused([W|S],[W|Words],List):-atomSplit2_unused(S,Words,List),!.
 
 
 %= 	 	 
@@ -1686,9 +1694,12 @@ replace_periods_string_list(A,S):-replace_periods(A,AR),to_word_list(AR,WL),subs
 % Converted To Word List.
 %
 to_word_list(A,SL):-var(A),!,A=SL.
-to_word_list(A,SL):-once(hotrace((to_word_list_0(A,S0),(is_list(S0)->delete(S0,'',S);S=S0)))),
+to_word_list(I,List):-convert_to_cycString(I,M),listify(M,List).
+/*
+to_word_list(A,SL):-once(hotrace((unused_to_word_list_0(A,S0),(is_list(S0)->delete(S0,'',S);S=S0)))),
    maplist(as_atom,S,SSL),!,
    must(SSL=SL),!.
+*/
 
 % as_atom(A,A):-atom(A),!.
 % 
@@ -1704,21 +1715,21 @@ as_atom(T,A):- compound(T), \+ is_list(T),arg(_,T,M),atomic(M),as_atom(M,A),!.
 as_atom(S,A):- catch(string_to_atom(S,A),_,fail),!.
 as_atom(T,A):- term_to_atom(T,A).
 
-:- export(to_word_list_0/2).
+:- export(unused_to_word_list_0/2).
 
 %= 	 	 
 
-%% to_word_list_0( ?V, ?V) is semidet.
+%% unused_to_word_list_0( ?V, ?V) is semidet.
 %
 % Converted To word list  Primary Helper.
 %
-to_word_list_0(V,V):-var(V),!.
-to_word_list_0([A],[A]):-number(A),!.
-to_word_list_0(E,[]):-empty_str(E),!.
-to_word_list_0([A|C],[A|C]):- string(A),!.
-%to_word_list_0(A,WList):- string(A),Final=` (period) `,replace_periods(A,Final,S),not(A=S),!,to_word_list_0(S,WList),!.
-%to_word_list_0([A|C],[A|C]):- (atomic(A);catch((text_to_string([A|C],_),fail),_,true)),!.
-to_word_list_0(A,WList):- must(any_to_string(A,String)),!,must(text_to_string(String,Atom)),to_word_list_2(Atom,WList),!.
+unused_to_word_list_0(V,V):-var(V),!.
+unused_to_word_list_0([A],[A]):-number(A),!.
+unused_to_word_list_0(E,[]):-empty_str(E),!.
+unused_to_word_list_0([A|C],[A|C]):- string(A),!.
+%unused_to_word_list_0(A,WList):- string(A),Final=` (period) `,replace_periods(A,Final,S),not(A=S),!,unused_to_word_list_0(S,WList),!.
+%unused_to_word_list_0([A|C],[A|C]):- (atomic(A);catch((text_to_string([A|C],_),fail),_,true)),!.
+unused_to_word_list_0(A,WList):- must(any_to_string(A,String)),!,must(text_to_string(String,Atom)),unused_to_word_list_2(Atom,WList),!.
 
 
 
@@ -1755,15 +1766,15 @@ is_simple_split(S):-text_to_string(S,SS),split_string(SS,`().!\"\'`,`()`,O),!,O=
 
 %= 	 	 
 
-%% to_word_list_2( ?Input, ?WList) is semidet.
+%% unused_to_word_list_2( ?Input, ?WList) is semidet.
 %
 % Converted To word list  Extended Helper.
 %
-to_word_list_2(Input,WList):-is_simple_split(Input),split_string(Input,' ',' ',WList),!.
-to_word_list_2(A,S):-atomSplit(A,S),!.
-to_word_list_2(Atom,WList):- atom_to_memory_file(Atom,File),open_memory_file(File,read,Stream),read_stream_to_arglist(Stream,WList).
-to_word_list_2(Input,WList):- open_string(Input,Stream),read_stream_to_arglist(Stream,WList).
-to_word_list_2(Input,Input).
+unused_to_word_list_2(Input,WList):-is_simple_split(Input),split_string(Input,' ',' ',WList),!.
+unused_to_word_list_2(A,S):-atomSplit(A,S),!.
+unused_to_word_list_2(Atom,WList):- atom_to_memory_file(Atom,File),open_memory_file(File,read,Stream),read_stream_to_arglist(Stream,WList).
+unused_to_word_list_2(Input,WList):- open_string(Input,Stream),read_stream_to_arglist(Stream,WList).
+unused_to_word_list_2(Input,Input).
 
 
 %= 	 	 
@@ -1838,4 +1849,29 @@ longest_string(Order,TStr1,TStr2):-
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- retract(double_quotes_was_strings(WAS)),set_prolog_flag(double_quotes,WAS).
 
+end_of_file.
+
+
+:-expects(convert_to_string('sadda sd', "sadda sd")).
+
+baseKB:  ?- any_to_string('sadda sd',O).
+O = "sadda sd".
+
+baseKB:  ?- any_to_string(1,O).
+O = "1".
+
+baseKB:  ?- any_to_string(r,O).
+O = "r".
+
+baseKB:  ?- any_to_string([a,b,c],O).
+O = "abc".
+
+baseKB:  ?- any_to_string([a,b,cc],O).
+% autoloading logicmoo_util_strings:must_maplist/3 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_bugger
+O = "a b cc".
+
+baseKB:  ?- any_to_string([a,b,cc],O).
+
+
+any_to_string('sadda sd',O).
 
