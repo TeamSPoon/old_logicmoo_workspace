@@ -1585,10 +1585,14 @@ atom_subst(A,F,R,K):-replace_in_string(F,R,A,K),!.
 %
 % Empty String.
 %
-empty_string(A):-var(A),!.
-empty_string([]).
-empty_string('').
-empty_string("").
+
+empty_string(A):-var(A),!,fail.
+empty_string([A]):-!,nonvar(A),empty_string0(A).
+empty_string(A):-empty_string0(A).
+empty_string0([]).
+empty_string0('').
+empty_string0(``).
+empty_string0("").
 
 
 

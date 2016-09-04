@@ -701,7 +701,7 @@ coerce0(String,ftText,StringO):- !,coerce0(String,ftString,StringO).
 %coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
 coerce0(Inst,Type,Inst):- var(Inst),!,instances_of_type(Inst,Type).
 
-coerce0(Any,_,_):- is_empty_string(Any),!,fail.
+coerce0(Any,_,_):- empty_string(Any),!,fail.
 
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(impl_coerce_hook(Text,Type,Inst)))).
 coerce0(Inst,Type,Inst):- instances_of_type(Inst,Type),!.
