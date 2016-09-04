@@ -21,7 +21,7 @@
 :- must(( 
   (Code =
      (example_known_is_success(G):- G)),
-   fully_expand(change(assert,assert_u),Code,Compiled),
+   fully_expand(clause(assert,assert_u),Code,Compiled),
   (Compiled = 
      (example_known_is_success(G):- call(G))))).
 

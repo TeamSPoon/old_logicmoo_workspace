@@ -305,7 +305,7 @@ colsOverlap(AT,AT).
 %
 pl_arg_type(Arg,Type):- 
       var(Arg) -> Type =ftVar;
-      integer(Arg) -> Type =ftInteger;
+      integer(Arg) -> Type =ftInt;
       number(Arg) -> Type =ftFloat;
       string(Arg) -> Type =ftString;
       is_ftText(Arg) -> Type =ftText;
@@ -325,8 +325,12 @@ pl_arg_type(Arg,Type):-
 %
 is_ftText(Arg):-string(Arg),!.
 is_ftText(Arg):- \+ compound(Arg),!,fail.
+is_ftText([Arg|_]):-string(Arg),!.
+is_ftText(Arg):-is_ftVar(Arg),!,fail.
 is_ftText(Arg):- text_to_string_safe(Arg,_),!.
 is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
+
+ftText(O):-is_ftText(O).
 
 % :- was_dynamic(coerce/3).
 :- was_export(coerce/4).
@@ -401,8 +405,11 @@ correctArgsIsa0(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa0(Op,G,GG),M:GG=MAA.
 correctArgsIsa0(Op,ISA,GG):- was_isa(ISA,_,_),!,must_equals(ISA,GG).
 correctArgsIsa0(Op,(A,B),(AA,BB)):-!,correctArgsIsa0(Op,A,AA),correctArgsIsa0(Op,B,BB).
 correctArgsIsa0(Op,(A;B),(AA;BB)):-!,correctArgsIsa0(Op,A,AA),correctArgsIsa0(Op,B,BB).
-correctArgsIsa0(_,G,GG):- get_functor(G,F),lookup_u(functorDeclares(F)),!,must_equals(G,GG).
+correctArgsIsa0(_,G,GG):- get_functor(G,F),functor_no_correct(F),!,must_equals(G,GG).
 correctArgsIsa0(Op,A,RESULTC):-A=..[PRED|ARGS],correctArgsIsa00(Op,[PRED|ARGS],RESULT), list_to_callform(RESULT,t,RESULTC).
+
+functor_no_correct(F):-lookup_u(functorDeclares(F)).
+functor_no_correct(agent_text_command).
 
 
 :- was_export(correctArgsIsa/4).

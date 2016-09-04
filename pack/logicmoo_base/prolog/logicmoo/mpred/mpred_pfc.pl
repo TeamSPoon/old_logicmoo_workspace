@@ -3121,8 +3121,11 @@ closest_u(H,HH):- ref(_) = Result,closest_u(H,H,HH,Result),ref(Ref)= Result,
   (H==HH -> true ; nonvar(Ref)),!.
 closest_u(H,P,PP):- copy_term(H+P,HH+PP),
       ((lookup_u(HH)*-> (=@=(P,PP)->(!,HH=H);(fail));(!,fail));(true)).
-closest_u(H,P,PP,Result):- sanity(Result=@=ref(Ref)),copy_term(H+P,HH+PP),
-      ((lookup_u(HH,Ref)*-> (=@=(P,PP)->(!,HH=H);(nb_setarg(1,Result,Ref),fail));(!,fail));((clause(HH,B,Ref),must(B)))).
+closest_u(H,P,PP,Result):- 
+      sanity(Result=@=ref(Ref)),
+      (copy_term(H+P,HH+PP),
+      ((lookup_u(HH,Ref)*-> (=@=(P,PP)->(!,HH=H);
+          (nb_setarg(1,Result,Ref),fail));(!,fail));((clause(HH,B,Ref),must(B))))).
 
 /*
 */
@@ -3255,6 +3258,8 @@ mpred_why:-
 
 pp_why(A):-mpred_why(A).
 
+clear_proofs- retractall(why_buffer(_P,_Js)).
+
 mpred_why(N):-
   number(N),
   !,
@@ -3267,6 +3272,7 @@ mpred_why(P):-mpred_why_sub(P).
 
 mpred_why_sub(P):-
   justifications(P,Js),
+  nb_setval('$last_printed',[]),
   retractall_u(why_buffer(_,_)),
   assert_u_no_dep(why_buffer(P,Js)),
   mpred_whyBrouse(P,Js).
@@ -3274,11 +3280,18 @@ mpred_why_sub(P):-
 
 mpred_why_sub_sub(P):-
   justifications(P,Js),
+  clear_proofs,
   % retractall_u(why_buffer(_,_)),
+  (nb_hasval('$last_printed',P)-> dmsg(hasVal(P)) ;
+   ((
   assert_u_no_dep(why_buffer(P,Js)),
-  b_getval('last_printed',LP),
-  ((mpred_pp_db_justification1(LP,Js,1),fmt('~N~n',[]))).
+   nb_getval('$last_printed',LP),
+   ((mpred_pp_db_justification1(LP,Js,1),fmt('~N~n',[])))))).
   
+nb_pushval(Name,Value):-nb_current(Name,Before)->nb_setval(Name,[Value|Before]);nb_setval(Name,[Value]).
+nb_peekval(Name,Value):-nb_current(Name,[Value|_Before]).
+nb_hasval(Name,Value):-nb_current(Name,List),member(Value,List).
+nb_popval(Name,Value):-nb_current(Name,[Value|Before])->nb_setval(Name,Before).
 
 mpred_why1(P):-
   justifications(P,Js),
@@ -3341,13 +3354,15 @@ mpred_pp_db_justification1(Prefix,[J|Js],N):-
 mpred_pp_db_justifications2(_Prefix,[],_,_).
 
 mpred_pp_db_justifications2(Prefix,[C|Rest],JustNo,StepNo):- 
+(nb_hasval('$last_printed',C)-> dmsg(chasVal(C)) ;
+(
  (StepNo==1->fmt('~N~n',[]);true),
   sformat(LP,' ~w.~p.~p',[Prefix,JustNo,StepNo]),
-  nb_setval('last_printed',LP),
+  nb_pushval('$last_printed',LP),
   format("~N  ~w ~p",[LP,C]),
   ignore(mpred_why_sub_sub(C)),
   StepNext is 1+StepNo,    
-  mpred_pp_db_justifications2(Prefix,Rest,JustNo,StepNext).
+  mpred_pp_db_justifications2(Prefix,Rest,JustNo,StepNext))).
 
 mpred_prompt_ask(Info,Ans):-
   format("~N~p",[Info]),

@@ -361,10 +361,6 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 :- must_det(argIsa(genlPreds,2,_)).
 
-:- expand_file_search_path(pack(logicmoo_nlu/prolog/pldata),X),exists_directory(X),!,assert(user:file_search_path(pldata,X)).
-
-:- ensure_loaded(logicmoo(logicmoo_plarkc)). % ,logicmoo_i_cyc_kb:call(call,ltkb1).
-
 %:- initialization(ltkb1,load_ckb).
 
 :- assert_setting01(lmconf:eachRule_Preconditional(true)).

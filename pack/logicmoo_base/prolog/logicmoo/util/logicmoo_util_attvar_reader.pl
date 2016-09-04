@@ -17,6 +17,7 @@
           read_attvars/1,read_attvars/0,
           mpred_get_attr/3,
           mpred_put_attr/3,
+          verbatum_var/1,
           mpred_get_attrs/2,
           mpred_put_attrs/2,
           install_attvar_expander/1,
@@ -194,9 +195,9 @@ serialize_attvars(V,S):- var(V),must(serialize_1v(V,S)),!.
 serialize_attvars(C,A):- compound_name_arguments(C,F,Args),maplist(serialize_attvars,Args,OArgs),compound_name_arguments(A,F,OArgs).
 
 serialize_1v(V,'$VAR'(Name)):- get_attrs(V, att(vn, Name, [])),!.
-serialize_1v(V,avar('$VAR'(N),SO)):- variable_name_or_ref(V,N),get_attrs(V, S),!,put_attrs(TEMP,S),del_attr(TEMP,vn),!,get_attrs(TEMP, SO),!.
-serialize_1v(V,avar(S)):- get_attrs(V, S),!.
+serialize_1v(V,avar('$VAR'(N),SO)):- get_attrs(V, S),variable_name_or_ref(V,N),!,put_attrs(TEMP,S),del_attr(TEMP,vn),!,get_attrs(TEMP, SO),!.
 serialize_1v(V,'$VAR'(N)):-  variable_name_or_ref(V,N).
+serialize_1v(V,avar(S)):- get_attrs(V, S),!.
 serialize_1v(V,V).
 
 
@@ -206,11 +207,13 @@ serialize_1v(V,V).
 %
 verbatum_term(I):- attvar(I),!,fail.
 verbatum_term(I):- \+ compound(I),!. % this is intended to include the non-attrbuted variables
-verbatum_term('$VAR'(_)).
-verbatum_term('avar'(_)).
-verbatum_term('avar'(_,_)).
 verbatum_term('$was_imported_kb_content$'(_,_)).
 verbatum_term('varname_info'(_,_,_,_)).
+verbatum_term(V):-verbatum_var(V).
+
+verbatum_var('$VAR'(_)).
+verbatum_var('avar'(_)).
+verbatum_var('avar'(_,_)).
 
 
 

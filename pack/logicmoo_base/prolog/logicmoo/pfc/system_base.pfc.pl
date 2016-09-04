@@ -41,10 +41,27 @@
 :- dynamic(baseKB:col_as_static/1).
 
 col_as_isa(tCol).
-col_as_isa(ttRelationType).
 col_as_isa(tSet).
-col_as_isa(ttSpatialType).
+
+col_as_isa(ttTypeType).
+col_as_isa(ttRelationType).
 col_as_isa(ttExpressionType).
+col_as_isa(ttItemType).
+col_as_isa(ttAgentType).
+col_as_isa(ttMicrotheoryType).
+col_as_isa(ttRegionType).
+col_as_isa(ttValueType).
+col_as_isa(ttTopicType).
+col_as_isa(ttSituationType).
+col_as_isa(ttActionType).
+col_as_isa(ttEventType).
+col_as_isa(ttSpatialType).
+col_as_isa(ttTemporalType).
+
+%denotesTypeType(FT,CT)==>prefered_collection(FT,CT).
+%prefered_collection(ftSubLString,ftString).
+%prefered_collection(rtCycLPredicator,tPred).
+
 
 :- set_prolog_flag(lm_expanders,true).
 % :- set_prolog_flag(read_attvars,false).
@@ -98,9 +115,11 @@ col_as_isa(ttRelationType).
 col_as_unary(completeExtentAsserted).
 col_as_unary(completelyAssertedCollection).
 
+%:- rtrace.
 col_as_unary(Col)==>tCol(Col).
 col_as_isa(Col)==>tCol(Col).
-
+%:- nortrace.
+%:-break.
 
 
 % ((prologHybrid(C),{must(callable(C)),get_functor(C,F,A),C\=F}) ==> arity(F,A)).
@@ -113,15 +132,18 @@ t(C,I)==>isa(I,C).
 % Completely Asserted Collection.
 %
 t(completelyAssertedCollection,prologNegByFailure).
-t(completelyAssertedCollection,pm).
-t(completelyAssertedCollection,prologMacroHead).
+t(completeExtentAsserted,pm).
+t(completeExtentAsserted,prologMacroHead).
 t(completelyAssertedCollection,tMicrotheory).
-t(T,I):- cwc, I==T,completelyAssertedCollection==I,!.
 t(completelyAssertedCollection,mtCycL).
-t(T,I):- cwc, I==T,ttExpressionType==I,!,fail.
+
+:-assert((t(T,I):- cwc, I==T,completelyAssertedCollection==I,!)).
+:-assert((t(T,I):- cwc, I==T,completeExtentAsserted==I,!)).
+:-assert((t(T,I):- ((cwc, I==T,ttExpressionType==I,!,fail)))).
+
 completelyAssertedCollection(prologNegByFailure).
-completelyAssertedCollection(pm).
-completelyAssertedCollection(prologMacroHead).
+completeExtentAsserted(pm).
+completeExtentAsserted(prologMacroHead).
 completelyAssertedCollection(tMicrotheory).
 completelyAssertedCollection(mtCycL).
 
@@ -160,6 +182,12 @@ baseKB:mtCycL(baseKB).
 :- nortrace.
 
 :-  abolish(yall:'/' / 2).
+
+:- expand_file_search_path(pack(logicmoo_nlu/prolog/pldata),X),exists_directory(X),!,assert_if_new(user:file_search_path(pldata,X)).
+
+:- ensure_loaded(logicmoo(logicmoo_plarkc)).
+
+
 
 
 %:- rtrace.
@@ -256,6 +284,7 @@ tCol(ttExpressionType).
 tCol(functorDeclares).
 functorDeclares(ttModule).
 
+ttExpressionType(ftList(ftInt)).
 
 %:- sanity((fix_mp(clause(assert,sanity),arity(apathFn,2),M,O),M:O=baseKB:arity(apathFn,2))).
 
@@ -270,6 +299,7 @@ arity(xyzFn,4).
 arity(arity,2).
 arity(is_never_type,1).
 arity(argIsa, 3).
+arity(argsIsa, 2).
 arity(Prop,1):- cwc, clause_b(ttRelationType(Prop)).
 arity(meta_argtypes,1).
 arity(arity,2).
@@ -283,6 +313,23 @@ arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1), (col_as_unary(F);
 
 tCol(ttModule).
 arity(tCol,1).
+tCol(ftAssertable).
+tCol(ftCallable).
+tCol(ftAskable).
+tCol(tRelation).
+tCol(ftListFn(Atom)):-callable(Atom),tCol(Atom).
+tSpec(ftListFn(Atom)):-callable(Atom),tSpec(Atom).
+ttExpressionType(ftListFn(Atom)):-callable(Atom).
+
+tSet(ftListFn(Atom)):-callable(Atom),!,fail.
+
+ttExpressionType(ftAssertable).
+ttExpressionType(ftCallable).
+ttExpressionType(ftAskable).
+tCol(ftString).
+tCol(ftAtom).
+tCol(ftProlog).
+tCol(tAvoidForwardChain).
 
 tSet(ttModule,mudToCyc('MicrotheoryType')).
 

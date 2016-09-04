@@ -645,7 +645,7 @@ ttValueType(vtColor).
 
 ttValueType(VT)==>tInferInstanceFromArgType(VT).
 
-prologHybrid(verb_alias(ftString,vtVerb)).
+prologHybrid(verb_alias(ftText,vtVerb)).
 prologHybrid(typeHasGlyph(tCol,ftString)).
 prologHybrid(mudMaxHitPoints(tAgent,ftInt)).
 prologHybrid(mudStowing(tAgent,tItem)).
@@ -945,12 +945,6 @@ arity(mudAreaConnected,2).
 
 mudAreaConnected(R1,R2)/ground(mudAreaConnected(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion),mudAreaConnected(R2,R1).
 
-prologBuiltin(random_path_dir/1).
-random_path_dir(Dir):-nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
-random_path_dir(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
-random_path_dir(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
-random_path_dir(Dir):- call(call,random_instance(vtDirection,Dir,true)).
-
 (mudAreaConnected(R1,R2)/ground(mudAreaConnected(R1,R2)), \+ pathDirLeadsTo(R1,_,R2), 
   {random_path_dir(Dir),reverse_dir(Dir,Rev)}, 
    {\+ pathDirLeadsTo(R1,Dir,_NotR2), 
@@ -1047,7 +1041,7 @@ typeProps(tSkin,[mudColor(vUnique),mudShape(vUnique)]).
 
 %Empty Location
 % You *have* to use 0 as the id of the empty location. (no way!)
-mudLabelTypeProps(--,tRegion,[]).
+mudLabelTypeProps("--",tRegion,[]).
 
 %NEXT TODO predTypeMax(mudEnergy,tAgent,120).
 
@@ -1057,14 +1051,18 @@ genls('SpaceInAHOC',tRegion).
 
 typeProps(tAgent,[mudMoveDist(1)]).
 % isRandom(vtBasicDir)
-typeProps(tAgent,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(90),  mudFacing(vNorth), mudAgentTurnnum(0), mudScore(1), 
-    mudMemory(aDirectionsFn([vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW,vUp,vDown]))]).
+typeProps(tAgent,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(90),  
+  mudFacing(vNorth), mudAgentTurnnum(0), mudScore(1)]).
 % typeProps(tAgent,mudLastCommand(actStand)).
 typeProps(tAgent,mudNeedsLook(vFalse)).
 
 typeProps(tFood,[mudHeight(0)]).
 
 typeProps(tItem,mudEnergy(140)).
+
+typeProps(C,Ps)==> (isa(I,C)=>props(I,Ps)).
+
+% typeProps(tAgent,[mudMemory(aDirectionsFn([vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW,vUp,vDown]))]).
 
 typeProps(tItem,mudListPrice(0)).
 typeProps(tObj,[mudOpaqueness(100)]).
@@ -1076,7 +1074,7 @@ typeProps(tSpatialThing,mudHeight(0)).
 mudLabelTypeProps(Lbl,Type,Props)/ground(mudLabelTypeProps(Lbl,Type,Props))==> (typeHasGlyph(Type,Lbl) , typeProps(Type,Props)).
 
 % Vacuum World example objects........
-mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
+mudLabelTypeProps("wl",tWall,[mudHeight(3),mudWeight(4)]).
 
 %TOO SLOW isa(I,SC)<=isa(I,C),genls(C,SC).
 
@@ -1323,6 +1321,8 @@ genls(tRoom,tRegion).
 
 
 vtActionTemplate(actImprove(rtStatPred)).
+
+:- listing(vtActionTemplate/1).
 
 % check to make sure the canonicalizer left the compound..
 :- sanity(clause(baseKB:vtActionTemplate(actImprove(rtStatPred)),true)).

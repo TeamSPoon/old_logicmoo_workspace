@@ -242,41 +242,41 @@ typeProps(tAgent,[predInstMax(mudHealth,500)]).
 
 
 % Vacuum World example objects........
-mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
-mudLabelTypeProps(tr,tTree,[mudHeight(3),mudWeight(4)]).
-mudLabelTypeProps(rk,tRock,[mudHeight(2),mudWeight(4)]).
-mudLabelTypeProps(pt,tPit,[mudHeight(-1),mudWeight(4)]).
- mudLabelTypeProps(ot,tPowerOutlet,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenStays),mudActAffect(actTake,mudEnergy(+50))]).
- mudLabelTypeProps(nt,tNut,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+40)),spawn_rate(10)]).
-mudLabelTypeProps(lw,tLowWall,[mudHeight(2),mudWeight(4)]).
-mudLabelTypeProps(lg,tLedge,[mudHeight(2),mudWeight(4)]).
-mudLabelTypeProps(lb,tLowBox,[mudHeight(2),mudWeight(2)]).
-mudLabelTypeProps(hw,tHighWall,[mudHeight(3),mudWeight(4)]).
-mudLabelTypeProps(hb,tHighBox,[mudHeight(3),mudWeight(3)]).
+mudLabelTypeProps("wl",tWall,[mudHeight(3),mudWeight(4)]).
+mudLabelTypeProps("tr",tTree,[mudHeight(3),mudWeight(4)]).
+mudLabelTypeProps("rk",tRock,[mudHeight(2),mudWeight(4)]).
+mudLabelTypeProps("pt",tPit,[mudHeight(-1),mudWeight(4)]).
+ mudLabelTypeProps("ot",tPowerOutlet,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenStays),mudActAffect(actTake,mudEnergy(+50))]).
+ mudLabelTypeProps("nt",tNut,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+40)),spawn_rate(10)]).
+mudLabelTypeProps("lw",tLowWall,[mudHeight(2),mudWeight(4)]).
+mudLabelTypeProps("lg",tLedge,[mudHeight(2),mudWeight(4)]).
+mudLabelTypeProps("lb",tLowBox,[mudHeight(2),mudWeight(2)]).
+mudLabelTypeProps("hw",tHighWall,[mudHeight(3),mudWeight(4)]).
+mudLabelTypeProps("hb",tHighBox,[mudHeight(3),mudWeight(3)]).
 
 :- do_gc.
 
- mudLabelTypeProps(gd,tGold,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+10))]).
- mudLabelTypeProps(fd,tFood,[mudHeight(0),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+80))]).
-mudLabelTypeProps(el,tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudHealth(+80))]).
-mudLabelTypeProps(ed,tEdgeOfWorld,[mudHeight(10),mudWeight(4)]).
- mudLabelTypeProps(dt,tDirt,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+1)),spawn_rate(5)]).
-mudLabelTypeProps(dr,tDoor,[mudHeight(3),mudWeight(2)]).
+ mudLabelTypeProps("gd",tGold,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+10))]).
+ mudLabelTypeProps("fd",tFood,[mudHeight(0),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+80))]).
+mudLabelTypeProps("el",tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudHealth(+80))]).
+mudLabelTypeProps("ed",tEdgeOfWorld,[mudHeight(10),mudWeight(4)]).
+ mudLabelTypeProps("dt",tDirt,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+1)),spawn_rate(5)]).
+mudLabelTypeProps("dr",tDoor,[mudHeight(3),mudWeight(2)]).
 
 %Empty Location
 % You *have* to use ftVar/isMissing as the ftID of the empty location. (no way!)
-mudLabelTypeProps(--,isMissing,[]).
+mudLabelTypeProps("--",isMissing,[]).
 
 % What an agent turns into upon death.
 % Must be named iCorpseFn (or edit agent_to_corpse/1 in lib.pl.
- mudLabelTypeProps(cp,tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+80)),mudActAffect(actTake,mudScore(+10))]).
- mudLabelTypeProps(cp,tCorpseb,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+120))]).
-mudLabelTypeProps(da,tCorpsec,[mudHeight(2),mudWeight(2)]).
+ mudLabelTypeProps("cp",tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+80)),mudActAffect(actTake,mudScore(+10))]).
+ mudLabelTypeProps("cp",tCorpseb,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+120))]).
+mudLabelTypeProps("da",tCorpsec,[mudHeight(2),mudWeight(2)]).
 % This is used to make the monster roaming the maze a bit tougher
 % It doesn't require any of the usual traits since the monster will never 
 % leave the monster's mudPossession.
-mudLabelTypeProps(th,tNastyKnife,[mudActAffect(actWield,mudAttack(2))]).
-mudLabelTypeProps(th,tToughHide,[mudActAffect(actWear,mudArmor(2))]).
+mudLabelTypeProps("th",tNastyKnife,[mudActAffect(actWield,mudAttack(2))]).
+mudLabelTypeProps("th",tToughHide,[mudActAffect(actWear,mudArmor(2))]).
 
 
 % Define the maximum mudEnergy and maximum mudHealth an agent can have

@@ -2155,7 +2155,7 @@ nonfact_metawrapper(term_expansion(_,_)).
 nonfact_metawrapper(P):- \+ current_predicate(_,P).
 nonfact_metawrapper(M:P):-atom(M),!,nonfact_metawrapper(P).
 nonfact_metawrapper(P):- get_functor(P,F,_), 
-   (a(prologSideEffects,F);a(tNotForUnboundPredicates,F)).
+   (a(prologSideEffects,F);a(rtNotForUnboundPredicates,F)).
 nonfact_metawrapper(P):-rewritten_metawrapper(P).
 
 

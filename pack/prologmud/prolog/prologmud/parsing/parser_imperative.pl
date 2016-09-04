@@ -256,9 +256,11 @@ dmsg_parserm(F,A):-ignore((debugging_logicmoo(logicmoo(parser)),dmsg(F,A))).
 
 must_atomics(A):-must(atomic(A)).
 
-parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- destringify(SVERB,AVERB),SVERB \=@= AVERB,!,
+destringify_arg(A,A).
+
+parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- destringify_arg(SVERB,AVERB),SVERB \=@= AVERB,!,
    parse_agent_text_command(Agent,AVERB,Args,NewAgent,GOAL).
-parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- is_list(Args),maplist(destringify,Args,AArgs),AArgs \=@= Args,!,
+parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- is_list(Args),maplist(destringify_arg,Args,AArgs),AArgs \=@= Args,!,
    parse_agent_text_command(Agent,SVERB,AArgs,NewAgent,GOAL).
 parse_agent_text_command(Agent,SVERB,[],NewAgent,GOAL):-compound(SVERB),!,must((NewAgent=Agent,GOAL=SVERB)),!.
 parse_agent_text_command(_Agent,SVERB,ARGS,_,_):-slow_sanity((must(atomic(SVERB)),maplist(must_atomics,ARGS))),fail.
@@ -314,12 +316,16 @@ parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
    dmsg_parserm(parserm("chooseBestGoal"=GOAL)).
 
 
-verb_alias('i',actInventory).
-verb_alias('l',actLook).
-verb_alias('lo',actLook).
-verb_alias('s',actMove(vSouth)).
-% verb_alias('go','go').
-verb_alias('where is',actWhere).
+verb_alias("i",actInventory).
+verb_alias("l",actLook).
+verb_alias("lo",actLook).
+verb_alias("s",actMove(vSouth)).
+verb_alias("go",actMove).
+verb_alias("where is",actWhere).
+verb_alias(["where","is"],actWhereTest).
+
+:- listing(verb_alias/2).
+
 
 % :- sanity((clause_u(verb_alias(S,actWhere)),argIsa(verb_alias,1,C),isa(S,C))).
 
@@ -672,15 +678,12 @@ parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
 coerce_hook(A,B,C):- (var(A);var(B)),!,trace_or_throw(freeze(A,coerce_hook(A,B,C))).
-coerce_hook(A,B,C):- to_arg_value(A,AStr)->isa(AStr,B)->A=C.
+coerce_hook(A,B,C):- to_arg_value(A,AStr),isa(AStr,B),A=C.
 coerce_hook(A,B,C):- no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 % THIS SHOULD BEEN OK.. coerce_hook(AStr,B,C):- any_to_string(AStr,A), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 
 coerce0(String,Type,Inst):- var(Type),!,trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
-coerce0([String],Type,Inst):- !, coerce(String,Type,Inst).
-coerce0(_,tObj,iCommBadge774):- dtrace,!,fail.
-coerce0(String,Type,Inst):- \+ string(String),!,text_to_string_safe(String,StringS),!,coerce(StringS,Type,Inst).
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(impl_coerce_hook(Text,Type,Inst)))).
 
 coerce0(String,isNot(Type),Inst):-!, sanity(nonvar(Type)), \+ (coerce(String,Type,Inst)).
@@ -688,7 +691,7 @@ coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,In
 
 coerce0(isRandom(WhatNot),Type,Inst):- !, must((nonvar(WhatNot),to_arg_value(WhatNot,TypeR),random_instance(TypeR,Inst,isa(Inst,Type)))).
 coerce0(String,Type,Inst):- Type==tCol, i_name('t',String,Inst),is_asserted(tCol(Inst)),!.
-coerce0(String,Type,Inst):- ttExpressionType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
+coerce0(String,Type,Inst):- ttExpressionType(Type),!,checkAnyType(clause(assert,actParse),String,Type,AAA),Inst=AAA.
 %coerce0(String,Type,Longest) :- findall(Inst, (impl_coerce_hook(Inst,Type,Inst),string_equal_ci(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce0(String,C,Inst):- compound(C),!,loop_check(parseIsa(C,Inst,[String],[])).
 coerce0(String,Type,Inst):- must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).

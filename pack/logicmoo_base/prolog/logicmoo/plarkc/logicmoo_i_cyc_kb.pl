@@ -136,8 +136,6 @@ cwtdl(Goal,DL,TL):- cwc,
 
 % :- file_begin(pfc).
 
-:- must_det(argIsa(genlPreds,2,_)).
-
 transfer_predicate(C,If,Q):-doall((clause(C,true,Ref),If,Q,on_x_log_throw(erase(Ref)))).
 transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(ain(Template))).
 
@@ -193,7 +191,8 @@ freeze_pvars([ ],Goal):-!,call(Goal).
 freeze_pvars([V],Goal):-!,freeze(V,Goal).
 freeze_pvars([V|Vs],Goal):-freeze(V,freeze_pvars(Vs,Goal)).
 
-isT(X):- isT(_,X).
+% NOCOMMIT
+isT(X):- fail,isT(_,X).
 
 isAskableT(Gaf):- var(Gaf),!.
 isAskableT(isT(_)):-!,fail.

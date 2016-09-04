@@ -71,13 +71,14 @@ prologHybrid(genls/2).
 %          pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2)))),
 
 % with_pfa(With,((pfcControlled/1,pfcRHS/1,logical_functor_pttp/1,          add_args/15,argIsa_known/3,call_mt_t/11,call_which_t/9,constrain_args_pttp/2,contract_output_proof/2,get_clause_vars_for_print/2,holds_f_p2/2,input_to_forms/2,is_wrapper_pred/1,lambda/5,mpred_f/1,pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,
-%          quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2,tNotForUnboundPredicates/1))),
+%          quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2,rtNotForUnboundPredicates/1))),
  with_pfa(With,(((bt/2),(nt/3),(pk/3),(pt/2),(spft/3),(tms/1),(hs/1),(que/1),(pm/1),
           (('==>')/1),(('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('~')/1),(('nesc')/1),((mpred_action)/1),
           (mpred_do_and_undo_method/2),
 	  prologMultiValued/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,pfcControlled/1,ttRelationType/1,
            prologHybrid/1,predCanHaveSingletons/1,prologDynamic/1,prologBuiltin/1,prologMacroHead/1,prologListValued/1,prologSingleValued/1,
-          (hs/1),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,prologMacroHead/1,pfcControlled/1,
+          (hs/1),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,
+          prologMacroHead/1,pfcControlled/1,
            resolveConflict/1,resolverConflict_robot/1)))),
  with_pfa(With,((mpred_isa/2,arity/2,predicateConventionMt/2))),
  with_pfa(With,((vtColor/1))).
@@ -155,7 +156,7 @@ prologBuiltin(agent_text_command/4,prologDynamic).
 
 % tPred(member/2,prologBuiltin).
 
-tSet(tNotForUnboundPredicates).
+tSet(rtNotForUnboundPredicates).
 
 
 ==>tCol(vtVerb).
@@ -163,12 +164,31 @@ tSet(tNotForUnboundPredicates).
 :- sanity(fileAssertMt(baseKB)).
 :- sanity(defaultAssertMt(baseKB)).
 
-
-tNotForUnboundPredicates(member).
-
-
+ttRelationType(rtNotForUnboundPredicates).
+rtNotForUnboundPredicates(member).
 
 
+:- fully_expand(pkif("
+(==> 
+    (and 
+      (typeGenls ?COLTYPE1 ?COL1) 
+      (typeGenls ?COLTYPE2 ?COL2) 
+      (disjointWith ?COL1 ?COL2)) 
+    (disjointWith ?COLTYPE1 ?COLTYPE2))"
+),O),dmsg(O).
+
+:-must(ain(pkif("
+(==> 
+    (and 
+      (typeGenls ?COLTYPE1 ?COL1) 
+      (typeGenls ?COLTYPE2 ?COL2) 
+      (disjointWith ?COL1 ?COL2)) 
+    (disjointWith ?COLTYPE1 ?COLTYPE2))"
+))).
+
+/*
+?- isa(iExplorer2,W),
+*/
 
 % ===================================================================
 % Type checker system / Never Assert / Retraction checks
@@ -277,6 +297,9 @@ completelyAssertedCollection(ttTemporalType).
 completelyAssertedCollection(ttTypeType).
 completelyAssertedCollection(ttUnverifiableType).
 
+prologNegByFailure(quotedIsa).
+~prologNegByFailure(isa).
+
 ttRelationType(pfcDatabaseTerm).
 ttRelationType(pfcControlled).
 ttRelationType(prologSingleValued).
@@ -382,7 +405,7 @@ pfcControlled(argIsa).
 %underkill - Though it is making bad things happen 
 ttExpressionType(C)==> \+ completelyAssertedCollection(C).
 
-tSet(tNotForUnboundPredicates).
+tSet(rtNotForUnboundPredicates).
 tSet(tPred).
 tSet(prologBuiltin).
 tSet(tFunction).
@@ -635,9 +658,9 @@ disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 (rtSymmetric(Pred) ==> ({atom(Pred),G1=..[Pred,X,Y],G2=..[Pred,Y,X]}, (G1==>G2), (~(G1)==> ~(G2)))).
 
 
-tSet(tNotForUnboundPredicates).
+tSet(rtNotForUnboundPredicates).
 
-prologSideEffects(P)==>tNotForUnboundPredicates(P).
+prologSideEffects(P)==>rtNotForUnboundPredicates(P).
 
 isa(tRelation,ttAbstractType).
 
@@ -724,12 +747,14 @@ isa('tThing',tAvoidForwardChain).
 % isa(I,C):- cwc, when(?=(I,C),\+ clause_b(isa(I,C))), (loop_check(visit_pred(I,C))*->true;loop_check(no_repeats(isa_backchaing(I,C)))).
 %isa(I,C):- cwc, loop_check(visit_pred(I,C)).
 %isa(I,C):- cwc, loop_check(visit_isa(I,C)).
-isa(I,C):-string(I),!,(C=ftString;C=ftText).
-isa(I,ftInt):-integer(I).
-isa(I,C):- cwc, no_repeats(loop_check((make_never_ft(C),(isa_backchaing(I,C);call_u(isa(I,C)))))).
-make_never_ft(C):- ignore((var(C),\+ attvar(C),freeze(C, \+ (atom(C),atom_concat('ft',_,C))))).
 
-quotedIsa(I,C):- cwc, term_is_ft(I,C).
+isa([tIndividual(tSack)],C):-C==ftListFn(ftAskable),!.
+isa(iExplorer2,C):- C==argsQuoted,!,fail.
+isa(I,C):- cwc, no_repeats(loop_check(isa_backchaing(I,C))).
+% isa(_,C):- nonvar(C),\+ tSet(C),!,fail.
+
+quotedIsa(_,C):- nonvar(C), tSet(C),!,fail.
+quotedIsa(I,C):- cwc, loop_check(term_is_ft(I,C)).
 
 dif_in_arg(P,N,Q):- cwc, ground(P),P=..[F|ARGS],arg(N,P,B),Q=..[F|ARGS],nb_setarg(N,Q,A),dif(A,B).
 
@@ -875,12 +900,44 @@ argIsa('<=>',_,ftTerm).
 argIsa(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftVoprop).
 argIsa(isEach(descriptionHere,mudDescription,nameString,mudKeyword),2,ftString).
 
-quotedArgIsa(F,N,Type):- functorDeclares(F),(N=1 -> Type=F ; Type=ftVoprop).
+argQuotedIsa(F,N,Type)==>argIsa(F,N,Type).
+
+argQuotedIsa(F,N,Type):- functorDeclares(F),(N=1 -> Type=F ; Type=ftVoprop).
 %argIsa(F,N,Type):- t(tCol,F),!,(N=1 -> Type=F ; Type=ftVoprop).
 
+/*
+{source_file(M:P,_),functor(P,F,A),
+  \+ predicate_property(M:P,imported_from(_))} 
+   ==> functor_module(M,F,A).
+:- show_count(functor_module/3).
+*/
 
-{current_predicate(F/A),functor(P,F,A), predicate_property(P,meta_predicate(P)), 
-  between(1,A,N),arg(N,P,Number),number(Number)} ==> argIsa(F,N,ftAskable).
+:- dynamic(functor_module/3).
+
+({current_module(M),
+ (predicate_property(functor_module(_,_,_),
+   clause_count(N)),N<1000),current_predicate(M:F/A),functor(P,F,A), 
+  \+ predicate_property(M:P,imported_from(_))}) 
+   ==> functor_module(M,F,A).
+
+functor_module(_,F,A)==> arity(F,A).
+
+
+:- show_count(arity/2).
+
+(functor_module(M,F,A),
+  {functor(P,F,A),predicate_property(M:P,static)})==>
+  (predicateConventionMt(F,M),mpred_prop(F,A,prologBuiltin)).
+
+(functor_module(M,F,A),
+  {functor(P,F,A), predicate_property(M:P,meta_predicate(P)), 
+  between(1,A,N),arg(N,P,Number),number(Number)}) 
+       ==> argIsa(F,N,ftAskable).
+
+(functor_module(M,F,A),
+  {functor(P,F,A), predicate_property(M:P,meta_predicate(P)), 
+  between(1,A,N),arg(N,P,0)}) 
+       ==> argIsa(F,N,ftAskable).
 
 
 
@@ -917,11 +974,11 @@ argsIsa(subFormat,ttExpressionType).
 
 */
 
-arity(F,A)/(atom(F),number(A),functor(P,F,A)), 
+arity(F,A)/(atom(F),\+ is_sentence_functor(F),number(A),A<10,functor(P,F,A),\+ rtLogicalConnective(F)), 
   \+ meta_argtypes_guessed(P),   
    argIsa(F,A,_),
    argIsa(F,1,_),
- {generateArgVars(P,argIsa(F),=(_))}
+ {generateArgVars(P, argIsa(F), '='(_))}
 ==> meta_argtypes_guessed(P).
 
 meta_argtypes_guessed(P)==>meta_argtypes(P).
@@ -1251,20 +1308,22 @@ prologHybrid(quotedDefnIff(ttExpressionType,ftTerm)).
 
 tFuncton(isLikeFn(tPred,tCol)).
 tRelation('==>'(ftAskable,ftAssertable)).
-prologHybrid(instTypeProps(ftID,tCol,ftRest(ftVoprop))).
 prologHybrid(subFormat(ttExpressionType,ttExpressionType)).
-prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
-prologMacroHead(pddlObjects(tCol,ftListFn(ftID))).
-prologMacroHead(pddlDescription(ftID,ftListFn(ftString))).
-prologMacroHead(pddlPredicates(ftListFn(ftVoprop))).
-prologMacroHead(pddlSorts(tCol,ftListFn(tCol))).
-prologMacroHead(pddlTypes(ftListFn(tCol))).
 prologMultiValued(comment(ftTerm,ftString)).
 prologMultiValued(genlInverse(tPred,tPred)).
 prologMultiValued(genlPreds(tPred,tPred)).
 prologMultiValued(predProxyAssert(prologMultiValued,ftTerm)).
 prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
 
+:- if(false).
+prologHybrid(instTypeProps(ftID,tCol,ftRest(ftVoprop))).
+prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
+prologMacroHead(pddlObjects(tCol,ftListFn(ftID))).
+prologMacroHead(pddlDescription(ftID,ftListFn(ftString))).
+prologMacroHead(pddlPredicates(ftListFn(ftVoprop))).
+prologMacroHead(pddlSorts(tCol,ftListFn(tCol))).
+prologMacroHead(pddlTypes(ftListFn(tCol))).
+:- endif.
 
 
 % prologMultiValued('<==>'(ftTerm,ftTerm)).
@@ -1370,7 +1429,8 @@ quotedDefnIff(X,_)==>ttExpressionType(X).
 quotedDefnIff(ftInt,integer).
 quotedDefnIff(ftFloat,float).
 quotedDefnIff(ftAtom,atom).
-quotedDefnIff(ftString,string).
+quotedDefnIff(ftString,is_ftString).
+quotedDefnIff(ftSimpleString,string).
 quotedDefnIff(ftCallable,is_callable).
 quotedDefnIff(ftCompound,is_ftCompound).
 quotedDefnIff(ftGround,ground).
@@ -1382,7 +1442,7 @@ quotedDefnIff(ftNumber,number).
 quotedDefnIff(ftList,is_list).
 % quotedDefnIff(ftRest,is_rest).
 quotedDefnIff(ftBoolean,is_boolean).
-quotedDefnIff(ftText,is_string).
+quotedDefnIff(ftText,is_ftText).
 quotedDefnIff(ftRest(Type),is_rest_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftListFn(Type),is_list_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftCodeIs(SomeCode),SomeCode):- cwc, is_ftNonvar(SomeCode).
@@ -1452,4 +1512,11 @@ prologHybrid(formatted_resultIsa/2).
 :- must(tCol(vtVerb)).
 :- must(t(tCol,vtVerb)).
 :- must(isa(vtVerb,tCol)).
+
+
+isa(iPlato,'tPhilosopher').
+%:- mpred_test(\+ isa(iPlato,ftAtom)).
+%:- mpred_test(~isa(iPlato,ftAtom)).
+:- mpred_test(~quotedIsa(iPlato,'tPhilosopher')).
+:- mpred_test(quotedIsa(iPlato,ftAtom)).
 

@@ -1055,7 +1055,7 @@ ltrim(X,X).
 %
 % Any Converted To String.
 %
-any_to_string(Atom,String):-  (must(any_to_string1(Atom,StringS)),!,must(StringS=String)),!.
+any_to_string(Atom,String):-   any_to_string1(Atom,StringS),!,StringS=String.
 % any_to_string(Atom,String):- with_err_to_pred(nop, (must(any_to_string1(Atom,StringS)),!,must(StringS=String))),!.
 
 
@@ -1077,13 +1077,13 @@ any_to_string1(Empty,""):- empty_str(Empty),!.
 any_to_string1(string(Atom),String):- !, any_to_string1(Atom,String). 
 any_to_string1(fmt(Fmt,Args),String):-!,must(sformat(String,Fmt,Args)).
 any_to_string1(txtFormatFn(Fmt,Args),String):-!,must(sformat(String,Fmt,Args)).
-%any_to_string1(List,String):- text_to_string_safe(List,String),!.
+any_to_string1(List,String):- text_to_string_safe(List,String),!.
 any_to_string1(List,String):- is_list(List),!,must_maplist(any_to_string1,List,StringList), 
     must(atomics_to_string(StringList, ' ', String)),!.
+any_to_string1(List,String):- on_x_debug(format(string(String),'~w',[List])).
 
 
 /*
-any_to_string1(List,String):- on_x_debug(format(string(String),'~w',[List])).
 any_to_string1(Term,String):- show_call(on_x_debug(term_string(Term,String))).
 any_to_string1(List,String):- on_x_debug(format(string(String),'~p',[List])).
 any_to_string1(List,String):- format(string(String),'~q',[List]).
@@ -1100,6 +1100,7 @@ text_to_uq_atom(A,Sub):- atom_prefix(A,'"'),ifprolog:atom_suffix(A,1,'"'),sub_at
 text_to_uq_atom(A,A).
 
 convert_to_string_list(I,O):-convert_to_atoms_list(I,M),maplist(atom_string,M,O).
+
 convert_to_cycString(I,O):- convert_to_string_list(I,M),delistify_single_element(M,O).
 
 convert_to_string(I,O):- convert_to_atoms_list(I,M),(is_list(M)->atomics_to_string(M," ",O);atom_to_sting(M,O)).

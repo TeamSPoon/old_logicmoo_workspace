@@ -387,6 +387,12 @@ calc_from_center_xyz(Region1,Dir,R,X2,Y2,Z2):-
    get_dir_offset(Dir,R,OX,OY,_),
    X2 is X+ OX ,Y2 is Y+ OY, Z2 is Z.
 
+prologBuiltin(random_path_dir/1).
+random_path_dir(Dir):-nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
+random_path_dir(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
+random_path_dir(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
+random_path_dir(Dir):- call(call,random_instance(vtDirection,Dir,true)).
+
 from_dir_target(LOC,Dir,XXYY):- is_3d(LOC),!,
   move_dir_target(LOC,Dir,XXYY).
 from_dir_target(Agent,Dir,XXYY):-
@@ -513,7 +519,7 @@ facing_offset(behind,F,X,Y,Z):-dir_offset(vSouth,F,X,Y,Z).
 facing_offset(front,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
 
 
-% baseKB:decl_database_hook(change( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
+% baseKB:decl_database_hook(clause( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
 
 % mudAtLoc(Agent,_)==> mudNeedsLook(Agent,vTrue).
 mudAtLoc(Agent,_)==>{padd(Agent,mudNeedsLook(vTrue))}.

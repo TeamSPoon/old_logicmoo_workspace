@@ -1085,6 +1085,7 @@ baseKB:prologBuiltin(decl_type/1).
 %
 decl_type(All):- map_list_conj(decl_type,All),!.
 decl_type(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_type_why(Spec,Why)).
+decl_type(_):-!.
 decl_type(Spec):- show_call(why,ain(tCol(Spec))),!,guess_supertypes(Spec).
 
 

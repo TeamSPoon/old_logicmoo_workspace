@@ -1498,8 +1498,9 @@ sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
 sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:dbreak).
 
-sanity3(F,L,Goal):- (( \+ \+ Goal)->true;( wdmsg(sanity_ge(F,L,Goal),dtrace(Goal)))).
-must3(F,L,Goal):- ( Goal *->true; ( wdmsg(must_ge(F,L,Goal),dtrace(Goal)))).
+sanity3(F,L,Goal):- (( \+ \+ Goal)->true;( wdmsg(sanity_ge(F,L,Goal)),dtrace(Goal),!,fail)).
+
+must3(F,L,Goal):- ( Goal *->true; ( wdmsg(must_ge(F,L,Goal)),dtrace(Goal),!,fail)).
 
 
 compare_results(N+NVs,O+OVs):-
@@ -1518,6 +1519,7 @@ need_speed:-current_prolog_flag(unsafe_speedups,true).
 %
 % If Is A Release.
 
+is_release:- current_prolog_flag(unsafe_speedups,false),!,fail.
 is_release:-!,fail.
 is_release:- current_prolog_flag(unsafe_speedups,true),!.
 is_release:- notrace((\+ current_prolog_flag(logicmoo_debug,true), \+ (1 is random(4)))).

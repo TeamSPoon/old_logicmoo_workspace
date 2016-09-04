@@ -866,6 +866,7 @@ retract_eq(HB):-expand_to_hb(HB,H,B),show_failure(modulize_head(H,MH)),clause_as
 %
 % Safely Paying Attention To Corner Cases Univ.
 %
+safe_univ(Call,Univ):-string(Call),!,[Call]=Univ.
 safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
 
 

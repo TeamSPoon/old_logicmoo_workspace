@@ -22,9 +22,9 @@
 :- baseKB:disable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,false).
 :- wdmsg("loading current_renames").
-:- load_files(pldata(current_renames),[qcompile(auto)]).
+:- load_files(pldata(current_renames),[if(not_loaded),qcompile(auto)]).
 :- wdmsg("done with rns").
-:- load_files(rs,[qcompile(auto)]).
+:- load_files(rs,[if(not_loaded),qcompile(auto)]).
 :- wdmsg("done with current_renames").
 :- retractall(renames(_)).
 :- baseKB:enable_mpred_expansion.
@@ -43,7 +43,7 @@
 :- ensure_loaded(pldata('kb_7166.qlf')).
 :- else.
 :- wdmsg("qcompile kb_7166").
-:- load_files(pldata(kb_7166),[qcompile(auto)]).
+:- load_files(pldata(kb_7166),[if(not_loaded),qcompile(auto)]).
 :- endif.
 :- wdmsg("done loading kb_7166").
 :- set_module(kb_7166:class(library)).

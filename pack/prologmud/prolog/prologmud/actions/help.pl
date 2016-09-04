@@ -32,13 +32,16 @@ get_good_templates(Templ):- isa(Templ,vtActionTemplate),good_template(Templ).
 
 get_bad_templates(Templ):- no_repeats_old((action_info(Templ,_),not(good_template(Templ)))).
 
+{between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}==>
+         action_info(TEMPL, txtConcatFn(Text,"does: ",do(A2,TEMPL))).
 
-{between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}==>action_info(TEMPL, txtConcatFn(Text,'does: ',do(A2,TEMPL))).
-(action_rules(_Agent,Verb,[Obj|Objs],List),{atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs])} ==> action_info(Syntax, txtConcatFn(makes,happen,List))).
+(action_rules(_Agent,Verb,[Obj|Objs],List),{atomic(Verb),safe_univ(Syntax,[Verb,Obj|Objs])} ==> 
+         action_info(Syntax, txtConcatFn(["makes","happen"|List]))).
+
 
 to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).
 
-first_pl((BODY,_),PL):-!,
+first_pl((BODY,_),PL):- nonvar(BODY),!,
  first_pl(BODY,PL).
 first_pl(PL,PL).
 

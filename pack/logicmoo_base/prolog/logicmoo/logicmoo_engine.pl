@@ -95,8 +95,8 @@ pttp_listens_to_stub(prologKIF).
 baseKB:mpred_provide_setup(Op,H):- provide_kif_op(Op,H).
 
 % OPHOOK ASSERT
-provide_kif_op(change(assert,How),(HeadBody)):- 
-   pttp_listens_to_head(change(assert,How),HeadBody),
+provide_kif_op(clause(assert,How),(HeadBody)):- 
+   pttp_listens_to_head(clause(assert,How),HeadBody),
    why_to_id(provide_kif_op,(HeadBody),ID),
    kif_add_boxes1(ID,(HeadBody)).
 

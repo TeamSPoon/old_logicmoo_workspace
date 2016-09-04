@@ -19,6 +19,8 @@
           virtualize_source/3,
           virtualize_code/3,
           virtualize_code_fa/5,
+          virtualize_code_each/4,
+          safe_virtualize/3,
           ereq/1,
           dbreq/1,
           swc/0,
@@ -287,7 +289,7 @@ virtualize_ereq(singleValuedInArg,2).
 virtualize_ereq(spft,3).
 virtualize_ereq(support_hilog,2).
 virtualize_ereq(tCol,1).
-virtualize_ereq(tNotForUnboundPredicates,1).
+virtualize_ereq(rtNotForUnboundPredicates,1).
 virtualize_ereq(tPred,1).
 virtualize_ereq(tRelation,1).
 virtualize_ereq(tAgent,1).
@@ -314,7 +316,8 @@ virtualize_ereq(coerce_hook,_).
 %clause_b(Goal):-  !,clause(baseKB:Goal,true).
 
 % lookup_u/cheaply_u/call_u/clause_b
-clause_b(Goal):-  baseKB:call(call,Goal).
+%clause_b(Goal):-  baseKB:call(call,Goal).
+clause_b(Goal):-  baseKB:clause(Goal,true).
 % clause_b(Goal):-  baseKB:clause(Goal,B),baseKB:call(B).
 
 %clause_b(Goal):-  baseKB:clause(Goal,B)*->call(B);clause_b0(Goal).
@@ -435,9 +438,8 @@ virtualize_source(X,In,Out):-  current_prolog_flag(unsafe_speedups,true),!,
 virtualize_source(X,In,Out):- callable(In),
  term_variables(In,List),
   (List==[] -> (virtualize_code(X,In,Out)->In\=@=Out,dmsg(virtualize_source(X,(In))-->Out));
- setup_call_cleanup(maplist(lock_vars,List),
-   (virtualize_code(X,In,Out)->In\=@=Out,nop(dmsg(virtualize_source(X,In)-->Out))),
-   maplist(unlock_vars,List))).
+ with_vars_locked(throw,List,
+   (virtualize_code(X,In,Out)->In\=@=Out,nop(dmsg(virtualize_source(X,In)-->Out))))).
 
 
 %% safe_virtualize( Term, +How, -Wrapped) is semidet.
