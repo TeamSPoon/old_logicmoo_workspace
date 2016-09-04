@@ -1006,9 +1006,11 @@ temp_comp(H,B,PRED,OUT):- nonvar(H),term_variables(B,Vs1),Vs1\==[], term_attvars
 db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.
 db_expand_0(Op,I,O):- sanity(is_ftNonvar(Op)),\+ compound(I),if_defined(do_renames(I,O),I=O),!.
 db_expand_0(_,mpred_prop(A,B,C),mpred_prop(A,B,C)):-!.
-db_expand_0(Op,pkif(SentI),SentO):- nonvar(SentI),!,must((any_to_string(SentI,Sent),must(expand_kif_string_or_fail(Op,Sent,SentM)),SentM\=@=Sent,!,
+db_expand_0(Op,pkif(SentI),SentO):- nonvar(SentI),!,must((any_to_string(SentI,Sent),
+  must(expand_kif_string_or_fail(Op,Sent,SentM)),SentM\=@=Sent,!,
   fully_expand_clause_now(Op,SentM,SentO))).
-db_expand_0(_Op,kif(Sent),SentO):- nonvar(Sent),!, must(expand_kif_string(Sent,SentO)).
+db_expand_0(_Op,kif(Sent),SentO):- nonvar(Sent),!, must(expand_kif_string(Sent,SentM)),
+  if_defined(sexpr_sterm_to_pterm(SentM,SentO),SentM=SentO).
 
 % db_expand_0(Op,Sent,SentO):- string(Sent),((expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause_now(Op,SentM,SentO));SentO=Sent),!.
 % db_expand_0(Op,M:Sent,SentO):- db_expand_0(Op,Sent,SentM),!,(is_stripped_module(M)->SentM=SentO;SentO=M:SentM).

@@ -324,6 +324,15 @@ verb_alias("go",actMove).
 verb_alias("where is",actWhere).
 verb_alias(["where","is"],actWhereTest).
 
+
+ttTypeType(ttCoercable).
+
+genls(ttStringType,ttCoercable).
+
+ttCoercable(StringType),argIsa(F,N,StringType),arity(F,A),{functor(P,F,A),copy_term(P,C)},P,{arg(N,P,E),\+ isa(E,StringType)}),
+  ==> 
+   \+ P,{coerce(E,StringType,EStr),setarg(N,C,EStr)},C.
+
 :- listing(verb_alias/2).
 
 
@@ -684,25 +693,32 @@ coerce_hook(A,B,C):- to_arg_value(A,AStr),isa(AStr,B),A=C.
 coerce_hook(A,B,C):- no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 % THIS SHOULD BEEN OK.. coerce_hook(AStr,B,C):- any_to_string(AStr,A), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 
+% Error conditions
 coerce0(String,Type,Inst):- var(Type),!,trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 
+% higher order
 coerce0(String,isNot(Type),Inst):-!, sanity(nonvar(Type)), \+ (coerce(String,Type,Inst)).
 coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,Inst),!.
 
+% Strings
 coerce0(String,ftString,String):- is_ftString(String),!.
-coerce0(Inst,ftString,String):- is_mud_object(Inst),!,name_text(Inst,String).
+coerce0(Inst,ftString,String):- \+ is_ftText(Inst),!,must(name_text(Inst,String)).
 coerce0(Any,ftString,String):- !, any_to_string(Any,String).
+
+coerce0(String,Type,Inst):- string(String),string_to_atom(String,Inst),isa(Inst,Type),!.
+
 
 % Handles text
 coerce0(String,ftText,String):- is_ftText(String),!.
 coerce0(String,ftText,StringO):- !,coerce0(String,ftString,StringO).
 
-
+% User dirrected
 %coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
 coerce0(Inst,Type,Inst):- var(Inst),!,instances_of_type(Inst,Type).
-
+% Stop string floundering
 coerce0(Any,_,_):- empty_string(Any),!,fail.
 
+% User overloaded
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(impl_coerce_hook(Text,Type,Inst)))).
 coerce0(Inst,Type,Inst):- instances_of_type(Inst,Type),!.
 

@@ -76,7 +76,17 @@ clip_qm(A,AO):-clip_us(A,AO).
 :- meta_predicate(sexpr_sterm_to_pterm(?,?)).
 :- meta_predicate(sexpr_sterm_to_pterm_list(?,?)).
 
+is_relation_sexpr('=>').
+is_relation_sexpr('<=>').
+is_relation_sexpr('==>').
+is_relation_sexpr('<==>').
+is_relation_sexpr('not').
+is_relation_sexpr(typeGenls).
+
+is_va_relation('or').
+is_va_relation('and').
 %= 	 	 
+
 
 %% sexpr_sterm_to_pterm( ?VAR, ?V) is semidet.
 %
@@ -84,16 +94,22 @@ clip_qm(A,AO):-clip_us(A,AO).
 %
 sexpr_sterm_to_pterm(VAR,'$VAR'(V)):- atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
 sexpr_sterm_to_pterm(VAR,kw((V))):- atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
-sexpr_sterm_to_pterm([S,Vars|TERM],PTERM):- nonvar(S),call_if_defined(common_logic_snark:is_quantifier(S)),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[S,Vars|PLIST])),!.
-sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['=>'|PLIST])),!.
-sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('<=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['<=>'|PLIST])),!.
 sexpr_sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
-sexpr_sterm_to_pterm([S|TERM],PTERM):- (number(S); \+ is_list(TERM) ; (atom(S),fail,atom_concat(_,'Fn',S))),sexpr_sterm_to_pterm_list([S|TERM],PTERM),!.            
-sexpr_sterm_to_pterm([S|TERM],dot_holds(PTERM)):- not(is_list(TERM)),sexpr_sterm_to_pterm_list([S|TERM],(PTERM)),!.
-sexpr_sterm_to_pterm([S],O):-is_ftVar(S),sexpr_sterm_to_pterm(S,Y),!,s_univ(O,[Y]),!.
-sexpr_sterm_to_pterm([S],O):-nonvar(S),sexpr_sterm_to_pterm(S,Y),!,s_univ(O,[Y]),!.
-sexpr_sterm_to_pterm([S|TERM],PTERM):-is_ftVar(S), sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[t,S|PLIST]),!.
-sexpr_sterm_to_pterm([S|TERM],PTERM):- atom(S),sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[S|PLIST]),!.
+sexpr_sterm_to_pterm([S|TERM],dot_holds(PTERM)):- \+ (is_list(TERM)),sexpr_sterm_to_pterm_list([S|TERM],(PTERM)),!.
+sexpr_sterm_to_pterm([S,Vars|TERM],PTERM):- nonvar(S),
+   call_if_defined(common_logic_snark:is_quantifier(S)),
+   must_det_l((sexpr_sterm_to_pterm_list(TERM,PLIST),
+   PTERM=..[S,Vars|PLIST])),!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):- (number(S);  (atom(S),fail,atom_concat(_,'Fn',S))),sexpr_sterm_to_pterm_list([S|TERM],PTERM),!.            
+sexpr_sterm_to_pterm([S],O):- is_ftVar(S),sexpr_sterm_to_pterm(S,Y),!,s_univ(O,[Y]),!.
+sexpr_sterm_to_pterm([S],O):- nonvar(S),sexpr_sterm_to_pterm(S,Y),!,s_univ(O,[Y]),!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):- is_ftVar(S), sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[t,S|PLIST]),!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):- \+ atom(S), sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[t,S|PLIST]),!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):- S==and,!,must_det_l((maplist(sexpr_sterm_to_pterm,TERM,PLIST),list_to_conjuncts(',',PLIST,PTERM))).
+sexpr_sterm_to_pterm([S|TERM],PTERM):- is_va_relation(S),!,must_det_l((maplist(sexpr_sterm_to_pterm,TERM,PLIST),list_to_conjuncts(S,PLIST,PTERM))).
+sexpr_sterm_to_pterm([S|TERM],PTERM):- is_relation_sexpr(S),must_det_l((sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[S|PLIST])),!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):- !, sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[S|PLIST]),!.
+sexpr_sterm_to_pterm(STERM,PTERM):- STERM=..[S|TERM],sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[S|PLIST]),!.
 sexpr_sterm_to_pterm(VAR,VAR).
 
 s_univ(P,[F|ARGS]):- atom(F),is_list(ARGS),length(ARGS,A),l_arity(F,A),P=..[F|ARGS].
@@ -104,6 +120,7 @@ l_arity(function,1).
 l_arity(quote,1).
 l_arity('$BQ',1).
 l_arity(_,1).
+l_arity(F,A):-current_predicate(F/A).
 
 %% sexpr_sterm_to_pterm_list( ?VAR, ?VAR) is semidet.
 %

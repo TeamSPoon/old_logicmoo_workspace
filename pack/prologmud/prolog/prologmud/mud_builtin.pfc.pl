@@ -945,11 +945,12 @@ arity(mudAreaConnected,2).
 
 mudAreaConnected(R1,R2)/ground(mudAreaConnected(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion),mudAreaConnected(R2,R1).
 
-(mudAreaConnected(R1,R2)/ground(mudAreaConnected(R1,R2)), \+ pathDirLeadsTo(R1,_,R2), 
+(mudAreaConnected(R1,R2)/(ground(mudAreaConnected(R1,R2),\+ pathDirLeadsTo(R1,_,R2))),
+   
   {random_path_dir(Dir),reverse_dir(Dir,Rev)}, 
    {\+ pathDirLeadsTo(R1,Dir,_NotR2), 
    \+ pathDirLeadsTo(R2,Rev,_NotR1)}) ==>
-  {ain(pathDirLeadsTo(R1,Dir,R2))}.
+  pathDirLeadsTo(R1,Dir,R2).
 
 pathDirLeadsTo(R1,Dir,R2)/reverse_dir(Dir,Rev) ==> pathDirLeadsTo(R2,Rev,R1).
 % pathDirLeadsTo(R1,_,R2) ==> mudAreaConnected(R1,R2).

@@ -243,7 +243,7 @@ mosftSpecificLocalityOfObject(Obj,Where):-
                         (tPathway(Obj),localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)).
 
 
-mudDoorwayDir(Region,apathFn(Region,Dir),Dir) :-  tPathway(apathFn(Region,Dir)).
+tPathway(apathFn(Region,Dir)) ==> mudDoorwayDir(Region,apathFn(Region,Dir),Dir).
 
 mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):- call_u(calc_from_center_xyz(Region,Dir,2,X,Y,Z)).
 
@@ -294,7 +294,7 @@ wearsClothing(Agent,Clothes)==>mudSubPart(Agent,Clothes).
 
 
 is_in_world(Var):- is_ftVar(Var),!,trace_or_throw(var_is_in_world(Var)).
-is_in_world(apathFn(_,_)):-!.
+is_in_world(apathFn(A,B)):- gound(apathFn(A,B)),!.
 is_in_world(Obj):-isa_asserted(Obj,tRegion),!.
 is_in_world(Obj):-lookup_u(mudAtLoc(Obj,_)),!.
 is_in_world(Obj):-lookup_u(mudStowing(Who,Obj)),!,is_in_world(Who).

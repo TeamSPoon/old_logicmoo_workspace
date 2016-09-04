@@ -93,3 +93,48 @@ setup_call_cleanup_each(Setup,Goal,Cleanup):-
 
 :- endif.
 
+
+end_of_file.
+
+
+:-export(call_using_first_responder/1).
+:-meta_predicate(call_using_first_responder(0)).
+call_using_first_responder(Call):- 
+  Responded = responded(_),Cutted = was_cut(_),
+
+  CheckCut = (ignore(deterministic(HasCut)),(HasCut=true->nb_setarg(1,Cutted,cut);true)),
+  
+  clause(Call,Body),
+  \+ ground(Cutted),
+  FakeBody = (Body;fail),
+  ((( (FakeBody,CheckCut,nb_setarg(1,Responded,answered)) *-> true ; (CheckCut,fail))
+     ; (CheckCut,ground(Responded),((HasCut==true->!;true)),fail))).
+
+
+ % one_must(C1,one_must(C2,one_must(C3,one_must(C4,C5)))).
+
+
+
+a:- !,fail.
+a:- throw(failed_test).
+fr1:- \+ call_using_first_responder(a).
+
+
+b:- !.
+b:- throw(failed_test).
+fr2:- call_using_first_responder(b).
+
+wa(A):-writeln(A),asserta(A).
+
+c:- fail.
+c:- !, (wa(c(2));wa(c(3))).
+c:- throw(failed_test).
+fr3:- call_using_first_responder(c).
+
+
+
+d:- wa(d(1));(wa(d(2));wa(d(3))).
+d:- throw(failed_test).
+fr4:- call_using_first_responder(d).
+
+:- break.

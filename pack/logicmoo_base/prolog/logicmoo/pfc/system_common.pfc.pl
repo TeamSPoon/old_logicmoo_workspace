@@ -167,6 +167,9 @@ tSet(rtNotForUnboundPredicates).
 ttRelationType(rtNotForUnboundPredicates).
 rtNotForUnboundPredicates(member).
 
+%and(A,B):- cwc, call_u((A,B)).
+%or(A,B):- cwc, call_u((A;B)).
+
 
 :- fully_expand(pkif("
 (==> 
@@ -185,6 +188,7 @@ rtNotForUnboundPredicates(member).
       (disjointWith ?COL1 ?COL2)) 
     (disjointWith ?COLTYPE1 ?COLTYPE2))"
 ))).
+
 
 /*
 ?- isa(iExplorer2,W),
@@ -1249,17 +1253,17 @@ tSet('SententialOperator').
 %TODO tAvoidForwardChain('$VAR'('FUNC')).
 
 tAvoidForwardChain(isEach('FunctionToArg',holds,equals,different,evaluate,trueSentence,'TINYKB-ASSERTION',termOfUnit)).
-genls('SententialRelation','SententialOperator').
-genls('SententialOperator',tAvoidForwardChain).
-genls('VariableArityRelation',tAvoidForwardChain).
-genls('CommutativeRelation',tAvoidForwardChain).
+genls('rtSententialRelation','rtSententialOperator').
+genls('rtSententialOperator',tAvoidForwardChain).
+genls('rtVariableArityRelation',tAvoidForwardChain).
+genls('rtCommutativeRelation',tAvoidForwardChain).
 genls('tFunction',tAvoidForwardChain).
-genls('EvaluatableRelation',tAvoidForwardChain).
+genls('rtEvaluatableRelation',tAvoidForwardChain).
 
-tSet('CommutativeRelation').
-tSet('EvaluatableRelation').
-tSet('SententialRelation').
-tSet('VariableArityRelation').
+tSet('rtCommutativeRelation').
+tSet('rtEvaluatableRelation').
+tSet('rtSententialRelation').
+tSet('rtVariableArityRelation').
 
 
 tSet(completeIsaAsserted).
@@ -1274,6 +1278,7 @@ ttExpressionType(ftVoprop).
 
 ttStringType('CharacterString').
 ttStringType('SubLString').
+ttStringType('ControlCharacterFreeString').
 ttStringType('SubLListOfStrings').
 ttStringType(['ListOfTypeFn', X]):-atom(X),ttStringType(X).
 
@@ -1315,7 +1320,7 @@ prologMultiValued(genlPreds(tPred,tPred)).
 prologMultiValued(predProxyAssert(prologMultiValued,ftTerm)).
 prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
 
-:- if(false).
+:- if(true).
 prologHybrid(instTypeProps(ftID,tCol,ftRest(ftVoprop))).
 prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
 prologMacroHead(pddlObjects(tCol,ftListFn(ftID))).
@@ -1519,4 +1524,41 @@ isa(iPlato,'tPhilosopher').
 %:- mpred_test(~isa(iPlato,ftAtom)).
 :- mpred_test(~quotedIsa(iPlato,'tPhilosopher')).
 :- mpred_test(quotedIsa(iPlato,ftAtom)).
+
+ttBarrierStr(A)/(atomic_list_concat([A,"Type"],AType0),
+  atomic_list_concat([A,''],Type0),
+  do_renames(Type0,Type),
+  do_renames(AType0,TypeType))
+  ==> barrierSpindle(TypeType,Type).
+
+
+barrierSpindle(TypeType,Type)==> isa(TypeType,ttBarrierType),isa(TypeType,ttBarrier),typeGenls(TypeType,Type).
+
+ttBarrier(A)/dif(A,B),ttBarrier(B)==> disjointWith(A,B).
+% ttBarrierType(A)/dif(A,B),ttBarrierType(B)==> disjointWith(A,B).
+
+
+ttBarrierStr("Action").
+ttBarrierStr("Agent").
+ttBarrierStr("Artifact").
+barrierSpindle('SpecifiedPartTypeCollection','PhysicalPartOfObject').
+ttBarrierStr("Capability").
+ttBarrierStr("Event").
+ttBarrierStr("Script").
+ttBarrierStr("FormulaTemplate").
+ttBarrierStr("Goal").
+ttBarrierStr("Group").
+ttBarrierStr("LinguisticObject").
+ttBarrierStr("Microtheory").
+ttBarrierStr("PersonTypeByActivity").
+ttBarrierStr("Place").
+ttBarrierStr("Quantity").
+ttBarrierStr("Relation").
+ttBarrierStr("ScalarInterval").
+ttBarrierStr("Situation").
+ttBarrierStr("ExpressionType").
+ttBarrierStr("TimeParameter").
+ttBarrierStr("Topic").
+
+:- listing(disjointWith/2).
 

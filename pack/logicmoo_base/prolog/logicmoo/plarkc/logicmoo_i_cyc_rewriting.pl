@@ -419,8 +419,9 @@ baseKB:cyc_to_plarkc(C,P):- atom(C), once(cyc_to_mpred_idiom1(C,I)), C\==I, loop
 
 baseKB:mpred_to_cyc(P,C):- loop_check(baseKB:cyc_to_plarkc(C,P)),!.
 
-dehyphenize_const(PM,PMO):-tokenize_atom(PM,Toks),member(E,Toks),number(E),E<0,!,atomic_list_concat(List,'-',PM),atomic_list_concat(List,'_',PMO),!.
-dehyphenize_const(PM,PMO):-atomic_list_concat([P|List],'-',PM),maplist(toPropercase,List,ListO),atomic_list_concat([P|ListO],PMO),!.
+dehyphenize_const(PM,PMO):-tokenize_atom(PM,[_,T1|Toks]),member(E,[T1|Toks]),number(E),E<0,!,atomic_list_concat(List,'-',PM),atomic_list_concat(List,'_',PMO),!.
+dehyphenize_const(PM,PMO):-atomic_list_concat([P,F|List],'-',PM),maplist(toPropercase,[F|List],ListO),atomic_list_concat([P|ListO],PMO),!.
+dehyphenize_const(PM,PM).
 
 :- must(dehyphenize_const('a-b','aB')).
 :- must(dehyphenize_const('a-2b','a_2b')).
