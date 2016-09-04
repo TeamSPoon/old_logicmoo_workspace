@@ -410,7 +410,7 @@ baseKB:cyc_to_plarkc('Friday',vFriday).
 baseKB:cyc_to_plarkc('Saturday',vSaturday).
 baseKB:cyc_to_plarkc('ArgGenlQuantityTernaryPredicate',rtArgGenlQuantityTernaryPredicate).
 
-
+baseKB:cyc_to_plarkc(X,Y):- starts_lower(X),!,dehyphenize_const(X,Y).
 baseKB:cyc_to_plarkc(C,P):- atom(C), once(cyc_to_mpred_idiom1(C,I)), C\==I, loop_check(baseKB:cyc_to_plarkc(I,P)).
 % baseKB:cyc_to_plarkc(C,P):- atom(C), transitive_lc(cyc_to_mpred_idiom1,C,I),baseKB:cyc_to_plarkc(I,P).
 % BAD?  baseKB:cyc_to_plarkc(C,P):- rename(P,C).
@@ -658,6 +658,8 @@ do_renames_compound_name_arguments(_A,P,ARGS,B):- maplist(do_renames,[P|ARGS],[T
 
 is_builtin_like(format).
 is_builtin_like(sformat).
+is_builtin_like(F):-exact_args_f(F).
+
 
 compute_argIsa(ARG1ISA,NN,ARGISA):-
   atom(ARG1ISA),

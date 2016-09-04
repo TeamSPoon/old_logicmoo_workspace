@@ -29,6 +29,7 @@
   throw_depricated/0,
   lookup_m_g/3,
   head_to_functor_name/2,
+          ain_expanded/1,
 
   get_consequent_functor/3,
   mpred_post1_rem/2,
@@ -196,6 +197,7 @@ push_current_choice/1,
       each_E(+,+,+),
       pfcl_do(0),
       pfcl_do(+), % not all arg1s are callable
+      ain_expanded(+),
       lookup_u(+),
       lookup_u(?,?),
       mnotrace(0),
@@ -441,7 +443,7 @@ fix_mp(Why,Junct,ABox,Result):- fail, (mpred_db_type(Junct,rule);(functor(Junct,
    defaultAssertMt(ABox),!.
 
 %fix_mp(call(hb(HC,_BC,Op)),H,M,HH):- contains_var(H,HC),!,
-%   fix_mp(clause(assert,Op),H,M,HH).
+%   fix_mp(change(assert,Op),H,M,HH).
 
 fix_mp(call(hb(_HC,BC,Op)),B,M,BB):- contains_var(B,BC),B\=@=BC,!,
    fix_mp(call(Op),B,M,BB).
@@ -502,7 +504,7 @@ convention_to_symbolic_mt(_Why,F,A,abox):- baseKB:wrap_shared(F,A,ereq).
 full_transform_warn(Why,MH,MHH):- full_transform(Why,MH,MHH),must(MH=@=MHH).
 
 full_transform(Why,MH,MHH):-
-   must(fully_expand(clause(Why,full_transform),MH,MHH)),!,
+   must(fully_expand(change(assert,Why),MH,MHH)),!,
    sanity(same_modules(MH,MHH)).
 
 same_modules(MH,MHH):- strip_module(MH,HM,_),strip_module(MHH,HHM,_),!,
@@ -510,7 +512,7 @@ same_modules(MH,MHH):- strip_module(MH,HM,_),strip_module(MHH,HHM,_),!,
 
 %:- if(\+ current_prolog_flag(umt_local,false)).
 
-listing_u(P):-call_u_no_bc(listing(P)).
+listing_u(P):-call_u_no_bc(listing(P)),!.
 
 attvar_op_fully(Why,MH):- !, attvar_op(Why,MH).
 %attvar_op_fully(Why,M:H):- must_notrace_pfc(full_transform_warn(change(Why,attvar_op_fully),H,true,HH,true)),!,each_E(attvar_op(Why),M:HH,[]).
@@ -519,10 +521,10 @@ attvar_op_fully(Why,MH):- !, attvar_op(Why,MH).
 throw_depricated:- trace_or_throw(throw_depricated).
 
 assert_u(MH):- assert_u_no_dep(MH).
-assert_u_no_dep(MH):- fix_mp(clause(assert,assert_u),MH,MHA),
+assert_u_no_dep(MH):- fix_mp(change(assert,assert_u),MH,MHA),
     attvar_op_fully(assert_i, MHA),expire_tabled_list(MHA).
-asserta_u(MH):- fix_mp(clause(assert,asserta_u),MH,MHA),attvar_op_fully(asserta_i,MHA).
-assertz_u(MH):- fix_mp(clause(assert,assertz_u),MH,MHA),attvar_op_fully(assertz_i,MHA).
+asserta_u(MH):- fix_mp(change(assert,asserta_u),MH,MHA),attvar_op_fully(asserta_i,MHA).
+assertz_u(MH):- fix_mp(change(assert,assertz_u),MH,MHA),attvar_op_fully(assertz_i,MHA).
 retract_u(H):- retract_u0(H) *-> true; attvar_op_fully(retract_u0,H).
 
 retract_u0(H0):- strip_module(H0,_,H),(H = ( \+ _ )),!,trace_or_throw(mpred_warn(retract_u(H0))),expire_tabled_list(H).
@@ -721,6 +723,8 @@ mpred_set_default(GeneralTerm,Default):-
 % :- must(mpred_set_default(pm(_), pm(direct))).
 
 
+ain_expanded(IIIOOO):- mpred_ain(IIIOOO).
+
 
 %% mpred_ainz(+G, ?S) is semidet.
 %
@@ -780,10 +784,10 @@ mpred_ain(PIn,S):-
   must(ain_fast(P0,S)),!,
   ignore((P\=@=P0, mpred_db_type(P,fact(_)),show_call(mpred_fwc(P)))).
 
-mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!.
+mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]),!,fail.
 
 
-ain_fast(P):- clause_asserted(P),!.
+ain_fast(P):-  \+ t_l:is_repropagating(_),clause_asserted(P),!.
 ain_fast(P):- call_u((( get_source_ref(UU), ain_fast(P,UU)))).
 
 ain_fast(P,S):- maybe_updated_value(P,RP,OLD),subst(S,P,RP,RS),!,ain_fast(RP,RS),ignore(mpred_retract(OLD)).
@@ -1021,7 +1025,7 @@ same_file_facts(F,FF):- FF=@=F,!.
 %
 mpred_post_update4(Was,P,S,What):- 
   not_not_ignore_mnotrace(( (get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
-  fix_mp(clause(assert,post),P,M,PP),
+  fix_mp(change(assert,post),P,M,PP),
   must(S=(F,T)),wdmsg(call_mpred_post4:- (Was,post1=M:PP,fact=F,trig=T,What)))),
   fail.
 
@@ -1041,7 +1045,7 @@ mpred_post_update4(identical,P,S,simular(_)):- !,mpred_add_support_fast(P,S).
 /*
 mpred_post_update4(Was,P,S,What):- 
   not_not_ignore_mnotrace(( \+ (get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
-  fix_mp(clause(assert,post),P,M,PP),
+  fix_mp(change(assert,post),P,M,PP),
   must(S=(F,T)),wdmsg(mpred_post_update4:- (Was,post1=M:PP,fact=F,trig=T,What)))),
   fail.
 */
@@ -1730,7 +1734,7 @@ cut_c:-
 mpred_eval_lhs(X,S):-
    prolog_current_choice(CP),push_current_choice(CP),
    
-   with_current_why(S,mpred_eval_lhs_0(X,S)).
+   with_current_why(S,loop_check(mpred_eval_lhs_0(X,S),fail)).
 
 
 %% mpred_eval_lhs_0(X,Support) is det.

@@ -75,7 +75,6 @@
             db_expand_final/3,
             in_dialect_pfc/0,
             db_expand_maplist/5,
-            db_expand_up/4,
             db_op_sentence/4,
             db_op_simpler/3,
             db_quf/4,
@@ -87,7 +86,6 @@
             replaced_module/3,
             fully_expand_clause_now/3,
             do_expand_args/3,
-            ain_expanded/1,
             do_expand_args_l/3,
             do_expand_args_pa/4,
             ex_argIsa/3,
@@ -175,7 +173,6 @@
 :- meta_predicate 
    % mpred_expansion
    cheaply_u(+),
-   ain_expanded(+),
    cheaply_u(+),
    db_expand_maplist(2,*,*,*,*),
    % mpred_expansion
@@ -566,8 +563,6 @@ fully_expand(X,Y):- must((fully_expand(clause(unknown,cuz),X,Y))).
 
 
 
-ain_expanded(III):- fully_expand_now(change(assert,ain_expanded),III,OOO),ain(OOO).
-
 %% fully_expand( ++Op, ^Sent, --SentO) is det.
 %
 % Fully Expand.
@@ -741,7 +736,7 @@ recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..
 % Converted To If Is A Term Primary Helper.
 %
 as_is_term(NC):- cyclic_break(NC), var(NC),!.
-as_is_term(NC):- \+ compound(NC),fail.
+as_is_term(NC):- \+ compound(NC),!,fail.
 as_is_term(P):-functor(P,F,A),functor(C,F,A),C=@=P,!.
 as_is_term(PARSE):-is_parse_type(PARSE),!,fail.
 as_is_term(meta_argtypes(_)):-!.
@@ -871,7 +866,8 @@ db_expand_final(_,VAR,VAR):- is_ftVar(VAR),!.
 db_expand_final(_ ,NC,NCO):- string(NC),convert_to_cycString(NC,NCO),!.
 db_expand_final(_ ,NC,NCO):- atomic(NC),if_defined(do_renames(NC,NCO),fail),!.
 db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
-%db_expand_final(_ ,NC,NC):-  as_is_term(NC),!.
+db_expand_final(_ ,CI,CI ):- CI=..[C,I],C==I,!.
+db_expand_final(_ ,NC,NC):-  as_is_term(NC),!.
 %db_expand_final(_,PARSE,ISA):- PARSE=..[t,C,I],atom(C),atom(I),ISA=..[C,I],!.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),(not_ftCompound(T)),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
@@ -955,11 +951,6 @@ db_expand_chain(_,('nesc'(P)),P) :- !.
 
 
 
-%% fully_expand_head_throw_if_loop( ?A, ?B, ?C) is semidet.
-%
-% Database Expand A.
-%
-fully_expand_head_throw_if_loop(A1,B1,C1):- must(loop_check_term(fully_expand_head(A1,B1,C1),fully_expand_head(A1,B1,C1),trace_or_throw(loop_check(fully_expand_head(A1,B1,C1))))),!.
 
 %% fully_expand_head( ?A, ?B, ?C) is semidet.
 %
@@ -1029,11 +1020,12 @@ db_expand_0(_,Sent,SentO):-as_is_term(Sent),!,SentO=Sent.
 % Database expand  Extended Helper.
 %
 db_expand_0(_,Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
+
+/*
 db_expand_0(Op,Sent,SentO):- arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F),fail,
   asserted_argIsa_known(F,2,_),!,
   correctArgsIsa(Op,Sent,SentO),!.
 
-/*
 db_expand_0(Op,tCol(I),isa(I,tCol)):- \+ compound(I).
 db_expand_0(Op,tSet(I),isa(I,tSet)):- \+ compound(I).
 db_expand_0(Op,tPred(I),isa(I,tPred)):- \+ compound(I).
@@ -1051,7 +1043,7 @@ db_expand_0(_,Sent,SentO):- is_ftNonvar(Sent),copy_term(Sent,NoVary),get_ruleRew
 db_expand_0(call(Op),Sent,SentO):-  mreq(quasiQuote(QQuote)),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,db_expand_0(call(Op),MID,SentO).
 
 db_expand_0(_,I,O):- \+ compound(I),!,I=O.
-
+db_expand_0(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_0(Op,Sent,SentO):- transitive_lc(db_expand_chain(Op),Sent,SentO)-> SentO \=@= Sent.
 
 db_expand_0(Op,EL,O):- is_list(EL),!,must_maplist(db_expand_0(Op),EL,O).
@@ -1140,8 +1132,8 @@ db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),fully_expand_clause_now(Op,
 db_expand_0(Op,DECL,O):- fail, arg(_,DECL,S),string(S),DECL=..[F|Args],maplist(destringify,Args,ArgsO),
   ArgsO\=@=Args,!,DECLM=..[F|ArgsO],db_expand_0(Op,DECLM,O).
 
-% db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],is_ftNameArity(F,A),functor_declares_instance(D,TPRED),
+db_expand_0(Op,DECL,((arity(F,A),O))):-DECL=..[D,FA|Args],compound(FA),FA= (F/A),
+  is_ftNameArity(F,A),functor_declares_instance(D,TPRED),
   is_ftNonvar(TPRED),is_relation_type(TPRED),expand_props(_Prefix,Op,props(F,[D,TPRED|Args]),O),!.
 
 
@@ -1818,6 +1810,8 @@ exact_args_f(mpred_ain).
 exact_args_f(dynamic).
 exact_args_f((=..)).
 exact_args_f((=)).
+exact_args_f(dmsg).
+exact_args_f(wdmsg).
 exact_args_f('$was_imported_kb_content$'):-dtrace.
 exact_args_f(wid).
 exact_args_f(ignore).

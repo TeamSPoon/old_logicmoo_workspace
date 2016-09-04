@@ -16,6 +16,7 @@
             any_to_value/2,
             argIsa_op_call/4,
             as_one_of/2,
+            show_count/1,
             assert_argIsa/3,
             assert_predArgTypes/1,
             assert_predArgTypes_fa/2,
@@ -309,7 +310,8 @@ pl_arg_type(Arg,Type):-
       number(Arg) -> Type =ftFloat;
       string(Arg) -> Type =ftString;
       is_ftText(Arg) -> Type =ftText;
-      is_list(Arg) -> Type =ftListFn(_);
+      is_list(Arg) -> Type = ftList;
+  /* is_list(Arg) -> Type =ftListFn(_); */
       atom(Arg) -> Type =ftAtom;
       atomic(Arg) -> Type =ftAtomic;
       compound(Arg) -> Type =ftCompound;
@@ -394,13 +396,14 @@ correctArgsIsa(In,Out):- correctArgsIsa(query(must,t),In,Out),!.
 % correct Arguments  (isa/2).
 %
 % correctArgsIsa0(_,G,G):- (\+ t_l:infMustArgIsa), (is_release; bad_idea; skipWrapper;  t_l:infSkipArgIsa),!.
-correctArgsIsa(_,G,G):-!. 
+% correctArgsIsa(_,G,G):-!. 
 correctArgsIsa(_,G,GG):- t_l:infSkipArgIsa, !,must_equals(G,GG).
-correctArgsIsa(_,NC,NC):- \+ compound(NC),!.
-correctArgsIsa(Op,G,GG):- correctArgsIsa0(Op,G,GG),sanity(nonvar(GG)).
+correctArgsIsa(_,G,GG):- sanity(var(GG)), ( \+ compound(G)), !,must(G=GG).
+% correctArgsIsa(Op,G,GG):- correctArgsIsa0(Op,G,GG),var(GG),!,break,correctArgsIsa0(Op,G,GG),break,break.
+correctArgsIsa(Op,G,GG):- must((correctArgsIsa0(Op,G,GG),sanity(nonvar(GG)))).
 
 correctArgsIsa0(_,NC,NC):- \+ compound(NC),!.
-correctArgsIsa0(Op,G,GG):- is_list(G),!,must_maplist(correctArgsIsa0(Op),A,AA).
+correctArgsIsa0(Op,G,GG):- is_list(G),!,must_maplist(correctArgsIsa0(Op),G,GG).
 correctArgsIsa0(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa0(Op,G,GG),M:GG=MAA.
 correctArgsIsa0(Op,ISA,GG):- was_isa(ISA,_,_),!,must_equals(ISA,GG).
 correctArgsIsa0(Op,(A,B),(AA,BB)):-!,correctArgsIsa0(Op,A,AA),correctArgsIsa0(Op,B,BB).
@@ -433,6 +436,8 @@ list_to_callform([P|ARGS],_,CALL):-atom(P),!,CALL=..[P|ARGS].
 list_to_callform(ARGS,Functor,CALL):-CALL=..[Functor|ARGS].
 
 
+
+show_count(F/A):- functor(P,F,A), predicate_property(M:P,number_of_clauses(N)),dmsg(F=M:N).
 
 %= 	 	 
 
@@ -525,7 +530,7 @@ is_valuespec(G):-evaluatableArg(G,_).
 %
 % Evaluatable Argument.
 %
-evaluatableArg(AA,_):-compound(AA),get_functor(AA,F),!,evaluatableFunctor(F).
+evaluatableArg(AA,Value):-fail,sanity(nonvar(AA)),compound(AA),get_functor(AA,F),!,evaluatableFunctor(F).
 
 %= 	 	 
 
@@ -548,14 +553,15 @@ evaluatableFunctor(isOptional).
 % ?- correctType(query(must,t),ab_c,ftString,O).
 % correctAnyType(_,A,_,A):- bad_idea.
 
-correctAnyType(_, A,_Type,AA):- is_ftVar(A),sanity(var(AA)),must_det(A=AA),!.
+correctAnyType(_, A,_Type,AA):- is_ftVar(A),sanity(var(AA)),A=AA,must_det(A==AA),!.
 correctAnyType(Op,A,Type,AA):-  var(Type),!,trace_or_throw(var_correctAnyType(Op,A,Type,AA)).
-correctAnyType(Op,A,Type,AA):-  (var(A)->correctType(Op,A,Type,AA)->sanity(var(AA))->must_det(A==AA)),!,ignore(A=AA).
-correctAnyType(_, A,Type,AA):-  evaluatableArg(A,Type)->dmsg(evaluatableArg(A,Type))->must_det(A=AA),!.
+% correctAnyType(Op,A,Type,AA):-  var(A),!,must(correctType(Op,A,Type,AA)),sanity(var(AA)),sanity(A==AA).
+% correctAnyType(_, A,Type,AA):-  evaluatableArg(Type,A)->dmsg(evaluatableArg(A,Type))->must_det(A=AA),!.
 correctAnyType(Op,A,Type,AA):- var(Type),trace_or_throw(correctAnyType(Op,A,Type,AA)).
 % TODO snags on new tpyes correctAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
-correctAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),!,ignore(A=AA).
-correctAnyType(Op,A,Type,AA):- must(A=AA),dmsg(dtrace(nop(warn(not(correctAnyType(Op,A,Type)))))).
+correctAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),!,sanity(nonvar(AA)).
+correctAnyType(Op,A,Type,AA):- must(A=AA),atom(Type),atom(A),!,nop(dmsg(dtrace(warn(not(correctAnyType(op(Op),arg(A),type(Type))))))).
+correctAnyType(Op,A,Type,AA):- must(A=AA),dmsg(dtrace(nop(warn(not(correctAnyType(op(Op),arg(A),type(Type))))))).
 
 
 
@@ -584,8 +590,8 @@ correctFormatType(Op,A,Type,A):- dmsg(todo(not(correctFormatType(Op,A,Type)))),f
 %
 % Check Any Type.
 %
-checkAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),sanity(var(AA)),must_det(A==AA),!.
-checkAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
+checkAnyType(Op,A,Type,A):- var(A),correctType(Op,A,Type,AA),!,sanity(var(AA)),(A==AA).
+checkAnyType(Op,A,Type,A):- correctType(Op,A,Type,AA),nonvar(AA),!,(AA=@=A).
 
 
 %= 	 	 
@@ -594,7 +600,7 @@ checkAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 %
 % Correct Any Type Or Fail.
 %
-correctAnyTypeOrFail(Op,A,Type,AA):- w_tl(tlbugger:skipMust,checkAnyType(Op,A,Type,AA)).
+correctAnyTypeOrFail(Op,A,Type,AA):- w_tl(tlbugger:skipMust,correctType(Op,A,Type,AA)),A\=@=AA.
 
 
 
@@ -639,7 +645,19 @@ is_renamed_to(A,AA):- fail,atomic(A),not(A=[];A='';A=""),not(atom_concat(_,'Tabl
 correctType(Op,A,Type,AA):- sanity(nonvar(Type)), loop_check(correctType0(Op,A,Type,AA)).
 
 
-%= 	 	 
+
+is_call_like(ftCallable).
+is_call_like(ftAskable).
+is_call_like(ftAssertable).
+
+is_uncheckable(X):-is_call_like(X).
+is_uncheckable(tCol).
+is_uncheckable(tSet).
+is_uncheckable(ftProlog).
+is_uncheckable(ftTerm).
+
+ensure_never_ft_binding(C):- ignore((var(C),\+ attvar(C),freeze(C, \+ (atom(C),atom_concat('ft',_,C))))).
+
 
 %% correctType0( ?Op, :TermA, :TermType, :TermAA) is semidet.
 %
@@ -650,31 +668,34 @@ correctType0(_ ,A,T,AA):- A==T,!,must_equals(A,AA).
 correctType0(Op,A,Type,AA):- var(Type),trace_or_throw(correctType(Op,A,Type,AA)).
 correctType0(_,A,_,AA):- var(A),!, must_equals(A,AA).
 
+correctType0(_ ,A,FTType,AA):- quotedIsa(A,FTType),!, must_equals(A,AA).
 correctType0(_ ,A,ftString,AA):- !, must(any_to_string(A,AA)),!.
 correctType0(_ ,A,ftText,AA):- atomic(A),convert_to_cycString(A,AA),!.
 correctType0(_ ,A,ftText,AA):- any_to_string(A,M),convert_to_cycString(M,AA),!.
+correctType0(Op,A,ftTerm(_),AA):- loop_check(must_equals_correct(Op,A,AA),
+                        ((A=AA,dmsg(looped_on(correctType0(Op,A,ftTerm(_),AA)))))).
+correctType0(_ ,A,FTType,A):- isa(A,FTType),!.
+correctType0(_ ,String,ftNumber,Number):- string(String),!, any_to_number(String,Number).
 
 
-correctType0(_ ,A,ftCallable,AA):- must_equals(A,AA).
-correctType0(_ ,A,ftAssertable,AA):- must_equals(A,AA).
-correctType0(_ ,A,tCol,AA):- atom(A),!,must_equals(A,AA).
+correctType0(_ ,A,Type,AA):- is_uncheckable(Type), must_equals(A,AA).
+
+correctType0(Op,A,Type,AA):-  is_call_like(Type),!,must_equals_correct(query(Type,Op),A,AA).
 correctType0(Op,A,ftID,AA):- must_equals_correct(query(ftID,Op),A,AA),!.
-correctType0(_ ,A,Type,AAA):-A==Type,!,A=AAA.
+
+correctType0(_ ,A,tCol,AA):- atom(A),!,must_equals(A,AA).
+
+correctType0(_ ,A,Type,AA):-A==Type,!,A=AA.
+
 correctType0(query(ftID,Op),A,ftAction,AA):- must_equals_correct(Op,A,AA),!.
 correctType0(Op,A,Type,AAA):-is_renamed_to(A,AA),!,must(correctType(Op,AA,Type,AAA)).
 correctType0(Op,+A,Type,+AA):-nonvar(A),!,correctType(Op,A,Type,AA).
 correctType0(Op,-A,Type,-AA):-nonvar(A),!,correctType(Op,A,Type,AA).
-correctType0(Op,A,ftInteger,AA):-!,correctType(Op,A,ftInt,AA).
-correctType0(Op,A,ftAskable,AA):-!,must_equals_correct(query(ftAskable,Op),A,AA).
 correctType0(_ ,A,ftInt,AA):- any_to_number(A,AA).
 correctType0(_ ,A,ftNumber,AA):- any_to_number(A,AA).
-correctType0(_ ,A,ftProlog,AA):- must_equals(A,AA).
-correctType0(Op,A,ftTerm(_),AA):- must_equals_correct(Op,A,AA).
 correctType0(_ ,A,ftVoprop,AA):- !, must(A=AA).
 correctType0(Op,A,ftVoprop,AA):- is_list(A),!,maplist(correctTypeArg(Op,ftAskable),A,AA).
 correctType0(Op,A,ftVoprop,AA):- !,w_tl(t_l:inVoprop,correctType(Op,A,ftAskable,AA)).
-
-correctType0(_ ,A,ftTerm,AA):- must_equals(A,AA),!.
 
 correctType0(_ ,A,tPred,AA):- any_to_relation(A,AA).
 correctType0(_ ,A,tFunction,AA):- any_to_relation(A,AA).
@@ -690,7 +711,9 @@ correctType0(Op,A,Super,AA):- a(ttExpressionType,Super),call_u(genls(Sub,Super))
 
 correctType0(_ ,What,Type,NewThing):- call_u(coerce(What,Type,NewThing)),!.
 
-correctType0(Op,[A|AA],ftListFn(T),LIST):-!,findall(OT,((member(O,[A|AA]),correctAnyType(Op,O,T,OT))),LIST).
+correctType0(Op,[A|NIL],ftListFn(T),[L]):-NIL==[],!,correctAnyType(Op,A,T,L).
+correctType0(Op,[A|AA],ftListFn(T),[L|LIST]):-!,correctAnyType(Op,A,T,L),correctType0(Op,AA,ftListFn(T),LIST).
+
 correctType0(Op,A,ftListFn(T),[OT]):-!,correctAnyType(Op,A,T,OT).
 correctType0(_ ,[],[],[]):-!.
 correctType0(Op,[H|T],[H2|T2],[H3|T3]):-!, correctAnyType(Op,H,H2,H3),correctType(Op,T,T2,T3).

@@ -4031,7 +4031,7 @@ end_of_file.
         mpred_hooks:support_hilog/2),
         mpred_hooks:t/1),
         mpred_hooks:t/2),
-        mpred_hooks:tNotForUnboundPredicates/1),
+        mpred_hooks:rtNotForUnboundPredicates/1),
         mpred_kb_ops:arity/2),
         mpred_kb_ops:support_hilog/2),
         mpred_pfc:arity/2),

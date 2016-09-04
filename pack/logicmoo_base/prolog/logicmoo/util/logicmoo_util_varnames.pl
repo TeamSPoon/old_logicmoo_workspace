@@ -26,6 +26,8 @@
             never_bound/1,
             dif_matrix/2,
             term_singletons/2,
+            with_vars_locked/3,
+            with_vars_locked/2,
           term_singletons/3,
           term_singletons/5,
             set_varname/2,
@@ -429,22 +431,51 @@ dif_matrix_hopfully(A,B):- dif:dif(A,B),!.
 %
 % Lock Variables.
 %
-lock_vars(Var):-var(Var),!,when:when(nonvar(Var),Var='$VAR'(_)).
-lock_vars(Var):-var(Var),!,only_stars(Var). 
-lock_vars(Term):- must(notrace((term_variables(Term,Vs),maplist(lock_vars,Vs),all_different_vars(Vs)))).
+
+lock_vars(Term):-lock_vars(fail,Term).
+
+%lock_vars(_Notify,_Var):- current_prolog_flag(unsafe_speedups,true),!.
+lock_vars( Notify, Term):-  must(notrace((NotifyP=call(Notify),term_variables(Term,Vs),maplist(lock_each_var(NotifyP,Vs),Vs)))).
+
+lock_each_var(Notify,Vs,Var):- get_attr(Var,vl,when_rest(NotifyP,RestP)),delete_eq(Vs,Var,Rest),
+   append(Rest,RestP,NewRest),put_attr(Var,vl,when_rest(dual_notify(Notify,NotifyP),NewRest)).
+lock_each_var(Notify,Vs,Var):- delete_eq(Vs,Var,Rest),put_attr(Var,vl,when_rest(Notify,Rest)).
+% lock_each_var(_,_ ,  Var):-var(Var),!,only_stars(Var). 
+
+dual_notify(N1,N2,Value):-ignore( \+ call(N1,Value)),ignore( \+ call(N2,Value)).
 
 
-%= 	 	 
+vl:attr_unify_hook(when_rest(Notify,RestOfVars),VarValue):- 
+  not_member_eq(VarValue,RestOfVars),
+  \+ (var(VarValue);verbatum_var(VarValue)),
+  nb_setarg(1,Notify,wdmsg),
+  dumpST,
+  dmsg(error_locked_var(Notify,VarValue)),!,
+  call(Notify,VarValue),!.
+
+
 
 %% unlock_vars( :TermVar) is semidet.
 %
 % Unlock Variables.
 %
 
-unlock_vars( Var):-var(Var),!,del_attr(Var,when),del_attr(Var,eq),del_attr(Var,dif).
+%unlock_vars(_Var):- current_prolog_flag(unsafe_speedups,true),!.
+unlock_vars( Var):- attvar(Var),!,del_attr(Var,vl).
 unlock_vars(Term):- must(notrace((term_attvars(Term,Vs),maplist(unlock_vars,Vs)))).
 
 
+:- meta_predicate(with_vars_locked(1,0)).
+with_vars_locked(Notify,Goal):- term_variables(Goal,Vs),with_vars_locked(Notify,Vs,Goal).
+
+:- meta_predicate(with_vars_locked(1,?,0)).
+with_vars_locked(Notify,Vs,Goal):-
+ setup_call_cleanup_each(
+   lock_vars(Notify,Vs),
+      Goal,
+     unlock_vars(Vs)).
+  
+    
 
 
 %= 	 	 
@@ -509,7 +540,7 @@ del_attr_type(Type,Var):-ignore(del_attr(Var,Type)).
 get_clause_vars(_,[]):-!.
 get_clause_vars(MHB,[V|Vs]):- all_different_vars([V|Vs]),vmust((get_clause_vars_copy(MHB,WVARS),!,
    vmust(MHB=WVARS),unlock_vars(MHB),nop(sanity(check_varnames(MHB))))),!,
-   maplist(del_attr_type(when),[V|Vs]).
+   maplist(del_attr_type(vl),[V|Vs]).
 get_clause_vars(MHB,Vs):- vmust((get_clause_vars_copy(MHB,WVARS),!,vmust(MHB=WVARS),unlock_vars(MHB),must(check_varnames(Vs)))),!.
 get_clause_vars(_,_):- !.
 
