@@ -133,21 +133,21 @@ do_change_use(ActUse,Agent,Obj,vTakenStays) :-
         ain(mudAtLoc(Obj,Was)).
 % default is same as vTakenMoves
 do_change_use(ActUse,Agent,Obj,vTakenMoves) :-
- must_det_l([
+ must_det_l((
         get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),        
         detatch_object(Obj),
         clr(t(Unstowed,Agent,Obj)),
 	ain(t(NowWielding,Agent,Obj)),
-        must_post_use(ActUse,Agent,Obj)]).
+        must_post_use(ActUse,Agent,Obj))).
 
 must_post_use(ActUse,Agent,Obj):-
-      must_det_l([
+      must_det_l((
        get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
        fmt([Agent,ActUse,Obj]),       
        REQ = t(NowWielding,Agent,Obj),
        CLR = t(Unstowed,Agent,Obj),
        (ireq(REQ) -> true; trace_or_throw(ireq(REQ))),
-       (ireq(CLR) -> trace_or_throw(not(ireq(REQ))); true)]),!.
+       (ireq(CLR) -> trace_or_throw(not(ireq(REQ))); true))),!.
 
 % Record keeping
 update_charge(Agent,_ActWield) :- 

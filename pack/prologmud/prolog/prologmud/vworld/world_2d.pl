@@ -544,7 +544,7 @@ in_world_move0(LOC,Agent,Dir) :-
         ain(mudFacing(Agent,DirS)),
         check_behind_for_ground(LOC),
 	move_dir_target(LOC,Dir,XXYY),!,
-   must_det_l([
+   must_det_l((
         dmsg(move_dir_target(LOC,DirS,XXYY)),
         locationToRegion(LOC,Region1),
         locationToRegion(XXYY,Region2),
@@ -554,7 +554,7 @@ in_world_move0(LOC,Agent,Dir) :-
    ifThen(( Region1\==Region2) ,raise_location_event(LOC,actNotice(reciever,actLeave(Agent,Region1,to(Dir))))),
         reverse_dir(Dir,Rev),
    ifThen(( Region1\==Region2) ,raise_location_event(XXYY,actNotice(reciever,actEnter(Agent,Region2,from(Rev))))),!,
-	check_for_fall(LOC,XXYY,Agent)]).
+	check_for_fall(LOC,XXYY,Agent))).
 
 check_behind_for_ground(LOC):-nonvar(LOC).
 check_ahead_for_ground(XXYY):-nonvar(XXYY),

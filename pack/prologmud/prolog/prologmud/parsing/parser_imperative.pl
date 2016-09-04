@@ -678,16 +678,36 @@ parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
 coerce_hook(A,B,C):- (var(A);var(B)),!,trace_or_throw(freeze(A,coerce_hook(A,B,C))).
+% futureAssertion: THIS IS WHAT I THINKL THE CODE SHOULD LIKE
+% coerce_hook(A,B,C):- to_arg_value(A,AStr),A\=@=AStr,!,coerce_hook(AStr,B,C).
 coerce_hook(A,B,C):- to_arg_value(A,AStr),isa(AStr,B),A=C.
 coerce_hook(A,B,C):- no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 % THIS SHOULD BEEN OK.. coerce_hook(AStr,B,C):- any_to_string(AStr,A), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 
 coerce0(String,Type,Inst):- var(Type),!,trace_or_throw(var_specifiedItemType(String,Type,Inst)).
-coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
-coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(impl_coerce_hook(Text,Type,Inst)))).
 
 coerce0(String,isNot(Type),Inst):-!, sanity(nonvar(Type)), \+ (coerce(String,Type,Inst)).
 coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,Inst),!.
+
+coerce0(String,ftString,String):- is_ftString(String),!.
+coerce0(Inst,ftString,String):- is_mud_object(Inst),!,name_text(Inst,String).
+coerce0(Any,ftString,String):- !, any_to_string(Any,String).
+
+% Handles text
+coerce0(String,ftText,String):- is_ftText(String),!.
+coerce0(String,ftText,StringO):- !,coerce0(String,ftString,StringO).
+
+
+%coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
+coerce0(Inst,Type,Inst):- var(Inst),!,instances_of_type(Inst,Type).
+
+coerce0(Any,_,_):- is_empty_string(Any),!,fail.
+
+coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(impl_coerce_hook(Text,Type,Inst)))).
+coerce0(Inst,Type,Inst):- instances_of_type(Inst,Type),!.
+
+
+
 
 coerce0(isRandom(WhatNot),Type,Inst):- !, must((nonvar(WhatNot),to_arg_value(WhatNot,TypeR),random_instance(TypeR,Inst,isa(Inst,Type)))).
 coerce0(String,Type,Inst):- Type==tCol, i_name('t',String,Inst),is_asserted(tCol(Inst)),!.
@@ -717,6 +737,8 @@ instances_sortable0(tWieldAble,distance_to_current_avatar(Agent)):-current_agent
 instances_sortable0(tWearAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 
 distance_to_current_avatar(Agent,ORDEROUT,L,R):-mudDistance(Agent,L,L1),mudDistance(Agent,R,R1),compare(ORDER,L1,R1),!, (ORDER == '=' -> naming_order(ORDEROUT,L,R) ; ORDEROUT=ORDER).
+
+% :- register_new_toString_hook(is_mud_object,name_text).
 
 :- set_prolog_flag(lm_expanders,true).
 

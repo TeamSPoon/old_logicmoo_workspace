@@ -233,13 +233,13 @@ do_pttp_test(TestName,Data) :-
            call_cleanup((     
              catch((      
                clear_pttp,
-                must_det_l([
+                must_det_l((
                           dmsg(do_pttp_test(TestName)),
                           retractall_wid(TestName),
                            eraseall(int_query,_),eraseall(int_not_firstOrder,_),eraseall(int_firstOrder,_),                                                           
                                pttp_tell_wid(TestName:0,Data), 
                                once((ignore(call_print_tf(pttp_test_prove(TestName,query))))),
-                               sleep(1)])),E,dmsg(error(TestName:E)))),retractall_wid(TestName)).
+                               sleep(1)))),E,dmsg(error(TestName:E)))),retractall_wid(TestName)).
                               
 
 % -- CODEBLOCK

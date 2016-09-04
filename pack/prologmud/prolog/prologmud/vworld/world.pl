@@ -210,7 +210,7 @@ genls(mobExplorer,tAgent).
 punless(Cond,Action):- once((call(Cond);call(Action))).
 
 create_instance_0(T,tAgent,List):-
-  must_det_l([
+  must_det_l((
    retractall(agent_list(_)),
    create_meta(T,_,tAgent,P),
    mreq(isa(P,tAgent)),
@@ -226,7 +226,7 @@ create_instance_0(T,tAgent,List):-
                        mudScore(1)]),   
    % set_stats(P,[]),
    put_in_world(P),
-   add_missing_instance_defaults(P)]).
+   add_missing_instance_defaults(P))).
 
 add_missing_instance_defaults(P):- ain(tNewlyCreated(P)).
    

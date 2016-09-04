@@ -1395,6 +1395,8 @@ one_must_det(_Call,OnFail):-OnFail,!.
 must_det_l(Goal):-strip_module(Goal,_,P),var(P),trace_or_throw(var_must_det_l(Goal)),!.
 must_det_l([Goal]):-!,must_det(Goal).
 must_det_l([Goal|List]):-!,must_det(Goal),!,must_det_l(List).
+must_det_l(M:[Goal]):-!,must_det(M:Goal).
+must_det_l(M:[Goal|List]):-!,must_det(M:Goal),!,must_det_l(M:List).
 must_det_l(Goal):-tlbugger:skip_bugger,!,must_det(Goal).
 must_det_l((Goal,List)):-!,must_det_l(Goal),!,must_det_l(List).
 must_det_l(Goal):- must_det(Goal),!.

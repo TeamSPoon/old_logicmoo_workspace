@@ -24,7 +24,7 @@ agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), to_case_breaks(DirSS
    xti(Dist,digit)]),show_call(coerce(DirS,vtDirection,Dir)),OUT=actMove(Dist,Dir).
 agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(coerce(DirSS,vtDirection,Dir)),OUT=actMove(Dir).
 
-agent_call_command(Agnt,Cmd):- trace, compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
+agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
 
 action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [1] south % distance in direction").
 
@@ -52,7 +52,7 @@ get_move_dist(_Gent,1).
 move_command(Agent,DirS,DistS) :- 
    string_to_atom(DirS,Dir),
    any_to_number(DistS,Dist),
-   catch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
+   rtrace(catch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true)).
 
 
 
