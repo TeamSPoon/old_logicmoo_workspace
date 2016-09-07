@@ -346,7 +346,7 @@ ftText(O):-is_ftText(O).
 coerce(What,Type,NewThing,_Else):- call_u(coerce(What,Type,NewThing)),!.
 coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
-coerce(A,B,C):-no_repeats(call_u(coerce_hook(A,B,C))),(sanity(show_failure(call_u(isa(C,B))))->!;true).
+coerce(A,B,C):-no_repeats(call_u(coerce_hook(A,B,C))),nop((sanity(show_failure(call_u(isa(C,B))))->!;true)).
 
 
 

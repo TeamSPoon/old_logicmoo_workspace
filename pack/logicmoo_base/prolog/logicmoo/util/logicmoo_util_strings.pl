@@ -1109,16 +1109,18 @@ convert_to_atoms_list(A,B):- \+ atomic(A),!,A=B.
 convert_to_atoms_list(A,B):- atom_length(A,L),tokenize_atom(A,T),!,convert_to_atoms_by_len(A,L,T,B),!.
 convert_to_atoms_list(A,B):- text_to_atom(A,B).
 
+is_upcased(U):- \+ downcase_atom(U,U), upcase_atom(U,U).
+
 convert_to_atoms_by_len(_,0,_,['']):-!.
 convert_to_atoms_by_len(A,L,_,[A]):- L<3,!.
-convert_to_atoms_by_len(A,L,B,B):- L>3, \+ atom_contains(A,' '), \+ atom_contains(A,"'"),!.
 convert_to_atoms_by_len(A,_,[],[A]):-!.
 convert_to_atoms_by_len(_,_,[A],[A]):-!.
+% convert_to_atoms_by_len(A,L,B,B):- L>3, \+ atom_contains(A,' '), \+ atom_contains(A,"'"),!.
 convert_to_atoms_by_len(_,_,List,M):-convert_to_atoms_list_list(List,M).
 
 % convert_to_atoms_list_list(T,P)
 convert_to_atoms_list_list([],[]):-!.
-convert_to_atoms_list_list([T,J,P|List],B):-arg(_,v('_','-','@'),J),atomic_list_concat([T,P],J,TP),!,convert_to_atoms_list_list([TP|List],B).
+convert_to_atoms_list_list([T,J,P|List],B):-arg(_,v('_','-'),J),is_upcased(T),is_upcased(P),atomic_list_concat([T,P],J,TP),!,convert_to_atoms_list_list([TP|List],B).
 convert_to_atoms_list_list(['\'',T|List],B):-member(T,['t','s','m','re','ll','d','ve']),atom_concat('\'',T,TP),!,convert_to_atoms_list_list([TP|List],B).
 convert_to_atoms_list_list([T,P|List],B):-member(T,['#','~','#$']),atom_concat(T,P,TP),!,convert_to_atoms_list_list([TP|List],B).
 convert_to_atoms_list_list([P|List],[P|BList]):-convert_to_atoms_list_list(List,BList).
