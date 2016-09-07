@@ -754,6 +754,7 @@ isa('tThing',tAvoidForwardChain).
 
 isa([tIndividual(tSack)],C):-C==ftListFn(ftAskable),!.
 isa(iExplorer2,C):- C==argsQuoted,!,fail.
+isa(I,C):- ground(I:C),not_isa(I,C),!,fail.
 isa(I,C):- cwc, no_repeats(loop_check(isa_backchaing(I,C))).
 % isa(_,C):- nonvar(C),\+ tSet(C),!,fail.
 
@@ -814,7 +815,7 @@ prologHybrid(argIsa/3).
 %
 argIsa(F/_,N,Type):- nonvar(F),!,argIsa(F,N,Type).
 argIsa(F,N,Type):- var(F),!,tRelation(F),argIsa(F,N,Type).
-argIsa(F,N,Type):- var(N),arity_no_bc(F,A),!,between(1,A,N),argIsa(F,N,Type).
+argIsa(F,N,Type):- var(N),arity_no_bc(F,A),!,system_between(1,A,N),argIsa(F,N,Type).
 argIsa(F,1,F):- tCol(F), arity_no_bc(F,1),!.
 % Managed Arity Predicates.
 argIsa(Pred,N,ftVoprop) :- number(N),arity_no_bc(Pred,A),N>A,!.
@@ -878,7 +879,7 @@ argIsa(predInstMax,2,tPred).
 argIsa(predInstMax,3,ftInt).
 
 argIsa(props,1,ftID).
-argIsa(props,N,ftVoprop):- integer(N), between(2,31,N).
+argIsa(props,N,ftVoprop):- integer(N), system_between(2,31,N).
 
 argIsa(apathFn,1,tRegion).
 argIsa(apathFn,2,vtDirection).
@@ -886,16 +887,16 @@ argIsa(localityOfObject,1,tObj).
 argIsa(localityOfObject,2,tSpatialThing).
 
 argIsa(typeProps,1,tCol).
-argIsa(typeProps,N,ftVoprop):-between(2,31,N).
+argIsa(typeProps,N,ftVoprop):-system_between(2,31,N).
 
 argIsa(instTypeProps,1,ftProlog).
 argIsa(instTypeProps,2,tCol).
-argIsa(instTypeProps,N,ftVoprop):-between(3,31,N).
+argIsa(instTypeProps,N,ftVoprop):-system_between(3,31,N).
 
 
 argIsa(must,1,ftCallable).
 
-argsIsa(F,Type),arity(F,A),{between(1,A,N)}==>argIsa(F,N,Type).
+argsIsa(F,Type),arity(F,A),{system_between(1,A,N)}==>argIsa(F,N,Type).
 
 argIsa(predicateConventionMt,1,tPred).
 argIsa(predicateConventionMt,2,ftAtom).
@@ -935,12 +936,12 @@ functor_module(_,F,A)==> arity(F,A).
 
 (functor_module(M,F,A),
   {functor(P,F,A), predicate_property(M:P,meta_predicate(P)), 
-  between(1,A,N),arg(N,P,Number),number(Number)}) 
+  system_between(1,A,N),arg(N,P,Number),number(Number)}) 
        ==> argIsa(F,N,ftAskable).
 
 (functor_module(M,F,A),
   {functor(P,F,A), predicate_property(M:P,meta_predicate(P)), 
-  between(1,A,N),arg(N,P,0)}) 
+  system_between(1,A,N),arg(N,P,0)}) 
        ==> argIsa(F,N,ftAskable).
 
 
@@ -1496,8 +1497,11 @@ completelyAssertedCollection(rtBinaryPredicate).
 % TODO ADD THIS 
 %(tCol(Super),completelyAssertedCollection(Super),genls(Sub, Super), isa(I,Sub), {ground(I:Sub:Super),\==(Sub, Super)}) ==> isa(I,Super).
 
-% genlPreds(genls,equals).
-% genls(A, B):- tCol(A),{A=B}.
+:- mpred_trace_exec.
+((genlPreds(P,equals),argIsa(P,1,Col)) ==>  {trace},(t(P,A,B):- (nonvar(A),A==B,isa(A,Col)))).
+genlPreds(genls,equals).
+:- mpred_notrace_exec.
+rtReflexiveBinaryPredicate(TB)==>genlPreds(TB,equals).
 
 % (isa(TypeType,ttTypeType) , isa(Inst,TypeType), genls(SubInst,Inst)) ==> isa(SubInst,TypeType).
 
@@ -1528,23 +1532,36 @@ isa(iPlato,'tPhilosopher').
 ttBarrierStr(A)/(atomic_list_concat([A,"Type"],AType0),
   atomic_list_concat([A,''],Type0),
   do_renames(Type0,Type),
-  do_renames(AType0,TypeType))
-  ==> barrierSpindle(TypeType,Type).
+  do_renames(AType0,TypeType)) ==> barrierSpindle(TypeType,Type).
 
 
-barrierSpindle(TypeType,Type)==> isa(TypeType,ttBarrierType),isa(TypeType,ttBarrier),typeGenls(TypeType,Type).
+
+barrierSpindle(TypeType,Type)==> isa(TypeType,ttBarrierType),isa(Type,ttBarrier),typeGenls(TypeType,Type).
+
+ttBarrier(C)==>tSet(C).
+ttBarrierType(C)==>tSet(C),ttTypeType(C).
+
+ttBarrier(C)==>(isa(I,C)==>mainClass(I,C)).
+
 
 ttBarrier(A)/dif(A,B),ttBarrier(B)==> disjointWith(A,B).
 % ttBarrierType(A)/dif(A,B),ttBarrierType(B)==> disjointWith(A,B).
 
+tCol(ttAbstractType).
+disjointWith(C,D)==> tCol(C),tCol(D).
+not_isa(I,C):- cwc, mainClass(I,MC),disjointWith(MC,DC),genls(C,DC).
 
+cycBetween(A,B,N):-
+  number(A),number(B),!,system_between(A,B,N).
+
+genlsFwd(tItem,'Artifact').
+genlsFwd(tRegion,'Place').
 ttBarrierStr("Action").
 ttBarrierStr("Agent").
 ttBarrierStr("Artifact").
 barrierSpindle('SpecifiedPartTypeCollection','PhysicalPartOfObject').
 ttBarrierStr("Capability").
 ttBarrierStr("Event").
-ttBarrierStr("Script").
 ttBarrierStr("FormulaTemplate").
 ttBarrierStr("Goal").
 ttBarrierStr("Group").
@@ -1559,6 +1576,11 @@ ttBarrierStr("Situation").
 ttBarrierStr("ExpressionType").
 ttBarrierStr("TimeParameter").
 ttBarrierStr("Topic").
+% ttBarrierStr("Collection").
 
 :- listing(disjointWith/2).
+
+
+% ttBarrier(X)==> (isa(I,_),mpred_truth_value(isa(I,X),TF,Why)==>mudTF(isa(I,X),TF,Why)).
+% :- listing(mudTF/3).
 

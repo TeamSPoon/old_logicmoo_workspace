@@ -651,7 +651,7 @@ do_renames(uU('SubLQuoteFn','$VAR'(A)),uSubLQuoteFn(A)):-!,nb_setval('$has_quote
 do_renames('$VAR'(A),'$VAR'(B)):- catch((fix_var_name(A,B),!,nb_setval('$has_var',t)),E,(dtrace(dmsg(E)))),!.
 %do_renames('$VAR'(A),B):- catch((fix_var_name(A,B),!,nb_setval('$has_var',t)),E,(dtrace(dmsg(E)))),!.
 do_renames(A,B):- string(A),!,logicmoo_util_strings:convert_to_cycString(A,B).
-do_renames(A,B):- atom(A),rename_atom(A,B),!.
+do_renames(A,B):- atom(A),must(rename_atom(A,B)),!.
 do_renames(A,B):- \+ compound(A),!,A=B.
 do_renames([A|Rest],BList):- is_list([A|Rest]),!,maplist(do_renames,[A|Rest],BList).
 do_renames([A|Rest],[B|List]):- !, do_renames(A,B),do_renames(Rest,List).
