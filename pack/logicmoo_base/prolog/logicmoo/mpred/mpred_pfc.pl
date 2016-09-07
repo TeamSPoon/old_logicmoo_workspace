@@ -214,6 +214,7 @@ push_current_choice/1,
       call_u_no_bc(+),
       mpred_call_no_bc0(+),
       call_u(+),
+      retract_u0(+),
       mpred_BC_CACHE(+,+),
       mpred_BC_CACHE0(+,+),
       foreachl_do(0,?), 
@@ -453,8 +454,11 @@ fix_mp(call(hb(_HC,BC,Op)),B,M,BB):- contains_var(B,BC),B\=@=BC,!,
 % fix_mp(Why,Unassertable,_,_):- Why = clause(_,_), unassertable(Unassertable),!,trace_or_throw(unassertable_fix_mp(Why,Unassertable)).
 
 */
+system_between(A,B,C):-call(call,between,A,B,C).
 
-
+mpred_truth_value(Call,vTrue,vAsserted):-clause_b(Call),!.
+mpred_truth_value(Call,vTrue,vDeduced):-call_u(Call),!.
+mpred_truth_value(_Call,vUnknown,vFailed).
 
 convention_to_mt(Why,F,A,RealMt):-convention_to_symbolic_mt_ec(Why,F,A,Mt),to_real_mt(Why,Mt,RealMt).
 
@@ -528,10 +532,11 @@ assertz_u(MH):- fix_mp(change(assert,assertz_u),MH,MHA),attvar_op_fully(assertz_
 retract_u(H):- retract_u0(H) *-> true; attvar_op_fully(retract_u0,H).
 
 retract_u0(H0):- strip_module(H0,_,H),(H = ( \+ _ )),!,trace_or_throw(mpred_warn(retract_u(H0))),expire_tabled_list(H).
-retract_u0(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R),expire_tabled_list(H).
+retract_u0(M:(H:-B)):- atom(M),!, M:clause_u(H,B,R),erase(R),expire_tabled_list(H).
 retract_u0((H:-B)):-!,clause_u(H,B,R),erase(R),expire_tabled_list(H).
 retract_u0(H):- clause_u(H,true,R),erase(R),expire_tabled_list(H).
 
+:- lmcache:import(retract_u0/1).
 
 retractall_u(H):- attvar_op_fully(retractall_u0,H).
 retractall_u0(H):- forall(clause_u(H,_,R),erase(R)),expire_tabled_list(H).
@@ -1479,7 +1484,7 @@ mpred_remove_supports_quietly(_).
 %
 % - a positive or negative trigger.
 % - an action by finding a method and successfully executing it.
-% - or a random fact, printing out the dtrace, if relevant.
+% - or a random fact, printing out the trace, if relevant.
 %
 
 mpred_undo(X):- mpred_undo1(X),!.
@@ -1870,21 +1875,30 @@ call_u(G):- strip_module(G,M,P), no_repeats(gripe_time(5.3,call_u_mp(M,P))).
 
 call_u_mp(user, P1 ):-!,  call_u_mp(baseKB,P1).
 call_u_mp(M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
+call_u_mp(_, M:P1):-!,call_u_mp(M,P1).
 call_u_mp(M, (P1,P2)):-!,call_u_mp(M,P1),call_u_mp(M,P2).
+call_u_mp(M, (P1;P2)):-!,call_u_mp(M,P1);call_u_mp(M,P2).
+call_u_mp(M, (P1*->P2;P3)):-!,call_u_mp(M,P1)*->call_u_mp(M,P2);call_u_mp(M,P3).
+call_u_mp(M, (P1->P2;P3)):-!,call_u_mp(M,P1)->call_u_mp(M,P2);call_u_mp(M,P3).
+call_u_mp(M, (P1->P2)):-!,call_u_mp(M,P1)->call_u_mp(M,P2).
+call_u_mp(M, (P1*->P2)):-!,call_u_mp(M,P1)*->call_u_mp(M,P2).
 call_u_mp(M,( \+ P1)):-!, \+ call_u_mp(M,P1).
 call_u_mp(M,must(P1)):-!, must( call_u_mp(M,P1)).
-call_u_mp(M,call(O,P1)):- atom(O), arg(_,v(call,ereq,call_u),O), !, call_u_mp(M,P1).
-call_u_mp(M,call(P1)):-!, call_u_mp(M,P1).
 call_u_mp(M, 't'(P1)):-!, call_u_mp(M,P1).
 call_u_mp(M,'{}'(P1)):-!, call_u_mp(M,P1).
 call_u_mp(_,mtCycL(P)):-!,clause(baseKB:mtCycL(P),true).
 call_u_mp(_,is_string(P)):- !, logicmoo_util_bugger:is_string(P).
-
+call_u_mp(M,call(O,P1)):- !,M:call(O,P1).
+call_u_mp(M,call(P1)):- !, M:call(P1).
+call_u_mp(M,P1):- predicate_property(M:P1,built_in),!, M:call(P1).
+call_u_mp(M,P1):- predicate_property(M:P1,static),!, M:call(P1).
 call_u_mp(M,P):- functor(P,F,A), call_u_mp_fa(M,P,F,A).
 
 make_visible(R,M:F/A):- wdmsg(make_visible(R,M:F/A)),fail.
 make_visible(M,M:F/A):- must_det(M:export(M:F/A)).
 make_visible(R,M:F/A):- must_det_l((M:export(M:F/A),R:import(M:F/A),R:export(M:F/A))).
+
+
 
 call_u_mp_fa(_,P,F,_):- (F==t; ( \+ clause_b(prologBuiltin(F)),
   F \= isT,F \= isTT, \+ predicate_property(P,file(_)))),if_defined(t_ify0(P,TGaf),fail), if_defined(isT(TGaf),false).

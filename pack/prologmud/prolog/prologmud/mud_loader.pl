@@ -571,7 +571,7 @@ download_and_install_el:-
 
 % :- show_entry(ensure_mpred_file_loaded(prologmud(server/builtin))).
 % :- must(rescan_pfc).
-:- show_entry(forall(filematch('*/*.pfc.pl', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X)))).
+% :- show_entry(forall(filematch('./*/*.pfc.pl', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X)))).
 
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)

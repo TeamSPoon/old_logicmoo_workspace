@@ -40,12 +40,12 @@ agent_call_command(Agent,actEat(String)) :-
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
 agent_call_command(Agent,actEat(Obj)) :-
-  rtrace((must_det((
+  ((must_det((
 	mudPossess(Agent,Obj),
 	must((do_act_affect(Agent,actEat,Obj))),
         must((clr(mudStowing(Agent,Obj)))),
         % dmsg_show(_),
-        destroy_instance(Obj),
+        destroy_instance(Obj),!,
         sanity(\+ (mudPossess(Agent,Obj))),
 	must((call_update_charge(Agent,actEat))))))),!.
 

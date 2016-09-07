@@ -444,13 +444,14 @@ lock_each_var(Notify,Vs,Var):- delete_eq(Vs,Var,Rest),put_attr(Var,vl,when_rest(
 
 dual_notify(N1,N2,Value):-ignore( \+ call(N1,Value)),ignore( \+ call(N2,Value)).
 
-
+vl:attr_unify_hook(_,_):- \+ thread_self(main),!,fail.
 vl:attr_unify_hook(when_rest(Notify,RestOfVars),VarValue):- 
   not_member_eq(VarValue,RestOfVars),
   \+ (var(VarValue);verbatum_var(VarValue)),
   nb_setarg(1,Notify,wdmsg),
   dumpST,
   dmsg(error_locked_var(Notify,VarValue)),!,
+  dtrace,
   call(Notify,VarValue),!.
 
 
@@ -469,6 +470,7 @@ unlock_vars(Term):- must(notrace((term_attvars(Term,Vs),maplist(unlock_vars,Vs))
 with_vars_locked(Notify,Goal):- term_variables(Goal,Vs),with_vars_locked(Notify,Vs,Goal).
 
 :- meta_predicate(with_vars_locked(1,?,0)).
+with_vars_locked(_Notify,_Vs,_Goal):- \+ thread_self(main),!.
 with_vars_locked(Notify,Vs,Goal):-
  setup_call_cleanup_each(
    lock_vars(Notify,Vs),

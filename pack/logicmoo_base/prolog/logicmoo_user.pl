@@ -56,7 +56,8 @@
 :- user:ensure_loaded(library(logicmoo_utils)).
 :- user:ensure_loaded(library(logicmoo_base)).
 :- set_prolog_flag(pfc_booted,false).
-:-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
+% :-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
+:-  time((baseKB:ensure_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
 :- set_prolog_flag(pfc_booted,true).
 
 /*

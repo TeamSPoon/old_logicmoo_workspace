@@ -104,21 +104,19 @@
 
 :- set_fileAssertMt(baseKB).
 
-el(X):- logicmoo_util_filesystem:filematch(X,Y),ensure_loaded(Y).
+:- ensure_loaded(('system_common.pfc')).
 
-:- el(('system_common.pfc')).
+:- ensure_loaded(('system_if_missing.pfc')).
 
-:- el(('system_if_missing.pfc')).
+:- ensure_loaded(('system_mdefault.pfc')).
 
-:- el(('system_mdefault.pfc')).
+:- ensure_loaded(('system_singleValued.pfc')).
 
-:- el(('system_singleValued.pfc')).
+:- ensure_loaded(('logicmoo/snark/common_logic_clif.pfc')).
 
-:- el(('logicmoo/snark/common_logic_clif.pfc')).
+:- ensure_loaded(('user_relationAllExists.pfc')).
 
-:- el(('user_relationAllExists.pfc')).
-
-:- el(('user_transitiveViaArg.pfc')).
+:- ensure_loaded(('user_transitiveViaArg.pfc')).
 
 
 :- multifile(baseKB:locked_baseKB/0).

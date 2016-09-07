@@ -623,7 +623,10 @@ fix_var_name(A,B):- atomic_list_concat(AB,'-',A),atomic_list_concat(AB,'_',B).
 
 % rename_atom(A,B):- atom_contains(A,'~'),!,convert_to_cycString(A,B),nb_setval('$has_quote',t),!.
 rename_atom(A,B):- atom_contains(A,' '),!,convert_to_cycString(A,B),nb_setval('$has_quote',t),!.
-rename_atom(A,B):- must(cyc_to_mpred_idiom(A,B)),!.
+rename_atom(A,B):- best_rename(A,B),!.
+rename_atom(A,B):- cyc_to_mpred_idiom(A,B),!.
+rename_atom(A,A):- upcase_atom(A,A),!.
+rename_atom(A,A):- dmsg(didnt_rename_atom(A)).
 
 cyc_to_mpred_sent_idiom_2(and,(','),trueSentence).
 

@@ -492,7 +492,7 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 etrace:-leash(+all),leash(+exception),dtrace.
 
 
-el(X):- cwc,sanity(nonvar(X)),logicmoo_util_filesystem:filematch(X,Y),sanity(atom(Y)),ensure_loaded(Y).
+% el(X):- cwc,sanity(nonvar(X)),logicmoo_util_filesystem:filematch(X,Y),sanity(atom(Y)),ensure_loaded(Y),!.
 
 
 :- style_check(+singleton).
@@ -1956,10 +1956,10 @@ ensure_mpred_file_loaded(World,FileIn):-
 % Must Be Successfull Locate File.
 %
 must_locate_file(FileIn,File):-
-  quietly_must(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File)).
+ no_repeats(File, quietly_must(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File))).
 
 maybe_locate_file(FileIn,File):-
-  quietly(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File)).
+ no_repeats(File, quietly(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File))).
 
 
 

@@ -241,7 +241,7 @@ check_consistent_0(Type,Scope):- once(tCol(Type)),
  catch((forall(isa(Obj,Type),check_consistent(Obj,Scope)),
                                                    assert_if_new(lmcache:is_instance_consistent(Type,Scope))),E,assert_if_new(bad_instance(Type,E))),fail.
 
-hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg(checked_consistent(object_string(_,Obj,0-5,String))).
+% hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg(checked_consistent(object_string(_,Obj,0-5,String))).
 % ---------------------------------------------------------------------------------------------
 baseKB:mud_test_local:-
   test_name("Tests our types to populate bad_instance/2 at level 5"),
