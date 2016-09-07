@@ -160,7 +160,7 @@ objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),mat
 object_string(O,String):-nameString(O,String).
 object_string(O,String):-mudKeyword(O,String).
 
-% nameString(O,S)==>mudKeyword(O,S).
+nameString(O,S)==>mudKeyword(O,S).
 
 :- begin_tests(parser_imparative,[setup(foc_current_agent(_))]).
 
@@ -713,10 +713,12 @@ parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String
 parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
+coerce_as(B,A,C):-coerce(A,B,C).
+
 coerce_hook(A,B,C):- (var(A);var(B)),!,trace_or_throw(freeze(A,coerce_hook(A,B,C))).
 % futureAssertion: THIS IS WHAT I THINKL THE CODE SHOULD LIKE
 % coerce_hook(A,B,C):- to_arg_value(A,AStr),A\=@=AStr,!,coerce_hook(AStr,B,C).
-coerce_hook(A,B,C):- to_arg_value(A,AStr),isa(AStr,B),A=C.
+coerce_hook(A,B,C):- to_arg_value(A,AStr),isa(AStr,B),AStr=C.
 coerce_hook(A,B,C):- no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 % THIS SHOULD BEEN OK.. coerce_hook(AStr,B,C):- any_to_string(AStr,A), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 
@@ -732,6 +734,11 @@ coerce0(String,ftString,String):- is_ftString(String),!.
 coerce0(Inst,ftString,String):- \+ is_ftText(Inst),!,must(name_text(Inst,String)).
 coerce0(Any,ftString,String):- !, any_to_string(Any,String).
 
+
+coerce0(IsList,ftListFn(How),Result):- is_list(IsList),!,maplist(coerce_as(How),IsList,Result).
+coerce0(IsList,ftListFn(How),Result):- !,maplist(coerce_as(How),[IsList],Result).
+
+coerce0([A],B,C):- string(A),coerce_hook(A,B,C).
 coerce0(String,Type,Inst):- string(String),string_to_atom(String,Inst),isa(Inst,Type),!.
 
 

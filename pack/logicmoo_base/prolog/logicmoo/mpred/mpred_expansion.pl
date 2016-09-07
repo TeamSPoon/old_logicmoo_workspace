@@ -866,6 +866,7 @@ db_expand_final(_,VAR,VAR):- is_ftVar(VAR),!.
 db_expand_final(_ ,NC,NCO):- string(NC),convert_to_cycString(NC,NCO),!.
 db_expand_final(_ ,NC,NCO):- atomic(NC),if_defined(do_renames(NC,NCO),fail),!.
 db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
+db_expand_final(_,[String],String):-string(String),!.
 db_expand_final(_ ,CI,CI ):- CI=..[C,I],C==I,!.
 db_expand_final(_ ,NC,NC):-  as_is_term(NC),!.
 %db_expand_final(_,PARSE,ISA):- PARSE=..[t,C,I],atom(C),atom(I),ISA=..[C,I],!.
