@@ -180,8 +180,8 @@ agent_call_command_all_fallback(_Agent,CMD):- nop(xlisting(CMD)).
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
-     ignore((must_det_l([flush_output,renumbervars_prev(CMD,SCMD),Message =..[Done,Agent,SCMD],
-                raise_location_event(Where,actNotice(reciever,Message)),flush_output]))),!.
+     ignore((must_det_l((flush_output,renumbervars_prev(CMD,SCMD),Message =..[Done,Agent,SCMD],
+                raise_location_event(Where,actNotice(reciever,Message)),flush_output)))),!.
 
 
 

@@ -189,6 +189,11 @@
 				<F N="../logicmoo_nlu/prolog/POSTaggerParser.java"/>
 			</Folder>
 		</Folder>
+		<Folder Name="../MUD_ircbot">
+			<Folder Name="prolog">
+				<F N="../MUD_ircbot/prolog/eggdrop.pl"/>
+			</Folder>
+		</Folder>
 		<Folder Name="/opt">
 			<Folder Name="cyc">
 				<F N="/opt/cyc/kb_7166.pl-a1"/>

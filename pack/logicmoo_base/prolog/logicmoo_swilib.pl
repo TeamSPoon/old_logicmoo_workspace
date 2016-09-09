@@ -180,29 +180,29 @@
 :- redefine_system_predicate(system:'$term_in_file'(_,_,_,_,_,_,_,_)).
 :- abolish(system:'$term_in_file'/8).
 system:'$term_in_file'(In, Read, RLayout, Term, TLayout, Stream, Parents, Options) :-
-        '$skip_script_line'(In),
-        '$read_clause_options'(Options, ReadOptions),
-        repeat,
-          read_clause(In, Raw,
-                      [ variable_names(Bindings),
-                        term_position(Pos),
-                        subterm_positions(RawLayout)
-                      | ReadOptions
-                      ]),
-          b_setval('$term_position', Pos),
+	'$skip_script_line'(In),
+	'$read_clause_options'(Options, ReadOptions),
+	repeat,
+	  read_clause(In, Raw,
+		      [ variable_names(Bindings),
+			term_position(Pos),
+			subterm_positions(RawLayout)
+		      | ReadOptions
+		      ]),
+	  b_setval('$term_position', Pos),
           b_setval('$source_term', Raw), /* DRM: added for expansion hooks*/
           b_setval('$variable_names', Bindings),
-          (   Raw == end_of_file
-          ->  !,
-              (   Parents = [_,_|_]     % Included file
-              ->  fail
-              ;   '$expanded_term'(In,
-                                   Raw, RawLayout, Read, RLayout, Term, TLayout,
-                                   Stream, Parents, Options)
-              )
-          ;   '$expanded_term'(In, Raw, RawLayout, Read, RLayout, Term, TLayout,
-                               Stream, Parents, Options)
-          ).
+	  (   Raw == end_of_file
+	  ->  !,
+	      (	  Parents = [_,_|_]	% Included file
+	      ->  fail
+	      ;	  '$expanded_term'(In,
+				   Raw, RawLayout, Read, RLayout, Term, TLayout,
+				   Stream, Parents, Options)
+	      )
+	  ;   '$expanded_term'(In, Raw, RawLayout, Read, RLayout, Term, TLayout,
+			       Stream, Parents, Options)
+	  ).
 
 :- redefine_system_predicate('$toplevel':'$query_loop'()).
 :- abolish('$toplevel':'$query_loop',0).

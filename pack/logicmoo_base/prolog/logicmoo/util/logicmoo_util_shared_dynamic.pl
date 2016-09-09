@@ -21,6 +21,7 @@
           virtualize_code_fa/5,
           virtualize_code_each/4,
           safe_virtualize/3,
+          sd_goal_expansion/4,
           ereq/1,
           dbreq/1,
           swc/0,
@@ -551,11 +552,24 @@ sd_goal_expansion(_,In,_,OOut):-
 %system:sub_body_expansion(In,Out):-virtualize_source(be,In,Out).
 %system:sub_body_expansion(In,Out):- Out\== true, Out\=(cwc,_),could_safe_virtualize,virtualize_source(be,In,Out).
 %system:sub_call_expansion(In,Out):-virtualize_source(ce,In,Out).
-system:goal_expansion(In,Pos,Out,PosOut):- fail,compound(In), \+ current_prolog_flag(xref,true), 
-  strip_module(In,_,In0),
-  compound(In0),sd_goal_expansion(Pos,In,In0,Out),PosOut=Pos.
 
-system:term_expansion((Head:-In),Pos,(Head:-Out),PosOut):- compound(In), \+ current_prolog_flag(xref,true), 
+
+should_base_sd(I):-  nb_current('$goal_term',Was),same_terms(I, Was),!,fail.
+should_base_sd(I):-  
+   (nb_current_or_nil('$source_term',TermWas),\+ same_terms(TermWas, I)),
+   (nb_current_or_nil('$term',STermWas),\+ same_terms(STermWas, I)),!,
+   fail.
+should_base_sd(_).
+
+:- multifile(system:goal_expansion/4).
+system:goal_expansion(In,Pos,Out,PosOut):- fail,
+  \+ current_prolog_flag(xref,true), 
+  strip_module(In,_,In0),
+  sd_goal_expansion(Pos,In,In0,Out),PosOut=Pos.
+
+:- multifile(system:term_expansion/4).
+system:term_expansion((Head:-In),Pos,(Head:-Out),PosOut):- % fail,
+  compound(In), \+ current_prolog_flag(xref,true), 
   strip_module(In,_,In0),
   compound(In0),sd_goal_expansion(Pos,In,In0,Out),PosOut=Pos.
 

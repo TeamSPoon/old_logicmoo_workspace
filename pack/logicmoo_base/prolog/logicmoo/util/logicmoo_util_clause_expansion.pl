@@ -153,7 +153,7 @@ sub_positional(P):- compound(P),functor(P,F,A),arg(A,P,[L|_]),compound(L),functo
 
 positional_seg(term_position(G2787,_,G2787,_,[_-_])).
 
-nb_current_or_nil(N,V):- nb_current(N,V)->true;V=[].
+nb_current_or_nil(N,V):- notrace((nb_current(N,V)->true;V=[])).
 
 lmce_system_goal_expansion(Mod,I,P,O,P2):- 
   notrace((nb_current_or_nil('$term',Was),

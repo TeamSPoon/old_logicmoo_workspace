@@ -25,9 +25,9 @@
    (prolog_load_context(file,F) -> asserta(baseKB:ignore_file_mpreds(F)) ; true))).
 :-endif.
 
-:- user:ensure_loaded(setup_paths).
+:- notrace((user:ensure_loaded(setup_paths))).
 :- set_prolog_flag(double_quotes,string).
-:- user:ensure_loaded(library(logicmoo_utils)).
+:- notrace((user:ensure_loaded(library(logicmoo_utils)))).
 :- set_prolog_flag(double_quotes,string).
 
 % :- module(init_mud_server,[]).
@@ -69,6 +69,7 @@
 :- set_prolog_stack(local, limit(16*10**9)).
 :- set_prolog_stack(trail, limit(16*10**9)).
 :- set_prolog_flag(unsafe_speedups,true).
+:- set_prolog_flag(logicmoo_debug,false).
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
@@ -123,7 +124,6 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 % Loaded LogicMOO Code!!!
 :- ensure_loaded(logicmoo_repl).
 
-:- set_prolog_flag(unsafe_speedups,true).
 %:- mpred_trace_exec.
 :- debug.
 % :- rtrace.
@@ -231,7 +231,6 @@ ensure_webserver_3020:-
 :- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
 %:- lmce:reset_modules.
 
-:- set_prolog_flag(logicmoo_debug,true).
 
 :- mpred_trace_exec.
 :- ain(isLoaded(iSourceCode7)).
@@ -244,8 +243,6 @@ ensure_webserver_3020:-
 
 :- set_prolog_flag(dialect_pfc,false).
 %:- set_prolog_flag(retry_undefined,true).
-:- set_prolog_flag(logicmoo_debug,true).
-:- set_prolog_flag(unsafe_speedups,false).
 
 % :- mpred_trace_exec.
 
@@ -352,7 +349,6 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
 % :- assert_setting01(lmconf:eachFact_Preconditional(isRuntime)).
 
-:- set_prolog_flag(unsafe_speedups,true).
 % isa(starTrek,mtCycL).
 % :- starTrek:force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
@@ -377,10 +373,12 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 :- must((parseIsa_Call(tEatAble,O,[food],Rest),O=iFoodRez2,Rest=[])).
 */
 
-:- set_prolog_flag(unsafe_speedups,true).
 :- statistics.
 %:- gripe_time(1.0,must(coerce(s,vtDirection,_))).
 %:- gripe_time(2.0,must( \+ coerce(l,vtDirection,_))).
+
+:- set_prolog_flag(logicmoo_debug,true).
+:- set_prolog_flag(unsafe_speedups,false).
 
 :- check_clause_counts.
 

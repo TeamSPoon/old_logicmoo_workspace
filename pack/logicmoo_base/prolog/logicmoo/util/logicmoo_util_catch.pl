@@ -86,9 +86,14 @@
             must/1,
             must3/3,
             must_det/1,
-            %must_det_dead/2,
-            must_det_l/1,
+            %must_det_dead/2,            
             must_l/1,
+
+            must_det_l/1,
+            must_det_l_pred/2,
+            call_must_det/2,
+            call_each/2,
+
             nd_dbgsubst/4,
             nd_dbgsubst1/5,
             nd_dbgsubst2/4,
@@ -176,7 +181,12 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
         must_find_and_call(0),
         must_det(0),
         %must_det_dead(0, 0),
+
         must_det_l(0),
+        must_det_l_pred(1,+),
+        call_must_det(1,+),
+        call_each(1,+),
+
         must_l(0),
         one_must(0, 0),
         one_must_det(0, 0),
@@ -1392,14 +1402,19 @@ one_must_det(_Call,OnFail):-OnFail,!.
 %
 % Must Be Successfull Deterministic (list Version).
 %
-must_det_l(Goal):-strip_module(Goal,_,P),var(P),trace_or_throw(var_must_det_l(Goal)),!.
-must_det_l([Goal]):-!,must_det(Goal).
-must_det_l([Goal|List]):-!,must_det(Goal),!,must_det_l(List).
-must_det_l(M:[Goal]):-!,must_det(M:Goal).
-must_det_l(M:[Goal|List]):-!,must_det(M:Goal),!,must_det_l(M:List).
-must_det_l(Goal):-tlbugger:skip_bugger,!,must_det(Goal).
-must_det_l((Goal,List)):-!,must_det_l(Goal),!,must_det_l(List).
-must_det_l(Goal):- must_det(Goal),!.
+must_det_l(Goal):- call_each(must_det,Goal).
+
+must_det_l_pred(Pred,Rest):- tlbugger:skip_bugger,!,call(Pred,Rest).
+must_det_l_pred(Pred,Rest):- call_each(call_must_det(Pred),Rest).
+
+call_must_det(Pred,Arg):-must_det(call(Pred,Arg)).
+
+call_each(Pred,Goal):-strip_module(Goal,_,P),var(P),trace_or_throw(var_must_det_l_pred(Pred,Goal)),!.
+call_each(Pred,[Goal]):-!,call(Pred,Goal).
+call_each(Pred,[Goal|List]):-!, call(Pred,Goal),!,call_each(Pred,List).
+call_each(Pred,Goal):-tlbugger:skip_bugger,!,call(Pred,Goal).
+call_each(Pred,(Goal,List)):-!,call_each(Pred,Goal),!,call_each(Pred,List).
+call_each(Pred,Goal):- call(Pred,Goal),!.
 
 must_find_and_call(G):-must(G).
 
@@ -1493,7 +1508,7 @@ is_recompile:-fail.
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
 sanity(_):- \+ current_prolog_flag(logicmoo_debug,true), notrace((is_release, \+ is_recompile)),!.
 */
-% sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
+sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
 sanity(Goal):- fail, \+ current_prolog_flag(logicmoo_debug,true), current_prolog_flag(unsafe_speedups,true), \+ tracing,!, 
    (1 is random(10)-> must(Goal) ; true).
 sanity(Goal):- quietly(Goal),!.
@@ -1631,7 +1646,7 @@ system:goal_expansion(I,O):-compound(I),I=must(Goal),source_location(F,L), O= mu
 
 :- dynamic(inlinedPred/1).
 
-system:goal_expansion(I,O):-compound(I),functor(I,F,A),inlinedPred(F/A),
+system:goal_expansion(I,O):- fail, compound(I),functor(I,F,A),inlinedPred(F/A),
   source_location(File,L),clause(I,Body),O= (file_line(F,begin,File,L),Body,file_line(F,end,File,L)).
 
 file_line(F,What,File,L):- (debugging(F)->wdmsg(file_line(F,What,File,L));true).

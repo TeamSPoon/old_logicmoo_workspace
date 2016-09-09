@@ -167,20 +167,23 @@ baseKB:mpred_skipped_module(eggdrop).
 %system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
 %system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
 
+in_goal_expansion:- prolog_current_frame(F),
+   prolog_frame_attribute(F,parent_goal,expand_goal(_,_,_,_)).
 
-
-
-base_clause_expansion(_,I,_):-
-  % prolog_load_context(term,TermWas),
-   (b_getval('$source_term',TermWas),\+ same_terms(TermWas, I)),
-   (b_getval('$term',STermWas),\+ same_terms(STermWas, I)),!,
+should_base_ce(I):-  nb_current('$goal_term',Was),same_terms(I, Was),!,fail.
+should_base_ce(I):-  
+   (nb_current_or_nil('$source_term',TermWas),\+ same_terms(TermWas, I)),
+   (nb_current_or_nil('$term',STermWas),\+ same_terms(STermWas, I)),!,
    fail.
+should_base_ce(_).
+
+base_clause_expansion(_,I,_):- notrace((\+ should_base_ce(I))),!,fail.
 base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
 base_clause_expansion(_,I,_):- \+ compound(I), !, fail.
 base_clause_expansion(_,':-'(ain_expanded(I)),':-'(ain_expanded(I))):-!.
 base_clause_expansion(_,':-'(ain(I)),':-'(ain(I))):-!.
 base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
-base_clause_expansion(_,I, O):- get_consequent_functor(I,F,A)->base_clause_expansion_fa(I,O,F,A),!.
+base_clause_expansion(_,I, O):- \+ in_goal_expansion, get_consequent_functor(I,F,A)->base_clause_expansion_fa(I,O,F,A),!.
 base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.
 
 base_clause_expansion_fa(_,_,F,A):- clause_b(mpred_prop(F,A,prologBuiltin)),!,fail.

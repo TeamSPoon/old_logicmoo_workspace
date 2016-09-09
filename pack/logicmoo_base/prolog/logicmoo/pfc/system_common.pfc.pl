@@ -592,14 +592,16 @@ tFunction(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes),{get_f
 ttExpressionType(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
 
 argIsa(completeExtentAsserted,1,tPred).
-((meta_argtypes(ArgTypes)/is_ftCompound(ArgTypes)) ==> ({get_functor(ArgTypes,F,A)},arity(F,A),{arg(N,ArgTypes,Type)},argIsa(F,N,Type))).
 
-:-mpred_run.
-:- mpred_notrace_exec.
+((meta_argtypes(ArgTypes)/is_ftCompound(ArgTypes)) ==> ({get_functor(ArgTypes,F,A)},arity(F,A),{arg(N,ArgTypes,Type)},argIsa(F,N,Type))).
 
 
 meta_argtypes(predicateConventionMt(tPred,tMicrotheory)).
 meta_argtypes(argIsa(tRelation,ftInt,tCol)).
+
+:- mpred_run.
+:- mpred_notrace_exec.
+
 :- must(argIsa(predicateConventionMt,1,tPred)).
 :- must(argIsa(predicateConventionMt,2,tMicrotheory)).
 
@@ -1498,7 +1500,7 @@ completelyAssertedCollection(rtBinaryPredicate).
 %(tCol(Super),completelyAssertedCollection(Super),genls(Sub, Super), isa(I,Sub), {ground(I:Sub:Super),\==(Sub, Super)}) ==> isa(I,Super).
 
 :- mpred_trace_exec.
-((genlPreds(P,equals),argIsa(P,1,Col)) ==>  {trace},(t(P,A,B):- (nonvar(A),A==B,isa(A,Col)))).
+((genlPreds(P,equals),argIsa(P,1,Col)) ==>  (t(P,A,B):- (nonvar(A),A==B,isa(A,Col)))).
 genlPreds(genls,equals).
 :- mpred_notrace_exec.
 rtReflexiveBinaryPredicate(TB)==>genlPreds(TB,equals).

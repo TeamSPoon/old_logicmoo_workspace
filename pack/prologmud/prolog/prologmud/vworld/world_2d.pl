@@ -388,10 +388,11 @@ calc_from_center_xyz(Region1,Dir,R,X2,Y2,Z2):-
    X2 is X+ OX ,Y2 is Y+ OY, Z2 is Z.
 
 prologBuiltin(random_path_dir/1).
-random_path_dir(Dir):-nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
-random_path_dir(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
-random_path_dir(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
+
+random_path_dir(Dir):- nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
 random_path_dir(Dir):- call(call,random_instance(vtDirection,Dir,true)).
+random_path_dir(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
+random_path_dir(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
 
 from_dir_target(LOC,Dir,XXYY):- is_3d(LOC),!,
   move_dir_target(LOC,Dir,XXYY).
@@ -542,15 +543,19 @@ in_world_move0(LOC,Agent,Dir) :-
       any_to_dir(Dir,DirS),
         % rtrace(padd(Agent,mudFacing(DirS))),
         ain(mudFacing(Agent,DirS)),
+        sanity((is_asserted(mudAtLoc(Agent,LOC)))),
         check_behind_for_ground(LOC),
 	move_dir_target(LOC,Dir,XXYY),!,
-   must_det_l((
+   must_det_l_pred(show_call,(
         dmsg(move_dir_target(LOC,DirS,XXYY)),
         locationToRegion(LOC,Region1),
         locationToRegion(XXYY,Region2),
-              ((expire_dont_add, clr(mudAtLoc(Agent,LOC)))),
-        ((expire_dont_add, ain_expanded(mudAtLoc(Agent,XXYY)),
-        sanity((is_asserted(mudAtLoc(Agent,LOC2)),LOC2 \== LOC)))),         
+        ((expire_dont_add, clr(mudAtLoc(Agent,LOC)))),
+        %rtrace,
+        call((expire_dont_add, ain_expanded(mudAtLoc(Agent,XXYY)),
+        %nortrace,
+        sanity((is_asserted(mudAtLoc(Agent,XXYY)))),
+        sanity((clause_u(mudAtLoc(Agent,LOC2)),LOC2 \== LOC)))),         
    ifThen(( Region1\==Region2) ,raise_location_event(LOC,actNotice(reciever,actLeave(Agent,Region1,to(Dir))))),
         reverse_dir(Dir,Rev),
    ifThen(( Region1\==Region2) ,raise_location_event(XXYY,actNotice(reciever,actEnter(Agent,Region2,from(Rev))))),!,

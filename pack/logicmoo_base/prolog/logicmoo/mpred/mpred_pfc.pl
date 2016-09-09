@@ -730,6 +730,8 @@ mpred_set_default(GeneralTerm,Default):-
 
 ain_expanded(IIIOOO):- mpred_ain(IIIOOO).
 
+system:ain_expanded(IIIOOO):- mpred_ain(IIIOOO).
+
 
 %% mpred_ainz(+G, ?S) is semidet.
 %
