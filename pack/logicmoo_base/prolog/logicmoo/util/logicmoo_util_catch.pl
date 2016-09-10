@@ -1511,12 +1511,15 @@ sanity(_):- \+ current_prolog_flag(logicmoo_debug,true), notrace((is_release, \+
 sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
 sanity(Goal):- fail, \+ current_prolog_flag(logicmoo_debug,true), current_prolog_flag(unsafe_speedups,true), \+ tracing,!, 
    (1 is random(10)-> must(Goal) ; true).
+sanity(_):- current_prolog_flag(safe_speedups,true),!.
 sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
 sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:dbreak).
 
+sanity3(_,_,_):- current_prolog_flag(safe_speedups,true),!.
 sanity3(F,L,Goal):- (( \+ \+ Goal)->true;( wdmsg(sanity_ge(F,L,Goal)),dtrace(Goal),!,fail)).
 
+must3(_,_,Goal):- current_prolog_flag(safe_speedups,true),!,Goal.
 must3(F,L,Goal):- ( Goal *->true; ( wdmsg(must_ge(F,L,Goal)),dtrace(Goal),!,fail)).
 
 

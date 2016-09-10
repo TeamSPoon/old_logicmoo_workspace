@@ -27,6 +27,7 @@
   call_m_g/3,
   same_modules/2,
   throw_depricated/0,
+  mpred_post_exactly/1,
   lookup_m_g/3,
   head_to_functor_name/2,
           ain_expanded/1,
@@ -905,7 +906,10 @@ mpred_post2(Fact, _):- current_prolog_flag(unsafe_speedups,true), ground(Fact),f
 
 mpred_post2(P,S):- gripe_time(0.6,mpred_post12(P,S)).
 
+mpred_post_exactly(P):- current_why(S),mpred_enqueue(P,S).
+mpred_remove_exactly(P):- remove_if_unsupported(P).
 
+:- module_transparent(mpred_post_exactly/1).
 :- module_transparent(mpred_post1/2).
 :- module_transparent(mpred_post12/2).
 :- export(mpred_post12/2).
@@ -931,6 +935,7 @@ mpred_post12( ~ P,   S):- sanity( \+ is_ftOpenSentence(P)), \+ mpred_unique_u(P)
 
 mpred_post12(P,S):- maybe_updated_value(P,RP,OLD),!,subst(S,P,RP,RS),mpred_post12(RP,RS),ignore(mpred_retract(OLD)).
 
+%  TODO MAYBE mpred_post12(actn(P),S):- !, with_current_why(S,call(P)).
 % Two versions exists of this function one expects for a clean database (fresh_mode) and adds new information.
 % tries to assert a fact or set of fact to the database.
 % The other version is if the program is been running before loading this module.
@@ -3117,6 +3122,12 @@ mpred_add_support_fast(P,(Fact,Trigger)):-
 mpred_get_support(P,(Fact,Trigger)):-
       lookup_u(spft(P,Fact,Trigger)).
 
+/*
+%  TODO MAYBE 
+mpred_get_support(F,J):- 
+  full_transform(mpred_get_support,F,FF),!,
+  F\==FF,mpred_get_support(FF,J).
+*/
 
 mpred_rem_support_if_exists(P,(Fact,Trigger)):-
  SPFT = spft(P,Fact,Trigger),

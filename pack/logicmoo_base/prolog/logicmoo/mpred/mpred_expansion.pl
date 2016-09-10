@@ -644,9 +644,13 @@ fully_expand_clause_now(Op,Sent,SentO):-
    memoize_on(fully_expand,Sent->SentO,(fully_expand_clause(Op,Sent,SentM),post_expansion(Op,SentM,SentO))),!.
    
 
+post_expansion(_Op,Sent,Sent):- current_prolog_flag(logicmoo_renames,false),!.
 post_expansion(Op,Sent,SentO):- 
-   if_defined(do_renames(Sent,SentM),=(Sent,SentM)),!,
+   do_renames_expansion(Sent,SentM),!,
    maybe_correctArgsIsa(Op,SentM,SentO),!.
+
+do_renames_expansion(Sent,Sent):- current_prolog_flag(logicmoo_renames,false),!.
+do_renames_expansion(Sent,SentM):- if_defined(do_renames(Sent,SentM),=(Sent,SentM)).
 
 maybe_correctArgsIsa(_ ,SentO,SentO):-!.
 maybe_correctArgsIsa(Op,SentM,SentO):- w_tl(t_l:infMustArgIsa,correctArgsIsa(Op,SentM,SentO)),!.
@@ -1005,7 +1009,7 @@ temp_comp(H,B,PRED,OUT):- nonvar(H),term_variables(B,Vs1),Vs1\==[], term_attvars
 % :- meta_predicate(term_expansion(':'(:-),(:-))).
 % :- mode(term_expansion(+,--)).
 db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.
-db_expand_0(Op,I,O):- sanity(is_ftNonvar(Op)),\+ compound(I),if_defined(do_renames(I,O),I=O),!.
+db_expand_0(Op,I,O):- sanity(is_ftNonvar(Op)),\+ compound(I),do_renames_expansion(I,O),!.
 db_expand_0(_,mpred_prop(A,B,C),mpred_prop(A,B,C)):-!.
 db_expand_0(Op,pkif(SentI),SentO):- nonvar(SentI),!,must((any_to_string(SentI,Sent),
   must(expand_kif_string_or_fail(Op,Sent,SentM)),SentM\=@=Sent,!,

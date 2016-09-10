@@ -535,6 +535,10 @@ args_match_types(TemplIn,Templ):-compound(TemplIn),!,TemplIn=..TemplInL, Templ=.
 args_match_types(Templ,Templ):-!.
 args_match_types(Obj,Type):-!,isa(Obj,Type).
 
+% hook for toplevel pass 1
+agent_command(Agent,Templ):- on_x_rtrace(agent_command_affordance(Agent,Templ)).
+
+% hook for toplevel pass last
 agent_command_fallback(Agent,TemplIn):-agent_command_simbots_real(Agent,TemplIn).
 
 agent_command_simbots_real(Agent,actImprove(Trait)):- nonvar(Trait),
@@ -566,19 +570,19 @@ affordance_message(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
 verb_desc_or_else(ActVerb,Types,Mesg):-verb_desc(ActVerb,Types,Mesg).
 verb_desc_or_else(ActVerb,Types,verb_desc(ActVerb,Types)):-nonvar(ActVerb),nonvar(Types),not(verb_desc(ActVerb,Types,_)).
 
-agent_command(Agent,Templ):- simbots_templates(Templ), (fmt(agent_command_simbots_real_3(Agent,Templ)),fail).
+agent_command_affordance(Agent,Templ):- simbots_templates(Templ), (fmt(agent_command_simbots_real_3(Agent,Templ)),fail).
 
 action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
-agent_command(Agent,actDo(A)):-CMD=..[A],!,agent_command(Agent,CMD).
-agent_command(Agent,actDo(A,B)):-CMD=..[A,B],!,agent_command(Agent,CMD).
-agent_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,agent_command(Agent,CMD).
-agent_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,agent_command(Agent,CMD).
-agent_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,agent_command(Agent,CMD).
+agent_command_affordance(Agent,actDo(A)):-CMD=..[A],!,agent_command_affordance(Agent,CMD).
+agent_command_affordance(Agent,actDo(A,B)):-CMD=..[A,B],!,agent_command_affordance(Agent,CMD).
+agent_command_affordance(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,agent_command_affordance(Agent,CMD).
+agent_command_affordance(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,agent_command_affordance(Agent,CMD).
+agent_command_affordance(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,agent_command_affordance(Agent,CMD).
 
 action_info(actTextcmd(ftString),"reinterps a term as text").
-agent_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_agent_action(Agent,CMD).
-agent_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_agent_action(Agent,CMD).
-agent_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_agent_action(Agent,CMD).
+agent_command_affordance(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_agent_action(Agent,CMD).
+agent_command_affordance(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_agent_action(Agent,CMD).
+agent_command_affordance(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_agent_action(Agent,CMD).
 
 
 genls(tShelf,tHasSurface).

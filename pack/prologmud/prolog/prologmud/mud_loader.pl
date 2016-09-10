@@ -206,7 +206,8 @@ hard_work:-
 % [Required] load the mud PFCs
 :- set_prolog_flag(pfc_booted,false).
 
-:- show_entry(gripe_time(40,force_reload_mpred_file(prologmud('mud_builtin.pfc')))).
+:- show_entry(gripe_time(40,ensure_loaded(prologmud('mud_builtin.pfc')))).
+% :- show_entry(gripe_time(40,force_reload_mpred_file(prologmud('mud_builtin.pfc')))).
 
 slow_work:- wno_tl( set_prolog_flag(lm_expanders,false) , within_user(at_start(hard_work))).
 

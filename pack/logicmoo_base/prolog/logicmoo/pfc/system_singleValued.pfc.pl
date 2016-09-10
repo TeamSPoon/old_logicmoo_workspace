@@ -97,7 +97,7 @@ someSV_testing(a,c,4).
 
 
 
-:- if(current_prolog_flag(logicmoo_debug,true);baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
+:- if((fail,current_prolog_flag(logicmoo_debug,true);baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity))).
 
 :- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_sv.pfc')).
 

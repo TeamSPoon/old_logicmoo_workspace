@@ -2409,6 +2409,7 @@ time_call(Call):-
 %
 % Gripe Time.
 %
+gripe_time(_TooLong,Goal):- current_prolog_flag(safe_speedups,true),!,Goal.
 gripe_time(TooLong,Goal):- statistics(cputime,StartCPU),
   statistics(walltime,[StartWALL,_]),
   NeedGripe=v(yes),

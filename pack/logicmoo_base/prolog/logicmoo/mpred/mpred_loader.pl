@@ -1100,7 +1100,8 @@ checked_clause_count(ignore_file_mpreds(_)).
 
 :- dynamic(lmcache:last_clause_count/2).
 
-check_clause_count(Mask):- swc,
+check_clause_count(MMask):- swc,
+ strip_module(MMask,_,Mask),
  clause_count(Mask,N),
     (retract(lmcache:last_clause_count(Mask,Was)) -> true ; Was=0),
      (assert(lmcache:last_clause_count(Mask,N)),
@@ -1110,7 +1111,7 @@ check_clause_count(Mask):- swc,
      ((Diff<0 ,Change is N/abs(Diff ), Change>0.20)
          -> trace_or_throw(bad_count(Mask,(Was --> N))) ; dmsg(good_count(Mask,(Was --> N)))))).
 
-check_clause_counts:-!.
+check_clause_counts:- current_prolog_flag(safe_speedups,true),!.
 check_clause_counts:- current_prolog_flag(unsafe_speedups,true),!.
 check_clause_counts:- ((forall(checked_clause_count(Mask),sanity(check_clause_count(Mask))))),fail.
 check_clause_counts.

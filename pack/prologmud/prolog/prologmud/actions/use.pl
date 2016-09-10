@@ -15,7 +15,7 @@
 meta_argtypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
 
-genls(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
+==>genls(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
 genls('FluidReservoir',tDrinkAble).
 genls(tWeapon,tWieldAble).
 genls(tContolDevice,tUseAble).

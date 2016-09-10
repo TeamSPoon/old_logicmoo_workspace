@@ -34,6 +34,9 @@
 % :- must(initEnvironment).
 :- endif.
 
+:- set_prolog_flag(safe_speedups,true).
+:- set_prolog_flag(logicmoo_renames,false).
+
 :- set_module(baseKB:class(development)).
 
 :- dynamic(baseKB:col_as_isa/1).
@@ -124,8 +127,6 @@ col_as_isa(Col)==>tCol(Col).
 
 % ((prologHybrid(C),{must(callable(C)),get_functor(C,F,A),C\=F}) ==> arity(F,A)).
 
-t(C,I)==>isa(I,C).
-
 
 %% t(?Collection, ?VALUE1) is semidet.
 %
@@ -163,7 +164,6 @@ genls(ttRelationType,completelyAssertedCollection).
 :- export(baseKB:agent_call_command/2).
 :- system:import(baseKB:agent_call_command/2).
 
-arity(comment,2).
 
 :- dynamic(decided_not_was_isa/2).
 :- kb_dynamic(baseKB:mtCycL/1).
@@ -241,11 +241,14 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
 
 
 :- dynamic(arity/2).
+:- abolish(system:arity,2).
+:- system:import(arity/2).
 :- dynamic(disjointWith/2).
 :- dynamic(genlsFwd/2).
 :- kb_dynamic(arity/2).
 :- kb_dynamic(disjointWith/2).
 :- kb_dynamic(genlsFwd/2).
+arity(comment,2).
 
 % prologHybrid(arity/2).
 
@@ -377,7 +380,7 @@ argsQuoted(vtActionTemplate).
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
-(((isa(F,tPred),
+(((tPred(F),
  arity(F,A)/
   (is_ftNameArity(F,A),A>1, 
       \+ prologBuiltin(F), 
@@ -408,7 +411,7 @@ bt(P,_)/nonvar(P) ==> (P:- mpred_bc_only(P)).
 ((sometimesUseless,prologHybrid(F),arity(F,A))==>hybrid_support(F,A)).
 (hybrid_support(F,A))==>prologHybrid(F),arity(F,A).
 
-((mpred_mark(pfcRHS,F,A)/(A\=0)) ==> {kb_dynamic(F/A)}).
+==>((mpred_mark(pfcRHS,F,A)/(A\=0)) ==> {kb_dynamic(F/A)}).
 % ((mpred_mark(_,F,A)/(A\=0)) ==> {shared_multifile(F/A)}).
 
 
@@ -477,8 +480,8 @@ mpred_mark(pfcRHSF,1)/(fail,atom(F),functor(Head,F,1),
 % mpred_mark(Type,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
 
 mpred_mark_C(G) ==> {map_mpred_mark_C(G)}.
-map_mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),ain([isa(F,pfcControlled),arity(F,A)]))),G).
-mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>(isa(F,tPred),arity(F,A),isa(F,pfcControlled)).
+map_mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),ain([pfcControlled(F),arity(F,A)]))),G).
+mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>(tPred(F),arity(F,A),pfcControlled(F)).
 
 % (hybrid_support(F,A) ==>{\+ is_static_predicate(F/A), must(kb_dynamic(F/A))}).
 
@@ -521,7 +524,8 @@ term actually _is_ reified in the Cyc Knowledge Base, it is, more specifically, 
 (named, say, `GovernmentOfFrance'). Similary, the constant for GovernmentFn can be applied to the constant (or other reified or 
 reifiable term) for _any_ instance of GeopoliticalEntity to form a reifiable NAT that denotes that region's government; and should 
  this NAT appear in a sentence that is asserted to the KB, it will thereby become a NART. Note, however, that not all NATs are such that it 
-is desireable that they should become reified (i.e. become NARTs) if they appear in assertions; for more on this see UnreifiableFunction."),
+is desireable that they should become reified (i.e. become NARTs) if they appear in assertions; for more on this see UnreifiableFunction."
+),
 genls(tFunction)).
 
 
@@ -733,5 +737,17 @@ nondet.
 
 % :- set_prolog_flag(dialect_pfc,false).
 :- mpred_notrace_exec.
+
+% isa(I,C)==>{wdmsg(isa(I,C))}.
+
+
+do_and_undo(mpred_post_exactly,mpred_remove_exactly).
+
+:- if( \+ current_prolog_flag(safe_speedups,true)).
+(((CI,{was_mpred_isa(CI,I,C)},\+ ~isa(I,C)) ==> actn(mpred_post_exactly(isa(I,C))))).
+:- endif.
+
+:- abolish(system:arity,2).
+:- system:import(arity/2).
 
 

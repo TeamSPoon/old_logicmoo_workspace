@@ -70,6 +70,12 @@
 :- set_prolog_stack(trail, limit(16*10**9)).
 :- set_prolog_flag(unsafe_speedups,true).
 :- set_prolog_flag(logicmoo_debug,false).
+
+/*
+:- set_prolog_flag(logicmoo_debug,true).
+:- set_prolog_flag(unsafe_speedups,false).
+*/
+
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
@@ -122,6 +128,7 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 :- endif.
 
 % Loaded LogicMOO Code!!!
+%:- profile(ensure_loaded(logicmoo_repl)).
 :- ensure_loaded(logicmoo_repl).
 
 %:- mpred_trace_exec.
@@ -350,14 +357,14 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 % :- assert_setting01(lmconf:eachFact_Preconditional(isRuntime)).
 
 % isa(starTrek,mtCycL).
-% :- starTrek:force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
-lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
+% :- starTrek:force_reload_mpred_file('../games/src_game_startrek/?*.pfc.pl').
+lst :- force_reload_mpred_file('../games/src_game_startrek/?*.pfc.pl').
 
 :- check_clause_counts.
 
 :- must_det(argIsa(genlPreds,2,_)).
 
-%:- initialization(ltkb1,load_ckb).
+%:- initialization((ltkb1,load_ckb)).
 
 :- assert_setting01(lmconf:eachRule_Preconditional(true)).
 :- assert_setting01(lmconf:eachFact_Preconditional(true)).

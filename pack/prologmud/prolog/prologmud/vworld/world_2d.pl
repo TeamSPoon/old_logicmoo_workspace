@@ -238,10 +238,11 @@ mosftSpecificLocalityOfObject(Obj,Where):-
   ~inRegion(Obj,OldLoc)).
 
 % create pathway objects and place them in world
+/*
 (pathDirLeadsTo(Region,Dir,R2)/ground(pathDirLeadsTo(Region,Dir,R2)),   
-    { mudExitAtLoc(Region,Dir,LOC), Obj = apathFn(Region,Dir) }) ==>  
+    { mudExitAtLoc(Region,Dir,LOC), Obj = apathFn_BAD1(Region,Dir) }) ==>  
                         (tPathway(Obj),localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)).
-
+*/
 
 tPathway(apathFn(Region,Dir)) ==> mudDoorwayDir(Region,apathFn(Region,Dir),Dir).
 
@@ -294,7 +295,7 @@ wearsClothing(Agent,Clothes)==>mudSubPart(Agent,Clothes).
 
 
 is_in_world(Var):- is_ftVar(Var),!,trace_or_throw(var_is_in_world(Var)).
-is_in_world(apathFn(A,B)):- gound(apathFn(A,B)),!.
+is_in_world(apathFn(A,B)):- ground(apathFn(A,B)),!.
 is_in_world(Obj):-isa_asserted(Obj,tRegion),!.
 is_in_world(Obj):-lookup_u(mudAtLoc(Obj,_)),!.
 is_in_world(Obj):-lookup_u(mudStowing(Who,Obj)),!,is_in_world(Who).
@@ -327,16 +328,16 @@ prologHybrid(mudInsideOf(tObj,tObj)).
 
 % facts that must be true 
 %  suggest a deducable fact that is always defiantely true but not maybe asserted
-fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
+%TODO USE EVER? fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
 fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 
-(((localityOfObject(_,_),{localityOfObject(apathFn(LivingRoom,Dir),LivingRoom)},
-    \+ pathDirLeadsTo(LivingRoom, Dir, _)  ) ==>
-     \+ localityOfObject(apathFn(LivingRoom,Dir),LivingRoom))).
+(((localityOfObject(_,_),{localityOfObject(apathFn(Region,Dir),Region)},
+    \+ pathDirLeadsTo(Region, Dir, _)  ) ==>
+     \+ localityOfObject(apathFn(Region,Dir),Region))).
 
 %  suggest a deducable fact that is probably true but not already asserted
-fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
-fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
+%TODO USE EVER? fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
+%TODO USE EVER? fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
 
 % create_and_assert_random_fact(_):- t_l:noDBaseHOOKS(_),!.
 create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),aina(Fact).
@@ -390,9 +391,11 @@ calc_from_center_xyz(Region1,Dir,R,X2,Y2,Z2):-
 prologBuiltin(random_path_dir/1).
 
 random_path_dir(Dir):- nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
-random_path_dir(Dir):- call(call,random_instance(vtDirection,Dir,true)).
-random_path_dir(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
-random_path_dir(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
+random_path_dir(Dir):- no_repeats(random_path_dir0(Dir)).
+
+random_path_dir0(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
+random_path_dir0(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
+random_path_dir0(Dir):- call(call,random_instance(vtDirection,Dir,true)).
 
 from_dir_target(LOC,Dir,XXYY):- is_3d(LOC),!,
   move_dir_target(LOC,Dir,XXYY).
