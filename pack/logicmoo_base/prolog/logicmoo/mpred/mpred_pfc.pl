@@ -1884,11 +1884,11 @@ call_u_mp(user, P1 ):-!,  call_u_mp(baseKB,P1).
 call_u_mp(M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
 call_u_mp(_, M:P1):-!,call_u_mp(M,P1).
 call_u_mp(M, (P1,P2)):-!,call_u_mp(M,P1),call_u_mp(M,P2).
-call_u_mp(M, (P1;P2)):-!,call_u_mp(M,P1);call_u_mp(M,P2).
-call_u_mp(M, (P1*->P2;P3)):-!,call_u_mp(M,P1)*->call_u_mp(M,P2);call_u_mp(M,P3).
-call_u_mp(M, (P1->P2;P3)):-!,call_u_mp(M,P1)->call_u_mp(M,P2);call_u_mp(M,P3).
-call_u_mp(M, (P1->P2)):-!,call_u_mp(M,P1)->call_u_mp(M,P2).
-call_u_mp(M, (P1*->P2)):-!,call_u_mp(M,P1)*->call_u_mp(M,P2).
+call_u_mp(M, (P1;P2)):- !,(call_u_mp(M,P1);call_u_mp(M,P2)).
+call_u_mp(M, (P1*->P2;P3)):-!,(call_u_mp(M,P1)*->call_u_mp(M,P2);call_u_mp(M,P3)).
+call_u_mp(M, (P1->P2;P3)):-!,(call_u_mp(M,P1)->call_u_mp(M,P2);call_u_mp(M,P3)).
+call_u_mp(M, (P1->P2)):-!,(call_u_mp(M,P1)->call_u_mp(M,P2)).
+call_u_mp(M, (P1*->P2)):-!,(call_u_mp(M,P1)*->call_u_mp(M,P2)).
 call_u_mp(M,( \+ P1)):-!, \+ call_u_mp(M,P1).
 call_u_mp(M,must(P1)):-!, must( call_u_mp(M,P1)).
 call_u_mp(M, 't'(P1)):-!, call_u_mp(M,P1).

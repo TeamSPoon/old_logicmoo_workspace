@@ -135,7 +135,8 @@ ttExpressionType(C)==>tAvoidForwardChain(C).
 % TODO ((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ genls/*Fwd*/(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 %    \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 
-completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ tAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
+completeIsaAsserted(I) ==> ((isa_complete(I,Sub)/ (\+ tAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
+%completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ tAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
 /*
 
 % isRuntime ==> 
