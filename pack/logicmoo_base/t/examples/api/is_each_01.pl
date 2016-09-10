@@ -16,7 +16,7 @@
 
 % :- fully_expand( (isEach(aa(X),bb(Y)) :- related(X,Y)), _O).
 
-isEach(aa(X),bb(Y)) :- related(X,Y).
+==>(isEach(aa(X),bb(Y)) :- related(X,Y)).
 
 :- listing([aa,bb]).
 

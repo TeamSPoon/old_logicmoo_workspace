@@ -11,7 +11,7 @@
 
 :- begin_pfc.
 
-isEach(system(X),system(Y)) :- related(X,Y).
+==>(isEach(system(X),system(Y)) :- related(X,Y)).
 
 :- process_this_script.
 

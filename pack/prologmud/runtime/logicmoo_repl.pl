@@ -26,7 +26,7 @@ setup_rl_read_history_0:-
 :- setup_rl_read_history_0.
 :- initialization(setup_rl_read_history_0,restore).
 
-:- sanity((statistics(cputime,X),X<97)).
+:- sanity((statistics(cputime,X),X<197)).
 
 % ==============================
 % Default Daemons

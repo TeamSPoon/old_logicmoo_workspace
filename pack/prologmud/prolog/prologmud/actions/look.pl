@@ -176,7 +176,7 @@ get_feet0(Agent,Percepts):-
 	get_mdir_u(Agent,[Facing,Rev],LOC,Percepts))),
 	!.
 
-pddlObjects(vtDirection,[vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW]).
+==>pddlObjects(vtDirection,[vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW]).
 
 
 %View list starting at vac'vSouth position and moving out in a clockwise spiral

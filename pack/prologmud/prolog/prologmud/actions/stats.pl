@@ -18,7 +18,9 @@
 action_info(actStats(isOptional(tObj,isSelfAgent)), "Examine MUD stats of something").
 
 tCol(rtStatPred).
-rtStatPred(isEach(
+
+==>
+ rtStatPred(isEach(
          mudEnergy,
          mudStr,
          mudStm, % stamina

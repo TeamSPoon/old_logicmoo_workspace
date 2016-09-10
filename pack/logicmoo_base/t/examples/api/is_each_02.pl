@@ -46,7 +46,7 @@ example_proven_false(G):- example_impossible_is_success(G),example_known_is_fail
 example_inconsistent(G):- example_known_is_success(G),example_impossible_is_success(G).
 example_unknown(G):- example_known_is_failure(G),example_impossible_is_failure(G).
 
-isEach(aa(X),bb(Y)) :- related(X,Y).
+==>(isEach(aa(X),bb(Y)) :- related(X,Y)).
 
 :- listing([aa,bb]).
 

@@ -396,10 +396,15 @@ persistInMudIsa(tRegion).
 
 sometimesHack(genls).
 
-typeGenls(ttAgentType,tAgent).
+% ~tPathway(apathFn(iOfficeRoom7, vNorth)).
+
+% tPathway(PATH):- cwc, PATH=@=apathFn(iOfficeRoom7, vNorth),trace_or_throw(error(tPathway(PATH))).
+
 typeGenls(ttAgentType,tAgent).
 
-(sometimesSlow, tCol(Inst), {isa_from_morphology(Inst,Type)}) ==> isa(Inst,Type).
+(sometimesSlow, tCol(Col), {isa_from_morphology(Col,Type)}) ==> isa(Col,Type).
+
+(sometimesSlow, tInstance(Inst), {isa_from_morphology(Inst,Type)}) ==> isa(Inst,Type).
 
 % HOW TO MAKE THIS FAST? isa(Inst,Type) <= {isa_from_morphology(Inst,Type)}.
 
@@ -516,7 +521,7 @@ tCol(tChannel).
 tCol(tItem).
 tCol(vtVerb).
 
-% predIsFlag(tAgent(ftID),[predIsFlag]).
+% prologIsFlag(tAgent(ftID),[prologIsFlag]).
 % prologDynamic(createableSubclassType/2).
 % alt_forms1(none_AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),call_u(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
 % alt_forms1(none_AR,mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
@@ -531,10 +536,10 @@ tCol(vtVerb).
 %isa(AT,ttAgentType):- genls(AT,ttAgentGeneric).
 %genls(AT,ttAgentGeneric):- isa(AT,ttAgentType).
 %subFormat(ftTextType,ftText).
-%predIsFlag(tItem(ftID),[predIsFlag]).
-%predIsFlag(tRegion(ftID),[predIsFlag]).
-%predIsFlag(tRegion(ftID),tCol).
-predIsFlag(tThinking(tAgent),[predIsFlag]).
+%prologIsFlag(tItem(ftID),[prologIsFlag]).
+%prologIsFlag(tRegion(ftID),[prologIsFlag]).
+%prologIsFlag(tRegion(ftID),tCol).
+prologIsFlag(tThinking(tAgent),[prologIsFlag]).
 
 prologHybrid(isEach((mudLastCmdSuccess/3 ))).
 prologHybrid(isEach(mudLastCommand/2,mudNamed/2, mudSpd/2,mudStr/2,typeGrid/3)).
@@ -755,9 +760,9 @@ defnSufficient(ftTerm,vtValue).
 
 genls('FemaleAnimal',tAgent).
 genls('MaleAnimal',tAgent).
-genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
-genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
-genls(isEach(tRegion,tAgent),tChannel).
+==>genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
+==>genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
+==>genls(isEach(tRegion,tAgent),tChannel).
 
 genls(tAgent,tObj).
 genls(tAgent,tSpatialThing).
@@ -954,6 +959,12 @@ mudAreaConnected(R1,R2)/ground(mudAreaConnected(R1,R2)) ==>
    \+ pathDirLeadsTo(R2,Rev,_NotR1)}) ==>
   pathDirLeadsTo(R1,Dir,R2).
 
+pathDirLeadsTo(R1,Dir,_)==>tPathway(apathFn(R1,Dir)).
+
+% Is PathFn a total reifable function or a  partual unreifiable 
+rtTotalFunction(apathFn).
+rtReifiableFunction(apathFn).
+
 pathDirLeadsTo(R1,Dir,R2)/reverse_dir(Dir,Rev) ==> pathDirLeadsTo(R2,Rev,R1).
 % pathDirLeadsTo(R1,_,R2) ==> mudAreaConnected(R1,R2).
 
@@ -994,7 +1005,7 @@ genlsInheritable(ttRelationType).
 
 genls(tPortableDevice,tCarryAble).
 
-predIsFlag(spatialInRegion/1).
+prologIsFlag(spatialInRegion/1).
 
 :-do_gc.
 
@@ -1113,7 +1124,8 @@ wornOn(I,BPart),isa(BPart,BType),isa(I,IType) ==> wornOnTypeType(IType,BType).
 
 genls(tBread, tFood).
 
-typeProps(tCrackers,
+==>
+ typeProps(tCrackers,
   [mudColor(vTan),tBread,
    mudShape(isEach(vCircular,vFlat)),
    mudSize(vSmall),
