@@ -513,14 +513,61 @@ db_expand_maplist(FE,List,T,G,O):-bagof(M, (member(T,List),call(FE,G,M)), ML),li
 %
 % Must Be Successfull Expand.
 %
-must_expand(/*to_exp*/(_)).
-must_expand(props(_,_)).
-must_expand(iprops(_,_)).
-must_expand(upprop(_,_)).
-must_expand(typeProps(_,_)).
-must_expand(G):-functor(G,_,A),!,A==1.
+%TODO Maybe later? must_expand(G):- \+ skip_expand(G), arg(_,G,E),compound(E).
+must_expand(G):- \+ compound(G),!,fail.
+must_expand(_:G):- !,must_expand(G).
+must_expand((G:-_)):- !,must_expand(G).
+must_expand((G ==> _)):- !,must_expand(G).
+must_expand(G):- skip_expand(G),!,fail.
+must_expand(G):- functor(G,F,A),must_expand_fa(F,A),!,arg(1,G,NV),nonvar(NV).
+must_expand(G):- arg(A,G,C),(string(C);(compound(C),A==2)),!.
 
-% fully_expand_warn(_,C,C):-!.
+
+must_expand_fa(kif,1).
+must_expand_fa(pkif,1).
+must_expand_fa('==>',1).
+must_expand_fa('~',1).
+must_expand_fa(F,_):-must_expand_fa(F).
+
+must_expand_fa(props).
+must_expand_fa(iprops).
+must_expand_fa(upprop).
+must_expand_fa(typeProps).
+must_expand_fa(mudLabelTypeProps).
+must_expand_fa(iprops).
+must_expand_fa(isa).
+must_expand_fa(t).
+must_expand_fa(isEach).
+
+% Collecton Hooks
+must_expand_fa(tPred).
+must_expand_fa(tFunction).
+must_expand_fa(tRelation).
+must_expand_fa(tCol).
+must_expand_fa(tSet).
+must_expand_fa(F):-atom_concat('tt',_,F).
+must_expand_fa(F):-atom_concat('rt',_,F).
+
+% Pred Impl Hooks
+must_expand_fa(prologHybrid).
+must_expand_fa(prologBuiltin).
+must_expand_fa(prologDynamic).
+must_expand_fa(F):-atom_concat('prolog',_,F).
+must_expand_fa(F):-atom_concat('pddl',_,F).
+must_expand_fa(F):-atom_concat('pfc',_,F).
+must_expand_fa(F):-atom_concat('mpred_',_,F).
+
+
+% Will expand these only after evaluation
+skip_expand(G):- \+ compound(G),!,fail.
+skip_expand((G:-_)):- !, skip_expand(G).
+skip_expand(G):- functor(G,F,A),skip_expand_fa(F,A).
+skip_expand_fa(==>,2).
+skip_expand_fa(<==>,2).
+skip_expand_fa(<-,2).
+skip_expand_fa(never_retract_u,_).
+skip_expand_fa(actn,1).
+skip_expand_fa(':-',2).
 
 %= 	 	 
 
@@ -580,6 +627,24 @@ in_dialect_pfc:-
 fully_expand(Op,Sent,SentO):-
  % must(/*hotrace*/( / nop(deserialize_attvars(Sent,SentI)))),
  gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,Sent,SentO))).
+
+
+fully_expand2(_Op,Sent,Sent):- skip_expand(Sent),!.
+
+% This issues no warnings
+fully_expand2(Op,Sent,SentO):- must_expand(Sent),!,
+ % must(/*hotrace*/( / nop(deserialize_attvars(Sent,SentI)))),
+ gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,Sent,SentO))).
+
+% This skips warnings
+fully_expand2(_Op,Sent,Sent):- current_prolog_flag(unsafe_speedups,true),\+ current_prolog_flag(logicmoo_debug,true).
+
+fully_expand2(_Op,Sent,Sent):- current_prolog_flag(safe_speedups,true),!.
+% This warns if it does anything
+fully_expand2(Op,Sent,SentO):-
+ deserialize_attvars(Sent,SentI),
+ gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,SentI,SentO))),
+ must(Sent==SentO->true;(wdmsg(warn(Sent --> SentO)),!)).
 
 %% fully_expand_now( ++Op, ^Sent, --SentO) is det.
 %
@@ -670,6 +735,7 @@ fully_expand_clause(_,Sent,SentO):- t_l:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_clause(Op,Sent,SentO):- \+ compound(Sent),!,fully_expand_head(Op,Sent,SentO).
 fully_expand_clause(_,aNoExpansionFn(Sent),Sent):- !.
 fully_expand_clause(Op,aExpansionFn(Sent),SentO):- fully_expand_clause(Op,Sent,SentO).
+%  TODO MAYBE  fully_expand_clause(Op,'==>'(Sent,CONSQ),'==>'(SentO,CONSQ)):-!,fully_expand_clause(Op,Sent,SentO).
 fully_expand_clause(Op,'==>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,'=>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,M:Sent,SentO):- is_stripped_module(M),!,fully_expand_clause(Op,Sent,SentO).
@@ -868,8 +934,9 @@ is_parse_type('pkif'(NV)):-nonvar(NV).
 db_expand_final(_,VAR,VAR):- is_ftVar(VAR),!.
 % db_expand_final(Op,Sent,Sent):- Sent=..[_,A],atom(A),!.
 db_expand_final(_ ,NC,NCO):- string(NC),convert_to_cycString(NC,NCO),!.
-db_expand_final(_ ,NC,NCO):- atomic(NC),if_defined(do_renames(NC,NCO),fail),!.
+db_expand_final(_ ,NC,NCO):- atomic(NC),do_renames_expansion(NC,NCO).
 db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
+%TODO db_expand_final(_,no_xform(SO),no_xform(SO)):-!.
 db_expand_final(_,[String],String):-string(String),!.
 db_expand_final(_ ,CI,CI ):- CI=..[C,I],C==I,!.
 db_expand_final(_ ,NC,NC):-  as_is_term(NC),!.
@@ -1475,9 +1542,10 @@ was_mpred_isa(G,_,_):-is_ftVar(G),!,fail.
 was_mpred_isa(G,_,_):- \+compound(G),!,fail.
 was_mpred_isa(isa(I,C),I,C):-!.
 was_mpred_isa(t(P,I,C),I,C):-!,P==isa.
-was_mpred_isa(t(C,I),I,C):-!.
+was_mpred_isa(t(C,I),I,C):-!,C\==actn.
 was_mpred_isa(a(C,I),I,C):-!.
-was_mpred_isa(G,I,C):-was_isa(G,I,C).
+% TODO was_mpred_isa(CI,I,C):- CI=..[C,I],C\==actn,clause_asserted(baseKB:tCol(C)).
+% was_mpred_isa(G,I,C):-was_isa(G,I,C),C\==actn.
 
 
 %= 	 	 
@@ -1737,6 +1805,7 @@ fix_negations(~~(I),O):- functor(~~(I),~~,1),!, fix_negations(\+(~I),O).
 fix_negations(not(I),O):- !, fix_negations(\+(I),O).
 fix_negations(~(I),~(O)):- !, fix_negations(I,O).
 fix_negations(\+(I),\+(O)):- !, fix_negations(I,O).
+% fix_negations(isa(I,C),nearestIsa(I,C)):-!.
 fix_negations(C,C):- if_defined(exact_args(C),fail),!.
 fix_negations([H|T],[HH|TT]):-!,fix_negations(H,HH),fix_negations(T,TT),!.
 fix_negations(C,CO):-C=..[F|CL],must_maplist(fix_negations,CL,CLO),!,CO=..[F|CLO].
