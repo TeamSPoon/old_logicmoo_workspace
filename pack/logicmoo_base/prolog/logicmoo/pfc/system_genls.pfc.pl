@@ -21,14 +21,14 @@ genls(tRR,tRRP).
 genls(tRRP,tRRP2).
 col_as_unary(tRRP2).
 tRR(iRR7).
-% tAvoidForwardChain(functorDeclares).
-tAvoidForwardChain(C):- loop_check(tCol(C)),compound(C).
-tAvoidForwardChain(meta_argtypes).
-% tAvoidForwardChain(completeIsaAsserted).
-ttExpressionType(C)==>tAvoidForwardChain(C).
+% rtAvoidForwardChain(functorDeclares).
+rtAvoidForwardChain(C):- loop_check(tCol(C)),compound(C).
+rtAvoidForwardChain(meta_argtypes).
+% rtAvoidForwardChain(completeIsaAsserted).
+ttExpressionType(C)==>rtAvoidForwardChain(C).
 genls(C,P)==>tCol(C),tCol(P).
 (genls(C,P)/(C\=P)), completelyAssertedCollection(P)  ==> genlsFwd(C,P).
-(genls(C,P)/(C\=P, \+ ttExpressionType(C) , \+ ttExpressionType(P) , \+ tAvoidForwardChain(P) )) ==> genlsFwd(C,P).
+(genls(C,P)/(C\=P, \+ ttExpressionType(C) , \+ ttExpressionType(P) , \+ rtAvoidForwardChain(P) )) ==> genlsFwd(C,P).
 genlsFwd(C,P) ==> (isa(I,C) ==> isa(I,P)).
 
 not_undoable(G):-call_u(G).
@@ -46,7 +46,7 @@ col_as_unary(C) ==> {atom(C),not_undoable((CI=..[C,I],forall(retract(isa(I,C):-t
 col_as_isa(C) ==> {atom(C),not_undoable((CI=..[C,I],forall(retract(CI:-true),mpred_post1(isa(I,C))),retractall(col_as_unary(C))))}.
 
 genls(tSet,functorDeclares).
-col_as_unary(functorDeclares).
+rtQuotedPred(functorDeclares).
 genls(completelyAssertedCollection,tSet).
 
 isa(I,ttRelationType):-I==col_as_unary,!,fail.
@@ -125,30 +125,30 @@ tSet(tKnownID).
 
 % TODO (genls(C,SC)==>(tCol(C),tCol(SC))).
 
-% tAvoidForwardChain(functorDeclares).
-tAvoidForwardChain(C):-tCol(C),compound(C).
-tAvoidForwardChain(meta_argtypes).
-% tAvoidForwardChain(completeIsaAsserted).
+% rtAvoidForwardChain(functorDeclares).
+rtAvoidForwardChain(C):-tCol(C),compound(C).
+rtAvoidForwardChain(meta_argtypes).
+% rtAvoidForwardChain(completeIsaAsserted).
 
-ttExpressionType(C)==>tAvoidForwardChain(C).
+ttExpressionType(C)==>rtAvoidForwardChain(C).
 
 % TODO ((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ genls/*Fwd*/(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 %    \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 
-% completeIsaAsserted(I) ==> ((isa_complete(I,Sub)/ (\+ tAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
-completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ tAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
+completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ rtAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
+mudIsa(I,C),genls(C,P) ==> mudIsa(I,P).
 /*
 
 % isRuntime ==> 
-% (mudIsa(I,Sub)/(ground(mudIsa(I,Sub)), \+ tAvoidForwardChain(Sub))) ==> isa(I,Sub).
-((completelyAssertedCollection(Sub) / (\+ tAvoidForwardChain(Sub)))) ==> ttMudIsaCol(Sub).
+% (mudIsa(I,Sub)/(ground(mudIsa(I,Sub)), \+ rtAvoidForwardChain(Sub))) ==> isa(I,Sub).
+((completelyAssertedCollection(Sub) / (\+ rtAvoidForwardChain(Sub)))) ==> ttMudIsaCol(Sub).
 ttMudIsaCol(Sub) ==> (isa(I,Sub) ==> mudIsa(I,Sub)).
-((completeIsaAsserted(I),mudIsa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ tAvoidForwardChain(Super))) ==> mudIsa(I,Super).
+((completeIsaAsserted(I),mudIsa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ rtAvoidForwardChain(Super))) ==> mudIsa(I,Super).
 */
 
 
 (genls(C,P)/(C\=P)), completelyAssertedCollection(P)  ==> genlsFwd(C,P).
-(genls(C,P)/(C\=P, \+ ttExpressionType(C) , \+ ttExpressionType(P) , \+ tAvoidForwardChain(P) )) ==> genlsFwd(C,P).
+(genls(C,P)/(C\=P, \+ ttExpressionType(C) , \+ ttExpressionType(P) , \+ rtAvoidForwardChain(P) )) ==> genlsFwd(C,P).
 
 genlsFwd(C,P)/(C\=P) ==> (isa(I,C) ==> isa(I,P)).
 

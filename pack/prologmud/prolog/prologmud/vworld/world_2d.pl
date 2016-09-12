@@ -244,7 +244,8 @@ mosftSpecificLocalityOfObject(Obj,Where):-
                         (tPathway(Obj),localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)).
 */
 
-tPathway(apathFn(Region,Dir)) ==> mudDoorwayDir(Region,apathFn(Region,Dir),Dir).
+:- ain(tPathway(apathFn(Region,Dir)) ==> mudDoorwayDir(Region,apathFnAA(Region,Dir),Dir)).
+
 
 mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):- call_u(calc_from_center_xyz(Region,Dir,2,X,Y,Z)).
 

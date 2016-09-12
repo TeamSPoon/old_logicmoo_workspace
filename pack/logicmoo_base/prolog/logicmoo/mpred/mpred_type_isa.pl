@@ -73,7 +73,7 @@
             onLoadPfcRule/1,
             pfcNeverTrue/1,
             tCol_gen/1,
-            tSetOrdered/1,
+			tSetOrdered/1,
             to_isa_out/3,
             transitive_P/4,
             transitive_P_l_r/4,
@@ -632,7 +632,7 @@ not_mud_isa0(actGossup,tChannel).
 not_mud_isa0(_, blah):-!.
 not_mud_isa0(I,meta_argtypes):- \+ (is_ftCompound(I)).
 not_mud_isa0(_,prologHybrid):-!,fail.
-not_mud_isa0(prologMacroHead, ttExpressionType).
+not_mud_isa0(functorIsMacro, ttExpressionType).
 not_mud_isa0(tAgent,ttExpressionType).
 not_mud_isa0(tCol,ttExpressionType).
 not_mud_isa0(tItem,ttExpressionType).
@@ -675,7 +675,7 @@ not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 % True Structure Col Gen.
 %
 tSetOrdered(T):- no_repeats(T,call_u(baseKB:(atom(T);ttTemporalType(T);completelyAssertedCollection(T);tSet(T)))). % ,atom(T). ;tCol(T)
-tCol_gen(T):- no_repeats(T,call_u(baseKB:(atom(T);ttTemporalType(T);completelyAssertedCollection(T);tSet(T);tCol(T)))). % ,atom(T).
+tCol_gen(T):- tSetOrdered(T). % no_repeats(T,call_u(baseKB:(atom(T);ttTemporalType(T);completelyAssertedCollection(T);tSet(T);tCol(T)))). % ,atom(T).
 % ==========================
 % isa_backchaing(i,c)
 % ==========================

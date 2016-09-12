@@ -516,7 +516,7 @@ get_consequent(P,P).
 
 % TODO READD
 %:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttRelationType,
-%     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),
+%     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,functorIsMacro,prologListValued,prologSingleValued),P),
 
 
 % TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
@@ -2081,7 +2081,7 @@ should_call_for_facts(_,F,_):- \+ a(pfcControlled,F),!.
 no_side_effects(P):-  (\+ is_side_effect_disabled->true;(get_functor(P,F,_),a(prologSideEffects,F))).
 
 
-:- was_dynamic(prologMacroHead/1).
+:- was_dynamic(functorIsMacro/1).
 
 
 %% compute_resolve( +NewerP, ?OlderQ, ?SU, ?SU, ?OlderQ) is semidet.
@@ -2372,7 +2372,7 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 
 % TODO READD
 %:- foreach(consequent_arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttRelationType,
-%     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),)
+%     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,functorIsMacro,prologListValued,prologSingleValued),P),)
 
 %% get
 

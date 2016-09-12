@@ -1572,7 +1572,7 @@ mpred_term_expansion((M:Fact:- BODY),(:- ((cl_assert(Dir,M:Fact:- BODY))))):- no
       mpred_term_expansion_by_pred_class(_,Fact,Output):- get_functor(Fact,F,_A),lookup_u(prologOnly(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!,fail.
       mpred_term_expansion_by_pred_class(pfc(pred_type),Fact,Output):- get_functor(Fact,F,_A),lookup_u(ttRelationType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttRelationType(F)),!.
       mpred_term_expansion_by_pred_class(pfc(func_decl),Fact,Output):- get_functor(Fact,F,_A),lookup_u(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
-      mpred_term_expansion_by_pred_class(pfc(macro_head),Fact,Output):- get_functor(Fact,F,_A),lookup_u(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(macro_head),Fact,Output):- get_functor(Fact,F,_A),lookup_u(functorIsMacro(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorIsMacro(F)),!.
       mpred_term_expansion_by_pred_class(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,_A),lookup_u(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
       mpred_term_expansion_by_pred_class(pfc(hybrid),Fact,Output):- get_functor(Fact,F,_A),lookup_u(prologHybrid(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
       mpred_term_expansion_by_pred_class(pfc(pl),Fact,Output):- get_functor(Fact,F,_A),(a(prologDynamic,F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.

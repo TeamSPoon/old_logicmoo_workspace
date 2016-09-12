@@ -397,11 +397,11 @@ functor_declares_instance_0(decl_mpred_prolog,prologDynamic).
 % functor_declares_instance_0(prologSideEffects,tPred).
 % functor_declares_instance_0(tPred,tPred).
 functor_declares_instance_0(meta_argtypes,tRelation).
-functor_declares_instance_0(prologMacroHead,tRelation).
+functor_declares_instance_0(functorIsMacro,tRelation).
 functor_declares_instance_0(tFunction,tFunction).
 functor_declares_instance_0(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_isa,mpred_isa,
        prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologSideEffects,
-       predCanHaveSingletons,prologBuiltin,prologKIF,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),P).
+       predCanHaveSingletons,prologBuiltin,prologKIF,prologDynamic,functorIsMacro,prologListValued,prologSingleValued),P).
 functor_declares_instance_0(P,tPred):-isa_from_morphology(P,ttRelationType).
 functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,ftFunctional).
 functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,O)->O=tFunction.
@@ -628,24 +628,6 @@ fully_expand(Op,Sent,SentO):-
  % must(/*hotrace*/( / nop(deserialize_attvars(Sent,SentI)))),
  gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,Sent,SentO))).
 
-
-fully_expand2(_Op,Sent,Sent):- skip_expand(Sent),!.
-
-% This issues no warnings
-fully_expand2(Op,Sent,SentO):- must_expand(Sent),!,
- % must(/*hotrace*/( / nop(deserialize_attvars(Sent,SentI)))),
- gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,Sent,SentO))).
-
-% This skips warnings
-fully_expand2(_Op,Sent,Sent):- current_prolog_flag(unsafe_speedups,true),\+ current_prolog_flag(logicmoo_debug,true).
-
-fully_expand2(_Op,Sent,Sent):- current_prolog_flag(safe_speedups,true),!.
-% This warns if it does anything
-fully_expand2(Op,Sent,SentO):-
- deserialize_attvars(Sent,SentI),
- gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,SentI,SentO))),
- must(Sent==SentO->true;(wdmsg(warn(Sent --> SentO)),!)).
-
 %% fully_expand_now( ++Op, ^Sent, --SentO) is det.
 %
 % Fully Expand Now.
@@ -735,7 +717,6 @@ fully_expand_clause(_,Sent,SentO):- t_l:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_clause(Op,Sent,SentO):- \+ compound(Sent),!,fully_expand_head(Op,Sent,SentO).
 fully_expand_clause(_,aNoExpansionFn(Sent),Sent):- !.
 fully_expand_clause(Op,aExpansionFn(Sent),SentO):- fully_expand_clause(Op,Sent,SentO).
-%  TODO MAYBE  fully_expand_clause(Op,'==>'(Sent,CONSQ),'==>'(SentO,CONSQ)):-!,fully_expand_clause(Op,Sent,SentO).
 fully_expand_clause(Op,'==>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,'=>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,M:Sent,SentO):- is_stripped_module(M),!,fully_expand_clause(Op,Sent,SentO).
@@ -812,7 +793,7 @@ as_is_term(PARSE):-is_parse_type(PARSE),!,fail.
 as_is_term(meta_argtypes(_)):-!.
 as_is_term(argsQuoted(Atom)):- !, \+ compound(Atom).
 as_is_term(arity(F,_)):-atom(F),!.
-as_is_term(prologMacroHead(Atom)):- !, \+ compound(Atom).
+as_is_term(functorIsMacro(Atom)):- !, \+ compound(Atom).
 as_is_term(functorDeclares(Atom)):- !, \+ compound(Atom).
 as_is_term('$VAR'(_)).
 as_is_term(_:NC):-!,as_is_term(NC). 
@@ -934,9 +915,8 @@ is_parse_type('pkif'(NV)):-nonvar(NV).
 db_expand_final(_,VAR,VAR):- is_ftVar(VAR),!.
 % db_expand_final(Op,Sent,Sent):- Sent=..[_,A],atom(A),!.
 db_expand_final(_ ,NC,NCO):- string(NC),convert_to_cycString(NC,NCO),!.
-db_expand_final(_ ,NC,NCO):- atomic(NC),do_renames_expansion(NC,NCO).
+db_expand_final(_ ,NC,NCO):- atomic(NC),if_defined(do_renames(NC,NCO),fail),!.
 db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
-%TODO db_expand_final(_,no_xform(SO),no_xform(SO)):-!.
 db_expand_final(_,[String],String):-string(String),!.
 db_expand_final(_ ,CI,CI ):- CI=..[C,I],C==I,!.
 db_expand_final(_ ,NC,NC):-  as_is_term(NC),!.
@@ -1542,10 +1522,9 @@ was_mpred_isa(G,_,_):-is_ftVar(G),!,fail.
 was_mpred_isa(G,_,_):- \+compound(G),!,fail.
 was_mpred_isa(isa(I,C),I,C):-!.
 was_mpred_isa(t(P,I,C),I,C):-!,P==isa.
-was_mpred_isa(t(C,I),I,C):-!,C\==actn.
+was_mpred_isa(t(C,I),I,C):- nonvar(C),!.
 was_mpred_isa(a(C,I),I,C):-!.
-% TODO was_mpred_isa(CI,I,C):- CI=..[C,I],C\==actn,clause_asserted(baseKB:tCol(C)).
-% was_mpred_isa(G,I,C):-was_isa(G,I,C),C\==actn.
+was_mpred_isa(G,I,C):-was_isa(G,I,C).
 
 
 %= 	 	 
@@ -1805,7 +1784,6 @@ fix_negations(~~(I),O):- functor(~~(I),~~,1),!, fix_negations(\+(~I),O).
 fix_negations(not(I),O):- !, fix_negations(\+(I),O).
 fix_negations(~(I),~(O)):- !, fix_negations(I,O).
 fix_negations(\+(I),\+(O)):- !, fix_negations(I,O).
-% fix_negations(isa(I,C),nearestIsa(I,C)):-!.
 fix_negations(C,C):- if_defined(exact_args(C),fail),!.
 fix_negations([H|T],[HH|TT]):-!,fix_negations(H,HH),fix_negations(T,TT),!.
 fix_negations(C,CO):-C=..[F|CL],must_maplist(fix_negations,CL,CLO),!,CO=..[F|CLO].

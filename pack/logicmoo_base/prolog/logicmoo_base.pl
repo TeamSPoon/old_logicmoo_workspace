@@ -193,12 +193,12 @@ base_clause_expansion_fa(_,_,F,A):- ain(mpred_prop(F,A,prologBuiltin)),!,fail.
 
 
 needs_pfc(F,A):- 
-  (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(prologHybrid(F));
+  (clause_b(functorIsMacro(F));clause_b(functorDeclares(F));clause_b(prologHybrid(F));
   clause_b(mpred_prop(F,A,prologHybrid));clause_b(wrap_shared(F,A,ereq))),!.
 
 /*
 maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
-   \+ (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(mpred_prop(F,A,prologHybrid))),
+   \+ (clause_b(functorIsMacro(F));clause_b(functorDeclares(F));clause_b(mpred_prop(F,A,prologHybrid))),
    ain(prologBui sltin(F/A)).
 
 */

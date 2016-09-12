@@ -90,7 +90,7 @@ ttTypeType(col_as_static).
 col_as_unary(col_as_isa).
 col_as_unary(col_as_unary).
 col_as_unary(col_as_static).
-col_as_unary(argsQuoted).
+rtQuotedPred(argsQuoted).
 col_as_unary(mtProlog).
 col_as_unary(mtExact).
 col_as_unary(mtCycL).
@@ -104,6 +104,10 @@ typeCheckDecl(pfcControlled(C),callable(C)).
 
 % :- break.
 
+tSet(rtQuotedPred).
+ttRelationType(rtQuotedPred).
+
+
 %:- start_rtrace,trace.
 :- ain_expanded(baseKB:mtCycL(baseKB)).
 col_as_isa(tSet).
@@ -115,10 +119,11 @@ tSet(ttRelationType).
 col_as_isa(ttRelationType).
 %col_as_isa(completelyAssertedCollection).
 
-col_as_unary(completeExtentAsserted).
+rtQuotedPred(completeExtentAsserted).
 col_as_unary(completelyAssertedCollection).
 
 %:- rtrace.
+% rtQuotedPred(P)==> ~tCol(P).
 col_as_unary(Col)==>tCol(Col).
 col_as_isa(Col)==>tCol(Col).
 %:- nortrace.
@@ -134,7 +139,7 @@ col_as_isa(Col)==>tCol(Col).
 %
 t(completelyAssertedCollection,prologNegByFailure).
 t(completeExtentAsserted,pm).
-t(completeExtentAsserted,prologMacroHead).
+t(completeExtentAsserted,functorIsMacro).
 t(completelyAssertedCollection,tMicrotheory).
 t(completelyAssertedCollection,mtCycL).
 
@@ -144,7 +149,7 @@ t(completelyAssertedCollection,mtCycL).
 
 completelyAssertedCollection(prologNegByFailure).
 completeExtentAsserted(pm).
-completeExtentAsserted(prologMacroHead).
+completeExtentAsserted(functorIsMacro).
 completelyAssertedCollection(tMicrotheory).
 completelyAssertedCollection(mtCycL).
 
@@ -284,7 +289,7 @@ tCol(tFunction).
 tCol(tRelation).
 tCol(ttTemporalType).
 tCol(ttExpressionType).
-tCol(functorDeclares).
+~tCol(functorDeclares).
 functorDeclares(ttModule).
 
 ttExpressionType(ftList(ftInt)).
@@ -332,7 +337,7 @@ ttExpressionType(ftAskable).
 tCol(ftString).
 tCol(ftAtom).
 tCol(ftProlog).
-tCol(tAvoidForwardChain).
+tCol(rtAvoidForwardChain).
 
 tSet(ttModule,mudToCyc('MicrotheoryType')).
 
@@ -452,7 +457,7 @@ mpred_mark(pfcPosTrigger,F, A)/(\+ ground(F/A))==>{trace_or_throw(mpred_mark(pfc
 mpred_mark(pfcPosTrigger,F, A)==>marker_supported(F,A).
 mpred_mark(pfcNegTrigger,F, A)==>marker_supported(F,A).
 mpred_mark(pfcBcTrigger,F, A)==>marker_supported(F,A).
-mpred_mark(pfcLHS,F, A)==>arity(F,A),prologMacroHead(F).
+mpred_mark(pfcLHS,F, A)==>arity(F,A),functorIsMacro(F).
 mpred_mark(pfcRHS,F, A)==>
   {functor(P,F,A),make_dynamic(P),kb_dynamic(P),
     create_predicate_istAbove(abox,F,A)},
@@ -462,8 +467,8 @@ mpred_mark(pfcCallCode,F, A)/predicate_is_undefined_fa(F,A)
     ==> marker_supported(F,A).
 
 
-tCol(P)==>prologMacroHead(P).
-prologMacroHead(prologMacroHead).
+tCol(P)==>functorIsMacro(P).
+functorIsMacro(functorIsMacro).
 
 % (marker_supported(F,A))==>(prologHybrid(F),hybrid_support(F,A)).
 %mpred_mark(pfcPosTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).

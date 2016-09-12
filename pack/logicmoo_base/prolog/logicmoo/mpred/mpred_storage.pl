@@ -621,7 +621,7 @@ special_head(_,F,Why):-special_head0(F,Why),!,show_failure(why,\+(a(prologDynami
 %
 special_head0(F,ttRelationType):-a(ttRelationType,F),!.
 special_head0(F,functorDeclares):-a(functorDeclares,F),!.
-special_head0(F,prologMacroHead):-a(prologMacroHead,F),!.
+special_head0(F,functorIsMacro):-a(functorIsMacro,F),!.
 special_head0(F,pfcControlled):-a(pfcControlled,F).
 special_head0(isa,isa).
 special_head0(F,tCol):-a(tCol,F),!.

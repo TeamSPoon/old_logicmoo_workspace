@@ -437,9 +437,9 @@ maybe_define_if_not_static(M,PI):-
 
 
 % mpred_isa(F,prologDynamic):- \+ (mpred_isa(F,prologHybrid)),(F=ttRelationType;(current_predicate(F/1);not(t(F,tCol)))).
-mpred_isa(G,predProxyAssert(ain)):- atom(G),prologMacroHead(G).
-mpred_isa(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
-mpred_isa(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
+mpred_isa(G,predProxyAssert(ain)):- atom(G),functorIsMacro(G).
+mpred_isa(G,predProxyQuery(ireq)):- atom(G),functorIsMacro(G).
+mpred_isa(G,predProxyRetract(del)):- atom(G),functorIsMacro(G).
 */
 
 

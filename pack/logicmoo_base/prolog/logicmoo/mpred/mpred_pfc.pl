@@ -500,7 +500,7 @@ convention_to_symbolic_mt(_Why,mtCycL,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,tCol,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,mtProlog,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,functorDeclares,1,baseKB):-!.
-convention_to_symbolic_mt(_Why,prologMacroHead,1,baseKB):-!.
+convention_to_symbolic_mt(_Why,functorIsMacro,1,baseKB):-!.
 convention_to_symbolic_mt(_Why,F,A,abox):- mpred_database_term(F,A,_).
 convention_to_symbolic_mt(_Why,F,_,Mt):-  call(baseKB:predicateConventionMt(F,Mt)),!.
 convention_to_symbolic_mt(_Why,F,A,abox):- baseKB:wrap_shared(F,A,ereq).
@@ -1884,7 +1884,7 @@ call_u_mp(user, P1 ):-!,  call_u_mp(baseKB,P1).
 call_u_mp(M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
 call_u_mp(_, M:P1):-!,call_u_mp(M,P1).
 call_u_mp(M, (P1,P2)):-!,call_u_mp(M,P1),call_u_mp(M,P2).
-:- if(false).
+:- if(true).
 call_u_mp(M, (P1;P2)):- !,(call_u_mp(M,P1);call_u_mp(M,P2)).
 call_u_mp(M, (P1*->P2;P3)):-!,(call_u_mp(M,P1)*->call_u_mp(M,P2);call_u_mp(M,P3)).
 call_u_mp(M, (P1->P2;P3)):-!,(call_u_mp(M,P1)->call_u_mp(M,P2);call_u_mp(M,P3)).

@@ -444,7 +444,7 @@ needs_canoncalization(CycL):-needs_indexing(CycL).
 
 is_better_backchained(CycL):-is_ftVar(CycL),!,fail.
 is_better_backchained(CycL):-functor(CycL,F,_),isa_db(F,'SentenceOperator').
-is_better_backchained(V):-unnumbervars(V,FOO),(((each_subterm(FOO,SubTerm),nonvar(SubTerm),isa_db(SubTerm,tAvoidForwardChain)))),!.
+is_better_backchained(V):-unnumbervars(V,FOO),(((each_subterm(FOO,SubTerm),nonvar(SubTerm),isa_db(SubTerm,rtAvoidForwardChain)))),!.
 
 
 as_cycl(VP,VE):-subst(VP,('-'),(~),V0),subst(V0,('v'),(or),V1),subst(V1,('exists'),(thereExists),V2),subst(V2,('&'),(and),VE),!.

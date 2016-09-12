@@ -281,7 +281,7 @@ virtualize_ereq(prologBuiltin,1).
 virtualize_ereq(prologDynamic,1).
 virtualize_ereq(prologHybrid,1).
 virtualize_ereq(prologKIF,1).
-virtualize_ereq(prologMacroHead,1).
+virtualize_ereq(functorIsMacro,1).
 virtualize_ereq(prologPTTP,1).
 virtualize_ereq(prologSideEffects,1).
 

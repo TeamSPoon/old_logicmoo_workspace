@@ -226,23 +226,6 @@ predicateConventionMt(agent_call_command,baseKB).
 :- dynamic(mudTermAnglify/2).
 :- discontiguous(mudTermAnglify/2).
 
-tCol(tCol).
-tCol(tSet).
-:- debug.
-tCol(meta_argtypes).
-% tCol(prologMacroHead)
-tSet(functorDeclares).
-tCol(prologMultiValued).
-tCol(prologSingleValued).
-tCol(tFunction).
-tCol(tInferInstanceFromArgType).
-tCol(tPred).
-tCol(tRelation).
-tCol(meta_argtypes).
-tCol(ttSpatialType).
-tCol(ttTypeType).
-
-tCol(tWorld).
 tWorld(iWorld7).
 
 /*
@@ -250,6 +233,10 @@ tWorld(iWorld7).
 :- trace.
 */
 ttExpressionType(ftProlog).
+
+ftChangeQuantity(X):- compound(X),arg(X,1,Q),quotedIsa(Q,ftNumber).
+ttExpressionType(ftChangeQuantity).
+
 
 % ==> neg(arity(mudAreaConnected,1)).
 
@@ -262,7 +249,6 @@ typeGenls(ttAgentType,tAgent).
 typeGenls(ttExpressionTypeType,ttExpressionType).
 :- dynamic(tItem/1).
 :- dynamic(ttItemType/1).
-tSet(ttItemType).
 ttTypeType(ttItemType).
 tSet(tItem).
 typeGenls(ttItemType,tItem).
@@ -343,19 +329,17 @@ formatted_resultIsa(ftDiceFn(ftInt,ftInt,ftInt),ftInt).
 
 
 
-%  tCol(prologMacroHead).
+rtQuotedPred(functorIsMacro).
 % tCol(ArgsIsa):-mpred_is_trigger(ArgsIsa).
 % tCol(ArgsIsa):-ttRelationType(ArgsIsa).
 % TODO decide if OK
 %(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) ==> meta_argtypes(ArgTypes).
-%tCol(F):-t(functorDeclares,F).
-%tCol(F):-t(prologMacroHead,F).
 
 tSet(COL)==>tCol(COL).
 ttExpressionType(COL)==>tCol(COL).
 
 
-tCol(prologMacroHead).
+tCol(functorIsMacro).
 tCol(tCol).
 tCol(tFunction).
 tCol(tPred).
@@ -369,8 +353,8 @@ tSet(tFunction).
 tSet(tPred).
 tSet(tRegion).
 tSet(tRelation).
-tSet(ttExpressionType).
-tSet(ttSpatialType).
+ttTypeType(ttExpressionType).
+ttTypeType(ttSpatialType).
 
 ftSpec(vtActionTemplate).
 
@@ -396,9 +380,9 @@ persistInMudIsa(tRegion).
 
 sometimesHack(genls).
 
-% ~tPathway(apathFn(iOfficeRoom7, vNorth)).
+~tPathway(apathFn(iOfficeRoom7, vNorth)).
 
-% tPathway(PATH):- cwc, PATH=@=apathFn(iOfficeRoom7, vNorth),trace_or_throw(error(tPathway(PATH))).
+tPathway(PATH):- cwc, PATH=@=apathFn(iOfficeRoom7, vNorth),trace_or_throw(error(tPathway(PATH))).
 
 typeGenls(ttAgentType,tAgent).
 
@@ -426,8 +410,8 @@ tSourceData(iSourceData8,comment("PrologMUD WorldState Data")).
 % functorDeclares(Toy),tFunction(Toy),arity(Toy,A),{A2 is A + 1}==>prologArity(Toy,A2).
 
 tCol(completelyAssertedCollection).
-tCol(completeIsaAsserted).
-genls(tSpatialThing,completeIsaAsserted).
+rtQuotedPred(completeIsaAsserted).
+tSpatialThing(I)==>completeIsaAsserted(I).
 genls(completelyAssertedCollection,tCol).
 completelyAssertedCollection(tItem).
 completelyAssertedCollection(tRegion).
@@ -437,6 +421,8 @@ completelyAssertedCollection(tAgent).
 completelyAssertedCollection(tCarryAble).
 completelyAssertedCollection(vtVerb).
 % :-rnotrace.
+
+ttTypeType(completeIsaAssertedType).
 
 completeIsaAssertedType(Col) ==> (isa(I,Col) ==> completeIsaAsserted(I)).
 completeIsaAssertedType(tAgent).
@@ -462,7 +448,7 @@ dividesBetween(tAgent,tHumanControlled,tNpcAgent).
 % slow... ttObjectType(Col1) ==> ~ttExpressionType(Col1).
 
 neg(isa(I,Super)) <- {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Super)).
-% disjointWith(P1,P2) ==> {\+(isa(P1,tAvoidForwardChain)),\+(isa(P2,tAvoidForwardChain))},(neg(isa(C,P1)) <==> isa(C,P2)).
+% disjointWith(P1,P2) ==> {\+(isa(P1,rtAvoidForwardChain)),\+(isa(P2,rtAvoidForwardChain))},(neg(isa(C,P1)) <==> isa(C,P2)).
 
 
 tCol(ttSpatialType).
@@ -622,6 +608,12 @@ resultIsa(apathFn,tPathway).
 '<==>'(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 '<==>'(nameString(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 
+
+rtDeduceArgTypes(pathDirLeadsTo).
+rtDeduceArgTypes(F)/current_predicate(F,P),argIsa(F,N,T)/arg(N,P,E),{call(P)}==>isa(E,T).
+
+
+
 ttPredAndValueType("size").
 ttPredAndValueType("texture").
 ttPredAndValueType("color").
@@ -754,6 +746,7 @@ formatted_resultIsa(apathFn(tRegion,vtDirection),tPathway).
 prologBuiltin(is_vtActionTemplate/1).
 
 is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
+
 defnSufficient(ftAction,is_vtActionTemplate).
 defnSufficient(ftAction,vtVerb).
 defnSufficient(ftTerm,vtValue).
@@ -917,6 +910,7 @@ typeGenls(ttRegionType,tRegion).
 genls('SetOrCollection',tCol).
 genls('Collection',tCol).
 
+meta_argtypes(verb_affordance(vtVerb,tTemporalThing,rtStatPred,ftChangeQuantity,ftChangeQuantity)).
 
 prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
@@ -959,10 +953,10 @@ mudAreaConnected(R1,R2)/ground(mudAreaConnected(R1,R2)) ==>
    \+ pathDirLeadsTo(R2,Rev,_NotR1)}) ==>
   pathDirLeadsTo(R1,Dir,R2).
 
-pathDirLeadsTo(R1,Dir,_)==>tPathway(apathFn(R1,Dir)).
+% pathDirLeadsTo(R1,Dir,_)==>tPathway(apathFnPLD(R1,Dir)).
 
-% Is PathFn a total reifable function or a  partual unreifiable 
-rtTotalFunction(apathFn).
+% Is PathFn a total reifable function or a  partual unreifiable ?
+rtPartialFunction(apathFn).
 rtReifiableFunction(apathFn).
 
 pathDirLeadsTo(R1,Dir,R2)/reverse_dir(Dir,Rev) ==> pathDirLeadsTo(R2,Rev,R1).
