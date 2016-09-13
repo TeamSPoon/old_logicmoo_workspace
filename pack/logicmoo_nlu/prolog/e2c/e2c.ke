@@ -57,7 +57,7 @@ isa: CollectionDenotingFunction UnaryFunction Function-Denotational.
 arity: 1.
 resultIsa: Collection.
 arg1Isa: Thing. 
-F:  (functionCorrespondingPredicate-Generic IsaFn isa 2).
+F: (functionCorrespondingPredicate-Generic IsaFn isa 2).
 F: (implies (isa ?INST ?COL) (equals (IsaFn ?INST) ?COL)).
 F: (isa ?INST (IsaFn ?INST)).
 
@@ -102,7 +102,7 @@ default mt: UniversalVocabularyMt.
 isa :  PublishedMaterial TextualPCW .
 
 default mt: UniversalVocabularyMt.
-constant: DoomTemplateParsingMt.
+constant: VersuTemplateParsingMt.
 isa: EnglishLexicalMicrotheory TemplateParsingMicrotheory.
 default mt: BaseKB.
 genlMt: RKFParsingMt.
@@ -115,7 +115,7 @@ F: (arg2Genl nlTemplateCatagoryForInstance ParsingTemplateCategory).
 F: (transitiveViaArg nlTemplateCatagoryForInstance genls 1).
 ;;;F: (transitiveViaArg nlTemplateCatagoryForInstance genls 2).
 
-default mt: DoomTemplateParsingMt.
+default mt: VersuTemplateParsingMt.
 contextOfPCW :  (ContextOfPCWFn E2C-Parses-CCW) .
 
 ;;;default mt: TKB-FETSourceDocumentsMt.
@@ -234,20 +234,20 @@ F: (and
 ;;;F:   (implies (and (hypotheticDenotation ?HYPOTHETIC ?Pronoun ?THEWORD) (denotation ?THEWORD ObjectPronoun ?N0 ?WHAT)) (equals ?HYPOTHETIC ?WHAT)).
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; DoomCyclifyFn
+;;; VersuCyclifyFn
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 default mt: UniversalVocabularyMt.
-constant: DoomCyclifyFn.
+constant: VersuCyclifyFn.
 isa:  VariableArityFunction EvaluatableFunction  .
 resultIsa:  (ListOfTypeFn CycLSentence)  .
 arg1QuotedIsa:  SubLString  .
-F: (evaluationDefn DoomCyclifyFn (SubLQuoteFn 'DOOM-CYCLIFY)).
+F: (evaluationDefn VersuCyclifyFn (SubLQuoteFn 'VERSU-CYCLIFY)).
 
-F:(comment  DoomCyclifyFn  "A function mapping English string to ordered lists of CycL interpretations. (evaluate ?W (DoomCyclifyFn \"I know you\" ))" ) .
-F:(exampleSentences  DoomCyclifyFn  
+F:(comment  VersuCyclifyFn  "A function mapping English string to ordered lists of CycL interpretations. (evaluate ?W (VersuCyclifyFn \"I know you\" ))" ) .
+F:(exampleSentences  VersuCyclifyFn  
   (#$evaluate ?X 
-  (#$DoomCyclifyFn "Two small curved ramps on either side of the
+  (#$VersuCyclifyFn "Two small curved ramps on either side of the
 room lead north to the lower part of the bridge, and a large circular
 skylight shows the space outside the ship"))).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -320,7 +320,7 @@ F: (implies (?PRED paraphrasePattern ?VAL) (?PRED ParaphrasePatternFn ?VAL)).
 F: (paraphrasePattern (ParaphraseFn ?ARG1) (ParaphrasePatternFn ?ARG1)).
 inTopic:  SubcategorizationFrames-Lexicon-Topic.
 
-default mt: DoomTemplateParsingMt.
+default mt: VersuTemplateParsingMt.
   F: (and
   (paraphrasePattern NLSentence STemplate)
   (paraphrasePattern NounPhrase NPTemplate)
@@ -337,7 +337,7 @@ default mt: DoomTemplateParsingMt.
 
 
 
-default mt: DoomTemplateParsingMt.
+default mt: VersuTemplateParsingMt.
 F: (and
   (paraphrasePattern (TheDisjunctiveCoordinationSet ?ARG1)  (ParaphrasePatternFn ?ARG1))
   (paraphrasePattern (TheDisjunctiveCoordinationSet ?ARG1 ?ARG2 . ?ARGS) 
@@ -468,7 +468,7 @@ F: (and
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-default mt: DoomTemplateParsingMt
+default mt: VersuTemplateParsingMt
 F: (comment nlTemplateCatagoryForInstance "(nlTemplateCatagoryForInstance ScalarInterval QuantityTemplate) say QuantityTemplate represents the best set of templates for parsing an instance of subclass of a ScalarInterval)").
 F: (nlTemplateCatagoryForInstance Collection NPTemplate).
 F: (nlTemplateCatagoryForInstance ScalarInterval QuantityTemplate).
@@ -732,9 +732,9 @@ F: (resultArgIsa NLPredicateConstraintFn 2 CharacterString).
 arg1QuotedIsa: CycLVariableList.
 arg2Isa: NLTemplateExpression.
 F: (arg2QuotedIsa (NLPredicateConstraintFn ??VARS ??EXPRESSION) SubLString).
-F: (predicateConventionMt (NLPredicateConstraintFn ??VARS ??EXPRESSION) DoomTemplateParsingMt).
+F: (predicateConventionMt (NLPredicateConstraintFn ??VARS ??EXPRESSION) VersuTemplateParsingMt).
 F: (expansion NLPredicateConstraintFn (Kappa (:ARG1) :ARG2)).
-default mt: DoomTemplateParsingMt.
+default mt: VersuTemplateParsingMt.
 
 
 ;;(implies 
@@ -781,19 +781,19 @@ default mt: DoomTemplateParsingMt.
 ;;;;;arg1Isa: NLSemanticPredicate.
 ;;;;;arg2Isa: SubcategorizationFrame.
 ;;; arity: 2.
-;;; F: (predicateConventionMt predicateCatFrameTypes DoomTemplateParsingMt).
-;;; default mt: DoomTemplateParsingMt.
+;;; F: (predicateConventionMt predicateCatFrameTypes VersuTemplateParsingMt).
+;;; default mt: VersuTemplateParsingMt.
 ;;; F:
 ;;;    (implies
 ;;;     (and (semTransArg ?PRED 4)(?PRED ??WORD ??NUM ?FRAME ??CYCL))
-;;;     (ist DoomTemplateParsingMt (predicateCatFrameTypes ?PRED ?FRAME))).
+;;;     (ist VersuTemplateParsingMt (predicateCatFrameTypes ?PRED ?FRAME))).
 ;;;
 ;;; default mt: BaseKB.
-;;; F: (genlMt DoomTemplateParsingMt EverythingPSC).
-;;; F: (genlMt DoomTemplateParsingMt InferencePSC).
+;;; F: (genlMt VersuTemplateParsingMt EverythingPSC).
+;;; F: (genlMt VersuTemplateParsingMt InferencePSC).
 ;;;
 ;;; default mt: BaseKB.
-;;; constant: DoomTemplateParsingMt.
+;;; constant: VersuTemplateParsingMt.
 ;;; isa: EnglishLexicalMicrotheory TemplateParsingMicrotheory.
 ;;; genlMt: RKFParsingMt.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -847,7 +847,7 @@ POPULATE-RTP-FROM-MT  (MT)
 (RKF-SET-ACTIVE-CONCEPT-HARVESTER-METHODS (cons 'print-l (RKF-ACTIVE-CONCEPT-HARVESTER-METHODS )))
 (CATEGORIZING-TEMPLATE-PARSE  )
 ;;SEM-PARSE  (SENTENCE MT &OPTIONAL (CAT STemplate) (COMPLETE-PARSES-ONLY T)) 
-(define rtp-doom (sent &optional &OPTIONAL (CAT STemplate) )
+(define rtp-versu (sent &optional &OPTIONAL (CAT STemplate) )
   (clet ((*RTP-EXHAUSTIVE-KB-PARSE?*  T)( *TRACE-GET-CYCLS-FOR-STRING-ESCALATING?* t))
   ;;STORE-RTP-PARSES-IN-PIPELINE  (SENTENCE-STRING PARSE PARSING-MT CATEGORY )
   (ret (ITP-SEQUEL sent cat))))
@@ -860,19 +860,19 @@ POPULATE-RTP-FROM-MT  (MT)
 ;;;  Is a rollup of all the SemTransPred, SemTransTemplatePredicate:
 ;;; 
 default mt: UniversalVocabularyMt.
-constant: DoomTemplateParsingMt.
+constant: VersuTemplateParsingMt.
 genlMt: EnglishTemplateMt.
 genlMt: RKFParsingMt.
 constant: RKFParsingMt.
-genlMt: DoomTemplateDataMt.
+genlMt: VersuTemplateDataMt.
 
-F: (genls DoomTemplateParsingMicrotheory BroadMicrotheory).
+F: (genls VersuTemplateParsingMicrotheory BroadMicrotheory).
 
-constant: DoomTemplateDataMt.
+constant: VersuTemplateDataMt.
 genlMt: EnglishTemplateMt.
 genlMt: RKFParsingMt.
 constant: RKFParsingMt.
-genlMt: DoomTemplateDataMt.
+genlMt: VersuTemplateDataMt.
 
 constant: templateSemTrans.
 ;;isa: QuaternaryPredicate NLRelation NLSemanticPredicate NLSyntacticPredicate.
@@ -881,8 +881,8 @@ isa: TernaryPredicate NLRelation NLSemanticPredicate NLSyntacticPredicate.
 F: (and (termDoesntNeedLexification templateSemTrans) (keIrrelevantTerm-InternalCycTerm templateSemTrans)).
 ;; AllowGenericArgVariables LeaveSomeTermsAtEL 
 canonicalizerDirectiveForAllArgs: LeaveSomeTermsAtELAndAllowKeywordVariables. 
-predicateConventionMt: DoomTemplateDataMt.
-definingMt: DoomTemplateDataMt.
+predicateConventionMt: VersuTemplateDataMt.
+definingMt: VersuTemplateDataMt.
 argsQuotedIsa: CycLTerm.
 argsIsa: Thing.
 ;;;F: (canonicalizerDirectiveForArg templateSemTrans 1 LeaveSomeTermsAtELAndAllowKeywordVariables).
@@ -890,7 +890,7 @@ argsIsa: Thing.
 ;;;F: (canonicalizerDirectiveForArg templateSemTrans 3 LeaveSomeTermsAtELAndAllowKeywordVariables).
 ;;;F: (argIsa templateSemTrans 1 TemplateParsingSyntacticConstraint).
 ;;;F: (argIsa templateSemTrans 1 ParsingTemplateCategory).
-F: (comment templateSemTrans "(ist DoomTemplateDataMt (templateSemTrans ParsingTemplateCategory TemplateParsingSyntacticConstraint SubcategorizationFrame NLTemplateExpression))").
+F: (comment templateSemTrans "(ist VersuTemplateDataMt (templateSemTrans ParsingTemplateCategory TemplateParsingSyntacticConstraint SubcategorizationFrame NLTemplateExpression))").
 F: (comment templateSemTrans "(templateSemTrans ?ParsingTemplateCategory SYNTAX FRAME TRANS) means that the translation of any SYNTAX, appearing with subcategorization frame FRAME, means TRANS.").
 F: (argIsa templateSemTrans 1 TemplateParsingSyntacticConstraint).
 F: (argIsa templateSemTrans 2 SubcategorizationFrame).
@@ -901,15 +901,15 @@ F: (genFormat templateSemTrans "the subcategorization frame ~a has a syntactic v
        (TheList 2 1 3)).
 
 default mt: UniversalVocabularyMt.
-constant: DoomTemplateDataMt.
-isa: DoomTemplateParsingMicrotheory.
+constant: VersuTemplateDataMt.
+isa: VersuTemplateParsingMicrotheory.
 ;;remove (interArgIsa2-1 genlPreds TimeDependentRelation TimeDependentRelation)
 
 
 default mt: UniversalVocabularyMt.
-constant: DoomTemplateDataMt.
-isa: DoomMicrotheory.
-default mt: DoomTemplateDataMt.
+constant: VersuTemplateDataMt.
+isa: VersuMicrotheory.
+default mt: VersuTemplateDataMt.
 F:
 (implies 
 ;;   (and 
@@ -917,7 +917,7 @@ F:
     ;;(genls ?POS ?GPOS)
      ;;(posForTemplateCategory ?GPOS ?TEMPLATE))
     (isa ?CYCL NLTemplateExpression)
-;;(ist DoomTemplateDataMt 
+;;(ist VersuTemplateDataMt 
 ;; (and ))
  (and 
   (implies 
@@ -1016,7 +1016,7 @@ F:
 		    ;;WHAdverb
 
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
    (nounPrep ?WORD ?PREP ?CYCL)
    (templateSemTrans 
@@ -1027,7 +1027,7 @@ F: (implies
 
 ;;;; from here
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
    (verbPrep-TransitiveTemplate ?EVENT ?PREP ?CYCL) 
    (templateSemTrans 
@@ -1037,14 +1037,14 @@ F: (implies
        (implies 
            (isa :DENOT ?EVENT) ?CYCL))).
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
        (and 
            (elementOf ?POS (TheSet CountNoun MassNoun)) 
            (denotation ?WORD ?POS ?SN ?COL)) 
         (nounSemTrans ?WORD ?SN RegularNounFrame (isa :NOUN ?COL)))).
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F:
 (implies 
        (and 
@@ -1056,7 +1056,7 @@ F:
         (templateSemTrans  (NLPatternList (NLPattern-Word ?WORD1 ?POS)) ?FRAME 
            (not ?FORMULA))).
 
-default mt: DoomTemplateParsingMt.
+default mt: VersuTemplateParsingMt.
 F:
   (implies 
     (and 
@@ -1080,7 +1080,7 @@ F:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-default mt: DoomTemplateParsingMt.
+default mt: VersuTemplateParsingMt.
 F:
   (implies
    (and 
@@ -1091,7 +1091,7 @@ F:
     (?SemTransPRED ?WORD ?SN ?DefiniteDeterminerFrame (isa :DENOT ?COL))).
 
 
-default mt: DoomTemplateParsingMt.
+default mt: VersuTemplateParsingMt.
 F:
    (implies 
        (and 
@@ -1117,7 +1117,7 @@ F:
                (NLPattern-Word ?WORD ?POS) ?R) ?FRAME ?CYCL)).
 
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
    (and 
       (denotation ?WORD ?POS ?SN ?COL)
@@ -1126,7 +1126,7 @@ F: (implies
     (templateSemTrans (NLPatternList (NLPattern-Word ?WORD ?POS)) RegularNounFrame (isa :NOUN ?COL))).
 
 
-;; default mt: DoomTemplateParsingMt.
+;; default mt: VersuTemplateParsingMt.
 ;; F:
 ;; (implies
 ;;   (nounPrep ?WORD ?PREP
@@ -1145,7 +1145,7 @@ F: (implies
 ;;      (NLPatternList (NLPattern-Word ?WORD ?POS))
 ;;      ?FRAME ?CYCL)).
         
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
          (prepReln-Action ?ACTION ?OBLIQUE ?PREP ?CYCL) 
          (templateSemTrans
@@ -1160,7 +1160,7 @@ F: (implies
 ;;)
 
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
           (and 
 		    (prepReln-Object ?OBJECT ?OBLIQUE ?PREP ?CYCL) 
@@ -1175,7 +1175,7 @@ F: (implies
 		   (and (isa :NOUN ?OBJECT) (isa :OBLIQUE-OBJECT ?OBLIQUE)  ?CYCL))).
 
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
          (and 
             (adjSemTrans-Restricted ?WORD ??NUM ?FRAME ?COL ?CYCL)
@@ -1186,7 +1186,7 @@ F: (implies
 			       ?TEMPLATE-COL)
 			       ?FRAME (and (isa :NOUN ?COL) ?CYCL))).
 			
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
        (and 
               (nonCompositionalVerbSemTrans ?WORD ?COL ?CYCL)
@@ -1194,14 +1194,14 @@ F: (implies
         (templateSemTrans (NLPatternList (NLPattern-Word ?WORD Verb) ?TEMPLATE-COL)
 				UnderstoodReflexiveObjectFrame (and (isa :OBJECT ?COL) ?CYCL))).
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
       (and (lightVerb-TransitiveSemTrans ?WORD ?COL ?CYCL)
                 (genNLTemplateCatagory Noun ?COL :OBJECT ?TEMPLATE-COL))
          (templateSemTrans (NLPatternList (NLPattern-Word ?WORD Verb)
 			?TEMPLATE-COL) UnderstoodReflexiveObjectFrame (and (isa :OBJECT ?COL) ?CYCL))).
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
         (and (verbSemTransPartial ?WORD ??NUM ?FRAME ?CYCL)
              (genNLTemplateCatagory Noun ?COL :OBJECT ?TEMPLATE-COL))
@@ -1209,7 +1209,7 @@ F: (implies
 				(NLPattern-Word ?WORD Verb)?TEMPLATE-COL)  
 				?FRAME (and (isa :OBJECT ?COL) ?CYCL))).
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
        (and 
            (subcatFrame ?RUSH-THEWORD Verb ?NUM1 TransitiveNPFrame) 
@@ -1221,7 +1221,7 @@ F: (implies
                    (doneBy ?ACTION :SUBJECT) 
                    (isa ?ACTION ?CHARGING-RUSHING))))).
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
        (and 
            (isa ?POS SpeechPart) 
@@ -1242,14 +1242,14 @@ F: (implies
 
                       		         
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
        (and (denotation ?WORD ?POS ??NUM ?COL)
        (isa ?COL Collection)(genls   ?POS Noun))
          (templateSemTrans (NLPatternList (NLPattern-Word ?WORD Noun)   )RegularNounFrame (isa :NOUN ?COL))).
 
                 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 ;;; maybe delete dmiles
 F: 
 (implies 
@@ -1266,7 +1266,7 @@ F:
 
 ;;;;;;;;;;;;;;
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: 
 (implies (and  
   (denotesOpposite ?WORD ?POS ??NUM ?PRED) 
@@ -1279,7 +1279,7 @@ F:
                (not ?CYCL))).
 
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
 	(and 
 	   (derivedUsingSuffix (WordWithSuffixFn ?GIRL-THEWORD Ly_AdjectiveProducing-TheSuffix) Ly_AdjectiveProducing-TheSuffix) 
@@ -1288,7 +1288,7 @@ F: (implies
 	  (NLPatternList (NLPattern-Word (WordWithSuffixFn ?GIRL-THEWORD Ly_AdjectiveProducing-TheSuffix) Adjective)) RegularAdjFrame 
 	   (conceptuallyRelated :NOUN ?FEMALECHILD))).
  
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: (implies 
        (and 
            (relationInstanceAll performsInstancesAsPartOfJob ?REFINISHING ?REFINISHER) 
@@ -1304,7 +1304,7 @@ F: (implies
 
 
 
-default Mt: DoomTemplateParsingMt.        
+default Mt: VersuTemplateParsingMt.        
 F: 
 (verbPrep-TransitiveTemplate HoldingAnObject By-TheWord 
        (and 
@@ -1332,7 +1332,7 @@ default mt: UniversalVocabularyMt.
 constant: genNLTemplateCatagory.
 isa: QuaternaryPredicate.
 arity: 4.
-F: (predicateConventionMt genNLTemplateCatagory DoomTemplateParsingMt).
+F: (predicateConventionMt genNLTemplateCatagory VersuTemplateParsingMt).
 arg1Isa: LinguisticObjectType.
 arg2Isa: Thing. ;; Variable
 arg2QuotedIsa: CycLVariable.
@@ -1340,7 +1340,7 @@ arg3Isa: Thing. ;; Keyword
 arg3QuotedIsa: CycLTerm.
 arg4Isa: CycLTerm. ;; NLPattern-Template
 
-default mt: DoomTemplateParsingMt.
+default mt: VersuTemplateParsingMt.
 F: (genNLTemplateCatagory Noun ?COL ?KW (NLPattern-Template (NLTemplateForInstanceFn ?COL) ?KW)).
 F: (genNLTemplateCatagory Verb ?COL ?KW (NLPattern-Template (NLTemplateForInstanceFn ?COL) ?KW)).
 F:(implies  (and (posForTemplateCategory ?POS ?CATA)(nlTemplateCatagoryForInstance ?COL ?CATA) (genls ?OBLIQUE ?COL))
@@ -1350,7 +1350,7 @@ F:(implies  (and (posForTemplateCategory ?POS ?CATA)(nlTemplateCatagoryForInstan
 
 
  ;;;  (ke-unassert-now 
- ;;;  '(ist DoomTemplateParsingMt 
+ ;;;  '(ist VersuTemplateParsingMt 
  ;;;         (implies 
  ;;;             (and 
  ;;;                 (posForTemplateCategory 
@@ -1362,7 +1362,7 @@ F:(implies  (and (posForTemplateCategory ?POS ?CATA)(nlTemplateCatagoryForInstan
  ;;;                         (TLVariableFn 3 "?OBLIQUE")))) 
  ;;;             (genls 
  ;;;                 (TLVariableFn 2 "?NLTEMPLATEFORSPECFN") 
- ;;;                 (TLVariableFn 1 "?CATA")))) 'DoomTemplateParsingMt)
+ ;;;                 (TLVariableFn 1 "?CATA")))) 'VersuTemplateParsingMt)
  ;;;     (implies 
  ;;;         (and 
  ;;;             (adverbSemTransTemplate ?WORD ??NUM ?FRAME ?CYCL)) 
@@ -1379,7 +1379,7 @@ F:(implies  (and (posForTemplateCategory ?POS ?CATA)(nlTemplateCatagoryForInstan
  ;;;  (ask-template '
  ;;;   (implies
  ;;;      (?PRED ?WORD ??NUM ?FRAME ?CYCL)
- ;;;   (ist DoomTemplateDataMt 
+ ;;;   (ist VersuTemplateDataMt 
  ;;;      (templateSemTrans 
  ;;;        (NLPatternList 
  ;;;          (NLPattern-Word ?WORD ?POS)) ?FRAME ?CYCL)))
@@ -1412,7 +1412,7 @@ F:(implies  (and (posForTemplateCategory ?POS ?CATA)(nlTemplateCatagoryForInstan
   
 
 
- ;;; default Mt: DoomTemplateParsingMt.        
+ ;;; default Mt: VersuTemplateParsingMt.        
  ;;;  constant: sentenceInSubL.
  ;;;  isa: UnaryPredicate.
  ;;;  arg1Isa: Thing.
@@ -1439,7 +1439,7 @@ F:(implies  (and (posForTemplateCategory ?POS ?CATA)(nlTemplateCatagoryForInstan
 
 ;;;http://www.cnn.com/2005/POLITICS/11/04/carter.lookback/index.html
 ;;;ActiveVBarTemplate-NPGap   AdjPTemplate   AdjPTemplate-Predicative   AdvPTemplate   CardinalOrOrdinalTemplate   CycConstantTemplate   DateTemplate   GenericQuantityTemplate   GeopoliticalEntityTemplate   ImperativeTemplate   InfinitivalVBarTemplate   InfinitivalVPTemplate   ListTemplate   LocationTemplate   MovieTitleTemplate   NBarTemplate   NPTemplate   NumberTemplate   OrdinalTemplate   PPByTemplate   PPForTemplate   PPTemplate   PPTemporalDurationTemplate   PPTemporalTemplate   ParsingTemplateCategory   PassiveVBarTemplate   PassiveVBarTemplate-NPGap   PastTenseVBarTemplate   PercentTemplate   PerfectiveVBarTemplate   PerfectiveVPTemplate   PossessiveTemplate   PresentTenseVBarTemplate   ProgressiveVBarTemplate   ProgressiveVPTemplate   QuantityTemplate   QuestionTemplate   RTPActiveVBarTemplate   RTPPassiveVBarTemplate   RTPTensedVBarTemplate   RTPUntensedVBarTemplate   RatioTemplate   ResponseTemplate   STemplate   STemplate-NPGap   STemplate-RC   ScenarioTemplate   SinkTemplate   StringTemplate   SubAtomicParticleTemplate   TemporalTemplate   TokenTemplate   VBarTemplate   VPTemplate   VPTemplate-NPGap   VerbParticipleTemplate   
-;;;default mt: DoomTemplateParsingMt.
+;;;default mt: VersuTemplateParsingMt.
 ;;;F: (implies (and (termStrings ?THING ?STRING) (isa ?THING Individual) ) (termTemplate NPTemplate (NLPatternList (NLPattern-Exact ?STRING)) ?THING)).
 ;;;F: (implies (and (termStrings ?THING ?STRING) (isa ?THING Collection) ) (termTemplate NPTemplate (NLPatternList (NLPattern-Exact ?STRING)) (The ?THING))).
 

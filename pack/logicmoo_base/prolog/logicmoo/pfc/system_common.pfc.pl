@@ -277,7 +277,7 @@ completelyAssertedCollection(tFunction).
 
 completelyAssertedCollection(functorIsMacro).  % Items read from a file might be a special Macro Head
 completelyAssertedCollection(ttRelationType).  % Or they might be a predciate declarer
-completelyAssertedCollection(functorDeclares).  % or they might declare other things
+% completelyAssertedCollection(functorDeclares).  % or they might declare other things
 % completelyAssertedCollection(functorIsMacro).  % or they might declare other things
 
 :- ((ain(==>((completelyAssertedCollection(isEach(tPred,prologMultiValued,prologOrdered,prologIsFlag,rtAvoidForwardChain,

@@ -1,0 +1,54 @@
+
+Constant: denotationAndString.
+In Mt: BaseKB.
+f: (ist UniversalVocabularyMt (comment denotationAndString "A quaternary #$NLSemanticPredicate that relates natural language words to CycL terms to which they correspond in a certain way.  Some words have multiple such denotations due to the fact that they possess multiple #$WordSenses (q.v.), which word-senses might or might not belong to the same parts of speech (i.e. nouns, verbs, adjectives etc.); thus #$denotation also has argument-places for specifying both a #$SpeechPart (q.v.) and a particular word-sense (as represented by an integer understood in relation to some standardized word-sense numbering scheme).<p>(#$denotation WORD SPEECH-PART N TERM) means that the CycL correlate (or \"denotation\") of WORD, with respect to SPEECH-PART and the corresponding word-sense numbered N, is TERM.  Examples: (1) #$Place-TheWord, an instance of #$EnglishWord, has the denotation #$PuttingSomethingSomewhere when used as a #$Verb with its word-sense 0, and the denotation #$Place when used as a #$CountNoun with that same word-sense; (2) #$Ring-TheWord currently has four denotation assertions in the Knowledge Base: #$EmittingSound (as a #$Verb with its word-sense 1); #$AudibleSound (as a #$CountNoun with its word-sense 1); #$RingShapedObject (as a #$CountNoun with its word-sense 0); and #$Ring-Jewelry (as a #$CountNoun with its word-sense 2).  An example of a #$denotation sentence that has a NAT (see #$CycLNonAtomicTerm) rather than a constant in its fourth argument-position is<p>	`(#$denotation #$Density-TheWord #$Adjective 0 (#$IntervalMinFn #$LowAmountFn #$Density))'.<p>Note that #$denotation is _not_ to be confused with #$denotes (q.v.), which relates denoting CycL terms to things \"out there in the world\" (i.e. in the intended model of the CycL language).")).
+f: (ist UniversalVocabularyMt (isa denotationAndString QuintaryPredicate)).
+f: (ist EnglishParaphraseMt 
+  (genFormat denotationAndString "~a (~a) includes ~a (agreement-attr ~a) which denotes ~a" 
+       (TheList 
+         (TheList 1 :EQUALS) 
+         (TheList 5 :EQUALS) 
+         (TheList 2 :A-THE-WORD) 
+                  3 
+         (TheList 4 :EQUALS)))).
+
+Direction: :forward.
+f: (implies 
+     (and 
+      (speechPartPreds ?POS ?AGREE) 
+      (ist ?MT (wordForms ?WORD ?AGREE ?STRING))
+      (ist-Asserted ?MT (denotation ?WORD ?POS ??SENSE-NBR ?THING)))
+   (ist ?MT (denotationAndString ?WORD ?POS ?AGREE ?THING ?STRING))).
+
+f: (implies 
+     (and 
+      (genPhrase ?THING ?POS ?AGREE ?STRING)
+      (wordForms ?WORD ?AGREE ?STRING))
+   (denotationAndString ?WORD ?POS ?AGREE ?THING ?STRING)).
+
+
+
+; f: (ist EnglishMt 
+;    (implies 
+;     (and 
+;      (speechPartPreds ?POS ?AGREE) 
+;      (wordForms ?WORD ?AGREE ?STRING) 
+;      (denotation ?WORD ?POS ??SENSE-NBR ?THING)) 
+;     (ist EnglishMt (denotationAndString ?WORD ?POS ?AGREE ?THING ?STRING)))).
+
+
+
+
+
+;;f: (ist UniversalVocabularyMt (arg1Isa denotationAndString LexicalWord)).
+;;f: (ist UniversalVocabularyMt (arg2Isa denotationAndString SpeechPart)).
+;;f: (ist UniversalVocabularyMt (arg3Isa denotationAndString NLAgreementPredicate)).
+;;f: (ist UniversalVocabularyMt (arg4Isa denotationAndString Thing)).
+;;f: (ist UniversalVocabularyMt (arg5Isa denotationAndString CharacterString)).
+;;f: (ist UniversalVocabularyMt (isa denotationAndString FirstOrderCollectionPredicate)).
+;;f: (ist UniversalVocabularyMt (isa denotationAndString NLSemanticPredicate)).
+;;f: (ist WebSearchEnhancementMt (sharedNotes denotationAndString NLAssertionsForQueryAugmentation)).
+;;f: (ist UniversalVocabularyMt (transitiveViaArg denotationAndString genls 2)).
+;;f: (ist UniversalVocabularyMt (transitiveViaArg denotationAndString genlPreds 3)).
+
+

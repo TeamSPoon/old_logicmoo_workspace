@@ -1,0 +1,25 @@
+
+In Mt: BaseKB.
+Constant: plainCycConstant.
+In Mt: BaseKB.
+f: (and (isa plainCycConstant UnaryPredicate) (arg1Isa plainCycConstant Thing)).
+
+In Mt: BaseKB.
+Constant: mainClass.
+In Mt: BaseKB.
+f: (and (isa mainClass BinaryPredicate) (arg1Isa mainClass Thing)(arg2Isa mainClass Collection)).
+
+In Mt: BaseKB.
+Constant: mainType.
+In Mt: BaseKB.
+f: (and (isa mainType UnaryPredicate) (arg1Isa mainType Thing)).
+
+f: (mainType MicrotheoryType).
+f: (mainType Microtheory).
+f: (implies (and (mainType ?T) (plainCycConstant ?C) (isa ?C ?T) ) (mainClass ?C ?T)).
+f: (implies (and (plainCycConstant ?C) (isa ?C MicrotheoryType) ) (mainClass ?C MicrotheoryType)).
+
+;; (cdo ((*x* 0 (+ *x* 1))) ((= *x* (constant-count))) (cyc-assert `(#$plainCycConstant ,(find-constant-by-internal-id *x*)) '#$UniversalVocabularyMt))
+
+
+

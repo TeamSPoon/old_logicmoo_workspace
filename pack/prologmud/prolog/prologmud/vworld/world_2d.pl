@@ -394,9 +394,9 @@ prologBuiltin(random_path_dir/1).
 random_path_dir(Dir):- nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
 random_path_dir(Dir):- no_repeats(random_path_dir0(Dir)).
 
-random_path_dir0(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
 random_path_dir0(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
 random_path_dir0(Dir):- call(call,random_instance(vtDirection,Dir,true)).
+random_path_dir0(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
 
 from_dir_target(LOC,Dir,XXYY):- is_3d(LOC),!,
   move_dir_target(LOC,Dir,XXYY).

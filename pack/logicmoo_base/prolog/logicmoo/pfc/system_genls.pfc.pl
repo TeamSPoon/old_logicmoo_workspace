@@ -45,7 +45,7 @@ tCol(C) ==> {atom(C),not_undoable((CI=..[C,I],assertz_if_new((CI:- (cwc,   loop_
 col_as_unary(C) ==> {atom(C),not_undoable((CI=..[C,I],forall(retract(isa(I,C):-true),mpred_post1(CI)),retractall(col_as_isa(C))))}.
 col_as_isa(C) ==> {atom(C),not_undoable((CI=..[C,I],forall(retract(CI:-true),mpred_post1(isa(I,C))),retractall(col_as_unary(C))))}.
 
-genls(tSet,functorDeclares).
+% genls(tSet,functorDeclares).
 rtQuotedPred(functorDeclares).
 genls(completelyAssertedCollection,tSet).
 
