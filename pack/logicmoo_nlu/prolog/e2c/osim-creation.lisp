@@ -6,7 +6,7 @@
     
 (define sim-fn-name (name) 
   (csetq name (join-strings  (mapcar #'string-proper (string-tokenize name '(#\space #\-))) ""))
-  (punless (string-equal (substring name 0 4) "sim") (csetq name (cconcatenate "Sim" (string-proper name))))
+  (punless (string-equal (substring name 0 3) "sim") (csetq name (cconcatenate "Sim" (string-proper name))))
   (punless (string-equal (substring name (- (length name) 1)) "fn") (csetq name (cconcatenate (string-proper name) "Fn")))
   (ret (sim-cyc name)))
 
