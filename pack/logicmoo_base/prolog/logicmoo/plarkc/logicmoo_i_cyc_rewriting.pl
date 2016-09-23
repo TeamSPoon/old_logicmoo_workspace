@@ -653,12 +653,15 @@ do_renames('$VAR'(A),'$VAR'(B)):- catch((fix_var_name(A,B),!,nb_setval('$has_var
 do_renames(A,B):- string(A),!,logicmoo_util_strings:convert_to_cycString(A,B).
 do_renames(A,B):- atom(A),must(rename_atom(A,B)),!.
 do_renames(A,B):- \+ compound(A),!,A=B.
+
 do_renames([A|Rest],BList):- is_list([A|Rest]),!,maplist(do_renames,[A|Rest],BList).
 do_renames([A|Rest],[B|List]):- !, do_renames(A,B),do_renames(Rest,List).
 do_renames(uN(P,ARGS),B):-!,maplist(do_renames,[P|ARGS],List),compound_name_arguments(B,uT,List).
-do_renames(A,B):- compound_name_arguments(A,P,ARGS),do_renames_compound_name_arguments(A,P,ARGS,B).
-do_renames_compound_name_arguments(A,P,_,A):- is_builtin_like(P),!.
-do_renames_compound_name_arguments(_A,P,ARGS,B):- maplist(do_renames,[P|ARGS],[T|L]),do_renames_pass2(T,L,B).
+do_renames(A,B):- 
+  compound_name_arguments(A,P,ARGS),
+  maplist(do_renames,[P|ARGS],[T|L]),
+  do_renames_pass2(T,L,B).
+
 
 is_builtin_like(format).
 is_builtin_like(sformat).
@@ -672,6 +675,7 @@ compute_argIsa(ARG1ISA,NN,ARGISA):-
   atom_number(N,NN),
   atom_concat('arg',E,ARGISA),!.
 
+do_renames_pass2(T,L,B):- B=..[T|L], (is_builtin_like(T);skip_expand(B)),!.
 do_renames_pass2(forward,[MT,C,ARG1ISA,P,ID],OUT):- compute_argIsa(ARG1ISA,NN,ARGISA),!, 
   do_renames_pass2(forward,[MT,P,ARGISA,NN,C,ID],OUT).
 do_renames_pass2(backward,[MT,C,ARG1ISA,P,ID],OUT):- compute_argIsa(ARG1ISA,NN,ARGISA),!, 
@@ -679,6 +683,8 @@ do_renames_pass2(backward,[MT,C,ARG1ISA,P,ID],OUT):- compute_argIsa(ARG1ISA,NN,A
 do_renames_pass2(code,[MT,C,ARG1ISA,P,ID],OUT):- compute_argIsa(ARG1ISA,NN,ARGISA),!, 
   do_renames_pass2(code,[MT,P,ARGISA,NN,C,ID],OUT).
 
+  
+do_renames_pass2(t,[A|L],OUT):- atom(A),P=..[A|L],db_expand_argIsa(P,PO),PO=..POL , OUT =.. [t|POL].
 do_renames_pass2(t,[ARG1ISA,P,C],OUT):- compute_argIsa(ARG1ISA,NN,ARGISA),  OUT = t(ARGISA,P,NN,C).
 
 do_renames_pass2(P,[],B):-!,do_renames(P,B).
@@ -712,7 +718,7 @@ intrinsicPred(implies).
 intrinsicPred(equiv).
 intrinsicPred(forAll).
 intrinsicPred('[|]').
-intrinsicPred(;).
+intrinsicPred((;)).
 intrinsicPred(termOfUnit).
 
 intrinsicPred(argSometimesIsa).

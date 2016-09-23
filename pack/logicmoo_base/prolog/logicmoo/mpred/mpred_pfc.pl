@@ -508,6 +508,10 @@ convention_to_symbolic_mt(_Why,F,A,abox):- baseKB:wrap_shared(F,A,ereq).
 
 full_transform_warn(Why,MH,MHH):- full_transform(Why,MH,MHH),must(MH=@=MHH).
 
+full_transform_and_orignal(Why,MH,MHO):- full_transform(Why,MH,MHH),
+      (MH=@=MHH -> MHO=MH ; (MHO = MHH ; MHO = MH )).
+       
+
 full_transform(Why,MH,MHH):-
    must(fully_expand(change(assert,Why),MH,MHH)),!,
    sanity(same_modules(MH,MHH)).
@@ -789,6 +793,7 @@ mpred_ain(PIn,S):-
   % must(add_eachRulePreconditional(PIn,P)),
   PIn=P,
   must(full_transform(ain,P,P0)),!,
+  % P=P0,
   must(ain_fast(P0,S)),!,
   ignore((P\=@=P0, mpred_db_type(P,fact(_)),show_call(mpred_fwc(P)))).
 
@@ -2479,7 +2484,8 @@ mpred_compile_rhs_term_consquent(WS,Test,TestO):- is_list(Test),must_maplist(mpr
 mpred_compile_rhs_term_consquent(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],
    must_maplist(mpred_compile_rhs_term_consquent(WS),TestL,TestLO),TestO=..[F|TestLO],!.
 mpred_compile_rhs_term_consquent(Sup,I,O):-
-    full_transform(compile_rhs,I,O),
+  % TODO replace the next line with  I=O,
+    full_transform_warn(compile_rhs,I,O),    
     must(mpred_mark_as(Sup,O,pfcRHS)),!.
 
 

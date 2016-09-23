@@ -333,7 +333,7 @@
 (define GAME-EVAL (outval) (ret (list (list outval))))  ;; testing w/o socket
 
 
-;;(clet (res) (ccatch :odd-result (cdolist (x '(4 2 1 0) (pif (oddp x) (throw :odd-result x)    (print x))))(pwhen res (print (cconcatenate (str res) " was odd!")))))
+;;(clet (res) (ccatch :odd-result (cdolist (x '(4 2 1 0)) (pif (oddp x) (throw :odd-result x)    (print x))))(pwhen res (print (cconcatenate (str res) " was odd!"))))
 
 
 (inference-removal-module :removal-gameApi-bound-unbound

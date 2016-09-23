@@ -565,9 +565,13 @@ skip_expand(G):- functor(G,F,A),skip_expand_fa(F,A).
 skip_expand_fa(==>,2).
 skip_expand_fa(<==>,2).
 skip_expand_fa(<-,2).
+skip_expand_fa(txtConcatFn,_).
+skip_expand_fa(action_info,_).
+
 skip_expand_fa(never_retract_u,_).
 skip_expand_fa(actn,1).
 skip_expand_fa(':-',2).
+skip_expand_fa(X,_):-exact_args_f(X).
 
 %= 	 	 
 
@@ -626,14 +630,14 @@ in_dialect_pfc:-
 
 fully_expand(Op,Sent,SentO):-
  % must(/*hotrace*/( / nop(deserialize_attvars(Sent,SentI)))),
- gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,Sent,SentO))).
+ memoize_on(fully_expand,Sent->SentO,gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,Sent,SentO)))).
 
 %% fully_expand_now( ++Op, ^Sent, --SentO) is det.
 %
 % Fully Expand Now.
 
-fully_expand_now(Op,Sent,SentO):- 
- must((dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause_now(Op,Sent,SentO))))))),!.
+fully_expand_now(Op,Sent,SentO):-
+  must((dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause_now(Op,Sent,SentO))))))),!.
  /*
     SentO=BO,
     sanity(Sent=@=NoVary),
@@ -1102,8 +1106,9 @@ db_expand_0(Op,Sent,SentO):- transitive_lc(db_expand_chain(Op),Sent,SentO)-> Sen
 
 db_expand_0(Op,EL,O):- is_list(EL),!,must_maplist(db_expand_0(Op),EL,O).
 
+db_expand_0(_Op,P,PO):-db_expand_argIsa(P,PO).
 
-db_expand_0(_Op,P,PO):- 
+db_expand_argIsa(P,PO):- 
   compound(P),
   P=..[ARE,FF,AA],
    atom_concat('arg',REST,ARE),
@@ -1112,7 +1117,7 @@ db_expand_0(_Op,P,PO):-
    atom_concat('arg',E,AE),
   PO=..[AE,FF,NN,AA],!.
 
-db_expand_0(_Op,P,PO):- 
+db_expand_argIsa(P,PO):- 
   compound(P),
   P=..[ARE,FF,C1,C2],
    atom_concat('interArg',REST,ARE),
@@ -1124,7 +1129,7 @@ db_expand_0(_Op,P,PO):-
    atomic_list_concat(['interArg',E],AE),
   PO=..[AE,FF,N1,C1,N2,C2],!.
 
-db_expand_0(_Op,P,PO):- 
+db_expand_argIsa(P,PO):- 
   compound(P),
   P=..[ARE,FF,AA,RESULT],
    atom_concat('interArg',REST,ARE),
@@ -1855,12 +1860,14 @@ exact_args_f(second_order).
 exact_args_f(call).
 exact_args_f(format).
 exact_args_f(sformat).
+exact_args_f(txtConcatFn).
 exact_args_f(asserted).
 exact_args_f(retract_eq_quitely).
 exact_args_f(asserts_eq_quitely).
 exact_args_f(vtActionTemplate).
 exact_args_f(assertz_if_new).
 exact_args_f(mpred_ain).
+exact_args_f(skip_expand_fa).
 exact_args_f(dynamic).
 exact_args_f((=..)).
 exact_args_f((=)).

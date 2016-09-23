@@ -118,7 +118,7 @@ tSet(tKnownID).
 :- file_begin(pfc).
 
 
-((genls(X,Y),genls(Y,X),{X\==Y}) ==> {mpred_withdraw(genls(Y,X))}).
+(((genls(X,Y),genls(Y,X),{X\==Y}))) ==> {mpred_withdraw(genls(Y,X))}.
 % (genls(C,SC)==>(tCol(SC),tCol(C),{repropagate(SC)})).
 
 :- sanity(get_lang(pfc)).

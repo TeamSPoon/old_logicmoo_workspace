@@ -1,2 +1,2 @@
 
-(load "e2c/prologmud.lisp")
+'(load "e2c/prologmud.lisp")

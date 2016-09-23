@@ -1,12 +1,8 @@
+(define FORCE-PRINT (string) (print string) (force-output))
 
-(csetq *SMT* #$EverythingPSC)
-(define foc (string) (ret (find-or-create-constant string)))
-(csetq *REQUIRE-CASE-INSENSITIVE-NAME-UNIQUENESS* NIL)
+
 
 ;;;; use (load "cynd/osim.lisp")
-(in-package "CYC")
-(define FORCE-PRINT (string) 
- (print string) (force-output))
 
 (force-print "loading export.lisp...")
 
@@ -109,7 +105,7 @@
   ((cnot (consp trm)) (ret (plw-str (write-to-string trm))))  ;;((numberp trm) (ret (plw-str trm)))
   (t 
    (clet ((pred (car trm)) (wtrm trm) (cdrtrm (cdr trm)))
-	(pwhen (equal pred #$TheList) (ret (plw-dotl cdrtrm))) 
+	(pwhen (equal pred (foc #$TheList) (ret (plw-dotl cdrtrm))) 
 	(pwhen (equal pred ".") (ret (plw-dotl cdrtrm)))
 	(pwhen (function? pred) (ret (plw-naut "u" wtrm)))
 	
@@ -131,33 +127,13 @@
    (pwhen (stringp found) (ret found))
  (ret (constant-name trm))))
    
-(define mud-rename (trm str)
- (clet ((found (gethash trm *renames* )))
-   (pwhen (stringp found) (ret found))
- 
- (pwhen (null str) (ret ()))
- (punless (stringp str) (ret ()) (throw `(must-stringp ,str)))
- (pwhen (gethash trm *renames*) (ret ()))
- (punless (stringp str) (csetq str (string str)))
 
-  (sethash trm *renames* str)
-  (plw-str  "forward_default_d('iBookkeepingMt','oldConstantName'," )
-  (plw-atom str )
-  (plw-str  ",")
-  (plw-str (write-to-string (constant-name trm)))
-  (plw-str  ")." )
-  (plw-nl)
-   
-  (fi-assert `(#$futureConstantName ,trm ,str) '#$BookkeepingMt)
-  (cyc-rename trm str)
-  (pwhen (cor () (equal (rem (cinc  *every1000*) 10000) 1))  
-    (print `(cyc-rename ,trm ,str) *standard-output*)(force-output *standard-output*))))
-   
 (defvar *assrtwas* ())
 (defvar *assrtform* ())
 (defvar *deduced* ())
 (defvar *every1000* 1)
 (defvar *file-output* *standard-output*)
+(defvar *renames* (MAKE-HASH-TABLE 336790 ))
 
 ;; 1_2
 ;; 3_1_2
@@ -205,231 +181,6 @@
           (plw-nl))))))
 
  
-(define remove-dashes (str)
-(clet ((dash (position #\- str)))
- (punless dash
- (ret str))
- (pwhen (search "--" str)
- (ret (SUBSTITUTE #\_ #\- str)))
-
- (clet ((dash1 (1+ dash)) (left (subseq str 0 dash)) (right (subseq str dash1)) )
- (pwhen (equal right "") (ret (SUBSTITUTE #\_ #\- str)))
- (clet ((ch (char-upcase (CHAR right 0))))
- (punless (ALPHA-CHAR-P ch)
-   (ret (SUBSTITUTE #\_ #\- str)))
- (ret (remove-dashes (cconcatenate left (string (set-char right 0 ch)))))))))
-
-(define maybe-rename (trm)
- (punless (constant-p trm) (ret nil)) 
- (pwhen (gethash trm *renames*) (ret ()))
- (csetq *const* trm)
-  
- (clet ((str (constant-name trm)) (newname (with-prefix trm)))
- (pwhen (null newname)
-   (ret nil))
-
- (pwhen (function? trm)
-  (punless (search "nF"(REVERSE newname))
-   (csetq newname (cconcatenate newname "Fn"))))
-
- (pwhen (equal str newname)
-    (sethash trm *renames* () )
-    (ret nil))
-
- (mud-rename trm newname)
- (pwhen (equal (search "vt" newname) 0)
-	 (cdolist ( v (all-instances trm))
-	    (offer-prefix v "v")))
- (pwhen (equal (search "ct" newname) 0)
-	 (cdolist ( v (all-instances trm))
-	    (offer-prefix v "c")))
- (pwhen (equal (search "xt" newname) 0)
-	 (cdolist ( v (all-instances trm))
-	    (offer-prefix v "x")))
- (ret newname)))
-    
-
-(define with-prefix (trm)
- (punless (constant-p trm) (ret nil)) 
- (pwhen (gethash trm *renames*) (ret ()))
- (csetq *const* trm)
- (clet ((str (constant-name trm)) (woDashes (remove-dashes str)))  
-  (punless (prolog-need-quote str) 
-    (ret str))
-  (punless (prolog-need-quote woDashes) 
-    (ret woDashes))
-  
-  (clet ((new (guess-prefix-cached trm woDashes)))
-    (punless (stringp new) (ret nil))
-   (ret new))))
-     
-(define askm (query) 
- (ret (cyc-query query #$EverythingPSC)))
-
-(define result-isa-p (fn type)
- (punless (function? fn) (ret ()))
- (pwhen (askm `(#$resultGenl ,fn ,type)) (ret #$resultGenl))
- (pwhen (askm `(#$and (#$resultGenl ,fn ?RESULT) (#$isa ?RESULT ,fn ))) (ret t))
- (pwhen (askm `(#$resultIsa ,fn ,type)) (ret #$resultIsa))
- )
-
-(define offer-prefix (trm prefix)
- (punless (constant-p trm) (ret nil)) 
- (csetq *const* trm)
- (clet ((str (constant-prolog-name trm)) (woDashes (remove-dashes str)))
- (punless (prolog-need-quote str) 
-    (ret ()))
- (pwhen (LOWER-CASE-P (CHAR str 0))
-    (ret ()))
- (pwhen (equal (search prefix woDashes) 0) (ret woDashes))
- (mud-rename trm (cconcatenate prefix woDashes))))
-
-(defvar *renames* (MAKE-HASH-TABLE 336790 ))
-
-(defvar *typeprefixes* '())
-
-(csetq  *typeprefixes* '(
-(#$Action  "act" "act" "iAct_")
-(#$Goal  "goal" "goal" "iGoal_" )
-(#$Capability  "cap"  "cap" "cap")
-(#$IBTContentType "ibo" "ibo" "ibo")
-(#$Event  "event" "event" "iEvent_")  
-(#$Situation  "state" "state" "iState_")
-(#$FormulaTemplate  "ui_" "uitype_" "iUI_")
-(#$Topic  "ui_" "uitype_" "iUI_")
-(#$PhysicalPartOfObject "tPartType" "tPartType" "iPartType_")
-(#$SpecifiedPartTypeCollection "tPartType" "tPartType" "tPartType")
-(#$Group  "tGrouped" "tGrouped" "iGroup_")
-(#$OrganismClassificationType  "tTypeOf" "tTypeOf" "iClassificationOf_")
-(#$ConventionalClassificationType  "tTypeOf" "tTypeOf" "iClassificationOf_")
-(#$ConceptualWork "cw" "cw" "iCW_")
-(#$Place  "tPlace"  "ttPlaceLike" "iLoc_")  
-(#$TimeInterval  "timeOf" "timeOf"  "iTimeOf_")
-(#$TimeParameter  "timeOf" "timeOf" "iTimeOf_")
-(#$ScalarInterval  "v" "vt" nil)
-(#$Quantity  "quant" "vt" "v")
-(#$LinguisticObject "x" "xt" "x")
-(#$LinguisticObjectType "xt" "xt" "xt")
-(#$Relation  "rt" "" "")
-(#$PersonTypeByActivity  "mob" "mob" "mob")
-(#$SubLExpressionType  "ft" "ft" "ft")
-(#$Microtheory  "mt" "mt" "mt")
-(#$PropositionalConceptualWork "cw" "cw" "iCW_")
-(#$Artifact  "tObject" "tObject" "iObj_")  
-(#$Agent-Generic  "mob" "mob" nil)
-(#$InformationBearingObject "ibo" "ibo" "iIBO_")
-(#$Tuple  "v" "vt" "v")
-))
-
-(define guess-prefix-cached (trm &optional str)
- (punless (constant-p trm) (ret nil)) 
- (pwhen (gethash trm *renames*) (ret ()))
- (punless str (csetq str (constant-name trm)))
- (ret (guess-prefix trm str)))
-
-(define guess-prefix (trm &optional str)
- (punless str (csetq str (constant-name trm)))
- (csetq str (remove-dashes str))
- (pwhen (predicate? trm) (ret (remove-dashes str)))
- (pwhen (isa? trm #$LearnedActivityType) (ret (cconcatenate "act" str )))
- (pwhen (function? trm) (cdolist (ts *typeprefixes*)
- (pwhen (second ts) 
-   (clet ((why (result-isa-p trm (car ts))))
-     (pwhen why  
-	 (pwhen (equal #$resultIsa why)
-              (pwhen (fourth ts) (ret (cconcatenate (fourth ts) str ))))
-    (ret (cconcatenate (second ts) str )))))))
-
- (pwhen (collection? trm)
-   (cdolist (ts *typeprefixes*)
-     (pwhen (cand (third ts) (genls? trm (car ts))) (ret (cconcatenate (third ts) str )))))
- (ret (cconcatenate (guess-prefix2 trm) str)))
-
-;; (load "export.lisp")
-
-(define guess-prefix2 (trm22)
- (csetq *const* trm22)
-
- ;; (pwhen (gethash trm22 *renames*) (ret ()))
-
- 
- (pwhen (function? trm22) 
- (pcond
- ((isa? trm22 #$UnitOfMeasureDenotingFunction) (ret "v"))
- ((isa? trm22 #$RelationDenotingFunction) (ret "rt"))
- ((isa? trm22 #$MicrotheoryDesignatingFunction-Denotational) (ret "mt"))  
- ((result-isa-p trm22 #$CollectionType) (ret "ttColOf"))
- ((result-isa-p trm22 #$Collection) (ret "tColOf"))
- ((result-isa-p trm22 #$SetOrCollection) (ret "tSetOf"))
- ((isa? trm22 #$SetOrCollectionDenotingFunction) (ret "tColOf"))
- ((isa? trm22 #$UnreifiableFunction) (ret "u"))
- ((isa? trm22 #$ReifiableFunction) (ret "i"))
- ((isa? trm22 #$Function-Denotational) (ret "f"))
- (t (ret "a"))
-  ))
-
- (pcond
- ((isa? trm22 #$RelationshipType) (ret "rt"))
- ((isa? trm22 #$MicrotheoryType) (ret "mt"))
- ((genls? trm22 #$FormulaTemplateTopicType) (ret "uitype_"))
- ((isa? trm22 #$CycLExpressionType) (ret "ft"))
-    
- ((isa? trm22 #$TotallyOrderedQuantityType) (ret "vt"))
- ((isa? trm22 #$QuantityType) (ret "vt"))
-    
- ((genls? trm22 #$ObjectTypeBySensibleFeature) (ret "vt"))
- ((isa? trm22 #$ObjectTypeBySensibleFeature) (ret "v"))
-
- ((genls? trm22 #$VariedOrderCollection) (ret "vt"))
-    
- ((cand (isa? trm22 #$LinguisticObject)(isa? trm22 #$Collection)) (ret "xt"))
-  )
- (cdolist (ts *typeprefixes*)
- (pwhen (cand (fourth ts) (isa? trm22 (car ts))) (ret (fourth ts) )))
-
-
- (pcond    
- ((genls? trm22 #$Collection) (ret "tt"))
- ((isa? trm22 #$Collection) (ret "t"))
-
- ((isa? trm22 #$SpatialThing) (ret "i"))
- ((isa? trm22 #$TemporalThing) (ret "i"))
- ((isa? trm22 #$VectorInterval) (ret "v"))
-    
- ((isa? trm22 #$UnitVectorInterval) (ret "v"))
-    
- ((isa? trm22 #$Individual) (ret "i"))
-  ((all-genls trm22) (ret "t"))
- (t (ret "i"))))
-
-(plw-str "hi0" )
-
-(define dumpt ()
-	(sL::clet ((*file-output* (SL::OPEN-TEXT "dump4.txt" :output)))
-(plw-str  "
-:- style_check(-discontiguous). 
-:- style_check(-singleton).
-:- include('dir.header').
-")
-  (cdo ((anum 0 (1+ anum))) ((= anum (assertion-count)))
-	 (clet ((assrt (find-assertion-by-id anum)))
-	  (pwhen (equal (rem (cinc  *every1000*) 10000) 1) 
-	   (showa assrt *standard-output*) (force-output *standard-output*) (force-output *file-output*))
-
-   (showa assrt *file-output*)))
- (SL::close *file-output*)))
-
-
-(define namet()
-; (mud-rename #$Collection "tCol")
-(cdolist (trm22 (ALL-INSTANCES #$Function-Denotational)) (maybe-rename trm22))
-(cdolist (trm22 (ALL-INSTANCES #$LearnedActivityType)) (offer-prefix trm22 "act"))
-(cdolist (ts *typeprefixes*)
- (cdolist (trm22 (ALL-SPECS (car ts))) (pwhen (constant-p trm22) (offer-prefix trm22 (third ts))))
- (cdolist (trm22 (ALL-INSTANCES (car ts))) (pwhen (constant-p trm22) (offer-prefix trm22 (fourth ts)))))
-(cdolist (trm22 (ALL-INSTANCES #$ObjectTypeBySensibleFeature) (offer-prefix trm22 "vt")))
-( do-constants (trm22) (maybe-rename trm22)))
-
 
 #|
 
@@ -559,10 +310,31 @@ timedatectl set-ntp on
   (plw-deduction (find-deduction-by-id anum)))
   (SL::close *file-output*)))
 
+
+
+
+(plw-str "hi0" )
+
+(define dumpt ()
+	(sL::clet ((*file-output* (SL::OPEN-TEXT "dump4.txt" :output)))
+(plw-str  "
+:- style_check(-discontiguous). 
+:- style_check(-singleton).
+:- include('dir.header').
+")
+  (cdo ((anum 0 (1+ anum))) ((= anum (assertion-count)))
+	 (clet ((assrt (find-assertion-by-id anum)))
+	  (pwhen (equal (rem (cinc  *every1000*) 10000) 1) 
+	   (showa assrt *standard-output*) (force-output *standard-output*) (force-output *file-output*))
+
+   (showa assrt *file-output*)))
+ (SL::close *file-output*)))
+
 (force-output)
 (plw-str "hi")
 (force-output)
 
-(LOAD-KE-TEXT-FILE #$CycAdministrator "e2c/e2c-new.ke" :agenda nil)
-(cdo ((*x* (nart-count) (+ *x* 1))) ((= *x* (constant-count))) (fi-assert `(,(foc "plainCycConstant") ,(find-constant-by-internal-id *x*)) '#$UniversalVocabularyMt))
 ;; (LOAD-KE-TEXT-FILE #$CycAdministrator "e2c/e2c-new-0.ke" :agenda t)
+
+
+

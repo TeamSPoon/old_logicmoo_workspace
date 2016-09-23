@@ -10,14 +10,8 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
-		<buildCommand>
-			<name>se.sics.sicstus.ide.prologBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>ar.com.tadp.prolog.nature</nature>
-		<nature>se.sics.sicstus.ide.prologNature</nature>
 	</natures>
 </projectDescription>

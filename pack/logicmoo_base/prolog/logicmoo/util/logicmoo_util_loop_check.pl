@@ -13,6 +13,7 @@
             can_fail/1,
             cannot_table_call/1,
             cannot_use_tables/1,
+            maybe_save_memoized_on/0,
             cc_key/2,
             ex/0,
             expire_dont_add/0,
@@ -522,9 +523,29 @@ memoize_on(M,(In->_),G):- \+ ground(In),nop((retractall(lmcache:memoized_on(M,In
 % memoize_on(M,(In->Out),G):-make_key(In,Key),memoize_on(M,Key,Out,G).
 memoize_on(M,(In->Out),G):- memoize_on(M,In,Out,G),!.
 
-:- dynamic(lmcache:memoized_on/3).
-memoize_on(M,In,Out,_):- lmcache:memoized_on(M,In,Out),!.
-memoize_on(M,In,Out,G):- G,!,call(assert_if_new,lmcache:memoized_on(M,In,Out)),!.
+:- multifile(lmcache:cached_memoized_on/3).
+:- dynamic(lmcache:cached_memoized_on/3).
+memoize_on(M,In,Out,_):- lmcache:cached_memoized_on(M,In,Out),!.
+memoize_on(M,In,Out,G):- G,!,call(assert_if_new,lmcache:cached_memoized_on(M,In,Out)),!,
+   maybe_save_memoized_on.
+
+maybe_save_memoized_on:- flag('$memoized_on_count',X,X+1),1 is X mod 300,!,tell(memoized_on),
+  format('
+      :- multifile(lmcache:cached_memoized_on/3).
+      :- dynamic(lmcache:cached_memoized_on/3).
+  ',
+  []),
+   forall(lmcache:cached_memoized_on(A,B,C),
+     % (write_term(lmcache:cached_memoized_on(A,B,C),[ignore_ops(true),quoted(true),fullstop(true),numbervars(true),nl(true)]))
+     (write_canonical(lmcache:cached_memoized_on(A,B,C)),writeln('.'))
+     ),     
+   told.
+   
+maybe_save_memoized_on.
+
+:- if(exists_source('memoized_on')).
+:- ensure_loaded(memoized_on).
+:- endif.
 
 
 

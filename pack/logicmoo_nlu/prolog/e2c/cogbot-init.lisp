@@ -27,12 +27,15 @@
 
 (in-package "CYC")
 
+
+
 ;; (load "e2c/cogbot-init.lisp")
 ;; DMiles likes to watch
 (define FORCE-PRINT (string) (print string) (force-output))
 (force-print ";; start loading e2c/cogbot-init.lisp")
 (csetq *silent-progress?* NIL) ;this adds some printouts
 (csetq *dump-verbose* T) ;this adds some printouts
+#|
 (csetq *recan-verbose?* T)
 (csetq *tm-load-verbose?* T)
 (csetq *sunit-verbose* T)
@@ -41,11 +44,43 @@
 (csetq *it-failing-verbose* T)
 (csetq *it-verbose* T)
 (csetq *psp-verbose?* T)
+(csetq *quote-char* #\")
+
+(csetq *TASK-PROCESSOR-VERBOSITY* 1) ;;9
+(csetq *SBHL-TRACE-LEVEL* 1) ;; 9
+(csetq *ALLOW-EXTERNAL-INFERENCE* nil)
+(csetq *EVALUATABLE-BACKCHAIN-ENABLED* t)
+(csetq *ALLOW-FORWARD-SKOLEMIZATION* t)
+(csetq *UNBOUND-RULE-BACKCHAIN-ENABLED* t)
+(csetq *SUSPEND-SBHL-TYPE-CHECKING?* t)
+(csetq *REPORT-DEFAULT-METHOD-CALLS?* t)
+(csetq *EVAL-IN-API-TRACED-FNS* '(T EVAL))
+(csetq *EVAL-IN-API-LEVEL* -1)
+(csetq *DEFAULT-TRANSFORMATION-MAX* 10000) ;; normal 1000
+(csetq *DEFAULT-RECURSION-LIMIT* 10000) ;; normal 1000
+(csetq *ALLOW-EXPANDED-RULES-AS-OWL-EXPORT-CANDIDATES?* t)
+(csetq *ALLOW-BACKWARD-GAFS* t)
+(csetq *HL-FAILURE-BACKCHAINING* t)
+(csetq *PERFORM-EQUALS-UNIFICATION* t)
+(csetq *READ-REQUIRE-CONSTANT-EXISTS* t)
+(csetq *PERFORM-UNIFICATION-OCCURS-CHECK* t)
+(csetq *READ-REQUIRE-CONSTANT-EXISTS* T   )
+(csetq *SUSPEND-SBHL-TYPE-CHECKING?* T   )
+
+(csetq *EVALUATABLE-BACKCHAIN-ENABLED* nil   )
+(csetq *ALLOW-FORWARD-SKOLEMIZATION* nil   )
+(csetq *UNBOUND-RULE-BACKCHAIN-ENABLED* nil   )
+(csetq *REPORT-DEFAULT-METHOD-CALLS?* nil   )
+(csetq *ALLOW-EXPANDED-RULES-AS-OWL-EXPORT-CANDIDATES?* nil   )
+(csetq *ALLOW-BACKWARD-GAFS* nil   )
+(csetq *HL-FAILURE-BACKCHAINING* nil   )
+(csetq *PERFORM-EQUALS-UNIFICATION* nil   )
+|#
 
 (define foc (string) (ret (find-or-create-constant string)))
 
 ;; makes it more like common lisp .. (but leaks functions)
-(defmacro lambda (args &rest body) (ret `#'(define ,(gensym "LAMBDA") ,args ,@body)))
+;; (defmacro lambda (args &rest body) (ret `#'(define ,(gensym "LAMBDA") ,args ,@body)))
 
 (in-package :SUBLISP)
 #+Allegro
@@ -91,8 +126,8 @@
 (define cbnl-retract (sent &rest mts)
  (clet (askable template)
    (csetq mts (member-if #'mt? (flatten (cons mts (list *SMT*)))))
-   (csetq sent (fif (equal (car sent) #$ist) sent (list #$ist '?sim-retract-Mt sent)))
-   (csetq askable (fif (equal (car sent) #$ist) sent (list #$ist '?sim-retract-Mt sent)))
+   (csetq sent (fif (equal (car sent) #$ist) sent (list #$ist '?Mt sent)))
+   (csetq askable (fif (equal (car sent) #$ist) sent (list #$ist '?Mt sent)))
    (force-print `(ask-template ',sent ',askable ,*SMT*))
    (csetq mts (ask-template sent askable *SMT*))
    (print (length mts))
@@ -103,18 +138,31 @@
 (define sentence-ids (sent &rest mts)
  (clet (result askable template)
    (csetq mts (member-if #'mt? (flatten (cons mts (list *SMT*)))))
-   (csetq sent (fif (equal (car sent) #$ist) sent (list #$ist '?sim-retract-Mt sent)))
-   (csetq askable (fif (equal (car sent) #$ist) sent (list #$ist '?sim-retract-Mt sent)))
+   (csetq sent (fif (equal (car sent) #$ist) sent (list #$ist '?Mt sent)))
+   (csetq askable (fif (equal (car sent) #$ist) sent (list #$ist '?Mt sent)))
    ;;(force-print `(ask-template ',sent ',askable ,*SMT*))
    (csetq mts (ask-template sent askable *SMT*))
    (cdolist (sent mts) 
-    (clet ((gaf (find-gaf (third sent)(second sent))))
-     (pwhen gaf (cpushnew (assertion-id gaf )result))))
+    (clet ((call `(find-gaf ',(third sent) ',(canonicalize-hlmt (second sent))))(inm (force-print call))(gaf (eval call)))
+     (pwhen gaf (cpushnew (assertion-id gaf ) result))))
    (ret result)))
 
-(sentence-ids '(#$isa ?CITY #$USCity))
+'(sentence-ids '(#$isa ?CITY #$USCity))
+
+(define sentence-clauses (sent &rest mts)
+ (clet (result askable template)
+   (csetq mts (member-if #'mt? (flatten (cons mts (list *SMT*)))))
+   (csetq sent (fif (equal (car sent) #$ist) sent (list #$ist '?Mt sent)))
+   (csetq askable (fif (equal (car sent) #$ist) sent (list #$ist '?Mt sent)))
+   ;;(force-print `(ask-template ',sent ',askable ,*SMT*))
+   (csetq mts (ask-template sent  askable *SMT* )) ;;4 nil nil 3000
+  (ret mts)))
+
+'(sentence-clauses '(#$isa ?CITY #$USCity))
 
 
 (set-the-cyclist "CycAdministrator")
 
 (force-print ";; done loading e2c/cogbot-init.lisp")
+
+(in-package :CYC)

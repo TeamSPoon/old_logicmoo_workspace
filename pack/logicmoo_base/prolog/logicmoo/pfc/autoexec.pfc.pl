@@ -104,7 +104,8 @@
 
 :- set_fileAssertMt(baseKB).
 
-:- ensure_loaded(('system_common.pfc')).
+:- % profile 
+  (ensure_loaded(('./system_common.pfc'))).
 
 :- ensure_loaded(('system_if_missing.pfc')).
 

@@ -1,6 +1,6 @@
 
 (defvar *T-READTABLE* (COPY-READTABLE *READTABLE*))
-(defvar *LEFT-PAREN-READER* (get-macro-character (char "("  0)  *T-READTABLE*))
+(defvar *LEFT-PAREN-READER* (get-macro-character (char "()"  0)  *T-READTABLE*))  
 (defvar *kif-old-hash-dollar-reader* (symbol-function (GET-DISPATCH-MACRO-CHARACTER #\# #\$ *T-READTABLE*)))
 (defvar *POP-PACKAGE* *PACKAGE*)
 (defvar *T-PACKAGE* (fif (find-package "EXPORTING")(find-package "EXPORTING")(make-package "EXPORTING")))
@@ -25,7 +25,6 @@
 (ke-assert-now `(#$genls ,*kif-constant*  #$CycLConstant) *UVMt*)
 
 
-
 (define kif ()
     (LOAD "kif-loader.lisp")
     (print  (loadl "assertions8045.lisp"))
@@ -40,7 +39,7 @@
 ;; cunwind-protect hozed multiple-value-lists so thats the reason for the 'prognvals' weirdness
 
 
-(defvar *kif-to-cycl-table* '("Nima-Gns-KS" #$NGA-Gns-KS "forall" #$forAll "exists" #$thereExists "=>" #$implies "<=>" #$equiv "isa" #$isa "instance-of" #$isa "listof" #$TheList "true" #$True "false" #$False))
+(defvar *kif-to-cycl-table-plist* '("Nima-Gns-KS" #$NGA-Gns-KS "forall" #$forAll "exists" #$thereExists "=>" #$implies "<=>" #$equiv "isa" #$isa "instance-of" #$isa "listof" #$TheList "true" #$True "false" #$False))
 ;;(defvar *T-PACKAGE* (make-package :T))
 
 (define kif-break (&rest data)
@@ -141,12 +140,12 @@
 
 (define kif-constant (cycl &optional guid)
  (clet ((constant nil))
-    (csetq constant (second (member-if #'(lambda (a) (ret (cand (stringp a) (string-equal a cycl)))) *kif-to-cycl-table*)))
+    (csetq constant (second (member-if #'(lambda (a) (ret (cand (stringp a) (string-equal a cycl)))) *kif-to-cycl-table-plist*)))
     (pwhen constant (ret (values constant guid)))
     (csetq constant (kif-foc cycl guid))
     (pwhen constant 
        (csetq constant (find-or-create-constant (constant-name constant)))
-       (csetq *kif-to-cycl-table* (cons cycl (cons constant *kif-to-cycl-table*)))
+       (csetq *kif-to-cycl-table-plist* (cons cycl (cons constant *kif-to-cycl-table-plist*)))
        (ret (values constant cycl)))))
 
 (define kif-foc (cycl &optional guid)
@@ -155,7 +154,7 @@
  (pwhen (equal 0 (search "?" cycl)) (ret (intern cycl)))
  (pwhen (equal 0 (search "@" cycl)) (ret (intern (cconcatenate "?" (substring str 1)))))
  (clet ((constant nil))
-    (csetq constant (second (member-if #'(lambda (a) (ret (cand (stringp a) (string-equal a cycl)))) *kif-to-cycl-table*)))
+    (csetq constant (second (member-if #'(lambda (a) (ret (cand (stringp a) (string-equal a cycl)))) *kif-to-cycl-table-plist*)))
     (pwhen constant (ret constant))
     (csetq constant (find-constant cycl))
     (pwhen constant (ret constant))
@@ -220,7 +219,7 @@
 (define kif-mt (cycl)
   (csetq cycl (kif-cycl cycl))
   (punless cycl (ret *kif-mt*))
-  ;;(punless (mt? cycl)
+  ;;(punless (mt? cycl) ;; )
   (ke-assert-now `(#$isa ,cycl #$Microtheory) #$UniversalVocabularyMt)
   (WITHOUT-WFF-SEMANTICS (ke-assert-now `(#$isa ,cycl #$Microtheory) #$UniversalVocabularyMt))
   (ret cycl))
@@ -287,6 +286,7 @@
 
 (fresh-line)(force-output)
 |#
+
 #|
 
 (define mt-to-filename (mt)
@@ -316,7 +316,7 @@
        ((kif-cyc-p str) (ret str))
        ((stringp str)
             (csetq str (string-trim *WHITESPACE-CHARS* str))
-            (pwhen (char= (char "(" 0) (char str 0))
+            (pwhen (char= (char "()" 0) (char str 0))
                  (ret (kif-cycl (kif-read-from-string str))))
             (pwhen (char= #\# (char str 0))
                  (pwhen (char= #\$ (char str 1))
@@ -333,6 +333,8 @@
         ((member (car str) '(kif-dwim)) (ret (quotify (kif-dwim (second str)))))
         ((member (car str) '(quote)) (ret (quotify (kif-constant (second str)))))
         (t (ret (cons (kif-cycl (car str))(kif-constant (cdr str))))))))
+
+
 (define kif-by-id (guid)
   (punless guid (ret guid))
   (clet ((constant nil))  
@@ -378,8 +380,8 @@
 (csetq *REPORT-DEFAULT-METHOD-CALLS?* t)
 (csetq *EVAL-IN-API-TRACED-FNS* '(T EVAL))
 (csetq *EVAL-IN-API-LEVEL* -1)
-(csetq *DEFAULT-TRANSFORMATION-MAX* 1000)
-(csetq *DEFAULT-RECURSION-LIMIT* 1000)
+(csetq *DEFAULT-TRANSFORMATION-MAX* 10000) ;; normal 1000
+(csetq *DEFAULT-RECURSION-LIMIT* 10000) ;; normal 1000
 (csetq *ALLOW-EXPANDED-RULES-AS-OWL-EXPORT-CANDIDATES?* t)
 (csetq *ALLOW-BACKWARD-GAFS* t)
 (csetq *HL-FAILURE-BACKCHAINING* t)
@@ -389,6 +391,7 @@
 (csetq *READ-REQUIRE-CONSTANT-EXISTS* T   )
 (csetq *SUSPEND-SBHL-TYPE-CHECKING?* T   )
 
+;; changes
 (csetq *EVALUATABLE-BACKCHAIN-ENABLED* nil   )
 (csetq *ALLOW-FORWARD-SKOLEMIZATION* nil   )
 (csetq *UNBOUND-RULE-BACKCHAIN-ENABLED* nil   )
@@ -397,6 +400,7 @@
 (csetq *ALLOW-BACKWARD-GAFS* nil   )
 (csetq *HL-FAILURE-BACKCHAINING* nil   )
 (csetq *PERFORM-EQUALS-UNIFICATION* nil   )
+
 
 (LOAD-KB-PRODUCT-SHARED-SYMBOLS  "units/5002/")
 LOAD-ARG-TYPE-CACHE
@@ -424,9 +428,11 @@ APPLY LOAD-MISCELLANEOUS  )
    ( APPLY LOAD-SBHL-CACHE  ) 
    ( APPLY LOAD-SBHL-DATA  ) 
    ( APPLY LOAD-SBHL-DATA  ) 
-   ( APPLY LOAD-SBHL-MISCELLANY 
+   ( APPLY LOAD-SBHL-MISCELLANY  )
 
+|#
 
+#|
 (defvar *EXTERNAL-LISP-PACKAGE* (sl::make-package "EXTERNAL" '("SL" "CYC") '("EXT")))
 (defvar *EXPORTED-LISP-PACKAGE* (sl::make-package "EXPORTED" '() '("EXP")))
 
@@ -477,10 +483,11 @@ APPLY LOAD-MISCELLANEOUS  )
 
 
 (in-package :SL)
+
 (cdo-symbols (sym *SUBLISP-PACKAGE*)
    (unexport sym *SUBLISP-PACKAGE*))
 
-
+;;is this a MOVE SYMBOL  ?
    (clet ((f (find-symbol (symbol-name sym) *CYC-PACKAGE*)))
         (punless (eq f sym)
            (pcond
@@ -495,7 +502,7 @@ APPLY LOAD-MISCELLANEOUS  )
               (unintern sym)
                ;;*SUBLISP-PACKAGE*)
               (export f *SUBLISP-PACKAGE*)
-              (export f *CYC-PACKAGE*))))))
+              (export f *CYC-PACKAGE*))))
 
  (cdo-symbols (sym *SUBLISP-PACKAGE*)
   (pwhen (eq *SUBLISP-PACKAGE* (symbol-package sym))
@@ -519,11 +526,15 @@ APPLY LOAD-MISCELLANEOUS  )
        (pwhen (fboundp sym)
          (export sym from)
          (import sym (other-package from)))))))
-(make-dispatch-macro-character #\{)
-(symbol-function (get-macro-character #\{ ))
-(symbol-function (get-macro-character (char ")" 0) ))
+
+( make-dispatch-macro-character (char "{}" 0 ))
+(symbol-function (get-macro-character (char "{}" 0 )))
+
+(symbol-function (get-macro-character (char "()" 1)))
 (csetq *SBHL-OBJECT-TYPE-CHECKING-P* nil)
+
 |#
+
 ;;(REGISTER-DEFAULT-QL-PARSERS)
 ;;(csetq *ASSUME-FORWARD-DEDUCTION-IS-WF?* T)
 
@@ -623,11 +634,11 @@ APPLY LOAD-MISCELLANEOUS  )
 (define COERCIVE-LPARAMS-READER (stream subchar)
    (clet ((stream (coerce-stream stream )) found symbol access nextchar)
       (with-readcase (READTABLE-CASE *READTABLE*)
-         (csetq found (read-delimited-list (char ")" 0) stream t)))
+         (csetq found (read-delimited-list (char "()" 1) stream t)))
       (ret (values found t))))
 
 
-(set-macro-character (char "(" 0) #'COERCIVE-LPARAMS-READER *T-READTABLE*)
+(set-macro-character (char "()" 0) #'COERCIVE-LPARAMS-READER *T-READTABLE*)
 (set-dispatch-macro-character #\# #\< #'UGLY-OBJECT-RMF *T-READTABLE*)
 
 

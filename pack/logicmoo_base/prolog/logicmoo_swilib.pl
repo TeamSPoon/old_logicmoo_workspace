@@ -145,8 +145,8 @@
 :- endif.
 
 
-:- dynamic http:location/3.
 :- multifile http:location/3.
+:- dynamic http:location/3.
 
 :- system:use_module(library(prolog_autoload)).
 :- system:use_module(library(prolog_clause)).

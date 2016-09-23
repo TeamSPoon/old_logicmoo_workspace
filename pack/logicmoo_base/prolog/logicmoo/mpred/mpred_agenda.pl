@@ -298,7 +298,7 @@ agenda_slow_op_restart:-
 agenda_rescan_mpred_ops:- test_tl(agenda_suspend_scans),!.
 agenda_rescan_mpred_ops:- agenda_rescan_for_module_ready,!.
 
-:- thread_local t_l:in_agenda_rescan_for_module_ready/0.
+:- thread_local(t_l:in_agenda_rescan_for_module_ready/0).
 
 %= 	 	 
 

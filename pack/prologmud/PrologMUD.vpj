@@ -376,6 +376,7 @@
 				</Folder>
 				<Folder Name="e2c">
 					<Folder Name="backup">
+						<F N="../logicmoo_nlu/prolog/e2c/backup/as"/>
 						<F N="../logicmoo_nlu/prolog/e2c/backup/callbacks.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/backup/doom1.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/backup/doom3.lisp"/>
@@ -393,11 +394,13 @@
 								<Folder Name="closette">
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/closette/closette-tests.lisp"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/closette/closette.lisp"/>
+									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/closette/README"/>
 								</Folder>
 								<Folder Name="gabriel">
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/benchmark.lisp"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/boyer.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/browse.cl"/>
+									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/CHANGES"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/control.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/ctak.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/dderiv.cl"/>
@@ -412,6 +415,7 @@
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/frpoly-mod.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/frpoly.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/integer.cl"/>
+									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/make-declare.lsp"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/puzzle-mod-noproclaim.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/puzzle-mod.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/puzzle-mod1.cl"/>
@@ -419,6 +423,7 @@
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/puzzle-noproclaim.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/puzzle-sda.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/puzzle.cl"/>
+									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/README"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/stak.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/tak-mod.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/tak.cl"/>
@@ -430,8 +435,57 @@
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/triang-old-mod.cl"/>
 									<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/gabriel/triang.cl"/>
 								</Folder>
+								<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/.cvsignore"/>
+								<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/contrib/iclm.el"/>
 							</Folder>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/.cvsignore"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/batch.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/BUGS"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-arrays.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-characters.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-compile.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-conditions.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-conses.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-environment.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-eval.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-evaluation.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-filenames.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-files.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-flow.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-format.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-hash.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-iteration.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-loop.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-numbers.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-objects.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-packages.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-printer.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-reader.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-sequences.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-streams.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-strings.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-structures.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-subtypep.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-symbols.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-system.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-typep.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/cl-types.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/COPYING"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/emacs-cl"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/func.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/HACKING"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/HOWTO"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/INSTALL"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/interaction.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/load-cl.el"/>
+							<F
+								N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/Makefile"
+								Type="Makefile"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/populate.el"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/README"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/tests.el"/>
 							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/tests.lisp"/>
+							<F N="../logicmoo_nlu/prolog/e2c/cl/emacs-cl/utils.el"/>
 						</Folder>
 					</Folder>
 					<Folder Name="cogbotstuff">
@@ -454,6 +508,10 @@
 						<F N="../logicmoo_nlu/prolog/e2c/cynd/cogbot-parser.ke"/>
 						<F N="../logicmoo_nlu/prolog/e2c/cynd/cogbot-parser.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/cynd/common.lisp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/cynd/doom-agent-planner-instructions.text"/>
+						<F N="../logicmoo_nlu/prolog/e2c/cynd/doom.c"/>
+						<F N="../logicmoo_nlu/prolog/e2c/cynd/doom.h"/>
+						<F N="../logicmoo_nlu/prolog/e2c/cynd/doom.trans"/>
 						<F N="../logicmoo_nlu/prolog/e2c/cynd/kepatches.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/cynd/osim-agent-planner-html.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/cynd/osim-agent-planner-workarounds.lisp"/>
@@ -473,8 +531,66 @@
 						<F N="../logicmoo_nlu/prolog/e2c/cyndpandor3/doom-creation.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/cyndpandor3/doom-methods.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/cyndpandor3/doom-sksi.lisp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/cyndpandor3/doom.c"/>
+						<F N="../logicmoo_nlu/prolog/e2c/cyndpandor3/doom.h"/>
 						<F N="../logicmoo_nlu/prolog/e2c/cyndpandor3/doom.lisp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/cyndpandor3/doom.trans"/>
 						<F N="../logicmoo_nlu/prolog/e2c/cyndpandor3/startrek.lisp"/>
+					</Folder>
+					<Folder Name="microEx">
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/arith"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/bool"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/bratko"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/chap3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/chemins3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/cut"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/dbleconso3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/deborde"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/deriv"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/elisa"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/enigme3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/eras3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/erasto3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/fact"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/famille"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/filtre"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/flat"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/instant.pl"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/instant3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/lireliste"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/listes"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/listes.pl"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/myinstant.pl"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/path"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/path.pl"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/perm3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/predeval3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/queen"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/queen.pl"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/queen3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/rapport3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/send3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/sort"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/test3"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microEx/zebre3"/>
+					</Folder>
+					<Folder Name="microPrologIIV4">
+						<F N="../logicmoo_nlu/prolog/e2c/microPrologIIV4/blocs.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microPrologIIV4/boot.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microPrologIIV4/lecteur.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microPrologIIV4/Make"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microPrologIIV4/mlg.Start"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microPrologIIV4/pred.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microPrologIIV4/resol.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microPrologIIV4/unify.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microPrologIIV4/V4.lsp"/>
+					</Folder>
+					<Folder Name="microUt">
+						<F N="../logicmoo_nlu/prolog/e2c/microUt/clecteur.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microUt/cpred.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microUt/cunify.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microUt/cutili.lsp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/microUt/mlg.Start"/>
 					</Folder>
 					<Folder Name="paip">
 						<F N="../logicmoo_nlu/prolog/e2c/paip/auxfns.lisp"/>
@@ -497,6 +613,7 @@
 						<F N="../logicmoo_nlu/prolog/e2c/paip/interp2.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/interp3.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/intro.lisp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/paip/iterative-template-parser.lisp.txt"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/krep.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/krep1.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/krep2.lisp"/>
@@ -509,6 +626,7 @@
 						<F N="../logicmoo_nlu/prolog/e2c/paip/othello.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/othello2.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/overview.lisp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/paip/paip.zip"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/patmatch.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/prolog.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/prolog1.lisp"/>
@@ -517,6 +635,7 @@
 						<F N="../logicmoo_nlu/prolog/e2c/paip/prologc2.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/prologcp.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/pttp-1i.lisp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/paip/README.html"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/search.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/simple.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/paip/student.lisp"/>
@@ -529,12 +648,14 @@
 						<F N="../logicmoo_nlu/prolog/e2c/paip/waltz.lisp"/>
 					</Folder>
 					<Folder Name="pjb-micro-prolog-ii">
+						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/benchmark.pl"/>
 						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/blocs.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/boot.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/clecteur.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/cpred.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/cunify.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/cutili.lisp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/init.pl"/>
 						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/lecteur.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/loader.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/pjb-micro-prolog-ii/packages.lisp"/>
@@ -549,7 +670,10 @@
 						<F N="../logicmoo_nlu/prolog/e2c/setup/doom-creation.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/setup/doom-methods.lisp"/>
 						<F N="../logicmoo_nlu/prolog/e2c/setup/doom-sksi.lisp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/setup/doom.c"/>
+						<F N="../logicmoo_nlu/prolog/e2c/setup/doom.h"/>
 						<F N="../logicmoo_nlu/prolog/e2c/setup/doom.lisp"/>
+						<F N="../logicmoo_nlu/prolog/e2c/setup/doom.trans"/>
 						<F N="../logicmoo_nlu/prolog/e2c/setup/startrek.lisp"/>
 					</Folder>
 					<F N="../logicmoo_nlu/prolog/e2c/cb-prolog.lisp"/>
@@ -565,22 +689,33 @@
 					<F N="../logicmoo_nlu/prolog/e2c/cogbot-parser.ke"/>
 					<F N="../logicmoo_nlu/prolog/e2c/cogbot-parser.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/common.lisp"/>
+					<F N="../logicmoo_nlu/prolog/e2c/common.lisp.old"/>
 					<F N="../logicmoo_nlu/prolog/e2c/common_lisp.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/common_lisp2.lisp"/>
+					<F N="../logicmoo_nlu/prolog/e2c/const-renamer.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/cyc-init.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/cycdcg.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/cycdcg_test.lisp"/>
+					<F N="../logicmoo_nlu/prolog/e2c/doom-agent-planner-instructions.text"/>
+					<F N="../logicmoo_nlu/prolog/e2c/doom.c"/>
+					<F N="../logicmoo_nlu/prolog/e2c/doom.h"/>
+					<F N="../logicmoo_nlu/prolog/e2c/doom.trans"/>
+					<F N="../logicmoo_nlu/prolog/e2c/e2c-new-0.ke"/>
 					<F N="../logicmoo_nlu/prolog/e2c/e2c-new.ke"/>
 					<F N="../logicmoo_nlu/prolog/e2c/e2c.ke"/>
+					<F N="../logicmoo_nlu/prolog/e2c/e2c.pl"/>
 					<F N="../logicmoo_nlu/prolog/e2c/e2c_unused.ke"/>
 					<F N="../logicmoo_nlu/prolog/e2c/emacs.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/export.lisp"/>
+					<F N="../logicmoo_nlu/prolog/e2c/f.p"/>
+					<F N="../logicmoo_nlu/prolog/e2c/kb_interface.pl"/>
 					<F N="../logicmoo_nlu/prolog/e2c/kepatches.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/kif-loader.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/km.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/kmp.subl"/>
 					<F N="../logicmoo_nlu/prolog/e2c/logicmoo.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/microPrologII.lisp"/>
+					<F N="../logicmoo_nlu/prolog/e2c/mlg.Start"/>
 					<F N="../logicmoo_nlu/prolog/e2c/ner-utils.subl"/>
 					<F N="../logicmoo_nlu/prolog/e2c/osim-agent-planner-html.lisp"/>
 					<F N="../logicmoo_nlu/prolog/e2c/osim-agent-planner-workarounds.lisp"/>

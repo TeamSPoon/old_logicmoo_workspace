@@ -399,6 +399,7 @@ nnf(KB,Lit,FreeV,LitO,N):-nonvar(LitO),!,nnf(KB,Lit,FreeV,LitM,N),!,LitM=LitO.
 nnf(_KB,Lit,FreeV,Lit,1):- var(Lit),!,ignore(FreeV=[Lit]).
 %nnf(_KB,Lit,FreeV,Lit,1):- is_ftVar(Lit),!,trace_or_throw(bad_numbervars(Lit)),ignore(FreeV=[Lit]).
 nnf(KB,Lit,FreeV,Pos,Paths):- is_ftVar(Lit),!,nnf(KB,true_t(Lit),FreeV,Pos,Paths).
+nnf(_KB,true_t(Lit),_FreeV,true_t(Lit),1):- is_ftVar(Lit),!.
 nnf(_KB,Fml,_,Fml,1):- \+ compound(Fml), !.
 nnf(_KB,Fml,_,Fml,1):- leave_as_is(Fml), !. 
 

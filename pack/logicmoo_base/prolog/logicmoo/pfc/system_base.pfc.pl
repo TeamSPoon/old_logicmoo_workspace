@@ -385,12 +385,12 @@ argsQuoted(vtActionTemplate).
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
-(((tPred(F),
+((((tPred(F),
  arity(F,A)/
   (is_ftNameArity(F,A),A>1, 
       \+ prologBuiltin(F), 
       % sanity(mpred_must(\+ arity(F,1))),
-      sanity(mpred_must(\+ tCol(F)))))) 
+      sanity(mpred_must(\+ tCol(F)))))) )
    ==> (~(tCol(F)),support_hilog(F,A))).
 
 :- kb_dynamic(support_hilog/2).

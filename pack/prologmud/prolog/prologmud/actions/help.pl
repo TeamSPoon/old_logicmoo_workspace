@@ -32,8 +32,12 @@ get_good_templates(Templ):- isa(Templ,vtActionTemplate),good_template(Templ).
 
 get_bad_templates(Templ):- no_repeats_old((action_info(Templ,_),not(good_template(Templ)))).
 
-{between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}==>
-         action_info(TEMPL, txtConcatFn(Text,"does: ",do(A2,TEMPL))).
+
+:- sanity((fully_expand(action_info(TEMPL, txtConcatFn(_Text,"does: ",do(_A2,TEMPL))),O),wdmsg(O))).
+
+
+:-must(ain_expanded(({between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}==>
+         action_info(TEMPL, txtConcatFn(Text,"does: ",do(A2,TEMPL)))))).
 
 (action_rules(_Agent,Verb,[Obj|Objs],List),{atomic(Verb),safe_univ(Syntax,[Verb,Obj|Objs])} ==> 
          action_info(Syntax, txtConcatFn(["makes","happen"|List]))).
