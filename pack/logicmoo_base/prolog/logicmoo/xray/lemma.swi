@@ -15,7 +15,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(xray_lemma,[]).
-:- endif.
+
 
 :- was_dynamic(dynamic_lemma/3).
 :- was_dynamic(static_lemma/3).
@@ -544,3 +544,5 @@ remove_dynamic_lemmas :-
         retract_all(dynamic_lemma(_,_,_)).
 remove_static_lemmas :-
         retract_all(static_lemma(_,_,_)).
+
+:- endif.

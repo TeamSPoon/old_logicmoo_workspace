@@ -15,7 +15,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(xray_lemma_config,[]).
-:- endif.
+:- if(current_prolog_flag(logicmoo_xray,true)).
 
 :- lemma_handling.                         % default is LEMMA HANDLING
 
@@ -25,7 +25,7 @@
 
 :- lemma_format(unit).                     % default is to use UNIT lemmas only
 
-add_lemmatization_p(Head :- _Body) :-
+add_lemmatization_p((Head :- _Body)) :-
 	lemma_flag,
 	!,
 	(functor(Head,query,_) -> fail;
@@ -48,3 +48,6 @@ static_lemma_test_p(P,N) :-
          P == alpha -> fail;
 	 P == gamma -> lemma_type_parameter(delta);
 	 true       -> lemma_type_parameter(omega)).
+
+:- endif.
+:- endif.

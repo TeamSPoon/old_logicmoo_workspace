@@ -16,12 +16,12 @@
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(xray_debug,[]).
 :- endif.
-
+:- if(current_prolog_flag(logicmoo_xray,true)).
 :- ensure_loaded(hooks).
 
 :- body_hooks.
 
-bhook1_p(Head :- Body) :-
+bhook1_p((Head :- Body)) :-
 	Body = (nl,write(_),nl,fail) ->
 	     /* eliminates predicate hooks */
 	     false;
@@ -29,7 +29,7 @@ bhook1_p(Head :- Body) :-
 	     false;
 	%true ->
 	     true.
-bhook1(Head :- Body) :-
+bhook1((Head :- Body)) :-
 	functor(Head,gamma,_)  ->
 	     Head =.. [Pred,Arg1,Arg2|_],
 	     nl,write(trial:gamma(Arg1,Arg2)),nl;
@@ -42,9 +42,9 @@ bhook1(Head :- Body) :-
         %true ->
 	     true.
 
-bhook2_p(Head :- Body) :-
-	bhook1_p(Head :- Body).
-bhook2(Head :- Body) :-
+bhook2_p((Head :- Body)) :-
+	bhook1_p((Head :- Body)).
+bhook2((Head :- Body)) :-
 	functor(Head,gamma,_)  ->
 	     Head =.. [Pred,Arg1,Arg2|_],
 	     nl,write(success:gamma(Arg1,Arg2)),nl;
@@ -124,3 +124,4 @@ head3(P,N,Head,Head3) :-
                 Head3 =.. [P|Args3],
                 append(Args3,[_,_,_],Args),
                 Head =.. [P|Args].
+:-endif.

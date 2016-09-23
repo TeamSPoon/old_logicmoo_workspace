@@ -20,6 +20,8 @@
 :- module(xray_dmiles,[]).
 :- endif.
 
+:- if(current_prolog_flag(logicmoo_xray,true)).
+
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),
@@ -1784,3 +1786,4 @@ verbose_proof_printing.
 %:- lemma_handling.
 :- xray_configuration.
 
+:- endif.

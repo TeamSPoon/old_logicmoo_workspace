@@ -13,6 +13,8 @@
 %%                                                                           %%
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- if(current_prolog_flag(logicmoo_xray,true)).
+
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(xray_builtin,[]).
 :- endif.
@@ -96,3 +98,5 @@ builtin_predicate(P) :-
 	 name('_db',L1)
         ),
         append(_,L1,L).
+
+:- endif.

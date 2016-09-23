@@ -217,7 +217,7 @@ default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 
 :- default_te(file_syspreds,isa_detector, always_fail(i,c)).
 :- default_te(file_syspreds,isa_holder, c(i)).
-:- default_te(file_syspreds,isa_varholder, t(c,i)).  % was isa(i,c).
+:- default_te(file_syspreds,isa_varholder, (t(c,i))).  % was isa(i,c).
 :- default_te(file_syspreds,pred_holder, head).  % was isa(i,c).
 :- default_te(file_syspreds,pred_varholder, newhead=..[t,pred|args]).
 :- default_te(file_syspreds,proccess_directive, proccess_directive).

@@ -17,6 +17,8 @@
 :- module(xray_hooks,[]).
 :- endif.
 
+:- if(current_prolog_flag(logicmoo_xray,true)).
+
 :- was_dynamic(body_hooks_flag/0).
 :- was_dynamic(pred_hooks_flag/0).
 
@@ -72,12 +74,12 @@ no_pred_hooks.
 add_body_hooks((Head :- Body),(Head :- Body2)) :-
 	body_hooks_flag,
 	!,
-	(bhook1_p(Head :- Body) ->
-	    conjoin((bhook1(Head :- Body)),Body,Body1);
+	(bhook1_p((Head :- Body)) ->
+	    conjoin((bhook1((Head :- Body))),Body,Body1);
         %true ->
 	    Body1=Body),
-	(bhook2_p(Head :- Body) ->
-	    conjoin(Body1,(bhook2(Head :- Body)),Body2);
+	(bhook2_p((Head :- Body)) ->
+	    conjoin(Body1,(bhook2((Head :- Body))),Body2);
         %true ->
 	    Body2=Body1).
 
@@ -85,20 +87,20 @@ add_body_hooks((Head :- Body),(Head :- Body)).
 
 %%% COMPILE-TIME conditions for body hook insertion
 
-bhook1_p(_Head :- _Body) :-
+bhook1_p((_Head :- _Body)) :-
 	true.
-bhook2_p(_Head :- _Body) :-
+bhook2_p((_Head :- _Body)) :-
 	true.
 
 %%% RUN-TIME predicates for body hooks
 
-bhook1(Head :- Body) :-
+bhook1((Head :- Body)) :-
 	(Head = _) ->
 	    Head =.. [P|_],
 	    nl,dmsg(b1:(P)),nl,nl;
         %true ->
 	     true.
-bhook2(Head :- Body) :-
+bhook2((Head :- Body)) :-
 	(Head = _) ->
 	    Head =.. [P|_],
 	    nl,dmsg(b2:(P)),nl,nl;
@@ -165,3 +167,5 @@ head(P,N,Head) :-
                 Head = query;
 	%true ->
 		functor(Head,P,N).
+
+:-endif.

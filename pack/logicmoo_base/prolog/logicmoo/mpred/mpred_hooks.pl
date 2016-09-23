@@ -469,9 +469,9 @@ into_plist(In,Out):-into_plist_arities(2,12,In,Out).
 %
 into_plist_arities(Min,Max,PLIST,PLISTO):- var(PLIST),!,between(Min,Max,X),length(PLIST,X),PLISTO=PLIST.
 into_plist_arities(_,_,[P|LIST],[P|LIST]):-var(P),!.
-into_plist_arities(_,_,[t|PLIST],PLIST):-!.  % t is our versuion of '$holds' or call/N
+into_plist_arities(_,_,[(t)|PLIST],PLIST):-!.  % t is our versuion of '$holds' or call/N
 into_plist_arities(_,_,plist(P,LIST),[P|LIST]):-!.
-into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
+into_plist_arities(_,_,Call,PLIST):- Call=..PLIST. % finally the fallthrue
 
 
 

@@ -7,6 +7,7 @@
 % Dec 13, 2035
 %
 */
+:- if(exists_source(swish(lib/render))).
 
 :- module(swish_render_html,
 	  [ term_rendering//3			% +Term, +Vars, +Options
@@ -31,4 +32,4 @@
 
 term_rendering(Term, _Vars, _Options) --> {compound(Term),Term=html(_)}, html(Term).
 
-
+:- endif.

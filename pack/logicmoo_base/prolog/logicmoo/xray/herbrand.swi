@@ -3,6 +3,8 @@
 :- module(xray_herbrand,[]).
 :- endif.
 
+:- if(current_prolog_flag(logicmoo_xray,true)).
+
 :- was_dynamic(herbrandize).
 herbrandize.
 :- retractall(herbrandize).
@@ -193,3 +195,6 @@ instantiation([Clause|Matrix],Terms,MatrixInstances) :-
 	instances(Clause,Terms,Instances),
 	instantiation(Matrix,Terms,IMatrix),
 	combine_clauses(Instances,IMatrix,MatrixInstances).
+
+:- endif.
+

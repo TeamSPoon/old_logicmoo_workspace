@@ -103,7 +103,7 @@ time_tick(*,0),
         doing_agenda_slow_op/0,
         loaded_mpred_file/2)).
 */
-
+:- volatile(lmcache:after_mpred_load/0).
 
 
 %= 	 	 
