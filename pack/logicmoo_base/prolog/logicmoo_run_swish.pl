@@ -116,7 +116,7 @@ assert_sv(P):-!,functor(P,_,A),duplicate_term(P,R),setarg(A,R,_),ignore(retract(
 
 
 
-:- endif.
+% :- endif.
 
 
 

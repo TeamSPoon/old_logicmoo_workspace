@@ -196,7 +196,7 @@ push_current_choice/1,
 
 :- meta_predicate 
       each_E(+,+,+),
-      pfcl_do(0),
+     % pfcl_do(0),
       pfcl_do(+), % not all arg1s are callable
       ain_expanded(+),
       lookup_u(+),
@@ -2419,7 +2419,8 @@ mpred_mark_as(Sup,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup,P,F,A,
 %
 
 % mpred_mark_fa_as(_Sup,_P,'\=',2,_):- dtrace.
-mpred_mark_fa_as(_Sup,_P,_,_,Type):- Type \== pfcLHS, current_prolog_flag(unsafe_speedups,true),!.
+% BREAKS SIMPLE CASES 
+mpred_mark_fa_as(_Sup,_P,_,_,Type):- Type \== pfcLHS, Type \== pfcRHS, current_prolog_flag(unsafe_speedups,true),!.
 mpred_mark_fa_as(_Sup,_P,isa,_,_):- !.
 mpred_mark_fa_as(_Sup,_P,_,_,pfcCallCodeBody):- !.
 mpred_mark_fa_as(_Sup,_P,_,_,pfcCallCodeTst):- !.
@@ -2481,12 +2482,16 @@ mpred_compile_rhs_term_consquent(WS,'{}'(Test),'{}'(TestO)) :- !,build_code_test
 mpred_compile_rhs_term_consquent(WS,rhs(Test),rhs(TestO)) :- !,mpred_compile_rhs_term_consquent(WS,Test,TestO).
 mpred_compile_rhs_term_consquent(WS,Test,TestO):- is_list(Test),must_maplist(mpred_compile_rhs_term_consquent(WS),Test,TestO).
 
-mpred_compile_rhs_term_consquent(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],
-   must_maplist(mpred_compile_rhs_term_consquent(WS),TestL,TestLO),TestO=..[F|TestLO],!.
+mpred_compile_rhs_term_consquent(WS,Test,TestO):- 
+   code_sentence_op(Test),Test=..[F|TestL],
+   must_maplist(mpred_compile_rhs_term_consquent(WS),TestL,TestLO),
+   TestO=..[F|TestLO],!.
+
 mpred_compile_rhs_term_consquent(Sup,I,O):-
   % TODO replace the next line with  I=O,
-    full_transform_warn(compile_rhs,I,O),    
+    full_transform_warn(compile_rhs,I,O),  
     must(mpred_mark_as(Sup,O,pfcRHS)),!.
+    
 
 
 %% code_sentence_op( :TermVar) is semidet.

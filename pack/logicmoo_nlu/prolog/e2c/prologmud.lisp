@@ -1,7 +1,9 @@
+;;NEW
 (set-agenda-error-mode :ignore)
 (load "e2c/cogbot-init.lisp")
 (LOAD-KE-TEXT-FILE #$CycAdministrator "e2c/e2c-new.ke" :agenda nil)
-;;(LOAD-KE-TEXT-FILE #$CycAdministrator "e2c/e2c-new0.ke" :agenda nil)
+(LOAD-KE-TEXT-FILE #$CycAdministrator "e2c/e2c-new-0.ke" :agenda nil)
+(LOAD-KE-TEXT-FILE #$CycAdministrator "e2c/e2c-new-1.ke" :agenda t)
 (load "e2c/const-renamer.lisp")
 (load "e2c/export.lisp")
 (load "e2c/remove-instances.lisp")

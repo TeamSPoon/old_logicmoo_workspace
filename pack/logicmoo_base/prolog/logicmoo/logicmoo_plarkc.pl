@@ -24,7 +24,9 @@
 :- wdmsg("loading current_renames").
 :- load_files(pldata(current_renames),[if(not_loaded),qcompile(auto)]).
 :- wdmsg("done with rns").
+:- if(exists_source(rs)).
 :- load_files(rs,[if(not_loaded),qcompile(auto)]).
+:- endif.
 :- wdmsg("done with current_renames").
 :- retractall(renames(_)).
 :- baseKB:enable_mpred_expansion.

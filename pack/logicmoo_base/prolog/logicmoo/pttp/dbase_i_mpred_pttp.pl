@@ -13,6 +13,8 @@
 :- module(mpred_pttp,[]).
 :- endif.
 
+:- ensure_loaded('../logicmoo_utils').
+
 :- ensure_loaded(library(logicmoo_base)).
 :- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 

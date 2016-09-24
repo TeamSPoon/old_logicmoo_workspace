@@ -465,6 +465,10 @@ mpred_mark(pfcRHS,F, A)==>
 
 mpred_mark(pfcCallCode,F, A)/predicate_is_undefined_fa(F,A)
     ==> marker_supported(F,A).
+/*
+mpred_mark(pfcCallCodeTst,F, A)/predicate_is_undefined_fa(F,A)
+    ==> marker_supported(F,A).
+*/
 
 
 tCol(P)==>functorIsMacro(P).

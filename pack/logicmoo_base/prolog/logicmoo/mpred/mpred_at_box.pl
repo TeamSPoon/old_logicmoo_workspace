@@ -39,7 +39,7 @@
           has_parent_goal/1,
           has_parent_goal/2,
          fileAssertMt/1,
-         get_current_default_tbox/1,
+         
          in_mpred_kb_module/0,
          istAbove/2,
          make_as_dynamic/4,
@@ -79,7 +79,8 @@
 
 :- endif.
 
-:- module_transparent((         baseKB_hybrid_support/2,
+:- module_transparent((         
+     baseKB_hybrid_support/2,
          uses_predicate/2,
          uses_predicate/5,
          correct_module/3,
@@ -91,7 +92,7 @@
                                 has_parent_goal/1,
                                 has_parent_goal/2,
          fileAssertMt/1,
-         get_current_default_tbox/1,
+         
          in_mpred_kb_module/0,
          istAbove/2,
          make_as_dynamic/4)).
@@ -271,9 +272,13 @@ ensure_abox(M):-
 %:- (system:dtrace, rtrace, dtrace,cls ).
 %:- (dbreak,cnotrace,nortrace).
 
-% :- export(get_current_default_tbox/1).
-system:get_current_default_tbox(TBox):- defaultAssertMt(ABox),clause(ABox:defaultTBoxMt(TBox),B),B,!.
-system:get_current_default_tbox(baseKB).
+
+:- if(current_predicate(system:get_current_default_tbox/1)).
+:- redefine_system_predicate(system:get_current_default_tbox/1).
+:- endif.
+:- module_transparent(system:get_current_default_tbox/1).
+system:get_current_default_tbox(TBox):- defaultAssertMt(ABox)->current_module(ABox)->clause(ABox:defaultTBoxMt(TBox),B),call(B),!.
+system:get_current_default_tbox(baseKB). 
 
 %% set_defaultAssertMt( ?ABox) is semidet.
 %

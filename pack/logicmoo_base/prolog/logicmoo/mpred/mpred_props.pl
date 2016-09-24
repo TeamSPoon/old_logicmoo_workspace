@@ -481,7 +481,7 @@ listprolog:-listing(mpred_isa(_,prologDynamic)).
 %
 get_arity(Term,F,A):- atom(Term),F=Term,!,ensure_arity(F,A).
 get_arity(F/A,F,A):-!,atom(F),ensure_arity(F,A),!,(A>0).
-get_arity(F//A,F,A2):-!, atom(F),A2 #= A+2, ensure_arity(F,A2),!,(A2>0).
+get_arity(F // A,F,A2):-!, atom(F), #=(A2 , A+2), ensure_arity(F,A2),!,(A2>0).
 get_arity(M:FA,F,A):-atom(M),!,get_arity(FA,F,A).
 get_arity(FA,F,A):- get_functor(FA,F,A),must(A>0).
 

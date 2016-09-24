@@ -728,10 +728,10 @@ xlisting:- xlisting([]).
 %
 xlisting(Match):- \+ \+ t_l:no_xlisting(Match),!.
 xlisting([]):- '$current_source_module'(M),!,listing(M:_),'$current_typein_module'(TM),(TM==M->true;listing(TM:_)),!.
-xlisting(F/A):-integer(A),!,functor(P,F,A),xlisting(P).
-xlisting(M:F/A):-integer(A),!,functor(P,F,A),xlisting(M:P).
-xlisting(Match):- maybe_scan_for_varnames,is_list(Match),!,must_maplist(xlisting,Match).
-xlisting(Match):- w_tl(set_prolog_flag(retry_undefined,false),xlisting0(Match)).
+xlisting(F/A):-integer(A),!,functor(P,F,A),xlisting(P),!.
+xlisting(M:F/A):-integer(A),!,functor(P,F,A),xlisting(M:P),!.
+xlisting(Match):- maybe_scan_for_varnames,is_list(Match),!,must_maplist(xlisting,Match),!.
+xlisting(Match):- w_tl(set_prolog_flag(retry_undefined,false),xlisting0(Match)),!.
 xlisting0(Match):- t_l:in_prolog_listing(Match),!,findall(PI,to_pi(Match,PI),SkipPI),!,
   mpred_match_listing_skip_pi(Match,[_:varname_info(_,_,_,_)|SkipPI]),!.
 xlisting0(f(Match)):- !,xlisting_inner(portray_hbr,Match,[_:varname_info(_,_,_,_)]),!.

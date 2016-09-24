@@ -1051,7 +1051,8 @@ temp_comp(H,B,PRED,OUT):- nonvar(H),term_variables(B,Vs1),Vs1\==[], term_attvars
 % Database expand  Primary Helper.
 %
 
-:- discontiguous db_expand_0/3.
+%:- discontiguous baseKB:db_expand_0/3.
+%:- discontiguous db_expand_0/3.
 
 %% db_expand_0( ++Op, +:Sent, -SentO) is det.
 %
@@ -1107,38 +1108,6 @@ db_expand_0(Op,Sent,SentO):- transitive_lc(db_expand_chain(Op),Sent,SentO)-> Sen
 db_expand_0(Op,EL,O):- is_list(EL),!,must_maplist(db_expand_0(Op),EL,O).
 
 db_expand_0(_Op,P,PO):-db_expand_argIsa(P,PO).
-
-db_expand_argIsa(P,PO):- 
-  compound(P),
-  P=..[ARE,FF,AA],
-   atom_concat('arg',REST,ARE),
-   member(E,['Genl','Isa','SometimesIsa','Format','QuotedIsa']),atom_concat(N,E,REST),
-   atom_number(N,NN),
-   atom_concat('arg',E,AE),
-  PO=..[AE,FF,NN,AA],!.
-
-db_expand_argIsa(P,PO):- 
-  compound(P),
-  P=..[ARE,FF,C1,C2],
-   atom_concat('interArg',REST,ARE),
-   member(E,['Isa','Genl','Format','QuotedIsa','GenlQuantity','NotIsa','SometimesIsa','NotQuotedIsa']),
-   atom_concat(E,Nums,REST),
-   (atomic_list_concat([A1,A2],'-',Nums);atomic_list_concat([A1,A2],'_',Nums)),!,
-   atom_number(A1,N1),
-   atom_number(A2,N2),
-   atomic_list_concat(['interArg',E],AE),
-  PO=..[AE,FF,N1,C1,N2,C2],!.
-
-db_expand_argIsa(P,PO):- 
-  compound(P),
-  P=..[ARE,FF,AA,RESULT],
-   atom_concat('interArg',REST,ARE),
-   member(E,['ResultGenl','ResultIsa','ResultNotIsa','ResultSometimesIsa','ResultFormat','ResultQuotedIsa','ResultNotQuotedIsa']),
-   atom_concat(N,E,REST),
-   atom_number(N,NN),
-   atom_concat('interArg',E,AE),
-  PO=..[AE,FF,NN,AA,RESULT],!.
-
 
 db_expand_0(_Op,P,PO):- fail,
   compound(P),
@@ -1304,6 +1273,38 @@ map_f(F,F):-!.
 % ex Argument  (isa/2).
 %
 ex_argIsa(P,N,C):- clause(_:argIsa(P,N,C),true).
+
+
+db_expand_argIsa(P,PO):- 
+  compound(P),
+  P=..[ARE,FF,AA],
+   atom_concat('arg',REST,ARE),
+   member(E,['Genl','Isa','SometimesIsa','Format','QuotedIsa']),atom_concat(N,E,REST),
+   atom_number(N,NN),
+   atom_concat('arg',E,AE),
+  PO=..[AE,FF,NN,AA],!.
+
+db_expand_argIsa(P,PO):- 
+  compound(P),
+  P=..[ARE,FF,C1,C2],
+   atom_concat('interArg',REST,ARE),
+   member(E,['Isa','Genl','Format','QuotedIsa','GenlQuantity','NotIsa','SometimesIsa','NotQuotedIsa']),
+   atom_concat(E,Nums,REST),
+   (atomic_list_concat([A1,A2],'-',Nums);atomic_list_concat([A1,A2],'_',Nums)),!,
+   atom_number(A1,N1),
+   atom_number(A2,N2),
+   atomic_list_concat(['interArg',E],AE),
+  PO=..[AE,FF,N1,C1,N2,C2],!.
+
+db_expand_argIsa(P,PO):- 
+  compound(P),
+  P=..[ARE,FF,AA,RESULT],
+   atom_concat('interArg',REST,ARE),
+   member(E,['ResultGenl','ResultIsa','ResultNotIsa','ResultSometimesIsa','ResultFormat','ResultQuotedIsa','ResultNotQuotedIsa']),
+   atom_concat(N,E,REST),
+   atom_number(N,NN),
+   atom_concat('interArg',E,AE),
+  PO=..[AE,FF,NN,AA,RESULT],!.
 
 
 %= 	 	 

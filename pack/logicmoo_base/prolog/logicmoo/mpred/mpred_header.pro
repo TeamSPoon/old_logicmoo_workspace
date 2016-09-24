@@ -99,6 +99,7 @@ assert_if_new_h(G):- (catch(G,_,fail)->true;assert(G)).
 :- dynamic(baseKB:argsQuoted/1).
 :- dynamic(baseKB:resolveConflict/1).
 :- dynamic(baseKB:agent_call_command/2).
+:- export(baseKB:agent_call_command/2).
 :- system:import(baseKB:agent_call_command/2).
 :- dynamic(baseKB:mpred_skipped_module/1).
 

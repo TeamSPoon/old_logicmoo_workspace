@@ -177,6 +177,7 @@
 :- system:use_module(library(rdf_ntriples),[rdf_ntriple_part/4]).
 :- system:use_module(library(tty),[menu/3]).
 
+:- if(false). 
 :- redefine_system_predicate(system:'$term_in_file'(_,_,_,_,_,_,_,_)).
 :- abolish(system:'$term_in_file'/8).
 system:'$term_in_file'(In, Read, RLayout, Term, TLayout, Stream, Parents, Options) :-
@@ -232,7 +233,7 @@ system:'$term_in_file'(In, Read, RLayout, Term, TLayout, Stream, Parents, Option
                 '$execute'(Goal, ExpandedBindings)
             )), !.
 
-
+:- endif.
 
 :- forall((expand_file_search_path(swi('library/*.pl'),O),expand_file_name(O,S),member(M,S)),
  ignore((

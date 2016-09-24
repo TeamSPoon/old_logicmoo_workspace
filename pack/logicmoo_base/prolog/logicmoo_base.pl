@@ -25,7 +25,7 @@ prolog_stack:stack_guard(none).
 
 :- w_tl(set_prolog_flag(access_level,system),
    doall(( source_file(yall:lambda_functor(_),O),source_file(M:X,O),M\==yall,
-   clause(M:X,B,Ref),clause_property(Ref,file(O)),wdmsg(M:X :- B),on_x_fail(erase(Ref))))).
+   clause(M:X,B,Ref),clause_property(Ref,file(O)),wdmsg((M:X :- B)),on_x_fail(erase(Ref))))).
 
 :- abolish(yall:lambda_functor,1),dynamic(yall:lambda_functor/1).
 :- abolish(yall:lambda_like,1),dynamic(yall:lambda_like/1).

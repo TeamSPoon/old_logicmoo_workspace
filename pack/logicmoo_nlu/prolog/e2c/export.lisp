@@ -1,3 +1,4 @@
+;;NEW
 (define FORCE-PRINT (string) (print string) (force-output))
 
 
@@ -97,15 +98,16 @@
   ((EL-variable-p trm) (ret (plw-str (SUBSTITUTE #\_ #\- (EL-VAR-NAME-WITHOUT-PREFIX trm)))))
   ((HL-variable-p trm) (ret (plw-term (nth (variable-id trm) (ASSERTION-EL-VARIABLES *assrtwas*)))))
   ((constant-p trm) (ret (plw-atom trm)))
-  ((keywordp trm)(ret (progn (plw-str "'$VAR'(" ) (plw-atom (symbol-name trm)) (plw-str ")"))))
+  ((keywordp trm)(ret (progn (plw-str "'$KW'(" ) (plw-atom (symbol-name trm)) (plw-str ")"))))
   ((symbolp trm) (ret (progn (plw-str "'") (plw-str (package-name (symbol-package trm))) (plw-str ":") 
                                    (plw-str (symbol-name trm)) 
                                    (plw-str "'"))))
   ((stringp trm) (ret (plw-str (write-to-string (unescape trm)))))
-  ((cnot (consp trm)) (ret (plw-str (write-to-string trm))))  ;;((numberp trm) (ret (plw-str trm)))
+  ((cnot (consp trm)) (ret (plw-str (write-to-string trm))))
+  ;;((numberp trm) (ret (plw-str trm)))
   (t 
    (clet ((pred (car trm)) (wtrm trm) (cdrtrm (cdr trm)))
-	(pwhen (equal pred (foc #$TheList) (ret (plw-dotl cdrtrm))) 
+	(pwhen (equal pred #$TheList (ret (plw-dotl cdrtrm))))
 	(pwhen (equal pred ".") (ret (plw-dotl cdrtrm)))
 	(pwhen (function? pred) (ret (plw-naut "u" wtrm)))
 	
@@ -152,6 +154,7 @@
     (pwhen (> len 3) (ret (cons (second f) (cons pred (cddr f)))))))
 
 (define showa (assrt &optional (out *standard-output*))
+ (punless assrt (ret ()))
  (clet ((found assrt) )
   (pwhen (integerp assrt) (csetq found (FIND-ASSERTION-BY-ID assrt))(pwhen found (csetq assrt found)))
   (pwhen (consp assrt) (csetq found (FIND-ASSERTION-ANY-MT assrt))(pwhen found (csetq assrt found)))  
@@ -201,7 +204,7 @@
  (punless (null countme) (cinc *live*)
    (punless (equal *was* 'live)
      (csetq *was* 'live)
-	(print `(live ,anum ,assrt ,(asserted-by assrt)))))))
+	(print `(live ,anum ,assrt ,(asserted-by assrt))))))))
     
 
 (print `(*live* ,*live* *dead* ,*dead*)))
@@ -290,13 +293,13 @@ timedatectl set-ntp on
  ;;(plw-str ",")(plw-str (string-downcase (symbol-name (KB-DEDUCTION-STRENGTH ded))))
  ;;(plw-str ",")(plw-str (string-downcase (symbol-name (KB-DEDUCTION-TRUTH ded))))
   (plw-str ").")(plw-nl)))
- 
+  
 (define foc (trm) (ret (find-or-create-constant trm)))
 
 (define ds () (ds1 (foc "denotationAndString")))
 
 (define ds1 (term) 
-  (load "e2c/prologmud.lisp")
+ ;; (load "e2c/prologmud.lisp")
   (sL::clet ((*file-output* (SL::OPEN-TEXT (cconcatenate (simple-name term) ".pl") :output)) 
     (*standard-output* *file-output*))
    (WITH-ANY-MT (with-all-mts (map-term #'showa term)))
@@ -324,7 +327,7 @@ timedatectl set-ntp on
 ")
   (cdo ((anum 0 (1+ anum))) ((= anum (assertion-count)))
 	 (clet ((assrt (find-assertion-by-id anum)))
-	  (pwhen (equal (rem (cinc  *every1000*) 10000) 1) 
+	  (pwhen  (equal (rem (cinc  *every1000*) 10000) 1)
 	   (showa assrt *standard-output*) (force-output *standard-output*) (force-output *file-output*))
 
    (showa assrt *file-output*)))

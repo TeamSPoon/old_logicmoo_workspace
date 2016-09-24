@@ -9,6 +9,7 @@
 % Revised At:  $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 */
+% NEW
 :- module(logicmoo_util_attvar_reader, [
           deserialize_attvars/2,deserialize_attvars/3,
           serialize_attvars/2,
@@ -20,10 +21,12 @@
           verbatum_var/1,
           mpred_get_attrs/2,
           mpred_put_attrs/2,
+          holds_attrs/1,
           install_attvar_expander/1,
           system_expanded_attvars/4,
           is_term_expanding_in_file/1,
           system_expanded_attvars/2]).
+
 
 
 :- module_transparent((deserialize_attvars/2,deserialize_attvars/3,
@@ -31,7 +34,7 @@
           put_dyn_attrs/2,
           ensure_named/3,
           mpred_get_attr/3,
-          mpred_put_attr/3,
+          mpred_put_attr/3,    
           mpred_get_attrs/2,
           mpred_put_attrs/2,
           read_attvars/1,read_attvars/0,          
@@ -82,6 +85,7 @@ mpred_put_attr(VAR,A,Value):- VAR='$VAR'(Att3),!,setarg(1,VAR, att(A,Value,Att3)
 mpred_put_attr(VAR,A,Value):- VAR='avar'(Att3),!,setarg(1,VAR, att(A,Value,Att3)).
 mpred_put_attr(VAR,A,Value):- VAR='avar'(_,Att3),!,setarg(2,VAR, att(A,Value,Att3)).
 mpred_put_attr(V,A,Value):- trace_or_throw(mpred_put_attr(V,A,Value)).
+
 
 
 ensure_named(Vs,V,N):- atom(N),member(N=VV,Vs),VV==V,put_attr(V,vn,N).
@@ -211,9 +215,13 @@ verbatum_term('$was_imported_kb_content$'(_,_)).
 verbatum_term('varname_info'(_,_,_,_)).
 verbatum_term(V):-verbatum_var(V).
 
+holds_attrs(V):-var(V),!.
+holds_attrs(V):-verbatum_var(V),!.
+
 verbatum_var('$VAR'(_)).
 verbatum_var('avar'(_)).
 verbatum_var('avar'(_,_)).
+
 
 
 
