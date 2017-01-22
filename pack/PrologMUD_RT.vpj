@@ -330,47 +330,11 @@
 									<Folder Name="rfc2045">
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/config.h"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/config.h.in"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/makemime.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/makemime.html"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/reformime.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/reformime.html"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045.h"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045.html"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045_base64encode.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045_fromfd.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045acchk.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045acprep.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045appendurl.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045cdecode.c"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045charset.h"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045charset.h.in"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045decode.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045enomem.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045find.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045mkboundary.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045rewrite.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045tryboundary.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc2045/rfc2045xdump.c"/>
 									</Folder>
 									<Folder Name="rfc822">
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/config.h"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/config.h.in"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/imaprefs.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/imaprefs.h"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/imapsubj.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/reftest.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc2047.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc2047.h"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc2047u.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc822.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc822.h"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc822.html"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc822_getaddr.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc822_getaddrs.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc822_mkdate.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/rfc822_parsedt.c"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/maildrop/rfc822/testsuite.c"/>
 									</Folder>
 								</Folder>
 								<Folder Name="sha1">
@@ -414,8 +378,6 @@
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/md5passwd.c"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/memfile.c"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/memfile.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/mime.c"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/mime.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/nonblockio.c"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/nonblockio.h"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/pltotex.pl"/>
@@ -561,7 +523,6 @@
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_json.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_load.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_log.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_mime_plugin.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_multipart_plugin.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_open.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_openid.pl"/>
@@ -2439,7 +2400,6 @@
 						<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/build.templ"/>
 						<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/configure"/>
 						<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/configure.out"/>
-						<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/COPYING"/>
 						<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/dmiles.patch"/>
 						<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/doc-version"/>
 						<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/INSTALL"/>
@@ -2488,13 +2448,6 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
-		<Folder Name="jellyfish">
-			<F
-				N="jellyfish/*.*"
-				Recurse="1"
-				Refilter="1"
-				Excludes=".git/;*.*~;*~/"/>
-		</Folder>
 		<Folder Name="jllykifsh">
 			<F
 				N="jllykifsh/*.*"
@@ -2509,29 +2462,1324 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
-		<Folder Name="prologmud">
-			<Folder Name="games">
-				<F
-					N="prologmud/games/*.*"
-					Recurse="1"
-					Refilter="1"
-					Excludes=".git/;*.*~;*~/"/>
-			</Folder>
-		</Folder>
-		<Folder Name="runtime">
+		<Folder Name="multivar">
 			<F
-				N="runtime/*.*"
+				N="multivar/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes=".git/;*.*~;*~/i;.svn/"/>
+		</Folder>
+		<Folder Name="prologmud">
+			<F
+				N="prologmud/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes=".git/;*.*~;*~/i;.svn/"/>
+		</Folder>
+		<Folder Name="prologmud_runtime">
+			<F
+				N="prologmud_runtime/*.pl"
+				Recurse="1"
+				Refilter="1"
+				Excludes=".git/;*.*~;*~/i;.svn/"/>
+		</Folder>
+		<Folder Name="prologmud_sample">
+			<Folder Name="bin">
+				<F N="prologmud_sample/bin/cyc-runner.sh"/>
+				<F N="prologmud_sample/bin/run-cyc-00.sh"/>
+				<F N="prologmud_sample/bin/run-cyc-20.sh"/>
+				<F N="prologmud_sample/bin/run-cyc-40.sh"/>
+				<F N="prologmud_sample/bin/run-cyc-60.sh"/>
+				<F N="prologmud_sample/bin/run-cyc-80.sh"/>
+				<F N="prologmud_sample/bin/run-cyc-base-port.sh"/>
+				<F N="prologmud_sample/bin/run-cyc-no-init.sh"/>
+				<F N="prologmud_sample/bin/run-cyc-no-services.sh"/>
+				<F N="prologmud_sample/bin/run-cyc.bat"/>
+				<F N="prologmud_sample/bin/run-cyc.sh"/>
+			</Folder>
+			<Folder Name="conf">
+				<Folder Name="run">
+					<F N="prologmud_sample/conf/run/run-larkc.bat"/>
+					<F N="prologmud_sample/conf/run/run-larkc.sh"/>
+				</Folder>
+				<F N="prologmud_sample/conf/larkc-init.lisp"/>
+				<F N="prologmud_sample/conf/larkc.properties"/>
+				<F N="prologmud_sample/conf/larkc.rdf"/>
+				<F N="prologmud_sample/conf/log4j.properties"/>
+				<F N="prologmud_sample/conf/parameters.lisp"/>
+				<F N="prologmud_sample/conf/plugins.ini"/>
+			</Folder>
+			<Folder Name="config-enabled">
+				<Folder Name="now_disabled">
+					<F N="prologmud_sample/config-enabled/now_disabled/config.pl"/>
+					<F N="prologmud_sample/config-enabled/now_disabled/debug.pl"/>
+					<F N="prologmud_sample/config-enabled/now_disabled/store.pl"/>
+					<F N="prologmud_sample/config-enabled/now_disabled/zlib.pl"/>
+				</Folder>
+				<F N="prologmud_sample/config-enabled/010-packs.pl"/>
+				<F N="prologmud_sample/config-enabled/020-prefixes.pl"/>
+				<F N="prologmud_sample/config-enabled/020-yaz-namespaces.pl"/>
+				<F N="prologmud_sample/config-enabled/025-amalgame.pl"/>
+				<F N="prologmud_sample/config-enabled/accurator.pl"/>
+				<F N="prologmud_sample/config-enabled/accurator.pl.hide"/>
+				<F N="prologmud_sample/config-enabled/aers_rewrite.pl"/>
+				<F N="prologmud_sample/config-enabled/ag_lod.pl"/>
+				<F N="prologmud_sample/config-enabled/ag_menu.pl"/>
+				<F N="prologmud_sample/config-enabled/ag_modules.pl"/>
+				<F N="prologmud_sample/config-enabled/ag_preferences.pl"/>
+				<F N="prologmud_sample/config-enabled/ag_skin.pl"/>
+				<F N="prologmud_sample/config-enabled/ag_strat_prov_graph_viz.pl"/>
+				<F N="prologmud_sample/config-enabled/ann_preferences.pl"/>
+				<F N="prologmud_sample/config-enabled/annotation_dashboard.pl"/>
+				<F N="prologmud_sample/config-enabled/annotation_service.pl"/>
+				<F N="prologmud_sample/config-enabled/autocompletion.pl"/>
+				<F N="prologmud_sample/config-enabled/cache.pl"/>
+				<F N="prologmud_sample/config-enabled/cloud.pl"/>
+				<F N="prologmud_sample/config-enabled/cluster_search.pl"/>
+				<F N="prologmud_sample/config-enabled/command.pl"/>
+				<F N="prologmud_sample/config-enabled/config.done"/>
+				<F N="prologmud_sample/config-enabled/config.pl"/>
+				<F N="prologmud_sample/config-enabled/cpack_repository.pl"/>
+				<F N="prologmud_sample/config-enabled/cpack_server.pl"/>
+				<F N="prologmud_sample/config-enabled/debug.pl"/>
+				<F N="prologmud_sample/config-enabled/econnect.pl"/>
+				<F N="prologmud_sample/config-enabled/EDM.pl"/>
+				<F N="prologmud_sample/config-enabled/enable_autocomplete.pl"/>
+				<F N="prologmud_sample/config-enabled/find_resource.pl"/>
+				<F N="prologmud_sample/config-enabled/flint.pl"/>
+				<F N="prologmud_sample/config-enabled/foaf_user.pl"/>
+				<F N="prologmud_sample/config-enabled/image_annotation.pl"/>
+				<F N="prologmud_sample/config-enabled/isearch.pl"/>
+				<F N="prologmud_sample/config-enabled/jquery.pl"/>
+				<F N="prologmud_sample/config-enabled/load_rma_example.pl"/>
+				<F N="prologmud_sample/config-enabled/lod.pl"/>
+				<F N="prologmud_sample/config-enabled/logging.pl"/>
+				<F N="prologmud_sample/config-enabled/media_cache.pl"/>
+				<F N="prologmud_sample/config-enabled/network.pl"/>
+				<F N="prologmud_sample/config-enabled/oac_graphviz.pl"/>
+				<F N="prologmud_sample/config-enabled/opmv.pl"/>
+				<F N="prologmud_sample/config-enabled/pengines.pl"/>
+				<F N="prologmud_sample/config-enabled/prov.pl"/>
+				<F N="prologmud_sample/config-enabled/rda_gr2.pl"/>
+				<F N="prologmud_sample/config-enabled/rdf-mt.pl"/>
+				<F N="prologmud_sample/config-enabled/rdf_qa.pl"/>
+				<F N="prologmud_sample/config-enabled/rdfpath.pl"/>
+				<F N="prologmud_sample/config-enabled/README.txt"/>
+				<F N="prologmud_sample/config-enabled/skin_fix_menu.pl"/>
+				<F N="prologmud_sample/config-enabled/skos.pl"/>
+				<F N="prologmud_sample/config-enabled/skos_browser.pl"/>
+				<F N="prologmud_sample/config-enabled/store.pl"/>
+				<F N="prologmud_sample/config-enabled/swish.pl"/>
+				<F N="prologmud_sample/config-enabled/tag_matcher.pl"/>
+				<F N="prologmud_sample/config-enabled/versioned_graph.pl"/>
+				<F N="prologmud_sample/config-enabled/versioned_graphviz.pl"/>
+				<F N="prologmud_sample/config-enabled/virgil.pl"/>
+				<F N="prologmud_sample/config-enabled/waisda.pl"/>
+				<F N="prologmud_sample/config-enabled/waisda_search.pl"/>
+				<F N="prologmud_sample/config-enabled/winpath.pl"/>
+				<F N="prologmud_sample/config-enabled/xmlrdf.pl"/>
+				<F N="prologmud_sample/config-enabled/yaz.pl"/>
+				<F N="prologmud_sample/config-enabled/yui3.pl"/>
+				<F N="prologmud_sample/config-enabled/zlib.pl"/>
+			</Folder>
+			<Folder Name="cpack">
+				<Folder Name="accurator">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/accurator/api/accurator.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/accurator/config-available/accurator.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<Folder Name="accurator">
+							<Folder Name="recommendation">
+								<F N="prologmud_sample/cpack/accurator/lib/accurator/recommendation/strategy_expertise.pl"/>
+								<F N="prologmud_sample/cpack/accurator/lib/accurator/recommendation/strategy_random.pl"/>
+							</Folder>
+							<F N="prologmud_sample/cpack/accurator/lib/accurator/accurator_user.pl"/>
+							<F N="prologmud_sample/cpack/accurator/lib/accurator/annotation.pl"/>
+							<F N="prologmud_sample/cpack/accurator/lib/accurator/concept_scheme_selection.pl"/>
+							<F N="prologmud_sample/cpack/accurator/lib/accurator/domain.pl"/>
+							<F N="prologmud_sample/cpack/accurator/lib/accurator/expertise.pl"/>
+							<F N="prologmud_sample/cpack/accurator/lib/accurator/review.pl"/>
+							<F N="prologmud_sample/cpack/accurator/lib/accurator/subset_selection.pl"/>
+							<F N="prologmud_sample/cpack/accurator/lib/accurator/ui_elements.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="conversion">
+							<F N="prologmud_sample/cpack/accurator/rdf/conversion/language_country_rdf_conversion.pl"/>
+						</Folder>
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/accurator/rdf/cpack/accurator.ttl"/>
+						</Folder>
+						<Folder Name="domain">
+							<Folder Name="bible">
+								<Folder Name="ui">
+									<F N="prologmud_sample/cpack/accurator/rdf/domain/bible/ui/fields.ttl"/>
+									<F N="prologmud_sample/cpack/accurator/rdf/domain/bible/ui/labels.ttl"/>
+									<F N="prologmud_sample/cpack/accurator/rdf/domain/bible/ui/labels_nl.ttl"/>
+								</Folder>
+								<F N="prologmud_sample/cpack/accurator/rdf/domain/bible/bible_domain.ttl"/>
+								<F N="prologmud_sample/cpack/accurator/rdf/domain/bible/concept_scheme_bible_figure.ttl"/>
+								<F N="prologmud_sample/cpack/accurator/rdf/domain/bible/concept_scheme_bible_theme.ttl"/>
+							</Folder>
+							<Folder Name="bird">
+								<Folder Name="ui">
+									<F N="prologmud_sample/cpack/accurator/rdf/domain/bird/ui/fields.ttl"/>
+									<F N="prologmud_sample/cpack/accurator/rdf/domain/bird/ui/labels.ttl"/>
+									<F N="prologmud_sample/cpack/accurator/rdf/domain/bird/ui/labels_nl.ttl"/>
+								</Folder>
+								<F N="prologmud_sample/cpack/accurator/rdf/domain/bird/bird_domain.ttl"/>
+							</Folder>
+							<Folder Name="fashion">
+								<Folder Name="ui">
+									<F N="prologmud_sample/cpack/accurator/rdf/domain/fashion/ui/fields.ttl"/>
+									<F N="prologmud_sample/cpack/accurator/rdf/domain/fashion/ui/labels.ttl"/>
+									<F N="prologmud_sample/cpack/accurator/rdf/domain/fashion/ui/labels_nl.ttl"/>
+								</Folder>
+								<F N="prologmud_sample/cpack/accurator/rdf/domain/fashion/fashion_domain.ttl"/>
+							</Folder>
+							<F N="prologmud_sample/cpack/accurator/rdf/domain/domain.ttl"/>
+						</Folder>
+						<Folder Name="ui">
+							<F N="prologmud_sample/cpack/accurator/rdf/ui/fields.ttl"/>
+							<F N="prologmud_sample/cpack/accurator/rdf/ui/labels.ttl"/>
+							<F N="prologmud_sample/cpack/accurator/rdf/ui/labels_nl.ttl"/>
+							<F N="prologmud_sample/cpack/accurator/rdf/ui/labels_schema.ttl"/>
+						</Folder>
+						<F N="prologmud_sample/cpack/accurator/rdf/accurator_schema.ttl"/>
+						<F N="prologmud_sample/cpack/accurator/rdf/countries.ttl"/>
+						<F N="prologmud_sample/cpack/accurator/rdf/languages.ttl"/>
+						<F N="prologmud_sample/cpack/accurator/rdf/object.ttl"/>
+						<F N="prologmud_sample/cpack/accurator/rdf/void.ttl"/>
+					</Folder>
+				</Folder>
+				<Folder Name="aers_rewrite">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/aers_rewrite/config-available/aers_rewrite.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/aers_rewrite/lib/aers_rewrite.pl"/>
+						<F N="prologmud_sample/cpack/aers_rewrite/lib/ascii_rewrite.pl"/>
+						<F N="prologmud_sample/cpack/aers_rewrite/lib/ascii_simplify.pl"/>
+						<F N="prologmud_sample/cpack/aers_rewrite/lib/csvrdf.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/aers_rewrite/rdf/cpack/aers_rewrite.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="amalgame">
+					<Folder Name="api">
+						<Folder Name="form">
+							<Folder Name="amalgame">
+								<F N="prologmud_sample/cpack/amalgame/api/form/amalgame/startpage.pl"/>
+							</Folder>
+						</Folder>
+						<F N="prologmud_sample/cpack/amalgame/api/ag_process.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/api/correspondence.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/api/evaluate.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/api/hints.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/api/mapping.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/api/mappinglist.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/api/node_info.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/api/strategy_viz.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/api/virtual_concepts.pl"/>
+					</Folder>
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/amalgame/applications/builder.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/applications/evaluater.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/applications/publisher.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/applications/startpage.pl"/>
+					</Folder>
+					<Folder Name="components">
+						<Folder Name="amalgame">
+							<F N="prologmud_sample/cpack/amalgame/components/amalgame/controls.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/components/amalgame/correspondence.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/components/amalgame/startpage.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/components/amalgame/util.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/amalgame/config-available/025-amalgame.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/config-available/ag_lod.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/config-available/ag_menu.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/config-available/ag_modules.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/config-available/ag_preferences.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/config-available/ag_skin.pl"/>
+						<F N="prologmud_sample/cpack/amalgame/config-available/ag_strat_prov_graph_viz.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<Folder Name="ag_drivers">
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_drivers/exec_amalgame_process.pl"/>
+						</Folder>
+						<Folder Name="ag_modules">
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/ag_overlap.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/ag_sample.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/ancestor_generator.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/ancestor_match.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/ancestor_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/arity_select.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/best_numeric.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/compound_label_generator.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/compound_label_match.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/compound_label_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/descendent_generator.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/descendent_match.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/descendent_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/evaluate.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/exact_label_generator.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/exact_label_match.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/exact_label_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/generator_snd_input.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/isub_generator.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/isub_match.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/isub_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/label_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/map_merger.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/most_generic.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/most_labels.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/most_methods.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/numeric_difference_generator.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/numeric_difference_match.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/numeric_difference_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/preloaded_mapping.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/preloaded_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/propvalue_select.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/related_generator.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/related_match.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/related_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/sibling_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/snowball_label_generator.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/snowball_label_match.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/snowball_label_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/string_match_util.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/structure_selecter.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/subtree_select.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/type_select.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/uniq_label_voc_select.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/ag_modules/voc_exclude.pl"/>
+						</Folder>
+						<Folder Name="amalgame">
+							<Folder Name="hooks">
+								<F N="prologmud_sample/cpack/amalgame/lib/amalgame/hooks/autocomplete.pl"/>
+								<F N="prologmud_sample/cpack/amalgame/lib/amalgame/hooks/load.pl"/>
+								<F N="prologmud_sample/cpack/amalgame/lib/amalgame/hooks/skos_browser.pl"/>
+								<F N="prologmud_sample/cpack/amalgame/lib/amalgame/hooks/strategy_backward_compatability.pl"/>
+							</Folder>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/ag_evaluation.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/ag_provenance.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/ag_publish.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/ag_reference.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/ag_stats.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/ag_strategy.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/amalgame_modules.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/caching.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/candidate.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/edoal.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/expand_graph.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/json_util.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/lit_distance.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/map.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/rdf_util.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/scheme_stats.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/util.pl"/>
+							<F N="prologmud_sample/cpack/amalgame/lib/amalgame/vocabulary.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/amalgame/rdf/cpack/amalgame.ttl"/>
+						</Folder>
+						<Folder Name="tool">
+							<F N="prologmud_sample/cpack/amalgame/rdf/tool/ag_modules.ttl"/>
+							<F N="prologmud_sample/cpack/amalgame/rdf/tool/align.owl"/>
+							<F N="prologmud_sample/cpack/amalgame/rdf/tool/amalgame.ttl"/>
+							<F N="prologmud_sample/cpack/amalgame/rdf/tool/Manifest.ttl"/>
+							<F N="prologmud_sample/cpack/amalgame/rdf/tool/void.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="annotation_dashboard">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/annotation_dashboard/api/dashboard_api.pl"/>
+					</Folder>
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/annotation_dashboard/applications/dashboard_startpage.pl"/>
+						<F N="prologmud_sample/cpack/annotation_dashboard/applications/dashboard_task_page.pl"/>
+						<F N="prologmud_sample/cpack/annotation_dashboard/applications/dashboard_user_page.pl"/>
+					</Folder>
+					<Folder Name="components">
+						<Folder Name="dashboard">
+							<F N="prologmud_sample/cpack/annotation_dashboard/components/dashboard/pagination.pl"/>
+							<F N="prologmud_sample/cpack/annotation_dashboard/components/dashboard/show_annotations.pl"/>
+							<F N="prologmud_sample/cpack/annotation_dashboard/components/dashboard/show_objects.pl"/>
+							<F N="prologmud_sample/cpack/annotation_dashboard/components/dashboard/show_option_list.pl"/>
+							<F N="prologmud_sample/cpack/annotation_dashboard/components/dashboard/show_tasks.pl"/>
+							<F N="prologmud_sample/cpack/annotation_dashboard/components/dashboard/show_users.pl"/>
+							<F N="prologmud_sample/cpack/annotation_dashboard/components/dashboard/task_stats.pl"/>
+							<F N="prologmud_sample/cpack/annotation_dashboard/components/dashboard/top_nav_bar.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/annotation_dashboard/config-available/annotation_dashboard.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/annotation_dashboard/lib/dashboard_util.pl"/>
+						<F N="prologmud_sample/cpack/annotation_dashboard/lib/region_merge.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/annotation_dashboard/rdf/cpack/annotation_dashboard.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="annotation_service">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/annotation_service/api/annotation.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/annotation_service/config-available/annotation_service.pl"/>
+						<F N="prologmud_sample/cpack/annotation_service/config-available/oac_graphviz.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/annotation_service/lib/oa_annotation.pl"/>
+						<F N="prologmud_sample/cpack/annotation_service/lib/oa_schema.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/annotation_service/rdf/cpack/annotation_service.ttl"/>
+						</Folder>
+						<F N="prologmud_sample/cpack/annotation_service/rdf/oa.ttl"/>
+						<F N="prologmud_sample/cpack/annotation_service/rdf/oa_compat.ttl"/>
+						<F N="prologmud_sample/cpack/annotation_service/rdf/void.ttl"/>
+					</Folder>
+				</Folder>
+				<Folder Name="autocompletion">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/autocompletion/api/autocomplete_api.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/autocompletion/config-available/autocompletion.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/autocompletion/lib/ac_filter.pl"/>
+						<F N="prologmud_sample/cpack/autocompletion/lib/ac_list_util.pl"/>
+						<F N="prologmud_sample/cpack/autocompletion/lib/instance_search.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/autocompletion/rdf/cpack/autocompletion.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="cloud">
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/cloud/applications/app_cloud.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/cloud/config-available/cloud.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/cloud/lib/datacloud.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/cloud/rdf/cpack/cloud.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="cluster_search">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/cluster_search/api/cluster_search.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/cluster_search/config-available/cluster_search.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<Folder Name="cluster_search">
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/cs_filter.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/fuzzy.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/graph_search.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/iface_util.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/kwd_search.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/owl_ultra_lite.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/rdf_backward_search.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/rdf_cluster.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/rdf_direct_search.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/rdf_full_search.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/rdf_graph.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/rdf_hierarchy_search.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/rdf_search.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/rdfs_plus_skos.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/settings.pl"/>
+							<F N="prologmud_sample/cpack/cluster_search/lib/cluster_search/tree_abstract.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/cluster_search/rdf/cpack/cluster_search.ttl"/>
+						</Folder>
+						<F N="prologmud_sample/cpack/cluster_search/rdf/cluster_search_schema.ttl"/>
+						<F N="prologmud_sample/cpack/cluster_search/rdf/void.ttl"/>
+					</Folder>
+				</Folder>
+				<Folder Name="command">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/command/api/command.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/command/config-available/command.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/command/rdf/cpack/command.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="cpack_repository">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/cpack_repository/api/cpack.pl"/>
+					</Folder>
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/cpack_repository/applications/cpack_home.pl"/>
+						<F N="prologmud_sample/cpack/cpack_repository/applications/cpack_submit.pl"/>
+					</Folder>
+					<Folder Name="components">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/cpack_repository/components/cpack/graphs.pl"/>
+						</Folder>
+						<F N="prologmud_sample/cpack/cpack_repository/components/cpack.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/cpack_repository/config-available/cpack_repository.pl"/>
+						<F N="prologmud_sample/cpack/cpack_repository/config-available/cpack_server.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/cpack_repository/lib/cpack/dependency.pl"/>
+							<F N="prologmud_sample/cpack/cpack_repository/lib/cpack/repository.pl"/>
+							<F N="prologmud_sample/cpack/cpack_repository/lib/cpack/xref.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/cpack_repository/rdf/cpack/cpack_repository.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="ecdemo">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/ecdemo/config-available/econnect.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/ecdemo/rdf/cpack/ecdemo.ttl"/>
+						</Folder>
+						<Folder Name="semlayer">
+							<F N="prologmud_sample/cpack/ecdemo/rdf/semlayer/Manifest.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="EDM">
+					<Folder Name="components">
+						<Folder Name="edm">
+							<F N="prologmud_sample/cpack/EDM/components/edm/components.pl"/>
+							<F N="prologmud_sample/cpack/EDM/components/edm/graph.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/EDM/config-available/EDM.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/EDM/rdf/cpack/EDM.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="find_resource">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/find_resource/config-available/find_resource.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/find_resource/lib/find_resource.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/find_resource/rdf/cpack/find_resource.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="foaf">
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/foaf/lib/foaf_schema.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="base">
+							<Folder Name="foaf">
+								<Folder Name="spec">
+									<F N="prologmud_sample/cpack/foaf/rdf/base/foaf/spec/20100809.rdf"/>
+								</Folder>
+							</Folder>
+							<F N="prologmud_sample/cpack/foaf/rdf/base/Manifest.ttl"/>
+						</Folder>
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/foaf/rdf/cpack/foaf.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="foaf_user">
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/foaf_user/applications/foaf_user_profile.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/foaf_user/config-available/foaf_user.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<Folder Name="semweb">
+							<F N="prologmud_sample/cpack/foaf_user/lib/semweb/rdf_foaf.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/foaf_user/rdf/cpack/foaf_user.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="image_annotation">
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/image_annotation/applications/annotation.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/image_annotation/config-available/ann_preferences.pl"/>
+						<F N="prologmud_sample/cpack/image_annotation/config-available/enable_autocomplete.pl"/>
+						<F N="prologmud_sample/cpack/image_annotation/config-available/image_annotation.pl"/>
+						<F N="prologmud_sample/cpack/image_annotation/config-available/load_rma_example.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/image_annotation/rdf/cpack/image_annotation.ttl"/>
+						</Folder>
+						<F N="prologmud_sample/cpack/image_annotation/rdf/annotation_ui_bible.ttl"/>
+						<F N="prologmud_sample/cpack/image_annotation/rdf/annotation_ui_bird.ttl"/>
+						<F N="prologmud_sample/cpack/image_annotation/rdf/annotation_ui_example.ttl"/>
+						<F N="prologmud_sample/cpack/image_annotation/rdf/annotation_ui_schema.ttl"/>
+						<F N="prologmud_sample/cpack/image_annotation/rdf/void.ttl"/>
+					</Folder>
+				</Folder>
+				<Folder Name="isearch">
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/isearch/applications/isearch.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/isearch/config-available/isearch.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<Folder Name="search">
+							<F N="prologmud_sample/cpack/isearch/lib/search/facet.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/isearch/rdf/cpack/isearch.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="jquery">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/jquery/config-available/jquery.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/jquery/lib/jquery.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/jquery/rdf/cpack/jquery.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="media_cache">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/media_cache/api/media_caching.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/media_cache/config-available/media_cache.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/media_cache/lib/thumbnail.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/media_cache/rdf/cpack/media_cache.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="opmv">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/opmv/config-available/opmv.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/opmv/lib/opmv_schema.pl"/>
+						<F N="prologmud_sample/cpack/opmv/lib/opmvc_schema.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/opmv/rdf/cpack/opmv.ttl"/>
+						</Folder>
+						<F N="prologmud_sample/cpack/opmv/rdf/common.rdf"/>
+						<F N="prologmud_sample/cpack/opmv/rdf/Manifest.ttl"/>
+						<F N="prologmud_sample/cpack/opmv/rdf/opmv.ttl"/>
+						<F N="prologmud_sample/cpack/opmv/rdf/update.sh"/>
+					</Folder>
+				</Folder>
+				<Folder Name="owl">
+					<Folder Name="lib">
+						<Folder Name="semweb">
+							<F N="prologmud_sample/cpack/owl/lib/semweb/owl_sameas.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/owl/rdf/cpack/owl.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="prov">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/prov/config-available/prov.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/prov/lib/opmv_schema.pl"/>
+						<F N="prologmud_sample/cpack/prov/lib/opmvc_schema.pl"/>
+						<F N="prologmud_sample/cpack/prov/lib/prov_schema.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/prov/rdf/cpack/prov.ttl"/>
+						</Folder>
+						<F N="prologmud_sample/cpack/prov/rdf/prov-o.ttl"/>
+						<F N="prologmud_sample/cpack/prov/rdf/void.ttl"/>
+					</Folder>
+				</Folder>
+				<Folder Name="rda_gr2">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/rda_gr2/config-available/rda_gr2.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/rda_gr2/rdf/cpack/rda_gr2.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="rdf-mt">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/rdf-mt/config-available/rdf-mt.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<Folder Name="rdf_mt">
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/earl.pl"/>
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/earl_header.ttl"/>
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/graph_consistency.pl"/>
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/graph_list.pl"/>
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/graph_properties.pl"/>
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/manifest.pl"/>
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/mt_rdf.pl"/>
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/mt_rdfs.pl"/>
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/mt_simple.pl"/>
+							<F N="prologmud_sample/cpack/rdf-mt/lib/rdf_mt/rdf_reasoner.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/rdf-mt/rdf/cpack/rdf-mt.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="rdf_qa">
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/rdf_qa/applications/rdf_qa.pl"/>
+					</Folder>
+					<Folder Name="components">
+						<F N="prologmud_sample/cpack/rdf_qa/components/qa_cycle_prop.pl"/>
+						<F N="prologmud_sample/cpack/rdf_qa/components/qa_default_heuristics.pl"/>
+						<F N="prologmud_sample/cpack/rdf_qa/components/qa_domain_whitelist.pl"/>
+						<F N="prologmud_sample/cpack/rdf_qa/components/qa_empty_repo.pl"/>
+						<F N="prologmud_sample/cpack/rdf_qa/components/qa_heuristics.pl"/>
+						<F N="prologmud_sample/cpack/rdf_qa/components/qa_no_label.pl"/>
+						<F N="prologmud_sample/cpack/rdf_qa/components/qa_object_only.pl"/>
+						<F N="prologmud_sample/cpack/rdf_qa/components/qa_pred_only.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/rdf_qa/config-available/rdf_qa.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/rdf_qa/rdf/cpack/rdf_qa.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="skos">
+					<Folder Name="components">
+						<Folder Name="skos">
+							<F N="prologmud_sample/cpack/skos/components/skos/components.pl"/>
+							<F N="prologmud_sample/cpack/skos/components/skos/graph.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/skos/config-available/skos.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<Folder Name="skos">
+							<F N="prologmud_sample/cpack/skos/lib/skos/json.pl"/>
+							<F N="prologmud_sample/cpack/skos/lib/skos/util.pl"/>
+						</Folder>
+						<F N="prologmud_sample/cpack/skos/lib/skos_schema.pl"/>
+						<F N="prologmud_sample/cpack/skos/lib/skos_xl_schema.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="base">
+							<F N="prologmud_sample/cpack/skos/rdf/base/skos-xl.rdf"/>
+							<F N="prologmud_sample/cpack/skos/rdf/base/skos.rdf"/>
+							<F N="prologmud_sample/cpack/skos/rdf/base/void.ttl"/>
+						</Folder>
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/skos/rdf/cpack/skos.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="skos_browser">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/skos_browser/api/skos_concepts.pl"/>
+					</Folder>
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/skos_browser/applications/skos_browser.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/skos_browser/config-available/skos_browser.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/skos_browser/rdf/cpack/skos_browser.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="statistics">
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/statistics/lib/stat_lists.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/statistics/rdf/cpack/statistics.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="swish">
+					<Folder Name="client">
+						<F N="prologmud_sample/cpack/swish/client/swish-ask.sh"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/swish/rdf/cpack/swish.ttl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="web">
+						<Folder Name="bower_components">
+							<Folder Name="codemirror">
+								<Folder Name="component-tools">
+									<F N="prologmud_sample/cpack/swish/web/bower_components/codemirror/component-tools/build.sh"/>
+								</Folder>
+							</Folder>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="swish-normal">
+					<Folder Name="client">
+						<F N="prologmud_sample/cpack/swish-normal/client/swish-ask.sh"/>
+					</Folder>
+					<Folder Name="web">
+						<Folder Name="bower_components">
+							<Folder Name="codemirror">
+								<Folder Name="component-tools">
+									<F N="prologmud_sample/cpack/swish-normal/web/bower_components/codemirror/component-tools/build.sh"/>
+								</Folder>
+							</Folder>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="swish-rdf">
+					<Folder Name="client">
+						<F N="prologmud_sample/cpack/swish-rdf/client/swish-ask.sh"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/swish-rdf/rdf/cpack/swish.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="tag_matcher">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/tag_matcher/api/tag_matcher.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/tag_matcher/config-available/tag_matcher.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/tag_matcher/lib/tag_match.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/tag_matcher/rdf/cpack/tag_matcher.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="versioned_graph">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/versioned_graph/config-available/versioned_graph.pl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/config-available/versioned_graphviz.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/versioned_graph/lib/graph_version.pl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/lib/gv_git_io.pl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/lib/gv_git_objects.pl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/lib/gv_hash_uri.pl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/lib/gv_namespaces.pl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/lib/gv_replay.pl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/lib/hash_atom.pl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/lib/parse_git_objects.pl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/lib/url_to_filename.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/versioned_graph/rdf/cpack/versioned_graph.ttl"/>
+						</Folder>
+						<F N="prologmud_sample/cpack/versioned_graph/rdf/rdfgit.ttl"/>
+						<F N="prologmud_sample/cpack/versioned_graph/rdf/void.ttl"/>
+					</Folder>
+				</Folder>
+				<Folder Name="virgil">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/virgil/api/drugs.pl"/>
+						<F N="prologmud_sample/cpack/virgil/api/measurements.pl"/>
+						<F N="prologmud_sample/cpack/virgil/api/prov.pl"/>
+						<F N="prologmud_sample/cpack/virgil/api/reactions.pl"/>
+						<F N="prologmud_sample/cpack/virgil/api/reports.pl"/>
+					</Folder>
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/virgil/applications/virgil.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/virgil/config-available/virgil.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/virgil/lib/aers_report.pl"/>
+						<F N="prologmud_sample/cpack/virgil/lib/aspell.pl"/>
+						<F N="prologmud_sample/cpack/virgil/lib/drug_normalise.pl"/>
+						<F N="prologmud_sample/cpack/virgil/lib/drug_spell_check.pl"/>
+						<F N="prologmud_sample/cpack/virgil/lib/util.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/virgil/rdf/cpack/virgil.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="void">
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/void/lib/void_schema.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="base">
+							<F N="prologmud_sample/cpack/void/rdf/base/Manifest.ttl"/>
+							<F N="prologmud_sample/cpack/void/rdf/base/void-20110616.rdf"/>
+						</Folder>
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/void/rdf/cpack/void.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="waisda">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/waisda/config-available/waisda.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/waisda/lib/download_videos.pl"/>
+						<F N="prologmud_sample/cpack/waisda/lib/exp_stats.pl"/>
+						<F N="prologmud_sample/cpack/waisda/lib/import_waisda.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/waisda/rdf/cpack/waisda.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="webaccess">
+					<Folder Name="lib">
+						<Folder Name="http">
+							<F N="prologmud_sample/cpack/webaccess/lib/http/page_info.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/webaccess/rdf/cpack/webaccess.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="xmlrdf">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/xmlrdf/config-available/xmlrdf.pl"/>
+					</Folder>
+					<Folder Name="doc">
+						<F N="prologmud_sample/cpack/xmlrdf/doc/pltotex.pl"/>
+					</Folder>
+					<Folder Name="examples">
+						<Folder Name="AHM">
+							<F N="prologmud_sample/cpack/xmlrdf/examples/AHM/diag.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/examples/AHM/rewrite_data.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/examples/AHM/rewrite_people.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/examples/AHM/rewrite_thes.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/examples/AHM/run-data.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/examples/AHM/run-people.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/examples/AHM/run-thesaurus.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/examples/AHM/util.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="lib">
+						<Folder Name="xmlrdf">
+							<F N="prologmud_sample/cpack/xmlrdf/lib/xmlrdf/cvt_vocabulary.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/lib/xmlrdf/rdf_convert_util.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/lib/xmlrdf/rdf_name_bnodes.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/lib/xmlrdf/rdf_rename.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/lib/xmlrdf/rdf_rewrite.pl"/>
+							<F N="prologmud_sample/cpack/xmlrdf/lib/xmlrdf/xmlrdf.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/xmlrdf/rdf/cpack/xmlrdf.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="yaz">
+					<Folder Name="api">
+						<F N="prologmud_sample/cpack/yaz/api/edm_export.pl"/>
+						<F N="prologmud_sample/cpack/yaz/api/reconcile.pl"/>
+						<F N="prologmud_sample/cpack/yaz/api/ugm_ingest.pl"/>
+						<F N="prologmud_sample/cpack/yaz/api/video_frames.pl"/>
+					</Folder>
+					<Folder Name="applications">
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_admin.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_annotate.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_cgarden.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_fplayer.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_game.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_game_recap.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_garden.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_home.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_match_evaluate.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_mgarden.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_new_user.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_player.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_sgarden.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_shot_annotation.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_tag.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_tag_agreement.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_tag_edit.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_tag_garden.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_tags.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_user.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_video.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_video_stats.pl"/>
+						<F N="prologmud_sample/cpack/yaz/applications/yaz_videos.pl"/>
+					</Folder>
+					<Folder Name="components">
+						<F N="prologmud_sample/cpack/yaz/components/paginator.pl"/>
+						<F N="prologmud_sample/cpack/yaz/components/tag_cloud.pl"/>
+						<F N="prologmud_sample/cpack/yaz/components/yaz_page.pl"/>
+						<F N="prologmud_sample/cpack/yaz/components/yaz_video_item.pl"/>
+					</Folder>
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/yaz/config-available/020-yaz-namespaces.pl"/>
+						<F N="prologmud_sample/cpack/yaz/config-available/waisda_search.pl"/>
+						<F N="prologmud_sample/cpack/yaz/config-available/yaz.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/yaz/lib/download_video.pl"/>
+						<F N="prologmud_sample/cpack/yaz/lib/find_concept.pl"/>
+						<F N="prologmud_sample/cpack/yaz/lib/lod_load.pl"/>
+						<F N="prologmud_sample/cpack/yaz/lib/rdf_history.pl"/>
+						<F N="prologmud_sample/cpack/yaz/lib/user_process.pl"/>
+						<F N="prologmud_sample/cpack/yaz/lib/user_prov.pl"/>
+						<F N="prologmud_sample/cpack/yaz/lib/video_annotation.pl"/>
+						<F N="prologmud_sample/cpack/yaz/lib/videos.pl"/>
+						<F N="prologmud_sample/cpack/yaz/lib/yaz_util.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/yaz/rdf/cpack/yaz.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="yui3">
+					<Folder Name="config-available">
+						<F N="prologmud_sample/cpack/yui3/config-available/yui3.pl"/>
+					</Folder>
+					<Folder Name="lib">
+						<F N="prologmud_sample/cpack/yui3/lib/yui3.pl"/>
+						<F N="prologmud_sample/cpack/yui3/lib/yui3_beta.pl"/>
+					</Folder>
+					<Folder Name="rdf">
+						<Folder Name="cpack">
+							<F N="prologmud_sample/cpack/yui3/rdf/cpack/yui3.ttl"/>
+						</Folder>
+					</Folder>
+				</Folder>
+			</Folder>
+			<Folder Name="data">
+				<Folder Name="stanford-ner-cyc-2006-09-18">
+					<F N="prologmud_sample/data/stanford-ner-cyc-2006-09-18/ner-gui.sh"/>
+					<F N="prologmud_sample/data/stanford-ner-cyc-2006-09-18/ner.sh"/>
+				</Folder>
+			</Folder>
+			<Folder Name="daydreamer">
+				<F N="prologmud_sample/daydreamer/compat.cl"/>
+				<F N="prologmud_sample/daydreamer/dd.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_cntrl.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_compile.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_epis.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_gen.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_get.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_kb.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_macros.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_mutation.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_night.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_reversal.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_ri.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_rule1.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_rule2.cl"/>
+				<F N="prologmud_sample/daydreamer/dd_utils.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_compile.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_cx.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_get.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_instan.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_macros.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_main.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_obs.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_prove.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_read_pr.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_test.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_ty.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_unify.cl"/>
+				<F N="prologmud_sample/daydreamer/gate_utils.cl"/>
+				<F N="prologmud_sample/daydreamer/hello_world.cl"/>
+				<F N="prologmud_sample/daydreamer/loop.cl"/>
+			</Folder>
+			<Folder Name="e2c">
+				<Folder Name="cl">
+					<Folder Name="emacs-cl">
+						<Folder Name="contrib">
+							<Folder Name="gabriel">
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/boyer.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/browse.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/control.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/ctak.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/dderiv.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/deriv.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/destru-mod.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/destru.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/div2.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/fft-mod.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/fft.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/fprint.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/fread.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/frpoly-mod.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/frpoly.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/integer.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/puzzle-mod-noproclaim.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/puzzle-mod.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/puzzle-mod1.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/puzzle-mod2.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/puzzle-noproclaim.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/puzzle-sda.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/puzzle.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/stak.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/tak-mod.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/tak.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/takl.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/takr.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/tprint.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/traverse.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/triang-mod.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/triang-old-mod.cl"/>
+								<F N="prologmud_sample/e2c/cl/emacs-cl/contrib/gabriel/triang.cl"/>
+							</Folder>
+						</Folder>
+					</Folder>
+				</Folder>
+				<Folder Name="microEx">
+					<F N="prologmud_sample/e2c/microEx/instant.pl"/>
+					<F N="prologmud_sample/e2c/microEx/listes.pl"/>
+					<F N="prologmud_sample/e2c/microEx/myinstant.pl"/>
+					<F N="prologmud_sample/e2c/microEx/path.pl"/>
+					<F N="prologmud_sample/e2c/microEx/queen.pl"/>
+				</Folder>
+				<Folder Name="pjb-micro-prolog-ii">
+					<F N="prologmud_sample/e2c/pjb-micro-prolog-ii/benchmark.pl"/>
+					<F N="prologmud_sample/e2c/pjb-micro-prolog-ii/init.pl"/>
+				</Folder>
+				<F N="prologmud_sample/e2c/e2c.pl"/>
+				<F N="prologmud_sample/e2c/kb_interface.pl"/>
+			</Folder>
+			<Folder Name="games">
+				<Folder Name="btepisode">
+					<F N="prologmud_sample/games/btepisode/npc.pl"/>
+				</Folder>
+				<Folder Name="circlemuddata">
+					<F N="prologmud_sample/games/circlemuddata/convert_cm.sh"/>
+				</Folder>
+				<Folder Name="src_game_nani">
+					<Folder Name="web">
+						<Folder Name="prolog">
+							<F N="prologmud_sample/games/src_game_nani/web/prolog/mud_specific.pl"/>
+						</Folder>
+					</Folder>
+					<F N="prologmud_sample/games/src_game_nani/a_nani_household.pfc.pl"/>
+					<F N="prologmud_sample/games/src_game_nani/andrew_ke.pfc.pl"/>
+					<F N="prologmud_sample/games/src_game_nani/annie_ke.pfc.pl"/>
+					<F N="prologmud_sample/games/src_game_nani/dmiles_ke.pfc.pl"/>
+					<F N="prologmud_sample/games/src_game_nani/jess_ke.pfc.pl"/>
+					<F N="prologmud_sample/games/src_game_nani/justin_ke.pfc.pl"/>
+					<F N="prologmud_sample/games/src_game_nani/meredith_ke.pfc.pl"/>
+					<F N="prologmud_sample/games/src_game_nani/objs_misc_household.pfc.pl"/>
+				</Folder>
+				<Folder Name="src_game_sims">
+					<Folder Name="web">
+						<Folder Name="prolog">
+							<F N="prologmud_sample/games/src_game_sims/web/prolog/mud_specific.pl"/>
+						</Folder>
+					</Folder>
+					<F N="prologmud_sample/games/src_game_sims/objs_misc_household.pfc.pl"/>
+				</Folder>
+				<Folder Name="src_game_startrek">
+					<Folder Name="holodeck">
+						<F N="prologmud_sample/games/src_game_startrek/holodeck/maze.map.pfc.pl"/>
+						<F N="prologmud_sample/games/src_game_startrek/holodeck/objs_misc_household.pfc.pl"/>
+						<F N="prologmud_sample/games/src_game_startrek/holodeck/objs_misc_monster.pfc.pl"/>
+						<F N="prologmud_sample/games/src_game_startrek/holodeck/predator.map.pfc.pl"/>
+						<F N="prologmud_sample/games/src_game_startrek/holodeck/rooms_conf.pl"/>
+						<F N="prologmud_sample/games/src_game_startrek/holodeck/vacuum.map.pfc.pl"/>
+					</Folder>
+					<Folder Name="mobs">
+						<F N="prologmud_sample/games/src_game_startrek/mobs/federation.pl"/>
+					</Folder>
+					<Folder Name="web">
+						<Folder Name="prolog">
+							<F N="prologmud_sample/games/src_game_startrek/web/prolog/mud_specific.pl"/>
+						</Folder>
+					</Folder>
+					<F N="prologmud_sample/games/src_game_startrek/startrek.all.pfc.pl"/>
+				</Folder>
+				<Folder Name="src_game_wumpus">
+					<F N="prologmud_sample/games/src_game_wumpus/maze.map.pfc.pl"/>
+					<F N="prologmud_sample/games/src_game_wumpus/objs_misc_monster.pfc.pl"/>
+				</Folder>
+			</Folder>
+			<Folder Name="hmud">
+				<Folder Name="flashpolicyd_v0.6">
+					<Folder Name="Perl_xinetd">
+						<F N="prologmud_sample/hmud/flashpolicyd_v0.6/Perl_xinetd/in.flashpolicyd.pl"/>
+						<F N="prologmud_sample/hmud/flashpolicyd_v0.6/Perl_xinetd/install.sh"/>
+					</Folder>
+					<Folder Name="Python_init">
+						<F N="prologmud_sample/hmud/flashpolicyd_v0.6/Python_init/install.sh"/>
+					</Folder>
+					<Folder Name="Python_xinetd">
+						<F N="prologmud_sample/hmud/flashpolicyd_v0.6/Python_xinetd/install.sh"/>
+					</Folder>
+					<Folder Name="Standalone">
+						<F N="prologmud_sample/hmud/flashpolicyd_v0.6/Standalone/flashpolicyd.pl"/>
+					</Folder>
+				</Folder>
+			</Folder>
+			<F N="prologmud_sample/.buildpath"/>
+			<F N="prologmud_sample/.ircbot.pl"/>
+			<F N="prologmud_sample/.project"/>
+			<F N="prologmud_sample/.slack_auth.pl"/>
+			<F N="prologmud_sample/abcl.bat"/>
+			<F N="prologmud_sample/abcl.sh"/>
+			<F N="prologmud_sample/abclc"/>
+			<F N="prologmud_sample/ansi2html.sh"/>
+			<F N="prologmud_sample/AWTRemoteApplet.html"/>
+			<F N="prologmud_sample/b.xml"/>
+			<F N="prologmud_sample/bootstrap.ttl"/>
+			<F N="prologmud_sample/clear_putty.sh"/>
+			<F N="prologmud_sample/commitpush.sh"/>
+			<F N="prologmud_sample/composer.json"/>
+			<F N="prologmud_sample/cyc.lisp"/>
+			<F N="prologmud_sample/d.lisp"/>
+			<F N="prologmud_sample/d_compile.lisp"/>
+			<F N="prologmud_sample/daemon.pl"/>
+			<F N="prologmud_sample/daydream.pl"/>
+			<F N="prologmud_sample/debug_loop.sh"/>
+			<F N="prologmud_sample/debug_mud_game.pl"/>
+			<F N="prologmud_sample/debug_once.sh"/>
+			<F N="prologmud_sample/full_clone_externals.sh"/>
+			<F N="prologmud_sample/hg_push_pull.sh"/>
+			<F N="prologmud_sample/ide.lisp"/>
+			<F N="prologmud_sample/init_mud_server.pl"/>
+			<F N="prologmud_sample/init_mud_server_run.pl"/>
+			<F N="prologmud_sample/JDemoApplet.html"/>
+			<F N="prologmud_sample/jpl.jar"/>
+			<F N="prologmud_sample/km.lisp"/>
+			<F N="prologmud_sample/local.lisp"/>
+			<F N="prologmud_sample/logic_example.pl.pfc"/>
+			<F N="prologmud_sample/logicmoo_pdt.pl"/>
+			<F N="prologmud_sample/logicmoo_repl.pl"/>
+			<F N="prologmud_sample/make_ikvm_assemblies.cmd"/>
+			<F N="prologmud_sample/make_ikvm_assemblies.sh"/>
+			<F N="prologmud_sample/makeREPL.sh"/>
+			<F N="prologmud_sample/mud.ttl"/>
+			<F N="prologmud_sample/pbranch.sh"/>
+			<F N="prologmud_sample/preconfig.sh"/>
+			<F N="prologmud_sample/pull.sh"/>
+			<F N="prologmud_sample/README.md"/>
+			<F N="prologmud_sample/ReplaceSymLinkLinux.sh"/>
+			<F N="prologmud_sample/rn2.pl"/>
+			<F N="prologmud_sample/rs.pl"/>
+			<F N="prologmud_sample/rs.qlf"/>
+			<F N="prologmud_sample/run-cyc-java.bat"/>
+			<F N="prologmud_sample/run-cyc-java.sh"/>
+			<F N="prologmud_sample/run.pl"/>
+			<F N="prologmud_sample/run_loop.sh"/>
+			<F N="prologmud_sample/run_mud_game.pl"/>
+			<F N="prologmud_sample/settings.db"/>
+			<F N="prologmud_sample/setup_paths.pl"/>
+			<F N="prologmud_sample/slack_mud.pl"/>
+			<F N="prologmud_sample/startGame.sh"/>
+			<F N="prologmud_sample/test-suite.km"/>
+			<F N="prologmud_sample/test_loop.sh"/>
+			<F N="prologmud_sample/test_release.pl"/>
+			<F N="prologmud_sample/testj.lisp"/>
+			<F N="prologmud_sample/TestsMUDServer.bat"/>
+			<F N="prologmud_sample/TestsMUDServer.sh"/>
+			<F N="prologmud_sample/TONOTIFY.txt"/>
+			<F N="prologmud_sample/try_logicmoo_examples.pl"/>
+			<F N="prologmud_sample/users.db"/>
+			<F N="prologmud_sample/web_install.sh"/>
+		</Folder>
+		<Folder Name="slack_prolog">
+			<F
+				N="slack_prolog/*.*"
 				Recurse="1"
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/i;.svn/"/>
 		</Folder>
 		<Folder Name="swicli">
 			<Folder Name="prolog">
-				<F N="swicli/prolog/jpl.pl"/>
 				<F N="swicli/prolog/jpl_for_ikvm.pl"/>
 				<F N="swicli/prolog/swicffi.pl"/>
 				<F N="swicli/prolog/swicli.pl"/>
-				<F N="swicli/prolog/swicli.pl.model"/>
 			</Folder>
 		</Folder>
 		<Folder Name="swish">
