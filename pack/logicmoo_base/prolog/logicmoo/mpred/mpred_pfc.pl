@@ -466,6 +466,7 @@ convention_to_mt(Why,F,A,RealMt):-convention_to_symbolic_mt_ec(Why,F,A,Mt),to_re
 
 get_consequent_functor(G,F,A):- strip_module(G,_,GO),remove_meta_wrapper(GO,Unwrap),nonvar(Unwrap),functor(Unwrap,F,A),!.
 
+remove_meta_wrapper(Head,Head):-atomic(Head),!.
 remove_meta_wrapper(Head,Unwrap):- is_ftVar(Head),!,Head=Unwrap.
 remove_meta_wrapper( Head,UnwrapO):- fail, mpred_rule_hb(Head,Unwrap,_),nonvar(Unwrap),
   Head \=@= Unwrap,!,remove_meta_wrapper2(Unwrap,UnwrapO).
@@ -871,7 +872,7 @@ plus_fwc(P):- gripe_time(0.6,
       loop_check_term(must(mpred_fwc(P)),plus_fwc(P),true);true)),!.
 
 
-maybe_updated_value(UP,R,OLD):-
+maybe_updated_value(UP,R,OLD):- \+ current_prolog_flag(unsafe_speedups,true), fail,
     compound(UP),
     get_consequent(UP,P),
     compound(P),

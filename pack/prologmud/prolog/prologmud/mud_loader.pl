@@ -487,6 +487,7 @@ make_qlfs:-
 :- include_prolog_files('../src_asserts/pldata/?*.pl').
 
 */
+
 :-export(ensure_nl_loaded/1).
 system:ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 
@@ -528,10 +529,9 @@ download_and_install_el:-
 %:- ensure_loaded(logicmoo(dbase/mpred_ext_chr)).
 
 
-:-wdmsg(loading_mobs).
 
 % NPC planners
-:- wdmsg(loading_npcs).
+:-wdmsg(loading_mobs).
 :- expand_file_name('../prologmud/prolog/prologmud/mobs/?*.pl',O),maplist(ensure_mpred_file_loaded,O).
 %:- include_prolog_files(prologmud(mobs/'?*.pl')).
 %:- exists_directory('../src_assets/mobs/')->include_prolog_files('../src_assets/mobs/?*.pl');true.
@@ -587,10 +587,12 @@ download_and_install_el:-
 % Load the map file appropriate for the world being used.
 % Load the mud files appropriate for the mobs being used.
 
-:- show_entry(forall(filematch(prologmud('*/?*.pfc.pl'), X),dmsg(X))).
-:- show_entry(ensure_mpred_file_loaded(prologmud('*/?*.pfc.pl'))).
-:- show_entry(forall(filematch(prologmud('*/*/?*.pfc.pl'), X),dmsg(X))).
-%:- show_entry(ensure_mpred_file_loaded(prologmud('*/*/?*.pfc.pl'))).
+/*
+:- show_entry(forall(filematch(prologmud('* /?*.pfc.pl'), X),dmsg(X))).
+:- show_entry(ensure_mpred_file_loaded(prologmud('* /?*.pfc.pl'))).
+:- show_entry(forall(filematch(prologmud('* / * /?*.pfc.pl'), X),dmsg(X))).
+%:- show_entry(ensure_mpred_file_loaded(prologmud('* / * /?*.pfc.pl'))).
+*/
 
 % puts world into running state
 % :- must(old_setup).

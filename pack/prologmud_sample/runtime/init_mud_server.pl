@@ -27,12 +27,12 @@
 
 :- use_module(library(http/http_files)).
 :- use_module(pengine_sandbox:library(semweb/rdf_db)).
-:- ensure_loaded(run).
+% :- ensure_loaded(run).
 
 :-  abolish(rdf_rewrite:arity,2),  % clause(rdf_rewrite:arity(A, B),functor(A, _, B),R),erase(R),
   asserta((rdf_rewrite:arity(A, B) :- (compound(A),functor(A, _, B)))).
 
-:- profile(true).
+% :- profile(true).
 
 :-if((multifile(baseKB:ignore_file_mpreds/1),dynamic(baseKB:ignore_file_mpreds/1),
    (prolog_load_context(source,F1) -> asserta(baseKB:ignore_file_mpreds(F1)) ; true),

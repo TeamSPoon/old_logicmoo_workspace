@@ -114,7 +114,7 @@ tSet(tKnownID).
 */
 
 % to load this files use  ?- ensure_mpred_file_loaded('logicmoo/pfc/system_genls.pfc').
-:- dynamic(mudIsa/2).
+:- dynamic(isa/2).
 :- file_begin(pfc).
 
 
@@ -135,15 +135,15 @@ ttExpressionType(C)==>rtAvoidForwardChain(C).
 % TODO ((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ genls/*Fwd*/(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 %    \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 
-completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ rtAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
-mudIsa(I,C),genls(C,P) ==> mudIsa(I,P).
+completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ rtAvoidForwardChain(Sub))) ==> isa(I,Sub)).
+isa(I,C),genls(C,P) ==> isa(I,P).
 /*
 
 % isRuntime ==> 
-% (mudIsa(I,Sub)/(ground(mudIsa(I,Sub)), \+ rtAvoidForwardChain(Sub))) ==> isa(I,Sub).
+% (isa(I,Sub)/(ground(isa(I,Sub)), \+ rtAvoidForwardChain(Sub))) ==> isa(I,Sub).
 ((completelyAssertedCollection(Sub) / (\+ rtAvoidForwardChain(Sub)))) ==> ttMudIsaCol(Sub).
-ttMudIsaCol(Sub) ==> (isa(I,Sub) ==> mudIsa(I,Sub)).
-((completeIsaAsserted(I),mudIsa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ rtAvoidForwardChain(Super))) ==> mudIsa(I,Super).
+ttMudIsaCol(Sub) ==> (isa(I,Sub) ==> isa(I,Sub)).
+((completeIsaAsserted(I),isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ rtAvoidForwardChain(Super))) ==> isa(I,Super).
 */
 
 

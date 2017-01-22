@@ -800,7 +800,7 @@ isa_backchaing_1(I,C):- fail,
 %  (isa/2) asserted.
 %
 
-isa_asserted(I,C):-  clause_b(mudIsa(I,C)).
+isa_asserted(I,C):-  clause_b(isa(I,C)).
 isa_asserted(I,C):-  compound(I),!,no_repeats(loop_check(isa_asserted_0(I,C))).
 isa_asserted(I,C):-  ground(I:C),!,no_loop_check(no_repeats(loop_check(isa_asserted_0(I,C)))).
 isa_asserted(I,C):-  no_repeats(loop_check(isa_asserted_0(I,C))).
@@ -1159,7 +1159,7 @@ assert_isa_rev(T,I):-
    sanity(call_u(isa(I,T))),
    sanity(isa_asserted(I,T)),
    % sanity(call_u(installedMotelHook) -> must(call_motel(isa(I,T))) ; true),
-   % sanity(call_u(mudIsa(I,T))),
+   % sanity(call_u(isa(I,T))),
    expire_tabled_list(all))).
 
 

@@ -944,6 +944,7 @@ argQuotedIsa(F,N,Type):- functorDeclares(F),(N=1 -> Type=F ; Type=ftVoprop).
 */
 
 :- dynamic(functor_module/3).
+argsQuoted(functor_module).
 
 ({current_module(M),
  (predicate_property(functor_module(_,_,_),
@@ -1009,7 +1010,8 @@ disjointWith(tCol,tIndividual).
 :- noguitracer.
 %:- rtrace.
 
-arity(F,A)/(atom(F),\+ is_sentence_functor(F),number(A),A>1,A<10,functor(P,F,A),\+ rtLogicalConnective(F)), 
+codeTooSlow,
+  arity(F,A)/(atom(F),\+ is_sentence_functor(F),number(A),A>1,A<10,functor(P,F,A),\+ rtLogicalConnective(F)), 
   \+ meta_argtypes_guessed(P),   
    (argIsa(F,A,NOTFT)/NOTFT\==ftTerm),
    (argIsa(F,1,NOTFT2)/NOTFT2\==ftTerm),

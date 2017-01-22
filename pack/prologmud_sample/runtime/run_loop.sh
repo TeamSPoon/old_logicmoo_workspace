@@ -8,7 +8,7 @@ if [ $# -eq 0 ]
  then
     echo "No arguments supplied"
    #gdb -return-child-result -ex set pagination off -ex run --args rlwrap -a -A -r -c -N -r swipl -l init_mud_server.pl
-    export RUNFILE="rlwrap -a -A -r -c -N -r sudo -u mud swipl -l init_mud_server.pl"
+    export RUNFILE="rlwrap -a -A -r -c -N -r swipl -l init_mud_server.pl"
  else
     export RUNFILE="rlwrap -a -A -r -c -N -r ${*}"
 fi

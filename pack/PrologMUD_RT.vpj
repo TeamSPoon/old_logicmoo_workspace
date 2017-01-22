@@ -3284,39 +3284,6 @@
 							<F N="runtime/cpack/swish/rdf/cpack/swish.ttl"/>
 						</Folder>
 					</Folder>
-					<Folder Name="web">
-						<Folder Name="bower_components">
-							<Folder Name="codemirror">
-								<Folder Name="component-tools">
-									<F N="runtime/cpack/swish/web/bower_components/codemirror/component-tools/build.sh"/>
-								</Folder>
-							</Folder>
-						</Folder>
-					</Folder>
-				</Folder>
-				<Folder Name="swish-normal">
-					<Folder Name="client">
-						<F N="runtime/cpack/swish-normal/client/swish-ask.sh"/>
-					</Folder>
-					<Folder Name="web">
-						<Folder Name="bower_components">
-							<Folder Name="codemirror">
-								<Folder Name="component-tools">
-									<F N="runtime/cpack/swish-normal/web/bower_components/codemirror/component-tools/build.sh"/>
-								</Folder>
-							</Folder>
-						</Folder>
-					</Folder>
-				</Folder>
-				<Folder Name="swish-rdf">
-					<Folder Name="client">
-						<F N="runtime/cpack/swish-rdf/client/swish-ask.sh"/>
-					</Folder>
-					<Folder Name="rdf">
-						<Folder Name="cpack">
-							<F N="runtime/cpack/swish-rdf/rdf/cpack/swish.ttl"/>
-						</Folder>
-					</Folder>
 				</Folder>
 				<Folder Name="tag_matcher">
 					<Folder Name="api">

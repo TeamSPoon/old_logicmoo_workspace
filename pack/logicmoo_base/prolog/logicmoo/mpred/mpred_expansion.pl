@@ -781,7 +781,8 @@ recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..
 
 
 
-
+atom_or_var(I):- atomic(I),!,\+ string(I).
+% covered  atom_or_var(I):-   (atom(I);var(I);number(I);I='$VAR'(_)),!.
 
 :- export(as_is_term/1).
 
@@ -789,23 +790,26 @@ recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..
 %
 % Converted To If Is A Term Primary Helper.
 %
-as_is_term(NC):- cyclic_break(NC), var(NC),!.
-as_is_term(NC):- \+ compound(NC),!,fail.
-as_is_term(P):-functor(P,F,A),functor(C,F,A),C=@=P,!.
+as_is_term(NC):- cyclic_break(NC), is_ftVar(NC),!.
 as_is_term(PARSE):-is_parse_type(PARSE),!,fail.
-as_is_term(meta_argtypes(_)):-!.
-as_is_term(meta_argtypes_guessed(_)):-!.
-as_is_term(argsQuoted(Atom)):- !, \+ compound(Atom).
-as_is_term(arity(F,_)):-atom(F),!.
-as_is_term(functorIsMacro(Atom)):- !, \+ compound(Atom).
-as_is_term(functorDeclares(Atom)):- !, \+ compound(Atom).
-as_is_term('$VAR'(_)).
-as_is_term(_:NC):-!,as_is_term(NC). 
-as_is_term(Q):- functor(Q,F,_),!,exact_args_f(F),!.
-as_is_term(NC):-exact_args(NC),!.
-as_is_term(NC):-functor(NC,Op,2),infix_op(Op,_).
-as_is_term(NC):-loop_check(is_unit(NC)),!.
-%as_is_term(isa(I,C)):- \+ compound(I),atom(C), clause_asserted(baseKB:col_as_isa(C)),!.
+as_is_term(NC):- compound(NC),!,NC=..[F,A|R],as_is_term(F,A,R),!.
+as_is_term(_,A,[]):- atom_or_var(A).
+as_is_term(_,I,[C]):- C==I. % atom_or_var(I),atom_or_var(C),!.
+% covered  above as_is_term(CI):- CI=..[C,I],C==I,!.
+% covered  as_is_term(P):-functor(P,F,A),functor(C,F,A),C=@=P,!. % all vars
+% covered  as_is_term(meta_argtypes(_)):-!.
+% covered  as_is_term(meta_argtypes_guessed(_)):-!.
+% covered  as_is_term(argsQuoted(Atom)):- !, \+ compound(Atom).
+as_is_term(arity,F,_):-atom(F).
+% covered  as_is_term(functorIsMacro(Atom)):- !, \+ compound(Atom).
+% covered  as_is_term(functorDeclares(Atom)):- !, \+ compound(Atom).
+% covered  above as_is_term('$VAR'(_)).
+as_is_term((:),_,NC):-!,as_is_term(NC). 
+as_is_term(F,_,_):- exact_args_f(F).
+% covered  above as_is_term(NC):-exact_args(NC),!.
+as_is_term(Op,_,[_]):-infix_op(Op,_).
+% covered  above as_is_term(NC):-loop_check(is_unit(NC)),!.
+% as_is_term(isa(I,C)):- \+ compound(I),atom(C), clause_asserted(baseKB:col_as_isa(C)),!.
 
 :- mpred_trace_none(as_is_term(_)).
 :- '$set_predicate_attribute'(as_is_term(_), hide_childs, 1).
@@ -918,14 +922,12 @@ is_parse_type('pkif'(NV)):-nonvar(NV).
 % Database Expand Final.
 %
 
-db_expand_final(_,VAR,VAR):- is_ftVar(VAR),!.
+db_expand_final(_ ,NC,NC):-  as_is_term(NC),!.
 % db_expand_final(Op,Sent,Sent):- Sent=..[_,A],atom(A),!.
 db_expand_final(_ ,NC,NCO):- string(NC),convert_to_cycString(NC,NCO),!.
 db_expand_final(_ ,NC,NCO):- atomic(NC),if_defined(do_renames(NC,NCO),fail),!.
 db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
 db_expand_final(_,[String],String):-string(String),!.
-db_expand_final(_ ,CI,CI ):- CI=..[C,I],C==I,!.
-db_expand_final(_ ,NC,NC):-  as_is_term(NC),!.
 %db_expand_final(_,PARSE,ISA):- PARSE=..[t,C,I],atom(C),atom(I),ISA=..[C,I],!.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),(not_ftCompound(T)),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
@@ -1016,6 +1018,7 @@ db_expand_chain(_,('nesc'(P)),P) :- !.
 %
 % Database Expand A Noloop.
 %
+fully_expand_head(_,Sent,SentO):- as_is_term(Sent),!,SentO=Sent,!.
 fully_expand_head(Op,Sent,SentO):-
   memoize_on(fully_expand,Sent->SentO,find_and_call(fully_expand_head_now(Op,Sent,SentO))).
 
@@ -1858,32 +1861,34 @@ exact_args0(==>(_,_)):-!,fail.
 exact_args0((A/B)):- (is_ftVar(A);is_ftVar(B)),!.
 exact_args0(Q):- functor(Q,F,A),A>0,!,exact_args_f(F),!.
 
+exact_args_f(wid).
+exact_args_f(wdmsg).
+exact_args_f(vtActionTemplate).
+exact_args_f(txtConcatFn).
+exact_args_f(spft).
+exact_args_f(skip_expand_fa).
+exact_args_f(sformat).
+exact_args_f(second_order).
+exact_args_f(retract_eq_quitely).
 exact_args_f(not_undoable).
 exact_args_f(mtExact).
-exact_args_f(meta_argtypes).
-exact_args_f(meta_argtypes_guessed).
-exact_args_f(second_order).
-exact_args_f(call).
-exact_args_f(call_u).
 exact_args_f(mpred_prop).
-exact_args_f(format).
-exact_args_f(sformat).
-exact_args_f(txtConcatFn).
-exact_args_f(asserted).
-exact_args_f(retract_eq_quitely).
-exact_args_f(asserts_eq_quitely).
-exact_args_f(vtActionTemplate).
-exact_args_f(assertz_if_new).
 exact_args_f(mpred_ain).
-exact_args_f(skip_expand_fa).
+exact_args_f(meta_argtypes_guessed).
+exact_args_f(meta_argtypes).
+exact_args_f(ignore).
+exact_args_f(format).
 exact_args_f(dynamic).
+exact_args_f(dmsg).
+exact_args_f(call_u).
+exact_args_f(call).
+exact_args_f(assertz_if_new).
+exact_args_f(asserts_eq_quitely).
+exact_args_f(asserted).
+exact_args_f(argsQuoted).
 exact_args_f((=..)).
 exact_args_f((=)).
-exact_args_f(dmsg).
-exact_args_f(wdmsg).
 exact_args_f('$was_imported_kb_content$'):-dtrace.
-exact_args_f(wid).
-exact_args_f(ignore).
 exact_args_f(F):-cheaply_u(argsQuoted(F)),!.
 exact_args_f(F):-cheaply_u(prologBuiltin(F)),!.
 

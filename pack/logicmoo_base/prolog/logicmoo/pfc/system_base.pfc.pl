@@ -341,7 +341,7 @@ tSet(ttModule,mudToCyc('MicrotheoryType')).
 
 arity(argsQuoted,1).
 arity(quasiQuote,1).
-
+argsQuoted(spft).
 
 :-call(asserta_if_new, baseKB:mtCycL(baseKB)).
 
@@ -383,7 +383,9 @@ argsQuoted(vtActionTemplate).
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
-((((tPred(F),
+:- dynamic(codeTooSlow/0).
+
+((codeTooSlow,((tPred(F),
  arity(F,A)/
   (is_ftNameArity(F,A),A>1, 
       \+ prologBuiltin(F), 
@@ -393,7 +395,8 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 
 :- kb_dynamic(support_hilog/2).
 
-(((support_hilog(F,A)
+
+((codeTooSlow,(support_hilog(F,A)
   /(is_ftNameArity(F,A),
     \+ is_static_predicate(F/A), \+ prologDynamic(F)))) ==>
    (hybrid_support(F,A), 
