@@ -59,6 +59,7 @@ detatch_object(Obj):-
 % destroy from ontology
 destroy_instance(Obj):- % forall(isa(Obj,Col),mpred_remove(isa(Obj,Col))),
                         xlisting_inner(destroy_clause(Obj),contains(Obj),[]),!.
+
 :-export(destroy_clause/4).
 destroy_clause(Obj,H,B,R):- 
   call(call,baseKB:(nonvar(R),catch(clause_property(R,_),_,fail)->clause(M:HH,BB,R)->M\==lmcache->contains_var(Obj,clause(HH,BB,R))->erase(R))),

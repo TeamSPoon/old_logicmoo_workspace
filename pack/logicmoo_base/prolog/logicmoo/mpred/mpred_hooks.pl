@@ -922,7 +922,7 @@ relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc),
 %
 % Callable True/false.
 %
-callable_tf(P,2):- mpred_arity_pred(P),!,fail.
+callable_tf(P,2):- cheaply_u(mpred_arity_pred(P)),!,fail.
 callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
 
 

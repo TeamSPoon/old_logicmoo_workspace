@@ -69,9 +69,10 @@
 
             no_varnaming/1,
             no_vars_needed/1,
-            not_member_eq/2,            
+            not_member_eq/2,
    print_numbervars_maybe/1,
    print_numbervars/1,
+   scan_for_varnames0/0,
    que_read_source_file_vars/1,
             read_source_file_vars/1,
             read_source_file_vars_1/1,
@@ -115,7 +116,7 @@
         call_return_tf(0, ?),
         contains_singletons(*),
         get_clause_vars(:),
-        get_clause_vars(:, ?),        
+        get_clause_vars(:, ?),
         no_varnaming(0),
         without_varname_scan(0),
         dcall_when(2, ?, ?),
@@ -156,11 +157,11 @@
             lock_vars/1,
             logicmoo_util_varnames_file/0,
             make_subterm_path/3,
-            maybe_record_scanned_file/0,            
+            maybe_record_scanned_file/0,
             no_varnaming/1,
             without_varname_scan/1,
             no_vars_needed/1,
-            not_member_eq/2,            
+            not_member_eq/2,
    print_numbervars_maybe/1,
    print_numbervars/1,
             read_source_file_vars/1,
@@ -187,7 +188,7 @@
             unlock_vars/1,
             v_dif_rest/2,
             % name_variable/2, variable_name/2,
-            vmust/1,            
+            vmust/1,
             init_varname_stores/1
  )).
 :- meta_predicate dcall_if_verbose(0).
@@ -203,11 +204,11 @@ name_variable(Var,_Name) :- nonvar(Var),!.
 name_variable(Var,Name) :- !, put_attr(Var,vn,Name).
 
 
-name_variable(Var, Name1) :- get_attr(Var,vn,Name2), 
+name_variable(Var, Name1) :- get_attr(Var,vn,Name2),
         combine_names(Name1,Name2,Name),
 	put_attr(Var, vn, Name). % add_var_to_env(Name,Var),!.
 name_variable(Var, Name) :- var(Var), !,
-	put_attr(Var, vn, Name). 
+	put_attr(Var, vn, Name).
 
 name_variable('$VAR'(Var), Name):- Name==Var, !.
 name_variable('$VAR'(Var), Name):- var(Var),Name=Var,!.
@@ -233,7 +234,7 @@ variable_name_or_ref(Var, Name) :- format(atom(Name),'~q',[Var]).
 % Project Attributes.
 %
 vn:project_attributes(QueryVars, ResidualVars):-nop(dmsg(vn:proj_attrs(vn,QueryVars, ResidualVars))).
- 
+
 
 %% attribute_goals(@V)// is det.
 %	copy_term/3, which also determines  the   toplevel  printing  of
@@ -255,7 +256,7 @@ vn:attribute_goals(Var, [name_variable(Var,  Name)|B], B) :- variable_name(Var, 
 %:- export(attr_portray_hook/2).
 %:- export(attribute_goals/3).
 
- 	 
+
 :- thread_local(t_l:no_kif_var_coroutines/1).
 
 %% attr_unify_hook( ?X, ?Other) is semidet.
@@ -277,14 +278,14 @@ vn:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines(G),!,call(G).
 vn:attr_unify_hook(_Form, _OtherValue):-!.
 
 combine_names(Name1,Name2,Name1):-Name1==Name2,!.
-combine_names(Name1,Name2,Name):- 
+combine_names(Name1,Name2,Name):-
  ((atom_concat(_,Name1,Name2);atom_concat(Name1,_,Name2)) -> Name=Name2 ; (
    ((atom_concat(Name2,_,Name1);atom_concat(_,Name2,Name1)) -> Name=Name1 ; (
    (atomic_list_concat([Name2,'_',Name1],Name)))))).
 
 
 
-%= 	 	 
+%=
 
 %% attr_portray_hook( ?Value, ?Var) is semidet.
 %
@@ -300,7 +301,7 @@ vn:attr_portray_hook(Name, _) :- write('???'), write(Name),!.
 % Portray Attribute Variable.
 %
 portray_attvar(Var) :-
-	write('{<'),        
+	write('{<'),
         ((get_attr(Var,vn, VarName))->true;sformat(VarName,'~q',[Var])),
 	get_attrs(Var, Attr),
 	catch(writeq('??'(VarName,Attr)),_,'$attvar':portray_attrs(Attr, Var)),
@@ -328,16 +329,17 @@ portray_attvar(Var) :-
 
 :- meta_predicate vmust(0).
 
-%= 	 	 
+%=
 
 %% vmust( :GoalG) is semidet.
 %
 % Vmust.
 %
+vmust(G):-!,call(G).
 vmust(G):-must(G).
 
 
-%= 	 	 
+%=
 
 %% dcall_when( :PRED2P, ?In, ?Out) is semidet.
 %
@@ -351,7 +353,7 @@ dcall_when(P,In,Out):- must(call(P,In,Out)),ignore((In\=@=Out,dmsg((dcall_when(P
 :- thread_local(t_l:try_varname_clause_next/1).
 
 
-%= 	 	 
+%=
 
 %% no_varnaming( :GoalG) is semidet.
 %
@@ -361,7 +363,7 @@ dcall_when(P,In,Out):- must(call(P,In,Out)),ignore((In\=@=Out,dmsg((dcall_when(P
 no_varnaming(G):-w_tl(t_l:dont_varname,G).
 
 
-%= 	 	 
+%=
 
 %% not_member_eq( ?E, ?REST) is semidet.
 %
@@ -371,7 +373,7 @@ not_member_eq(_,[]):-!.
 not_member_eq(E,REST):- \+ identical_memberchk(E,REST).
 
 
-%= 	 	 
+%=
 
 %% all_different_vals(+P2, ?Term) is semidet.
 %
@@ -395,7 +397,7 @@ all_different_vars(A):-all_different_vals(v_dif_rest,A),!.
 %
 % All Different Vals.
 %
-all_different_vals(Pred,Term):- 
+all_different_vals(Pred,Term):-
  must(notrace(( (is_list(Term)-> Slots = Term ; term_slots(Term,Slots)),!,
                                  all_disjoint_in_sets(Pred,Slots,Slots)))).
 
@@ -434,25 +436,28 @@ dif_matrix_hopfully(A,B):- dif:dif(A,B),!.
 
 lock_vars(Term):-lock_vars(fail,Term).
 
-%lock_vars(_Notify,_Var):- current_prolog_flag(unsafe_speedups,true),!.
+% lock_vars( _Notify, _Term):-!.
+lock_vars(_Notify,_Var):- current_prolog_flag(unsafe_speedups,true),!.
 lock_vars( Notify, Term):-  must(notrace((NotifyP=call(Notify),term_variables(Term,Vs),maplist(lock_each_var(NotifyP,Vs),Vs)))).
 
 lock_each_var(Notify,Vs,Var):- get_attr(Var,vl,when_rest(NotifyP,RestP)),delete_eq(Vs,Var,Rest),
    append(Rest,RestP,NewRest),put_attr(Var,vl,when_rest(dual_notify(Notify,NotifyP),NewRest)).
 lock_each_var(Notify,Vs,Var):- delete_eq(Vs,Var,Rest),put_attr(Var,vl,when_rest(Notify,Rest)).
-% lock_each_var(_,_ ,  Var):-var(Var),!,only_stars(Var). 
+% lock_each_var(_,_ ,  Var):-var(Var),!,only_stars(Var).
 
 dual_notify(N1,N2,Value):-ignore( \+ call(N1,Value)),ignore( \+ call(N2,Value)).
 
-vl:attr_unify_hook(_,_):- \+ thread_self(main),!,fail.
-vl:attr_unify_hook(when_rest(Notify,RestOfVars),VarValue):- 
+%vl:attr_unify_hook(_,_):- \+ thread_self_main,!,fail.
+vl:attr_unify_hook(when_rest(Notify,RestOfVars),VarValue):-
   not_member_eq(VarValue,RestOfVars),
   \+ (var(VarValue);verbatum_var(VarValue)),
   nb_setarg(1,Notify,wdmsg),
-  dumpST,
+ /* dumpST,
   dmsg(error_locked_var(Notify,VarValue)),!,
-  dtrace,
+  dtrace,*/
+  dmsg(error_locked_var(Notify,VarValue)),
   call(Notify,VarValue),!.
+vl:attr_unify_hook(_,_).
 
 
 
@@ -470,17 +475,17 @@ unlock_vars(Term):- must(notrace((term_attvars(Term,Vs),maplist(unlock_vars,Vs))
 with_vars_locked(Notify,Goal):- term_variables(Goal,Vs),with_vars_locked(Notify,Vs,Goal).
 
 :- meta_predicate(with_vars_locked(1,?,0)).
-with_vars_locked(_Notify,_Vs,_Goal):- \+ thread_self(main),!.
+with_vars_locked(_Notify,_Vs,_Goal):- \+ thread_self_main,!.
 with_vars_locked(Notify,Vs,Goal):-
  setup_call_cleanup_each(
    lock_vars(Notify,Vs),
       Goal,
      unlock_vars(Vs)).
-  
-    
 
 
-%= 	 	 
+
+
+%=
 
 %% make_subterm_path( ?Sub, ?Term, ?PathO) is semidet.
 %
@@ -489,7 +494,7 @@ with_vars_locked(Notify,Vs,Goal):-
 make_subterm_path(Sub,Term,PathO):-vmust(subterm_path(Sub,Term,Path)),!,PathO=Path.
 
 
-%= 	 	 
+%=
 
 %% subterm_path( ?Sub, ?Term, :TermARG3) is semidet.
 %
@@ -499,7 +504,7 @@ subterm_path(Sub,Term,[]):-Sub==Term,!.
 subterm_path(Sub,Term,[arg(N)|Path]):-compound(Term),!,arg(N,Term,TermE),subterm_path(Sub,TermE,Path),!.
 
 
-%= 	 	 
+%=
 
 %% get_clause_vars( ?CV) is semidet.
 %
@@ -508,7 +513,7 @@ subterm_path(Sub,Term,[arg(N)|Path]):-compound(Term),!,arg(N,Term,TermE),subterm
 get_clause_vars(CV):- hotrace(get_clause_vars_nontraced(CV)).
 :- export(get_clause_vars_nontraced/1).
 
-%= 	 	 
+%=
 
 %% get_clause_vars_nontraced( :TermMHB) is semidet.
 %
@@ -524,7 +529,7 @@ get_clause_vars_nontraced(MHB):- term_variables(MHB,Vs),must(get_clause_vars(MHB
 :- '$set_predicate_attribute'(get_clause_vars(_), hide_childs, 1).
 
 
-%= 	 	 
+%=
 
 %% del_attr_type( ?Type, ?Var) is semidet.
 %
@@ -533,7 +538,7 @@ get_clause_vars_nontraced(MHB):- term_variables(MHB,Vs),must(get_clause_vars(MHB
 del_attr_type(Type,Var):-ignore(del_attr(Var,Type)).
 
 
-%= 	 	 
+%=
 
 %% get_clause_vars( ?MHB, ?Vs) is semidet.
 %
@@ -548,7 +553,7 @@ get_clause_vars(_,_):- !.
 
 
 
-%= 	 	 
+%=
 
 %% get_clause_vars_copy( ?HB, ?HB) is semidet.
 %
@@ -556,7 +561,7 @@ get_clause_vars(_,_):- !.
 %
 get_clause_vars_copy(HB,HB):- ground(HB),!.
 % get_clause_vars_copy(HH,HH):- sub_term(S,HH),compound(S),S='$VAR'(_),!. % already labled
-get_clause_vars_copy(H0,MHB):- 
+get_clause_vars_copy(H0,MHB):-
     source_variables_lv(AllS),
     must((copy_term(H0+AllS,MHB+CAllS),
     term_slots(MHB,Slots),
@@ -566,14 +571,14 @@ get_clause_vars_copy(H0,MHB):-
     must_maplist(set_varname(write_functor),CAllS),
     get_clause_vars_hb_int(H,B))),!.
 
-get_clause_vars_copy(H0,MHB):- 
+get_clause_vars_copy(H0,MHB):-
     must((copy_term_and_varnames(H0,MHB),lock_vars(MHB),as_clause_no_m( MHB,  H, B),
     get_clause_vars_hb_int(H,B))),!.
 
 
 
 
-%= 	 	 
+%=
 
 %% get_clause_vars_hb_int( ?H, ?B) is semidet.
 %
@@ -584,7 +589,7 @@ get_clause_vars_hb_int(H,B):- call_return_tf(try_get_body_vars(B),_TF1),call_ret
 
 
 
-%= 	 	 
+%=
 
 %% atom_subst_frak_0( ?A, ?F, ?R, ?K) is semidet.
 %
@@ -592,7 +597,7 @@ get_clause_vars_hb_int(H,B):- call_return_tf(try_get_body_vars(B),_TF1),call_ret
 %
 atom_subst_frak_0(A,F,R,K):-replace_in_string_frak_0(F,R,A,K),!.
 
-%= 	 	 
+%=
 
 %% replace_in_string_frak_0( ?F, ?R, ?A, ?K) is semidet.
 %
@@ -603,7 +608,7 @@ replace_in_string_frak_0(SepChars,Repl,A,C):- atomics_to_string(B,SepChars,A),at
 
 
 
-%= 	 	 
+%=
 
 %% fix_varcase_name( ?N, ?VN) is semidet.
 %
@@ -612,7 +617,7 @@ replace_in_string_frak_0(SepChars,Repl,A,C):- atomics_to_string(B,SepChars,A),at
 fix_varcase_name(N,VN):-atom_subst_frak_0(N,'-','_',O),atom_subst_frak_0(O,'?','_',VN).
 
 
-%= 	 	 
+%=
 
 %% no_vars_needed( ?H) is semidet.
 %
@@ -624,7 +629,7 @@ no_vars_needed(H):-var(H),!.
 no_vars_needed('$VAR'(_)):-!.
 no_vars_needed(H):- compound(H),H=varname_info(_,_,_,_),!.
 
-%= 	 	 
+%=
 
 %% try_get_inner_vars( ?H) is semidet.
 %
@@ -634,7 +639,7 @@ try_get_inner_vars(H):- once((functor(H,_,N),arg(N,H,List),member(vars(Vs),List)
 
 
 
-%= 	 	 
+%=
 
 %% term_slots( ?Term, ?Slots) is semidet.
 %
@@ -644,7 +649,7 @@ try_get_inner_vars(H):- once((functor(H,_,N),arg(N,H,List),member(vars(Vs),List)
 term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
 
-%= 	 	 
+%=
 
 %% term_singletons( ?A, ?Vs) is semidet.
 %
@@ -654,7 +659,7 @@ term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 term_singletons(A,Vs):- notrace(term_singletons(A,[],_,[],Vs)).
 %= %= :- was_export(term_singletons/3).
 
-%= 	 	 
+%=
 
 %% term_singletons( ?Term, ?NonSingle, ?Singles) is semidet.
 %
@@ -664,7 +669,7 @@ term_singletons(A,Vs):- notrace(term_singletons(A,[],_,[],Vs)).
 term_singletons(Term,NonSingle,Singles):- notrace(term_singletons(Term,[],NonSingle,[],Singles)).
 %= %= :- was_export(term_singletons/5).
 
-%= 	 	 
+%=
 
 %% term_singletons( :TermFml, ?NS, ?NS, ?S, ?S) is semidet.
 %
@@ -679,7 +684,7 @@ term_singletons([H|T],NS,NSO,S,NSV):- !, term_singletons(H,NS,NSM,S,M),term_sing
 term_singletons(Fml, NS,NSO, S,NSV):- compound(Fml),Fml=..[_|T],!, term_singletons(T, NS,NSO, S,NSV).
 
 
-%= 	 	 
+%=
 
 %% call_return_tf( :GoalCall, ?TF) is semidet.
 %
@@ -689,7 +694,7 @@ call_return_tf(Call,TF):- ((Call-> TF = t ; TF = nil)).
 
 
 
-%= 	 	 
+%=
 
 %% try_get_varname_cache( ?H) is semidet.
 %
@@ -699,7 +704,7 @@ try_get_varname_cache(H):- no_vars_needed(H),!.
 try_get_varname_cache(H):- varname_cache:varname_info(H,_,Vs,_),maplist(set_varname(write_functor),Vs),!.
 try_get_varname_cache(H):- varname_cache:varname_info(_,H,Vs,_),maplist(set_varname(write_functor),Vs),!.
 
-%= 	 	 
+%=
 
 %% try_get_head_vars( ?H) is semidet.
 %
@@ -713,7 +718,7 @@ try_get_head_vars(B):- must(get_random_headvars(B)),!.
 
 
 
-%= 	 	 
+%=
 
 %% try_varname_infos( ?H) is semidet.
 %
@@ -722,7 +727,7 @@ try_get_head_vars(B):- must(get_random_headvars(B)),!.
 try_varname_infos(H):- varname_cache:varname_info(H,_,Vs,_),maplist(set_varname(write_functor),Vs),!.
 
 
-%= 	 	 
+%=
 
 %% get_random_headvars( ?H) is semidet.
 %
@@ -732,7 +737,7 @@ get_random_headvars(H):- \+ compound(H),!.
 get_random_headvars(H):- functor(H,F,A),get_random_headvars(H,F,A,A).
 
 
-%= 	 	 
+%=
 
 %% get_random_headvars( ?H, ?F, ?A, ?N) is semidet.
 %
@@ -742,7 +747,7 @@ get_random_headvars(_H,_F,A,N):- (N < 1 ; N>A),!.
 get_random_headvars( H, F,A,N):- arg(N,H,HA),ignore(get_1head_arg_var(H,F,N,A,HA)),N2 is N-1,get_random_headvars(H,F,A,N2).
 
 
-%= 	 	 
+%=
 
 %% get_1head_arg_var( ?H, ?F, ?N, ?A, ?HA) is semidet.
 %
@@ -753,15 +758,15 @@ get_1head_arg_var(_H,F,N,A,HA):-
  (nonvar(HA)->!;
  (arg(N,HH,COMP),
   (( arg_varname(HH,N,Name),HA='$VAR'(Name));(try_get_varname_cache(HH),sub_ft_var(HA,COMP))))).
- 
 
-%= 	 	 
+
+%=
 
 %% sub_ft_var( ?HA, ?COMP) is semidet.
 %
 % Sub Format Type Variable.
 %
-sub_ft_var(HA,COMP):- 
+sub_ft_var(HA,COMP):-
   (is_ftVar(COMP)-> HA=COMP; (compound(COMP),arg(_,COMP,FTVAR),sub_ft_var(HA,FTVAR))).
 
 
@@ -772,7 +777,7 @@ sub_ft_var(HA,COMP):-
 arg_varname(P,N,Name):- arg(N,P,Now),varname_cache:varname_info(P,_,List,_),var(Now),member(Nam=V,List),Now==V,must(Nam=Name).
 
 
-%= 	 	 
+%=
 
 %% try_get_body_vars( :TermH) is semidet.
 %
@@ -797,7 +802,7 @@ try_get_body_vars(_).
 :- meta_predicate set_varname(+,*).
 % set_varname(How,B):-var(B),!.
 
-%= 	 	 
+%=
 
 %% set_varname( +How, ?B) is semidet.
 %
@@ -811,7 +816,7 @@ set_varname(How,N=V):-must(set_varname(How,N,V)),!.
 
 %set_varname(How,N,V):-var(V),var(N),!,V=N.
 
-%= 	 	 
+%=
 
 %% set_varname( +How, ?N, ?V) is semidet.
 %
@@ -836,7 +841,7 @@ set_varname(Nb_setval,N,V):- call(call,Nb_setval,'$variable_names',[N=V]).
 
 write_functor(N=V):-write_functor(N,V).
 
-%= 	 	 
+%=
 
 %% write_functor( ?N, ?V) is semidet.
 %
@@ -847,14 +852,14 @@ write_functor(N,V):-ignore('$VAR'(N)=V),!.
 
 :-export(save_clause_vars/2).
 :-module_transparent(save_clause_vars/2).
-% save_clause_vars(_,[]):-!.
 
-%= 	 	 
+%=
 
 %% save_clause_vars( ?MHB, ?Vs) is semidet.
 %
 % Save Clause Variables.
 %
+% save_clause_vars(_,[]):-!.
 save_clause_vars(MHB,Vs):- ignore(maybe_record_scanned_file),ignore(current_why(Why)),
   ignore((var(Why),loading_file(Why))),!,save_clause_vars(MHB,Vs,Why).
 
@@ -863,7 +868,7 @@ save_clause_vars(MHB,Vs):- ignore(maybe_record_scanned_file),ignore(current_why(
 
 :-export(save_clause_vars/3).
 
-%= 	 	 
+%=
 
 %% save_clause_vars( ?MHB, ?Vs, :TermWhy) is semidet.
 %
@@ -875,7 +880,7 @@ save_clause_vars(MHB,Vs,Why):-  ( \+ \+ (logicmoo_util_term_listing:as_clause_w_
 
 
 
-%= 	 	 
+%=
 
 %% locate_clause_ref( ?M, ?H, ?MB, ?B, ?ClauseRef) is semidet.
 %
@@ -890,7 +895,7 @@ locate_clause_ref(_M,H,_MB,B,ClauseRef):-clause_asserted(H,B,ClauseRef).
 locate_clause_ref(_M,H,_MB,B,ClauseRef):-clause_asserted(_:H,B,ClauseRef).
 
 
-%= 	 	 
+%=
 
 %% clause_ref_vars( ?ClauseRef, ?Was) is semidet.
 %
@@ -898,7 +903,7 @@ locate_clause_ref(_M,H,_MB,B,ClauseRef):-clause_asserted(_:H,B,ClauseRef).
 %
 clause_ref_vars(ClauseRef,Was):-prolog_clause:clause_info(ClauseRef, _File, _TermPos, _NameOffset, [variable_names(Was)]).
 
-%= 	 	 
+%=
 
 %% clause_ref_file( ?ClauseRef, ?File) is semidet.
 %
@@ -908,7 +913,7 @@ clause_ref_file(ClauseRef,File):-prolog_clause:clause_info(ClauseRef, File, _Ter
 
 :-export(save_to_clause_ref/3).
 
-%= 	 	 
+%=
 
 %% save_to_clause_ref( ?ClauseRef, ?Vs, ?Why) is semidet.
 %
@@ -918,7 +923,7 @@ save_to_clause_ref(ClauseRef,Vs,Why):- ain00(names(ClauseRef,Vs)),ain00(names_wh
 
 :-export(save_clause_vars/6).
 
-%= 	 	 
+%=
 
 %% save_clause_vars( ?M, ?H, ?MB, ?B, ?Vs, ?Why) is semidet.
 %
@@ -930,7 +935,7 @@ save_clause_vars(M,H,MB,B,Vs,Why):- fail, locate_clause_ref(M,H,MB,B,ClauseRef),
 save_clause_vars(_M,H,_MB,B,Vs,Why):- ain00(varname_cache:varname_info(H,B,Vs,Why)).
 
 
-%= 	 	 
+%=
 
 %% ain00( ?A) is semidet.
 %
@@ -948,20 +953,20 @@ contains_ftVar(Term):- sub_term(Sub,Term),compound(Sub),Sub='$VAR'(_).
 
 
 
-%= 	 	 
+%=
 
 %% ensure_vars_labled_r( ?I, ?O) is semidet.
 %
 % Ensure Variables Labled R.
 %
-ensure_vars_labled_r(I,I):-!. 
-ensure_vars_labled_r(I,O):- 
+ensure_vars_labled_r(I,I):-!.
+ensure_vars_labled_r(I,O):-
   once((((get_varname_list(Vs),Vs\==[])),
    copy_term(I:Vs,O:OVs),
     must_maplist(write_functor,OVs))),
    (O \=@= I ;  ground(O)),!.
 
-ensure_vars_labled_r(I,O):- 
+ensure_vars_labled_r(I,O):-
      once((get_clause_vars_copy(I,O),unlock_vars(O))),
      (O \=@= I ;  ground(O)),!.
 
@@ -969,7 +974,7 @@ ensure_vars_labled_r(I,O):- copy_term_and_varnames(I,O),I\=@=O.
 
 :-export(copy_term_and_varnames/2).
 
-%= 	 	 
+%=
 
 %% copy_term_and_varnames( ?Term, ?Named) is semidet.
 %
@@ -980,14 +985,14 @@ copy_term_and_varnames(Term,Named):-
    notrace((ignore((source_variables_lv(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(set_varname([write_functor,b_setarg]),CAllS))).
 
 
-%= 	 	 
+%=
 
 %% renumbervars( ?How, ?Term, ?Named) is semidet.
 %
 % Renumbervars.
 %
-renumbervars(How,Term,Named):- 
-   notrace((ignore((source_variables_lv(AllS))), 
+renumbervars(How,Term,Named):-
+   notrace((ignore((source_variables_lv(AllS))),
    copy_term(Term+AllS,Named+CAllS),
    maplist(set_varname(How),CAllS))).
 
@@ -995,7 +1000,7 @@ renumbervars(How,Term,Named):-
 
 
 
-%= 	 	 
+%=
 
 %% source_variables_lv( ?AllS) is semidet.
 %
@@ -1011,7 +1016,7 @@ source_variables_lv(AllS):-
 
 
 
-%= 	 	 
+%=
 
 %% contain_numbervars( ?Term) is semidet.
 %
@@ -1022,26 +1027,26 @@ contain_numbervars(Term):- sub_term(Sub,Term),compound(Sub),Sub='$VAR'(_),!.
 
 
 
-%= 	 	 
+%=
 
 %% contains_singletons( ?Term) is semidet.
 %
 % Contains Singletons.
 %
-contains_singletons(Term):-contains_singletons(Term,N),N>0. 
+contains_singletons(Term):-contains_singletons(Term,N),N>0.
 
 
-%= 	 	 
+%=
 
 %% contains_singletons( ?Term, ?N) is semidet.
 %
 % Contains Singletons.
 %
-contains_singletons(Term,N):-  
+contains_singletons(Term,N):-
   % sanity(\+contain_numbervars(Term)),
      \+ ground(Term),
      copy_term_nat(Term,Nat),
-     term_variables(Nat,Vs), 
+     term_variables(Nat,Vs),
      numbervars(Nat,0,_,[attvar(bind),singletons(true)]),!,
      count_members_eq('$VAR'('_'),Vs,N).
 
@@ -1052,9 +1057,9 @@ contains_singletons(Term,N):-
 % Count Members Using (==/2) (or =@=/2) ).
 %
 count_members_eq(_,[],0):-!.
-count_members_eq(Find,[E|List],N):- 
+count_members_eq(Find,[E|List],N):-
   count_members_eq(Find,List,NN),!,  (E == Find -> N is NN+1 ; NN=N).
-   
+
 
 
 %% call_not_not(:Goal) is semidet.
@@ -1064,7 +1069,7 @@ count_members_eq(Find,[E|List],N):-
 call_not_not(Goal):- \+ \+ Goal.
 
 
-%= 	 	 
+%=
 
 %% contains_badvarnames( ?Term) is semidet.
 %
@@ -1074,7 +1079,7 @@ contains_badvarnames(Term):-  notrace((sub_term(SubV,Term),compound(SubV),SubV='
 
 contains_dvar(Term):-notrace((sub_term(SubV,Term),compound(SubV),SubV='$VAR'(_),!)).
 
-%= 	 	 
+%=
 
 %% bad_varnamez( ?Sub) is semidet.
 %
@@ -1088,7 +1093,7 @@ bad_varnamez(Sub):- string(Sub),!.
 bad_varnamez(Sub):- format(atom(A),'~w',['$VAR'(Sub)]),sub_string(A,_,_,_,'$').
 
 
-%= 	 	 
+%=
 
 %% mpred_numbervars_with_names( ?Term) is semidet.
 %
@@ -1097,7 +1102,7 @@ bad_varnamez(Sub):- format(atom(A),'~w',['$VAR'(Sub)]),sub_string(A,_,_,_,'$').
 mpred_numbervars_with_names(Term):- term_variables(Term,Vars),mpred_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
 
 
-%= 	 	 
+%=
 
 %% mpred_name_variables( :TermVar) is semidet.
 %
@@ -1114,7 +1119,7 @@ mpred_name_variables([Var|Vars]):-
 %=========================================
 
 
-%= 	 	 
+%=
 
 %% b_implode_varnames( ?VALUE1) is semidet.
 %
@@ -1122,7 +1127,7 @@ mpred_name_variables([Var|Vars]):-
 %
 b_implode_varnames(_):-!.
 
-%= 	 	 
+%=
 
 %% b_implode_varnames0( :TermN) is semidet.
 %
@@ -1132,7 +1137,7 @@ b_implode_varnames0([]):-!.
 b_implode_varnames0([N=V|Vs]):- ignore((V='$VAR'(N);V=N)),b_implode_varnames0(Vs),!.
 
 
-%= 	 	 
+%=
 
 %% imploded_copyvars( ?C, ?CT) is semidet.
 %
@@ -1155,7 +1160,7 @@ source_variables([]).
 
 
 
-%= 	 	 
+%=
 
 %% check_varnames( :TermVs) is semidet.
 %
@@ -1169,7 +1174,7 @@ check_varnames(_).
 
 :-meta_predicate(snumbervars4(0,?,?,?)).
 
-%= 	 	 
+%=
 
 %% snumbervars4( :GoalTerm, ?Start, ?End, ?List) is semidet.
 %
@@ -1180,7 +1185,7 @@ snumbervars4(Term,Start,End,List):- snumbervars5(Term,Start,End,List).
 
 :-meta_predicate(snumbervars5(0,?,?,?)).
 
-%= 	 	 
+%=
 
 %% snumbervars5( :GoalTerm, ?Start, ?End, ?List) is semidet.
 %
@@ -1190,7 +1195,7 @@ snumbervars5(Term,Start,End,List):-must_det_l((integer(Start),is_list(List), num
 
 :-export(try_save_vars/1).
 
-%= 	 	 
+%=
 
 %% try_save_vars( ?HB) is semidet.
 %
@@ -1201,7 +1206,7 @@ try_save_vars(HB):-ignore((get_varname_list(Vs),Vs\==[],save_clause_vars(HB,Vs))
 
 :-export(maybe_scan_for_varnames/0).
 
-%= 	 	 
+%=
 
 %% maybe_scan_for_varnames is semidet.
 %
@@ -1211,13 +1216,21 @@ maybe_scan_for_varnames:- current_prolog_flag(mpred_vars, true)->scan_for_varnam
 
 :-export(scan_for_varnames/0).
 
-%= 	 	 
+:- dynamic(thglobal:scanning_for_varnames_already/0).
+
+%=
 
 %% scan_for_varnames is semidet.
 %
 % Scan For Varnames.
 %
-scan_for_varnames:- 
+scan_for_varnames:- thglobal:scanning_for_varnames_already,!.
+scan_for_varnames:- setup_call_cleanup(
+   asserta(thglobal:scanning_for_varnames_already),
+   scan_for_varnames0,
+   retractall(thglobal:scanning_for_varnames_already)).
+
+scan_for_varnames0:-
  set_prolog_flag(mpred_vars, true),
  ensure_loaded(library(make)),
  doall((make:modified_file(F),retractall(varname_cache:varname_info_file(F)))),
@@ -1232,7 +1245,7 @@ scan_for_varnames:-
 que_read_source_file_vars(F):-varname_cache:varname_info_file(F),!.
 que_read_source_file_vars(F):-ain00(varname_cache:queued_read_source_file_vars(F)).
 
-%= 	 	 
+%=
 
 %% dcall_if_verbose( :GoalG) is semidet.
 %
@@ -1245,7 +1258,7 @@ dcall_if_verbose(G):-show_call(why,G).
 :- dynamic(varname_cache:varname_info_file/1).
 :- dynamic(varname_cache:queued_read_source_file_vars/1).
 
-%= 	 	 
+%=
 
 %% read_source_file_vars( ?F) is semidet.
 %
@@ -1257,7 +1270,7 @@ read_source_file_vars(F):- clause_asserted(varname_cache:varname_info_file(F)),!
 read_source_file_vars(F):- asserta(varname_cache:varname_info_file(F),Ref), catch((read_source_file_vars_1(F)),E,(dmsg(E),erase(Ref))).
 
 
-%= 	 	 
+%=
 
 %% save_file_source_vars( ?F, ?T, ?Vs) is semidet.
 %
@@ -1269,7 +1282,7 @@ save_file_source_vars(F,T,Vs):- put_variable_names(Vs),!,w_tl(t_l:current_why_so
 
 
 
-%= 	 	 
+%=
 
 %% read_source_vars( ?File, ?In) is semidet.
 %
@@ -1284,21 +1297,21 @@ read_source_vars(File,In):-
           arg(1,Module,M),
           (Term = module(MM,_) -> (nb_setarg(1,Module,MM),fail);
           ((stream_position_data(line_count, TermPos, LineNo),
-          
+
 	  ignore(save_file_source_vars(mfl(M,File,LineNo),Term,Vs)),
 	  (   is_list(Expanded)
 	  ->  member(T, Expanded)
 	  ;   T = Expanded
 	  ),
 	(   T == end_of_file
-	->  ! ; 
+	->  ! ;
            ( T\==Term, save_file_source_vars(mfl(M,File,LineNo),T,Vs),
 	    fail))))).
 
 
 % new method
 
-%= 	 	 
+%=
 
 %% read_source_file_vars_1( ?File) is semidet.
 %
@@ -1333,7 +1346,7 @@ only_stars(_).
 
 del_each_attr(M,V):-del_attr(V,M).
 
-%= 	 	 
+%=
 
 %% ensure_vars_labled( ?I, ?O) is semidet.
 %
@@ -1350,19 +1363,19 @@ ensure_vars_labled(I,I).
 
 :- multifile(user:portray/1).
 
-%= 	 	 
+%=
 
 %% portray( :TermObj) is semidet.
 %
 % Hook To [user:portray/1] For Module Logicmoo_varnames.
 % Portray.
 %
-user:portray(A) :-  \+ tracing, 
+user:portray(A) :-  \+ tracing,
   catch(notrace(((compound(A);var(A)), current_prolog_flag(mpred_vars, true), set_prolog_flag(mpred_vars, false),
     call_cleanup((((user:portray(A) -> ! ; print_numbervars_maybe(A)))),set_prolog_flag(mpred_vars, true)))),E,(writeq(E),nl,fail)).
 
 
-%= 	 	 
+%=
 
 %% print_numbervars( ?H) is semidet.
 %
@@ -1373,7 +1386,7 @@ print_numbervars(H):- must( \+ \+ ((on_x_log_fail(print_numbervars_maybe(H));on_
 
 
 
-%= 	 	 
+%=
 
 %% print_numbervars_maybe( ?H) is semidet.
 %
@@ -1382,7 +1395,7 @@ print_numbervars(H):- must( \+ \+ ((on_x_log_fail(print_numbervars_maybe(H));on_
 print_numbervars_maybe(H):-(compound(H);var(H)), copy_term(H,HC), \+ \+ ((get_clause_vars(H), HC\=@=H, print_numbervars_1(H))),!.
 
 
-%= 	 	 
+%=
 
 %% print_numbervars_1( ?H) is semidet.
 %
@@ -1392,7 +1405,7 @@ print_numbervars_1(H):- loop_check(print_numbervars_2(H),format('~N~q.~n',[H])).
 
 % print_numbervars_2(H):- dtrace,baseKB:portray_one_line_hook(H),!.
 
-%= 	 	 
+%=
 
 %% print_numbervars_2( ?H) is semidet.
 %
@@ -1403,24 +1416,24 @@ print_numbervars_2(H):- write_term(H,[portrayed(false)]),nl,!.
 
 :- multifile(t_l:disable_px/0).
 :- thread_local(t_l:disable_px/0).
- 
 
-%= 	 	 
+
+%=
 
 %% term_expansion_save_vars( ?HB) is semidet.
 %
 % Term Expansion Save Variables.
 %
-term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:dont_varname, % \+ current_prolog_flag(xref, true), 
-   current_predicate(logicmoo_util_varnames_file/0), current_prolog_flag(mpred_vars,true),  
+term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:dont_varname, % \+ current_prolog_flag(xref, true),
+   current_predicate(logicmoo_util_varnames_file/0), current_prolog_flag(mpred_vars,true),
    source_context_module(M),init_varname_stores(M),logicmoo_util_with_assertions:w_tl([t_l:dont_varname_te,t_l:disable_px],try_save_vars(M:HB)),!,fail.
 
 
 without_varname_scan(Goal):-
-  w_tl(current_prolog_flag(mpred_vars,false),  
+  w_tl(current_prolog_flag(mpred_vars,false),
    w_tl([ - t_l:dont_varname_te,- t_l:dont_varname],Goal)).
 
-%= 	 	 
+%=
 
 %% maybe_record_scanned_file is semidet.
 %
@@ -1429,7 +1442,7 @@ without_varname_scan(Goal):-
 maybe_record_scanned_file:-ignore((  source_location(F,_), \+ varname_cache:varname_info_file(F), asserta(varname_cache:varname_info_file(F)))).
 
 
-%= 	 	 
+%=
 
 %% init_varname_stores( ?M) is semidet.
 %
@@ -1443,7 +1456,7 @@ init_varname_stores(_):- !.
 % :- maybe_scan_for_varnames.
 
 
-%= 	 	 
+%=
 
 %% logicmoo_util_varnames_file is semidet.
 %
@@ -1452,7 +1465,7 @@ init_varname_stores(_):- !.
 logicmoo_util_varnames_file.
 
 
-%= 	 	 
+%=
 
 %% make_hook( ?VALUE1, ?Files) is semidet.
 %
@@ -1462,7 +1475,7 @@ logicmoo_util_varnames_file.
 prolog:make_hook(before, Files):-forall(member(File,Files),retractall(varname_cache:varname_info_file(File))).
 % prolog:make_hook(after, Files):- forall(member(File,Files),show_call(why,ain00(varname_cache:varname_info_file(File)))).
 
-%= 	 	 
+%=
 
 %% term_expansion( :TermFDecl, ?Clause) is semidet.
 %

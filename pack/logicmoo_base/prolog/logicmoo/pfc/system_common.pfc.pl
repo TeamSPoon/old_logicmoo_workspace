@@ -1006,11 +1006,13 @@ argsIsa(subFormat,ttExpressionType).
 */
 
 disjointWith(tCol,tIndividual).
+:- noguitracer.
+%:- rtrace.
 
 arity(F,A)/(atom(F),\+ is_sentence_functor(F),number(A),A>1,A<10,functor(P,F,A),\+ rtLogicalConnective(F)), 
   \+ meta_argtypes_guessed(P),   
-   argIsa(F,A,_),
-   argIsa(F,1,_),
+   (argIsa(F,A,NOTFT)/NOTFT\==ftTerm),
+   (argIsa(F,1,NOTFT2)/NOTFT2\==ftTerm),
  {generateArgVars(P, argIsa(F), '='(_))}
 ==> meta_argtypes_guessed(P).
 
@@ -1114,6 +1116,8 @@ arity(typeProps,2).
 % :- decl_mpred_pfc ~/1.
 prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/1)).
 
+% :- break.
+
 :- ignore(show_failure(why,arity(typeProps,2))).
 :- must(call_u(arity(typeProps,2))).
 :- ain_expanded(==>(argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,predCanHaveSingletons,prologDynamic,functorIsMacro,prologListValued,prologSingleValued),1,tPred))).
@@ -1197,7 +1201,7 @@ typeGenls(ttValueType,vtValue).
 % :- must((vtColor(vRed))).
 
 
-argIsa(Prop,N,Type) :- cwc,number(N),loop_check(argIsa_known(Prop,N,Type)),must(ground(argIsa(Prop,N,Type))).
+%argIsa(Prop,N,Type) :- cwc,number(N),loop_check(argIsa_known(Prop,N,Type)),must(ground(argIsa(Prop,N,Type))).
 %argIsa(Prop,N,Type) <- {cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type)))}.
 
 ttExpressionType(Type) ==> (argIsa(Prop,N,Type),{number(N)} ==> argQuotedIsa(Prop,N,Type)).
@@ -1394,9 +1398,8 @@ subFormat(ftVar,ftProlog).
 subFormat(ftVoprop,ftRest(ftVoprop)).
 subFormat(ftVoprop,ftTerm).
 
-subFormat(COL1,COL2)/atom(COL1)==>(ttExpressionType(COL1),ttExpressionType(COL2)).
-
-tCol(W)==>{guess_supertypes(W)}.
+subFormat(COL1,COL2)/(atom(COL1);atom(COL2))==>(ttExpressionType(COL1),ttExpressionType(COL2)).
+tCol(W)==>{quietly_u(guess_supertypes(W))}.
 
 
 tSet(tNewlyCreated).

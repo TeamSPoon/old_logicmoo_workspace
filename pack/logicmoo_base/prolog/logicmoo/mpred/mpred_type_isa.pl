@@ -771,7 +771,7 @@ compound_isa(_,I,T):- cheaply_u(isa_asserted(I,T)).
 
 if_bound(C,G):-var(C)->true;call_u(G).
 
-:- table(subcache/2).
+%:- table(subcache/2).
 
 :-dynamic(subcache/2).
 

@@ -1,8 +1,8 @@
 %:-module(mud_testing,[]).
 /* *
- <module> 
+ <module>
 % A MUD testing API is defined here
-% 
+%
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
@@ -18,7 +18,7 @@
         test_true/1,
         run_mud_test/1,
         test_false/1,
-        
+
         test_call/1]).
 */
 
@@ -85,7 +85,7 @@ test_false(SomeGoal):- test_true(not(SomeGoal)).
 
 run_mud_test(Filter):-
    doall((
-   member(F/A,[baseKB:mud_test/0,baseKB:mud_test/1,baseKB:mud_test/2]),   
+   member(F/A,[baseKB:mud_test/0,baseKB:mud_test/1,baseKB:mud_test/2]),
    current_predicate(M:F/A),
    functor(H,F,A),
    not(predicate_property(M:H,imported_from(_))),
@@ -163,7 +163,7 @@ mud_test_level2(drop_take,
   do_agent_action('eat food'))))).
 
 
-:- catch(noguitracer,_,true).
+:- catch(ignore(noguitracer),_,true).
 
 % [Optionally] load and start sparql server
 %:- at_start(start_servers)
@@ -179,36 +179,36 @@ baseKB:mud_test_local:-
    test_name("tests to see if we have: mudAtLoc"),
    test_true((foc_current_agent(Agent),show_call(mudAtLoc(Agent,_Where)))).
 
-baseKB:mud_test_local:- 
+baseKB:mud_test_local:-
    test_name("tests to see if we have: localityOfObject"),
    test_true((foc_current_agent(Agent),show_call(localityOfObject(Agent,_Where)))).
 
-baseKB:mud_test_local:- 
+baseKB:mud_test_local:-
    test_name("tests to see if our clothing doesnt: mudAtLoc"),
    test_false(mudAtLoc('iGoldUniform775',_X)).
-    
-baseKB:mud_test_local:- 
+
+baseKB:mud_test_local:-
    foc_current_agent(Agent),
    test_name("tests to see if we have: argIsas on mudEnergy"),
    test_true(correctArgsIsa(mudEnergy(Agent,_),_)).
 
-baseKB:mud_test_local:- 
+baseKB:mud_test_local:-
    test_name("tests to see if we have: singleValued on mudMoveDist"),
    foc_current_agent(Agent),
    must(ain(mudMoveDist(Agent,3))),
    test_true(must((findall(X,mudMoveDist(Agent,X),L),length(L,1)))).
 
-baseKB:mud_test_local:- 
-      test_name("nudity test"), 
+baseKB:mud_test_local:-
+      test_name("nudity test"),
       foc_current_agent(Agent),
        test_true_req(wearsClothing(Agent, 'ArtifactCol1003-Gold-Uniform775')).
 
-baseKB:mud_test_local:- 
-      test_name("genlInverse test"), 
+baseKB:mud_test_local:-
+      test_name("genlInverse test"),
       foc_current_agent(Agent),
        test_true_req(mudPossess(Agent, 'ArtifactCol1003-Gold-Uniform775')).
 
-baseKB:mud_test_local:- 
+baseKB:mud_test_local:-
    test_name("Tests our action templates"), doall((get_all_templates(Templates),dmsg(get_all_templates(Templates)))).
 
 baseKB:mud_test_local:-

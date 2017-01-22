@@ -1,3 +1,18 @@
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
+
 /* <module> mpred_www
 % Provides /logicmoo runtime preds browsing
 %
@@ -7,6 +22,7 @@
 % Dec 13, 2035
 %
 */
+
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 :- endif.
 :- module(logicmoo_run_clio,[]).

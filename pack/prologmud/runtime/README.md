@@ -1,41 +1,20 @@
+# CYC_JRTL_with_CommonLisp
 
-= Human Readable:
+Most Worked-on Feature set * Full compatibility with LarKC Platform http://larkc.eu * This library is a drop-in replacement to the subl.jar of OpenCyc
 
-README.md - This File
-logicmoo_repl.pl - Load Logicmoo Inference Engine
-run_mud_server.pl - Load the MUD CODE
-start_mud_server.pl - Load the MUD WORLD
+Un-Armed Bear Common Lisp for Java - LispSharp
 
-run.pl/daemon.pl - Created by ClioPatria's install script (Unused)
-config-enabled/**
+A specialized re-implementation of Armed Bear Common Lisp.
 
-= Executables:
+(see http://common-lisp.net/project/armedbear)
 
-logicmoo_repl - Bootstraped Inference Engine "logicmoo_repl.pl"
-running_mud_server - Bootstraped MUD CODE "run_mud_server"
-started_mud_world - Bootstraped MUD WORLD "run_mud_server"
-debug_once.sh
+Extra features * Passes additional CL ANSI-TESTS * Also Runs under .NET/Mono as an EXE and DLL * Requires no Java/JVM
 
-= Datafiles:
-bootstrap.ttl
-settings.db
-site.docstore
-storage/**
-RDF-store/**
-cache/**
+This allows OpenCyc to use common-lisp * Generate .java files from lisp source files instead of .class files. This allows users to go back in and re-edit the generated .java files.
 
+Licence: GPLv2 + Classpath Exception
 
+Project Information
 
-= Temp and log files:
-
-httpd.log
-saved_cached_queries
-fooooo0
-fooooo2
-fooooo4
-fooooo9
-lastrun.html
-lastrun.txt
-typescript
-typescript.html
-
+Labels: 
+lisp java ikvm .net LispSharp lisp.net

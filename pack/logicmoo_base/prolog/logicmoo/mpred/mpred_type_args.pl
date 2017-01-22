@@ -18,6 +18,7 @@
             as_one_of/2,
             show_count/1,
             assert_argIsa/3,
+            argIsa_known/3,
             assert_predArgTypes/1,
             assert_predArgTypes_fa/2,
             assert_predArgTypes_from_left/3,
@@ -30,7 +31,7 @@
             correctAnyTypeOrFail/4,
             correctArgsIsa/2,
             correctArgsIsa/3,
-            correctArgsIsa/4,
+            %correctArgsIsa/4,
             correctArgsIsa/3,
             correctArgsIsa00/3,
             correctFormatType/4,
@@ -46,8 +47,8 @@
             discoverAndCorrectArgsIsa_from_right/5,
             evaluatableArg/2,
             evaluatableFunctor/1,
-            compoundSpecs/2,
-            meta_argtypes/1,
+            %compoundSpecs/2,
+            %meta_argtypes/1,
             % hook_coerce/3,
             is_boolean/1,
             is_declarations/1,
@@ -62,7 +63,7 @@
             is_valuespec/1,
             list_to_callform/3,
             is_declarations/1,
-            mpred_arity_pred/1,
+            %mpred_arity_pred/1,
             must_equals/2,
             must_equals_correct/3,
             pl_arg_type/2,
@@ -165,7 +166,7 @@ assert_predArgTypes_from_right(F,A,ArgsList):-append(Left,[Last],ArgsList),
 
 generateArgVars(P,ArgPred,Else):-
  (ground(P)->true;
-  (arg(N,P,E),var(E),(call(ArgPred,N,Arg)-> Arg=E, call(Else,E)),
+  (arg(N,P,E),var(E),(call_u(call(ArgPred,N,Arg))-> Arg=E, call_u(call(Else,E))),
      nonvar(E),generateArgVars(P,ArgPred,Else))).
    
 
@@ -373,8 +374,9 @@ as_one_of(Types,isOneOf(Types)).
 argIsa_op_call(Op,_:F,N,Type):-!,argIsa_op_call(Op,F,N,Type),!.
 argIsa_op_call(Op,F/_,N,Type):- !,argIsa_op_call(Op,F,N,Type),!.
 argIsa_op_call(Op,Func,N,Type):- compound(Func),!,functor(Func,F,_),argIsa_op_call(Op,F,N,Type),!.
-argIsa_op_call(_,F,N,Type):-hotrace((loop_check((argIsa(F,N,Type),!),Type=ftTerm),must(nonvar(Type)))).
+argIsa_op_call(_,F,N,Type):-hotrace((loop_check((call_u(argIsa(F,N,Type)),!),Type=ftTerm),must(nonvar(Type)))).
 
+argIsa_known(F,N,Type):-argIsa_op_call(_,F,N,Type).
 
 
 :- was_export(correctArgsIsa/2).

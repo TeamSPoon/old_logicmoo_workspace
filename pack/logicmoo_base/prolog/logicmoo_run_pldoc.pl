@@ -1,3 +1,17 @@
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 :- endif.
 :- module(logicmoo_run_pldoc,[]).

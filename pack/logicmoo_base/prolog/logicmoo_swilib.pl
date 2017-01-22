@@ -21,6 +21,9 @@
 % restore entry state
 %:- lmce:reset_modules.
 
+:- if(((current_prolog_flag(shared_object_extension,dll), once((getenv(path,X),name(X,S),member(0,S)))))).
+:- getenv('JAVA_HOME',Where),directory_file_path(Where,bin,New),setenv('Path',New).
+:- endif.
 
 % ======================================================
 % Preload library so that autoloading is not used
@@ -30,7 +33,7 @@
 :- use_module(http_exception:library(settings)).
 
 % XPCE related autoloads
-
+/*
 :- system:use_module(library(pce),except([op(_,_,_)])).
 :- system:use_module(library(swi_compatibility)).
 :- system:use_module(library(pce_util)).
@@ -43,13 +46,15 @@
 :- system:use_module(library(gui_tracer)).
 :- system:use_module(library(pce_meta)).
 :- system:use_module(library(portray_object)).
-:- system:use_module(library(keybinding)).
+:- system:use_module(library(keybinding)).   
 :- system:use_module(library(emacs_tags)).
 :- system:use_module(library(pce_require)).
 :- system:use_module(library(pce_debug)).
 :- system:use_module(library(help_message)).
 :- system:use_module(library(toolbar)).
 :- system:use_module(library(plot/plotter)).
+
+:- system:use_module(library(jpl)).
 
 :- system:use_module(library(imageops)).
 :- system:use_module(library(pce_float_item)).
@@ -61,7 +66,7 @@
 :- call((system:use_module(library(pce_report)))). % ,except([colour/2])))).
 :- call((system:use_module(library('swi/pce_debug_monitor')))). %,except([colour/2,resource/3])))).
 :- call((system:use_module(library('swi/thread_monitor')))).
-
+*/
 
 :- system:use_module(library(statistics)).
 :- system:use_module(library(dialect/hprolog),[]).

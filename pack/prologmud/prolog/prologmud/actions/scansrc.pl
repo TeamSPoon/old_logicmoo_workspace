@@ -45,8 +45,8 @@ remove_undef_search:- ((
  '@'(use_module(library(check)),'user'),
  redefine_system_predicate(check:list_undefined(_)),
  abolish(check:list_undefined/1),
- assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
- assert((check:list_undefined(A):- reload_library_index,  update_changed_files,call(thread_self(main)),!, ignore(A=[]))),
+ assert((check:list_undefined(A):- not(thread_self_main),!, ignore(A=[]))),
+ assert((check:list_undefined(A):- reload_library_index,  update_changed_files,call(thread_self_main),!, ignore(A=[]))),
  assert((check:list_undefined(A):- ignore(A=[]),scansrc_list_undefined(A))))).
 */
 

@@ -43,7 +43,7 @@ prolog_stack:stack_guard(none).
 :- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 */
 :- set_prolog_flag(verbose_load,true).
-:- set_prolog_flag(verbose_autoload, true).
+%:- set_prolog_flag(verbose_autoload, true).
 :- set_prolog_flag(debug_on_error,true).
 :- set_prolog_flag(report_error,true).
 :- set_prolog_flag(debug,true).
@@ -53,6 +53,7 @@ prolog_stack:stack_guard(none).
 
 
 :- set_prolog_flag(logicmoo_autoload,false).
+%%% TODO one day :- set_prolog_flag(logicmoo_autoload,true).
 
 
 % must be xref-ing or logicmoo_autoload or used as include file
@@ -64,6 +65,7 @@ lmbase:skip_module_decl:-
       ((prolog_load_context(file,F),  prolog_load_context(source,F))
              -> throw(error(format(":- include(~w).",[F]),ensure_loaded(F))) ; true))). 
 
+%%% TODO one day :- set_prolog_flag(logicmoo_include,fail).
 
 
 :- include('logicmoo/mpred/mpred_header.pi').

@@ -49,7 +49,7 @@
 
 :- include('logicmoo_util_header.pi').
 
-:- use_module(library(gui_tracer)).
+%:- use_module(library(gui_tracer)).
 :- meta_predicate with_each_item(:,+,+).
 %% with_each_item(:P2,+EleList,+ArgList) is nondet.
 %

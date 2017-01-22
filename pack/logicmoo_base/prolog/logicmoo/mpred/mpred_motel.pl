@@ -15,9 +15,13 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+
+end_of_file.
+
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_motel,
           [ 
+          getLibraries
           ]).
 :- endif.
 
@@ -130,8 +134,8 @@ SICSTUS Prolog as described the appendix of the MOTEL user manual.
 :- dynamic(rel/5).
 % The following predicates are used for additional informations about
 % the terminology and the world description.
-:- multifile(attribute/5).
-:- dynamic(attribute/5).
+:- multifile((attribute)/5).
+:- dynamic((attribute)/5).
 
 :- multifile(axiom/3).
 :- dynamic(axiom/3).

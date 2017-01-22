@@ -768,6 +768,7 @@ t_ify0(PGaf,TGaf):-
     (PGaf=..[P|ARGS], (P==t -> PGaf=TGaf ; (maplist(t_ify0,ARGS,TARGS)->TGaf=..[t,P|TARGS]))))).
 
 
+makeRenames:- \+ current_prolg_flag(did_todos,_),!.
 makeRenames:- 
  w_tl(set_prolog_flag(logicmoo_load_state,making_renames),
      forall(makeRenames0,true)),!.

@@ -15,7 +15,8 @@ Provide access to ClioPatria's RDF store using pengines.
 
 % Only allow connections from localhost.  Use `[*]` to allow access from
 % anywhere.  Note that the cpack `swish` also depends on this setting.
-:- set_setting_default(pengines:allow_from, ['127.0.0.1']).
+%:- set_setting_default(pengines:allow_from, ['127.0.0.1']).
+:- set_setting_default(pengines:allow_from, [*]).
 
 % Deny hosts/networks.  Deny rules are applied after allow rules, i.e.,
 % you are granted access if you are allowed and not denied.

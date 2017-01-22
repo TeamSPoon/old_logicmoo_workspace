@@ -15,7 +15,7 @@
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_kb_ops,
           [ deducedSimply/1,
-
+get_consequent/2,
 how_to_op/2,
 is_callable/1,
 lookup_inverted_op/3,

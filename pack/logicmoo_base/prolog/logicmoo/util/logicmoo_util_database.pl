@@ -866,7 +866,7 @@ retract_eq(HB):-expand_to_hb(HB,H,B),show_failure(modulize_head(H,MH)),clause_as
 %
 % Safely Paying Attention To Corner Cases Univ.
 %
-safe_univ(Call,Univ):-string(Call),!,[Call]=Univ.
+safe_univ(SCall,Univ):-string(SCall),!,atom_string(Call,SCall),[Call]=Univ.
 safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
 
 
@@ -877,6 +877,7 @@ safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
 % Safely Paying Attention To Corner Cases Univ Primary Helper.
 %
 safe_univ0(M:Call,[N:L|List]):- nonvar(M),nonvar(N),!,safe_univ0(Call,[L|List]).
+safe_univ0(M:Call,[N:L|List]):- nonvar(N),var(M),N=M,!,safe_univ(Call,[L|List]).
 safe_univ0(Call,[M:L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ0(M:Call,[L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ0(Call,[L|List]):- not(is_list(Call)),sanity(atom(L);compound(Call)), Call =..[L|List],!,warn_bad_functor(L).

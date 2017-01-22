@@ -1226,8 +1226,8 @@ remove_undef_search:- ((
  '@'(use_module(library(check)),'user'),
  redefine_system_predicate(check:list_undefined(_)),
  abolish(check:list_undefined/1),
- assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
- assert((check:list_undefined(A):- check:reload_library_index,  update_changed_files,call(thread_self(main)),!, ignore(A=[]))),
+ assert((check:list_undefined(A):- not(thread_self_main),!, ignore(A=[]))),
+ assert((check:list_undefined(A):- check:reload_library_index,  update_changed_files,call(thread_self_main),!, ignore(A=[]))),
  assert((check:list_undefined(A):- ignore(A=[]),scansrc_list_undefined(A))))).
 
 % :- remove_undef_search.
@@ -1462,16 +1462,19 @@ prolog:locate_clauses(A, OutOthers) :-
 % Prolog Listing List Clauses.
 %
 prolog_listing_list_clauses(Pred, Source) :-  current_prolog_flag(listing_vars,true),!,
-       scan_for_varnames,
+      % scan_for_varnames,
        strip_module(Pred, Module, Head),   
       (current_prolog_flag(listing_docs,true)-> autodoc_pred(Module,Pred); true),
        (    clause(Pred, Body),
-            get_clause_vars_copy((Head:-Body),ForPrint),
+           once(( get_clause_vars_copy((Head:-Body),ForPrint),
             prolog_listing:write_module(Module, Source, Head),
-            prolog_listing:portray_clause(ForPrint),
+            prolog_listing:portray_clause(ForPrint))),
 	    fail
 	;   true
 	).
+
+
+       
 
 % System Version 7.3.9
 prolog_listing_list_clauses(Pred, Source) :-

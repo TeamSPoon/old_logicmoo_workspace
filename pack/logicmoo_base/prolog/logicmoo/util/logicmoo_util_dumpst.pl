@@ -456,14 +456,14 @@ end_dump(GG):-compound(GG),functor(GG,F,_),atom_concat(dump,_,F),nb_setval('$hid
 % dtrace/0/1/2
 % =====================
 
-system:dtrace:- wdmsg("DUMP_TRACE/0"), (thread_self(main)->dtrace(system:trace);(dumpST(30),abort)).
+system:dtrace:- wdmsg("DUMP_TRACE/0"), (thread_self_main->dtrace(system:trace);(dumpST(30),abort)).
 %= 	 	 
 
 %% dtrace is semidet.
 %
 % (debug) Trace.
 %
-system:dbreak:- wdmsg("DUMP_BREAK/0"), (thread_self(main)->dtrace(system:break);true).
+system:dbreak:- wdmsg("DUMP_BREAK/0"), (thread_self_main->dtrace(system:break);true).
 
 :- thread_local(tlbugger:has_auto_trace/1).
 :-meta_predicate(dtrace(0)).
@@ -475,7 +475,7 @@ system:dbreak:- wdmsg("DUMP_BREAK/0"), (thread_self(main)->dtrace(system:break);
 % (debug) Trace.
 %
 
-dtrace(G):- strip_module(G,_,dbreak),\+ thread_self(main),!.
+dtrace(G):- strip_module(G,_,dbreak),\+ thread_self_main,!.
 dtrace(G):- tlbugger:has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
 dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dumptrace_or_cont(G))),trace).
 

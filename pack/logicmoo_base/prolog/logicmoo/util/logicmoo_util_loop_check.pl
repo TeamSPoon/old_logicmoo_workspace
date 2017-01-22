@@ -529,6 +529,7 @@ memoize_on(M,In,Out,_):- lmcache:cached_memoized_on(M,In,Out),!.
 memoize_on(M,In,Out,G):- G,!,call(assert_if_new,lmcache:cached_memoized_on(M,In,Out)),!,
    maybe_save_memoized_on.
 
+maybe_save_memoized_on:-!.
 maybe_save_memoized_on:- flag('$memoized_on_count',X,X+1),1 is X mod 300,!,tell(memoized_on),
   format('
       :- multifile(lmcache:cached_memoized_on/3).
@@ -541,7 +542,7 @@ maybe_save_memoized_on:- flag('$memoized_on_count',X,X+1),1 is X mod 300,!,tell(
      ),     
    told.
    
-maybe_save_memoized_on.
+
 
 :- if(exists_source('memoized_on')).
 :- ensure_loaded(memoized_on).

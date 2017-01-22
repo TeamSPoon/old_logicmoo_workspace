@@ -585,9 +585,12 @@ remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
 remove_pred(M,F,A):- 
  on_x_log_cont((
   w_tl(set_prolog_flag(access_level,system),
-    ((functor(P,F,A),unlock_predicate(M:P),
-    redefine_system_predicate(M:F/A),redefine_system_predicate(F/A),
-    M:redefine_system_predicate(P),M:redefine_system_predicate(M:P),
+    ((functor(P,F,A),
+    redefine_system_predicate(M:F/A),
+    redefine_system_predicate(F/A),
+    M:redefine_system_predicate(P),
+    M:redefine_system_predicate(M:P),
+    unlock_predicate(M:P),
     abolish(M:F,A),
   M:asserta((M:P:- wdmsg(permission_error(P)),throw(permission_error(M:F/A)))),
   lock_predicate(M:P)))))),!.
@@ -641,7 +644,7 @@ current_predicate_module(P,PredMt):-!,functor_safe(P,F,A),(current_predicate(Pre
 dynamic_multifile(F/N):-
    dynamic(F/N),
    multifile(F/N),
-   module_transparent(F/N).
+   module_transparent(F/N),!.
 dynamic_multifile(M:F/N):-
    dynamic(M:F/N),
    multifile(M:F/N),

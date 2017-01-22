@@ -1,7 +1,7 @@
 #!/bin/bash
 #cls ; swipl -T18G -L18G -T18G -s externals/MUD_ScriptEngines/snark/snark_in_prolog.pl
 export OLDPWD="`pwd`"
-export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/src && pwd )"
+export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #export SWIPL=/usr/local/lib/swipl-7.1.11/bin/x86_64-linux/swipl
 export RUNFILE="run_debug.pl"
 if [ $# -eq 0 ] 

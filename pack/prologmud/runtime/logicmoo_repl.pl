@@ -21,10 +21,11 @@
 
 user:file_search_path(prologmud, library(prologmud)).
 setup_rl_read_history_0:-
-  ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),
-  (exists_file(File) -> rl_read_history(File); true)).
-:- setup_rl_read_history_0.
-:- initialization(setup_rl_read_history_0,restore).
+  ignore((
+  current_prolog_flag(readline, true),expand_file_name("~/.pl-history", [File|_]),
+  exists_file(File), !, rl_read_history(File))).
+%:- setup_rl_read_history_0.
+%:- initialization(setup_rl_read_history_0,restore).
 
 :- sanity((statistics(cputime,X),X<197)).
 

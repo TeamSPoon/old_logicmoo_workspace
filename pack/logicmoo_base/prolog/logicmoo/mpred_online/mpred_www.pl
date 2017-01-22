@@ -1935,7 +1935,7 @@ section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(get
           mpred_www_file/0)).
 
 :- export(get_print_mode/1).
-get_print_mode(Text):-thread_self(main),!,Text=text.
+get_print_mode(Text):-thread_self_main,!,Text=text.
 get_print_mode(html).
 
 
@@ -2231,7 +2231,7 @@ write_atom_link(L,N):-must_run((write_atom_link(atom(W),L,N),format('~w',[W]))),
 %
 write_atom_link(W,A/_,N):-atom(A),!,write_atom_link(W,A,N).
 write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N).
-%write_atom_link(W,_,N):- thread_self(main),!,write_term_to_atom_one(W,N),!.
+%write_atom_link(W,_,N):- thread_self_main,!,write_term_to_atom_one(W,N),!.
 write_atom_link(W,_,N):- must_run(nonvar(W)),\+ get_print_mode(html),write_term_to_atom_one(W,N),!.
 write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),
    url_encode(AQ,URL),

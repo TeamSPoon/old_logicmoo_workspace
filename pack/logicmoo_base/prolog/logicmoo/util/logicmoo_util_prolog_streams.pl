@@ -112,7 +112,8 @@ set_main_io:- (thread_self(main)->((stream_property(Err, alias(user_error)),set_
 :- initialization(set_main_io,restore).
 
 
-current_error(Err):- current_error0(Err), (thread_self(main)->true; \+ stream_property(Err,alias(main_error))), 
+current_error(Err):- current_error0(Err),
+  (thread_self(main)->true; \+ stream_property(Err,alias(main_error))), 
   !. % stream_property(Err,type(text)),!.
 
 current_error0(Err):- clause(current_error1(Err),B),catch(B,_,fail).

@@ -427,7 +427,7 @@
         writeSavedPrompt/0.
 
 
-:- use_module(library(gui_tracer)).
+%:- use_module(library(gui_tracer)).
 :- use_module(library(check)).
 
 

@@ -7,10 +7,10 @@
 :- if(current_prolog_flag(dialect,yap)).
 :-  expects_dialect(swi).
 @(C,M) :- M:call(C).
-user:file_search_path(library, '../../../pack/logicmoo_base/prolog').
-user:file_search_path(library, '../../../pack/logicmoo_nlu/prolog').
-user:file_search_path(library, '../../../pack/logicmoo_packages/prolog').
-user:file_search_path(library, '../../../pack/logicmoo_planner/prolog').
+user:file_search_path(library, '../logicmoo_base/prolog').
+user:file_search_path(library, '../logicmoo_nlu/prolog').
+user:file_search_path(library, '../logicmoo_packages/prolog').
+user:file_search_path(library, '../logicmoo_planner/prolog').
 
 :- else.
 
@@ -50,14 +50,14 @@ user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 
-prmtc2:efsp_e(pack, '../../../pack').
+prmtc2:efsp_e(pack, '..').
 prmtc2:efsp_e(cliopatria,pack('ClioPatria')). % :- current_prolog_flag(unix,true).
 prmtc2:efsp_e(user, pack('ClioPatria/user')).
 prmtc2:efsp_e(user, pack('swish')).
 prmtc2:efsp_e(prologmud, library(prologmud)).
 
 
-prmtc2:efsp_e(games, '../games').
+prmtc2:efsp_e(games, pack(prologmud_worlds)).
 prmtc2:efsp_e(library, LIB):- prmtc2:efsp_lib(LIB).
 
 prmtc2:efsp_lib(pack('logicmoo_base/prolog')).

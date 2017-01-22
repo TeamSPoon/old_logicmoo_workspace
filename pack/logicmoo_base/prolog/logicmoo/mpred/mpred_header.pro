@@ -24,16 +24,16 @@
 :- dynamic(baseKB:module_local_init/2).
 :- discontiguous(baseKB:module_local_init/2).
 /*
-:- use_module(library(error)).
-:- use_module(library(backcomp)).
-:- use_module(library(occurs)).
-:- use_module(library(gensym)).
-:- use_module(library(apply)).
-:- use_module(library(memfile)).
-:- use_module(library(terms)).
-:- use_module(library(listing)).
-:- use_module(library(codesio)).
-% :- use_module(library(logicmoo_utils)).
+:- ensure_loaded(library(error)).
+:- ensure_loaded(library(backcomp)).
+:- ensure_loaded(library(occurs)).
+:- ensure_loaded(library(gensym)).
+:- ensure_loaded(library(apply)).
+:- ensure_loaded(library(memfile)).
+:- ensure_loaded(library(terms)).
+:- ensure_loaded(library(listing)).
+:- ensure_loaded(library(codesio)).
+% :- ensure_loaded(library(logicmoo_utils)).
 */
 :-
  op(1199,fx,('==>')), 
@@ -52,14 +52,14 @@
 
 :- op(1100,fx,(shared_multifile)).
 
-assert_if_new_h(G):- (catch(G,_,fail)->true;assert(G)).
                    
 :- ensure_loaded('../../logicmoo_utils').
-        
+/*        
+assert_if_new_hh(G):- (catch(G,_,fail)->true;assert(G)).
 :- prolog_load_context(module,M),
  once((M==baseKB ;
-   ((assert_if_new_h(baseKB:mtProlog(M)),on_x_log_cont(nop(add_import_module(baseKB,M,end))))))).
-
+   ((assert_if_new_hh(baseKB:mtProlog(M)),on_x_log_cont(nop(add_import_module(baseKB,M,end))))))).
+*/
 %:- multifile(user_db:grant_openid_server/2).
 
 :- multifile(baseKB:coerce_hook/3).
@@ -162,10 +162,10 @@ user:prolog_load_file/2,
 user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_expansion/2]),
   (multifile(M:F/A),M:module_transparent(M:F/A),dynamic(M:F/A),discontiguous(M:F/A))).
 
-%:- use_module(library(logicmoo_utils)).
+%:- ensure_loaded(library(logicmoo_utils)).
 
-% :- use_module(library(logicmoo/util/logicmoo_util_catch)).
-% :- use_module(library(logicmoo/util/logicmoo_util_first)).
+% :- ensure_loaded(library(logicmoo/util/logicmoo_util_catch)).
+% :- ensure_loaded(library(logicmoo/util/logicmoo_util_first)).
 
 :- multifile(baseKB:ignore_file_mpreds/1).
 :- dynamic(baseKB:ignore_file_mpreds/1).
@@ -279,63 +279,63 @@ lm_util:register_mpred_impl_file(F):- (current_prolog_flag(xref,true)->true;
    prologSingleValued/1)).
 
 /*
-:-use_module(system:library('logicmoo/mpred/mpred_loader.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_at_box.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_expansion.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_kb_ops.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_listing.pl')).
-:-use_module(system:library('logicmoo/snark/common_logic_sexpr.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_pfc.pl'),except([op(_,_,_)])).
-:-use_module(system:library('logicmoo/mpred/mpred_prolog_file.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_props.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_storage.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_stubs.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_type_constraints.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_type_isa.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_type_naming.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_type_wff.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_type_args.pl')).
-:-use_module(system:library('logicmoo/mpred/mpred_agenda.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_loader.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_at_box.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_expansion.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_kb_ops.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_listing.pl')).
+:-ensure_loaded(system:library('logicmoo/snark/common_logic_sexpr.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_pfc.pl'),except([op(_,_,_)])).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_prolog_file.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_props.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_storage.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_stubs.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_constraints.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_isa.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_naming.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_wff.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_args.pl')).
+:-ensure_loaded(system:library('logicmoo/mpred/mpred_agenda.pl')).
 */
+
 :- if(current_prolog_flag(logicmoo_autoload,true)).
-:- use_module(library('logicmoo/mpred/mpred_at_box.pl')).
-:- use_module(library('logicmoo/mpred/mpred_expansion.pl')).
-:- use_module(library('logicmoo/mpred/mpred_loader.pl')).
-:- use_module(library('logicmoo/mpred/mpred_pfc.pl')). % except([op(_,_,_)]).
-:- use_module(library('logicmoo/mpred/mpred_prolog_file.pl')).
-:- use_module(library('logicmoo/mpred/mpred_props.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_at_box.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_expansion.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_loader.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_pfc.pl')). % except([op(_,_,_)]).
+:- ensure_loaded(library('logicmoo/mpred/mpred_prolog_file.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_props.pl')).
 
-:- use_module(library('logicmoo/mpred/mpred_motel.pl')).
-:- use_module(library('logicmoo/mpred/mpred_type_isa.pl')).
-:- use_module(library('logicmoo/mpred/mpred_kb_ops.pl')).
-:- use_module(library('logicmoo/mpred/mpred_agenda.pl')).
-:- use_module(library('logicmoo/mpred/mpred_storage.pl')).
+% :- ensure_loaded(library('logicmoo/mpred/mpred_motel.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_type_isa.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_kb_ops.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_agenda.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_storage.pl')).
 
-:- use_module(library('logicmoo/mpred/mpred_listing.pl')).
-:- use_module(library('logicmoo/mpred/mpred_stubs.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_listing.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_stubs.pl')).
 
-:- use_module(library('logicmoo/mpred/mpred_type_constraints.pl')).
-:- use_module(library('logicmoo/mpred/mpred_type_naming.pl')).
-:- use_module(library('logicmoo/mpred/mpred_type_wff.pl')).
-:- use_module(library('logicmoo/mpred/mpred_type_args.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_type_constraints.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_type_naming.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_type_wff.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_type_args.pl')).
 
-:- use_module(library('logicmoo/snark/common_logic_snark.pl')). %except([op(_,_,_)]).
-:- use_module(library('logicmoo/mpred/mpred_hooks.pl')).
+:- ensure_loaded(library('logicmoo/snark/common_logic_snark.pl')). %except([op(_,_,_)]).
+:- ensure_loaded(library('logicmoo/mpred/mpred_hooks.pl')).
 
-:- use_module(library('logicmoo/snark/common_logic_boxlog.pl')).
-:- use_module(library('logicmoo/snark/common_logic_skolem.pl')).
-:- use_module(library('logicmoo/snark/common_logic_compiler.pl')). % ,except([op(_,_,_)])). % ,arity/2,mpred_is_tracing_exec/0, (~)/1
+:- ensure_loaded(library('logicmoo/snark/common_logic_boxlog.pl')).
+:- ensure_loaded(library('logicmoo/snark/common_logic_skolem.pl')).
+:- ensure_loaded(library('logicmoo/snark/common_logic_compiler.pl')). % ,except([op(_,_,_)])). % ,arity/2,mpred_is_tracing_exec/0, (~)/1
 
-:- use_module(library('logicmoo/mpred_online/mpred_www.pl')).
+:- ensure_loaded(library('logicmoo/mpred_online/mpred_www.pl')).
 
-:- use_module(library('logicmoo/snark/common_logic_kb_hooks.pl')).
-:- use_module(library('logicmoo/snark/common_logic_sexpr.pl')).
+:- ensure_loaded(library('logicmoo/snark/common_logic_kb_hooks.pl')).
+:- ensure_loaded(library('logicmoo/snark/common_logic_sexpr.pl')).
 :- endif.
 
 :- prolog_load_context(module,M),
  once((M==baseKB;
    ((assert_if_new(baseKB:mtProlog(M)),on_x_log_cont(add_import_module(baseKB,M,end)))))).
-
 
 :-((current_prolog_flag(xref,true)->true;
     (   (prolog_load_context(source,F),

@@ -1,4 +1,4 @@
-%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 /*
 :- module(mud_telnet, [
          telnet_server/2,
@@ -28,15 +28,15 @@
       ]).
 */
 %  endif.
-/* * module   
-% Initial Telnet/Text console 
+/* * module
+% Initial Telnet/Text console
 % ALL telnet client business logic is here (removed from everywhere else!)
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
-*/ 
+*/
 
 :- dynamic((lmcache:agent_session/2,
       lmcache:session_agent/2,
@@ -71,8 +71,8 @@ kill_naughty_threads:-forall(thread_property(_,alias(ID)),sanify_thread(ID)).
 sanify_thread(main):-!.
 sanify_thread(ID):- ( \+ atom_concat('httpd',_,ID)),!,
    ignore(( thread_statistics(ID,local,Size),MSize is 200 * 1024, Size>MSize, dmsg(big_thread(ID,local,Size)))).
-sanify_thread(ID):- 
-   ignore(( thread_statistics(ID,local,Size),MSize is 200 * 1024, Size>MSize, 
+sanify_thread(ID):-
+   ignore(( thread_statistics(ID,local,Size),MSize is 200 * 1024, Size>MSize,
      % thread_signal(ID,abort) maybe
      dmsg(killing_big_thread(ID,local,Size)), thread_exit(ID) )).
 
@@ -90,23 +90,23 @@ sanify_thread(ID):-
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
-start_mud_telnet_4000:- 
+start_mud_telnet_4000:-
    getenv_safe('LOGICMOO_PORT',Was,3000),
    WebPort is Was + 1000,
   start_mud_telnet(WebPort),WebPort2 is WebPort + 2,
   start_prolog_telnet(WebPort2).
 
-start_mud_telnet(Port):- 
+start_mud_telnet(Port):-
   must(telnet_server(Port, [allow(_ALL),get_call_pred(login_and_run_nodebug)])),!.
 
-start_prolog_telnet(Port):- 
+start_prolog_telnet(Port):-
   must(telnet_server(Port, [allow(_ALL),get_call_pred(prolog)])),!.
 
 :- dynamic(lmcache:main_thread_error_stream/1).
 :- volatile(lmcache:main_thread_error_stream/1).
 
 save_error_stream:- lmcache:main_thread_error_stream(_),!.
-save_error_stream:- ignore((thread_self(main),(quintus:current_stream(2, write, Err),asserta(lmcache:main_thread_error_stream(Err))))).
+save_error_stream:- ignore((thread_self_main,(quintus:current_stream(2, write, Err),asserta(lmcache:main_thread_error_stream(Err))))).
 :- initialization(save_error_stream,restore).
 :- save_error_stream.
 
@@ -145,7 +145,7 @@ ensure_player_attached(In,Out,P):-
     current_agent(P)->true;player_connect_menu(In,Out,_,P))).
 
 player_connect_menu(In,Out,Wants,P):-
- must_det_l((
+ skip_failx_u((
    get_session_id_local(O),
    fmt('~N~nHello session ~q!~n',[O]),
    find_and_call(foc_current_agent(Wants)),
@@ -173,7 +173,7 @@ unset_player_telnet_options(P):-
      clr(repl_writer(P,_)),
      clr(repl_to_string(P,_)).
 
-goodbye_player:- 
+goodbye_player:-
      find_and_call(foc_current_agent(P3)),
      deliver_event(P3,goodBye(P3)).
 
@@ -185,8 +185,8 @@ login_and_run(In,Out):-
   player_connect_menu(In,Out,_,_),!,
   run_session(In,Out).
 
-run_session(In,Out):-  
-  call_u((must_det_l((
+run_session(In,Out):-
+  skip_failx_u((((
      get_session_id_local(O),
      ensure_player_attached(In,Out,P),
      retractall(lmcache:wants_logout(O)))),!,
@@ -198,10 +198,10 @@ run_session(In,Out):-
       retractall(lmcache:wants_logout(O)),
       ignore(current_agent(Agnt)->true;Agnt=P),
       deregister_player_stream_local(Agnt,In,Out))).
-  
+
 
 session_loop(In,Out):-
- call_u((must_det_l((
+ skip_failx_u((((
   get_session_id_local(O),
   ensure_player_attached(In,Out,P),
   find_and_call(start_agent_action_thread),
@@ -213,7 +213,7 @@ session_loop(In,Out):-
 
 :-export(register_player_stream_local/3).
 register_player_stream_local(P,In,Out):-
- ((((
+ skip_failx_u((((
    set_player_telnet_options(P),
    get_session_id_local(O),thread_self(Id),
    retractall(lmcache:session_io(_,_,_,Id)),
@@ -222,23 +222,23 @@ register_player_stream_local(P,In,Out):-
   %  wdmsg(asserta_new(lmcache:session_io(O,In,Out,Id))),
    retractall(lmcache:session_agent(O,_)),
    asserta_new(lmcache:session_agent(O,P)),
-   retractall(lmcache:agent_session(_,O)), 
-   asserta_new(lmcache:agent_session(P,O)), 
+   retractall(lmcache:agent_session(_,O)),
+   asserta_new(lmcache:agent_session(P,O)),
    nop(check_console(Id,In,Out,_Err)))))).
 
 deregister_player_stream_local(P,In,Out):-
- call_u((must_det_l((
+ skip_failx_u((((
    unset_player_telnet_options(P),
    get_session_id_local(O),thread_self(Id),
    retractall(lmcache:session_io(_,_,_,Id)),
    retractall(lmcache:session_io(O,_,_,_)),
    %  wdmsg(asserta_new(lmcache:session_io(O,In,Out,Id))),
    retractall(lmcache:session_agent(O,_)),
-   retractall(lmcache:agent_session(_,O)),   
+   retractall(lmcache:agent_session(_,O)),
    nop(check_console(Id,In,Out,_Err)))))).
 
 check_console(Id,In,Out,Err):-
-    (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),
+    (thread_self_main->get_main_thread_error_stream(Err); Err=Out),
      (call(call,thread_util:has_console(Id,In, Out,Err))->true;
        ((call(retractall,thread_util:has_console(Id,_,_,_)),
           call(asserta,thread_util:has_console(Id,In,Out,Err))))).
@@ -255,7 +255,7 @@ setup_streams:-
   setup_streams(In, Out),
   call(listing,thread_util:has_console/4).
 
-setup_streams(In, Out):- thread_self(main),!,
+setup_streams(In, Out):- thread_self_main,!,
    set_prolog_flag(color_term,true),
    set_prolog_flag(tty_control, true),
    stream_property(Err,alias(user_error)),set_stream(Err,alias(current_error)),
@@ -263,31 +263,39 @@ setup_streams(In, Out):- thread_self(main),!,
    call(asserta,thread_util:has_console(Id, In, Out, Err)).
 
 setup_streams(In,Out):-
-  call_u((must_det_l((
-   thread_self(Id),
-   thread_at_exit(call(retractall,thread_util:has_console(Id, _, _, _))),
-   set_prolog_flag(color_term,true),
-   set_stream(In, tty(true)),
-   set_prolog_IO(In, Out, Out),
-   stream_property(user_error,file_no(N)),quintus:current_stream(N,write,Err),
+   must(set_prolog_IO(In, Out, Out)),
+   must(thread_self(Id)),
    call(retractall,thread_util:has_console(Id, _, _, _)),
-   call(asserta,thread_util:has_console(Id, In, Out, Err)),
-   set_stream(Err,alias(user_error)), % set_stream(Err,alias(current_error)),
+   thread_at_exit(call(retractall,thread_util:has_console(Id, _, _, _))),
+   call(asserta,thread_util:has_console(Id, In, Out, Out)),
+   must(set_prolog_flag(color_term,true)),
+   must_det_l_pred(ignore,(
+   set_stream(In, tty(true)),
    set_stream(In, close_on_exec(false)),
-   set_stream(Out, close_on_exec(false)),
-   set_stream(Err, close_on_exec(false)),
+   set_stream(Out, close_on_exec(false)))),
+  % ignore(setup_error_stream),
+  must_det_l_pred(ignore,(
    set_stream(In, close_on_abort(false)),
    set_stream(Out, close_on_abort(false)),
-   set_stream(Err, close_on_abort(false)),
-   set_prolog_flag(tty_control, false),
+   set_prolog_flag(tty_control, false))),
    % catch(set_prolog_flag(tty_control, true),_,true),
+   must_det_l_pred(ignore,(
    current_prolog_flag(encoding, Enc),
-   set_stream(user_input, encoding(Enc)),
-   set_stream(user_output, encoding(Enc)),
+   set_stream(In, encoding(Enc)),
+   set_stream(Out, encoding(Enc)),
+   % set_stream(In, newline(detect)),
+   set_stream(Out, newline(dos)))).
+
+
+setup_error_stream:-
+   current_prolog_flag(encoding, Enc),
+   stream_property(user_error,file_no(N)),
    set_stream(user_error, encoding(Enc)),
-   set_stream(user_input, newline(detect)),
-   set_stream(user_output, newline(dos)),
-   set_stream(user_error, newline(dos)))))).
+   quintus:current_stream(N,write,Err),
+   set_stream(Err,alias(user_error)), % set_stream(Err,alias(current_error)),
+   set_stream(Err, close_on_exec(false)),
+   set_stream(Err, close_on_abort(false)),
+   set_stream(Err, newline(dos)),!.
 
 
 fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).
@@ -299,12 +307,12 @@ fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).
 
 :-export(prompt_read/4).
 prompt_read_telnet(In,Out,Prompt,Atom):-
-      get_session_id_local(O),      
+      get_session_id_local(O),
       prompt_read(In,Out,Prompt,IAtom),
       (IAtom==end_of_file -> (ain(lmcache:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
 prompt_read(In,Out,Prompt,Atom):-
-     with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),      
+     with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),
      repeat,read_code_list_or_next_command_with_prefix(In,Atom),!.
 
 local_to_words_list(Atom,Words):-var(Atom),!,Words = Atom.
@@ -319,15 +327,15 @@ read_code_list_or_next_command_with_prefix(In,Words):- read_code_list_or_next_co
 read_code_list_or_next_command(Atom):-current_input(In),read_code_list_or_next_command(In,Atom),!.
 
 read_code_list_or_next_command(In,end_of_file):- at_end_of_stream(In),!.
-read_code_list_or_next_command(In,Atom):- 
+read_code_list_or_next_command(In,Atom):-
  (var(In)->current_input(In);true), catch(wait_for_input([In], Ready, 1),_,fail),!,  member(In,Ready),
   read_pending_input(In,CodesL,[]),!,is_list(CodesL),CodesL\==[],
-   ((last(CodesL,EOL),member(EOL,[10,13])) -> code_list_to_next_command(CodesL,Atom); 
+   ((last(CodesL,EOL),member(EOL,[10,13])) -> code_list_to_next_command(CodesL,Atom);
     (read_line_to_codes(In,CodesR), (is_list(CodesR)-> (append(CodesL,CodesR,NewCodes),code_list_to_next_command(NewCodes,Atom)); Atom=CodesR))),!.
 
-read_code_list_or_next_command(In,Atom):- 
+read_code_list_or_next_command(In,Atom):-
   read_pending_input(In,CodesL,[]),is_list(CodesL),CodesL\==[],
-   ((last(CodesL,EOL),member(EOL,[10,13])) -> code_list_to_next_command(CodesL,Atom); 
+   ((last(CodesL,EOL),member(EOL,[10,13])) -> code_list_to_next_command(CodesL,Atom);
     (read_line_to_codes(In,CodesR), (is_list(CodesR)-> (append(CodesL,CodesR,NewCodes),code_list_to_next_command(NewCodes,Atom)); Atom=CodesR))),!.
 
 code_list_to_next_command(end_of_file,end_of_file).
@@ -343,7 +351,7 @@ tick_tock:-
            scan_src_updates,!,fmt('tick tock',[]),sleep(0.1),!.
 
 scan_src_updates:- !.
-scan_src_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
+scan_src_updates:- ignore((thread_self_main,ignore((catch(make,E,dmsg(E)))))).
 
 
 % ===========================================================
@@ -426,7 +434,7 @@ show_room_grid_new(Room):-
    grid_size(Room,Xs,Ys,_Zs),
    Ys1 is Ys+1,Xs1 is Xs+1,
    forall(between(0,Ys1,Y),
-   ((nl, 
+   ((nl,
    forall(between(0,Xs1,X),
    ((loc_to_xy(Room,X,Y,LOC),
    write(' '),
@@ -464,7 +472,7 @@ inst_label(_Obj,'&&').
 % show_room_grid_old(Room)
 % ===================================================================
 % Display world
-show_room_grid_old(Room) :-  
+show_room_grid_old(Room) :-
 	call_u(gridValue(Room,1,G,_)),
 	length(G,N),
 	M is N + 1,
@@ -523,7 +531,7 @@ display_grid_labels :-
 
 
 
-  
+
 % :- include(prologmud(mud_footer)).
 
 
@@ -565,12 +573,12 @@ display_grid_labels :-
 telnet_server(Port, Options):- \+ member(alias(_),Options),atom_concat(telnet_server_,Port,Alias),!,telnet_server(Port, [alias(Alias)|Options]).
 telnet_server(_Port, Options) :- member(alias(Alias),Options),thread_property(Was, status(running)),Was==Alias,!.
 
-telnet_server(Port, Options) :-  
+telnet_server(Port, Options) :-
         member(alias(Alias),Options),!,
-	tcp_socket(ServerSocket),        
+	tcp_socket(ServerSocket),
 	tcp_setopt(ServerSocket, reuseaddr),
         % tcp_setopt(ServerSocket, nodelay),
-        % tcp_setopt(ServerSocket, dispatch(false)),        
+        % tcp_setopt(ServerSocket, dispatch(false)),
 	must((tcp_bind(ServerSocket, Port),
 	tcp_listen(ServerSocket, 5))),
 	thread_create(server_loop(ServerSocket, Options), _,
@@ -600,7 +608,7 @@ server_loop(ServerSocket, Options) :-
 	catch(thread_create(
 		  service_client(Slave, In, Out, Host, Peer, Options),
 		  ThreadID,
-		  [ 
+		  [
                       alias(Alias)
                      % detached(true)
 		  ]),
@@ -630,10 +638,10 @@ service_client(Slave, In, Out, Host, Peer, Options) :-
    get_call_pred(Call, Options), !,
    thread_self(Id),
    format(user_error,'% Welcome ~q to the SWI-Prolog LogicMOO server on thread ~w~n~n', [Peer,service_client(Slave, In, Out, Host, Peer, call(Call,Options))]),
-   call_close_and_detatch(In, Out, Id, 
+   call_close_and_detatch(In, Out, Id,
     service_client_call(Call, Slave, In, Out, Host, Peer, Options)),!.
 
-service_client(_Slave, In, Out, Host, Peer, _Options):- 
+service_client(_Slave, In, Out, Host, Peer, _Options):-
    thread_self(Id),
    call_close_and_detatch(In, Out, Id,
        'format'(Out, 'Go away ~q!!~n', [Host:Peer])).
@@ -655,7 +663,7 @@ get_call_pred(Call, Options) :-
 
 % correct_o_stream:-current_error(E),set_stream(E).
 
-on_telnet_restore :- 
+on_telnet_restore :-
       % add_import_module(mud_telnet,baseKB,end),
       assert_if_new(( baseKB:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
         foreach(no_repeats(find_and_call(get_agent_sessions(A,O))),
@@ -664,7 +672,7 @@ on_telnet_restore :-
       start_mud_telnet_4000,
       http_handler('/hmud/', http_reply_from_files(pack(hMUD), []), [prefix]),!,
       http_handler('/hmud', http_reply_from_files(pack(hMUD), []), [prefix]),!.
-      
+
 
 :- all_source_file_predicates_are_transparent.
 

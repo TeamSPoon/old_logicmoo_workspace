@@ -1,4 +1,4 @@
-/* 
+/*
 < module > Adds autoloading of LogicMOO Utilities predicates
 % ===================================================================
     File:         'logicmoo_utils).'
@@ -22,10 +22,10 @@
    dynamic(user:file_search_path/2),
    (( \+ user:file_search_path(library,Dir)) ->asserta(user:file_search_path(library,Dir));true))).
 :- endif.
-:- if((set_prolog_flag(logicmoo_utils_file,(exists_source(library('logicmoo/util/logicmoo_util_clause_expansion.pl')), 
+:- if((set_prolog_flag(logicmoo_utils_file,(exists_source(library('logicmoo/util/logicmoo_util_clause_expansion.pl')),
        ensure_loaded(library('logicmoo/util/logicmoo_util_clause_expansion.pl')))))).
 :- endif.
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(logicmoo_utils_file,[logicmoo_utils_test_msg/0]).
 :- endif.
 % restore entry state
@@ -60,7 +60,7 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
 :- if( \+ exists_source(logicmoo(logicmoo_engine))).
-:- add_file_search_path_local(logicmoo,'./logicmoo/').
+:- add_file_search_path_local(logicmoo,'../../logicmoo_base/prolog/logicmoo/').
 :- exists_source(logicmoo(logicmoo_engine)).
 :- endif.
 
@@ -102,7 +102,7 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 :- ensure_loaded(library('logicmoo/util/logicmoo_util_engines.pl')).
 :- ensure_loaded(library('logicmoo/util/logicmoo_util_help.pl')).
 
-:- user:ensure_loaded(library(logicmoo_swilib)).
+% :- user:ensure_loaded(library(logicmoo_swilib)).
 :- system:ensure_loaded(library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
 
 :- forall((current_module(M),M\==baseKB),assert_if_new(baseKB:mtProlog(M))).
@@ -118,7 +118,7 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 % ======================================================
 :- dynamic(baseKB:logicmoo_scan_autoloads/0).
 :- dynamic(baseKB:logicmoo_pre_release/0).
- 	 	 
+
 
 %  logicmoo_pre_release() is semidet.
 %

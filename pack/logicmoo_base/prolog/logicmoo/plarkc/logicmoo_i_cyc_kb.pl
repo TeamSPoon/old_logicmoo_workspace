@@ -621,6 +621,7 @@ wkb2:- tell(fooooo2),
       told.
 
 :- dmsg("Dont forget to ?- logicmoo_i_cyc_xform.").
+end_of_file.
 
 % :- set_prolog_flag(gc,false).
 :- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_rewriting)).
@@ -628,10 +629,13 @@ wkb2:- tell(fooooo2),
 %:- trace,(cyc_to_clif("a",_X)).
 %:- break.
 :- must(predicate_property(tinyKB9(_),number_of_clauses(_))).
+
 :- retractall(tinyKB9(_)).
+
 :- if((predicate_property(tinyKB9(_),number_of_clauses(N)),N==0)).
 % :- rtrace.
 %:- break.
+
 :- gripe_time(7.0,mwkb1).
 
 :- wdmsg("Made tinyKB").

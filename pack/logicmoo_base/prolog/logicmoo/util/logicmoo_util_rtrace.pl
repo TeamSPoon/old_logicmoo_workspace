@@ -158,9 +158,9 @@ hotrace:-notrace.
 %
 % Only leashs the main thread
 %
-%thread_leash(-Some):- thread_self(main)->leash(-Some);true.
-%thread_leash(+Some):- thread_self(main)->leash(+Some);true.
-thread_leash(Some):- thread_self(main)->leash(Some);true.
+%thread_leash(-Some):- thread_self_main->leash(-Some);true.
+%thread_leash(+Some):- thread_self_main->leash(+Some);true.
+thread_leash(Some):- thread_self_main->leash(Some);true.
 
 :- meta_predicate hotrace(0).
 

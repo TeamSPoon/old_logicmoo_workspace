@@ -108,7 +108,6 @@
             fully_expand_clause/3,
             fully_expand_goal/3,
             fully_expand_head/3,
-            fully_expand_head_throw_if_loop/3,         
             fully_expand_now/3,
             fully_expand_warn/3,
             functor_declares_collectiontype/2,
@@ -795,6 +794,7 @@ as_is_term(NC):- \+ compound(NC),!,fail.
 as_is_term(P):-functor(P,F,A),functor(C,F,A),C=@=P,!.
 as_is_term(PARSE):-is_parse_type(PARSE),!,fail.
 as_is_term(meta_argtypes(_)):-!.
+as_is_term(meta_argtypes_guessed(_)):-!.
 as_is_term(argsQuoted(Atom)):- !, \+ compound(Atom).
 as_is_term(arity(F,_)):-atom(F),!.
 as_is_term(functorIsMacro(Atom)):- !, \+ compound(Atom).
@@ -863,11 +863,13 @@ additiveOp((/)).
 % If Is A Unit.
 %
 is_unit(A):-notrace(is_unit_like(A)).
+
 is_unit_like(A):- atomic(A),!.
-is_unit_like(C):- mpred_get_attr(C,sk,_),!.
-is_unit_like(C):- var(C),!,fail.
-is_unit_like(C):- \+ compound(C),!.
-is_unit_like(C):- C\='VAR'(_),C\='$VAR'(_),C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F).
+is_unit_like(C):-is_unit_like0(C).
+
+is_unit_like0(C):- var(C),!,mpred_get_attr(C,sk,_),!.
+is_unit_like0(C):- \+ compound(C),!.
+is_unit_like0(C):- C\='VAR'(_),C\='$VAR'(_),C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F).
 
 
 
@@ -938,6 +940,7 @@ db_expand_final(Op, meta_argtypes(Args),    O  ):-is_ftCompound(Args),functor(Ar
     (Pred=t->  (fully_expand_head(Op, Args,ArgsO),O=meta_argtypes(ArgsO)) ; (assert_arity(Pred,A),O=meta_argtypes(Args))).
 db_expand_final(_ ,meta_argtypes(F,Args),    meta_argtypes(Args)):-atom(F),!,functor(Args,Pred,A),assert_arity(Pred,A).
 db_expand_final(_ ,meta_argtypes(Args),      meta_argtypes(Args)):-!.
+db_expand_final(_ ,meta_argtypes_guessed(Args),      meta_argtypes_guessed(Args)):-!.
 db_expand_final(_ ,isa(Args,Meta_argtypes),  meta_argtypes(Args)):-Meta_argtypes==meta_argtypes,!,is_ftCompound(Args),!,functor(Args,Pred,A),assert_arity(Pred,A).
 db_expand_final(Op,(A,B),(AA,BB)):-  !,db_expand_final(Op,A,AA),db_expand_final(Op,B,BB).
 db_expand_final(Op,props(A,B),PROPS):- (is_ftNonvar(A);is_ftNonvar(B)),!,expand_props(_,Op,props(A,B),Props),!,Props\=props(_,_),fully_expand_head(Op,Props,PROPS).
@@ -972,6 +975,7 @@ is_elist_functor(isAnd).
 %
 as_list(ftListFn(Atom),[Atom]):- atom(Atom),!.
 as_list(Atom,[]):-is_elist_functor(Atom),!.
+as_list(_,Atom):- \+ var(Atom), \+ is_list(Atom),!,fail.
 as_list(EC,AL):-compound(EC),EC=..[IsEach,A|List],is_elist_functor(IsEach),!,((List==[],is_list(A))->AL=A;AL=[A|List]).
 as_list(List,AL):-sanity(is_list(List)),AL=List.
 
@@ -1857,8 +1861,11 @@ exact_args0(Q):- functor(Q,F,A),A>0,!,exact_args_f(F),!.
 exact_args_f(not_undoable).
 exact_args_f(mtExact).
 exact_args_f(meta_argtypes).
+exact_args_f(meta_argtypes_guessed).
 exact_args_f(second_order).
 exact_args_f(call).
+exact_args_f(call_u).
+exact_args_f(mpred_prop).
 exact_args_f(format).
 exact_args_f(sformat).
 exact_args_f(txtConcatFn).
@@ -1877,8 +1884,8 @@ exact_args_f(wdmsg).
 exact_args_f('$was_imported_kb_content$'):-dtrace.
 exact_args_f(wid).
 exact_args_f(ignore).
-exact_args_f(F):-cheaply(argsQuoted(F)),!.
-exact_args_f(F):-cheaply(prologBuiltin(F)),!.
+exact_args_f(F):-cheaply_u(argsQuoted(F)),!.
+exact_args_f(F):-cheaply_u(prologBuiltin(F)),!.
 
 % exact_args((_:-_)).
 % exact_args((:-( _))).

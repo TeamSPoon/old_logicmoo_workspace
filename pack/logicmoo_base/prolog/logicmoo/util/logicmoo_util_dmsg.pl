@@ -926,7 +926,7 @@ dmsg00(V):- dmsg000(V),!.
 %
 % Always Show (debug)message.
 %
-always_show_dmsg:- thread_self(main).
+always_show_dmsg:- thread_self_main.
 always_show_dmsg:- tlbugger:tl_always_show_dmsg.
 
 

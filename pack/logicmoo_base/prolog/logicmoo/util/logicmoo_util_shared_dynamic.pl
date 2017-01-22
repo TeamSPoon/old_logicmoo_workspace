@@ -448,7 +448,8 @@ virtualize_source(X,In,Out):- callable(In),
 % Safely Paying Attention To Corner Cases Wrap.
 %
 
-safe_virtualize(Goal,How,Out):- must(safe_virtualize_0(Goal,How,call(MHow,MGoal))),!, Out=..[MHow,MGoal].
+safe_virtualize(Goal,How,Out):- must(safe_virtualize_0(Goal,How,call(MHow,MGoal))),!, 
+   safe_univ(Out,[MHow,MGoal]).
 
 safe_virtualize_0(M:Goal,M:How,call(How,M:Goal)).
 safe_virtualize_0(M:Goal,How,call(How,M:Goal)).

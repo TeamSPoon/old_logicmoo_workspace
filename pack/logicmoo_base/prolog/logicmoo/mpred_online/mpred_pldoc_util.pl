@@ -1,3 +1,6 @@
+
+end_of_file.
+
 :- module(mpred_pldoc_util,
 	  [ 		% +Source, +OutStream, +Options
           source_to_txt/3,

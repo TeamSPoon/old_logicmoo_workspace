@@ -1183,7 +1183,7 @@ The south is a direction.
 The southeast is a direction.
 The southwest is a direction.
 The east is a direction.
-A/sr1 - SR1 - Physical World Model §30 14
+A/sr1 - SR1 - Physical World Model S30 14
 The west is a direction.
 The up is a direction.
 The down is a direction.
@@ -1212,7 +1212,7 @@ A door has an object called other side.
 The other side property translates into I6 as "door_to".
 Leading-through relates one room (called the other side) to various doors.
 The verb to be through implies the leading-through relation.
-§33. Containers and supporters. The carrying capacity property is the exception to the remarks above
+S33. Containers and supporters. The carrying capacity property is the exception to the remarks above
 about the qualitative nature of the world model: here for the first and only time we have a value which can
 be meaningfully compared.
 Section SR1/6 - Containers
@@ -1257,9 +1257,9 @@ The specific action-processing rulebook has a truth state called action keeping 
 The specific action-processing rulebook has a rulebook called specific check rulebook.
 The specific action-processing rulebook has a rulebook called specific carry out rulebook.
 The specific action-processing rulebook has a rulebook called specific report rulebook.
-The specific action-processing rulebook has a truth state called within the player’s sight.
-The player’s action awareness rules is a rulebook. [13]
-§16. The rules on accessibility and visibility, which control whether an action is physically possible, have
+The specific action-processing rulebook has a truth state called within the player''s sight.
+The player''s action awareness rules is a rulebook. [13]
+S16. The rules on accessibility and visibility, which control whether an action is physically possible, have
 named outcomes as a taste of syntactic sugar.
 Accessibility rules is a rulebook. [14]
 Reaching inside rules is an object-based rulebook. [15]
@@ -1269,10 +1269,10 @@ Reaching outside rules have outcomes allow access (success) and deny access (fai
 Visibility rules is a rulebook. [17]
 Visibility rules have outcomes there is sufficient light (failure) and there is
 insufficient light (success).
-§17. Two rulebooks govern the processing of asking other people to carry out actions:
+S17. Two rulebooks govern the processing of asking other people to carry out actions:
 Persuasion rules is a rulebook. [18]
 Persuasion rules have outcomes persuasion succeeds (success) and persuasion fails (failure).
-Unsuccessful attempt by is a rulebook. [19
+Unsuccessful attempt by is a rulebook. [19]
 
 */
 

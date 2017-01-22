@@ -23,7 +23,12 @@
             as_clause_w_m/5,
             source_module/1,
             bad_functor/1,
+            main_self/1,
+            set_main_error/0,
+            find_main_eror/1,
+            set_mains/0,
             current_why/1,
+            thread_self_main/0,
             badfood/1,
             unsafe_safe/2,
             quietly/1,
@@ -32,7 +37,7 @@
             on_x_f/3,
             hide_trace/1,
             block/2,
-            block/3,
+            block3/3,
             with_current_why/2,
             bubbled_ex/1,
             bubbled_ex_check/1,
@@ -41,11 +46,11 @@
             current_source_file/1,current_source_location0/1,
             lmcache:current_main_error_stream/1,
             lmcache:thread_current_input/2,
-            dbgsubst/4,            
+            dbgsubst/4,
             dbgsubst0/4,
             ddmsg/1,
             ddmsg/2,
-            ddmsg_call/1,            
+            ddmsg_call/1,
             det_lm/2,
             dif_safe/2,
             dumpST_error/1,
@@ -64,7 +69,7 @@
             is_ftNameArity/2,
             is_ftNonvar/1,
             is_ftVar/1,
-            
+
             is_main_thread/0,
             is_pdt_like/0,
             is_release/0,
@@ -76,8 +81,11 @@
             %on_x_log_throwEach/1,
             on_x_log_cont/1,
             on_x_log_fail/1,
+            skip_failx_u/1,
+            on_xf_log_cont/1,
+            on_xf_log_cont_l/1,
             maplist_safe/2,
-            maplist_safe/3,            
+            maplist_safe/3,
             module_functor/4,
 
             trace_or_throw/1,
@@ -86,18 +94,19 @@
             must/1,
             must3/3,
             must_det/1,
-            %must_det_dead/2,            
+            %must_det_dead/2,
             must_l/1,
 
             must_det_l/1,
             must_det_l_pred/2,
             call_must_det/2,
             call_each/2,
+            p_call/2,
 
             nd_dbgsubst/4,
             nd_dbgsubst1/5,
             nd_dbgsubst2/4,
-            
+
             not_is_release/0,
             one_must/2,
             one_must_det/2,
@@ -137,18 +146,24 @@
           ]).
 
 
+:- use_module(logicmoo_util_prolog_streams).
+:- thread_self(Goal),assert(lmcache:thread_main(user,Goal)).
 
+main_self(main).
+main_self(W):-atom(W),atom_concat('pdt_',_,W),!.
+main_self(W):-lmcache:thread_main(user,W),!.
+
+thread_self_main:- notrace((thread_self(W),!,main_self(W))).
 
 %% non_user_console is semidet.
 %
 % Not User Console.
 %
-non_user_console:-thread_self(main),!,fail.
+non_user_console:-thread_self_main,!,fail.
 non_user_console:-current_input(In),stream_property(In,tty(true)),!,fail.
 non_user_console:-current_prolog_flag(debug_threads,true),!,fail.
 non_user_console:-current_input(In),stream_property(In, close_on_abort(true)).
 non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
-
 
 
 :- if(\+ current_predicate(system:nop/1)).
@@ -160,21 +175,24 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
 :- meta_predicate
 
 
-		block(+, :, ?),
+		block3(+, :, ?),
 		catchv(0, ?, 0),
 		catchvvnt(0, ?, 0),
 		catchv(0, ?, 0),
-		
+
 		if_defined(:),
 		if_defined(:, 0),
 		ddmsg_call(0),
 		on_x_fail(0),
+		on_xf_log_cont(0),
+		skip_failx_u(0),
+		on_xf_log_cont_l(0),
 		on_x_log_throw(0),
-		
-		
+
+
 		on_x_log_cont(0),
 		on_x_log_fail(0),
-		
+
 
         must(0),
         must3(+,+,0),
@@ -185,7 +203,8 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
         must_det_l(0),
         must_det_l_pred(1,+),
         call_must_det(1,+),
-        call_each(1,+),
+        call_each(+,+),
+        p_call(+,+),
 
         must_l(0),
         one_must(0, 0),
@@ -213,7 +232,7 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
         as_clause_no_m/3,
         as_clause_w_m/4,
         as_clause_w_m/5,
-        bad_functor/1,        
+        bad_functor/1,
         badfood/1,
         block/2,
         bubbled_ex/1,
@@ -260,6 +279,12 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
         showHiddens/0,
         show_new_src_location/1,
         show_new_src_location/2,
+
+            on_xf_log_cont/1,
+            on_xf_log_cont_l/1,
+            skip_failx_u/1,
+            p_call/2,
+
         show_source_location/0,
         skipWrapper/0,
         skipWrapper0/0,
@@ -298,7 +323,7 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
 
 % = :- meta_predicate(catchvvnt(0,?,0)).
 
-%= 	 	 
+%=
 
 %% catchvvnt( :GoalT, ?E, :GoalF) is semidet.
 %
@@ -306,10 +331,13 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
 %
 catchvvnt(T,E,F):-catchv(hotrace(T),E,F).
 
-:- thread_self(Goal),assert(lmcache:thread_main(user,Goal)).
+
+:-meta_predicate(skip_failx_u(0)).
+skip_failx_u(G):-call_each([baseKB:call_u,on_xf_log_cont,notrace],G).
 
 
-%= 	 	 
+
+%=
 
 %% is_pdt_like is semidet.
 %
@@ -319,13 +347,14 @@ is_pdt_like:-thread_property(_,alias(pdt_console_server)).
 is_pdt_like:-lmcache:thread_main(user,Goal),!,Goal \= main.
 
 
-%= 	 	 
+%=
 
 %% is_main_thread is semidet.
 %
 % If Is A Main Thread.
 %
 is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
+is_main_thread:-thread_self_main,!.
 
 :- thread_local(tlbugger:no_colors/0).
 :- thread_local(t_l:thread_local_error_stream/1).
@@ -336,7 +365,7 @@ is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
 
 % = :- meta_predicate(with_main_error_to_output(0)).
 
-%= 	 	 
+%=
 
 %% with_main_error_to_output( :GoalGoal) is semidet.
 %
@@ -345,10 +374,10 @@ is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
 with_main_error_to_output(Goal):-
  current_output(Out),
   w_tl(t_l:thread_local_error_stream(Out),Goal).
-   
+
 
 with_current_io(Goal):-
-  current_input(IN),current_output(OUT),get_thread_current_error(Err),  
+  current_input(IN),current_output(OUT),get_thread_current_error(Err),
   setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,Err)).
 
 
@@ -359,16 +388,16 @@ with_dmsg_to_main(Goal):-
   current_input(IN),current_output(OUT),
    w_tl(t_l:thread_local_error_stream(Err),
    setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,ErrWas))).
-   
-with_error_to_main(Goal):- 
+
+with_error_to_main(Goal):-
   get_main_error_stream(Err),current_error(ErrWas),Err=ErrWas,!,Goal.
 with_error_to_main(Goal):- trace,
   get_main_error_stream(Err),get_thread_current_error(ErrWas),
   current_input(IN),current_output(OUT),
    w_tl(t_l:thread_local_error_stream(Err),
    setup_call_cleanup_each(set_prolog_IO(IN,OUT,Err),Goal,set_prolog_IO(IN,OUT,ErrWas))).
-   
-   
+
+
 
 
 
@@ -391,7 +420,7 @@ get_main_error_stream(Err):- t_l:thread_local_error_stream(Err),!.
 get_main_error_stream(Err):- stream_property(Err,alias(user_error)),!.
 
 
-%= 	 	 
+%=
 
 %% format_to_error( ?F, ?A) is semidet.
 %
@@ -399,7 +428,7 @@ get_main_error_stream(Err):- stream_property(Err,alias(user_error)),!.
 %
 format_to_error(F,A):-get_main_error_stream(Err),!,format(Err,F,A).
 
-%= 	 	 
+%=
 
 %% fresh_line_to_err is semidet.
 %
@@ -413,30 +442,34 @@ fresh_line_to_err:- notrace((flush_output_safe,get_main_error_stream(Err),format
 :- dynamic(lmcache:thread_current_error_stream/2).
 :- volatile(lmcache:thread_current_error_stream/2).
 
-%= 	 	 
+%=
 
 %% save_streams is semidet.
 %
 % Save Streams.
 %
-save_streams:- thread_self(ID), save_streams(ID).
+save_streams:- thread_self(ID),save_streams(ID),!.
+
+set_mains:-
+       stream_property(In, alias(user_input)),set_stream(In,alias(main_input)),
+       stream_property(Out, alias(user_output)),set_stream(Out,alias(main_output)),
+       find_main_eror(Err),set_stream(Err,alias(main_error)), set_stream(Err,alias(current_error)),set_stream(Err, alias(user_error)).
+
+find_main_eror(Err):-stream_property(Err, alias(user_error)).
+find_main_eror(Err):-stream_property(Err, alias(main_error)).
+find_main_eror(Err):-stream_property(Err, alias(current_error)).
+find_main_eror(user_error).
+
+set_main_error:- thread_self_main->set_mains;true.
 
 
-set_main_error:- (thread_self(main)->((stream_property(Err, alias(user_error)),set_stream(Err,alias(main_error))),
-       (stream_property(In, alias(user_input)),set_stream(In,alias(main_input))),
-       (stream_property(Out, alias(user_output)),set_stream(Out,alias(main_output))),
-                                    set_stream(Err,alias(current_error)));true).
-
-:- initialization(set_main_error).
-:- initialization(set_main_error,restore).
-
-%= 	 	 
+%=
 
 %% save_streams( ?ID) is semidet.
 %
 % Save Streams.
 %
-save_streams(ID):- 
+save_streams(ID):-
   retractall((lmcache:thread_current_input(ID,_))),
   retractall((lmcache:thread_current_error_stream(ID,_))),
   current_input(In),asserta(lmcache:thread_current_input(ID,In)),
@@ -458,7 +491,7 @@ with_main_input(Goal):-
     setup_call_cleanup_each(set_prolog_IO(In,OutPrev,Err),Goal,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
 
 
-%= 	 	 
+%=
 
 %% with_main_io( :GoalGoal) is semidet.
 %
@@ -479,7 +512,7 @@ with_main_input(Goal):-
 % ddmsg(_):-current_prolog_flag(bugger_debug,false),!.
 % ddmsg(D):- current_predicate(_:wdmsg/1),wdmsg(D),!.
 
-%= 	 	 
+%=
 
 %% ddmsg( ?D) is semidet.
 %
@@ -488,7 +521,7 @@ with_main_input(Goal):-
 ddmsg(D):- ddmsg("~N~q~n",[D]).
 %ddmsg(F,A):- current_predicate(_:wdmsg/2),wdmsg(F,A),!.
 
-%= 	 	 
+%=
 
 %% ddmsg( ?F, ?A) is semidet.
 %
@@ -496,7 +529,7 @@ ddmsg(D):- ddmsg("~N~q~n",[D]).
 %
 ddmsg(F,A):- format_to_error(F,A),!.
 
-%= 	 	 
+%=
 
 %% ddmsg_call( :GoalD) is semidet.
 %
@@ -538,7 +571,7 @@ if_defined(Goal,Else):- current_predicate(_,Goal)*->Goal;Else.
 :- meta_predicate when_defined(:).
 :- export(when_defined/1).
 
-%= 	 	 
+%=
 
 %% when_defined( ?Goal) is semidet.
 %
@@ -552,7 +585,7 @@ when_defined(Goal):-if_defined(Goal,true).
 
 % = :- meta_predicate(to_pi(?,?)).
 
-%= 	 	 
+%=
 
 %% to_pi( ?P, ?M) is semidet.
 %
@@ -560,14 +593,14 @@ when_defined(Goal):-if_defined(Goal,true).
 %
 to_pi(P,M:P):-var(P),!,current_module(M).
 to_pi(M:P,M:P):-var(P),!,current_module(M).
-to_pi(Find,(M:PI)):- 
+to_pi(Find,(M:PI)):-
  w_tl(set_prolog_flag(retry_undefined,false),
    (once(catch(match_predicates(Find,Found),_,fail)),Found=[_|_],!,member(M:F/A,Found),functor(PI,F,A))).
 to_pi(M:Find,M:PI):-!,current_module(M),to_pi0(M,Find,M:PI).
 to_pi(Find,M:PI):-current_module(M),to_pi0(M,Find,M:PI).
 
 
-%= 	 	 
+%=
 
 %% to_pi0( ?M, :TermFind, :TermPI) is semidet.
 %
@@ -580,16 +613,16 @@ to_pi0(M,Find,PI):-get_pi(Find,PI0),!,(PI0\=(_:_)->(current_module(M),PI=(M:PI0)
 
 :- thread_local(t_l:last_src_loc/2).
 
-%= 	 	 
+%=
 
 %% input_key( ?K) is semidet.
 %
 % Input Key.
 %
 input_key(K):-thread_self(K).
-   
 
-%= 	 	 
+
+%=
 
 %% show_new_src_location( ?FL) is semidet.
 %
@@ -598,7 +631,7 @@ input_key(K):-thread_self(K).
 show_new_src_location(FL):-input_key(K),show_new_src_location(K,FL).
 
 
-%= 	 	 
+%=
 
 %% show_new_src_location( ?K, ?FL) is semidet.
 %
@@ -612,7 +645,7 @@ show_new_src_location(K,FL):- retractall(t_l:last_src_loc(K,_)),format_to_error(
 :- thread_local(t_l:current_why_source/1).
 
 
-%= 	 	 
+%=
 
 %% sl_to_filename( ?W, ?W) is semidet.
 %
@@ -627,7 +660,7 @@ sl_to_filename(W,To):-nonvar(To),To=(W:_),atom(W),!.
 
 
 
-%= 	 	 
+%=
 
 %% current_source_file( ?F) is semidet.
 %
@@ -638,7 +671,7 @@ current_source_file(F):- clause(current_source_location0(W),Body),catchv(Body,_,
 current_source_file(F):- F = unknown.
 
 
-%= 	 	 
+%=
 
 %% current_source_location0( :TermF) is semidet.
 %
@@ -657,7 +690,7 @@ current_source_location0(module(M)):- '$current_typein_module'(M).
 :-export(current_why/1).
 :-module_transparent(current_why/1).
 
-%= 	 	 
+%=
 
 %% current_why( ?Why) is semidet.
 %
@@ -679,7 +712,7 @@ with_current_why(Why,Prolog):- w_tl(t_l:current_local_why(Why,Prolog),Prolog).
 % source_module(M):-!,M=u.
 :-export(source_module/1).
 
-%= 	 	 
+%=
 
 %% source_module( ?M) is semidet.
 %
@@ -692,7 +725,7 @@ source_module(M):-loading_module(M),!.
 :- thread_local(t_l:last_source_file/1).
 :- export(loading_file/1).
 
-%= 	 	 
+%=
 
 %% loading_file( ?FIn) is semidet.
 %
@@ -700,7 +733,7 @@ source_module(M):-loading_module(M),!.
 %
 loading_file(FIn):- ((source_file0(F) *-> (retractall(t_l:last_source_file(_)),asserta(t_l:last_source_file(F))) ; (fail,t_l:last_source_file(F)))),!,F=FIn.
 
-%= 	 	 
+%=
 
 %% source_file0( ?F) is semidet.
 %
@@ -717,7 +750,7 @@ source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property
 
 :-export(source_variables_l/1).
 
-%= 	 	 
+%=
 
 %% source_variables_l( ?AllS) is semidet.
 %
@@ -734,14 +767,14 @@ source_variables_l(AllS):-
 
 
 
-%= 	 	 
+%=
 
 
 :-export( show_source_location/0).
 %show_source_location:- hotrace((tlbugger:no_slow_io)),!.
 %show_source_location:- is_hiding_dmsgs,!.
 
-%= 	 	 
+%=
 
 %% show_source_location is semidet.
 %
@@ -756,7 +789,7 @@ show_source_location:- dumpST,dtrace.
 
 :-export( as_clause_no_m/3).
 
-%= 	 	 
+%=
 
 %% as_clause_no_m( ?MHB, ?H, ?B) is semidet.
 %
@@ -764,7 +797,7 @@ show_source_location:- dumpST,dtrace.
 %
 as_clause_no_m( MHB,  H, B):- strip_module(MHB,_M,HB), expand_to_hb( HB,  MH, MB),strip_module(MH,_M2H,H),strip_module(MB,_M2B,B).
 
-%= 	 	 
+%=
 
 %% as_clause_w_m( ?MHB, ?M, ?H, ?B) is semidet.
 %
@@ -772,7 +805,7 @@ as_clause_no_m( MHB,  H, B):- strip_module(MHB,_M,HB), expand_to_hb( HB,  MH, MB
 %
 as_clause_w_m(MHB, M, H, B):-  as_clause_w_m(MHB, M1H, H, B, M2B), (M1H==user->M2B=M;M1H=M).
 
-%= 	 	 
+%=
 
 %% as_clause_w_m( ?MHB, ?M1H, ?H, ?B, ?M2B) is semidet.
 %
@@ -786,7 +819,7 @@ as_clause_w_m(MHB, M1H, H, B, M2B):-  expand_to_hb( MHB,  MH, MB),strip_module(M
 %
 % If Is A Format Type of a Compound specifier
 %
-is_ftNameArity(F,A):-integer(A), atom(F), (F \= (/)),A>=0.      
+is_ftNameArity(F,A):-integer(A), atom(F), (F \= (/)),A>=0.
 
 %% is_ftCompound( ?Goal) is semidet.
 %
@@ -802,7 +835,7 @@ not_ftCompound(A):- is_ftVar(A) -> true ; \+ is_ftCompound(A).
 
 :- export(is_ftVar/1).
 
-%= 	 	 
+%=
 
 %% is_ftVar( :TermV) is semidet.
 %
@@ -821,7 +854,7 @@ ftNonvar(X):- is_ftNonvar(X).
 
 :- export(is_ftNonvar/1).
 
-%= 	 	 
+%=
 
 %% is_ftNonvar( ?V) is semidet.
 %
@@ -841,7 +874,7 @@ is_ftNonvar(V):- \+ is_ftVar(V).
    maplist_safe/3)).
 
 
-%= 	 	 
+%=
 
 %% maplist_safe( ?Pred, ?LIST) is semidet.
 %
@@ -852,7 +885,7 @@ maplist_safe(Pred,LIST):-findall(E,(member(E,LIST), on_f_debug(apply(Pred,[E])))
 % though this should been fine %  maplist_safe(Pred,[A|B]):- copy_term(Pred+A, Pred0+A0), on_f_debug(once(call(Pred0,A0))),     maplist_safe(Pred,B),!.
 
 
-%= 	 	 
+%=
 
 %% maplist_safe( ?Pred, ?LISTIN, ?LIST) is semidet.
 %
@@ -866,7 +899,7 @@ maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),on_f_debug(ap
 
 :- export(bad_functor/1).
 
-%= 	 	 
+%=
 
 %% bad_functor( ?L) is semidet.
 %
@@ -876,7 +909,7 @@ bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 
 :- export(warn_bad_functor/1).
 
-%= 	 	 
+%=
 
 %% warn_bad_functor( ?L) is semidet.
 %
@@ -886,7 +919,7 @@ warn_bad_functor(L):-ignore((hotrace(bad_functor(L)),!,dtrace,nop(ddmsg(bad_func
 
 :- export(strip_f_module/2).
 
-%= 	 	 
+%=
 
 %% strip_f_module( ?P, ?PA) is semidet.
 %
@@ -906,7 +939,7 @@ strip_f_module(P,P).
 :- export((catchv/3,catchv/3)).
 
 
-%= 	 	 
+%=
 
 %% bubbled_ex( ?VALUE1) is semidet.
 %
@@ -915,7 +948,7 @@ strip_f_module(P,P).
 bubbled_ex(block(_,_)).
 bubbled_ex('$aborted').
 
-%= 	 	 
+%=
 
 %% bubbled_ex_check( ?E) is semidet.
 %
@@ -925,7 +958,7 @@ bubbled_ex_check(E):- ( \+ bubbled_ex(E)),!.
 bubbled_ex_check(E):-throw(E).
 
 
-%= 	 	 
+%=
 
 %% catchv( :GoalGoal, ?E, :GoalRecovery) is semidet.
 %
@@ -942,7 +975,7 @@ catchv(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (th
 
 :- export(functor_catch/3).
 
-%= 	 	 
+%=
 
 %% functor_catch( ?P, ?F, ?A) is semidet.
 %
@@ -955,7 +988,7 @@ functor_catch(P,F,A):- catchv(functor(P,F,A),_,compound_name_arity(P,F,A)).
 
 :- export(functor_safe/3).
 
-%= 	 	 
+%=
 
 %% functor_safe( ?P, ?F, ?A) is semidet.
 %
@@ -979,52 +1012,52 @@ functor_safe_compound(P,F,A):- var(F),strip_f_module(P,P0),!,functor_catch(P0,F0
 functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor_catch(P0,F0,A).
 */
 
-% block(test, (repeat, !(test), fail))).
-:- meta_predicate block(+, :, ?). 
+% block3(test, (repeat, !(test), fail))).
+:- meta_predicate block3(+, :, ?).
 
-%= 	 	 
+%=
 
-%% block( +Name, ?Goal, ?Var) is semidet.
+%% block3( +Name, ?Goal, ?Var) is semidet.
 %
 % Block.
 %
-block(Name, Goal, Var) :- Goal, keep(Name, Var).	% avoid last-call and GC 
+block3(Name, Goal, Var) :- Goal, keep(Name, Var).	% avoid last-call and GC
 
-%= 	 	 
+%=
 
 %% keep( ?VALUE1, ?VALUE2) is semidet.
 %
 % Keep.
 %
-keep(_, _).  
+keep(_, _).
 
-%= 	 	 
+%=
 
 %% set_block_exit( ?Name, ?Value) is semidet.
 %
 % Set Block Exit.
 %
-set_block_exit(Name, Value) :-  prolog_current_frame(Frame),  prolog_frame_attribute(Frame, parent_goal,  mcall:block(Name, _, Value)). 
+set_block_exit(Name, Value) :-  prolog_current_frame(Frame),  prolog_frame_attribute(Frame, parent_goal,  mcall:block3(Name, _, Value)).
 
-%= 	 	 
+%=
 
 %% block( ?Name, ?Goal) is semidet.
 %
 % Block.
 %
-block(Name, Goal) :-  block(Name, Goal, Var),  (   Var == !  ->  !  ;   true  ). 
+block(Name, Goal) :-  block3(Name, Goal, Var),  (   Var == !  ->  !  ;   true  ).
 
-%= 	 	 
+%=
 
 %% !( ?Name) is semidet.
 %
 % !.
 %
-!(Name) :- set_block_exit(Name, !). 
+!(Name) :- set_block_exit(Name, !).
 
-:- export((block/3, 
-            set_block_exit/2, 
-            block/2, 
+:- export((block3/3,
+            set_block_exit/2,
+            block/2,
             !/1 )).
 
 :- dynamic(buggerFile/1).
@@ -1034,7 +1067,7 @@ block(Name, Goal) :-  block(Name, Goal, Var),  (   Var == !  ->  !  ;   true  ).
 % hasLibrarySupport :- absolute_file_name('logicmoo_util_library.pl',File),exists_file(File).
 
 
-%= 	 	 
+%=
 
 %% throwNoLib is semidet.
 %
@@ -1046,7 +1079,7 @@ throwNoLib:- dtrace,absolute_file_name('.',Here), buggerFile(BuggerFile), listin
 :- abolish(buggerDir/1),prolog_load_context(directory,D),asserta(buggerDir(D)).
 
 
-%= 	 	 
+%=
 
 %% addLibraryDir is semidet.
 %
@@ -1063,7 +1096,7 @@ addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_na
 
 
 
-%= 	 	 
+%=
 
 %% ib_multi_transparent33( ?MT) is semidet.
 %
@@ -1072,7 +1105,7 @@ addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_na
 ib_multi_transparent33(MT):-multifile(MT),module_transparent(MT),dynamic_safe(MT).
 
 
-%= 	 	 
+%=
 
 %% dif_safe( ?Agent, ?Obj) is semidet.
 %
@@ -1083,7 +1116,7 @@ dif_safe(Agent,Obj):- Agent\==Obj.
 
 % hide Pred from tracing
 
-%= 	 	 
+%=
 
 %% to_m_f_arity_pi( ?Term, ?M, ?F, ?A, ?PI) is semidet.
 %
@@ -1095,7 +1128,7 @@ to_m_f_arity_pi(F/A,_M,F,A,PI):-functor_safe(PI,F,A),!.
 to_m_f_arity_pi(PI,_M,F,A,PI):-functor_safe(PI,F,A).
 
 
-%= 	 	 
+%=
 
 %% with_preds( ?H, ?M, ?F, ?A, ?PI, :GoalGoal) is semidet.
 %
@@ -1116,7 +1149,7 @@ with_preds(H,M,F,A,PI,Goal):-forall(to_m_f_arity_pi(H,M,F,A,PI),Goal).
 
 :- export(dbgsubst/4).
 
-%= 	 	 
+%=
 
 %% dbgsubst( ?A, ?B, ?Goal, ?A) is semidet.
 %
@@ -1127,18 +1160,18 @@ dbgsubst(A,B,Goal,D):-var(A),!,ddmsg(dbgsubst(A,B,Goal,D)),dumpST,dtrace(dbgsubs
 dbgsubst(A,B,Goal,D):-dbgsubst0(A,B,Goal,D).
 
 
-%= 	 	 
+%=
 
 %% dbgsubst0( ?A, ?B, ?Goal, ?D) is semidet.
 %
 % Dbgsubst Primary Helper.
 %
-dbgsubst0(A,B,Goal,D):- 
+dbgsubst0(A,B,Goal,D):-
       catchv(hotrace(nd_dbgsubst(A,B,Goal,D)),E,(dumpST,ddmsg(E:nd_dbgsubst(A,B,Goal,D)),fail)),!.
 dbgsubst0(A,_B,_C,A).
 
 
-%= 	 	 
+%=
 
 %% nd_dbgsubst( ?Var, ?VarS, ?SUB, ?SUB) is semidet.
 %
@@ -1148,20 +1181,20 @@ nd_dbgsubst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
 nd_dbgsubst(  P, Goal,Sk, P1 ) :- functor_safe(P,_,N),nd_dbgsubst1( Goal, Sk, P, N, P1 ).
 
 
-%= 	 	 
+%=
 
 %% nd_dbgsubst1( ?Goal, ?Sk, ?P, ?N, ?P1) is semidet.
 %
 % Nd Dbgsubst Secondary Helper.
 %
 nd_dbgsubst1( _,  _, P, 0, P  ).
-nd_dbgsubst1( Goal, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], 
+nd_dbgsubst1( Goal, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args],
             nd_dbgsubst2( Goal, Sk, Args, ArgS ),
-            nd_dbgsubst2( Goal, Sk, [F], [FS] ),  
+            nd_dbgsubst2( Goal, Sk, [F], [FS] ),
             P1 =.. [FS|ArgS].
 
 
-%= 	 	 
+%=
 
 %% nd_dbgsubst2( ?X, ?Sk, ?L, ?L) is semidet.
 %
@@ -1179,7 +1212,7 @@ nd_dbgsubst2( _X, _Sk, L, L ).
 % Module Utils
 %=========================================
 
-%= 	 	 
+%=
 
 %% module_functor( ?PredImpl, ?Module, ?Pred, ?Arity) is semidet.
 %
@@ -1188,7 +1221,7 @@ nd_dbgsubst2( _X, _Sk, L, L ).
 module_functor(PredImpl,Module,Pred,Arity):-strip_module(PredImpl,Module,NewPredImpl),strip_arity(NewPredImpl,Pred,Arity).
 
 
-%= 	 	 
+%=
 
 %% strip_arity( ?PredImpl, ?Pred, ?Arity) is semidet.
 %
@@ -1240,7 +1273,7 @@ for obvious reasons.
 % =========================================================================
 
 
-%= 	 	 
+%=
 
 %% trace_or_throw( ?E) is semidet.
 %
@@ -1256,7 +1289,7 @@ trace_or_throw(E):- wdmsg(E),dtrace((dtrace,throw(E))).
 
 :-export(on_x_fail/1).
 
-%= 	 	 
+%=
 
 %% on_x_fail( :GoalGoal) is semidet.
 %
@@ -1267,7 +1300,7 @@ on_x_fail(Goal):- catchv(Goal,_,fail).
 
 % false = hide this wrapper
 
-%= 	 	 
+%=
 
 %% showHiddens is semidet.
 %
@@ -1278,7 +1311,7 @@ showHiddens:-true.
 :- meta_predicate on_x_log_fail(0).
 :- export(on_x_log_fail/1).
 
-%= 	 	 
+%=
 
 %% on_x_log_fail( :GoalGoal) is semidet.
 %
@@ -1286,13 +1319,16 @@ showHiddens:-true.
 %
 on_x_log_fail(Goal):- catchv(Goal,E,(dmsg(E:Goal),fail)).
 
+on_xf_log_cont(Goal):- (on_x_log_cont(Goal)*->true;dmsg(on_f_log_cont(Goal))).
+
+on_xf_log_cont_l(Goal):- call_each(on_xf_log_cont,Goal).
 
 % -- CODEBLOCK
 
 :- export(on_x_log_throw/1).
 :- export(on_x_log_cont/1).
 
-%= 	 	 
+%=
 
 %% on_x_log_throw( :GoalGoal) is semidet.
 %
@@ -1301,7 +1337,7 @@ on_x_log_fail(Goal):- catchv(Goal,E,(dmsg(E:Goal),fail)).
 on_x_log_throw(Goal):- catchv(Goal,E,(ddmsg(on_x_log_throw(E,Goal)),throw(E))).
 %on_x_log_throwEach(Goal):-with_each(1,on_x_log_throw,Goal).
 
-%= 	 	 
+%=
 
 %% on_x_log_cont( :GoalGoal) is semidet.
 %
@@ -1315,7 +1351,7 @@ on_x_log_cont(Goal):- catchv( (Goal*->true;ddmsg(failed_on_x_log_cont(Goal))),E,
 
 :- export(errx/0).
 
-%= 	 	 
+%=
 
 %% errx is semidet.
 %
@@ -1327,7 +1363,7 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 
 %skipWrapper:-!,fail.
 
-%= 	 	 
+%=
 
 %% skipWrapper is semidet.
 %
@@ -1356,7 +1392,7 @@ skipWrapper0:- is_release,!.
 
 % = :- meta_predicate(one_must(0,0)).
 
-%= 	 	 
+%=
 
 %% one_must( :GoalMCall, :GoalOnFail) is semidet.
 %
@@ -1366,16 +1402,16 @@ one_must(MCall,OnFail):-  MCall *->  true ; OnFail.
 
 
 
-%= 	 	 
+%=
 
 %% must_det( :GoalGoal) is semidet.
 %
 % Must Be Successfull Deterministic.
 %
-must_det(Goal):- must(Goal),!.
+must_det(Goal):- ignore(must(Goal)),!.
 
 
-%= 	 	 
+%=
 
 %% one_must_det( :GoalGoal, :GoalOnFail) is semidet.
 %
@@ -1385,7 +1421,7 @@ one_must_det(Goal,_OnFail):-Goal,!.
 one_must_det(_Call,OnFail):-OnFail,!.
 
 
-%= 	 	 
+%=
 
 %% must_det_dead( :GoalGoal, :GoalOnFail) is semidet.
 %
@@ -1396,7 +1432,7 @@ one_must_det(_Call,OnFail):-OnFail,!.
 
 :- module_transparent(must_det_l/1).
 
-%= 	 	 
+%=
 
 %% must_det_l( :GoalMGoal) is semidet.
 %
@@ -1410,17 +1446,23 @@ must_det_l_pred(Pred,Rest):- call_each(call_must_det(Pred),Rest).
 call_must_det(Pred,Arg):-must_det(call(Pred,Arg)).
 
 call_each(Pred,Goal):-strip_module(Goal,_,P),var(P),trace_or_throw(var_must_det_l_pred(Pred,Goal)),!.
-call_each(Pred,[Goal]):-!,call(Pred,Goal).
-call_each(Pred,[Goal|List]):-!, call(Pred,Goal),!,call_each(Pred,List).
-call_each(Pred,Goal):-tlbugger:skip_bugger,!,call(Pred,Goal).
-call_each(Pred,(Goal,List)):-!,call_each(Pred,Goal),!,call_each(Pred,List).
-call_each(Pred,Goal):- call(Pred,Goal),!.
+call_each(Pred,[Goal]):- trace_or_throw(call_each(Pred,[Goal])),!,p_call(Pred,Goal).
+call_each(Pred,[Goal|List]):-  trace_or_throw(call_each(Pred,[Goal|List])), !, p_call(Pred,Goal),!,call_each(Pred,List).
+% call_each(Pred,Goal):-tlbugger:skip_bugger,!,p_call(Pred,Goal).
+call_each(Pred,M:(Goal,List)):-!, p_call(Pred,M:Goal),!,call_each(Pred,M:List).
+call_each(Pred,(Goal,List)):-!,p_call(Pred,Goal),!,call_each(Pred,List).
+call_each(Pred,Goal):- p_call(Pred,Goal),!.
+
+p_call(Pred,_:M:Goal):-!,p_call(Pred,M:Goal).
+p_call([Pred],Goal):-!,call(Pred,Goal).
+p_call([Pred1|PredS],Goal):-!,p_call(PredS,call(Pred1,Goal)).
+p_call(Pred,Goal):-call(Pred,Goal).
 
 must_find_and_call(G):-must(G).
 
 :- module_transparent(det_lm/2).
 
-%= 	 	 
+%=
 
 %% det_lm( ?M, ?Goal) is semidet.
 %
@@ -1431,7 +1473,7 @@ det_lm(M,Goal):-M:Goal,!.
 
 :- module_transparent(must_l/1).
 
-%= 	 	 
+%=
 
 %% must_l( :GoalGoal) is semidet.
 %
@@ -1450,7 +1492,7 @@ must_l(Goal):- must(Goal).
 % thread locals should defaults to false  tlbugger:skip_use_slow_sanity.
 
 
-%= 	 	 
+%=
 
 %% slow_sanity( :GoalGoal) is semidet.
 %
@@ -1464,7 +1506,7 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; must(Goal)),!.
 hide_trace(G):- \+ tracing,!,call(G).
 hide_trace(G):- !,call(G).
 hide_trace(G):- skipWrapper,!,call(G).
-hide_trace(G):- 
+hide_trace(G):-
  restore_trace((
    hotrace(
       ignore((tracing,
@@ -1509,7 +1551,7 @@ is_recompile:-fail.
 sanity(_):- \+ current_prolog_flag(logicmoo_debug,true), notrace((is_release, \+ is_recompile)),!.
 */
 sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
-sanity(Goal):- fail, \+ current_prolog_flag(logicmoo_debug,true), current_prolog_flag(unsafe_speedups,true), \+ tracing,!, 
+sanity(Goal):- fail, \+ current_prolog_flag(logicmoo_debug,true), current_prolog_flag(unsafe_speedups,true), \+ tracing,!,
    (1 is random(10)-> must(Goal) ; true).
 sanity(_):- current_prolog_flag(safe_speedups,true),!.
 sanity(Goal):- quietly(Goal),!.
@@ -1557,7 +1599,7 @@ not_is_release:- \+ is_release.
 
 :- thread_local tlbugger:show_must_go_on/0.
 
-%= 	 	 
+%=
 
 %% badfood( ?MCall) is semidet.
 %
@@ -1570,7 +1612,7 @@ badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x
 % = :- meta_predicate(without_must(0)).
 
 
-%= 	 	 
+%=
 
 %% without_must( :GoalGoal) is semidet.
 %
@@ -1582,7 +1624,7 @@ without_must(Goal):- w_tl(tlbugger:skipMust,Goal).
 :- export(y_must/2).
 :- meta_predicate (y_must(?,0)).
 
-%= 	 	 
+%=
 
 %% y_must( ?Y, :GoalGoal) is semidet.
 %
@@ -1599,7 +1641,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 :- meta_predicate(must(0)).
 %must(Call):-(repeat, (catchv(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),dtrace,Call)),!).
 
-%= 	 	 
+%=
 
 %% must( :GoalGoal) is semidet.
 %
@@ -1611,7 +1653,7 @@ must(Goal):-  notrace((get_must(Goal,MGoal),!)),call(MGoal).
 
 dumpST_error(Msg):- notrace((ddmsg(error,Msg),dumpST,ddmsg(error,Msg))).
 
-%= 	 	 
+%=
 
 %% get_must( ?Goal, ?CGoal) is semidet.
 %
@@ -1623,7 +1665,7 @@ get_must(hotrace(Goal),CGoal):- !,get_must((hotrace(Goal)*->true;Goal),CGoal).
 get_must(Goal,CGoal):-  (tlbugger:show_must_go_on; non_user_console),!,
  CGoal = ((catchv(Goal,E,
      notrace(((dumpST_error(sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal)),ignore(rtrace(Goal)),badfood(Goal)))))
-            *-> true ; 
+            *-> true ;
               notrace(dumpST_error(sHOW_MUST_go_on_failed_F__A__I__L_(Goal))),ignore(rtrace(Goal)),badfood(Goal))).
 
 get_must(Goal,CGoal):-  (tlbugger:skipMust;skipWrapper),!,CGoal = Goal.
@@ -1631,15 +1673,22 @@ get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(fai
 % get_must(Goal,CGoal):- !, CGoal = (Goal *-> true ; ((dumpST_error(failed_FFFFFFF(must(Goal))),dtrace(Goal)))).
 
 %get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),dtrace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),dtrace,Goal))).
-get_must(Goal,CGoal):-    
+get_must(Goal,CGoal):-
    (CGoal = (catchv(Goal,E,
      ignore_each(((dumpST_error(must_xI_(E,Goal)), %set_prolog_flag(debug_on_error,true),
          rtrace(Goal),nortrace,dtrace(Goal),badfood(Goal)))))
          *-> true ; (dumpST,ignore_each(((dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).
 
+:- thread_self_main.
 :- save_streams.
 :- initialization(save_streams).
 :- initialization(save_streams,restore).
+
+
+:- setup_call_cleanup(true,set_main_error,notrace).
+:- initialization(set_main_error).
+:- initialization(set_main_error,restore).
+:- notrace.
 
 %:- 'mpred_trace_none'(ddmsg(_)).
 %:- 'mpred_trace_none'(ddmsg(_,_)).

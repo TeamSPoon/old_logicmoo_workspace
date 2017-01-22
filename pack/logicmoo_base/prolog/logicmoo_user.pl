@@ -8,16 +8,16 @@
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- if(( ( current_prolog_flag(xref,true)) )).
 :- module(logicmoo_user_module,
- [ 
- op(1199,fx,('==>')), 
+ [
+ op(1199,fx,('==>')),
  op(1190,xfx,('::::')),
  op(1180,xfx,('==>')),
- op(1170,xfx,'<==>'),  
+ op(1170,xfx,'<==>'),
  op(1160,xfx,('<-')),
  op(1150,xfx,'=>'),
  op(1140,xfx,'<='),
- op(1130,xfx,'<=>'), 
- op(600,yfx,'&'), 
+ op(1130,xfx,'<=>'),
+ op(600,yfx,'&'),
  op(600,yfx,'v'),
  op(350,xfx,'xor'),
  op(300,fx,'~'),
@@ -26,23 +26,23 @@
 :- endif.
 
 % restore entry state
-:- lmce:current_smt(SM,M),writeln(current_smt1(SM,M)).
+%:- lmce:current_smt(SM,M),writeln(current_smt1(SM,M)).
 :- lmce:reset_modules.
-:- lmce:current_smt(SM,M),writeln(current_smt2(SM,M)).
+%:- lmce:current_smt(SM,M),writeln(current_smt2(SM,M)).
 
 :- if(prolog_load_context(module,system)).
 :- set_prolog_flag(access_level,system).
 :- endif.
 :-
- op(1199,fx,('==>')), 
+ op(1199,fx,('==>')),
  op(1190,xfx,('::::')),
  op(1180,xfx,('==>')),
- op(1170,xfx,'<==>'),  
+ op(1170,xfx,'<==>'),
  op(1160,xfx,('<-')),
  op(1150,xfx,'=>'),
  op(1140,xfx,'<='),
- op(1130,xfx,'<=>'), 
- op(600,yfx,'&'), 
+ op(1130,xfx,'<=>'),
+ op(600,yfx,'&'),
  op(600,yfx,'v'),
  op(350,xfx,'xor'),
  op(300,fx,'~'),

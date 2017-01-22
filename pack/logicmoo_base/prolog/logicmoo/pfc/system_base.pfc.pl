@@ -298,22 +298,20 @@ ttExpressionType(ftList(ftInt)).
 
 :- dynamic(ttRelationType/1).
 
-arity(apathFn,2).
-arity(isKappaFn,2).
-%arity('$VAR',_).
-arity(isInstFn,1).
-arity(ftListFn,1).
 arity(xyzFn,4).
-arity(arity,2).
-arity(is_never_type,1).
-arity(argIsa, 3).
-arity(argsIsa, 2).
 arity(Prop,1):- cwc, clause_b(ttRelationType(Prop)).
-arity(meta_argtypes,1).
-arity(arity,2).
-arity(is_never_type,1).
 arity(prologSingleValued,1).
+arity(meta_argtypes,1).
+arity(isKappaFn,2).
+arity(isInstFn,1).
+arity(is_never_type,1).
+arity(ftListFn,1).
+arity(arity,2).
+arity(argsIsa, 2).
+arity(argIsa, 3).
+arity(apathFn,2).
 arity('<=>',2).
+%arity('$VAR',_).
 arity(F,A):- cwc, is_ftNameArity(F,A), current_predicate(F/A),A>1.
 arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1), (col_as_unary(F);col_as_isa(F)), \+((call((dif:dif(Z,1))), arity(F,Z))).
 

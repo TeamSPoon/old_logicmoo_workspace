@@ -13,7 +13,7 @@
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
 :- set_prolog_flag(generate_debug_info,true).
 
-:-if((multifile(baseKB:ignore_file_mpreds/1),dynamic(baseKB:ignore_file_mpreds/1), 
+:-if((multifile(baseKB:ignore_file_mpreds/1),dynamic(baseKB:ignore_file_mpreds/1),
    (prolog_load_context(source,F1) -> asserta(baseKB:ignore_file_mpreds(F1)) ; true),
    (prolog_load_context(file,F) -> asserta(baseKB:ignore_file_mpreds(F)) ; true))).
 :-endif.
@@ -28,15 +28,15 @@
 
 :- set_prolog_flag(access_level,user).
 
-:- 
+:-
  op(1190,xfx,('::::')),
  op(1180,xfx,('==>')),
- op(1170,xfx,'<==>'),  
+ op(1170,xfx,'<==>'),
  op(1160,xfx,('<-')),
  op(1150,xfx,'=>'),
  op(1140,xfx,'<='),
- op(1130,xfx,'<=>'), 
- op(600,yfx,'&'), 
+ op(1130,xfx,'<=>'),
+ op(600,yfx,'&'),
  op(600,yfx,'v'),
  op(350,xfx,'xor'),
  op(300,fx,'~'),
@@ -53,12 +53,12 @@
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
 
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 %:- lmce:reset_modules.
 :- endif.
 
 
-:- shell('./hmud/policyd').
+:- ignore(shell('./hmud/policyd')).
 
 unsafe_preds_init(W,shell,2):-predicate_property(shell(_,_),imported_from(W)).
 unsafe_preds_init(W,shell,1):-predicate_property(shell(_),imported_from(W)).
@@ -90,7 +90,7 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 :- ensure_loaded(library(eggdrop)).
 %:- egg_go.
 :- endif.
-%:- use_listing_vars.
+:- use_listing_vars.
 % :- [run].
 :- endif.
 
@@ -116,7 +116,7 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 :- kb_dynamic(baseKB:sanity_test/0).
 :- kb_dynamic(baseKB:regression_test/0).
 :- kb_dynamic(baseKB:feature_test/0).
-:- kb_dynamic((        
+:- kb_dynamic((
         baseKB:feature_test/0,
         baseKB:mud_test/2,
         baseKB:regression_test/0,
@@ -149,7 +149,7 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 
 
 
-:- user:ensure_loaded(load_).
+% :- user:ensure_loaded(load_).
 started_mud_server.
 
 :- push_modules.
@@ -192,14 +192,14 @@ started_mud_server.
 :- declare_load_dbase('../games/src_game_nani/?*.pfc.pl').
 
 % [Optional] the following worlds are in version control in examples
-% :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
+% :- add_game_dir('../games/src_game_wumpus',prolog_repl).
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
-% :- add_game_dir('../games/src_game_nani',prolog_repl).       
+% :- add_game_dir('../games/src_game_nani',prolog_repl).
 % :- add_game_dir('../games/src_game_startrek',prolog_repl).
 lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 % ==============================
-% MUD GAME REPL 
+% MUD GAME REPL
 % ==============================
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(login_and_run)).
