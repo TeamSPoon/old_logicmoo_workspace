@@ -164,9 +164,9 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 % Loaded LogicMOO Code!!!
 %:- profile(ensure_loaded(logicmoo_repl)).
 %:- ensure_loaded(daydream).
-:- ensure_loaded(multivar).
-:- ensure_loaded(udt).
-:- ensure_loaded(atts).
+:- ensure_loaded(library(multivar)).
+:- ensure_loaded(library(udt)).
+:- ensure_loaded(library(atts)).
 :- ensure_loaded(logicmoo_repl).
 
 

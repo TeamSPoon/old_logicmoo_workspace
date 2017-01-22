@@ -50,9 +50,6 @@ pack/metastudio~
 pack/phase02-jrtl
 pack/pldata_larkc
 pack/RemoteSystemsTempFiles
-pack/slack_prolog/
-pack/swicli
-pack/swish
 pack/prologmud_sample/bin/
 pack/prologmud_sample/RDF-store/
 pack/prologmud_sample/cache/

@@ -620,8 +620,10 @@ include_mpred_files(Mask):-
      forall(maybe_locate_file(Mask,E),ensure_mpred_file_loaded(E)).
 
 :- module_transparent(include_prolog_files/1).
+
 include_prolog_files(Mask):- 
      forall(maybe_locate_file(Mask,E),ensure_loaded(E)).
+
 /*
 module(M,Preds):-
     'format'(user_output /*e*/,'% visting module ~w.~n',[M]),
@@ -1958,8 +1960,7 @@ ensure_mpred_file_loaded(World,FileIn):-
 %
 % Must Be Successfull Locate File.
 %
-must_locate_file(FileIn,File):-
- no_repeats(File, quietly_must(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File))).
+must_locate_file(FileIn,File):- must(maybe_locate_file(FileIn,File)).
 
 maybe_locate_file(FileIn,File):-
  no_repeats(File, quietly(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File))).

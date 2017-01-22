@@ -188,8 +188,8 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 % :- assert_setting01(lmconf:eachFact_Preconditional(isRuntime)).
 
 % isa(starTrek,mtCycL).
-% :- starTrek:force_reload_mpred_file('../prologmud_worlds/src_game_startrek/?*.pfc.pl').
-lst :- force_reload_mpred_file('../prologmud_worlds/src_game_startrek/?*.pfc.pl').
+% :- starTrek:force_reload_mpred_file('../prologmud_sample/runtime/games/src_game_startrek/?*.pfc.pl').
+lst :- force_reload_mpred_file('../prologmud_sample/runtime/games/src_game_startrek/?*.pfc.pl').
 
 :- check_clause_counts.
 

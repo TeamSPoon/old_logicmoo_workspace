@@ -458,6 +458,7 @@ Proof end.
 
 */
 
+
 % done in 'user' to avoid reloading when we reload dbase
 ensure_q_loaded(File):-
     expand_file_search_path(logicmoo('pldata/mworld0_declpreds.pl'),Path),exists_file(Path),!,                                 
@@ -530,20 +531,24 @@ download_and_install_el:-
 :-wdmsg(loading_mobs).
 
 % NPC planners
-:- include_prolog_files(prologmud(mobs/'?*.pl')).
-:- exists_directory('../src_assets/mobs/')->include_prolog_files('../src_assets/mobs/?*.pl');true.
+:- wdmsg(loading_npcs).
+:- expand_file_name('../prologmud/prolog/prologmud/mobs/?*.pl',O),maplist(ensure_mpred_file_loaded,O).
+%:- include_prolog_files(prologmud(mobs/'?*.pl')).
+%:- exists_directory('../src_assets/mobs/')->include_prolog_files('../src_assets/mobs/?*.pl');true.
 % :- xperimental->include_prolog_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
 
-:-wdmsg(loading_actions).
-
 % Action/Commands implementation
-:- include_prolog_files(prologmud(actions/'?*.pl')).
-:- exists_directory('../src_assets/actions/')->include_prolog_files('../src_assets/actions/?*.pl');true.
+:- wdmsg(loading_actions).
+:- expand_file_name('../prologmud/prolog/prologmud/actions/?*.pl',O),maplist(ensure_mpred_file_loaded,O).
+% :- include_prolog_files(prologmud(actions/'?*.pl')).
+% :- exists_directory('../src_assets/actions/')->include_prolog_files('../src_assets/actions/?*.pl');true.
 % :- xperimental->include_prolog_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 % New Objects
-:- include_prolog_files(prologmud(objs/'?*.pl')).
-:- exists_directory('../src_assets/objs/')->include_prolog_files('../src_assets/objs/?*.pl');true.
+:- wdmsg(loading_objects).
+:- expand_file_name('../prologmud/prolog/prologmud/objs/?*.pl',O),maplist(ensure_mpred_file_loaded,O).
+%:- include_prolog_files(prologmud(objs/'?*.pl')).
+%:- exists_directory('../src_assets/objs/')->include_prolog_files('../src_assets/objs/?*.pl');true.
 % :- xperimental->include_prolog_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 
