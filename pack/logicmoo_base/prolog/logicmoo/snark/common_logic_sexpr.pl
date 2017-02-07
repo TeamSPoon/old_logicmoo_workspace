@@ -796,7 +796,7 @@ run(S):-'format'('~n~s~n',[S]),run(S,V),writeq(V).
 %
 % If Script File Time.
 %
-if_script_file_time(X):-if_startup_script_local(time(X)).
+if_script_file_time(X):-if_startup_script_local((X)).
 
 
 %= 	 	 

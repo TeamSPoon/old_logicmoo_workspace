@@ -1,4 +1,6 @@
 
+:- install_constant_renamer_until_eof.
+
 :- file_begin(pfc).
 
 :- set_fileAssertMt(baseKB).
@@ -81,20 +83,20 @@ tCol(tHumanBody).
 ((relationAllOnly(Pred,Col1,Col2)/(G=..[Pred,VAL,Value])) ==> 
    (isa(VAL,Col1) ==> (( G ==> isa(Value,Col2))))).
 
-cycl('
+cycl(kif('
    (implies 
        (and 
            (isa ?BPRED SymmetricBinaryPredicate) 
            (transitiveViaArg ?PRED ?BPRED ?N)) 
        (transitiveViaArgInverse ?PRED ?BPRED ?N))'
-   ).
+   )).
 
 
 
 
 /*
 :- sanity(( 
-   fully_expand(((t(foo,a)/bar)=>baz),OUT),
+   fully_expand_real(((t(foo,a)/bar)=>baz),OUT),
    OUT = (((foo(a))/bar)=>baz))).
 
 :- show_failure((
@@ -259,8 +261,6 @@ genls(tHumanBody,tBodyPart).
 
 % :- cls.
 
-:- noguitracer.
-
 :- printAll(tHominid(_)).
 :- printAll(tHumanBody(_)).
 
@@ -275,9 +275,10 @@ pass4,relationAllExists(mudSubPart,tHominid,tHumanBody).
 
 
 
-
-pass4,relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).
-pass4,relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
+==>((
+pass4,relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs))
+)).
+==>((pass4,relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)))).
 
 
 :- endif.
@@ -307,7 +308,7 @@ have to confirm how *most* works
 
 isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),tCol(C).
 
-
+:- set_prolog_flag(do_renames,restore).
 end_of_file.
 
 :- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
@@ -328,4 +329,5 @@ end_of_file.
 
 %prologHybrid(defnIff(ttExpressionType,ftTerm)).
 %defnIff(X,_)==>ttExpressionType(X).
+
 

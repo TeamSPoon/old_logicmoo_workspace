@@ -9,3 +9,43 @@
 %
 
 :- include('mpred_header.pro').
+
+:- use_module(library('logicmoo/mpred/mpred_type_wff.pl')).
+:- use_module(library('logicmoo/mpred/mpred_at_box.pl')).
+:- use_module(library('logicmoo/mpred/mpred_expansion.pl')).
+:- use_module(library('logicmoo/mpred/mpred_loader.pl')).
+:- use_module(library('logicmoo/mpred/mpred_pfc.pl')). % except([op(_,_,_)]).
+:- use_module(library('logicmoo/mpred/mpred_prolog_file.pl')).
+:- use_module(library('logicmoo/mpred/mpred_props.pl')).
+:- use_module(library('logicmoo/mpred/mpred_type_isa.pl')).
+:- use_module(library('logicmoo/mpred/mpred_kb_ops.pl')).
+:- use_module(library('logicmoo/mpred/mpred_agenda.pl')).
+:- use_module(library('logicmoo/mpred/mpred_storage.pl')).
+:- use_module(library('logicmoo/snark/common_logic_sexpr.pl')).
+:- use_module(library('logicmoo/mpred/mpred_hooks.pl')).
+
+:- use_module(library('logicmoo/mpred/mpred_listing.pl')).
+:- use_module(library('logicmoo/mpred/mpred_stubs.pl')).
+
+:- use_module(library('logicmoo/mpred/mpred_type_constraints.pl')).
+:- use_module(library('logicmoo/mpred/mpred_type_naming.pl')).
+
+:- use_module(library('logicmoo/mpred/mpred_type_args.pl')).
+
+:- use_module(library('logicmoo/snark/common_logic_snark.pl')). %except([op(_,_,_)]).
+
+
+:- use_module(library('logicmoo/snark/common_logic_boxlog.pl')).
+:- use_module(library('logicmoo/snark/common_logic_skolem.pl')).
+:- use_module(library('logicmoo/snark/common_logic_compiler.pl')). % ,except([op(_,_,_)])). % ,arity/2,mpred_is_tracing_exec/0, (~)/1
+
+:- use_module(library('logicmoo/mpred_online/mpred_www.pl')).
+
+:- use_module(library('logicmoo/snark/common_logic_kb_hooks.pl')).
+
+/*
+
+
+% :- use_module(library('logicmoo/mpred/mpred_motel.pl')).
+:- use_module(library('logicmoo/mpred/mpred_userkb.pl')).
+*/

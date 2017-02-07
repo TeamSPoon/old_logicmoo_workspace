@@ -1,5 +1,5 @@
 % :-swi_module(user). 
-:-swi_module(modHelp, [show_help/0]).
+:-swi_module(modHelp, [actHelp/0]).
 /* * module * A command to tell an agent all the possible commands
 % help.pl
 % Douglas Miles 2014
@@ -33,7 +33,7 @@ get_good_templates(Templ):- isa(Templ,vtActionTemplate),good_template(Templ).
 get_bad_templates(Templ):- no_repeats_old((action_info(Templ,_),not(good_template(Templ)))).
 
 
-:- sanity((fully_expand(action_info(TEMPL, txtConcatFn(_Text,"does: ",do(_A2,TEMPL))),O),wdmsg(O))).
+:- sanity((fully_expand_real(foo,action_info(TEMPL, txtConcatFn(_Text,"does: ",do(_A2,TEMPL))),O),wdmsg(O))).
 
 
 :-must(ain_expanded(({between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}==>
@@ -43,7 +43,9 @@ get_bad_templates(Templ):- no_repeats_old((action_info(Templ,_),not(good_templat
          action_info(Syntax, txtConcatFn(["makes","happen"|List]))).
 
 
+to_param_doc(TEMPL,["Prolog", "looks", "like", ":",TEMPL]):-!.
 to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).
+
 
 first_pl((BODY,_),PL):- nonvar(BODY),!,
  first_pl(BODY,PL).
@@ -80,11 +82,11 @@ nvfmt(XX=[YY]):-!,nvfmt(XX=YY).
 nvfmt(XX):-copy_term(XX,X),numbervars(X,0,_,[attvar(bind),singletons(true)]),fmt(X).
 
 % Help - A command to tell an agent all the possible commands
-show_help:- commands_list(ListS),forall(member(E,ListS),show_templ_doc(E)).
-agent_call_command(_Agent,actHelp) :- show_help.
-agent_call_command(_Agent,actHelp(Str)) :-show_help(Str).
+actHelp:- commands_list(ListS),forall(member(E,ListS),show_templ_doc(E)).
+agent_call_command(_Agent,actHelp) :- actHelp.
+agent_call_command(_Agent,actHelp(Str)) :-actHelp(Str).
 
-show_help(Str):-commands_list(ListS),forall(member(E,ListS),write_string_if_contains(Str,E)).
+actHelp(Str):-commands_list(ListS),forall(member(E,ListS),write_string_if_contains(Str,E)).
 
 write_string_if_contains('',E):-!,show_templ_doc(E),!.
 write_string_if_contains([],E):-!,show_templ_doc(E),!.
@@ -104,8 +106,11 @@ impl_coerce_hook(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 % :-ain(((get_all_templates(Templ))==>vtActionTemplate(Templ))).
 
 (type_action_info(_,TEMPL,Help) ==> action_info(TEMPL,Help)).
+
 (action_info(TEMPL,_Help) ==> vtActionTemplate(TEMPL)).
-((vtActionTemplate(TEMPL), { not_asserted(action_info(TEMPL,_)),to_param_doc(TEMPL,S)}) ==> action_info(TEMPL,S)).
+
+vtActionTemplate(TEMPL) ==> (\+ action_info(TEMPL,_),{to_param_doc(TEMPL,S)},action_info(TEMPL,S)).
+
 action_info(TEMPL,_S)==>vtActionTemplate(TEMPL).
 
 

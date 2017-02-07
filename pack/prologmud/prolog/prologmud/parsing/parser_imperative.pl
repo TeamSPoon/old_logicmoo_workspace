@@ -1,8 +1,22 @@
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
-%:- module(parser_imperative, []).
-:- endif.
-/* module
-% Imperitive Sentence Parser (using DCG)
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
+/*
+:- swi_module(parser_imperative, [
+                   parse_agent_text_command/5,            
+                   parse_agent_text_command_0/5,            
+                   objects_match/3,
+                   match_object/2,
+                   object_string/2,
+                   save_fmt_a_0/2,
+                   save_fmt_a/2,
+                   % coerce/3,
+                   parseIsa//2,
+                   phrase_parseForTypes_9//2,
+                   guess_nameStrings/2,
+                   parseForTypes//2
+]).
+*/
+%:- endif.
+/* * <module>  parser_imperative - Imperitive Sentence Parser (using DCG)
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
@@ -10,6 +24,7 @@
 %
 */
 :- include(prologmud(mud_header)).
+
 
 :- set_prolog_flag(logicmoo_virtualize,true).
 
@@ -114,9 +129,15 @@ desc_len(S0,Region):- call(some_term_to_atom(S0,S)),
 
 
 :-export(objects_match_for_agent/3).
-objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[mudPossess(Agent,isThis),isSame(mudAtLoc),isSame(localityOfObject),tAgent,tItem,tRegion],ObjList).  
+objects_match_for_agent(Agent,Text,ObjList):- 
+   objects_match_for_agent(Agent,Text,
+   [mudPossess(Agent,isThis),
+    isSame(mudAtLoc),
+    isSame(localityOfObject),tAgent,tItem,tRegion],ObjList).  
 :-export(objects_match_for_agent/4).
-objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,isOneOf([text_means(Agent,Text,isThis),isAnd([isOneOf(Match),match_object(Text,isThis)])]),ObjList).  
+objects_match_for_agent(Agent,Text,Match,ObjList):- trace,
+ objects_for_agent(Agent,isOneOf([text_means(Agent,Text,isThis),
+    isAnd([isOneOf(Match),match_object(Text,isThis)])]),ObjList).  
 
 
 text_means(Agent,Text,Agent):- string_equal_ci(Text,"self"),!.
@@ -342,7 +363,7 @@ verb_alias("lo",actLook).
 verb_alias("s",actMove(vSouth)).
 verb_alias("go",actMove).
 verb_alias("where is",actWhere).
-verb_alias(["where","is"],actWhereTest).
+% verb_alias(["where","is"],actWhereTest).
 
 % remove nonstringed aliases
 :-ain(((verb_alias(NonStr, Act), {\+ is_ftText(NonStr),convert_to_cycString(NonStr,EStr)}) ==> 
@@ -633,7 +654,7 @@ parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_comman
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
 to_arg_value(Var,Var):-is_ftVar(Var),!.
-to_arg_value(Val,What):-parserVars((Val;isParserVar(Val)),What,_),!. 
+to_arg_value(Val,What):- parserVars((Val;isParserVar(Val)),What,_),!. 
 to_arg_value(vHere,Here):-must((current_agent(Who),where_atloc(Who,Here))).
 to_arg_value(isSelfAgent,Who):-must((current_agent(Who))).
 to_arg_value(isRandom(Type),Term):- nonvar(Type),!,must((to_arg_value(Type,TypeR),random_instance(TypeR,Term,true))).
@@ -730,7 +751,7 @@ coerce0(String,isNot(Type),Inst):-!, sanity(nonvar(Type)), \+ (coerce(String,Typ
 coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,Inst),!.
 
 % Strings
-coerce0(String,ftString,String):- is_ftString(String),!.
+coerce0(String,ftString,String):- is_ftString2(String),!.
 coerce0(Inst,ftString,String):- \+ is_ftText(Inst),!,must(name_text(Inst,String)).
 coerce0(Any,ftString,String):- !, any_to_string(Any,String).
 
@@ -775,7 +796,7 @@ instances_of_type(Inst,Type):- no_repeats_old(instances_of_type_0(Inst,Type)).
 available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), isa(Obj,Type), mudDistance(Agent,Obj,D),D<6.
 
 % test_with ?- coerce(s,vtDirection,O).
-%TODO add back if usefull instances_of_type_0(Inst,Type):- \+ current_prolog_flag(unsafe_speedups,true), instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
+%TODO add back if usefull instances_of_type_0(Inst,Type):- \+ flag_call(unsafe_speedups == true) , instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
 % should never need this but .. instances_of_type_0(Inst,Type):- genls(SubType,Type),isa(Inst,SubType).
 instances_of_type_0(Inst,Type):- isa(Inst,Type).
 

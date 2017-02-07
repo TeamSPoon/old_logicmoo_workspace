@@ -20,7 +20,8 @@
   mpred_fwc/1,
   get_mpred_is_tracing/1,
   show_if_debug/1,
-  full_transform_warn/3,
+  full_transform_warn_if_changed/3,
+  full_transform_warn_if_same/3,
   full_transform/3,
   maybe_mpred_break/1,
   each_E/3,
@@ -322,7 +323,7 @@ mnotrace(G):- (no_trace(G)),!.
 % =================================================
 % ==============  UTILS BEGIN        ==============
 % =================================================
-% copy_term_vn(A,A):- current_prolog_flag(unsafe_speedups,true),!.
+% copy_term_vn(A,A):- flag_call(unsafe_speedups == true) ,!.
 copy_term_vn(B,A):- ground(B),!,A=B.
 copy_term_vn(B,A):- !,copy_term(B,A).
 copy_term_vn(B,A):- need_speed,!,copy_term(B,A).
@@ -384,6 +385,8 @@ get_source_ref1(M):- ground(M),!.
 get_source_ref1(M):- get_source_ref10(M),!.
 get_source_ref1(_).
 
+system:get_source_ref1(M):- get_source_ref1(M),!.
+
 get_source_ref10(M):- current_why(M), nonvar(M) , M =mfl(_,_,_).
 get_source_ref10(mfl(M,F,L)):- defaultAssertMt(M), source_location(F,L).
 
@@ -414,7 +417,7 @@ to_real_mt(_Why,BOX,BOX).
 % Ensure modules are correct when asserting/calling information into the correct MTs
 %
 %fix_mp(Why,I,UO):- compound(UO),dtrace,UO=(U:O),!,quietly_must(fix_mp(Why,I,U,O)).
-% fix_mp(Why,I,MT:UO):- current_prolog_flag(unsafe_speedups,true), !, strip_module(I,_,UO),defaultAssertMt(MT).
+% fix_mp(Why,I,MT:UO):- flag_call(unsafe_speedups == true) , !, strip_module(I,_,UO),defaultAssertMt(MT).
 fix_mp(Why,I,UO):- quietly_must(fix_mp(Why,I,U,O)),maybe_prepend_mt(U,O,UO).
 
 
@@ -507,14 +510,24 @@ convention_to_symbolic_mt(_Why,F,_,Mt):-  call(baseKB:predicateConventionMt(F,Mt
 convention_to_symbolic_mt(_Why,F,A,abox):- baseKB:wrap_shared(F,A,ereq).
 % convention_to_symbolic_mt(_Why,_,_,M):- atom(M),!.
 
-full_transform_warn(Why,MH,MHH):- full_transform(Why,MH,MHH),must(MH=@=MHH).
+full_transform_warn_if_changed(_,MH,MHH):-!,MH=MHH.
+full_transform_warn_if_changed(Why,MH,MHH):- full_transform(Why,MH,MHH),must(MH=@=MHH).
+full_transform_warn_if_same(Why,MH,MHH):- full_transform(Why,MH,MHH),must(MH \=@= MHH).
 
+/*
 full_transform_and_orignal(Why,MH,MHO):- full_transform(Why,MH,MHH),
       (MH=@=MHH -> MHO=MH ; (MHO = MHH ; MHO = MH )).
 
 
+
+full_transform(Op,isa(I,C),SentO):- !, must(fully_expand_real(Op,isa(I,C),SentO)),!.
+full_transform(Op,Sent,SentO):- functor(Sent,F,A),may_fully_expand(F,A),!,must(fully_expand_real(Op,Sent,SentO)),!.
+
+*/
+
+
 full_transform(Why,MH,MHH):-
-   must(fully_expand(change(assert,Why),MH,MHH)),!,
+   must(fully_expand_real(change(assert,Why),MH,MHH)),!,
    sanity(same_modules(MH,MHH)).
 
 same_modules(MH,MHH):- strip_module(MH,HM,_),strip_module(MHH,HHM,_),!,
@@ -525,8 +538,8 @@ same_modules(MH,MHH):- strip_module(MH,HM,_),strip_module(MHH,HHM,_),!,
 listing_u(P):-call_u_no_bc(listing(P)),!.
 
 attvar_op_fully(Why,MH):- !, attvar_op(Why,MH).
-%attvar_op_fully(Why,M:H):- must_notrace_pfc(full_transform_warn(change(Why,attvar_op_fully),H,true,HH,true)),!,each_E(attvar_op(Why),M:HH,[]).
-%attvar_op_fully(Why,MH):- full_transform_warn(Why, MH,MHH),each_E(attvar_op(Why),MHH,[]).
+%attvar_op_fully(Why,M:H):- must_notrace_pfc(full_transform_warn_if_changed(change(Why,attvar_op_fully),H,true,HH,true)),!,each_E(attvar_op(Why),M:HH,[]).
+%attvar_op_fully(Why,MH):- full_transform_warn_if_changed(Why, MH,MHH),each_E(attvar_op(Why),MHH,[]).
 
 throw_depricated:- trace_or_throw(throw_depricated).
 
@@ -553,7 +566,7 @@ clause_u(C):- expand_to_hb(C,H,B),!,clause_u(H,B).
 
 
 %% clause_u( ?H, ?B) is semidet.
-clause_u(H,B):-  current_prolog_flag(unsafe_speedups,true), ground(H:B),!,clause(H,B).
+clause_u(H,B):-  flag_call(unsafe_speedups == true) , ground(H:B),!,clause(H,B).
 clause_u(H,B):- clause_u(H,B,_).
 %clause_u(H,B):- clause_true( ==>( B , H) ).
 %clause_u(H,B):- clause_true( <-( H , B) ).
@@ -587,7 +600,7 @@ clause_u(MH,B,R):- Why = clause(clause,clause_u),
 
 % lookup_u/cheaply_u/call_u/clause_b
 lookup_u(SPFT):- baseKB:call(call,SPFT).
-% lookup_u(SPFT):- current_prolog_flag(unsafe_speedups,true), !,baseKB:mtCycL(MT),call(MT:SPFT).
+% lookup_u(SPFT):- flag_call(unsafe_speedups == true) , !,baseKB:mtCycL(MT),call(MT:SPFT).
 % lookup_u(H):-lookup_u(H,_).
 
 
@@ -772,7 +785,7 @@ mpred_ain(MTP,S):- is_ftVar(MTP),!,trace_or_throw(var_mpred_ain(MTP,S)).
 mpred_ain(user:MTP,S):- !, must(mpred_ain(MTP,S)).
 mpred_ain(user:MTP :-B,S):- !, must(mpred_ain(MTP:-B,S)).
 
-mpred_ain(ToMt:P :- B,(mfl(FromMt,File,Lineno),UserWhy)):- ToMt \== FromMt,
+mpred_ain( ToMt:P :- B , (mfl(FromMt,File,Lineno),UserWhy)):- ToMt \== FromMt,
  defaultAssertMt(ABox), ToMt \== ABox,!,
   with_umt(ToMt,(mpred_ain(ToMt:P :- B,(mfl(ToMt,File,Lineno),UserWhy)))).
 
@@ -816,9 +829,11 @@ ain_fast(P,S):-
   each_E(mpred_post1,P,[S]),!,
   mpred_run.
 
+:- abolish(lmconf:eachRule_Preconditional/1).
+:- abolish(lmconf:eachFact_Preconditional/1).
 :- dynamic(lmconf:eachRule_Preconditional/1).
-lmconf:eachRule_Preconditional(true).
 :- dynamic(lmconf:eachFact_Preconditional/1).
+lmconf:eachRule_Preconditional(true).
 lmconf:eachFact_Preconditional(true).
 
 add_eachRulePreconditional(A,A):-var(A),!.
@@ -837,7 +852,7 @@ add_eachRulePreconditional_now(A,(Was,A)):- lmconf:eachRule_Preconditional(Was),
 
 
 
-remove_negative_version(_P):- current_prolog_flag(unsafe_speedups,true),!.
+remove_negative_version(_P):- flag_call(unsafe_speedups == true) ,!.
 remove_negative_version((H:-B)):- !,
   % TODO extract_predciates((H:-B),Preds),trust(Preds),
   with_no_mpred_trace_exec((
@@ -853,14 +868,14 @@ remove_negative_version(P):-
 
 fwc1s_post1s(3,0):-!.
 %fwc1s_post1s(1,2):-!.
-%fwc1s_post1s(1,2):- current_prolog_flag(unsafe_speedups,false),!.
+%fwc1s_post1s(1,2):- flag_call(unsafe_speedups == false) ,!.
 
 fwc1s_post1s(1,3):- fresh_mode,!.
 fwc1s_post1s(1,2):- current_prolog_flag(pfc_booted,true),!.
 % fwc1s_post1s(10,20):- defaultAssertMt(Mt)->Mt==baseKB,!.
 fwc1s_post1s(1,2).
 
-fresh_mode :- \+ current_prolog_flag(pfc_booted,true), \+ current_prolog_flag(unsafe_speedups,false).
+fresh_mode :- \+ current_prolog_flag(pfc_booted,true), \+ flag_call(unsafe_speedups == false) .
 plus_fwc :- \+ fresh_mode.
 
 plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
@@ -872,11 +887,12 @@ plus_fwc(P):- gripe_time(0.6,
       loop_check_term(must(mpred_fwc(P)),plus_fwc(P),true);true)),!.
 
 
-maybe_updated_value(UP,R,OLD):- \+ current_prolog_flag(unsafe_speedups,true), fail,
+maybe_updated_value(UP,R,OLD):- % \+ flag_call(unsafe_speedups == true) ,
     compound(UP),
-    get_consequent(UP,P),
+    get_consequent(UP,P),!,
     compound(P),
     once((arg(N,P,UPDATE),is_relative(UPDATE))),
+    must(flag_call(unsafe_speedups == false) ),
     replace_arg(P,N,Q_SLOT,Q),
     must(call_u(Q)), update_value(Q_SLOT,UPDATE,NEW), must( \+ is_relative(NEW)),
     replace_arg(Q,N,NEW,R),!,R\=@=UP,subst(UP,P,Q,OLD).
@@ -907,7 +923,7 @@ mpred_post1(P, S):- each_E(mpred_post2,P,[S]).
 
 mpred_post2( P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post2( P0,   S).
 
-mpred_post2(Fact, _):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(One,_Two),Three is One * 1,
+mpred_post2(Fact, _):- flag_call(unsafe_speedups == true) , ground(Fact),fwc1s_post1s(One,_Two),Three is One * 1,
    filter_buffer_n_test('$last_mpred_post1s',Three,Fact),!.
 
 mpred_post2(P,S):- gripe_time(0.6,mpred_post12(P,S)).
@@ -1637,7 +1653,7 @@ mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc==fwc,ground(BODY)
 mpred_fwc1(support_hilog(_,_)):-!.
 % mpred_fwc1(singleValuedInArg(_, _)):-!.
 % this line filters sequential (and secondary) dupes
-% mpred_fwc1(Fact):- current_prolog_flag(unsafe_speedups,true), ground(Fact),fwc1s_post1s(_One,Two),Six is Two * 3,filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
+% mpred_fwc1(Fact):- flag_call(unsafe_speedups == true) , ground(Fact),fwc1s_post1s(_One,Two),Six is Two * 3,filter_buffer_n_test('$last_mpred_fwc1s',Six,Fact),!.
 
 mpred_fwc1(Fact):-
   mpred_trace_msg(mpred_fwc1(Fact)),
@@ -1908,7 +1924,7 @@ call_u_mp(M,must(P1)):-!, must( call_u_mp(M,P1)).
 call_u_mp(M, 't'(P1)):-!, call_u_mp(M,P1).
 call_u_mp(M,'{}'(P1)):-!, call_u_mp(M,P1).
 call_u_mp(_,mtCycL(P)):-!,clause(baseKB:mtCycL(P),true).
-call_u_mp(_,is_string(P)):- !, logicmoo_util_bugger:is_string(P).
+%call_u_mp(_,is_string(P)):- !, logicmoo_util_bugger:is_string(P).
 call_u_mp(M,call(O,P1)):- !,M:call(O,P1).
 call_u_mp(M,call(P1)):- !, M:call(P1).
 call_u_mp(M,P1):- predicate_property(M:P1,built_in),!, M:call(P1).
@@ -1982,14 +1998,14 @@ call_u_no_bc(P):- no_repeats(call_u(P)).
 % TODO .. mpred_call_no_bc0(P):-  defaultAssertMt(Mt), clause_b(genlMt(Mt,SuperMt)), call_umt(SuperMt,P).
 %mpred_call_no_bc0(P):- mpred_call_with_no_triggers(P).
 % mpred_call_no_bc0(P):- nonvar(P),predicate_property(P,defined),!, P.
-mpred_call_no_bc0(P):- current_prolog_flag(unsafe_speedups,true),!,baseKB:call(P).
+mpred_call_no_bc0(P):- flag_call(unsafe_speedups == true) ,!,baseKB:call(P).
 mpred_call_no_bc0(P):- loop_check(mpred_METACALL(ereq, P)).
 
 pred_check(A):- var(A),!.
 % catch module prefix issues
 pred_check(A):- nonvar(A),must(atom(A)).
 
-mpred_METACALL(How,P):- current_prolog_flag(unsafe_speedups,true),!,baseKB:call(How,P).
+mpred_METACALL(How,P):- flag_call(unsafe_speedups == true) ,!,baseKB:call(How,P).
 mpred_METACALL(How,P):- mpred_METACALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);call_u_no_bc(Cut))).
 
 mpred_METACALL(How, Cut, Var):- var(Var),!,trace_or_throw(var_mpred_METACALL_MI(How,Cut,Var)).
@@ -2035,14 +2051,14 @@ mpred_METACALL(_How, _Cut, assert(X)):- !, mpred_ain(X).
 mpred_METACALL(_How, _Cut, retract(X)):- !, mpred_remove(X).
 % TODO: test removal
 %mpred_METACALL(How, Cut, prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
-% mpred_METACALL(How, Cut, HB):-hotrace((fully_expand_warn(mpred_METACALL,HB,HHBB))),!,mpred_METACALL(How, Cut, HHBB).
+% mpred_METACALL(How, Cut, HB):-hotrace((full_transform_warn_if_changed(mpred_METACALL,HB,HHBB))),!,mpred_METACALL(How, Cut, HHBB).
 %mpred_METACALL(How, Cut, argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(mpred_METACALL(How, Cut, argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
 % TODO: test removal
 % mpred_METACALL(How, Cut, isa(H,B)):-!,isa_asserted(H,B).
 mpred_METACALL(_How, _Cut, (H:-B)):- !, clause_u((H :- B)).
 mpred_METACALL(_How, _Cut, M:(H:-B)):- !, clause_u((M:H :- B)).
 
-% TODO: mpred_METACALL(_How, _Cut, M:HB):- current_prolog_flag(unsafe_speedups,true),!, call(M:HB).
+% TODO: mpred_METACALL(_How, _Cut, M:HB):- flag_call(unsafe_speedups == true) ,!, call(M:HB).
 
 mpred_METACALL(_How, _SCut, P):- predicate_property(P,built_in),!, call(P).
 %mpred_METACALL(How, Cut, (H)):- is_static_pred(H),!,show_pred_info(H),dtrace(mpred_METACALL(How, Cut, (H))).
@@ -2421,7 +2437,7 @@ mpred_mark_as(Sup,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup,P,F,A,
 
 % mpred_mark_fa_as(_Sup,_P,'\=',2,_):- dtrace.
 % BREAKS SIMPLE CASES
-mpred_mark_fa_as(_Sup,_P,_,_,Type):- Type \== pfcLHS, Type \== pfcRHS, current_prolog_flag(unsafe_speedups,true),!.
+mpred_mark_fa_as(_Sup,_P,_,_,Type):- Type \== pfcLHS, Type \== pfcRHS, flag_call(unsafe_speedups == true) ,!.
 mpred_mark_fa_as(_Sup,_P,isa,_,_):- !.
 mpred_mark_fa_as(_Sup,_P,_,_,pfcCallCodeBody):- !.
 mpred_mark_fa_as(_Sup,_P,_,_,pfcCallCodeTst):- !.
@@ -2490,7 +2506,7 @@ mpred_compile_rhs_term_consquent(WS,Test,TestO):-
 
 mpred_compile_rhs_term_consquent(Sup,I,O):-
   % TODO replace the next line with  I=O,
-    full_transform_warn(compile_rhs,I,O),
+    full_transform_warn_if_changed(compile_rhs,I,O),
     must(mpred_mark_as(Sup,O,pfcRHS)),!.
 
 
@@ -2578,12 +2594,12 @@ clause_asserted_call(H,B):-clause_asserted(H,B).
 clause_asserted_u(MH):- sanity((nonvar(MH), ignore(show_failure(\+ is_static_predicate(MH))))),fail.
 %clause_asserted_u(MH):- \+ ground(MH),must_notrace_pfc(full_transform(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
 clause_asserted_u((MH:-B)):- must(nonvar(MH)), !, must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),!,
-              (current_prolog_flag(unsafe_speedups,true) ->
+              (flag_call(unsafe_speedups == true)  ->
                  (clause_asserted_ii((M:H , B )))
                  /*; clause_asserted_u((M:H :- B ))*/
                  ; clause_asserted_i((M:H :- B ))).
 
-clause_asserted_u(MH):- current_prolog_flag(unsafe_speedups,true), !,clause_asserted_ii(MH).
+clause_asserted_u(MH):- flag_call(unsafe_speedups == true) , !,clause_asserted_ii(MH).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(clause(clause,clause_asserted_u),MH,M,H))),clause_asserted_ii(M:H).
 
 clause_asserted_ii(H,B):- HB=(H:-B),copy_term(HB,HHBB),clause(H,B),variant(HHBB,HB),!.
@@ -2779,6 +2795,7 @@ to_u(S,U):-S=(U,ax),!.
 to_u(S,U):-S=(U,_),!.
 to_u(S,U):-S=(U),!.
 
+
 mpred_trace_maybe_break(Add,P0,_ZS):-
   get_head_term(P0,P),
    (
@@ -2912,7 +2929,7 @@ show_if_debug(A):-  get_mpred_is_tracing(A) -> show_call(call_u(A)) ; call_u(A).
 % If Is A Silient.
 %
 mpred_is_silient :- t_l:hide_mpred_trace_exec,!, \+ tracing.
-mpred_is_silient :- notrace(( \+ t_l:mpred_debug_local, \+ lookup_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_spying_pred(_)),
+mpred_is_silient :- notrace(( \+ t_l:mpred_debug_local, \+ lookup_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_spying_pred(_,_)),
   current_prolog_flag(debug,false), is_release)) ,!.
 
 
@@ -3508,6 +3525,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 
 :- '$current_source_module'(M),forall(mpred_database_term(F,A,_),(abolish(mpred_pfc:F/A),abolish(user:F/A),abolish(M:F/A))).
 % :- initialization(ensure_abox(baseKB)).
+% :- dynamic(mpred_is_spying_pred/1).
 
 
 :- set_prolog_flag(mpred_pfc_file,true).

@@ -665,7 +665,7 @@ loggerFmtReal(S,F,A):-
 % Using (debug)message.
 %
 with_dmsg(Functor,Goal):-
-   w_tl(t_l:is_with_dmsg(Functor),Goal).
+   w_tl(tlbugger:is_with_dmsg(Functor),Goal).
 
 
 :- use_module(library(listing)).
@@ -855,6 +855,7 @@ dmsg(C):- notrace((tlbugger:no_slow_io,!,writeln(dmsg(C)))).
 dmsg(V):- w_tl(set_prolog_flag(retry_undefined,false), if_defined(dmsg0(V),logicmoo_util_catch:ddmsg(V))).
 %dmsg(F,A):- notrace((tlbugger:no_slow_io,on_x_fail(format(atom(S),F,A))->writeln(dmsg(S));writeln(dmsg_fail(F,A)))),!.
 
+system:dmsg(O):-logicmoo_util_dmsg:dmsg(O).
 %= 	 	 
 
 %% dmsg( ?F, ?A) is semidet.

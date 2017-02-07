@@ -14,9 +14,32 @@
 %
 % Dec 13, 2035
 % Douglas Miles
-*/
 
-:- set_prolog_flag(lm_expanders,false).
+*/
+:- use_module(library('logicmoo/util/logicmoo_util_file_scope')).
+
+:- set_prolog_flag_until_eof(lm_expanders,false).
+
+
+:- module_transparent(show_missing_renames/0).
+:- export(show_missing_renames/0).
+show_missing_renames:-!.
+show_missing_renames:-
+  listing(baseKB:rn(I,I)),
+  % TODO USING? listing(baseKB:mpred_to_cyc(I,I)),
+  listing(baseKB:rename(I,I)),!.
+  
+:- module_transparent(install_constant_renamer_until_eof/0).
+:- export(install_constant_renamer_until_eof/0).
+install_constant_renamer_until_eof:- 
+ call_on_eof(show_missing_renames),
+ set_prolog_flag_until_eof(do_renames,term_expansion),
+ assert_until_eof((
+     system:term_expansion(I, O):- 
+      compound(I),
+      current_prolog_flag(do_renames,term_expansion),
+      b_getval('$term', Term),Term==I,       
+      do_renames(I,O)->I\==O )).
 
 :- dynamic(baseKB:cycPrepending/2).
 baseKB:cycPrepending(ft,'Atom').
@@ -106,6 +129,10 @@ baseKB:cycPrepending(rt,'ArgGenlQuantityBinaryPredicate').
 baseKB:cycPrepending(rt,'BinaryFunction').
 baseKB:cycPrepending(rt,'UnreifiableFunction').
 baseKB:cycPrepending(rt,'UnaryFunction').
+baseKB:cycPrepending(rt,'LogicalConnective').
+baseKB:cycPrepending(rt,'ELRelationOneWay').
+
+
 
 
 baseKB:cycPrepending(v,'Forward-AssertionDirection').
@@ -122,6 +149,7 @@ prepender(Pre,C):- best_rename(C,P),atom_concat(Pre,C,P).
 % for SUMO
 :- dynamic(baseKB:sumo_to_plarkc/2).
 baseKB:sumo_to_plarkc('domain', 'argIsa').
+baseKB:sumo_to_plarkc('subclass', 'genls').
 baseKB:sumo_to_plarkc('range', 'resultIsa').
 baseKB:sumo_to_plarkc('domainSubclass', 'argGenl').
 baseKB:sumo_to_plarkc('rangeSubclass', 'resultGenl').
@@ -134,41 +162,25 @@ baseKB:sumo_to_plarkc('SetOrClass', 'tCol').
 renamed_surely(C):- rn(C,_);rn(_,C).
 
 ftCycOnlyTerm(C):- rn(C,_), \+ rename(_,C).
-ftCycOnlyTerm(C):- rename(_,C).
+ftCycOnlyTerm(C):- rename(_,C), atom(C).
+
 ftLarkcOnlyTerm(P):- rn(_,P), \+ rename(P,_).
 ftLarkcOnlyTerm(P):- rename(P,_).
 
-cyc_renames(C,P1,P2):- ftCycOnlyTerm(C),atomic(C),
-   ((rename(P2,C),atomic(P2))->true;P1=P2),
-   gripe_time(0.1,once((cyc_to_mpred_idiom(C,P1);P1=P2))).
+cyc_renames(C,P1,P2):- ftCycOnlyTerm(C),atom(C),
+   ((rename(P2,C),atom(P2))->true;P1=P2),
+   gripe_time(0.1,once((cyc_to_mpred_create(C,P1);P1=P2))).
 
-remove_renames(T):- retractall(rn(_,T)).
+remove_renames(T):- sanity(nonvar(T)),retractall(rn(_,T)).
 
-:- doall((findall(P,((rename(P,_);rn(P,_);rename(_,P);rn(_,P)), \+ atom(P)),L),
-          member(P,L),maplist(retractall,[rename(_,P),rename(P,_),rn(_,P),rn(P,_)]))).
-
-:- remove_renames('ftExpression').
-:- remove_renames('ftSentence').
-
-:- call((doall((findall(P,(ftLarkcOnlyTerm(P), atom_concat('xt',_,P)),L), 
-          member(P,L),remove_renames(P))))).
-
-:- call((doall((findall(P,(ftLarkcOnlyTerm(P), atom_concat('vt',_,P)),L), 
-          member(P,L),remove_renames(P))))).
-
-:- call((doall((findall(P,(ftLarkcOnlyTerm(P),starts_hungarian('v',P)),L), 
-          member(P,L),remove_renames(P))))).
-
-starts_hungarian(V,P):-atom_concat(V,Rest,P),name(Rest,[A|_]),char_type(A,upper).
-
-conflicted(C,P1,P2):- cyc_renames(C,P1,P2), P1\==P2.
+conflicted_rename(C,P1,P2):- cyc_renames(C,P1,P2), P1\==P2.
 
 is_merge0(C1,C2):- ftLarkcOnlyTerm(P),rn(C1,P),dif(C1,C2),rn(C2,P).
 is_merge(O1,O2):- no_repeats([O1,O2],(is_merge0(C1,C2), sort([C1,C2],[O1,O2]))).
 
-best_rename(C,P):- baseKB:cyc_to_plarkc(C,P),!.
-best_rename(C,P):- rn(C,P),nonvar(C),retractall(rename(_,C)),!.
+best_rename(C,P):- builtin_rn_or_rn(C,P),!,nonvar(C),ignore((rename(_,C),doall(show_call(retract(rename(_,C)))))),!.
 best_rename(C,P):- cyc_renames(C,P1,P2), \+ rn(C,_), once(best_rename(C,P1,P2,P)),!.
+% best_rename(C,P):- cyc_to_mpred_create(C,P),!.
 
 best_rename(_C,P,P,P):-!.
 best_rename(C,C,P2,P):-!,P=P2.
@@ -180,251 +192,990 @@ best_rename(_C,_,P2,P):-starts_lower(P2),!,P=P2.
 % best_rename(_C,P1,_,P):-starts_lower(P1),!,P=P1.
 best_rename(_C,P1,_,P1).
 
-:- multifile(baseKB:cyc_to_plarkc/2).
-:- dynamic(baseKB:cyc_to_plarkc/2).
+:- multifile(baseKB:rn_new/2).
+:- dynamic(baseKB:rn_new/2).
 
 
-% BAD? baseKB:cyc_to_plarkc('BaseKB', baseKB).
-baseKB:cyc_to_plarkc('between', cycBetween).
-baseKB:cyc_to_plarkc('forall', cycforAll).
+builtin_rn_or_rn_new(C,P):-builtin_rn(C,P).
+builtin_rn_or_rn_new(C,P):-rn(C,P).
+builtin_rn_or_rn_new(C,P):-kb7166:rnc(C,P).
+builtin_rn_or_rn_new(C,P):-baseKB:rn_new(C,P).
 
-% BAD?  baseKB:cyc_to_plarkc('equals', mudEquals).
-% BAD?  baseKB:cyc_to_plarkc('termOfUnit',skolem ).
+builtin_rn_or_rn(P,PP):-builtin_rn_or_rn_new(P,PP),!.
+builtin_rn_or_rn(P,PP):-builtin_rn_or_rn_new(_,P),!,P=PP.
 
-% BAD? baseKB:cyc_to_plarkc('ScalarInterval', 'tScalarInterval').
-% BAD? baseKB:cyc_to_plarkc('SetOrCollection',tSpec).
-% BAD? baseKB:cyc_to_plarkc(Was, baseKB):-mtUndressedMt(Was).
-% BAD?  baseKB:cyc_to_plarkc('or', 'v').
-% BAD?  baseKB:cyc_to_plarkc('and', '&').
-baseKB:cyc_to_plarkc('SiblingDisjointCollectionType',tSet).
-baseKB:cyc_to_plarkc('forAll', 'all').
-baseKB:cyc_to_plarkc('thereExists', 'exists').
-baseKB:cyc_to_plarkc('thereExistsAtLeast', 'atleast').
-baseKB:cyc_to_plarkc('thereExistsAtMost', 'atmost').
-baseKB:cyc_to_plarkc('CycLClosedAtomicTerm', 'ftAtomicTerm').
-baseKB:cyc_to_plarkc('UnitOfMeasure', 'tUnitOfMeasure').
-baseKB:cyc_to_plarkc('CharacterString', ftString).
-baseKB:cyc_to_plarkc('Collection',tCol).
-baseKB:cyc_to_plarkc('CollectionType',ttTypeType).
-baseKB:cyc_to_plarkc('SiblingDisjointCollectionType',tSet).
-baseKB:cyc_to_plarkc('ObjectType',ttValueType).
-baseKB:cyc_to_plarkc('ObjectType',tSet).
-baseKB:cyc_to_plarkc('AspatialThing',vtValue).
-baseKB:cyc_to_plarkc('RelationshipType',ttRelationType).
-baseKB:cyc_to_plarkc('Predicate',tPred).
-baseKB:cyc_to_plarkc('SubLExpressionType',ttExpressionType).
+% BAD? builtin_rn('BaseKB', baseKB).
+builtin_rn('between', cycBetween).
+% builtin_rn('forall', cycforAll).
 
-baseKB:cyc_to_plarkc('holds', 't').
-baseKB:cyc_to_plarkc('dot_holds', 't').
-baseKB:cyc_to_plarkc('ArgGenlQuantityTernaryPredicate',rtArgGenlQuantityTernaryPredicate).
-baseKB:cyc_to_plarkc('ELRelation',rtELRelation).
-baseKB:cyc_to_plarkc('InterArgFormatPredicate',rtInterArgFormatPredicate).
-baseKB:cyc_to_plarkc('ArgTypePredicate',rtArgTypePredicate).
-baseKB:cyc_to_plarkc('ArgIsaPredicate',rtArgIsaPredicate).
-baseKB:cyc_to_plarkc('SententialRelation',rtSententialRelation).
-baseKB:cyc_to_plarkc('ThePrototypicalBinaryPredicate',rtThePrototypicalBinaryPredicate).
-baseKB:cyc_to_plarkc('ThePrototypicalTransitiveBinaryPredicate',rtThePrototypicalTransitiveBinaryPredicate).
-baseKB:cyc_to_plarkc('TruthFunction',rtTruthFunction).
-baseKB:cyc_to_plarkc('ArgTypeBinaryPredicate',rtArgTypeBinaryPredicate).
-baseKB:cyc_to_plarkc('ArgGenlTernaryPredicate',rtArgGenlTernaryPredicate).
-baseKB:cyc_to_plarkc('ArgIsaTernaryPredicate',rtArgIsaTernaryPredicate).
-baseKB:cyc_to_plarkc('ArgGenlBinaryPredicate',rtArgGenlBinaryPredicate).
-baseKB:cyc_to_plarkc('ArgIsaBinaryPredicate',rtArgIsaBinaryPredicate).
-baseKB:cyc_to_plarkc('ArgTypeTernaryPredicate',rtArgTypeTernaryPredicate).
-baseKB:cyc_to_plarkc('InterArgIsaPredicate',rtInterArgIsaPredicate).
-baseKB:cyc_to_plarkc('AntiTransitiveBinaryPredicate',rtAntiTransitiveBinaryPredicate).
-baseKB:cyc_to_plarkc('BookkeepingPredicate',rtBookkeepingPredicate).
-baseKB:cyc_to_plarkc('DistributingMetaKnowledgePredicate',rtDistributingMetaKnowledgePredicate).
-baseKB:cyc_to_plarkc('DocumentationPredicate',rtDocumentationPredicate).
-baseKB:cyc_to_plarkc('AntiSymmetricBinaryPredicate',rtAntiSymmetricBinaryPredicate).
-baseKB:cyc_to_plarkc('EvaluatableFunction',rtEvaluatableFunction).
-baseKB:cyc_to_plarkc('EvaluatableRelation',rtEvaluatableRelation).
-baseKB:cyc_to_plarkc('ArgConstraintPredicate',rtArgConstraintPredicate).
-baseKB:cyc_to_plarkc('ScopingRelation',rtScopingRelation).
-baseKB:cyc_to_plarkc('MicrotheoryDesignatingRelation',rtMicrotheoryDesignatingRelation).
-baseKB:cyc_to_plarkc('TransitiveBinaryPredicate',rtTransitiveBinaryPredicate).
-baseKB:cyc_to_plarkc('ArgQuotedIsaBinaryPredicate',rtArgQuotedIsaBinaryPredicate).
-baseKB:cyc_to_plarkc('ArgQuotedIsaPredicate',rtArgQuotedIsaPredicate).
-baseKB:cyc_to_plarkc('ArgQuotedIsaTernaryPredicate',rtArgQuotedIsaTernaryPredicate).
-baseKB:cyc_to_plarkc('ArgSometimesIsaPredicate',rtArgSometimesIsaPredicate).
-baseKB:cyc_to_plarkc('AssociativeRelation',rtAssociativeRelation).
-baseKB:cyc_to_plarkc('CollectionDenotingFunction',rtCollectionDenotingFunction).
-baseKB:cyc_to_plarkc('EvaluatablePredicate',rtEvaluatablePredicate).
-baseKB:cyc_to_plarkc('ExceptionPredicate',rtExceptionPredicate).
-baseKB:cyc_to_plarkc('IndeterminateTermDenotingFunction',rtIndeterminateTermDenotingFunction).
-baseKB:cyc_to_plarkc('QuaternaryRelation',rtQuaternaryRelation).
-baseKB:cyc_to_plarkc('QuintaryRelation',rtQuintaryRelation).
-baseKB:cyc_to_plarkc('TernaryRelation',rtTernaryRelation).
-baseKB:cyc_to_plarkc('AsymmetricBinaryPredicate',rtAsymmetricBinaryPredicate).
-baseKB:cyc_to_plarkc('SymmetricBinaryPredicate',rtSymmetricBinaryPredicate).
-baseKB:cyc_to_plarkc('BinaryRelation',rtBinaryRelation).
-baseKB:cyc_to_plarkc('CommutativeRelation',rtCommutativeRelation).
-baseKB:cyc_to_plarkc('UnaryRelation',rtUnaryRelation).
-baseKB:cyc_to_plarkc('PartiallyCommutativeRelation',rtPartiallyCommutativeRelation).
-baseKB:cyc_to_plarkc('IrreflexiveBinaryPredicate',rtIrreflexiveBinaryPredicate).
-baseKB:cyc_to_plarkc('ReflexiveBinaryPredicate',rtReflexiveBinaryPredicate).
-baseKB:cyc_to_plarkc('QuaternaryPredicate',rtQuaternaryPredicate).
-baseKB:cyc_to_plarkc('QuintaryPredicate',rtQuintaryPredicate).
-baseKB:cyc_to_plarkc('TernaryPredicate',rtTernaryPredicate).
-baseKB:cyc_to_plarkc('BinaryPredicate',rtBinaryPredicate).
-baseKB:cyc_to_plarkc('CycLReformulationRulePredicate',rtReformulationRulePredicate).
-baseKB:cyc_to_plarkc('DefaultMonotonicPredicate',rtDefaultMonotonicPredicate).
-baseKB:cyc_to_plarkc('InferenceRelatedBookkeepingPredicate',rtInferenceRelatedBookkeepingPredicate).
-baseKB:cyc_to_plarkc('FixedArityRelation',rtFixedArityRelation).
-baseKB:cyc_to_plarkc('VariableArityRelation',rtVariableArityRelation).
-baseKB:cyc_to_plarkc('SkolemFunction',rtSkolemFunction).
-baseKB:cyc_to_plarkc('VariableAritySkolemFunction',rtVariableAritySkolemFunction).
-baseKB:cyc_to_plarkc('FixedAritySkolemFunction',rtFixedAritySkolemFunction).
-baseKB:cyc_to_plarkc('ReifiableFunction',rtReifiableFunction).
-baseKB:cyc_to_plarkc('InferenceSupportedCollection',ttInferenceSupportedCollection).
-baseKB:cyc_to_plarkc('AssertionDirection',vtAssertionDirection).
-baseKB:cyc_to_plarkc('Backward-AssertionDirection',vBackwardAssertionDirection).
-baseKB:cyc_to_plarkc('Code-AssertionDirection',vCodeAssertionDirection).
-baseKB:cyc_to_plarkc('Forward-AssertionDirection',vForwardAssertionDirection).
-baseKB:cyc_to_plarkc('UnaryFunction',rtUnaryFunction).
-baseKB:cyc_to_plarkc('UnreifiableFunction',rtUnreifiableFunction).
-baseKB:cyc_to_plarkc('BinaryFunction',rtBinaryFunction).
-baseKB:cyc_to_plarkc('ArgGenlQuantityBinaryPredicate',rtArgGenlQuantityBinaryPredicate).
-baseKB:cyc_to_plarkc('TransformationModuleSupportedPredicate',rtTransformationModuleSupportedPredicate).
-baseKB:cyc_to_plarkc('SentenceClosedPredicate',rtSentenceClosedPredicate).
-baseKB:cyc_to_plarkc('InferenceSupportedPredicate',rtInferenceSupportedPredicate).
-baseKB:cyc_to_plarkc('RemovalModuleSupportedPredicate-Specific',rtRemovalModuleSupportedPredicateSpecific).
-baseKB:cyc_to_plarkc('RemovalModuleSupportedPredicate-Generic',rtRemovalModuleSupportedPredicateGeneric).
-baseKB:cyc_to_plarkc('UnaryPredicate',rtUnaryPredicate).
-baseKB:cyc_to_plarkc('RemovalModuleSupportedCollection-Generic',ttRemovalModuleSupportedCollectionGeneric).
-baseKB:cyc_to_plarkc('TransformationModuleSupportedCollection',ttTransformationModuleSupportedCollection).
-baseKB:cyc_to_plarkc('SetTheFormat',vSetTheFormat).
-baseKB:cyc_to_plarkc('SingleEntry',vSingleEntry).
-baseKB:cyc_to_plarkc('Symbol',ftSymbol).
-baseKB:cyc_to_plarkc('String',ftString).
-baseKB:cyc_to_plarkc('Sentence',ftSentence).
-baseKB:cyc_to_plarkc('RepresentedAtomicTerm',ftRepresentedAtomicTerm).
-baseKB:cyc_to_plarkc('ReifiedDenotationalTerm',ftReifiedDenotationalTerm).
-baseKB:cyc_to_plarkc('ReifiableNonAtomicTerm',ftReifiableNonAtomicTerm).
-baseKB:cyc_to_plarkc('ReifiableDenotationalTerm',ftReifiableDenotationalTerm).
-baseKB:cyc_to_plarkc('RealNumber',ftRealNumber).
-baseKB:cyc_to_plarkc('PropositionalSentence',ftPropositionalSentence).
-baseKB:cyc_to_plarkc('PositiveInteger',ftPositiveInteger).
-baseKB:cyc_to_plarkc('NonVariableSymbol',ftNonVariableSymbol).
-baseKB:cyc_to_plarkc('NonVariableNonKeywordSymbol',ftNonVariableNonKeywordSymbol).
-baseKB:cyc_to_plarkc('NonNegativeInteger',ftNonNegativeInteger).
-baseKB:cyc_to_plarkc('NonAtomicTerm-Assertible',ftNonAtomicTermAssertible).
-baseKB:cyc_to_plarkc('NonAtomicTerm-Askable',ftNonAtomicTermAskable).
-baseKB:cyc_to_plarkc('NonAtomicTerm',ftNonAtomicTerm).
-baseKB:cyc_to_plarkc('NonAtomicReifiedTerm',ftNonAtomicReifiedTerm).
-baseKB:cyc_to_plarkc('List',ftList).
-baseKB:cyc_to_plarkc('Keyword',ftKeyword).
-baseKB:cyc_to_plarkc('KBDatastructure',ftKBDatastructure).
-baseKB:cyc_to_plarkc('InferenceSupportedTerm',ftInferenceSupportedTerm).
-baseKB:cyc_to_plarkc('NonNegativeScalarInterval',ftNonNegativeScalarInterval).
-baseKB:cyc_to_plarkc('InferenceDataStructure',ftInferenceDataStructure).
-baseKB:cyc_to_plarkc('ExpressionAssertible',ftExpressionAssertible).
-baseKB:cyc_to_plarkc('ExpressionAskable',ftExpressionAskable).
-baseKB:cyc_to_plarkc('Expression',ftExpression).
-baseKB:cyc_to_plarkc('Constant',ftConstant).
-baseKB:cyc_to_plarkc('Character',ftCharacter).
-baseKB:cyc_to_plarkc('AtomicTerm',ftAtomicTerm).
-baseKB:cyc_to_plarkc('AtomicSentence',ftAtomicSentence).
-baseKB:cyc_to_plarkc('AtomicAssertion',ftAtomicAssertion).
-baseKB:cyc_to_plarkc('Atom',ftAtom).
-baseKB:cyc_to_plarkc('Integer',ftInt).
-baseKB:cyc_to_plarkc('CycLFormulaicSentence',ftSentence).
-baseKB:cyc_to_plarkc('FormulaicSentence',ftSentence).
-baseKB:cyc_to_plarkc('SubLFormulaicSentence',ftSentence).
-baseKB:cyc_to_plarkc(icSentenceSentence,ftSentence).
-baseKB:cyc_to_plarkc('CycLVariable',ftVar).
-baseKB:cyc_to_plarkc('Variable',ftVar).
-baseKB:cyc_to_plarkc('CycLExpressionType',ttExpressionType).
-baseKB:cyc_to_plarkc('ExpressionType',ttExpressionType).
-baseKB:cyc_to_plarkc('Agent-Generic',tAgent).
-baseKB:cyc_to_plarkc('Collection',tCol).
-baseKB:cyc_to_plarkc('Function-Denotational',tFunction).
-baseKB:cyc_to_plarkc('HumanCyclist',tHumanCyclist).
-baseKB:cyc_to_plarkc('KnowledgeBase',tKnowledgeBase).
-baseKB:cyc_to_plarkc('Microtheory',tMicrotheory).
-baseKB:cyc_to_plarkc('Predicate',tPred).
-baseKB:cyc_to_plarkc('CycProblemStore',tProblemStore).
-baseKB:cyc_to_plarkc('RuleTemplate',tRuleTemplate).
-baseKB:cyc_to_plarkc('Thing',tThing).
-baseKB:cyc_to_plarkc('Individual',tIndividual).
-baseKB:cyc_to_plarkc('DayOfWeekType',vtDayOfWeekType).
-baseKB:cyc_to_plarkc('MonthOfYearType',vtMonthOfYearType).
-baseKB:cyc_to_plarkc('Format',vtFormat).
-baseKB:cyc_to_plarkc('CycInferenceProblemLinkStatus',vtInferenceProblemLinkStatus).
-baseKB:cyc_to_plarkc('CycHLTruthValue',vtHLTruthValue).
-baseKB:cyc_to_plarkc('CycProvabilityStatus',vtProvabilityStatus).
-baseKB:cyc_to_plarkc('TruthValue',vtTruthValue).
-baseKB:cyc_to_plarkc('CanonicalizerDirective',vtCanonicalizerDirective).
-baseKB:cyc_to_plarkc('CollectionSubsetFn',tColOfCollectionSubsetFn).
-baseKB:cyc_to_plarkc('True',vTrue).
-baseKB:cyc_to_plarkc('False',vFalse).
-baseKB:cyc_to_plarkc('Guest',vGuest).
-baseKB:cyc_to_plarkc('CycAdministrator',vAdministrator).
-baseKB:cyc_to_plarkc('IntervalEntry',vIntervalEntry).
-baseKB:cyc_to_plarkc('SingleEntry',vSingleEntry).
-baseKB:cyc_to_plarkc('CycLClosedAtomicTerm',ftAtomicTerm).
-baseKB:cyc_to_plarkc('SetTheFormat',vSetTheFormat).
-baseKB:cyc_to_plarkc('AssertedFalseDefault',vAssertedFalseDefault).
-baseKB:cyc_to_plarkc('AssertedFalseMonotonic',vAssertedFalseMonotonic).
-baseKB:cyc_to_plarkc('AssertedTrueDefault',vAssertedTrueDefault).
-baseKB:cyc_to_plarkc('AssertedTrueMonotonic',vAssertedTrueMonotonic).
-baseKB:cyc_to_plarkc('MonotonicallyFalse',vMonotonicallyFalse).
-baseKB:cyc_to_plarkc('MonotonicallyTrue',vMonotonicallyTrue).
-baseKB:cyc_to_plarkc('DefaultFalse',vDefaultFalse).
-baseKB:cyc_to_plarkc('DefaultTrue',vDefaultTrue).
-baseKB:cyc_to_plarkc('Good-ProblemProvabilityStatus',vGoodProblemProvabilityStatus).
-baseKB:cyc_to_plarkc('Neutral-ProblemProvabilityStatus',vNeutralProblemProvabilityStatus).
-baseKB:cyc_to_plarkc('NoGood-ProblemProvabilityStatus',vNoGoodProblemProvabilityStatus).
-baseKB:cyc_to_plarkc('Unknown-HLTruthValue',vUnknownHLTruthValue).
-baseKB:cyc_to_plarkc('ExistentialQuantifier-Bounded',vExistentialQuantifierBounded).
-baseKB:cyc_to_plarkc('AllowGenericArgVariables',vAllowGenericArgVariables).
-baseKB:cyc_to_plarkc('AllowKeywordVariables',vAllowKeywordVariables).
-baseKB:cyc_to_plarkc('RelaxArgTypeConstraintsForVariables',vRelaxArgTypeConstraintsForVariables).
-baseKB:cyc_to_plarkc('LeaveSomeTermsAtEL',vLeaveSomeTermsAtEL).
-baseKB:cyc_to_plarkc('LeaveSomeTermsAtELAndAllowKeywordVariables',vLeaveSomeTermsAtELAndAllowKeywordVariables).
-baseKB:cyc_to_plarkc('LeaveVariablesAtEL',vLeaveVariablesAtEL).
-baseKB:cyc_to_plarkc('DontReOrderCommutativeTerms',vDontReOrderCommutativeTerms).
-baseKB:cyc_to_plarkc('ReformulationBackwardDirection',vReformulationBackwardDirection).
-baseKB:cyc_to_plarkc('ReformulationForwardDirection',vReformulationForwardDirection).
-baseKB:cyc_to_plarkc('ReformulationNeitherDirection',vReformulationNeitherDirection).
-baseKB:cyc_to_plarkc('CycLSentence-ClosedPredicate',ftSentenceAssertible).
-baseKB:cyc_to_plarkc('CycLNonAtomicTerm-ClosedFunctor',ftNonAtomicTerm).
-baseKB:cyc_to_plarkc('April',vApril).
-baseKB:cyc_to_plarkc('August',vAugust).
-baseKB:cyc_to_plarkc('December',vDecember).
-baseKB:cyc_to_plarkc('February',vFebruary).
-baseKB:cyc_to_plarkc('January',vJanuary).
-baseKB:cyc_to_plarkc('July',vJuly).
-baseKB:cyc_to_plarkc('June',vJune).
-baseKB:cyc_to_plarkc('March',vMarch).
-baseKB:cyc_to_plarkc('May',vMay).
-baseKB:cyc_to_plarkc('November',vNovember).
-baseKB:cyc_to_plarkc('October',vOctober).
-baseKB:cyc_to_plarkc('September',vSeptember).
-baseKB:cyc_to_plarkc('Sunday',vSunday).
-baseKB:cyc_to_plarkc('Monday',vMonday).
-baseKB:cyc_to_plarkc('Tuesday',vTuesday).
-baseKB:cyc_to_plarkc('Wednesday',vWednesday).
-baseKB:cyc_to_plarkc('Thursday',vThursday).
-baseKB:cyc_to_plarkc('Friday',vFriday).
-baseKB:cyc_to_plarkc('Saturday',vSaturday).
-baseKB:cyc_to_plarkc('ArgGenlQuantityTernaryPredicate',rtArgGenlQuantityTernaryPredicate).
+% BAD?  builtin_rn('equals', mudEquals).
+% BAD?  builtin_rn('termOfUnit',skolem ).
 
-baseKB:cyc_to_plarkc(X,Y):- starts_lower(X),!,dehyphenize_const(X,Y).
-baseKB:cyc_to_plarkc(C,P):- atom(C), once(cyc_to_mpred_idiom1(C,I)), C\==I, loop_check(baseKB:cyc_to_plarkc(I,P)).
-% baseKB:cyc_to_plarkc(C,P):- atom(C), transitive_lc(cyc_to_mpred_idiom1,C,I),baseKB:cyc_to_plarkc(I,P).
-% BAD?  baseKB:cyc_to_plarkc(C,P):- rename(P,C).
+% BAD? builtin_rn('ScalarInterval', 'tScalarInterval').
+% BAD? builtin_rn('SetOrCollection',ftSpec).
+% BAD? builtin_rn(Was, baseKB):-mtUndressedMt(Was).
+% BAD?  builtin_rn('or', 'v').
+% BAD?  builtin_rn('and', '&').
+
+builtin_rn('PhysicalPartOfObject',tPartTypePhysicalPartOfObject).
+builtin_rn("PhysicalPartOfObject",tPartTypePhysicalPartOfObject).
+builtin_rn('SpecifiedPartTypeCollection',ttSpecifiedPartTypeCollection).
+builtin_rn("SpecifiedPartTypeCollection",ttSpecifiedPartTypeCollection).
+builtin_rn('SiblingDisjointCollectionType',tSet).
+builtin_rn('forAll', 'all').
+builtin_rn('thereExists', 'exists').
+builtin_rn('Relation', tRelation).
+builtin_rn('thereExistsAtLeast', 'atleast').
+builtin_rn('thereExistsAtMost', 'atmost').
+builtin_rn('CycLClosedAtomicTerm', 'ftAtomicTerm').
+builtin_rn('UnitOfMeasure', 'ttUnitOfMeasure').
+builtin_rn('CharacterString', ftString).
+builtin_rn('Collection',tCol).
+builtin_rn('CollectionType',ttTypeType).
+builtin_rn('SiblingDisjointCollectionType',tSet).
+builtin_rn('ObjectType',ttValueType).
+builtin_rn('ObjectType',tSet).
+builtin_rn('AspatialThing',vtValue).
+builtin_rn('RelationshipType',ttRelationType).
+builtin_rn('Predicate',tPred).
+builtin_rn('SubLExpressionType',ttExpressionType).
+
+builtin_rn('holds', 't').
+builtin_rn('dot_holds', 't').
+builtin_rn('ArgGenlQuantityTernaryPredicate',rtArgGenlQuantityTernaryPredicate).
+builtin_rn('ELRelation',rtELRelation).
+builtin_rn('InterArgFormatPredicate',rtInterArgFormatPredicate).
+builtin_rn('ArgTypePredicate',rtArgTypePredicate).
+builtin_rn('ArgIsaPredicate',rtArgIsaPredicate).
+builtin_rn('SententialRelation',rtSententialRelation).
+builtin_rn('ThePrototypicalBinaryPredicate',rtThePrototypicalBinaryPredicate).
+builtin_rn('ThePrototypicalTransitiveBinaryPredicate',rtThePrototypicalTransitiveBinaryPredicate).
+builtin_rn('TruthFunction',rtTruthFunction).
+builtin_rn('ArgTypeBinaryPredicate',rtArgTypeBinaryPredicate).
+builtin_rn('ArgGenlTernaryPredicate',rtArgGenlTernaryPredicate).
+builtin_rn('ArgIsaTernaryPredicate',rtArgIsaTernaryPredicate).
+builtin_rn('ArgGenlBinaryPredicate',rtArgGenlBinaryPredicate).
+builtin_rn('ArgIsaBinaryPredicate',rtArgIsaBinaryPredicate).
+builtin_rn('ArgTypeTernaryPredicate',rtArgTypeTernaryPredicate).
+builtin_rn('InterArgIsaPredicate',rtInterArgIsaPredicate).
+builtin_rn('AntiTransitiveBinaryPredicate',rtAntiTransitiveBinaryPredicate).
+builtin_rn('BookkeepingPredicate',rtBookkeepingPredicate).
+builtin_rn('DistributingMetaKnowledgePredicate',rtDistributingMetaKnowledgePredicate).
+builtin_rn('DocumentationPredicate',rtDocumentationPredicate).
+builtin_rn('AntiSymmetricBinaryPredicate',rtAntiSymmetricBinaryPredicate).
+builtin_rn('EvaluatableFunction',rtEvaluatableFunction).
+builtin_rn('EvaluatableRelation',rtEvaluatableRelation).
+builtin_rn('ArgConstraintPredicate',rtArgConstraintPredicate).
+builtin_rn('ScopingRelation',rtScopingRelation).
+builtin_rn('MicrotheoryDesignatingRelation',rtMicrotheoryDesignatingRelation).
+builtin_rn('TransitiveBinaryPredicate',rtTransitiveBinaryPredicate).
+builtin_rn('ArgQuotedIsaBinaryPredicate',rtArgQuotedIsaBinaryPredicate).
+builtin_rn('ArgQuotedIsaPredicate',rtArgQuotedIsaPredicate).
+builtin_rn('ArgQuotedIsaTernaryPredicate',rtArgQuotedIsaTernaryPredicate).
+builtin_rn('ArgSometimesIsaPredicate',rtArgSometimesIsaPredicate).
+builtin_rn('AssociativeRelation',rtAssociativeRelation).
+builtin_rn('CollectionDenotingFunction',rtCollectionDenotingFunction).
+builtin_rn('EvaluatablePredicate',rtEvaluatablePredicate).
+builtin_rn('ExceptionPredicate',rtExceptionPredicate).
+builtin_rn('IndeterminateTermDenotingFunction',rtIndeterminateTermDenotingFunction).
+builtin_rn('QuaternaryRelation',rtQuaternaryRelation).
+builtin_rn('QuintaryRelation',rtQuintaryRelation).
+builtin_rn('TernaryRelation',rtTernaryRelation).
+builtin_rn('AsymmetricBinaryPredicate',rtAsymmetricBinaryPredicate).
+builtin_rn('SymmetricBinaryPredicate',rtSymmetricBinaryPredicate).
+builtin_rn('BinaryRelation',rtBinaryRelation).
+builtin_rn('CommutativeRelation',rtCommutativeRelation).
+builtin_rn('UnaryRelation',rtUnaryRelation).
+builtin_rn('PartiallyCommutativeRelation',rtPartiallyCommutativeRelation).
+builtin_rn('IrreflexiveBinaryPredicate',rtIrreflexiveBinaryPredicate).
+builtin_rn('ReflexiveBinaryPredicate',rtReflexiveBinaryPredicate).
+builtin_rn('QuaternaryPredicate',rtQuaternaryPredicate).
+builtin_rn('QuintaryPredicate',rtQuintaryPredicate).
+builtin_rn('TernaryPredicate',rtTernaryPredicate).
+builtin_rn('BinaryPredicate',rtBinaryPredicate).
+builtin_rn('CycLReformulationRulePredicate',rtReformulationRulePredicate).
+builtin_rn('DefaultMonotonicPredicate',rtDefaultMonotonicPredicate).
+builtin_rn('InferenceRelatedBookkeepingPredicate',rtInferenceRelatedBookkeepingPredicate).
+builtin_rn('FixedArityRelation',rtFixedArityRelation).
+builtin_rn('VariableArityRelation',rtVariableArityRelation).
+builtin_rn('SkolemFunction',rtSkolemFunction).
+builtin_rn('VariableAritySkolemFunction',rtVariableAritySkolemFunction).
+builtin_rn('FixedAritySkolemFunction',rtFixedAritySkolemFunction).
+builtin_rn('ReifiableFunction',rtReifiableFunction).
+builtin_rn('InferenceSupportedCollection',ttInferenceSupportedCollection).
+builtin_rn('AssertionDirection',vtAssertionDirection).
+builtin_rn('Backward-AssertionDirection',vBackwardAssertionDirection).
+builtin_rn('Code-AssertionDirection',vCodeAssertionDirection).
+builtin_rn('Forward-AssertionDirection',vForwardAssertionDirection).
+builtin_rn('UnaryFunction',rtUnaryFunction).
+builtin_rn('UnreifiableFunction',rtUnreifiableFunction).
+builtin_rn('BinaryFunction',rtBinaryFunction).
+builtin_rn('ArgGenlQuantityBinaryPredicate',rtArgGenlQuantityBinaryPredicate).
+builtin_rn('TransformationModuleSupportedPredicate',rtTransformationModuleSupportedPredicate).
+builtin_rn('SentenceClosedPredicate',rtSentenceClosedPredicate).
+builtin_rn('InferenceSupportedPredicate',rtInferenceSupportedPredicate).
+builtin_rn('RemovalModuleSupportedPredicate-Specific',rtRemovalModuleSupportedPredicateSpecific).
+builtin_rn('RemovalModuleSupportedPredicate-Generic',rtRemovalModuleSupportedPredicateGeneric).
+builtin_rn('UnaryPredicate',rtUnaryPredicate).
+builtin_rn('RemovalModuleSupportedCollection-Generic',ttRemovalModuleSupportedCollectionGeneric).
+builtin_rn('TransformationModuleSupportedCollection',ttTransformationModuleSupportedCollection).
+builtin_rn('SetTheFormat',vSetTheFormat).
+builtin_rn('SingleEntry',vSingleEntry).
+builtin_rn('Symbol',ftSymbol).
+builtin_rn('String',ftString).
+builtin_rn('Sentence',ftSentence).
+builtin_rn('RepresentedAtomicTerm',ftRepresentedAtomicTerm).
+builtin_rn('ReifiedDenotationalTerm',ftReifiedDenotationalTerm).
+builtin_rn('ReifiableNonAtomicTerm',ftReifiableNonAtomicTerm).
+builtin_rn('ReifiableDenotationalTerm',ftReifiableDenotationalTerm).
+builtin_rn('RealNumber',ftRealNumber).
+builtin_rn('PropositionalSentence',ftPropositionalSentence).
+builtin_rn('PositiveInteger',ftPositiveInteger).
+builtin_rn('NonVariableSymbol',ftNonVariableSymbol).
+builtin_rn('NonVariableNonKeywordSymbol',ftNonVariableNonKeywordSymbol).
+builtin_rn('NonNegativeInteger',ftNonNegativeInteger).
+builtin_rn('NonAtomicTerm-Assertible',ftNonAtomicTermAssertible).
+builtin_rn('NonAtomicTerm-Askable',ftNonAtomicTermAskable).
+builtin_rn('NonAtomicTerm',ftNonAtomicTerm).
+builtin_rn('NonAtomicReifiedTerm',ftNonAtomicReifiedTerm).
+builtin_rn('List',ftList).
+builtin_rn('Keyword',ftKeyword).
+builtin_rn('KBDatastructure',ftKBDatastructure).
+builtin_rn('InferenceSupportedTerm',ftInferenceSupportedTerm).
+builtin_rn('NonNegativeScalarInterval',ftNonNegativeScalarInterval).
+builtin_rn('InferenceDataStructure',ftInferenceDataStructure).
+builtin_rn('ExpressionAssertible',ftExpressionAssertible).
+builtin_rn('ExpressionAskable',ftExpressionAskable).
+builtin_rn('Expression',ftExpression).
+builtin_rn('Constant',ftConstant).
+builtin_rn('Character',ftCharacter).
+builtin_rn('AtomicTerm',ftAtomicTerm).
+builtin_rn('AtomicSentence',ftAtomicSentence).
+builtin_rn('AtomicAssertion',ftAtomicAssertion).
+builtin_rn('Atom',ftAtom).
+builtin_rn('Integer',ftInt).
+builtin_rn('CycLFormulaicSentence',ftSentence).
+builtin_rn('FormulaicSentence',ftSentence).
+builtin_rn('SubLFormulaicSentence',ftSentence).
+builtin_rn(icSentenceSentence,ftSentence).
+builtin_rn('CycLVariable',ftVar).
+builtin_rn('Variable',ftVar).
+builtin_rn('CycLExpressionType',ttExpressionType).
+builtin_rn('ExpressionType',ttExpressionType).
+builtin_rn('Agent-Generic',tAgent).
+builtin_rn('Agent',tAgent).
+builtin_rn('Collection',tCol).
+builtin_rn('Function-Denotational',tFunction).
+builtin_rn('HumanCyclist',tHumanCyclist).
+builtin_rn('KnowledgeBase',tKnowledgeBase).
+builtin_rn('Microtheory',tMicrotheory).
+builtin_rn('Predicate',tPred).
+builtin_rn('CycProblemStore',tProblemStore).
+builtin_rn('RuleTemplate',tRuleTemplate).
+builtin_rn('Thing',tThing).
+builtin_rn('Individual',tIndividual).
+builtin_rn('DayOfWeekType',vtDayOfWeekType).
+builtin_rn('MonthOfYearType',vtMonthOfYearType).
+builtin_rn('Format',vtFormat).
+builtin_rn('CycInferenceProblemLinkStatus',vtInferenceProblemLinkStatus).
+builtin_rn('CycHLTruthValue',vtHLTruthValue).
+builtin_rn('CycProvabilityStatus',vtProvabilityStatus).
+builtin_rn('TruthValue',vtTruthValue).
+builtin_rn('CanonicalizerDirective',vtCanonicalizerDirective).
+builtin_rn('CollectionSubsetFn',tColOfCollectionSubsetFn).
+builtin_rn('True',vTrue).
+builtin_rn('False',vFalse).
+builtin_rn('Guest',vGuest).
+builtin_rn('CycAdministrator',vAdministrator).
+builtin_rn('IntervalEntry',vIntervalEntry).
+builtin_rn('SingleEntry',vSingleEntry).
+builtin_rn('CycLClosedAtomicTerm',ftAtomicTerm).
+builtin_rn('SetTheFormat',vSetTheFormat).
+builtin_rn('AssertedFalseDefault',vAssertedFalseDefault).
+builtin_rn('AssertedFalseMonotonic',vAssertedFalseMonotonic).
+builtin_rn('AssertedTrueDefault',vAssertedTrueDefault).
+builtin_rn('AssertedTrueMonotonic',vAssertedTrueMonotonic).
+builtin_rn('MonotonicallyFalse',vMonotonicallyFalse).
+builtin_rn('MonotonicallyTrue',vMonotonicallyTrue).
+builtin_rn('DefaultFalse',vDefaultFalse).
+builtin_rn('DefaultTrue',vDefaultTrue).
+builtin_rn('Good-ProblemProvabilityStatus',vGoodProblemProvabilityStatus).
+builtin_rn('Neutral-ProblemProvabilityStatus',vNeutralProblemProvabilityStatus).
+builtin_rn('NoGood-ProblemProvabilityStatus',vNoGoodProblemProvabilityStatus).
+builtin_rn('Unknown-HLTruthValue',vUnknownHLTruthValue).
+builtin_rn('ExistentialQuantifier-Bounded',vExistentialQuantifierBounded).
+builtin_rn('AllowGenericArgVariables',vAllowGenericArgVariables).
+builtin_rn('AllowKeywordVariables',vAllowKeywordVariables).
+builtin_rn('RelaxArgTypeConstraintsForVariables',vRelaxArgTypeConstraintsForVariables).
+builtin_rn('LeaveSomeTermsAtEL',vLeaveSomeTermsAtEL).
+builtin_rn('LeaveSomeTermsAtELAndAllowKeywordVariables',vLeaveSomeTermsAtELAndAllowKeywordVariables).
+builtin_rn('LeaveVariablesAtEL',vLeaveVariablesAtEL).
+builtin_rn('DontReOrderCommutativeTerms',vDontReOrderCommutativeTerms).
+builtin_rn('ReformulationBackwardDirection',vReformulationBackwardDirection).
+builtin_rn('ReformulationForwardDirection',vReformulationForwardDirection).
+builtin_rn('ReformulationNeitherDirection',vReformulationNeitherDirection).
+builtin_rn('CycLSentence-ClosedPredicate',ftSentenceAssertible).
+builtin_rn('CycLNonAtomicTerm-ClosedFunctor',ftNonAtomicTerm).
+builtin_rn('April',vApril).
+builtin_rn('August',vAugust).
+builtin_rn('December',vDecember).
+builtin_rn('February',vFebruary).
+builtin_rn('January',vJanuary).
+builtin_rn('July',vJuly).
+builtin_rn('June',vJune).
+builtin_rn('March',vMarch).
+builtin_rn('May',vMay).
+builtin_rn('November',vNovember).
+builtin_rn('October',vOctober).
+builtin_rn('September',vSeptember).
+builtin_rn('Sunday',vSunday).
+builtin_rn('Monday',vMonday).
+builtin_rn('Tuesday',vTuesday).
+builtin_rn('Wednesday',vWednesday).
+builtin_rn('Thursday',vThursday).
+builtin_rn('Friday',vFriday).
+builtin_rn('Saturday',vSaturday).
+builtin_rn('ArgGenlQuantityTernaryPredicate',rtArgGenlQuantityTernaryPredicate).
+
+
+builtin_rn('Likelihood-QuantityType', ttLikelihoodQuantityType).
+builtin_rn('Standing-QuantityType', ttStandingQuantityType).
+builtin_rn('CardinalityQuantType', ttCardinalityQuantType).
+builtin_rn('TaskSchedulerRegularTimeIntervalExpression', ftTaskSchedulerRegularTimeIntervalExpression).
+builtin_rn('ThePrototypicalGaugeStatusType', ttThePrototypicalGaugeStatusType).
+builtin_rn('TransitiveNPFrameType', ttTransitiveNPFrameType).
+builtin_rn('TransitiveGerundPPFrameType', ttTransitiveGerundPPFrameType).
+builtin_rn('TransitiveFrameType', ttTransitiveFrameType).
+builtin_rn('ClausalFrameType', ttClausalFrameType).
+builtin_rn('TransitiveParticleNPFrameType', ttTransitiveParticleNPFrameType).
+builtin_rn('ParticleFrameType', ttParticleFrameType).
+builtin_rn('TripleComplementFrameType', ttTripleComplementFrameType).
+builtin_rn('TransitiveCopulaFrameType', ttTransitiveCopulaFrameType).
+builtin_rn('TransitiveAdverbFrameType', ttTransitiveAdverbFrameType).
+builtin_rn('GerundPhraseFrameType', ttGerundPhraseFrameType).
+builtin_rn('PassiveVoiceOnlyFrameType', ttPassiveVoiceOnlyFrameType).
+builtin_rn('ActiveVoiceOnlyFrameType', ttActiveVoiceOnlyFrameType).
+builtin_rn('DitransitiveInfinitivePhraseFrameType', ttDitransitiveInfinitivePhraseFrameType).
+builtin_rn('DitransitiveNP-GenericFrameType', ttDitransitiveNPGenericFrameType).
+builtin_rn('DitransitiveParticleNP-PPFrameType', ttDitransitiveParticleNPPPFrameType).
+builtin_rn('DitransitiveFrameType', ttDitransitiveFrameType).
+builtin_rn('PleonasticFrameType', ttPleonasticFrameType).
+builtin_rn('TransitiveThatClauseFrameType', ttTransitiveThatClauseFrameType).
+builtin_rn('TransitiveInfinitivePhraseFrameType', ttTransitiveInfinitivePhraseFrameType).
+builtin_rn('PleonasticInfinitivePhraseFrameType', ttPleonasticInfinitivePhraseFrameType).
+builtin_rn('WHClauseFrameType', ttWHClauseFrameType).
+builtin_rn('DitransitivePPFrameType', ttDitransitivePPFrameType).
+builtin_rn('DitransitivePP-NPFrameType', ttDitransitivePPNPFrameType).
+builtin_rn('DitransitiveNP-PPGerundObjectFrameType', ttDitransitiveNPPPGerundObjectFrameType).
+builtin_rn('TransitivePPFrameType', ttTransitivePPFrameType).
+builtin_rn('IntransitiveParticleFrameType', ttIntransitiveParticleFrameType).
+builtin_rn('IntransitiveFrameType', ttIntransitiveFrameType).
+builtin_rn('ConditionExpression', ftConditionExpression).
+builtin_rn('ComputerCodeExpression', ftComputerCodeExpression).
+builtin_rn('AppositiveExpression', ftAppositiveExpression).
+builtin_rn('DefiniteExpression', ftDefiniteExpression).
+builtin_rn('IndefiniteExpression', ftIndefiniteExpression).
+builtin_rn('FirstPersonExpression', ftFirstPersonExpression).
+builtin_rn('SecondPersonExpression', ftSecondPersonExpression).
+builtin_rn('ThirdPersonExpression', ftThirdPersonExpression).
+builtin_rn('MasculineExpression', ftMasculineExpression).
+builtin_rn('FeminineExpression', ftFeminineExpression).
+builtin_rn('NeuterExpression', ftNeuterExpression).
+builtin_rn('SingularExpression', ftSingularExpression).
+builtin_rn('TaskSchedulerTimePatternExpression', ftTaskSchedulerTimePatternExpression).
+builtin_rn('TaskSchedulerDatePatternExpression', ftTaskSchedulerDatePatternExpression).
+builtin_rn('TaskSchedulerTemplateExpression', ftTaskSchedulerTemplateExpression).
+builtin_rn('TelephoneType', ttTelephoneType).
+builtin_rn('SyntacticNodeMeaningExpression', ftSyntacticNodeMeaningExpression).
+builtin_rn('CollectivePropertyModifierType', ttCollectivePropertyModifierType).
+builtin_rn('PairwiseModifierType', ttPairwiseModifierType).
+builtin_rn('SpecifiedValueModifierType', ttSpecifiedValueModifierType).
+builtin_rn('ComparativeModifierType', ttComparativeModifierType).
+builtin_rn('NumericModifierType', ttNumericModifierType).
+builtin_rn('InterfaceModifierType', ttInterfaceModifierType).
+builtin_rn('WordNetVerbFrameType', ttWordNetVerbFrameType).
+builtin_rn('CycLOpenExpression', ftCycLOpenExpression).
+builtin_rn('TypicalityReferenceSetPropertyType-AttackType', ttTypicalityReferenceSetPropertyTypeAttackType).
+builtin_rn('CycLFullyGroundExpression', ftCycLFullyGroundExpression).
+builtin_rn('CycLClosedExpression', ftCycLClosedExpression).
+builtin_rn('SExpression', ftSExpression).
+builtin_rn('ForwardReifiableCycLFunctor', rtForwardReifiableCycLFunctor).
+builtin_rn('ReifiableCycLFunctor', rtReifiableCycLFunctor).
+builtin_rn('UnreifiableCycLFunctor', rtUnreifiableCycLFunctor).
+builtin_rn('CycLFunctor', rtCycLFunctor).
+builtin_rn('CycLOperator', rtCycLOperator).
+builtin_rn('CSQLQuantifier', rtCSQLQuantifier).
+builtin_rn('CSQLLogicalOperator', rtCSQLLogicalOperator).
+builtin_rn('CSQLOperator', rtCSQLOperator).
+builtin_rn('CycLSetExpression', ftCycLSetExpression).
+builtin_rn('RegularExpression', ftRegularExpression).
+builtin_rn('CycLExpression', ftCycLExpression).
+builtin_rn('SubLSExpression', ftSubLSExpression).
+builtin_rn('PegStatusType', ttPegStatusType).
+builtin_rn('BitStringDatatypeType', ttBitStringDatatypeType).
+builtin_rn('FixedSizeComputerDatatypeType', ttFixedSizeComputerDatatypeType).
+builtin_rn('UnlimitedSizeComputerDatatypeType', ttUnlimitedSizeComputerDatatypeType).
+builtin_rn('VariableLimitedSizeDatatypeType', ttVariableLimitedSizeDatatypeType).
+builtin_rn('ComputerDatatypeType', ttComputerDatatypeType).
+builtin_rn('ObliqueSubjectAlternationType', ttObliqueSubjectAlternationType).
+builtin_rn('LexicalWordType', ttLexicalWordType).
+builtin_rn('NonTransitiveAlternationType', ttNonTransitiveAlternationType).
+builtin_rn('NLPhraseType', ttNLPhraseType).
+builtin_rn('SententialConstituentType', ttSententialConstituentType).
+builtin_rn('MetaphorTypeByBasisType', ttMetaphorTypeByBasisType).
+builtin_rn('FormalSemanticStructureType', ttFormalSemanticStructureType).
+builtin_rn('ObjectReferenceDatatypeType', ttObjectReferenceDatatypeType).
+builtin_rn('DefinedDatatypeType', ttDefinedDatatypeType).
+builtin_rn('CompositeDatatypeType', ttCompositeDatatypeType).
+builtin_rn('TransitivityAlternationType', ttTransitivityAlternationType).
+builtin_rn('LinguisticObjectType', ttLinguisticObjectType).
+builtin_rn('ThePrototypicalPegStatusType', ttThePrototypicalPegStatusType).
+builtin_rn('DateDataType', ttDateDataType).
+builtin_rn('ThePrototypicalNLPhraseType', ttThePrototypicalNLPhraseType).
+builtin_rn('ThePrototypicalSententialConstituentType', ttThePrototypicalSententialConstituentType).
+builtin_rn('ThePrototypicalMetaphorTypeByBasisType', ttThePrototypicalMetaphorTypeByBasisType).
+builtin_rn('ProgramExpression', ftProgramExpression).
+builtin_rn('StringIndexingSlot', rtStringIndexingSlot).
+builtin_rn('WhenClauseFrameType', ttWhenClauseFrameType).
+builtin_rn('VariedOrderCollection', ttVariedOrderCollection).
+builtin_rn('AtemporalNecessarilyEssentialCollectionType', ttAtemporalNecessarilyEssentialCollectionType).
+builtin_rn('SiblingDisjointSetOrCollectionType', ttSiblingDisjointSetOrCollectionType).
+builtin_rn('SocialStatusCollectionType', ttSocialStatusCollectionType).
+builtin_rn('TotallyOrderedCollection', ttTotallyOrderedCollection).
+builtin_rn('NonAbducibleCollection', ttNonAbducibleCollection).
+builtin_rn('IntensionalAbstractionTargetType', ttIntensionalAbstractionTargetType).
+builtin_rn('PragmaticallyDecontextualizedCollection', ttPragmaticallyDecontextualizedCollection).
+builtin_rn('ClarifyingCollectionType', ttClarifyingCollectionType).
+builtin_rn('KEClarifyingCollectionType', ttKEClarifyingCollectionType).
+builtin_rn('FactGatheringTypicallyUnspecifiedSetOrCollection', ttFactGatheringTypicallyUnspecifiedSetOrCollection).
+builtin_rn('NonEmptyCollection', ttNonEmptyCollection).
+builtin_rn('EmptyCollection', ttEmptyCollection).
+builtin_rn('FixedOrderCollection', ttFixedOrderCollection).
+builtin_rn('GrammaticallyEncodedDomainRestrictionType', ttGrammaticallyEncodedDomainRestrictionType).
+builtin_rn('MarketDataProductClassificationType-ContentType', ttMarketDataProductClassificationTypeContentType).
+builtin_rn('MarketDataProductClassificationType-AssetType', ttMarketDataProductClassificationTypeAssetType).
+builtin_rn('MarketDataProductClassificationType', ttMarketDataProductClassificationType).
+builtin_rn('ColorPerceptionCategoryType', ttColorPerceptionCategoryType).
+builtin_rn('ThePrototypicalSocialQuantityType', ttThePrototypicalSocialQuantityType).
+builtin_rn('ConstraintLanguageExpression', ftConstraintLanguageExpression).
+builtin_rn('ExtensionalRepresentationPredicate', rtExtensionalRepresentationPredicate).
+builtin_rn('RelationPredicate', rtRelationPredicate).
+builtin_rn('FunctionOrFunctionalPredicate', rtFunctionOrFunctionalPredicate).
+builtin_rn('CycSetExpression', ftCycSetExpression).
+builtin_rn('SymmetricalPartType', ttSymmetricalPartType).
+builtin_rn('RFProductType', ttRFProductType).
+builtin_rn('RFObjectType', ttRFObjectType).
+builtin_rn('RFExpenseType', ttRFExpenseType).
+builtin_rn('RFVehicleType', ttRFVehicleType).
+builtin_rn('RFIncomeType', ttRFIncomeType).
+builtin_rn('RFPhysiologicalConditionType', ttRFPhysiologicalConditionType).
+builtin_rn('Tie-ClothingType', ttTieClothingType).
+builtin_rn('CompositionPredicate', rtCompositionPredicate).
+builtin_rn('PersonByActivityType', ttPersonByActivityType).
+builtin_rn('OccupationType', ttOccupationType).
+builtin_rn('PositionType', ttPositionType).
+builtin_rn('UniquePartType', ttUniquePartType).
+builtin_rn('MeasurableAttributeType', ttMeasurableAttributeType).
+builtin_rn('InterExistingObjectSlot', rtInterExistingObjectSlot).
+builtin_rn('MutuallyDisjointIntervalCollection', ttMutuallyDisjointIntervalCollection).
+builtin_rn('FoodGroupType', ttFoodGroupType).
+builtin_rn('PrimitiveTemporalRelation', rtPrimitiveTemporalRelation).
+builtin_rn('ComplexTemporalRelation', rtComplexTemporalRelation).
+builtin_rn('TemporalPartSlot', rtTemporalPartSlot).
+builtin_rn('SubEventSlot', rtSubEventSlot).
+builtin_rn('EthnicGroupType', ttEthnicGroupType).
+builtin_rn('PureCompoundType', ttPureCompoundType).
+builtin_rn('ChemicalCompoundType', ttChemicalCompoundType).
+builtin_rn('DirectionExpression', ftDirectionExpression).
+builtin_rn('eyeColor-Old', eyeColorOld).
+builtin_rn('CollectionPredicate', rtCollectionPredicate).
+builtin_rn('TypePredicate', rtTypePredicate).
+builtin_rn('colorSchemeOf-Old', colorSchemeOfOld).
+builtin_rn('SpatiallyIntrinsicSlot', rtSpatiallyIntrinsicSlot).
+builtin_rn('IntendedFunction', rtIntendedFunction).
+builtin_rn('MainFunction', rtMainFunction).
+builtin_rn('MentalAttributeDescriptionPredicate', rtMentalAttributeDescriptionPredicate).
+builtin_rn('courseOfStudyLevel-Coll', courseOfStudyLevelColl).
+builtin_rn('AttributeType', ttAttributeType).
+builtin_rn('PhysicalFeatureDescribingPredicate', rtPhysicalFeatureDescribingPredicate).
+builtin_rn('PhysicalAttributeDescriptionSlot', rtPhysicalAttributeDescriptionSlot).
+builtin_rn('CotemporalObjectsSlot', rtCotemporalObjectsSlot).
+builtin_rn('MarketCategoryType', ttMarketCategoryType).
+builtin_rn('PrimitiveScalarIntervalType', ttPrimitiveScalarIntervalType).
+builtin_rn('PrimitiveQuantityType', ttPrimitiveQuantityType).
+builtin_rn('DerivedQuantityType', ttDerivedQuantityType).
+builtin_rn('QuantitySlot', rtQuantitySlot).
+builtin_rn('IntervalBasedQuantitySlot', rtIntervalBasedQuantitySlot).
+builtin_rn('WorkAccountType', ttWorkAccountType).
+builtin_rn('OrganismType', ttOrganismType).
+builtin_rn('UnitOfMeasureTaxonomicType', ttUnitOfMeasureTaxonomicType).
+builtin_rn('EnumeratedType', ttEnumeratedType).
+builtin_rn('MutuallyDisjointAttributeType', ttMutuallyDisjointAttributeType).
+builtin_rn('PathSystemType', ttPathSystemType).
+builtin_rn('RelationExpression', ftRelationExpression).
+builtin_rn('PersonTypeByLifeStageType', ttPersonTypeByLifeStageType).
+builtin_rn('CycArgumentByJustificationType', ttCycArgumentByJustificationType).
+builtin_rn('MentalSlot', rtMentalSlot).
+builtin_rn('testStatus-Manual', testStatusManual).
+builtin_rn('LinearOrderQuantityType', ttLinearOrderQuantityType).
+builtin_rn('InterPersonalRelationSlot', rtInterPersonalRelationSlot).
+builtin_rn('TaxType', ttTaxType).
+builtin_rn('InternetNewsgroupType', ttInternetNewsgroupType).
+builtin_rn('MagazineSeriesType', ttMagazineSeriesType).
+builtin_rn('DramaticPerformanceType', ttDramaticPerformanceType).
+builtin_rn('Play-DramaticType', ttPlayDramaticType).
+builtin_rn('OperaType', ttOperaType).
+builtin_rn('SpecifiedPlay-MusicalType', ttSpecifiedPlayMusicalType).
+builtin_rn('PhaseIIBattlespaceSource-PITType', ttPhaseIIBattlespaceSourcePITType).
+builtin_rn('MilitaryFieldManual-PITType', ttMilitaryFieldManualPITType).
+builtin_rn('PublishedEdition-PITType', ttPublishedEditionPITType).
+builtin_rn('sourceOfTerm-PIT', sourceOfTermPIT).
+builtin_rn('SpecifiedElectronicsProductType', ttSpecifiedElectronicsProductType).
+builtin_rn('SpecifiedComputerRoleplayingGameType', ttSpecifiedComputerRoleplayingGameType).
+builtin_rn('SpecifiedComputerActionGameType', ttSpecifiedComputerActionGameType).
+builtin_rn('SpecifiedComputerArcadeGameType', ttSpecifiedComputerArcadeGameType).
+builtin_rn('SpecifiedComputerBoardGameType', ttSpecifiedComputerBoardGameType).
+builtin_rn('SpecifiedComputerSportsGameType', ttSpecifiedComputerSportsGameType).
+builtin_rn('SpecifiedComputerEducationalGameType', ttSpecifiedComputerEducationalGameType).
+builtin_rn('SpecifiedComputerSimulationGameType', ttSpecifiedComputerSimulationGameType).
+builtin_rn('SpecifiedComputerStrategyGameType', ttSpecifiedComputerStrategyGameType).
+builtin_rn('formalityOfWS-New', formalityOfWSNew).
+builtin_rn('politenessOfWS-New', politenessOfWSNew).
+builtin_rn('InsuranceType', ttInsuranceType).
+builtin_rn('SocialAttributeType', ttSocialAttributeType).
+builtin_rn('UnorderedAttributeType', ttUnorderedAttributeType).
+builtin_rn('HumanTypeByHairColorType', ttHumanTypeByHairColorType).
+builtin_rn('ExceptionRelation', rtExceptionRelation).
+builtin_rn('SpecifiedComputerPuzzleGameType', ttSpecifiedComputerPuzzleGameType).
+builtin_rn('SpecifiedComputerAdventureGameType', ttSpecifiedComputerAdventureGameType).
+builtin_rn('PowerChess98-SpecifiedComputerGameType', ttPowerChess98SpecifiedComputerGameType).
+builtin_rn('TheDShow-SpecifiedComputerGameType', ttTheDShowSpecifiedComputerGameType).
+builtin_rn('CalvinAndHobbes-SpecifiedComicStripSeriesType', ttCalvinAndHobbesSpecifiedComicStripSeriesType).
+builtin_rn('CarTalk-SpecifiedRadioSeriesType', ttCarTalkSpecifiedRadioSeriesType).
+builtin_rn('SyndromeType', ttSyndromeType).
+builtin_rn('TheDrLauraShow-SpecifiedRadioSeriesType', ttTheDrLauraShowSpecifiedRadioSeriesType).
+builtin_rn('adjSemTrans-New', adjSemTransNew).
+builtin_rn('adjSemTrans-Restricted-New', adjSemTransRestrictedNew).
+builtin_rn('SupportGroupFn-FeelingAttributeType', ttSupportGroupFnFeelingAttributeType).
+builtin_rn('Album-RecordingType', ttAlbumRecordingType).
+builtin_rn('Single-RecordingType', ttSingleRecordingType).
+builtin_rn('SpecifiedMusicTrackType', ttSpecifiedMusicTrackType).
+builtin_rn('AttributeCoveringType', ttAttributeCoveringType).
+builtin_rn('AttributePartitionType', ttAttributePartitionType).
+builtin_rn('KBDescriptorPredicate', rtKBDescriptorPredicate).
+builtin_rn('CycSystemDescriptorPredicate', rtCycSystemDescriptorPredicate).
+builtin_rn('HumanTypeByPhysiologicalConditionType', ttHumanTypeByPhysiologicalConditionType).
+builtin_rn('BusinessByActivityType', ttBusinessByActivityType).
+builtin_rn('SpecifiedAcademicTestType', ttSpecifiedAcademicTestType).
+builtin_rn('SpecifiedPsychologicalTestType', ttSpecifiedPsychologicalTestType).
+builtin_rn('PersonByFacetedActivityType', ttPersonByFacetedActivityType).
+builtin_rn('AlternativeMedicineOccupationType', ttAlternativeMedicineOccupationType).
+builtin_rn('HumanSubcultureType', ttHumanSubcultureType).
+builtin_rn('EIAttack-Espionage-PurposeType', ttEIAttackEspionagePurposeType).
+builtin_rn('SubLExpression', ftSubLExpression).
+builtin_rn('InformationLeakByOrgType', ttInformationLeakByOrgType).
+builtin_rn('PartialDenotationalFunction', rtPartialDenotationalFunction).
+builtin_rn('TotalDenotationalFunction', rtTotalDenotationalFunction).
+builtin_rn('SpecifiedFoodType', ttSpecifiedFoodType).
+builtin_rn('EIAttack-Agent-PurposeType', ttEIAttackAgentPurposeType).
+builtin_rn('EIAttack-Military-PurposeType', ttEIAttackMilitaryPurposeType).
+builtin_rn('EIAttack-Corporate-PurposeType', ttEIAttackCorporatePurposeType).
+builtin_rn('EIAttack-Personal-PurposeType', ttEIAttackPersonalPurposeType).
+builtin_rn('HobbyFn-ScriptType', ttHobbyFnScriptType).
+builtin_rn('favoriteColorOfPerson-Old', favoriteColorOfPersonOld).
+builtin_rn('nounSemTrans-new', nounSemTransNew).
+builtin_rn('agentiveNounSemTrans-new', agentiveNounSemTransNew).
+builtin_rn('massNounSemTrans-new', massNounSemTransNew).
+builtin_rn('BinaryQuantityOrValuePredicate', rtBinaryQuantityOrValuePredicate).
+builtin_rn('PortableAudioEquipmentByComponentType', ttPortableAudioEquipmentByComponentType).
+builtin_rn('CumulativeType', ttCumulativeType).
+builtin_rn('AntiDavidsonianPredicate', rtAntiDavidsonianPredicate).
+builtin_rn('multiWordSemTrans-new', multiWordSemTransNew).
+builtin_rn('AttireType', ttAttireType).
+builtin_rn('AncienEgypt-LouvreCollection', ttAncienEgyptLouvreCollection).
+builtin_rn('reproducesAsexually-MicroorganismMob', reproducesAsexuallyMicroorganismMob).
+builtin_rn('ArgGenlQuanityBinaryPredicate', rtArgGenlQuanityBinaryPredicate).
+builtin_rn('ArgGenlQuanityPredicate', rtArgGenlQuanityPredicate).
+builtin_rn('granuleOfStuff-Generic', granuleOfStuffGeneric).
+builtin_rn('compoundSemTrans-new', compoundSemTransNew).
+builtin_rn('ScriptRelation', rtScriptRelation).
+builtin_rn('BodyPartTypeForClothingType', ttBodyPartTypeForClothingType).
+builtin_rn('CycSystemRelation', rtCycSystemRelation).
+builtin_rn('EucaryoticRNAType', ttEucaryoticRNAType).
+builtin_rn('ConservativeGeneralizedQuantifier', rtConservativeGeneralizedQuantifier).
+builtin_rn('ExtensionalGeneralizedQuantifier', rtExtensionalGeneralizedQuantifier).
+builtin_rn('EucaryoticGeneExpression', ftEucaryoticGeneExpression).
+builtin_rn('ProcaryoticGeneExpression', ftProcaryoticGeneExpression).
+builtin_rn('IdentifyingAnObjectAsType', ttIdentifyingAnObjectAsType).
+builtin_rn('OrganizationByActivityType', ttOrganizationByActivityType).
+builtin_rn('primaryFunction-AgnosticIntentional', primaryFunctionAgnosticIntentional).
+builtin_rn('soleFunction-AgnosticIntentional', soleFunctionAgnosticIntentional).
+builtin_rn('most-GenQuantRelnFromInstance', mostGenQuantRelnFromInstance).
+builtin_rn('both-GenQuant', bothGenQuant).
+builtin_rn('many-GenQuant', manyGenQuant).
+builtin_rn('psRuleTemplateBindings-New', psRuleTemplateBindingsNew).
+builtin_rn('PossibleDefinitionalPredicate', rtPossibleDefinitionalPredicate).
+builtin_rn('BPVI-MilitaryUnitType', ttBPVIMilitaryUnitType).
+builtin_rn('TransitiveViaPredicate', rtTransitiveViaPredicate).
+builtin_rn('BPVI-UnitSpecialtyClassificationType', ttBPVIUnitSpecialtyClassificationType).
+builtin_rn('BPVI-EquipmentClassificationType', ttBPVIEquipmentClassificationType).
+builtin_rn('transportsTo-NEW', transportsToNEW).
+builtin_rn('transports-NEW', transportsNEW).
+builtin_rn('typesChemicalBondBetweenCapable-New', typesChemicalBondBetweenCapableNew).
+builtin_rn('CodonType', ttCodonType).
+builtin_rn('KillingTypeThroughEventType', ttKillingTypeThroughEventType).
+builtin_rn('VariableOrderCollection', ttVariableOrderCollection).
+builtin_rn('ActionQualifyingFunction', rtActionQualifyingFunction).
+builtin_rn('no-GenQuant', noGenQuant).
+builtin_rn('SpecDenotingFunction', rtSpecDenotingFunction).
+builtin_rn('SceneDenotingFunction', rtSceneDenotingFunction).
+builtin_rn('SoftwareExpression', ftSoftwareExpression).
+builtin_rn('PrimitiveUnitType', ttPrimitiveUnitType).
+builtin_rn('DynamicSizeDataType', ttDynamicSizeDataType).
+builtin_rn('Double-TheDataType', ttDoubleTheDataType).
+builtin_rn('Void-TheDataType', ttVoidTheDataType).
+builtin_rn('USCensusRace&OriginType', 'ttUSCensusRace&OriginType').
+builtin_rn('WebSearchQuaternaryRuleMacroPredicate', rtWebSearchQuaternaryRuleMacroPredicate).
+builtin_rn('WebSearchTernaryRuleMacroPredicate', rtWebSearchTernaryRuleMacroPredicate).
+builtin_rn('NonPredicateTruthFunction', rtNonPredicateTruthFunction).
+builtin_rn('echelonOfUnit-Coll', echelonOfUnitColl).
+builtin_rn('RFMonthType', ttRFMonthType).
+builtin_rn('governmentType-Coll', governmentTypeColl).
+builtin_rn('jobPositionOpeningStatus-Coll', jobPositionOpeningStatusColl).
+builtin_rn('InfectionSiteType', ttInfectionSiteType).
+builtin_rn('ClothingStyleType', ttClothingStyleType).
+builtin_rn('InterAgentRelationCollectionType', ttInterAgentRelationCollectionType).
+builtin_rn('GeoEntityByNationalBehaviorRelationType', ttGeoEntityByNationalBehaviorRelationType).
+builtin_rn('DocumentStructureType', ttDocumentStructureType).
+builtin_rn('IndividualByFlawType', ttIndividualByFlawType).
+builtin_rn('Military-ActionType', ttMilitaryActionType).
+builtin_rn('classificationOfInformation-Coll', classificationOfInformationColl).
+builtin_rn('designationOfInformation-Coll', designationOfInformationColl).
+builtin_rn('designationOfThing-Coll', designationOfThingColl).
+builtin_rn('conversationStatus-Coll', conversationStatusColl).
+builtin_rn('positionStatusOfArea-Coll', positionStatusOfAreaColl).
+builtin_rn('movieAdvisoryRating-Coll', movieAdvisoryRatingColl).
+builtin_rn('featureOfPathArtifact-Coll', featureOfPathArtifactColl).
+builtin_rn('nucleicAcidSequenceConnectivity-Coll', nucleicAcidSequenceConnectivityColl).
+builtin_rn('illuminationLevel-Coll', illuminationLevelColl).
+builtin_rn('transparencyOfObject-Coll', transparencyOfObjectColl).
+builtin_rn('resistanceToBioDeterioration-Coll', resistanceToBioDeteriorationColl).
+builtin_rn('impactAbsorptionOfObject-Coll', impactAbsorptionOfObjectColl).
+builtin_rn('colorHasHue-Coll', colorHasHueColl).
+builtin_rn('colorHasBrightness-Coll', colorHasBrightnessColl).
+builtin_rn('colorHasChroma-Coll', colorHasChromaColl).
+builtin_rn('hasOrbitalPathClass-Coll', hasOrbitalPathClassColl).
+builtin_rn('complexityOfConfiguration-Coll', complexityOfConfigurationColl).
+builtin_rn('uniformColorOfObject-Coll', uniformColorOfObjectColl).
+builtin_rn('mainColorOfObject-Coll', mainColorOfObjectColl).
+builtin_rn('significantColorOfObject-Coll', significantColorOfObjectColl).
+builtin_rn('rightsGranted-Coll', rightsGrantedColl).
+builtin_rn('accountStatus-Coll', accountStatusColl).
+builtin_rn('proposalStatus-Coll', proposalStatusColl).
+builtin_rn('locationState-Coll', locationStateColl).
+builtin_rn('activityCriticality-Coll', activityCriticalityColl).
+builtin_rn('financialState-Coll', financialStateColl).
+builtin_rn('levelOfEncryption-Coll', levelOfEncryptionColl).
+builtin_rn('levelOfSecurity-Coll', levelOfSecurityColl).
+builtin_rn('hasNumberingSchema-Coll', hasNumberingSchemaColl).
+builtin_rn('architecturalStyle-Coll', architecturalStyleColl).
+builtin_rn('artisticStyle-Coll', artisticStyleColl).
+builtin_rn('clothingStyle-Coll', clothingStyleColl).
+builtin_rn('hasStyle-Coll', hasStyleColl).
+builtin_rn('mtAnthropacity-Coll', mtAnthropacityColl).
+builtin_rn('organismsExistentialState-Coll', organismsExistentialStateColl).
+builtin_rn('agentsExistentialState-Coll', agentsExistentialStateColl).
+builtin_rn('constructionExistentialState-Coll', constructionExistentialStateColl).
+builtin_rn('datingStatus-Coll', datingStatusColl).
+builtin_rn('maritalStatus-Coll', maritalStatusColl).
+builtin_rn('skinColor-Coll', skinColorColl).
+builtin_rn('eventHasStyle-Coll', eventHasStyleColl).
+builtin_rn('processorArchitectureOfComputer-Coll', processorArchitectureOfComputerColl).
+builtin_rn('tasteOfObject-Coll', tasteOfObjectColl).
+builtin_rn('objectEmitsOdor-Coll', objectEmitsOdorColl).
+builtin_rn('placeHasOdor-Coll', placeHasOdorColl).
+builtin_rn('hasSecurityClearance-Coll', hasSecurityClearanceColl).
+builtin_rn('classificationOfReport-Coll', classificationOfReportColl).
+builtin_rn('reliabilityOfReportSources-Coll', reliabilityOfReportSourcesColl).
+builtin_rn('loanTermOptions-Coll', loanTermOptionsColl).
+builtin_rn('loanDedication-Coll', loanDedicationColl).
+builtin_rn('loanInterestOptions-Coll', loanInterestOptionsColl).
+builtin_rn('loanPrincipal-Coll', loanPrincipalColl).
+builtin_rn('styleOfMusicPerformer-Coll', styleOfMusicPerformerColl).
+builtin_rn('styleOfArtist-Coll', styleOfArtistColl).
+builtin_rn('localOrganizationOpennessState-Coll', localOrganizationOpennessStateColl).
+builtin_rn('hasZodiacSign-Coll', hasZodiacSignColl).
+builtin_rn('portalState-Coll', portalStateColl).
+builtin_rn('softwareFeatures-Coll', softwareFeaturesColl).
+builtin_rn('stateOfHealth-Coll', stateOfHealthColl).
+builtin_rn('stateOfDevice-Coll', stateOfDeviceColl).
+builtin_rn('lockState-Coll', lockStateColl).
+builtin_rn('bodyHairLevel-Coll', bodyHairLevelColl).
+builtin_rn('postureOfAnimal-Coll', postureOfAnimalColl).
+builtin_rn('executePrivilegeOfProgramCopy-Coll', executePrivilegeOfProgramCopyColl).
+builtin_rn('activityState-Coll', activityStateColl).
+builtin_rn('movieGenres-Coll', movieGenresColl).
+builtin_rn('cwGenre-Coll', cwGenreColl).
+builtin_rn('listHasFormat-Coll', listHasFormatColl).
+builtin_rn('listHasOrder-Coll', listHasOrderColl).
+builtin_rn('classificationOfOrder-Coll', classificationOfOrderColl).
+builtin_rn('workload-Coll', workloadColl).
+builtin_rn('rank-Military-Coll', rankMilitaryColl).
+builtin_rn('troopStrengthOfUnit-Coll', troopStrengthOfUnitColl).
+builtin_rn('hasComplementaryBasePairingProperty-Coll', hasComplementaryBasePairingPropertyColl).
+builtin_rn('verdict-Coll', verdictColl).
+builtin_rn('COAEvaluationPredicate', rtCOAEvaluationPredicate).
+builtin_rn('IterativeScriptedEventType', ttIterativeScriptedEventType).
+builtin_rn('MDMPInteractionDimension', rtMDMPInteractionDimension).
+builtin_rn('COAAnalysisEvaluationType', ttCOAAnalysisEvaluationType).
+builtin_rn('AccountSystemType', ttAccountSystemType).
+builtin_rn('FileSystemType', ttFileSystemType).
+builtin_rn('objectHasColor-Coll', objectHasColorColl).
+builtin_rn('ScriptRoleConstraintPredicate', rtScriptRoleConstraintPredicate).
+builtin_rn('AbductionRelation', rtAbductionRelation).
+builtin_rn('NonEntityCollection', ttNonEntityCollection).
+builtin_rn('typeHasStyle-Coll', typeHasStyleColl).
+builtin_rn('hairColor-Coll', hairColorColl).
+builtin_rn('KFD-KBContentTestSpecificationType', ttKFDKBContentTestSpecificationType).
+builtin_rn('followingValueOnScale-Coll', followingValueOnScaleColl).
+builtin_rn('SKSIContentTestSpecificationType', ttSKSIContentTestSpecificationType).
+builtin_rn('sizeOfBedding-Coll', sizeOfBeddingColl).
+builtin_rn('sizeOfBed-Coll', sizeOfBedColl).
+builtin_rn('schooling-Coll', schoolingColl).
+builtin_rn('educationLevel-Coll', educationLevelColl).
+builtin_rn('humanMeasurements-Coll', humanMeasurementsColl).
+builtin_rn('clothingSize-Coll', clothingSizeColl).
+builtin_rn('ploidy-Organism-Coll', ploidyOrganismColl).
+builtin_rn('clothingTypeFormality-Coll', clothingTypeFormalityColl).
+builtin_rn('clothingFormality-Coll', clothingFormalityColl).
+builtin_rn('colorOfType-Coll', colorOfTypeColl).
+builtin_rn('stateOfAilment-Coll', stateOfAilmentColl).
+builtin_rn('NuclearSubstance-BBNEntityType', ttNuclearSubstanceBBNEntityType).
+builtin_rn('PotentialChemicalTreat-BBNEntityType', ttPotentialChemicalTreatBBNEntityType).
+builtin_rn('PotentialBiologicalTreat-BBNEntityType', ttPotentialBiologicalTreatBBNEntityType).
+builtin_rn('HazardousMaterialType', ttHazardousMaterialType).
+builtin_rn('userRightsRelation-Coll', userRightsRelationColl).
+builtin_rn('IntendedOrientation-DeviceType', ttIntendedOrientationDeviceType).
+builtin_rn('EntityNonInitialIntermittentCollection', ttEntityNonInitialIntermittentCollection).
+builtin_rn('IntermittantCollection', ttIntermittantCollection).
+builtin_rn('softwareDesignedForArchitecture-Coll', softwareDesignedForArchitectureColl).
+builtin_rn('ProductTypeByFunction', rtProductTypeByFunction).
+builtin_rn('zodiacSignDateRange-Coll', zodiacSignDateRangeColl).
+builtin_rn('succeedingValueOnScale-Coll', succeedingValueOnScaleColl).
+builtin_rn('followingOrEqualValueOnScale-Coll', followingOrEqualValueOnScaleColl).
+builtin_rn('TroopStrengthRatioPercentType', ttTroopStrengthRatioPercentType).
+builtin_rn('hungerLevelOf-Coll', hungerLevelOfColl).
+builtin_rn('InterArgExactIsaPredicate', rtInterArgExactIsaPredicate).
+builtin_rn('SomethingToWearByGenericType', ttSomethingToWearByGenericType).
+builtin_rn('ScriptProcessingEventPredicate', rtScriptProcessingEventPredicate).
+builtin_rn('flawAccordingToAgent-Coll', flawAccordingToAgentColl).
+builtin_rn('WinningType', ttWinningType).
+builtin_rn('DiscourseStructurePredicate', rtDiscourseStructurePredicate).
+builtin_rn('HandPositionType', ttHandPositionType).
+builtin_rn('UnchangedActorsType', ttUnchangedActorsType).
+builtin_rn('participantStatus-Coll', participantStatusColl).
+builtin_rn('IndividualMilitaryUnit-TemplateType', ttIndividualMilitaryUnitTemplateType).
+builtin_rn('ScriptFunction', rtScriptFunction).
+builtin_rn('ScriptRelation-Scenes-Type', ttScriptRelationScenesType).
+builtin_rn('ScriptRelation-Predicate', rtScriptRelationPredicate).
+builtin_rn('MilitaryEquipment-TemplateType', ttMilitaryEquipmentTemplateType).
+builtin_rn('TypesOfMilitaryEquipment-TopicType', ttTypesOfMilitaryEquipmentTopicType).
+builtin_rn('MilitaryWeaponTypes-TopicType', ttMilitaryWeaponTypesTopicType).
+builtin_rn('TypesOfMilitaryPlatform-TopicType', ttTypesOfMilitaryPlatformTopicType).
+builtin_rn('RKF-SME-ProjectileLancherType', ttRKFSMEProjectileLancherType).
+builtin_rn('MilitaryWeaponTypes-TemplateType', ttMilitaryWeaponTypesTemplateType).
+builtin_rn('GoalPredicate', rtGoalPredicate).
+builtin_rn('MaxFordingDepthOfVehicle-RKFTemplateType', ttMaxFordingDepthOfVehicleRKFTemplateType).
+builtin_rn('MilitaryDefinedTerrainType', ttMilitaryDefinedTerrainType).
+builtin_rn('IndividualTerrain-TopicType', ttIndividualTerrainTopicType).
+builtin_rn('MilitaryUnitType', ttMilitaryUnitType).
+builtin_rn('RenderingPropertyPredicate', rtRenderingPropertyPredicate).
+builtin_rn('DoubleLine-BorderType', ttDoubleLineBorderType).
+builtin_rn('SingleLine-BorderType', ttSingleLineBorderType).
+builtin_rn('PotentialTargetForScriptedAttackType', ttPotentialTargetForScriptedAttackType).
+builtin_rn('IterationTerminationScriptPredicate', rtIterationTerminationScriptPredicate).
+builtin_rn('SKSIKBIntegrityTestSpecificationType', ttSKSIKBIntegrityTestSpecificationType).
+builtin_rn('SKSITestSpecificationType', ttSKSITestSpecificationType).
+builtin_rn('SharedElementPredicate', rtSharedElementPredicate).
+builtin_rn('TemporalExistenceEntailingPredicate', rtTemporalExistenceEntailingPredicate).
+builtin_rn('OnceTrueTrueTillDeathOfAnArgPredicate', rtOnceTrueTrueTillDeathOfAnArgPredicate).
+builtin_rn('ExperimentalSitTypePredicate', rtExperimentalSitTypePredicate).
+builtin_rn('ConversionToTemporallyQualified-TopicType', ttConversionToTemporallyQualifiedTopicType).
+builtin_rn('FacetPredicate', rtFacetPredicate).
+builtin_rn('wordIndexesCycTerm-IR', wordIndexesCycTermIR).
+builtin_rn('CoExistenceRelation', rtCoExistenceRelation).
+builtin_rn('ActorInMovies-AcademyAwards-TemplateType', ttActorInMoviesAcademyAwardsTemplateType).
+builtin_rn('SoftwareTestSpecificationTestOrType', ttSoftwareTestSpecificationTestOrType).
+builtin_rn('LoanAgreementTypeByFundingSourceType', ttLoanAgreementTypeByFundingSourceType).
+builtin_rn('SituationTypeMatchingPredicate', rtSituationTypeMatchingPredicate).
+builtin_rn('SKSISupportedMathFunction', rtSKSISupportedMathFunction).
+builtin_rn('WhClauseFrameType', ttWhClauseFrameType).
+builtin_rn('MajorCreditCardType', ttMajorCreditCardType).
+builtin_rn('suspects-Prop', suspectsProp).
+builtin_rn('UnaryEvalautionPredicate', rtUnaryEvalautionPredicate).
+builtin_rn('PictorialGenreType', ttPictorialGenreType).
+builtin_rn('CartographicalFeatureType', ttCartographicalFeatureType).
+builtin_rn('CST-WhichMonthsHaveThirtyDays-durationOfType', ttCSTWhichMonthsHaveThirtyDaysDurationOfType).
+builtin_rn('SOEGraphablePredicate', rtSOEGraphablePredicate).
+builtin_rn('AgentDataSentencePredicate', rtAgentDataSentencePredicate).
+builtin_rn('EventLocationAndDatePredicate', rtEventLocationAndDatePredicate).
+builtin_rn('RCCRelation', rtRCCRelation).
+builtin_rn('contractee-New', contracteeNew).
+builtin_rn('intervalOfTypeLiesBetween-Exclusive-New', intervalOfTypeLiesBetweenExclusiveNew).
+builtin_rn('ShapeType', ttShapeType).
+builtin_rn('defaultTinyIconTermImagePathnameForType-TillDeathOfAnArg-AnySolidColorOtherThanBlackVariety', defaultTinyIconTermImagePathnameForTypeTillDeathOfAnArgAnySolidColorOtherThanBlackVariety).
+builtin_rn('FeelingType', ttFeelingType).
+builtin_rn('ShapeDescribingPredicate', rtShapeDescribingPredicate).
+builtin_rn('OutdoorLocationByWeatherType', ttOutdoorLocationByWeatherType).
+builtin_rn('OutdoorLocationByIlluminationType', ttOutdoorLocationByIlluminationType).
+builtin_rn('OutdoorLocationByAmbientConditionType', ttOutdoorLocationByAmbientConditionType).
+builtin_rn('ClimaticTerrainType', ttClimaticTerrainType).
+builtin_rn('TemporallyQualifiableRelation', rtTemporallyQualifiableRelation).
+builtin_rn('TimeDependentRelation', rtTimeDependentRelation).
+builtin_rn('ShapeTypeFunction', rtShapeTypeFunction).
+builtin_rn('OwSemanticDataType', ttOwSemanticDataType).
+builtin_rn('Edited-TEPProvenanceType', ttEditedTEPProvenanceType).
+builtin_rn('Unedited-TEPProvenanceType', ttUneditedTEPProvenanceType).
+builtin_rn('ILPTest-BodyPred-In-UnboundForType', ttILPTestBodyPredInUnboundForType).
+builtin_rn('ILPTest-HeadPred-In-UnboundForType', ttILPTestHeadPredInUnboundForType).
+builtin_rn('ClayBasedFines-SoilType', ttClayBasedFinesSoilType).
+builtin_rn('VehicleType', ttVehicleType).
+builtin_rn('EventCasualtyPredicate', rtEventCasualtyPredicate).
+builtin_rn('CasualtyDesignatingPredicate', rtCasualtyDesignatingPredicate).
+builtin_rn('GeographicalRegionPredicate', rtGeographicalRegionPredicate).
+builtin_rn('SystemEntityPropertyFunction', rtSystemEntityPropertyFunction).
+builtin_rn('Endangered-OrganismClassificationType', ttEndangeredOrganismClassificationType).
+builtin_rn('probabilityOfSet-Generic', probabilityOfSetGeneric).
+builtin_rn('probability-Numeric', probabilityNumeric).
+builtin_rn('ArtisticStyleType', ttArtisticStyleType).
+builtin_rn('ArchitecturalStyleType', ttArchitecturalStyleType).
+builtin_rn('WordNetSpeechPartType', ttWordNetSpeechPartType).
+builtin_rn('UnderwaterTerrainFeatureType', ttUnderwaterTerrainFeatureType).
+builtin_rn('kineticEnergyOfObject-Translational', kineticEnergyOfObjectTranslational).
+builtin_rn('evincesGAF-Generic', evincesGAFGeneric).
+builtin_rn('8ByteRealDataType', tt8ByteRealDataType).
+builtin_rn('4ByteRealDataType', tt4ByteRealDataType).
+builtin_rn('RealNumberDataType', ttRealNumberDataType).
+builtin_rn('ComputerDataType', ttComputerDataType).
+builtin_rn('BitStringDataType', ttBitStringDataType).
+builtin_rn('FixedSizeComputerDataType', ttFixedSizeComputerDataType).
+builtin_rn('CompositeDataType', ttCompositeDataType).
+builtin_rn('ObjectReferenceDataType', ttObjectReferenceDataType).
+builtin_rn('DefinedDataType', ttDefinedDataType).
+builtin_rn('YahooFinanceStockQuotePagePredicate', rtYahooFinanceStockQuotePagePredicate).
+builtin_rn('PhysicalOrderingPredicate', rtPhysicalOrderingPredicate).
+builtin_rn('instanceDiffersFromPrototypicalInstance-Additions', instanceDiffersFromPrototypicalInstanceAdditions).
+builtin_rn('instanceDiffersFromPrototypicalInstance-Lacunae', instanceDiffersFromPrototypicalInstanceLacunae).
+builtin_rn('instanceDiffersFromPrototypicalInstance-Conflicts', instanceDiffersFromPrototypicalInstanceConflicts).
+builtin_rn('HighestInValueModifierType', ttHighestInValueModifierType).
+builtin_rn('OtherSurgicalIncisionType', ttOtherSurgicalIncisionType).
+builtin_rn('startsNoEarlierThanStartingOf-2', startsNoEarlierThanStartingOf_2).
+builtin_rn('NearlyFunctionalSlot', rtNearlyFunctionalSlot).
+builtin_rn('CCFPreopPatientStatusType', ttCCFPreopPatientStatusType).
+builtin_rn('Paced-HeartRhythmType', ttPacedHeartRhythmType).
+builtin_rn('OrganSystemType', ttOrganSystemType).
+builtin_rn('GeograhpicalRegionTypeByAdministratorType', ttGeograhpicalRegionTypeByAdministratorType).
+builtin_rn('SystemSlot', rtSystemSlot).
+builtin_rn('aortaAneurysmSize-1', aortaAneurysmSize_1).
+builtin_rn('DisjointMedicalProcedureType', ttDisjointMedicalProcedureType).
+builtin_rn('DrugModeOfActionType', ttDrugModeOfActionType).
+builtin_rn('ProteinMoleculeType', ttProteinMoleculeType).
+builtin_rn('StockType', ttStockType).
+builtin_rn('operationType-7', operationType_7).
+builtin_rn('hasIndicationForICUAdmission-8', hasIndicationForICUAdmission_8).
+builtin_rn('CCFCardiacValveType', ttCCFCardiacValveType).
+builtin_rn('priorHistoryOfConditionOnPartTypeWRTEvent-NoLoop', priorHistoryOfConditionOnPartTypeWRTEventNoLoop).
+builtin_rn('ReportGeneratorReportTypeType', ttReportGeneratorReportTypeType).
+builtin_rn('ETQ-GeneToMoleculeType', ttETQGeneToMoleculeType).
+builtin_rn('ChromosomeTypeByCellStageType', ttChromosomeTypeByCellStageType).
+builtin_rn('cmuReadTheWeb-MappingPredicate', cmuReadTheWebMappingPredicate).
+builtin_rn('ProcessingAlottmentType', ttProcessingAlottmentType).
+builtin_rn('causes-SubSitTypeSubSitType-NotNecUnique', causesSubSitTypeSubSitTypeNotNecUnique).
+builtin_rn('JCIDSCurrentKBStateComputingPredicate', rtJCIDSCurrentKBStateComputingPredicate).
+builtin_rn('ProteinTypeByChemicalCompoundType', ttProteinTypeByChemicalCompoundType).
+builtin_rn('HasExpertiseInSimilarSoftwareWRTType', ttHasExpertiseInSimilarSoftwareWRTType).
+builtin_rn('MemCpyFunction', rtMemCpyFunction).
+builtin_rn('ReadFileFunction', rtReadFileFunction).
+builtin_rn('WMemCpyFunction', rtWMemCpyFunction).
+builtin_rn('StrNCpyFunction', rtStrNCpyFunction).
+builtin_rn('StrCpyFunction', rtStrCpyFunction).
+builtin_rn('MemMoveFunction', rtMemMoveFunction).
+builtin_rn('MemCCopyFunction', rtMemCCopyFunction).
+builtin_rn('BCopyFunction', rtBCopyFunction).
+builtin_rn('VsnprintFFunction', rtVsnprintFFunction).
+builtin_rn('VsprintFFunction', rtVsprintFFunction).
+builtin_rn('SnprintFFunction', rtSnprintFFunction).
+builtin_rn('SprintFFunction', rtSprintFFunction).
+builtin_rn('PyrimidineType', ttPyrimidineType).
+builtin_rn('PurineType', ttPurineType).
+builtin_rn('TheLocaltimeFunction', rtTheLocaltimeFunction).
+builtin_rn('TheLocaltime_rFunction', rtTheLocaltime_rFunction).
+builtin_rn('TheGmtimeFunction', rtTheGmtimeFunction).
+builtin_rn('TheGmtime_rFunction', rtTheGmtime_rFunction).
+builtin_rn('TheRandFunction', rtTheRandFunction).
+builtin_rn('TheRand_rFunction', rtTheRand_rFunction).
+builtin_rn('TheGetLastErrorFunction', rtTheGetLastErrorFunction).
+builtin_rn('TheLoadLibraryFunction', rtTheLoadLibraryFunction).
+builtin_rn('TheSigactionFunction', rtTheSigactionFunction).
+builtin_rn('TheCloseHandleFunction', rtTheCloseHandleFunction).
+builtin_rn('TheExitProcessFunction', rtTheExitProcessFunction).
+builtin_rn('TheCopyFileFunction', rtTheCopyFileFunction).
+builtin_rn('codingFunctionArity-4', codingFunctionArity_4).
+builtin_rn('OntologyAnnotationPredicate', rtOntologyAnnotationPredicate).
+builtin_rn('ThePrintfFunction', rtThePrintfFunction).
+builtin_rn('TheWaitForSingleObjectExFunction', rtTheWaitForSingleObjectExFunction).
+builtin_rn('couldImpact-WeakEvidence', couldImpactWeakEvidence).
+builtin_rn('TheIsspaceFunction', rtTheIsspaceFunction).
+builtin_rn('CPTemplate-OppositePhasesWRTStructureType', ttCPTemplateOppositePhasesWRTStructureType).
+builtin_rn('The_malloc_dbgFunction', rtThe_malloc_dbgFunction).
+builtin_rn('The_aligned_mallocFunction', rtThe_aligned_mallocFunction).
+builtin_rn('The_realloc_dbgFunction', rtThe_realloc_dbgFunction).
+builtin_rn('HardwareComponentSpecificationForHardwareGroupType', ttHardwareComponentSpecificationForHardwareGroupType).
+builtin_rn('TheHeapAllocFunction', rtTheHeapAllocFunction).
+builtin_rn('TheHeapFreeFunction', rtTheHeapFreeFunction).
+builtin_rn('TheGlobalAllocFunction', rtTheGlobalAllocFunction).
+builtin_rn('TheLocalAllocFunction', rtTheLocalAllocFunction).
+builtin_rn('TheLocalFreeFunction', rtTheLocalFreeFunction).
+builtin_rn('TheGlobalFreeFunction', rtTheGlobalFreeFunction).
+builtin_rn('TheFreeFunction', rtTheFreeFunction).
+builtin_rn('TheNewFunction', rtTheNewFunction).
+builtin_rn('TheDeleteFunction', rtTheDeleteFunction).
+builtin_rn('TheAcceptFunction', rtTheAcceptFunction).
+builtin_rn('TheBindFunction', rtTheBindFunction).
+builtin_rn('TheClosesocketFunction', rtTheClosesocketFunction).
+builtin_rn('TheCreateProcessAFunction', rtTheCreateProcessAFunction).
+builtin_rn('TheCreateThreadFunction', rtTheCreateThreadFunction).
+builtin_rn('TheEncodePointerFunction', rtTheEncodePointerFunction).
+builtin_rn('TheDecodePointerFunction', rtTheDecodePointerFunction).
+builtin_rn('TheExitFunction', rtTheExitFunction).
+builtin_rn('TheFprintfFunction', rtTheFprintfFunction).
+builtin_rn('TheGetCurrentProcessIdFunction', rtTheGetCurrentProcessIdFunction).
+builtin_rn('TheHeapCreateFunction', rtTheHeapCreateFunction).
+builtin_rn('TheGetsFunction', rtTheGetsFunction).
+builtin_rn('TheFgetsFunction', rtTheFgetsFunction).
+builtin_rn('TheGets_sFunction', rtTheGets_sFunction).
+builtin_rn('TheGetws_sFunction', rtTheGetws_sFunction).
+builtin_rn('TheGetwsFunction', rtTheGetwsFunction).
+builtin_rn('TheFgetwsFunction', rtTheFgetwsFunction).
+builtin_rn('TheBsearchFunction', rtTheBsearchFunction).
+builtin_rn('TheBsearch_sFunction', rtTheBsearch_sFunction).
+builtin_rn('TheGetenvFunction', rtTheGetenvFunction).
+builtin_rn('TheWgetenvFunction', rtTheWgetenvFunction).
+builtin_rn('CodeAnalysisTQ-AttemptingToReturnAMemoryResourceWithAnIncompatibleFunction', rtCodeAnalysisTQAttemptingToReturnAMemoryResourceWithAnIncompatibleFunction).
+builtin_rn('The_wcsdecFunction', rtThe_wcsdecFunction).
+builtin_rn('The_tcsdecFunction', rtThe_tcsdecFunction).
+builtin_rn('The_strincFunction', rtThe_strincFunction).
+builtin_rn('The_wcsincFunction', rtThe_wcsincFunction).
+builtin_rn('The_mbsspnpFunction', rtThe_mbsspnpFunction).
+builtin_rn('The_wcsspnpFunction', rtTh).
+builtin_rn('The_strtimeFunction', rtThe_strtimeFunction).
+builtin_rn('The_wstrtimeFunction', rtThe_wstrtimeFunction).
+builtin_rn('The_ctime64Function', rtThe_ctime64Function).
+builtin_rn('TheWctimeFunction', rtTheWctimeFunction).
+builtin_rn('The_wctime64Function', rtThe_wctime64Function).
+builtin_rn('The_gmtime32Function', rtThe_gmtime32Function).
+builtin_rn('The_gmtime64Function', rtThe_gmtime64Function).
+builtin_rn('TheLocaltime32Function', rtTheLocaltime32Function).
+builtin_rn('The_localtime64Function', rtThe_localtime64Function).
+builtin_rn('TheMysql_autocommitFunction', rtTheMysql_autocommitFunction).
+builtin_rn('TheMysql_change_userFunction', rtTheMysql_change_userFunction).
+builtin_rn('TheMysql_closeFunction', rtTheMysql_closeFunction).
+builtin_rn('TheMysql_connectFunction', rtTheMysql_connectFunction).
+builtin_rn('TheMysql_commitFunction', rtTheMysql_commitFunction).
+builtin_rn('TheMysql_create_dbFunction', rtTheMysql_create_dbFunction).
+builtin_rn('TheMysql_drop_dbFunction', rtTheMysql_drop_dbFunction).
+builtin_rn('TheMysql_escape_stringFunction', rtTheMysql_escape_stringFunction).
+builtin_rn('TheMysql_fetch_fieldFunction', rtTheMysql_fetch_fieldFunction).
+builtin_rn('TheMysql_store_resultFunction', rtTheMysql_store_resultFunction).
+builtin_rn('TheMysql_fetch_field_directFunction', rtTheMysql_fetch_field_directFunction).
+builtin_rn('TheMysql_use_resultFunction', rtTheMysql_use_resultFunction).
+builtin_rn('TheMysql_free_resultFunction', rtTheMysql_free_resultFunction).
+builtin_rn('TheMysql_list_dbsFunction', rtTheMysql_list_dbsFunction).
+builtin_rn('TheMysql_list_fieldsFunction', rtTheMysql_list_fieldsFunction).
+builtin_rn('TheMysql_list_processesFunction', rtTheMysql_list_processesFunction).
+builtin_rn('TheMysql_list_tablesFunction', rtTheMysql_list_tablesFunction).
+builtin_rn('TheMysql_optionsFunction', rtTheMysql_optionsFunction).
+builtin_rn('TheMysql_pingFunction', rtTheMysql_pingFunction).
+builtin_rn('DeterminingTheValueOfASlot', rtDeterminingTheValueOfASlot).
+builtin_rn('TheMysql_infoFunction', rtTheMysql_infoFunction).
+builtin_rn('TheMysql_fetch_fieldsFunction', rtTheMysql_fetch_fieldsFunction).
+builtin_rn('TheMysql_fetch_lengthsFunction', rtTheMysql_fetch_lengthsFunction).
+builtin_rn('TheMysql_fetch_rowFunction', rtTheMysql_fetch_rowFunction).
+builtin_rn('The_allocaFunction', rtThe_allocaFunction).
+builtin_rn('MRSharedTradeAgreementStatusType', ttMRSharedTradeAgreementStatusType).
+builtin_rn('BoardTrickTypeByBoardType', ttBoardTrickTypeByBoardType).
+builtin_rn('ExpansionCardTypeByFunction', rtExpansionCardTypeByFunction).
+builtin_rn('TheCurl_global_initFunction', rtTheCurl_global_initFunction).
+builtin_rn('TheUriParseUriAFunction', rtTheUriParseUriAFunction).
+builtin_rn('TheCurl_easy_initFunction', rtTheCurl_easy_initFunction).
+builtin_rn('TheCurl_easy_performFunction', rtTheCurl_easy_performFunction).
+builtin_rn('TheLog4c_initFunction', rtTheLog4c_initFunction).
+builtin_rn('TheLog_4c_finiFunction', rtTheLog_4c_finiFunction).
+builtin_rn('TheLog4c_category_getFunction', rtTheLog4c_category_getFunction).
+builtin_rn('TheLog4c_category_logFunction', rtTheLog4c_category_logFunction).
+builtin_rn('TheUriToStringCharsRequiredAFunction', rtTheUriToStringCharsRequiredAFunction).
+builtin_rn('TheUriToStringAFunction', rtTheUriToStringAFunction).
+builtin_rn('ThePointerDereferenceFunction', rtThePointerDereferenceFunction).
+builtin_rn('GraphQuery-inheritRolePlayersOfType-SitTypeToSubSitType', ttGraphQueryInheritRolePlayersOfTypeSitTypeToSubSitType).
+builtin_rn('WavePropagationTypeByEmitterOrEmitterType', ttWavePropagationTypeByEmitterOrEmitterType).
+builtin_rn('VisualIBTTransitionType', ttVisualIBTTransitionType).
+builtin_rn('ComputeFarmMachineType', ttComputeFarmMachineType).
+builtin_rn('CombinationTherapeuticClassType', ttCombinationTherapeuticClassType).
+builtin_rn('SpaceTypeHasObjTypeAtLocationType', ttSpaceTypeHasObjTypeAtLocationType).
+builtin_rn('ConstantPolynomialFunction', rtConstantPolynomialFunction).
+builtin_rn('ReversingReactionType', ttReversingReactionType).
+builtin_rn('patientChronicallyUsesNarcoticWithReleaseProfileBetweenDates-Old', patientChronicallyUsesNarcoticWithReleaseProfileBetweenDatesOld).
+builtin_rn('CatalyticInhibitionEventByType', ttCatalyticInhibitionEventByType).
+builtin_rn('LevelOfWithRespectToRolePredicate', rtLevelOfWithRespectToRolePredicate).
+builtin_rn('ChloroplastPigmentType', ttChloroplastPigmentType).
+builtin_rn('GCATProductProvisioningEventType', ttGCATProductProvisioningEventType).
+builtin_rn('CompositeActivityType', ttCompositeActivityType).
+builtin_rn('SeptentaryFunction', rtSeptentaryFunction).
+builtin_rn('FluidFnHydrocarbonMixtureTypeByCompositionType', ttFluidFnHydrocarbonMixtureTypeByCompositionType).
+builtin_rn('AcquaintancePredicate', rtAcquaintancePredicate).
+builtin_rn('NuancedAcquaintancePredicate', rtNuancedAcquaintancePredicate).
+builtin_rn('VGeneratingFunction', rtVGeneratingFunction).
+builtin_rn('TermParaphraseFn-PhysicalLocationType', ttTermParaphraseFnPhysicalLocationType).
+builtin_rn('TermParaphraseFn-NP-QuaType', ttTermParaphraseFnNPQuaType).
+builtin_rn('parsedFromString-9', parsedFromString_9).
+builtin_rn('CyclishGlossary-Collection', ttCyclishGlossaryCollection).
+builtin_rn('BELLAInteractiveAgentPerformableEventType', ttBELLAInteractiveAgentPerformableEventType).
+builtin_rn('GAndARelatedAssumptionType', ttGAndARelatedAssumptionType).
+builtin_rn('EqualityOperator', rtEqualityOperator).
+builtin_rn('BusinessValuationProjectionPredicate', rtBusinessValuationProjectionPredicate).
+builtin_rn('RevenueProjectionStrategyType', ttRevenueProjectionStrategyType).
+builtin_rn('RewritingAMathematicalExpressionAsAnEquivalentExpression', ftRewritingAMathematicalExpressionAsAnEquivalentExpression).
+builtin_rn('DistributingAnExpressionOutOfAExpression', ftDistributingAnExpressionOutOfAExpression).
+builtin_rn('NegationExpression', ftNegationExpression).
+builtin_rn('ReplacingSubexpressionWithEquivalentExpression', ftReplacingSubexpressionWithEquivalentExpression).
+builtin_rn('BooleanEvidentialPredicate', rtBooleanEvidentialPredicate).
+builtin_rn('wellTestWaterCut-ImplicitUnits', wellTestWaterCutImplicitUnits).
+builtin_rn('FaultTreeAnalysisEventType', ttFaultTreeAnalysisEventType).
+builtin_rn('COPY_OF_ComputingService-SubServiceType', ttCOPY_OF_ComputingServiceSubServiceType).
+builtin_rn('BasicWellEventHypothesisType', ttBasicWellEventHypothesisType).
+builtin_rn('SingleOperationMathTransformationType', ttSingleOperationMathTransformationType).
+builtin_rn('EvaluatingAMathematicalExpression', ftEvaluatingAMathematicalExpression).
+builtin_rn('expectedTargetValueOfWellParameterAfterRestartOfHydrocarbonWellWithDate-RGQ-3', expectedTargetValueOfWellParameterAfterRestartOfHydrocarbonWellWithDateRGQ_3).
+builtin_rn('GaugeStatusType', ttGaugeStatusType).
+builtin_rn('BridgeAlarmEvidentialPredicate', rtBridgeAlarmEvidentialPredicate).
 
 
 
-baseKB:mpred_to_cyc(P,C):- loop_check(baseKB:cyc_to_plarkc(C,P)),!.
 
-dehyphenize_const(PM,PMO):-tokenize_atom(PM,[_,T1|Toks]),member(E,[T1|Toks]),number(E),E<0,!,atomic_list_concat(List,'-',PM),atomic_list_concat(List,'_',PMO),!.
-dehyphenize_const(PM,PMO):-atomic_list_concat([P,F|List],'-',PM),maplist(toPropercase,[F|List],ListO),atomic_list_concat([P|ListO],PMO),!.
-dehyphenize_const(PM,PM).
+dehyphenize_const(PM,PMO):- atom(PM), atomic_list_concat(List,'-',PM),dehyphenize_const(PM,List,PMO),!.
 
-:- must(dehyphenize_const('a-b','aB')).
+% \\000
+%dehyphenize_const(PM,List,PMO):- tokenize_atom(PM,[_,T1|Toks]),member(E,[T1|Toks]),number(E),E<0,!,atomic_list_concat(List,'_',PMO),!.
+dehyphenize_const(P,[P],P):-!.
+dehyphenize_const(_,[P,F|List],PMO):-maplist(toPropercase_hyphenize_number,[F|List],ListO),atomic_list_concat([P|ListO],PMO),!.
+
+toPropercase_hyphenize_number('','_').
+toPropercase_hyphenize_number(N,O):-sub_atom(N, 0, 1, _, S),char_type(S,digit),!,atom_concat('_',N,O).
+toPropercase_hyphenize_number(I,O):- string_codes(I,[C|Odes]),to_upper(C,U),atom_codes(O,[U|Odes]).
+
+:- sanity(dehyphenize_const('a-b','aB')).
 :- must(dehyphenize_const('a-2b','a_2b')).
+:- must(dehyphenize_const('uitype-ProductDescriptionTemplate','uitypeProductDescriptionTemplate')).
 
 %:- forall(baseKB:cycPrepending(AT,A),((atom_concat(AT,A,FT),dehyphenize_const(FT,FFT)))).
 
@@ -435,6 +1186,7 @@ notFormatType(rtInferenceSupportedFunction).
 
 :- forall(notFormatType(NFT),ain(tSet(NFT))).
 
+tinyKB1_if_loaded(G):- if_defined(tinyKB1(G),fail).
 
 expT('SubLExpressionType').
 expT('SubLExpression').
@@ -443,33 +1195,40 @@ expT('ttExpressionType').
 
 
 isF(X):- atom_concat(_,'Fn',X).
-isF(X):- tinyKB1(resultIsa(X,_)).
-isF(X):- tinyKB1(resultQuotedIsa(X,_)).
-isF(X):- tinyKB1(resultGenl(X,_)).
-isF(X):- tinyKB1(isa(X,C)),atom_contains(C,'Function').
+isF(X):- tinyKB1_if_loaded(resultIsa(X,_)).
+isF(X):- tinyKB1_if_loaded(resultQuotedIsa(X,_)).
+isF(X):- tinyKB1_if_loaded(resultGenl(X,_)).
+isF(X):- tinyKB1_if_loaded(isa(X,C)),atom_contains(C,'Function').
 
 isFT(X):- atom_concatR(_,'Expression',X).
-isFT(X):- tinyKB1(resultIsa(X,FT)),expT(FT),!.
-isFT(X):- tinyKB1(resultGenl(X,FT)),expT(FT),!.
-isFT(X):- tinyKB1(resultQuotedIsa(X,_)),!.
-isFT(X):- expT(FT),tinyKB1(isa(X,FT)),!.
-isFT(X):- expT(FT),tinyKB1(genls(X,FT)),!.
+isFT(X):- tinyKB1_if_loaded(resultIsa(X,FT)),expT(FT),!.
+isFT(X):- tinyKB1_if_loaded(resultGenl(X,FT)),expT(FT),!.
+isFT(X):- tinyKB1_if_loaded(resultQuotedIsa(X,_)),!.
+isFT(X):- expT(FT),tinyKB1_if_loaded(isa(X,FT)),!.
+isFT(X):- expT(FT),tinyKB1_if_loaded(genls(X,FT)),!.
 
-isV(X):- tinyKB1(isa(X,VT)),isVT(VT).
-isVT(X):- tinyKB1(genls(X,'Individual')).
+isV(X):- tinyKB1_if_loaded(isa(X,VT)),isVT(VT).
+isVT(X):- tinyKB1_if_loaded(genls(X,'Individual')).
+isVT(X):- atom_concat('UnitOf',_, X).
 
-isPT(X):- atom_concat(_,'Predicate',X).
-isPT(X):- tinyKB1(genls(X,'tPred')).
+
 
 isRT(X):- atom_contains(X,'Functor').
-isRT(X):- atom_concatR(_,'Operator',X).
-isRT(X):- atom_concatR(_,'Slot',X).
-isRT(X):- atom_concatR(_,'Dimension',X).
-isRT(X):- atom_concatR(_,'Function',X).
-isRT(X):- atom_concatR(_,'Relation',X).
-isRT(X):- atom_concatR(_,'Quantifier',X).
-isRT(X):- tinyKB1(genls(X,'tRelation')).
-isRT(X):- tinyKB1(genls(X,'tFunction')).
+isRT(X):- atom_concatR(L,'Fn',X),!,isRT0(L).
+isRT(X):- isRT0(X).
+isRT(X):- tinyKB1_if_loaded(genls(X,'tPred')).
+isRT(X):- tinyKB1_if_loaded(genls(X,'tRelation')).
+isRT(X):- tinyKB1_if_loaded(genls(X,'tFunction')).
+
+isRT0(X):- atom_concatR(_,'Pred',X).
+isRT0(X):- atom_concatR(_,'Predicate',X).
+isRT0(X):- atom_concatR(_,'Operator',X).
+isRT0(X):- atom_concatR(_,'Slot',X).
+isRT0(X):- atom_concatR(_,'Dimension',X).
+isRT0(X):- atom_concatR(_,'Function',X).
+isRT0(X):- atom_concatR(_,'Relation',X).
+isRT0(X):- atom_concatR(_,'Quantifier',X).
+
 
 
 mpred_prepend_type(X,_):- \+ atom(X),!,fail.
@@ -479,24 +1238,25 @@ mpred_prepend_type(X,_):- starts_lower(X),!,fail.
 
 
 
-% mpred_prepend_type(X,t):- tinyKB1(genls(X,'tMicrotheory')),!.
-mpred_prepend_type(X,rt):- isPT(X),!.
+% mpred_prepend_type(X,t):- tinyKB1_if_loaded(genls(X,'tMicrotheory')),!.
+mpred_prepend_type(X,rt):- isRT(X),!.
 mpred_prepend_type(X,rt):- isRT(X),!.
 mpred_prepend_type(X,ft):- isFT(X), \+ isF(X).
 
 
 mpred_prepend_type(X,tt):- atom_concatR(_,'Collection',X).
 mpred_prepend_type(X,tt):- atom_concatR(_,'Type',X).
-
+mpred_prepend_type(X,vt):- atom_concat('UnitOf',_,X).
+% mpred_prepend_type(X,vt):- isVT(X),!.
 
 
 %mpred_prepend_type(X,v):- isV(X), \+ isF(X).
 % ..                                    ""
 %mpred_prepend_type(X,v):- isVT(X),!.
-%mpred_prepend_type(X,tt):- tinyKB1(genls(X,'tCol')),!.
-%mpred_prepend_type(X,tt):- tinyKB1(isa(X,'AtemporalNecessarilyEssentialCollectionType')),!.
-%mpred_prepend_type(X,t):- tinyKB1(isa(X,'tCol')),!.
-%mpred_prepend_type(X,t):- tinyKB1(isa(_,X)),!.
+%mpred_prepend_type(X,tt):- tinyKB1_if_loaded(genls(X,'tCol')),!.
+%mpred_prepend_type(X,tt):- tinyKB1_if_loaded(isa(X,'AtemporalNecessarilyEssentialCollectionType')),!.
+%mpred_prepend_type(X,t):- tinyKB1_if_loaded(isa(X,'tCol')),!.
+%mpred_prepend_type(X,t):- tinyKB1_if_loaded(isa(_,X)),!.
 %mpred_prepend_type(X,v):- name(X,[C|_]),char_type(C,upper),!.
 
 mpred_postpend_type(X,_):- starts_lower(X),!,fail.
@@ -506,36 +1266,48 @@ mpred_postpend_type(C,'Fn'):-isF(C).
 
 prepend_constant(PT,C,_,P):- transitive_lc(cyc_to_mpred_idiom1,C,PM),dehyphenize_const(PM,PMH),!, atom_concat(PT,PMH,P).
 
-:- was_export(cyc_to_mpred_idiom/2).
-%cyc_to_mpred_idiom(different,dif).
+:- was_export(cyc_to_mpred_create/2).
+%cyc_to_mpred_create(different,dif).
 
 starts_lower(X):-name(X,[S|_]),char_type(S,lower).
+starts_upper(X):-name(X,[S|_]),char_type(S,upper).
 
 never_idiom((:-)).
 never_idiom((,)).
 never_idiom(Atom):-atom_length(Atom,Len),Len<3.
 never_idiom(A):- upcase_atom(A,U),downcase_atom(A,U).
 
-cyc_to_mpred_idiom(X,_):- \+ atom(X),!,fail.
-cyc_to_mpred_idiom(X,X):- never_idiom(X),!.
-cyc_to_mpred_idiom(KW,SYMBOL):-name(KW,[58,LETTER|REST]),char_type(LETTER,alpha),!,name(SYMBOL,[LETTER|REST]).
-cyc_to_mpred_idiom(KW,'$VAR'(VAR)):-name(KW,[63,LETTER|REST]),char_type(LETTER,alpha),!,name(SYMBOL,[LETTER|REST]),fix_var_name(SYMBOL,VAR),!.
-cyc_to_mpred_idiom(C,P):- rn(C,P),!.
-cyc_to_mpred_idiom(C,P):- baseKB:cyc_to_plarkc(C,P),!.
-%cyc_to_mpred_idiom(C,P):-baseKB:mpred_to_cyc(P,C),!.
-cyc_to_mpred_idiom(equiv,(<=>)).
-cyc_to_mpred_idiom(implies,(=>)). 
-%cyc_to_mpred_idiom(not,(~)).
-% cyc_to_mpred_idiom(X,Y):- starts_lower(X), rename(X,Y),!.
-cyc_to_mpred_idiom(X,Y):- starts_lower(X),!,dehyphenize_const(X,Y).
-cyc_to_mpred_idiom(C,PM):- 
+
+
+
+cyc_to_mpred_create(X,_):- \+ atom(X),!,fail.
+cyc_to_mpred_create(X,X):- never_idiom(X),!.
+cyc_to_mpred_create(X,Y):- starts_lower(X),!,dehyphenize_const(X,Y),!.
+% cyc_to_mpred_create(KW,SYMBOL):-name(KW,[58,LETTER|REST]),char_type(LETTER,alpha),!,name(SYMBOL,[LETTER|REST]).
+cyc_to_mpred_create(KW,KW):-name(KW,[58,LETTER|_]),char_type(LETTER,alpha),char_type(LETTER,upper).
+cyc_to_mpred_create(KW,'$VAR'(VAR)):-name(KW,[63,LETTER|REST]),char_type(LETTER,alpha),!,name(SYMBOL,[LETTER|REST]),fix_var_name(SYMBOL,VAR),!.
+cyc_to_mpred_create(equiv,(<=>)).
+cyc_to_mpred_create(implies,(=>)). 
+% cyc_to_mpred_create(not,(~)).
+% cyc_to_mpred_create(X,Y):- starts_lower(X), rename(X,Y),!.
+cyc_to_mpred_create(X,Y):- starts_lower(X),!,dehyphenize_const(X,Y).
+cyc_to_mpred_create(C,PM):- 
   cyc_to_mpred_idiom_did(C,PM),
   C\==PM,
-  asserta(baseKB:cyc_to_plarkc(C,PM)),
-  asserta(baseKB:mpred_to_cyc(PM,C)),!.
-% cyc_to_mpred_idiom(C,PM):- rename(PM,C),!.
-cyc_to_mpred_idiom(C,PM):- transitive_lc(cyc_to_mpred_idiom1,C,PM),!.
-cyc_to_mpred_idiom(C,P):- atom_concat(it,C,P).
+  azzert_rename(C,PM).
+% cyc_to_mpred_create(C,PM):- rename(PM,C),!.
+cyc_to_mpred_create(C,PM):- transitive_lc(cyc_to_mpred_idiom1,C,PM),!.
+cyc_to_mpred_create(C,P):- atom_concat(it,C,P).
+
+
+/*
+% cyc_to_mpred_create(C,P):- atom(C), once(cyc_to_mpred_idiom1(C,I)), C\==I, loop_check(cyc_to_mpred_create(I,P)),!.
+% cyc_to_mpred_create(C,P):- atom(C), transitive_lc(cyc_to_mpred_idiom1,C,I),cyc_to_mpred_create(I,P).
+% BAD?  cyc_to_mpred_create(C,P):- rename(P,C).
+
+% TODO USING? baseKB:mpred_to_cyc(P,C):- loop_check(cyc_to_mpred_create(C,P)),!.
+%cyc_to_mpred_create(C,P):-baseKB:mpred_to_cyc(P,C),!.
+*/
 
 cyc_to_mpred_idiom_did(C,PM):- atom(C),  transitive_lc(cyc_to_mpred_idiom1,C,M),!,
  m_to_pm(M,C,PM),!.
@@ -548,6 +1320,8 @@ cyc_to_mpred_idiom1('CycLTerm','CycLExpression').
 cyc_to_mpred_idiom1(C,P):-atom_concatM('CycLSentence-',Type,C),!,atom_concat('Sentence',Type,P).
 cyc_to_mpred_idiom1(C,P):-atom_concatM('Expression-',Type,C),!,atom_concat('Expression',Type,P).
 % cyc_to_mpred_idiom1(C,P):-nonvar(C),baseKB:mpred_to_cyc(P,C),!.
+
+cyc_to_mpred_idiom1(_C,_P):-!,fail. % its runtime .. correct?
 
 % TODO remove these next two simplifcations one day
 /*
@@ -568,11 +1342,11 @@ cyc_to_mpred_idiom1(C,P):-atom_concatM('Lisp',P,C).
 cyc_to_mpred_idiom1(C,P):-atom_concatM('CycL',P,C).
 cyc_to_mpred_idiom1(C,P):-atom_concatM('Cyc',P,C).
 cyc_to_mpred_idiom1(C,P):-atom_concatM('FormulaicSenten',Type,C),!,atom_concat('Senten',Type,P).
-cyc_to_mpred_idiom1(C,P):-atom_concatM('SExpressi',Type,C),!,atom_concat('Expressi',Type,P).
+%cyc_to_mpred_idiom1(C,P):-atom_concatM('SExpressi',Type,C),!,atom_concat('Expressi',Type,P).
 cyc_to_mpred_idiom1(C,P):-atom_concatR(C,Type,'-Assertible'),!,atom_concat(Type,'Assertible',P).
 cyc_to_mpred_idiom1(C,P):-atom_concatR(C,Type,'-Askable'),!,atom_concat(Type,'Askable',P).
 cyc_to_mpred_idiom1(C,P):-atom_concatR(C,Type,'FormulaicSentence'),!,atom_concat(Type,'Sentence',P).
-cyc_to_mpred_idiom1(B,A):-startsLower(B),dehyphenize_const(B,A).
+cyc_to_mpred_idiom1(B,A):-starts_lower(B),dehyphenize_const(B,A).
 
 cyc_to_mpred_idiom_unused([Conj|MORE],Out):-fail, not(is_ftVar(Conj)),!,cyc_to_mpred_sent_idiom_2(Conj,Pred,_),
   w_tl(thocal:outer_pred_expansion(Conj,MORE),
@@ -581,13 +1355,13 @@ cyc_to_mpred_idiom_unused([Conj|MORE],Out):-fail, not(is_ftVar(Conj)),!,cyc_to_m
          list_to_ops(Pred,MOREL,Out)))),!.
 
 
-atom_concatM(L,M,R):-atom(L),nonvar(R),atom_concat(L,M,R),atom_length(M,N),!,N > 2.
+atom_concatM(L,M,R):-atom(L),nonvar(R),atom_concat(L,M,R),atom_length(M,N),!,N > 2,starts_upper(M).
 atom_concatR(L,M,R):-atom(R),nonvar(L),atom_concat(L,M,R),atom_length(M,N),!,N > 2.
 atom_concatR(L,M,R):-atom(R),nonvar(M),atom_concat(L,M,R),atom_length(R,N),!,N > 2.
 
 
+starts_hungarian(V,P):-atom_concat(V,Rest,P),name(Rest,[A|_]),char_type(A,upper).
 
-kw_to_vars(KW,VARS):-subsT_each(KW,[':ARG1'=_ARG1,':ARG2'=_ARG2,':ARG3'=_ARG3,':ARG4'=_ARG4,':ARG5'=_ARG5,':ARG6'=_ARG6],VARS).
 make_kw_functor(F,A,CYCL):-make_kw_functor(F,A,CYCL,':ARG'),!.
 make_kw_functor(F,A,CYCL,PREFIX):-make_functor_h(CYCL,F,A),CYCL=..[F|ARGS],label_args(PREFIX,1,ARGS).
 
@@ -597,16 +1371,18 @@ label_args(PREFIX,N,[ARG|ARGS]):-atom_concat(PREFIX,N,TOARG),ignore(TOARG=ARG),!
 :- thread_local thocal:outer_pred_expansion/2.
 
 cyc_to_clif_notify(B,A):- cyc_to_clif(B,A) -> B\=@=A, nop(dmsg(B==A)).
-%cyc_to_clif_entry(I,O):-fail,cyc_to_clif(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
+%cyc_to_clif_entry(I,O):-fail,cyc_to_clif(I,M),!,must((compound_name_arity(I,FI,_),compound_name_arity(M,MF,_),FI==MF)),O=M.
+
+re_convert_string(H,H).
 
 cyc_to_clif(V,V):-is_ftVar(V),!.
 cyc_to_clif([],[]):-!.
-cyc_to_clif([H],HH):- string(H),convert_to_cycString(H,HH),!.
-cyc_to_clif(H,HH):- string(H),convert_to_cycString(H,HH),!.
+cyc_to_clif([H],HH):- string(H),re_convert_string(H,HH),!.
+cyc_to_clif(H,HH):- string(H),re_convert_string(H,HH),!.
 cyc_to_clif(I,O):- \+ (compound(I)),do_renames(I,O),!.
 cyc_to_clif('uSubLQuoteFn'(V),V):-atom(V),!.
 % cyc_to_clif(isa(I,C),O):-atom(C),M=..[C,I],!,cyc_to_clif(M,O).
-cyc_to_clif(I,O):-ruleRewrite(I,M),I\=@=M,!,cyc_to_clif(M,O).
+cyc_to_clif(I,O):- clause_b(ruleRewrite(I,M)),I\=@=M,!,cyc_to_clif(M,O).
 
 
 cyc_to_clif([H|T],[HH|TT]):-!,cyc_to_clif(H,HH),cyc_to_clif(T,TT),!.
@@ -617,16 +1393,19 @@ cyc_to_clif(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
 
 :-export(do_renames/2).
 
-fix_var_name(A,B):- atom_concat(':',_,A), atomic_list_concat(AB,'-',A),atomic_list_concat(AB,'_',B).
+fix_var_name(A,A):-var(A),!.
+fix_var_name('QUOTE','SUBLISP:QUOTE').
+fix_var_name(A,B):- atom_concat(':',_,A),!, atomic_list_concat(AB,'-',A),atomic_list_concat(AB,'_',B).
 fix_var_name(A,B):- atom_concat('?',QB,A),!,atom_concat('_',QB,B).
 fix_var_name(A,B):- atomic_list_concat(AB,'-',A),atomic_list_concat(AB,'_',B).
 
 % rename_atom(A,B):- atom_contains(A,'~'),!,convert_to_cycString(A,B),nb_setval('$has_quote',t),!.
-rename_atom(A,B):- atom_contains(A,' '),!,convert_to_cycString(A,B),nb_setval('$has_quote',t),!.
+rename_atom(A,B):- current_prolog_flag(do_renames,never),!,A=B.
 rename_atom(A,B):- best_rename(A,B),!.
-rename_atom(A,B):- cyc_to_mpred_idiom(A,B),!.
+rename_atom(A,B):- atom_contains(A,' '),!,A=B.
 rename_atom(A,A):- upcase_atom(A,A),!.
-rename_atom(A,A):- dmsg(didnt_rename_atom(A)).
+%rename_atom(A,B):- current_prolog_flag(logicmoo_break_atoms,true),atom_contains(A,' '),!,convert_to_cycString(A,B),nb_setval('$has_quote',t),!.
+rename_atom(A,B):-  must(cyc_to_mpred_create(A,B)),azzert_rename(A,B),!.
 
 cyc_to_mpred_sent_idiom_2(and,(','),trueSentence).
 
@@ -645,70 +1424,66 @@ list_to_ops(Pred,[H|T],Body):-!,
     (is_list(TT)-> Body=..[Pred,HH|TT]; Body=..[Pred,HH,TT]).
 
 
-do_renames(A,B):- var(A),!,A=B.
+% a7166_4139461
+convert_string(A,A):- \+ atom_contains(A,' '),!.
+convert_string(A,B):- logicmoo_util_strings:convert_to_cycString(A,B),!.
+
+:-nb_setval('$has_kw',[]).
+:-nb_setval('$has_var',[]).
+
+do_renames(A,B):- current_prolog_flag(do_renames,never),!,A=B.
+do_renames(A,B):- var(A),!,A=B,!,nb_setval('$has_var',t),!.
+do_renames(uN(P,ARGS),B):-!,do_renames([P|ARGS],List),compound_name_arguments_safe(B,uT,List).
 do_renames(uU('SubLQuoteFn',A),uSubLQuoteFn(A)):-var(A),!,nb_setval('$has_var',t),!.
-do_renames(uU('SubLQuoteFn','$VAR'(A)),uSubLQuoteFn(A)):-!,nb_setval('$has_quote',t),!.
+do_renames(uU('SubLQuoteFn','$VAR'(A)),uSubLQuoteFn(A)):-!,nb_setval('$has_quote',t),!,nb_setval('$has_var',t),!.
+do_renames('$KW'(A),'$VAR'(B)):- catch((fix_var_name(A,B),!,nb_setval('$has_kw',t)),E,(dtrace(dmsg(E)))),!.
 do_renames('$VAR'(A),'$VAR'(B)):- catch((fix_var_name(A,B),!,nb_setval('$has_var',t)),E,(dtrace(dmsg(E)))),!.
 %do_renames('$VAR'(A),B):- catch((fix_var_name(A,B),!,nb_setval('$has_var',t)),E,(dtrace(dmsg(E)))),!.
-do_renames(A,B):- string(A),!,logicmoo_util_strings:convert_to_cycString(A,B).
-do_renames(A,B):- atom(A),must(rename_atom(A,B)),!.
+do_renames(A,B):- atom(A),!,must(rename_atom(A,B)),!.
+do_renames(A,B):- string(A),!,re_convert_string(A,B).
+%do_renames(A,B):- number(A),!,A=B.
 do_renames(A,B):- \+ compound(A),!,A=B.
-
-do_renames([A|Rest],BList):- is_list([A|Rest]),!,maplist(do_renames,[A|Rest],BList).
 do_renames([A|Rest],[B|List]):- !, do_renames(A,B),do_renames(Rest,List).
-do_renames(uN(P,ARGS),B):-!,maplist(do_renames,[P|ARGS],List),compound_name_arguments(B,uT,List).
+do_renames(A,B):- compound_name_arity(A,P,0),!,do_renames(P,B).
 do_renames(A,B):- 
   compound_name_arguments(A,P,ARGS),
-  maplist(do_renames,[P|ARGS],[T|L]),
-  do_renames_pass2(T,L,B).
-
-
-is_builtin_like(format).
-is_builtin_like(sformat).
-is_builtin_like(F):-exact_args_f(F).
+   maplist(do_renames,[P|ARGS],[T|L]),
+   do_ren_pass2(T,L,[BB|LL]),!,
+   compound_name_arguments_safe(B,BB,LL).
 
 
 compute_argIsa(ARG1ISA,NN,ARGISA):-
-  atom(ARG1ISA),
+ % atom(ARG1ISA),
   atom_concat('arg',REST,ARG1ISA),
   member(E,['Genl','Isa','SometimesIsa','Format','QuotedIsa']),atom_concat(N,E,REST),
   atom_number(N,NN),
   atom_concat('arg',E,ARGISA),!.
 
-do_renames_pass2(T,L,B):- B=..[T|L], (is_builtin_like(T);skip_expand(B)),!.
-do_renames_pass2(forward,[MT,C,ARG1ISA,P,ID],OUT):- compute_argIsa(ARG1ISA,NN,ARGISA),!, 
-  do_renames_pass2(forward,[MT,P,ARGISA,NN,C,ID],OUT).
-do_renames_pass2(backward,[MT,C,ARG1ISA,P,ID],OUT):- compute_argIsa(ARG1ISA,NN,ARGISA),!, 
-  do_renames_pass2(backward,[MT,P,ARGISA,NN,C,ID],OUT).
-do_renames_pass2(code,[MT,C,ARG1ISA,P,ID],OUT):- compute_argIsa(ARG1ISA,NN,ARGISA),!, 
-  do_renames_pass2(code,[MT,P,ARGISA,NN,C,ID],OUT).
+do_ren_pass2('NART',[P|ARGS],[P|ARGS]):-atom(P).
+do_ren_pass2(nartR,[P|ARGS],[P|ARGS]):-atom(P).
+do_ren_pass2(nartR,ARGS,[nartR|ARGS]).
+do_ren_pass2(uU,ARGS,[u|ARGS]).
+do_ren_pass2(t,[P|IC],[t,P|IC]):- \+ atom(P).
+% do_ren_pass2(t,[isa,I,C],[C,I]):-atom(C).
+do_ren_pass2(t,[isa,I,C],[isa,I,C]).
+do_ren_pass2(t,[ARG1ISA,P,C],[ARGISA,P,NN,C]):- compute_argIsa(ARG1ISA,NN,ARGISA).
+do_ren_pass2(t,[P|IC],[P|IC]):- intrinsicPred(P).
+do_ren_pass2(ARG1ISA,[P,C],[ARGISA,P,C,NN]):- atom(ARG1ISA), compute_argIsa(ARG1ISA,NN,ARGISA),!.
+do_ren_pass2(P,IC,[P|IC]):- intrinsicPred(P).
+%do_ren_pass2(t,[P|IC],[P|IC]).
+do_ren_pass2(P,ARGS,[P|ARGS]).
 
-  
-do_renames_pass2(t,[A|L],OUT):- atom(A),P=..[A|L],db_expand_argIsa(P,PO),PO=..POL , OUT =.. [t|POL].
-do_renames_pass2(t,[ARG1ISA,P,C],OUT):- compute_argIsa(ARG1ISA,NN,ARGISA),  OUT = t(ARGISA,P,NN,C).
+compound_name_arguments_safe(B,P,ARGS):- ARGS==[],!,B=P.
+compound_name_arguments_safe(B,P,ARGS):- nonvar(ARGS), \+ is_list(ARGS),!,B=[P|ARGS].
+compound_name_arguments_safe(B,P,ARGS):- atom(P),!,compound_name_arguments(B,P,ARGS).
+compound_name_arguments_safe(B,P,ARGS):- append_term(P,ARGS,B),!.
 
-do_renames_pass2(P,[],B):-!,do_renames(P,B).
-do_renames_pass2('NART',[P|ARGS],(B)):-atom(P),!,compound_name_arguments(B,P,ARGS).
-do_renames_pass2(nartR,[P|ARGS],(B)):-atom(P),!,compound_name_arguments(B,P,ARGS).
-do_renames_pass2(nartR,ARGS,B):-!,compound_name_arguments(B,nartR,ARGS).
-do_renames_pass2(t,[P,I,C],B):- P==isa,atom(C),!,B=..[C,I].
-do_renames_pass2(t,[P|IC],B):- intrinsicPred(P),!,B=..[P|IC].
-do_renames_pass2(t,ARGS,B):- compound_name_arguments(B,t,ARGS).
-do_renames_pass2(uU,ARGS,B):-!,compound_name_arguments(B,u,ARGS).
-do_renames_pass2(P,IC,B):- intrinsicPred(P),!,B=..[P|IC].
-do_renames_pass2(P,ARGS,B):-!,compound_name_arguments_safe(B,P,ARGS).
-
-compound_name_arguments_safe(B,P,ARGS):-atom(P),!,compound_name_arguments(B,P,ARGS).
-compound_name_arguments_safe(B,P,ARGS):- must(append_term(P,ARGS,B)),!.
-
-intrinsicPred(genlMt).
 intrinsicPred(ist).
 intrinsicPred(and).
 intrinsicPred(~).
 intrinsicPred(not).
 intrinsicPred(=).
 intrinsicPred(or).
-intrinsicPred(genlMt).
 intrinsicPred(&).
 intrinsicPred(v).
 intrinsicPred(t).
@@ -720,36 +1495,25 @@ intrinsicPred(forAll).
 intrinsicPred('[|]').
 intrinsicPred((;)).
 intrinsicPred(termOfUnit).
-
+intrinsicPred(genlMt).
+intrinsicPred(genls).
 intrinsicPred(argSometimesIsa).
 intrinsicPred(argQuotedIsa).
 intrinsicPred(argIsa).
 intrinsicPred(argGenl).
 intrinsicPred(argFormat).
+intrinsicPred(format).
+intrinsicPred(sformat).
+% intrinsicPred(F):-exact_args_f(F).
 
 intrinsicPred(A):-atom(A),atom_concat('thereE',_,A).
 
-:- (current_prolog_flag(lm_expanders,PrevValue)->true;PrevValue=false),
-   call(assert,on_fin(set_prolog_flag(lm_expanders,PrevValue))),
-   set_prolog_flag(lm_expanders,false).
-
-/*
-:- (current_prolog_flag(double_quotes,PrevValue)->true;PrevValue=false),
-   call(assert,on_fin(set_prolog_flag(double_quotes,PrevValue))),
-   set_prolog_flag(double_quotes,atom).
-*/
-
-:- if(current_prolog_flag(logicmoo_simplify_te,true)).
-:- (call(asserta,((system:term_expansion(I, (:- true)):- !, I\=(:- _), call(assert,I))),Ref),call(assert,on_fin(erase(Ref)))),!.
-:- (call(asserta,((user:term_expansion(I, (:- true)):- !, I\=(:- _), call(assert,I))),Ref),call(assert,on_fin(erase(Ref)))),!.
-:- (call(asserta,((term_expansion(I, (:- true)):- !, I\=(:- _), call(assert,I))),Ref),call(assert,on_fin(erase(Ref)))),!.
-:- endif.
 
 
 % unt_ify(TGaf,PGaf):- \+ current_prolog_flag(logicmoo_untify,true),!,TGaf=PGaf.
 unt_ify(TGaf,PGaf):- notrace(unt_ify_a(TGaf,PGaf)).
 
-unt_ify_a(TGaf,PGaf):- compound(TGaf),functor(TGaf,UR,_),arg(_,v(uU,nartR),UR),!,TGaf=PGaf.
+unt_ify_a(TGaf,PGaf):- compound(TGaf),compound_name_arity(TGaf,UR,_),arg(_,v(uU,nartR),UR),!,TGaf=PGaf.
 unt_ify_a(TGaf,PGaf):- term_variables(TGaf,TVars),
   freeze_pvars(TVars,unt_ify0(TGaf,PGaf)).
 unt_ify0(TGaf,PGaf):- 
@@ -767,47 +1531,94 @@ t_ify0(PGaf,TGaf):-
   (is_list(PGaf) -> maplist(t_ify0,PGaf,TGaf);
     (PGaf=..[P|ARGS], (P==t -> PGaf=TGaf ; (maplist(t_ify0,ARGS,TARGS)->TGaf=..[t,P|TARGS]))))).
 
+:- meta_predicate freeze_pvars(*,0).
+freeze_pvars( _ ,Goal):-!,call(Goal). 
+freeze_pvars([ ],Goal):-!,call(Goal).
+freeze_pvars([V],Goal):-!,freeze(V,Goal).
+freeze_pvars([V|Vs],Goal):-freeze(V,freeze_pvars(Vs,Goal)).
 
-makeRenames:- \+ current_prolg_flag(did_todos,_),!.
+:- export(make_functor_h/3).
+make_functor_h(CycL,F,A):- length(Args,A),CycL=..[F|Args].
+
+
+saveRenames:-
+   retractall(baseKB:rn_new(N,N)),
+    absolute_file_name('/mnt/dddd/workspace/logicmoo_nlu/prolog/pldata/plkb7166/kb7166_pt7_constant_renames_NEW.pl',O),
+         tell(O),
+         listing(baseKB:rn_new/2),
+         told.
+
+% makeRenames:- dmsg("no need to makeRenames!?"),!.
 makeRenames:- 
  w_tl(set_prolog_flag(logicmoo_load_state,making_renames),
      forall(makeRenames0,true)),!.
 
-makeRenames0:- exists_file('./rn2.pl'),must(ensure_loaded('./rn2.pl')),!.
-makeRenames0:-
-  tell('./rn2.pl'),
-   writeln('
+makeRenames0:- remove_renames('ftExpression').
+makeRenames0:- remove_renames('ftSentence').
 
-:- multifile(baseKB:cyc_to_plarkc/2).
-:- dynamic(baseKB:cyc_to_plarkc/2). 
+makeRenames0:- call((doall((findall(P,(ftLarkcOnlyTerm(P), \+ compound(P), atom_concat('xt',_,P)),L), 
+          member(P,L),remove_renames(P))))).
+
+makeRenames0:- call((doall((findall(P,(ftLarkcOnlyTerm(P), \+ compound(P), atom_concat('vt',_,P)),L), 
+          member(P,L),remove_renames(P))))).
+
+makeRenames0:- call((doall((findall(P,(ftLarkcOnlyTerm(P), \+ compound(P), starts_hungarian('v',P)),L), 
+          member(P,L),remove_renames(P))))).
+
+/*
+makeRenames0:- baseKB:doall((findall(P,((rename(P,_);rn(P,_);rename(_,P);rn(_,P)), \+ atom(P)),L),
+          member(P,L),maplist(retractall,[rename(_,P),rename(P,_),rn(_,P),rn(P,_)]))).
+
+*/
+
+% makeRenames0:- exists_file('./rn2.pl'),must(ensure_loaded('./rn2.pl')),!.
+makeRenames0:- 
+%  tell('./rn2.pl'),
+   when_file_output(writeln('
+
+:- multifile(rn/2).
+:- dynamic(rn/2). 
+:- multifile(builtin_rn/2).
+:- dynamic(builtin_rn/2). 
 
             '
-            ), 
-    forall((ftCycOnlyTerm(C)),
-       ignore((best_rename(C,P),
+            )), 
+    forall(ftCycOnlyTerm(C), must(check_rename(C))).
+
+    
+makeRenames0:- nl,told.
+% makeRenames0:- makeCycRenames.
+
+
+check_rename(P):- rn(C,P),baseKB:rename(P,C),!.
+check_rename(C):- catch(check_rename0(C),_,(rtrace,check_rename0(C))).
+
+check_rename0(C):- 
+    ignore((best_rename(C,P),
          \+ rn(C,P),
          \+ baseKB:rename(P,C),
        ( \+ baseKB:rename(_,C)-> true;
           ((baseKB:rename(WasP,C),
             retractall((rename(WasP,C))),
-            retractall((rn(C,WasP))),
-            format('~n~q.',[:- retractall(rn(C,WasP))]),
-            format('~n~q.',[:- retractall(rename(WasP,C))])
+            when_file_output(format('~n~q.',[:- retractall(rn(C,WasP))])),
+            retractall((rn(C,WasP))),          
+            when_file_output(format('~n~q.',[:- retractall(rename(WasP,C))]))
             ))),
-          format('~n~q.',[baseKB:cyc_to_plarkc(C,P)]),
-         assert(rn(C,P))))).
-makeRenames0:- nl,told.
-makeRenames0:- makeCycRenames.
+          when_file_output(format('~n~q.',[baseKB:rn(C,P)])),
+         azzert_rename(C,P))).
 
-makeCycRenames:- forall(makeCycRenames0,true).
+makeCycRenames:- dmsg("no need to makeCycRenames!?"),!.
+makeCycRenames:- forall(makeCycRenames_real,true).
 
 actual_cyc_renames0(C,P):-rn(C,P).
-actual_cyc_renames0(C,P):-baseKB:cyc_to_plarkc(C,P), \+ rn(C,P).
+%actual_cyc_renames0(C,P):- builtin_rn(C,P), \+ rn(C,P).
 
 actual_cyc_renames(C,P):-actual_cyc_renames0(C,P).
-actual_cyc_renames(C,P):- ftCycOnlyTerm(C),\+actual_cyc_renames0(C,_),best_rename(C,P).
+actual_cyc_renames(C,P):- ftCycOnlyTerm(C),\+actual_cyc_renames0(C,_),rename_atom(C,P).
 
-makeCycRenames0:- 
+makeCycRenames_real:- call_cleanup(makeCycRenames1, (nl,told)).
+
+makeCycRenames1:- 
   tell('e2c/renames.lisp'),
    writeln('
 
@@ -821,8 +1632,199 @@ makeCycRenames0:-
  '
            ), 
     forall(actual_cyc_renames(C,P),format('(safely-rename-or-merge "~w" "~w")~n',[C,P])).
-makeCycRenames0:- nl,told.
+
+
+
+:- multifile(baseKB:rename/2).
+:- dynamic(baseKB:rename/2).
+
+:- multifile(kb7166:rnc/2).
+:- dynamic(kb7166:rnc/2).
+:- ((kb7166:load_files([library('pldata/plkb7166/kb7166_pt7_constant_renames')],[module(baseKB),redefine_module(false),qcompile(auto)]))).
+:- forall((kb7166:rnc(N,Y),(\+atom(N);\+atom(Y))),throw(retract(kb7166:rnc(N,Y)))).
+
+:- multifile(baseKB:rn_new/2).
+:- dynamic(baseKB:rn_new/2).
+:- ((baseKB:load_files([library('pldata/plkb7166/kb7166_pt7_constant_renames_NEW')],[module(baseKB),redefine_module(false),qcompile(auto)]))).
+:- forall((rn_new(N,Y),(\+atom(N);\+atom(Y))),throw(retract(rn_new(N,Y)))).
+
+:- dmsg("I am here").
+:- multifile(baseKB:rn/2).
+:- dynamic(baseKB:rn/2).
+baseKB:rn(C,P):-kb7166:rnc(C,P).
+
+azzert_rename(C,P):- builtin_rn(C,P),!.
+azzert_rename(C,P):- baseKB:rn(C,P),!.
+azzert_rename(C,P):- kb7166:rnc(C,P),!.
+azzert_rename(C,P):- baseKB:rn_new(C,P),!.
+azzert_rename(C,P):- asserta(baseKB:rn_new(C,P)),dmsg_rename(C,P).
+
+dmsg_rename(C,P):-C\=P,dmsg((azzert_rename(C,P))).
+dmsg_rename(C,_):-downcase_atom(C,C),!.
+dmsg_rename(C,_):-starts_lower(C),!.
+dmsg_rename(C,P):-break,dmsg(warn(azzert_rename(C,P))).
+
+re_symbolize(N,V):- catch(atom_concat(':',N,V),_,fail),!.
+re_symbolize(N,V):- ignore(V='?'(N)).
+
+
+:- set_prolog_flag(logicmoo_safety,0).
+:- set_prolog_flag(logicmoo_debug,1).
+:- set_prolog_flag(logicmoo_speed,3).
+
+:- nb_linkval('$ra5_often',1).
+
+/*
+:- export(do_vname/1).
+
+do_vname(Wff):-
+  do_vname(Wff,PO),
+   b_getval('$variable_names',V2s),
+   wt(current_output,PO,V2s),
+   b_getval('$ra5_often',Often),   
+   once(when_file_output((((nb_current('$has_var',t);nb_current('$has_quote',t);(flag('$ett',X,X+1),0 is X rem Often))-> 
+   wt(user_output,PO,V2s) ; true)))),!.
+
+:- export(do_vname/0).  
+do_vname:- do_vname("forward('WordSenseDisambiguationMt',t('isLicensedBy',TERM2,TERMO ),'implies',t('mutuallyLicensing',TERM1,TERM2 ) ,a7166_3090092, monotonic_a_b_w).").
+do_vname:- do_vname(forward('WordSenseDisambiguationMt',t('isLicensedBy',TERM2,TERM1 ),'implies',t('mutuallyLicensing',TERM1,TERM2 ) ,a7166_3090092, monotonic_a_b_w)).
+do_vname:- do_vname(forward('MultiMediaAnalysisMt',XXX,'tooGeneralForEventExpansion','Homeotherm' ,a7166_5554792, default_d)).
+do_vname:- do_vname(forward(iWordSenseDisambiguationMt,t(isLicensedBy,_80274,_80276),implies,t(mutuallyLicensing,_80276,_80274),a7166_3090092,monotonic_a_b_w)).
+
+
+
+
+do_vname(S,PO):-string(S),
+   rt(string(S),Wff,Vs),!,
+   nb_linkval('$variable_names',Vs),
+   do_vname(Wff,PO),!.
+
+do_vname(Wff,PO):- b_getval('$variable_names',Vs),
+   b_setval('$has_var',[]),b_setval('$has_quote',[]),
+   
+  on_x_rtrace((baseKB:do_renames(Wff,P)->true;throw(do_renames(Wff,P)))),!,
+
+  (nb_current('$has_var',[])-> (PO = P,V2s=Vs) ; must( reread_vars(P-Vs,re_symbolize,PO-V2s))),
+   nb_linkval('$variable_names',V2s),!,
+ 
+  once((V2s==[]->true;(compound_name_arity(PO,_,A),arg(A,PO,ID),
+    (maplist(arg(1),V2s,Names),
+     wt(current_output,assertionVars(ID,Names),[]))))),!.
+  
+*/
 
 :- gripe_time(7.0,makeRenames).
 
+%:- gripe_time(60,load_files(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb_prolog.pl'), [if(not_loaded),redefine_module(false),qcompile(auto)])).
+%:- gripe_time(60,load_files(library('pldata/kb_7166_assertions.pl'), [if(not_loaded),redefine_module(false),qcompile(auto)])).
 
+logicmoo_i_cyc_kb_tinykb_prolog:- ensure_loaded_with(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'),call(call,do_renames_cyc_to_clif)).
+
+gaf_rename(NCMPD,NEW):- \+ compound(NCMPD),!,do_renames(NCMPD,NEW).
+gaf_rename([P|ARGS],NEW):- !,
+   maplist(do_renames,[P|ARGS],[T|L]),!,
+   do_ren_pass2(T,L,NEW),!.
+gaf_rename(CMPD,NEW):- CMPD=..[P|ARGS],
+   gaf_rename([P|ARGS],[M|MID]),!,
+   compound_name_arguments_safe(NEW,M,MID).
+
+%monotonic_fact(nartR('ResultStandsInRelationFn','genlMt'),'ContentModelForPegFn','DiscourseModellingFromLinkagesMt','UniversalVocabularyMt',a7166_1938598 , [ monotonic,forward,fact,not_first_order,asserted,relevant,higher_order,dependants,asserted_when = 20050602 ] ).7
+%default_fact(nartR('ResultStandsInRelationFn','genlMt'),'ContentMtOfLinkageFn','LinkagesSpindleHeadMt','UniversalVocabularyMt',a7166_1938599 , [ default,forward,fact,not_first_order,asserted,relevant,higher_order,dependants,asserted_when = 20050602 ] ).
+% monotonic_fact('isa',nartR('ResultStandsInRelationFn','disjointWith'),'MetaFunction','UniversalVocabularyMt',a7166_1938600 , [ monotonic,forward,fact,deduced,relevant,computed_skolem,dependants ] ).az
+
+% and(t(nearestGenls,PRO,xtPronoun),t(speechPartPreds,xtPronoun,PRED)),t(speechPartPreds,PRO,PRED),a7166_445054)
+
+/*
+forward_default_rule(implies,
+    and(
+        isa(GEO,tGroupedGeopoliticalEntity),
+        t(considersAsEnemy,GEO,ENEMY),
+        isa(ENEMY,tGroupedGeopoliticalEntity),
+        t(genls,WEAPON_TYPE,tObjectWeaponOfMassDestruction),
+        t(increasesCausally,ACQUISITION,
+           exists(WEAPON,and(t(possesses,GEO,WEAPON),isa(WEAPON, WEAPON_TYPE))),likelihood)),
+
+        t(increasesCausally,ACQUISITION,
+           t(setBehaviorCapable,GEO,u(tSetOfTheSetOfFn,ATTACK,
+                   and(isa(ATTACK,actMilitaryAttack),
+                       t(destructivePotentialOf,ATTACK,vHighAmountFn(vtDestructivePotential)),
+                       t(maleficiary,ATTACK,ENEMY))),performedBy),likelihood),a7166_437341).
+
+
+% monotonic_rule(implies,t(disjointWith,COL1,COL2),t(collectionOverlapFraction,COL1,COL2,0),a7166_303312).
+
+% assertion_anteceedant(disjointWith,COL1,COL2,a7166_303312,{'COL1':COL1,'COL2':COL2}).
+% assertion_consequent(collectionOverlapFraction,COL1,COL2,0,a7166_303312,{'COL1':COL1,'COL2':COL2}).
+
+default_rule(not,
+and(t(actionTypeExpressesFeelingType,ACTION_TYPE,FEELING_TYPE_1),
+    t(actionTypeExpressesFeelingType,ACTION_TYPE,FEELING_TYPE_2),
+    t(contrastedFeelings,FEELING_TYPE_1,FEELING_TYPE_2)),a7166_303675).
+
+
+%forward_default_rule(implies,and(isa(QUEEN,iClassificationOf_QueenHeadOfState),t(nameString,QUEEN,NAME),t(evaluate,LONGNAME,u(xSubLStringConcatenationFn,["Queen",NAME]))),or(t(substring,"Queen",NAME),t(nameString,QUEEN,LONGNAME)),a7166_437982).
+
+*/
+
+
+kb_transposer_pt2(A,B,C):-kb_transposer(A,B,C),!.
+
+kb_transposer(I-Vs,Info,OUT):- !,must(kb_transposer(I,Vs,Info,OUT)),!.
+kb_transposer(I,Info,OUT):- must(kb_transposer(I,[],Info,OUT)),!.
+
+kb_transposer( '$translate_file_steam',_,_Info,[]).
+kb_transposer( end_of_file,_,_Info,end_of_file).
+kb_transposer( :-(G),Vs,_Info,[ ( :-(G)) - Vs]).
+
+kb_transposer(I,Vs,_Info,[A1-VSO,A2,A3|A4S]):- compound(I),
+ functor(I,IF,IA),
+ arg(_,v(default_fact,monotonic_fact,
+   code_default_fact,code_monotonic_fact,
+   backward_default_fact,backward_monotonic_fact,
+   default_rule,monotonic_rule,
+   code_default_rule,code_monotonic_rule,
+   forward_default_rule,forward_monotonic_rule),IF),
+ arg(IA,I,Props),
+ is_list(Props),!,
+
+ must_det_l(( 
+ I=..[P|List],
+ nb_setval('$has_kw',[]),
+ append(ARGS,[MTI,ID,Props],List), 
+ do_renames(MTI,MT),!,
+ maplist(do_renames,ARGS,[T|L]),
+ do_ren_pass2(T,L,MO),
+ append(MO,[ID],NEWARGS),
+ compound_name_arguments_safe(A0, assertion_content,NEWARGS),
+ (nb_current('$has_kw',t)-> reread_vars(A0-Vs,re_symbolize,A1-VSO); (A0-Vs=A1-VSO)),
+ functor(A1,_,A),
+ A2 = assertion_mt(ID,MT),
+ A3 = assertion_wrapper(ID,P,A),
+ must_maplist(make_assert_prop(ID),Props,A4S))).
+
+kb_transposer(A,B,C,D):- compound(A), kb_transposer_pt2(A,B,C,D),!.
+
+kb_transposer( G,Vs,_Info,[ G - Vs]).
+
+kb_transposer_pt2(assertion_documentation(_,_),_,_,[]).
+kb_transposer_pt2(I,VS,_Info,[I-VS]):- functor(I,F,A),atom_concat(assertion_,_,F),ensure_dynamic_decl(F,A),!.
+kb_transposer_pt2(I,[],_Info,[O]):- functor(I,F,A),!, ensure_dynamic_decl(assertion_content,A),I=..[F|List],O=..[assertion_content|List].
+kb_transposer_pt2(I,VS,_Info,[O-VS,assertion_vars(ID,VS)]):- functor(I,F,A),ensure_dynamic_decl(assertion_content,A),
+   I=..[F|List],O=..[assertion_content|List],last(List,ID).
+
+
+
+:- dynamic(is_known_pred/2).
+ensure_dynamic_decl(F,A):-is_known_pred(F,A),!.
+ensure_dynamic_decl(F,A):- asserta(is_known_pred(F,A)),wdmsg(is_known_pred(F/A)).
+   
+make_assert_prop(ID,TYPE,A4S):-atom(TYPE),!,atom_concat(assertion_,TYPE,ATYPE),A4S=..[ATYPE,ID].
+make_assert_prop(ID,TYPE=VALUE,A4S):-atom(TYPE),atom_concat(assertion_,TYPE,ATYPE),gaf_rename(VALUE,VALUEO),A4S=..[ATYPE,ID,VALUEO].
+make_assert_prop(ID,TYPE:VALUE,A4S):-atom(TYPE),atom_concat(assertion_,TYPE,ATYPE),gaf_rename(VALUE,VALUEO),A4S=..[ATYPE,ID,VALUEO].
+
+%kb_7166_ensure_translated_1:- ensure_translated_with(library('pldata/kb7166_assertions.pl'),kb_transposer,_).
+%kb_7166_ensure_translated_2:- ensure_translated_with(library('pldata/kb_7166_assertions-trans.pl'),kb_transposer_pt2,_).
+kb_7166_assertions:- ensure_loaded_with(library('pldata/kb_7166_assertions.pl'),kb_transposer).
+% :- (baseKB:load_files([library('pldata/kb_7166_assertions-trans.pl')],[if(not_loaded),redefine_module(false),qcompile(auto)])).
+% :- kb_7166_ensure_translated_2.
+% :- prolog.

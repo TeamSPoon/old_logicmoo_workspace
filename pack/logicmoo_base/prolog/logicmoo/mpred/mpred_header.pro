@@ -121,7 +121,7 @@ el_assertions:el_holds/7, %el_assertions
 el_assertions:el_holds/8, %el_assertions
 el_assertions:el_holds/9, %el_assertions
 el_assertions:el_holds_pred_impl/1, %el_assertions
-el_assertions:is_cyckb_t_pred/2, %el_assertions
+% el_assertions:is_cyckb_t_pred/2, %el_assertions
 lmcache:has_pfc_database_preds/1,
 lmcache:after_mpred_load/0,
 % baseKB:agent_call_command/2,

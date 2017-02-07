@@ -1,9 +1,9 @@
 /* Part of LogicMOO Base Logicmoo Path Setups
 % ===================================================================
-    File:         'logicmoo_util_library.pl'
+    File:         'logicmoo_util_scce.pl'
     Purpose:       To load the logicmoo libraries as needed
     Contact:       $Author: dmiles $@users.sourceforge.net ;
-    Version:       'logicmoo_util_library.pl' 1.0.0
+    Version:       'logicmoo_util_scce.pl' 1.0.0
     Revision:      $Revision: 1.7 $
     Revised At:    $Date: 2002/07/11 21:57:28 $
     Author:        Douglas R. Miles
@@ -28,7 +28,7 @@
             scce_test/1,
             scce_idea/3]).
 
-:- include('logicmoo_util_header.pi').
+% :- include('logicmoo_util_header.pi').
 
 % :- '$set_source_module'(system).
 
@@ -156,11 +156,6 @@ setup_e_4:-
 % :- set_prolog_flag(scce,pure).
 % :- set_prolog_flag(scce,scce_orig).
 % :- set_prolog_flag(scce,setup_call_cleanup).
-
-
-
-
-
 
 
 

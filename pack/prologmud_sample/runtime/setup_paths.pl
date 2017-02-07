@@ -19,6 +19,9 @@ user:file_search_path(library, '../logicmoo_planner/prolog').
 
 in_logicmoo_repl_source_file.
 
+:- if( \+ (exists_source(library(prolog_slack)))).
+
+:- endif.
 % ==============================
 % Link up to our local packs
 % ==============================

@@ -17,6 +17,8 @@
          ]).
 */
 
+:- install_constant_renamer_until_eof.
+
 % expand_file_search_path(pldata(assertions),From),[module(baseKB),derived_from(From)]
 
 :-kb_dynamic((('abbreviationString-PN'/2),
@@ -81,8 +83,6 @@
         cyckb_t_e2c/4,
         (verbSemTransTemplate/3))).
 
-
-:- if(current_prolog_flag(logicmoo_simplify_te,true)).
 disable_current_module_expansion(M):-
   system:forall((member(F/A,[term_expansion/2, term_expansion/4,goal_expansion/2, goal_expansion/4]),
             functor(P,F,A),
@@ -95,6 +95,7 @@ disable_current_module_expansion(M):-
         M:call(asserta,((P :- (!,fail))),Ref),
         call(asserta,on_end(erase(Ref)))))).
 
+:- if(current_prolog_flag(logicmoo_simplify_te,true)).
 :- disable_current_module_expansion(baseKB).
 :- forall(current_module(M),disable_current_module_expansion(M)).
 :- endif.

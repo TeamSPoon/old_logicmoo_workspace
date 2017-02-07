@@ -68,6 +68,7 @@
 :- call((system:use_module(library('swi/thread_monitor')))).
 */
 
+:- use_module(prolog_statistics:library(statistics),[time/1]).
 :- system:use_module(library(statistics)).
 :- system:use_module(library(dialect/hprolog),[]).
 

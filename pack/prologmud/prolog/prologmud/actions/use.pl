@@ -67,7 +67,7 @@ action_info(Syntax,String):-
  no_repeats([Syntax],(
   call_u(action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed)),
   Syntax=..[ActUse,isAnd([tNearestReachableItem,call(Possessing,isSelfAgent,isThis),Wieldable])])),
-   must_maplist(baseKB:name_text_now,[ActUse,Wieldable,Possessing,NowWielding,Unstowed],List),
+   must_maplist(name_text_now,[ActUse,Wieldable,Possessing,NowWielding,Unstowed],List),
    sformat(String,'~w a ~w that you ~w so it will be ~w and not be ~w afterwards.',List).
 
 agent_call_command(Agent,Syntax) :- 

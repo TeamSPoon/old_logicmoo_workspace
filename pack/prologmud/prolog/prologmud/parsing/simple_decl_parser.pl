@@ -1,17 +1,17 @@
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
-%:- module(simple_decl_parser, []).
-/*  module
-% an example of simple parsing of an inform7 like language.
+% :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
+% :- swi_module(simple_decl_parser, [parserVars/3,parserVars/4,asserta_parserVars/3]).
+/* * <module> simple_decl_parser - an example of simple parsing of an inform7 like languages.
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
-:- endif.
+% :- endif.
 
-
+:- check_clause_counts.
 :- include(prologmud(mud_header)).
+:- check_clause_counts.
 
 :-discontiguous((translation_spo/6,parserTest/2,parserTest/3,translation_w//1)).
 :-dynamic((translation_spo/6,parserTest/2,parserTest/3,translation_w//1)).
@@ -55,6 +55,7 @@ typeGenls(ttValueType,vtValue).
 
 
 asserta_parserVars(N,V,Type):- show_failure(current_agent(A)),asserta(parserVars(A,N,V,Type)).
+:-export(parserVars/3).
 parserVars(N,V,Type):- show_failure(current_agent(A);A=iCurrentAgentFn),
    (parserVars_local(A,N,V,Type)*->true;parserVars_falback(global,N,V,Type)).
 
@@ -334,7 +335,7 @@ tSmall(X) <==> mudSize(X,vSmall).
 tCol(tGreen).
 tGreen(X) <==> mudColor(X,vGreen).
 
-
+:-check_clause_counts.
 
 %:-assertz_if_new(parserTest(iWorld7,"All green books are small.", (tGreen(X),tBook(X))==>tSmall(X))).
 %:-assertz_if_new(parserTest(iWorld7,"Most green books are small.", pfc_default((tGreen(X),tBook(X))==>tSmall(X)))).
@@ -483,4 +484,6 @@ Persuasion rules have outcomes persuasion succeeds (success) and persuasion fail
 Unsuccessful attempt by is a rulebook. [19
 
 */
+:- include(prologmud(mud_footer)).
+:- all_source_file_predicates_are_transparent.
 

@@ -34,7 +34,8 @@ prologHybrid(mudLabelTypeProps/3).
 :- sanity(arity(mudLabelTypeProps,3)).
 
 prologHybrid(typeHasGlyph(tCol,ftString)).
-mudLabelTypeProps('Px',mobExplorer,[]).
+% mudLabelTypeProps('Px',mobExplorer,[]).
+typeHasGlyph(mobExplorer,'Px').
 
 world_agent_plan(_World,Agent,ActV):-
    tAgent(Agent),
@@ -104,5 +105,6 @@ explorer_idea(Agent,actLook) :-
 	random_permutation(Old,New),
 	ain(mudMemory(Agent,aDirectionsFn(New))).
 
+:- set_prolog_flag(logicmoo_debug,3).
 
 :- include(prologmud(mud_footer)).

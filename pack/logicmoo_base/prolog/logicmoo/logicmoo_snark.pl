@@ -62,7 +62,7 @@ checkKB:m1:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_d
 %m5 :- enable_mpred_system(baseKB).
 
 
-ensure_autoexec:- !. % call_u(ensure_loaded(logicmoo(pfc/'autoexec.pfc'))).
+ensure_autoexec:- !. % call_u(consult(logicmoo(pfc/'autoexec.pfc'))).
 
 %:- use_listing_vars.
 %:- autoload([verbose(false)]).

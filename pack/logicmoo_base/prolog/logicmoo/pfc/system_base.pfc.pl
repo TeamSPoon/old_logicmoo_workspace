@@ -34,8 +34,7 @@
 % :- must(initEnvironment).
 :- endif.
 
-:- set_prolog_flag(safe_speedups,true).
-:- set_prolog_flag(logicmoo_renames,false).
+:- set_prolog_flag(logicmoo_speed,3).
 
 :- set_module(baseKB:class(development)).
 
@@ -188,9 +187,9 @@ baseKB:mtCycL(baseKB).
 
 :-  abolish(yall:'/' / 2).
 
-:- expand_file_search_path(pack(logicmoo_nlu/prolog/pldata),X),exists_directory(X),!,assert_if_new(user:file_search_path(pldata,X)).
+% :- expand_file_search_path(pack(logicmoo_nlu/prolog/pldata),X),exists_directory(X),!,assert_if_new(user:file_search_path(pldata,X)).
 
-:- ensure_loaded(logicmoo(logicmoo_plarkc)).
+%^ :- consult(logicmoo(logicmoo_plarkc)).
 
 
 
@@ -324,7 +323,7 @@ tCol(ftCallable).
 tCol(ftAskable).
 tCol(tRelation).
 tCol(ftListFn(Atom)):-callable(Atom),tCol(Atom).
-tSpec(ftListFn(Atom)):-callable(Atom),tSpec(Atom).
+ftSpec(ftListFn(Atom)):-callable(Atom),ftSpec(Atom).
 ttExpressionType(ftListFn(Atom)):-callable(Atom).
 
 tSet(ftListFn(Atom)):-callable(Atom),!,fail.
@@ -590,12 +589,12 @@ ttModule(mtProlog).
 
 tCol(Decl)==>functorDeclares(Decl).
 
-:- sanity(( fully_expand_now(cuz,((ttModule(mtCycL,
+:- sanity(( fully_expand(cuz,==>((ttModule(mtCycL,
   comment("yada....................."),
   genlsFwd(tMicrotheory)))),
   OO),dmsg(full_transform=OO),OO=(_,_))).
 
-% :- rtrace((trace,fully_expand_now(zzz,ttModule(mtCycL777One,comment("hi there"),genlsFwd(tMicrotheory)),O))),nl,writeq(O),nl,notrace.
+% :- rtrace((trace,fully_expand(zzz,==>ttModule(mtCycL777One,comment("hi there"),genlsFwd(tMicrotheory)),O))),nl,writeq(O),nl,notrace.
 % :- break.
 
 :- ain_expanded(ttModule(mtCycL,
@@ -704,9 +703,6 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
 
 
 
-% :- with_umt(baseKB,baseKB:ensure_mpred_file_loaded('system_common_tbox.pfc')).
-
-
 % Unneeded yet
 % pass2
 
@@ -746,18 +742,19 @@ doRedelMe.
 nondet.
 
 % :- set_prolog_flag(dialect_pfc,false).
-:- mpred_notrace_exec.
+:- mpred_trace_exec.
 
 % isa(I,C)==>{wdmsg(isa(I,C))}.
 
 
 do_and_undo(mpred_post_exactly,mpred_remove_exactly).
 
-:- if( \+ current_prolog_flag(safe_speedups,true)).
+:- if( \+ flag_call(logicmoo_speed==true)).
 (((CI,{was_mpred_isa(CI,I,C)},\+ ~isa(I,C)) ==> actn(mpred_post_exactly(isa(I,C))))).
 :- endif.
 
 :- abolish(system:arity,2).
 :- system:import(arity/2).
 
+:- mpred_notrace_exec.
 

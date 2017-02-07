@@ -183,6 +183,13 @@
 
 %:- ensure_loaded(library(logicmoo_utils)).
 %:- ensure_loaded(library(logicmoo_swilib)).
+:- use_module(library(http/thread_httpd)).
+:- use_module(library(http/http_dispatch)).
+:- use_module(library(http/http_path)).
+:- use_module(library(http/http_server_files)).
+:- use_module(library(http/http_parameters)).
+:- use_module(library(http/html_head)).
+:- use_module(library(http/html_write)).
 
 
 :-
@@ -236,7 +243,6 @@ www_main_error_to_out(G):- with_main_error_to_output(G).
 %
 % Ensure Webserver.
 %
-ensure_webserver(Port) :- http_server_property(Port, _Property),!.
 ensure_webserver(Port) :- format(atom(A),'httpd@~w_1',[Port]),thread_property(_,alias(A)),!.
 ensure_webserver(Port) :- on_x_rtrace(catch((http_server(http_dispatch,[ port(Port), workers(16) ])),E,wdmsg(E))).
 
@@ -261,7 +267,7 @@ ensure_webserver:- ensure_webserver(3020).
 
 
 
-
+:- if( \+ exists_source(library(logicmoo_utils))).
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),
@@ -272,13 +278,13 @@ ensure_webserver:- ensure_webserver(3020).
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-
+:- endif.
  
 
 
 
 % WANT 
-%:- initialization(doc_collect(true)).
+:- during_boot(doc_collect(true)).
 
 
 :- portray_text(false).  % or Enable portray of strings
@@ -293,9 +299,8 @@ register_logicmoo_browser:-
   http_handler('/logicmoo_nc/', handler_logicmoo_cyclone, [prefix,chunked]).
 
 
-:- initialization(register_logicmoo_browser). %  % 
-:- initialization(register_logicmoo_browser,restore). %  % 
-:- register_logicmoo_browser.
+:- during_boot(register_logicmoo_browser).
+
 
 
 %% location( ?ARG1, ?ARG2, ?ARG3) is det.
@@ -312,8 +317,10 @@ http:location(pixmaps, root(pixmaps), []).
 % Hook To [user:file_search_path/2] For Module Mpred_www.
 % File Search Path.
 %
+:- prolog_load_context(directory,Here),atom_concat(Here,'/pixmaps',NewDir),asserta((user:file_search_path(pixmaps,NewDir))).
 user:file_search_path(pixmaps, logicmoo('mpred_online/pixmaps')).
-:- initialization(http_handler(pixmaps(.), serve_files_in_directory(pixmaps), [prefix])).
+
+:- during_boot(http_handler(pixmaps(.), http_server_files:serve_files_in_directory(pixmaps), [prefix])).
 
 :- meta_predicate
 	handler_logicmoo_cyclone(+).

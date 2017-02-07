@@ -27,8 +27,8 @@ action_removes_states(Agent,Action,A):- action_rules(Agent,VERB,SENT,StateRules)
 action_requires_states(Agent,Action,A):- action_rules(Agent,VERB,SENT,StateRules),to_verb_args(Action,[VERB|SENT]),member(?(A),StateRules).
 
 :- op(200,fy,'?').
-action_rules(Agent,actTestWield,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tUseAble),-mudStowing(Agent,Obj),+mudWielding(Agent,Obj)]).
-action_rules(Agent,actTestStow,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tStowAble),?genlPreds(Using,'mudControls'),
+==>action_rules(Agent,actTestWield,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tUseAble),-mudStowing(Agent,Obj),+mudWielding(Agent,Obj)]).
+==>action_rules(Agent,actTestStow,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tStowAble),?genlPreds(Using,'mudControls'),
   - t(Using,Agent,Obj),+mudStowing(Agent,Obj)]).
 
 guess_verb_template(Action):-

@@ -43,7 +43,8 @@
     ]).
 
 :- meta_predicate
-	restore_trace(0),
+	catch_safe(0,-,0),
+        restore_trace(0),
         on_x_rtrace(0),
 	cnotrace(0),
         fixhotrace(0),
@@ -66,21 +67,46 @@
       rtrace/0,      
       save_guitracer/0.
 
-:- include('logicmoo_util_header.pi').
+% :- include('logicmoo_util_header.pi').
+
+%! catch_safe( :GoalGoal, ?E, :GoalRecovery) is nondet.
+%
+% Catchv.
+%
+catch_safe(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (the user knows what they want)
+                         catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
+
+% catch_safe(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
+
+
+%! bubbled_ex( ?VALUE1) is nondet.
+%
+% Bubbled Ex.
+%
+bubbled_ex(block(_,_)).
+bubbled_ex('$aborted').
 
 
 
-%= 	 	 
+%! bubbled_ex_check( ?E) is nondet.
+%
+% Bubbled Ex Check.
+%
+bubbled_ex_check(E):- ( \+ bubbled_ex(E)),!.
+bubbled_ex_check(E):-throw(E).
 
-%% ggtrace is semidet.
+
+
+
+%! ggtrace is nondet.
 %
 % Gg Trace.
 %
 ggtrace:- default_dumptrace(DDT), ggtrace(DDT).
 
-%= 	 	 
 
-%% ggtrace( :GoalTrace) is semidet.
+
+%! ggtrace( :GoalTrace) is nondet.
 %
 % Gg Trace.
 %
@@ -90,17 +116,17 @@ ggtrace(Trace):-
    thread_leash(+call))),Trace,hotrace(thread_leash(-call)).
 
 
-%= 	 	 
 
-%% gftrace is semidet.
+
+%! gftrace is nondet.
 %
 % Gf Trace.
 %
 gftrace:- default_dumptrace(DDT), gftrace(DDT).
 
-%= 	 	 
 
-%% gftrace( :GoalTrace) is semidet.
+
+%! gftrace( :GoalTrace) is nondet.
 %
 % Gf Trace.
 %
@@ -110,51 +136,48 @@ gftrace(Trace):-
    thread_leash(+call))),Trace,thread_leash(-call).
 
 
-%= 	 	 
 
-%% grtrace is semidet.
+
+%! grtrace is nondet.
 %
 % Gr Trace.
 %
 grtrace:- default_dumptrace(DDT), grtrace(DDT).
 
-%= 	 	 
 
-%% grtrace( :GoalTrace) is semidet.
+
+%! grtrace( :GoalTrace) is nondet.
 %
 % Gr Trace.
 %
-grtrace(Trace):- hotrace(( visible(+all),thread_leash(+all))), Trace.
+grtrace(Trace):- notrace(( visible(+all),thread_leash(+all))), Trace.
 
 
 
-%= 	 	 
 
-%% cnotrace( :GoalGoal) is semidet.
+
+%! cnotrace( :GoalGoal) is nondet.
 %
 % Cno Trace.
 %
 cnotrace(Goal):- once(Goal).
 cnotrace:- notrace.
-%:- mpred_trace_less(hotrace/1).
-%:- '$set_predicate_attribute'(hotrace(_), hide_childs, 0).
-%:- '$set_predicate_attribute'(hotrace(_), trace, 1).
 
 
 
 
-%% hotrace is nondet.
+%! hotrace is nondet.
 %
 % Unlike notrace/1, it allows traceing when excpetions are raised during Goal.
 %
 hotrace:-!.
 hotrace:-notrace.
 %:- export(hotrace/1).
-%% = :- meta_predicate(hotrace(0)).
+%! = :- meta_predicate(hotrace(0)).
 
 
 
-%% thread_leash( +Flags) is det.
+%! thread_leash( +Flags) is det.
 %
 % Only leashs the main thread
 %
@@ -180,7 +203,7 @@ hotrace(Goal):-
 %:- '$set_predicate_attribute'(hotrace(_), trace, 0).
 
 
-:- thread_local(tlbugger:rtracing/0).
+:- thread_local(tl_rtrace:rtracing/0).
 
 
 % =========================================================================
@@ -189,73 +212,73 @@ hotrace(Goal):-
 :-thread_local(t_l:wasguitracer/1).
 :-thread_local(t_l:wastracer/1).
 
-%= 	 	 
 
-%% save_guitracer is semidet.
+
+%! save_guitracer is nondet.
 %
 % Save Guitracer.
 %
 save_guitracer:- ignore(((current_prolog_flag(gui_tracer, GWas);GWas=false),asserta(t_l:wasguitracer(GWas)))).
 
-%= 	 	 
 
-%% restore_guitracer is semidet.
+
+%! restore_guitracer is nondet.
 %
 % Restore Guitracer.
 %
 restore_guitracer:- ignore((retract(t_l:wasguitracer(GWas)),set_prolog_flag(gui_tracer, GWas))).
 
 
-%= 	 	 
 
-%% rtrace is semidet.
+
+%! rtrace is nondet.
 %
 % R Trace.
 %
-rtrace:- notrace,start_rtrace,trace. % save_guitracer,noguitracer
+rtrace:- notrace((save_guitracer,set_prolog_flag(gui_tracer,false),start_rtrace,trace)). % save_guitracer,noguitracer
 
-start_rtrace:- asserta(tlbugger:rtracing),visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception).
+start_rtrace:- asserta(tl_rtrace:rtracing),visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception).
 
 
 
-%% nortrace is semidet.
+%! nortrace is nondet.
 %
 % Nor Trace.
 %
 nortrace:- notrace,stop_rtrace.
 
-stop_rtrace:- ignore(retract(tlbugger:rtracing)),visible(+all),visible(+exception),thread_leash(+all),thread_leash(+exception).
+stop_rtrace:- ignore(retract(tl_rtrace:rtracing)),visible(+all),visible(+exception),thread_leash(+all),thread_leash(+exception).
 
 push_tracer_and_notrace:- notrace((push_tracer,notrace)).
    
-%= 	 	 
 
-%% push_tracer is semidet.
+
+%! push_tracer is nondet.
 %
 % Push Tracer.
 %
 push_tracer:- hotrace((get_tracer(Reset),asserta(t_l:wastracer(Reset)))),!.
 
-%= 	 	 
 
-%% pop_tracer is semidet.
+
+%! pop_tracer is nondet.
 %
 % Pop Tracer.
 %
-pop_tracer:- hotrace((retract(t_l:wastracer(Reset)),!,Reset)),!.
+pop_tracer:- notrace((retract(t_l:wastracer(Reset)),!,Reset)),!.
 
-%= 	 	 
 
-%% reset_tracer is semidet.
+
+%! reset_tracer is nondet.
 %
 % Reset Tracer.
 %
-reset_tracer:- hotrace((ignore(((t_l:wastracer(Reset),Reset))))).
+reset_tracer:- notrace((ignore(((t_l:wastracer(Reset),Reset))))).
  
 
-%= 	 	 
 
-%% get_tracer( ?Reset) is semidet.
+
+%! get_tracer( ?Reset) is nondet.
 %
 % Get Tracer.
 %
@@ -263,16 +286,16 @@ get_tracer(Reset):-
     Reset =  ((set_prolog_flag(debug,WasDebug),CC,CC2,'$leash'(_, OldL),'$visible'(_, OldV))),
     '$leash'(OldL, OldL),'$visible'(OldV, OldV),
      (current_prolog_flag(debug,true)->WasDebug=true;WasDebug=false),
-     (tlbugger:rtracing->CC2=rtrace;CC2= nortrace),
+     (tl_rtrace:rtracing->CC2=rtrace;CC2= nortrace),
      (tracing -> CC = dtrace ; CC = hotrace),!.
 
     
 
-%= :- meta_predicate  restore_trace(0).
+ :- meta_predicate  restore_trace(0).
 
-%= 	 	 
 
-%% restore_trace( :GoalGoal) is semidet.
+
+%! restore_trace( :GoalGoal) is nondet.
 %
 % restore  Trace.
 %
@@ -280,20 +303,20 @@ restore_trace(Goal):-
   setup_call_cleanup_each(push_tracer,Goal,pop_tracer).
 
 
-%= :- meta_predicate  rtrace(0).
+ :- meta_predicate  rtrace(0).
 
 
-%= 	 	 
 
-%% rtrace( :GoalGoal) is semidet.
+
+%! rtrace( :GoalGoal) is nondet.
 %
 % R Trace.
 %
-% rtrace(Goal):- hotrace(tlbugger:rtracing),!, Goal.
+% rtrace(Goal):- hotrace(tl_rtrace:rtracing),!, Goal.
 
 % rtrace(Goal):- wdmsg(rtrace(Goal)),!, restore_trace(setup_call_cleanup_each(rtrace,(trace,Goal),nortrace)).
 
-% rtrace(Goal):- notrace(tlbugger:rtracing),!,call(Goal).
+% rtrace(Goal):- notrace(tl_rtrace:rtracing),!,call(Goal).
 rtrace(Goal):- !,setup_call_cleanup(start_rtrace,call((rtrace,Goal)),notrace(stop_rtrace)).
 rtrace(Goal):- tracing,!,setup_call_cleanup(start_rtrace,call(Goal),stop_rtrace).
 rtrace(Goal):- \+ tracing,start_rtrace,!,setup_call_cleanup(trace,call(Goal),(notrace,stop_rtrace)).
@@ -301,8 +324,8 @@ rtrace(Goal):-
   ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
    '$leash'(OldL, OldL),'$visible'(OldV, OldV),
    wdmsg(rtrace(Goal)),
-   (Undo =   (((notrace,ignore(retract(tlbugger:rtracing)),'$leash'(_, OldL),'$visible'(_, OldV), Tracing)))),
-   (RTRACE = ((notrace,asserta(tlbugger:rtracing),visible(+all),thread_leash(-all),thread_leash(+exception),trace))),!,
+   (Undo =   (((notrace,ignore(retract(tl_rtrace:rtracing)),'$leash'(_, OldL),'$visible'(_, OldV), Tracing)))),
+   (RTRACE = ((notrace,asserta(tl_rtrace:rtracing),visible(+all),thread_leash(-all),thread_leash(+exception),trace))),!,
    setup_call_cleanup_each(RTRACE,(trace,Goal),Undo).
 /*
 :- '$set_predicate_attribute'(system:call_cleanup(_,_), trace, 0).
@@ -324,15 +347,15 @@ rtrace(Goal):-
 :- '$set_predicate_attribute'(nortrace, hide_childs, 1).
 :- '$set_predicate_attribute'(pop_tracer, trace, 0).
 :- '$set_predicate_attribute'(pop_tracer, hide_childs, 1).
-:- '$set_predicate_attribute'(tlbugger:rtracing, trace, 0).
+:- '$set_predicate_attribute'(tl_rtrace:rtracing, trace, 0).
 :- '$set_predicate_attribute'(system:tracing, trace, 0).
 :- '$set_predicate_attribute'(system:notrace, trace, 0).
 :- '$set_predicate_attribute'(system:trace, trace, 0).
-%= :- meta_predicate  ftrace(0).
+ :- meta_predicate  ftrace(0).
 
-%= 	 	 
 
-%% ftrace( :GoalGoal) is semidet.
+
+%! ftrace( :GoalGoal) is nondet.
 %
 % Functor Trace.
 %
@@ -343,7 +366,7 @@ ftrace(Goal):- restore_trace((
 
 
 
-%= 	 	 
+
 
 % :- mpred_trace_less(rtrace/0).
 % :- mpred_trace_less(nortrace/0).
@@ -372,9 +395,9 @@ ftrace(Goal):- restore_trace((
 
 :- export(fixhotrace/1).
 
-%= 	 	 
 
-%% fixhotrace( :GoalX) is semidet.
+
+%! fixhotrace( :GoalX) is nondet.
 %
 % Fixho Trace.
 %
@@ -384,14 +407,14 @@ fixhotrace(X):- tracing -> setup_call_cleanup_each(hotrace,X,hotrace(dtrace)) ; 
 
 :- export(on_x_rtrace/1).
 
-%= 	 	 
 
-%% on_x_rtrace( :GoalC) is semidet.
+
+%! on_x_rtrace( :GoalC) is nondet.
 %
 % If there If Is A an exception in  :Goal Class then r Trace.
 %
 on_x_rtrace(C):- 
- hotrace(skipWrapper;tracing;(tlbugger:rtracing))-> C;
-   catchv(C,E,
-     (wdmsg(on_x_rtrace(E)),catchv(rtrace(with_skip_bugger(C)),E,wdmsg(E)),dtrace(C))).
+ notrace(((skipWrapper;tracing;(tl_rtrace:rtracing)),thread_leash(+exception))) -> C;
+   catch_safe(C,E,
+     (wdmsg(on_x_rtrace(E)),catch_safe(rtrace(with_skip_bugger(C)),E,wdmsg(E)),dtrace(C))).
 

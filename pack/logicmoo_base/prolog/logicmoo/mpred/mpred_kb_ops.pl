@@ -25,7 +25,7 @@ oncely/1,
 reduce_mpred_op/2,
 second_order/2,
 whenAnd/2,
-if_missing/1,
+if_missing1/1,
 
 ain_minfo/2,
 cnstrn0/2,
@@ -307,7 +307,7 @@ mpred_facts_and_universe/1
       % call_u(+),
       assertz_mu(+),      
       assertz_mu(+,+),
-      if_missing(+),
+      if_missing1(*),
       assert_mu(+),
       assert_mu(+,+,+,+),
       ain_minfo_2(1,*),
@@ -832,8 +832,9 @@ assert_eq_quitely(H):- attvar_op(assert_if_new,H).
 %
 % PFC If Is A Tautology.
 %
-mpred_is_tautology(Var):-is_ftVar(Var).
-mpred_is_tautology(V):- copy_term_nat(V,VC),numbervars(VC),mpred_is_taut(VC).
+% :- module_transparent( (mpred_is_tautology)/1).
+mpred_is_tautology(V):- (is_ftVar(V) -> true;(copy_term_nat(V,VC),numbervars(VC),mpred_is_taut(VC))),!.
+
 
 
 %% mpred_is_taut( :TermA) is semidet.
@@ -1299,7 +1300,8 @@ is_already_supported(P,_S,UU):- clause_asserted_local(spft(P,US,UT)),must(get_so
 % is_already_supported(P,_S):- copy_term_and_varnames(P,PC),sp ftY(PC,_,_),P=@=PC,!.
 
 
-if_missing(Q):- mpred_literal_nv(Q), call_u( \+ ~ Q), if_missing_mask(Q,R,Test),!, lookup_u(R), Test.
+if_missing1(Q):- mpred_literal_nv(Q), call_u( \+ ~ Q), if_missing_mask(Q,R,Test),!, lookup_u(R), Test.
+
 
 %% if_missing_mask( +Q, ?R, ?Test) is semidet.
 %
@@ -1593,14 +1595,16 @@ mpred_retry(G):- fail; cnotrace(G).
 neg_in_code(G):-nonvar(G),loop_check(neg_in_code0(G)).
 :- meta_predicate neg_in_code0(*).
 :- export(neg_in_code0/1).
+
 neg_in_code0(G):- var(G),!,lookup_u(~ G).
 neg_in_code0(call_u(G)):- !,call_u(~G).
 neg_in_code0(~(G)):- nonvar(G),!,  \+ call_u(~G) ,!.
+neg_in_code0(G):-  is_ftNonvar(G), a(prologSingleValued,G),
+      must((if_missing_mask(G,R,Test),nonvar(R),nonvar(Test))),call_u(R),!,call_u(Test).
 neg_in_code0(G):-   neg_may_naf(G), \+ call_u(G),!.
-neg_in_code0(G):-  is_ftNonvar(G), a(prologSingleValued,G),must((if_missing_mask(G,R,Test),nonvar(R),nonvar(Test))),call_u(R),!,call_u(Test).
 
 
-:- meta_predicate neg_may_naf(0).
+:- meta_predicate neg_may_naf(*).
 :- module_transparent(neg_may_naf/1).
 :- export(neg_may_naf/1).
 
@@ -1674,7 +1678,7 @@ mpred_call_0(retract(X)):- !, mpred_remove(X).
 % TODO: test removal
 %mpred_call_0(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
 mpred_call_0((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(mpred_call_0((H))).
-%mpred_call_0(HB):-hotrace((fully_expand_warn(mpred_call_0,HB,HHBB))),!,mpred_call_0(HHBB).
+%mpred_call_0(HB):-hotrace((full_transform_warn_if_changed(mpred_call_0,HB,HHBB))),!,mpred_call_0(HHBB).
 mpred_call_0(H):- !, w_tl(t_l:infAssertedOnly(H),call_u(H)).
 %mpred_call_0(argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(mpred_call_0(argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
 % TODO: test removal
@@ -2347,7 +2351,7 @@ repropagate_meta_wrapper_rule(P):-repropagate_1(P).
 %
 fwd_ok(_):-!.
 fwd_ok(P):-ground(P),!.
-fwd_ok(if_missing(_,_)).
+fwd_ok(if_missing1(_,_)).
 fwd_ok(idForTest(_,_)).
 fwd_ok(clif(_)).
 fwd_ok(pfclog(_)).
@@ -2604,7 +2608,6 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent( (pfc_provide_storage_op)/2).
 :- module_transparent( (is_retract_first)/1).
 :- module_transparent( (mpred_is_taut)/1).
-:- module_transparent( (mpred_is_tautology)/1).
 :- module_transparent( (assert_eq_quitely)/1).
 :- module_transparent( (retract_eq_quitely_f)/1).
 :- module_transparent( (retract_eq_quitely)/1).
@@ -2662,7 +2665,7 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent(oncely/1).
 :- module_transparent(physical_side_effect/1).
 :- module_transparent(pred_head/2).
-:- module_transparent(if_missing/1).
+:- module_transparent(if_missing1/1).
 
 
  :- meta_predicate update_single_valued_arg(+,+,*).

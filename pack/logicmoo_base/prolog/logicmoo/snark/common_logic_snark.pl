@@ -191,6 +191,8 @@
 
 % :- dynamic(baseKB:(if/2,iif/2)).
 
+:- export(kw_to_vars/2).
+kw_to_vars(KW,VARS):-subsT_each(KW,[':ARG1'=_ARG1,':ARG2'=_ARG2,':ARG3'=_ARG3,':ARG4'=_ARG4,':ARG5'=_ARG5,':ARG6'=_ARG6],VARS).
 
 
 

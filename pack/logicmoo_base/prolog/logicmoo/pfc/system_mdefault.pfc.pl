@@ -64,7 +64,7 @@ mdefault(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/(gro
 
 :- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
-% :- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_birdt.pfc')).
+% :- reconsult(pack(logicmoo_base/t/examples/pfc/'sanity_birdt.pfc')).
 
 :- endif.
 

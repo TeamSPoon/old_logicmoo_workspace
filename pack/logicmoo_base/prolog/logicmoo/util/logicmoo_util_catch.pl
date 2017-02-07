@@ -43,6 +43,7 @@
             bubbled_ex_check/1,
             catchv/3,
             catchvvnt/3,
+            flag_call/1,
             current_source_file/1,current_source_location0/1,
             lmcache:current_main_error_stream/1,
             lmcache:thread_current_input/2,
@@ -188,6 +189,7 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
 		skip_failx_u(0),
 		on_xf_log_cont_l(0),
 		on_x_log_throw(0),
+                with_current_why(*,0),
 
 
 		on_x_log_cont(0),
@@ -594,7 +596,7 @@ when_defined(Goal):-if_defined(Goal,true).
 to_pi(P,M:P):-var(P),!,current_module(M).
 to_pi(M:P,M:P):-var(P),!,current_module(M).
 to_pi(Find,(M:PI)):-
- w_tl(set_prolog_flag(retry_undefined,false),
+ w_tl(flag_call(logicmoo_debug=false),
    (once(catch(match_predicates(Find,Found),_,fail)),Found=[_|_],!,member(M:F/A,Found),functor(PI,F,A))).
 to_pi(M:Find,M:PI):-!,current_module(M),to_pi0(M,Find,M:PI).
 to_pi(Find,M:PI):-current_module(M),to_pi0(M,Find,M:PI).
@@ -831,7 +833,9 @@ is_ftCompound(Goal):-compound(Goal),\+ is_ftVar(Goal).
 %
 % Not Compound.
 %
-not_ftCompound(A):- is_ftVar(A) -> true ; \+ is_ftCompound(A).
+
+not_ftCompound(A):- compound(A)-> is_ftVar0(A) ; true.
+% not_ftCompound(A):- is_ftVar(A) -> true ; \+ is_ftCompound(A).
 
 :- export(is_ftVar/1).
 
@@ -841,11 +845,11 @@ not_ftCompound(A):- is_ftVar(A) -> true ; \+ is_ftCompound(A).
 %
 % If Is A Format Type Variable.
 %
-is_ftVar(V):-var(V),!.
-is_ftVar('$VAR'(_)).
-is_ftVar('$VAR'(_,_)).
-is_ftVar('avar'(_)).
-is_ftVar('avar'(_,_)).
+is_ftVar(V):- (var(V);is_ftVar0(V)),!.
+is_ftVar0('$VAR'(_)).
+is_ftVar0('$VAR'(_,_)).
+is_ftVar0('avar'(_)).
+is_ftVar0('avar'(_,_)).
 %:- mpred_trace_nochilds(is_ftVar/1).
 
 ftVar(X):- is_ftVar(X).
@@ -1260,7 +1264,6 @@ for obvious reasons.
 :- ensure_loaded(library(debug)).
 :- ensure_loaded(library(lists)).
 :- ensure_loaded(library(make)).
-:- ensure_loaded(library(prolog_stack)).
 :- ensure_loaded(library(system)).
 :- ensure_loaded(library(apply)).
 
@@ -1281,7 +1284,7 @@ for obvious reasons.
 %
 trace_or_throw(E):- non_user_console,hotrace((thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),!,throw(abort),
                     thread_exit(trace_or_throw(E)))).
-trace_or_throw(E):- wdmsg(E),dtrace((dtrace,throw(E))).
+trace_or_throw(E):- wdmsg(trace_or_throw(E)),trace,break,dtrace((dtrace,throw(E))).
 
  %:-interactor.
 
@@ -1361,7 +1364,44 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 
 :- thread_local(tlbugger:rtracing/0).
 
-%skipWrapper:-!,fail.
+
+
+/*
+
+A value 0 means that the corresponding quality is totally unimportant, and 3 that the quality is extremely important; 
+1 and 2 are intermediate values, with 1 the neutral value. (quality 3) can be abbreviated to quality.
+
+*/
+compute_q_value(N,N):- number(N),!.
+compute_q_value(false,0).
+compute_q_value(neutral,1).
+compute_q_value(true,2).
+compute_q_value(quality,3).
+compute_q_value(Flag,Value):-current_prolog_flag(Flag,M),!,compute_q_value(M,Value).
+compute_q_value(N,1):- atom(N).
+compute_q_value(N,V):- V is N.
+
+/*
+
+Name                        Meaning
+---------------------       --------------------------------
+logicmoo_compilation_speed  speed of the compilation process   
+
+logicmoo_debug              ease of debugging                  
+logicmoo_space              both code size and run-time space  
+
+logicmoo_safety             run-time error checking            
+logicmoo_speed              speed of the object code
+
+unsafe_speedups      speed up that are possibily
+
+*/
+flag_call(FlagHowValue):-notrace(flag_call0(FlagHowValue)).
+flag_call0(Flag = Quality):- compute_q_value(Quality,Value),!, set_prolog_flag(Flag,Value).
+flag_call0(FlagHowValue):- FlagHowValue=..[How,Flag,Value],
+    compute_q_value(Flag,QVal),compute_q_value(Value,VValue),!,call(How,QVal,VValue).
+
+
 
 %=
 
@@ -1373,13 +1413,14 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 % false = use this wrapper, true = code is good and avoid using this wrapper
 :- export(skipWrapper/0).
 
+% skipWrapper:-!,fail.
 skipWrapper:- notrace((skipWrapper0)).
 :- export(skipWrapper0/0).
 % skipWrapper:- tracing,!.
 skipWrapper0:- tracing, \+ tlbugger:rtracing,!.
 skipWrapper0:- tlbugger:dont_skip_bugger,!,fail.
-skipWrapper0:- current_prolog_flag(logicmoo_debug,true),!,fail.
-skipWrapper0:- current_prolog_flag(unsafe_speedups,true),!.
+skipWrapper0:- flag_call(logicmoo_debug == true) ,!,fail.
+%skipWrapper0:- flag_call(unsafe_speedups == true) ,!.
 skipWrapper0:- tlbugger:skip_bugger,!.
 skipWrapper0:- is_release,!.
 %skipWrapper0:- 1 is random(5),!.
@@ -1480,7 +1521,7 @@ det_lm(M,Goal):-M:Goal,!.
 % Must Be Successfull (list Version).
 %
 must_l(Goal):- skipWrapper,!,call(Goal).
-must_l(Goal):-var(Goal),trace_or_throw(var_must_l(Goal)),!.
+must_l(Goal):- var(Goal),trace_or_throw(var_must_l(Goal)),!.
 must_l((A,!,B)):-!,must(A),!,must_l(B).
 must_l((A,B)):-!,must((A,deterministic(Det),true,(Det==true->(!,must_l(B));B))).
 must_l(Goal):- must(Goal).
@@ -1523,7 +1564,7 @@ on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
 
 quietly(G):- notrace(ground(G)),!, notrace(G).
 quietly(G):- notrace( \+ tracing),!,call(G).
-quietly(G):- skipWrapper,!,call(G).
+% quietly(G):- skipWrapper,!,call(G).
 % quietly(G):- !, on_x_f((G),setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),fail).
 quietly(G):- on_x_f(hide_trace(G),
                      setup_call_cleanup(wdmsg(begin_eRRor_in(G)),rtrace(G),wdmsg(end_eRRor_in(G))),
@@ -1548,20 +1589,23 @@ is_recompile:-fail.
 
 /*
 % sanity(Goal):- bugger_flag(release,true),!,assertion(Goal),!.
-sanity(_):- \+ current_prolog_flag(logicmoo_debug,true), notrace((is_release, \+ is_recompile)),!.
+sanity(_):- \+ flag_call(logicmoo_debug == true) , notrace((is_release, \+ is_recompile)),!.
 */
-sanity(_):- current_prolog_flag(unsafe_speedups,true),!.
-sanity(Goal):- fail, \+ current_prolog_flag(logicmoo_debug,true), current_prolog_flag(unsafe_speedups,true), \+ tracing,!,
+sanity(_):- flag_call(unsafe_speedups == true) ,!.
+sanity(Goal):- fail, \+ flag_call(logicmoo_debug == true) , flag_call(unsafe_speedups == true) , \+ tracing,!,
    (1 is random(10)-> must(Goal) ; true).
-sanity(_):- current_prolog_flag(safe_speedups,true),!.
+sanity(_):- flag_call(logicmoo_safety==false),!.
 sanity(Goal):- quietly(Goal),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,dmsg(show_failure(sanity,Goal)).
 sanity(Goal):- setup_call_cleanup(wdmsg(begin_FAIL_in(Goal)),rtrace(Goal),wdmsg(end_FAIL_in(Goal))),!,dtrace(system:dbreak).
 
-sanity3(_,_,_):- current_prolog_flag(safe_speedups,true),!.
+sanity3(_,_,_):- flag_call(logicmoo_speed>logicmoo_safety),!.
 sanity3(F,L,Goal):- (( \+ \+ Goal)->true;( wdmsg(sanity_ge(F,L,Goal)),dtrace(Goal),!,fail)).
 
-must3(_,_,Goal):- current_prolog_flag(safe_speedups,true),!,Goal.
+must3(_,_,Goal):- !, must(Goal).
+must3(_,_,Goal):- flag_call(logicmoo_debug>false),!,( Goal *->true; ((notrace((leash(+all),visible(+all),trace)),Goal))).
+must3(_,_,Goal):- flag_call(logicmoo_speed>logicmoo_safety),!,Goal.
+must3(F,L,Goal):- !, ( catch(Goal,E,(dmsg(must3(E,Goal,F,L)),!,fail)) *->true; ((notrace((leash(+all),visible(+all),trace)),Goal))).
 must3(F,L,Goal):- ( Goal *->true; ( wdmsg(must_ge(F,L,Goal)),dtrace(Goal),!,fail)).
 
 
@@ -1574,17 +1618,18 @@ unsafe_safe(_,O):- \+ allow_unsafe_code, !, call(O).
 unsafe_safe(N,O):- on_diff_throw(N,O).
 
 :- export(need_speed/0).
-need_speed:-current_prolog_flag(unsafe_speedups,true).
+need_speed:-flag_call(unsafe_speedups == true) .
 
 :- export(is_release/0).
 %% is_release is semidet.
 %
 % If Is A Release.
 
-is_release:- current_prolog_flag(unsafe_speedups,false),!,fail.
+is_release:-!.
+is_release:- flag_call(unsafe_speedups == false) ,!,fail.
 is_release:-!,fail.
-is_release:- current_prolog_flag(unsafe_speedups,true),!.
-is_release:- notrace((\+ current_prolog_flag(logicmoo_debug,true), \+ (1 is random(4)))).
+is_release:- flag_call(unsafe_speedups == true) ,!.
+is_release:- notrace((\+ flag_call(logicmoo_debug == true) , \+ (1 is random(4)))).
 
 
 
@@ -1635,20 +1680,20 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 % -- CODEBLOCK
 :- export(must/1).
 :- meta_predicate (must(0)).
-:- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(200), attributes(portray)]).
-:- set_prolog_flag(debugger_show_context,true).
 
 :- meta_predicate(must(0)).
-%must(Call):-(repeat, (catchv(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),dtrace,Call)),!).
 
 %=
 
-%% must( :GoalGoal) is semidet.
+%% must( :Goal) is semidet.
 %
 % Must Be Successfull.
 %
-% must(Goal):- \+ current_prolog_flag(logicmoo_debug,true),current_prolog_flag(unsafe_speedups,true),!,call(Goal).
-must(Goal):- skipWrapper,!, (Goal *-> true;trace_or_throw(failed_must(Goal))).
+% must(Goal):- \+ flag_call(logicmoo_debug == true) ,flag_call(unsafe_speedups == true) ,!,call(Goal).
+%must(Call):- !, (repeat, (catchv(Call,E,(dmsg(E:Call),fail)) *-> true ; (ignore(rtrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),trace,Call))).
+% must(Goal):- skipWrapper,!, (Goal *-> true;throw(failed_must(Goal))).
+
+must(Goal):- skipWrapper,!, Goal.
 must(Goal):-  notrace((get_must(Goal,MGoal),!)),call(MGoal).
 
 dumpST_error(Msg):- notrace((ddmsg(error,Msg),dumpST,ddmsg(error,Msg))).
@@ -1668,7 +1713,7 @@ get_must(Goal,CGoal):-  (tlbugger:show_must_go_on; non_user_console),!,
             *-> true ;
               notrace(dumpST_error(sHOW_MUST_go_on_failed_F__A__I__L_(Goal))),ignore(rtrace(Goal)),badfood(Goal))).
 
-get_must(Goal,CGoal):-  (tlbugger:skipMust;skipWrapper),!,CGoal = Goal.
+get_must(Goal,CGoal):-  (tlbugger:skipMust),!,CGoal = Goal.
 get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
 % get_must(Goal,CGoal):- !, CGoal = (Goal *-> true ; ((dumpST_error(failed_FFFFFFF(must(Goal))),dtrace(Goal)))).
 

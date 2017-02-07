@@ -16,11 +16,13 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
+:- if( \+ exists_source(library(logicmoo_utils))).
 
 :- if((prolog_load_context(directory,Dir),
    multifile(user:file_search_path/2),
    dynamic(user:file_search_path/2),
    (( \+ user:file_search_path(library,Dir)) ->asserta(user:file_search_path(library,Dir));true))).
+:- endif.
 :- endif.
 :- if((set_prolog_flag(logicmoo_utils_file,(exists_source(library('logicmoo/util/logicmoo_util_clause_expansion.pl')),
        ensure_loaded(library('logicmoo/util/logicmoo_util_clause_expansion.pl')))))).
@@ -28,6 +30,7 @@
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(logicmoo_utils_file,[logicmoo_utils_test_msg/0]).
 :- endif.
+
 % restore entry state
 :- current_predicate(lmce:reset_modules/0)->lmce:reset_modules;true.
 
@@ -50,10 +53,12 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 % ======================================================
 % Add Extra pack-ages directory
 % ======================================================
+:- if( \+ exists_source(library(logicmoo_utils))).
 % :- initialization(attach_packs,now).
 :- if( \+ exists_source(pack(logicmoo_base/prolog/logicmoo/logicmoo_utils))).
 :- add_file_search_path_local(pack,'../../').
 % :- initialization(attach_packs,now).
+:- endif.
 :- endif.
 % ======================================================
 % Save a directory of *this* file into logicmoo(..)
@@ -129,10 +134,8 @@ baseKB:logicmoo_pre_release.
 
 :- if(baseKB:logicmoo_pre_release).
 /*
-:- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000)]).
-:- set_prolog_flag(verbose_load,true).
+:- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray),spacing(next_argument]).
 :- set_prolog_flag(verbose_autoload, true).
-*/
 :- set_prolog_flag(debug, true).
 :- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_error,true).
 :- set_prolog_flag(backtrace_show_lines, true).
@@ -143,6 +146,8 @@ baseKB:logicmoo_pre_release.
 :- notrace(trace).
 :- notrace.
 :- endif.
+
+*/
 
 
 % baseKB:logicmoo_scan_autoloads() is semidet.

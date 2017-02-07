@@ -39,7 +39,6 @@
 :- discontiguous exactlyAssertedEL/5. 
 :- discontiguous exactlyAssertedEL_first/5.
 
-
 exactlyAssertedEL(A,B,MT,STR):- exactlyAssertedEL_first(A,B,MT,STR),true.
 exactlyAssertedEL(A,B,C,MT,STR):- exactlyAssertedEL_first(A,B,C,MT,STR),true.
 exactlyAssertedEL(A,B,C,D,MT,STR):- exactlyAssertedEL_first(A,B,C,D,MT,STR),true.
@@ -55,6 +54,7 @@ exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),not(i
 exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),is_better_backchained(=>(A,C)).
 exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not(What,MT,STR),true.
 
+:- install_constant_renamer_until_eof.
 
 exactlyAssertedEL_first(isa, xor, 'LogicalConnective', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, xor, 'ELRelation-OneWay', 'UniversalVocabularyMt', vStrDef).
@@ -68,6 +68,7 @@ exactlyAssertedEL_first(isa, trueSubL, 'EvaluatablePredicate', 'UniversalVocabul
 exactlyAssertedEL_first(isa, trueSubL, 'DefaultMonotonicPredicate', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, trueSentence, 'UnaryPredicate', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, trueRule, 'BinaryPredicate', 'UniversalVocabularyMt', vStrDef).
+
 
 exactlyAssertedEL_first(isa, transitiveViaArgInverse, 'TernaryPredicate', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, transitiveViaArgInverse, 'DefaultMonotonicPredicate', 'UniversalVocabularyMt', vStrDef).

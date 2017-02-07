@@ -1113,10 +1113,10 @@ check_clause_count(MMask):- swc,
      ((Diff<0 ,Change is N/abs(Diff ), Change>0.20)
          -> trace_or_throw(bad_count(Mask,(Was --> N))) ; dmsg(good_count(Mask,(Was --> N)))))).
 
-check_clause_counts:- current_prolog_flag(safe_speedups,true),!.
-check_clause_counts:- current_prolog_flag(unsafe_speedups,true),!.
-check_clause_counts:- ((forall(checked_clause_count(Mask),sanity(check_clause_count(Mask))))),fail.
-check_clause_counts.
+system:check_clause_counts:- flag_call(logicmoo_speed==true),!.
+system:check_clause_counts:- flag_call(unsafe_speedups == true) ,!.
+system:check_clause_counts:- ((forall(checked_clause_count(Mask),sanity(check_clause_count(Mask))))),fail.
+system:check_clause_counts.
 
 %% begin_pfc is det.
 %
@@ -1216,7 +1216,7 @@ set_file_lang(W):-
   % decache_file_type(Source),
 
    debug(logicmoo(loader),'~N~p~n',[lmcache:mpred_directive_value(Source,language,W)]),
-   (Source = '/root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/pfc/system_common.pfc.pl'-> must(W=pfc);true),
+   % (Source = '/root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/pfc/system_common.pfc.pl'-> must(W=pfc);true),
    assert_until_eof(Source,lmcache:mpred_directive_value(Source,language,W))))),
    sanity(get_lang(W)).
 
@@ -1554,7 +1554,7 @@ mpred_term_expansion_by_storage_type(_M,C,must_compile_special):- must_compile_s
 
 
 mpred_term_expansion(Fact,Fact):- get_functor(Fact,F,_A),(a(prologDynamic,F)),!.
-mpred_term_expansion(Fact,(:- ((cl_assert(Dir,Fact))))):- mpred_term_expansion_by_pred_class(Dir,Fact,_Output),!.
+mpred_term_expansion(Fact,(:- ((cl_assert(Dir,Fact))))):- mpred_term_expansion_by_pred_class(Dir,Fact,_Output),break,!.
 
 mpred_term_expansion(MC,(:- cl_assert(ct(How),MC))):- fail, strip_module(MC,M,C),hotrace(mpred_rule_hb(C,H,_B)),
   (mpred_term_expansion_by_storage_type(M,H,How)->true;(C \= (_:-_),mpred_term_expansion_by_storage_type(M,C,How))),!.
@@ -1723,7 +1723,7 @@ load_language_file(Name0):-
          (system:term_expansion(_,_,_,_):-!,fail),
          (system:goal_expansion(_,_,_,_):-!,fail),
          (system:goal_expansion(_,_):-!,fail)],
-     gripe_time(1,(baseKB:load_files(Name,[qcompile(auto),register(false),if(not_loaded  )])->asserta(baseKB:never_reload_file(Name));retract(baseKB:never_reload_file(Name)))))))),!.
+     gripe_time(1,(baseKB:load_files(Name,[qcompile(part),register(false),if(not_loaded  )])->asserta(baseKB:never_reload_file(Name));retract(baseKB:never_reload_file(Name)))))))),!.
  
 
 
@@ -1975,6 +1975,7 @@ maybe_locate_file(FileIn,File):-
 %
 % Force Reload Managed Predicate File.
 %
+force_reload_mpred_file(MFileIn):- must(consult(MFileIn)),!.
 force_reload_mpred_file(MFileIn):- 
  strip_module(MFileIn,M,FileIn),
  (FileIn==MFileIn->defaultAssertMt(World);World=M),
@@ -2012,30 +2013,33 @@ force_reload_mpred_file2(WorldIn,MFileIn):-
    assert_if_new(baseKB:registered_mpred_file(File)),
    quietly_must(time_file_safe(File,NewTime)),
    retractall(baseKB:loaded_file_world_time(File,World,_)),
-   system:assert(baseKB:loaded_file_world_time(File,World,NewTime)),    
-   DBASE = DBASE,
+   system:assert(baseKB:loaded_file_world_time(File,World,NewTime)),    DBASE = DBASE,
    wno_tl(t_l:disable_px,
      w_tl(set_prolog_flag(lm_expanders,true),
       w_tl(set_prolog_flag(mpred_te,true),
      show_call((with_source_module(NewModule,load_files(NewModule:File, [module(NewModule)]))))))),
+         must(force_reload_mpred_file3(File,World))
+     )))))).
+
+force_reload_mpred_file3(File,World):-
    catch((w_tl(t_l:loading_mpred_file(World,File),     
       load_mpred_on_file_end(World,File))),
     Error,
     (wdmsg(error(Error,File)),retractall(baseKB:loaded_mpred_file(World,File)),
-     retractall(baseKB:loaded_file_world_time(File,World,_AnyTime)))))))))).
+     retractall(baseKB:loaded_file_world_time(File,World,_AnyTime)))).
 
 
-
+:- dynamic(baseKB:loaded_mpred_file/2).
 
 %% load_mpred_on_file_end( ?World, ?File) is det.
 %
 % Load Managed Predicate Whenever File End.
 %
 :- export(load_mpred_on_file_end/2).
-load_mpred_on_file_end(World,File):- atom(File),
-   quietly_must(atom(File)),
+load_mpred_on_file_end(World,File):- 
+   sanity(atom(File)),   
    asserta_new(baseKB:loaded_mpred_file(World,File)),
-   signal_eof(File).
+   must(signal_eof(File)),!.
 
 
 

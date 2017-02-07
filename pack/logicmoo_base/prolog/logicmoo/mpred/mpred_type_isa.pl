@@ -216,7 +216,7 @@ noncol_type('LogicalConnective').
 never_type_why(V,ftVar(isThis)):-is_ftVar(V),!.
 never_type_why(cheaply_u,cheaply_u(isThis)):-!.
 never_type_why(C,_):-a(tCol,C),!,fail. % already declared to be a type
-never_type_why(_,_):- \+ current_prolog_flag(logicmoo_debug,true),!,fail.
+never_type_why(_,_):- \+ flag_call(logicmoo_debug == true) ,!,fail.
 never_type_why(C,noncol_type(T)):- noncol_type(T),a(T,C),!.
 never_type_why(F,decided_not_was_isa(F,W)):-call_u(decided_not_was_isa(F,W)),!.
 %never_type_why(C):- is_ftCompound(C),functor(C,F,1),isa_asserted(F,tCol).
@@ -800,7 +800,7 @@ isa_backchaing_1(I,C):- fail,
 %  (isa/2) asserted.
 %
 
-isa_asserted(I,C):-  clause_b(isa(I,C)).
+isa_asserted(I,C):-  clause_b(mudIsa(I,C)).
 isa_asserted(I,C):-  compound(I),!,no_repeats(loop_check(isa_asserted_0(I,C))).
 isa_asserted(I,C):-  ground(I:C),!,no_loop_check(no_repeats(loop_check(isa_asserted_0(I,C)))).
 isa_asserted(I,C):-  no_repeats(loop_check(isa_asserted_0(I,C))).
@@ -1159,7 +1159,7 @@ assert_isa_rev(T,I):-
    sanity(call_u(isa(I,T))),
    sanity(isa_asserted(I,T)),
    % sanity(call_u(installedMotelHook) -> must(call_motel(isa(I,T))) ; true),
-   % sanity(call_u(isa(I,T))),
+   % sanity(call_u(mudIsa(I,T))),
    expire_tabled_list(all))).
 
 

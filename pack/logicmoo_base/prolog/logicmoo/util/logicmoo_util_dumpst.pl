@@ -14,7 +14,7 @@
           getPFA/3,getPFA1/3,getPFA2/3,get_m_opt/4,fdmsg/1,fdmsg1/1,
           neg1_numbervars/3,clauseST/2,
           dtrace/0,dtrace/1,dtrace/2,
-          dumptrace/1,dumptrace/2,dumptrace0/1,
+          dumptrace/1,dumptrace/2,dumptrace0/1,dumptrace1/1,
           dumptrace_ret/1,
           drain_framelist/1,
           drain_framelist_ele/1,
@@ -37,6 +37,7 @@
   with_source_module(0),
   dumptrace_ret(0),
   dumptrace0(0),
+  dumptrace1(0),
   dumptrace(0),
   dtrace(*,0).
 
@@ -475,19 +476,22 @@ system:dbreak:- wdmsg("DUMP_BREAK/0"), (thread_self_main->dtrace(system:break);t
 % (debug) Trace.
 %
 
+dtrace(G):- notrace((tlbugger:has_auto_trace(C),wdmsg(has_auto_trace(C,G)))),!,call(C,G). 
 dtrace(G):- strip_module(G,_,dbreak),\+ thread_self_main,!.
-dtrace(G):- tlbugger:has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
-dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),scce_orig(notrace,restore_trace((leash(+all),dumptrace_or_cont(G))),trace).
+% dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),
+%   scce_orig(notrace,restore_trace((leash(+all),dumptrace_or_cont(G))),trace).
 
-dtrace(G):- notrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
+dtrace(G):- notrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG)))->true;catch(dumptrace1(G),E,handle_dumptrace_signal(G,E)). %always fails
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
-dtrace(G):- dumptrace_or_cont(G).
+%dtrace(G):- % dumptrace_or_cont(G).
+%    catch(dumptrace1(G),E,handle_dumptrace_signal(G,E)).
 
 handle_dumptrace_signal(G,E):-arg(_,v(continue,abort),E),!,wdmsg(continuing(E,G)),notrace,nodebug.
 handle_dumptrace_signal(_,E):-throw(E).
+%:- export(dumptrace_or_cont/1).
+%dumptrace_or_cont(G):- catch(dumptrace(G),E,handle_dumptrace_signal(G,E)).
 
-dumptrace_or_cont(G):- catch(dumptrace(G),E,handle_dumptrace_signal(G,E)).
 
 
 % :-meta_predicate(dtrace(+,?)).
@@ -536,11 +540,12 @@ dumptrace(G):- non_user_console,!,dumpST_error(non_user_console+dumptrace(G)),ab
 dumptrace(G):-
   w_tl(set_prolog_flag(gui_tracer, false),
    w_tl(set_prolog_flag(gui, false),
-    w_tl(set_prolog_flag(retry_undefined, false),
+    w_tl(flag_call(logicmoo_debug= false),
      dumptrace0(G)))).
 
 dumptrace0(G):- notrace((tracing,notrace,wdmsg(tracing_dumptrace(G)))),!, catch(((dumptrace0(G) *-> dtrace ; (dtrace,fail))),_,true).
-dumptrace0(G):-   
+dumptrace0(G):-dumptrace1(G).
+dumptrace1(G):-   
   catch(attach_console,_,true),
     repeat, 
     (tracing -> (!,fail) ; true),

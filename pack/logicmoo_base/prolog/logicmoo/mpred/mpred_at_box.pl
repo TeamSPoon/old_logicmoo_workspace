@@ -99,7 +99,7 @@
 
 :-dynamic(unused_predicate/4).
 
-:- set_prolog_flag(retry_undefined,false).
+:- flag_call(logicmoo_debug=false).
 
 :- set_prolog_flag(logicmoo_virtualize,true).
 
@@ -446,7 +446,7 @@ fixup_modules:-
    doall((current_module(M),once((findall(I,import_module(M,I),L))),once(fixup_module(M,L)))).
 
 % :- autoload([verbose(false)]).
-:- set_prolog_flag(retry_undefined,true).
+:- flag_call(logicmoo_debug=true).
 
 % :- fixup_modules.
 
@@ -665,7 +665,7 @@ create_predicate_istAbove(CallerMt,F,A):-
 
 
 
-with_no_retry_undefined(Goal):- w_tl(set_prolog_flag(retry_undefined,false),Goal).
+with_no_retry_undefined(Goal):- w_tl(flag_call(logicmoo_debug=false),Goal).
 
 
 % Every module has it''s own

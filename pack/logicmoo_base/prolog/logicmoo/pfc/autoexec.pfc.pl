@@ -104,20 +104,19 @@
 
 :- set_fileAssertMt(baseKB).
 
-:- % profile 
-  (ensure_loaded(('./system_common.pfc'))).
+:- consult(('./system_common.pfc')).
 
-:- ensure_loaded(('system_if_missing.pfc')).
+:- consult(('system_if_missing.pfc')).
 
-:- ensure_loaded(('system_mdefault.pfc')).
+:- consult(('system_mdefault.pfc')).
 
-:- ensure_loaded(('system_singleValued.pfc')).
+:- consult(('system_singleValued.pfc')).
 
-:- ensure_loaded(('logicmoo/snark/common_logic_clif.pfc')).
+:- consult(('logicmoo/snark/common_logic_clif.pfc')).
 
-:- ensure_loaded(('user_relationAllExists.pfc')).
+:- consult(('user_relationAllExists.pfc')).
 
-:- ensure_loaded(('user_transitiveViaArg.pfc')).
+:- consult(('user_transitiveViaArg.pfc')).
 
 
 :- multifile(baseKB:locked_baseKB/0).
@@ -125,6 +124,6 @@
 :- asserta((baseKB:locked_baseKB)).
 
 
-% :- mpred_test(ensure_loaded('pttpFWC.pfc')).
+% :- mpred_test(consult('pttpFWC.pfc')).
 
 

@@ -55,7 +55,7 @@ pred_subst(_Pred ,P,       _, _,       P     ).
 % -- CODEBLOCK
 :- was_export(must/1).
 :- meta_predicate(must(0)).
-must(Call):-(repeat, (catch(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),dtrace,Call)),!).
+must(Call):-(repeat, (catch(Call,E,(dmsg(E:Call),set_prolog_flag(logicmoo_debug,true),fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),dtrace,Call)),!).
 
 */
 

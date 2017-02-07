@@ -21,16 +21,69 @@
 %  Therefore, by definition, nothing of that type can exist. 
 
 % this commented out so the autoloader doent pick it up
-%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
-%:- module(baseKB_user, [mpred_userkb_file/0]).
-%:- include('mpred_header.pi').
-%:- endif.
-
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
+:- module(baseKB_user, [mpred_userkb_file/0]).
+:- include('mpred_header.pi').
+:- endif.
+:- if( \+ current_predicate(mpred_userkb_file/0)).
 mpred_userkb_file.
+
+:- endif.
+
+:- '$set_source_module'(baseKB).
+
+
+
+%:- thread_local t_l:side_effect_ok/0.
+%:- lmce:reset_modules.
+%system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
+%system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
+
+in_goal_expansion:- prolog_current_frame(F),
+   prolog_frame_attribute(F,parent_goal,expand_goal(_,_,_,_)).
+
+should_base_ce(I):-  nb_current('$goal_term',Was),same_terms(I, Was),!,fail.
+should_base_ce(I):-  
+   (nb_current_or_nil('$source_term',TermWas),\+ same_terms(TermWas, I)),
+   (nb_current_or_nil('$term',STermWas),\+ same_terms(STermWas, I)),!,
+   fail.
+should_base_ce(_).
+
+base_clause_expansion(_,I,_):- notrace((\+ should_base_ce(I))),!,fail.
+base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
+base_clause_expansion(_,I,_):- \+ compound(I), !, fail.
+base_clause_expansion(_,':-'(ain_expanded(I)),':-'(ain_expanded(I))):-!.
+base_clause_expansion(_,':-'(ain(I)),':-'(ain(I))):-!.
+base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
+base_clause_expansion(_,I, O):- \+ in_goal_expansion, get_consequent_functor(I,F,A)->base_clause_expansion_fa(I,O,F,A),!.
+base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.
+
+base_clause_expansion_fa(_,_,F,A):- clause_b(mpred_prop(F,A,prologBuiltin)),!,fail.
+base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- needs_pfc(F,A),!.
+base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- in_dialect_pfc,!,ain(mpred_prop(F,A,prologHybrid)).
+base_clause_expansion_fa(_,_,F,A):- ain(mpred_prop(F,A,prologBuiltin)),!,fail.
+
+
+needs_pfc(F,A):- 
+  (clause_b(functorIsMacro(F));clause_b(functorDeclares(F));clause_b(prologHybrid(F));
+  clause_b(mpred_prop(F,A,prologHybrid));clause_b(wrap_shared(F,A,ereq))),!.
+
+/*
+maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
+   \+ (clause_b(functorIsMacro(F));clause_b(functorDeclares(F));clause_b(mpred_prop(F,A,prologHybrid))),
+   ain(prologBui sltin(F/A)).
+
+*/
+
+:- ( defaultAssertMt(_)->true;set_defaultAssertMt(baseKB)).
+
+:- enable_mpred_expansion.
+
+% :- consult(library('logicmoo/mpred/mpred_userkb.pl')).
 
 
 :- ain(arity(functorDeclares, 1)).
-:- dynamic(isa/2).
+%:- dynamic(isa/2).
 
 %% base_kb_pred_list( ?VALUE1) is semidet.
 %
@@ -106,7 +159,7 @@ hybrid_support/2,
 if_missing/2, % pfc
 is_edited_clause/3,
 is_wrapper_pred/1,
-isa/2,
+% isa/2,
 ruleRewrite/2,
 resultIsa/2,
 % lmcache:isCycAvailable_known/0,
@@ -152,7 +205,6 @@ skolem/2,skolem/3,
 completeExtentEnumerable/1,
 %use_ideep_swi/0,
 cycPred/2,
-isa/2,
 cycPlus2/2,
 predStub/2,
 singleValuedInArg/2,
@@ -448,8 +500,8 @@ on_modules_changed :-
   forall((current_module(M),M\=user,M\=system,M\=baseKB),
      (default_module(baseKB,M)->true;catch(add_import_module(M,baseKB,end),E2,dmsg(E2:add_import_module(M,baseKB,end))))).
 
-:- on_modules_changed.
-:- initialization(on_modules_changed).
+%:- on_modules_changed.
+%:- initialization(on_modules_changed).
 
 %% never_assert_u0( :TermARG1, ?Why) is semidet.
 %
@@ -485,3 +537,17 @@ system:term_expansion(M1:(M2:G),(M1:G)):-atom(M1),M1==M2,!.
 system:goal_expansion(M1:(M2:G),(M1:G)):-atom(M1),M1==M2,!.
 system:sub_call_expansion(_:dynamic(_:((M:F)/A)),dynamic(M:F/A)):-atom(M),atom(F),integer(A).
 */
+
+
+/*
+
+% :- autoload. % ([verbose(false)]).
+
+bad_thing_to_do:- doall((clause(baseKB:wrap_shared(F,A,ereq),Body),
+    retract(( baseKB:wrap_shared(F,A,ereq):- Body )), 
+      between(0,9,A),ain((arity(F,A),pfcControlled(F),prologHybrid(F))),fail)).
+
+% :- doall((current_module(W),import_module(W,system),\+ import_module(W, user), W\==baseKB, add_import_module(lmcode,W,end))).
+
+*/
+

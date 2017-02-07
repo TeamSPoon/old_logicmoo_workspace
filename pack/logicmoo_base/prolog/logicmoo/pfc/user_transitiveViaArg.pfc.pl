@@ -1,4 +1,7 @@
 
+
+:- install_constant_renamer_until_eof.
+
 :- file_begin(pfc).
 
 :- set_fileAssertMt(baseKB).
@@ -24,11 +27,11 @@ coExtensional(A,B)==>
 
 :- dynamic(anatomicallyCapableOf/3).
 
-ttPredType('CapabilityPredicate').
-isa(CAP_PRED,'CapabilityPredicate') ==> transitiveViaArg(CAP_PRED,genls,2).
+ttPredType('rtCapabilityPredicate').
+isa(CAP_PRED,'rtCapabilityPredicate') ==> transitiveViaArg(CAP_PRED,genls,2).
 
 
-'CapabilityPredicate'(anatomicallyCapableOf('EmbodiedAgent','FirstOrderCollection','BinaryRolePredicate')).
+'rtCapabilityPredicate'(anatomicallyCapableOf('mobEmbodiedAgent','ttFirstOrderCollection','rtBinaryRolePredicate')).
 
 % disjointWith(A,B)==> (isa(I,A)==>~isa(I,B)).
 
@@ -61,4 +64,6 @@ isa(A, C) :- cwc,
 ".
 
 */
+:- (compiling -> dmsg("IS COMPILING");dmsg("NOT COMPILING")).
+:- set_prolog_flag(do_renames,restore).
 

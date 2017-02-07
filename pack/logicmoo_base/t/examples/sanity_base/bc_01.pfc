@@ -9,12 +9,12 @@
 :- module(bc_01,[]).
 
 :- make.
-:- set_prolog_flag(logicmoo_debug,true).
-:- set_prolog_flag(retry_undefined,true).
+:- flag_call(logicmoo_debug=true).
+:- flag_call(logicmoo_debug=true).
 
 :- use_module(library(logicmoo_base)).
 
-:- set_prolog_flag(logicmoo_debug,true).
+:- flag_call(logicmoo_debug=true).
 
 :- dynamic(bc_q/1).
 :- dynamic(bc_p/1).

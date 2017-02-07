@@ -15,28 +15,39 @@
           [ copy_stream/2,
             file_to_stream/2,
             file_to_stream_ssl_verify/5,
+            ensure_loaded_with/2,
+            when_file_output/1,
             l_open_input/2,
             l_open_input0/2,
             l_open_input1/2,
       %      make_socket/3,
+         reread_vars/3,
+         ensure_translated_with/3,
       %      negotiate_http_connect/2,
        %     ssl_failed/3,
        %     ssl_protocol_hook/4,
             text_to_stream/2,
+            l_open_output/2,
             with_stream_pos/2
           ]).
+
+:- meta_predicate(ensure_loaded_with(:,3)).
+
 :- multifile
         thread_httpd:accept_hook/2,
         thread_httpd:make_socket_hook/3,
         thread_httpd:open_client_hook/5,
         open_options/2,
         package_path/2.
-:- meta_predicate
-        with_stream_pos(+, 0).
+:- meta_predicate((
+        with_stream_pos(+, 0),
+        when_file_output(0),
+        ensure_translated_with(:,0,?))).
 :- module_transparent
         copy_stream/2,
         file_to_stream/2,
         file_to_stream_ssl_verify/5,
+        ensure_translated_with/3,
         l_open_input/2,
         l_open_input0/2,
         l_open_input1/2,
@@ -49,9 +60,150 @@
 
 
 :- include('logicmoo_util_header.pi').
+:- meta_predicate each_single(2,*).
+:- meta_predicate translate_file_stream(3,*,*,*,*).
+:- meta_predicate translate_file0(3,*,*,*,*),translate_file(3,*,*).
+:- meta_predicate reread_vars(*,2,*).
+
+
+l_open_output(File,Out):- \+ atom(File), absolute_file_name(File,Name),!,open(Name,write,Out,[alias(Name)]).
+l_open_output(File,Out):- is_stream(File),!,Out=File.
+l_open_output(File,Out):- stream_property(Out,alias(File)),!.
+l_open_output(File,Out):- stream_property(Out,file_name(File)),!.
+l_open_output(File,Out):- absolute_file_name(File,Name),!,open(Name,write,Out,[alias(Name)]).
+
+translate_file(With,Module:InF,OutF):-
+  translate_file0(With,Module,InF,OutF,[]).
+
+translate_file0(With,Module,InF,OutF,Options):-
+  setup_call_cleanup(l_open_input(InF,In),
+  setup_call_cleanup(l_open_output(OutF,Out),
+                     ((must_be(stream,In),must_be(stream,Out),
+                     translate_file_stream(With,Module,In,Out,Options))),
+  ( \+ is_stream(OutF)->close(Out);true)),
+   ( \+ is_stream(InF)->close(In);true)).
+
+translate_file_stream(With,Module,In,Out,Options):-  
+  Key = '$translate_file_steam',
+  % Info = translate_file_stream(With,Module,In,Out,Expanded,Options),
+  % b_setval(Key,Info),
+  % nb_linkval(Key,Info),
+  ignore((once(call(With,Key,Info,Out1)),once(write_translation(Out,Out1)))),  
+  repeat,
+   % trans_read_source_term(Module,In,Wff,Expanded,[variable_names(Vs)|Options]),
+   trans_read_source_term(Module,In,Wff,_Expanded,[variable_names(Vs)|Options]),
+   once(call(With,Wff-Vs,Info,WffO)),
+   once(write_translation(Out,WffO)),
+   (end_of_file == Wff; end_of_file == WffO),!.
+
+
+trans_read_source_term(M, In, Term, Term, Options):- !,
+   read_clause(In, Term, [ module(M)| Options ]).
+
+trans_read_source_term(M, In, Term, Expanded, Options) :-
+    prolog_source:maplist(read_clause_option, Options),
+    !,
+ prolog_source:(
+    select_option(subterm_positions(TermPos), Options,
+                  RestOptions, TermPos),
+    read_clause(In, Term,
+                [ subterm_positions(TermPos)
+                | RestOptions
+                ]),
+    logicmoo_util_filestreams:expand_unlikely(Term, TermPos, In, Expanded),
+    update_state(Term, Expanded, M)).
+trans_read_source_term(M, In, Term, Expanded, Options) :-
+ prolog_source:(
+    select_option(syntax_errors(SE), Options, RestOptions0, dec10),
+    select_option(subterm_positions(TermPos), RestOptions0,
+                  RestOptions, TermPos),
+    (   style_check(?(singleton))
+    ->  FinalOptions = [ singletons(warning) | RestOptions ]
+    ;   FinalOptions = RestOptions
+    ),
+    read_term(In, Term,
+              [ module(M),
+                syntax_errors(SE),
+                subterm_positions(TermPos)
+              | FinalOptions
+              ]),
+    logicmoo_util_filestreams:expand_unlikely(Term, TermPos, In, Expanded),
+    update_state(Term, Expanded, M)).
+
+expand_unlikely(Term, TermPos, In, Expanded):-
+  b_setval('$term', Term),
+  prolog_source:expand(Term, TermPos, In, Expanded),
+  b_setval('$term', []).
+
+write_translation(Out,Wff):- must_be(nonvar,Wff), is_list(Wff),!,maplist(write_translation(Out),Wff).
+write_translation(Out,end_of_file):-!,flush_output(Out),!.
+write_translation(Out,flush_output):-!,flush_output(Out),!.
+write_translation(_Ut,call(Goal)):-!,call(Goal).
+write_translation(Out,Wff-Vs):- !, must(is_list(Vs)), 
+  wto(Out,Wff,[variable_names(Vs),portrayed(true),quoted(true),fullstop(true),ignore_ops(true),nl(true),singletons(false)]).
+write_translation(Out,Wff):- nb_current('$variable_names',Vs),
+  wto(Out,Wff,[variable_names(Vs),portrayed(true),quoted(true),fullstop(true),ignore_ops(true),nl(true),singletons(false)]).
+
+:-nb_setval('$ra5_often',1).
+
+:- export(when_file_output/1).
+when_file_output(G):- (current_output(X),stream_property(X,file_name(_)))->call(G);true.
+%when_file_output(G):- (current_output(X),stream_property(X,alias(user_output)))->true;call(G).
+
+wto(Out,Wff,Opts):- 
+ write_term(Out,Wff,Opts),!,
+   when_file_output(
+   ignore((b_getval('$ra5_often',Often),
+   once((((nb_current('$has_var',t);nb_current('$has_quote',t);Often=1;(flag('$ett',X,X+1),0 is X rem Often))))),
+   write_term(user_output,Wff,Opts)))).
+
+file_newer(NamePl,Name):- exists_file(NamePl),exists_file(Name), 
+  time_file(NamePl,T1),time_file(Name,T2),!,T1>T2.
+
+file_needs_rebuilt(NamePl,_Name):- \+ exists_file(NamePl),!.
+file_needs_rebuilt(NamePl,Name):- \+ file_newer(NamePl,Name),
+   exists_file(Name), 
+   size_file(NamePl,S1),size_file(Name,S2),Thresh is S2 * 0.75,!,
+   S1<Thresh.
+
+ensure_loaded_with(ModuleFile,With):-   
+   strip_module(ModuleFile,Module,File),
+      absolute_file_name(File,Name),
+      ensure_translated_with(ModuleFile,With,NamePl),
+      w_tl(set_prolog_flag(do_renames,never),
+      time(Module:load_files([NamePl],[derived_from(Name),if(not_loaded),redefine_module(false),qcompile(auto)]))).
+
+ensure_translated_with(ModuleFile,With,NamePl):-   
+   strip_module(ModuleFile,Module,File),
+      absolute_file_name(File,Name),
+      ignore((var(NamePl),
+      file_name_extension(Base,Ext,Name),atomic_list_concat([Base,'-trans.',Ext],NamePl))),
+      (file_needs_rebuilt(NamePl,Name)->
+        (dmsg(start(translate_file(With,Module:Name,NamePl))),
+        translate_file(With,Module:Name,NamePl),
+        dmsg(complete(translate_file(With,Module:Name,NamePl))));
+        dmsg(unneeded(translate_file(With,Module:Name,NamePl)))).
+
 
 :- export(with_stream_pos/2).
-% = :- meta_predicate(with_stream_pos(+,0)).
+:- meta_predicate(with_stream_pos(+,0)).
+
+:- export(reread_vars/3).
+
+reread_vars(P-VsIn,SVC,Wff-VsO):-
+   wt(string(S),P,VsIn),
+   catch(read_term_from_atom(S,Wff,[module(user),double_quotes(string),variable_names(Vs),singletons(Singles)]),
+         E,trace_or_throw(error(E,P-VsIn))),
+   must(\+ \+ Wff=P),
+   maplist(each_single(SVC),Singles),
+   subtract_eq(Vs,Singles,VsO).
+
+each_single(CB,N=V):-call(CB,N,V).
+
+%rt(string(In),WffO,VsO):-!,catch(read_term_from_atom(In,Wff,[module(user),double_quotes(string),variable_names(Vs),singletons(Singles)]),E,(dmsg(E),dtrace,fail)),correct_singletons(Wff,WffO,Vs,Singles,VsO).
+%rt(In,WffO,VsO):- catch(read_term(In,Wff,[module(user),double_quotes(string),variable_names(Vs),singletons(Singles)]),E,(dmsg(E),dtrace,fail)),correct_singletons(Wff,WffO,Vs,Singles,VsO).
+wt(string(O),P,Vs):- !, with_output_to(string(O), write_term(P,[variable_names(Vs),portrayed(true),quoted(true),fullstop(true),ignore_ops(true),nl(true),singletons(false)])).
+wt(O,P,Vs):- write_term(O,P,[variable_names(Vs),portrayed(true),quoted(true),fullstop(true),ignore_ops(true),nl(true),singletons(false)]).
 
 %= 	 	 
 

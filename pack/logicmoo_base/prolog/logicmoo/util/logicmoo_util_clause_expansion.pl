@@ -106,7 +106,7 @@ appear in the source-code.
 
 :- module_transparent((is_user_module/0,without_lm_expanders/1,lmce_system_term_expansion/5,lmce_system_goal_expansion/5,functor_non_colon/3)).
 
-:- ensure_loaded(logicmoo_util_body_file_scope).
+:- ensure_loaded(logicmoo_util_file_scope).
 :- ensure_loaded(logicmoo_util_shared_dynamic).
 :- ensure_loaded(logicmoo_util_dmsg).
 :- ensure_loaded(logicmoo_util_rtrace).

@@ -124,6 +124,7 @@
         snumbervars5(*, ?, ?, ?),
         try_save_vars(:),
         all_different_vals(2,*),
+        dual_notify(1,1,?),
         all_disjoint_in_sets(2,*,*),
         init_varname_stores(?),
         vmust(0).
@@ -437,7 +438,7 @@ dif_matrix_hopfully(A,B):- dif:dif(A,B),!.
 lock_vars(Term):-lock_vars(fail,Term).
 
 % lock_vars( _Notify, _Term):-!.
-lock_vars(_Notify,_Var):- current_prolog_flag(unsafe_speedups,true),!.
+lock_vars(_Notify,_Var):- flag_call(unsafe_speedups == true) ,!.
 lock_vars( Notify, Term):-  must(notrace((NotifyP=call(Notify),term_variables(Term,Vs),maplist(lock_each_var(NotifyP,Vs),Vs)))).
 
 lock_each_var(Notify,Vs,Var):- get_attr(Var,vl,when_rest(NotifyP,RestP)),delete_eq(Vs,Var,Rest),
@@ -466,7 +467,7 @@ vl:attr_unify_hook(_,_).
 % Unlock Variables.
 %
 
-%unlock_vars(_Var):- current_prolog_flag(unsafe_speedups,true),!.
+%unlock_vars(_Var):- flag_call(unsafe_speedups == true) ,!.
 unlock_vars( Var):- attvar(Var),!,del_attr(Var,vl).
 unlock_vars(Term):- must(notrace((term_attvars(Term,Vs),maplist(unlock_vars,Vs)))).
 

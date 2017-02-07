@@ -1,34 +1,70 @@
+w
 #!/bin/bash
 #cls ; swipl -T18G -L18G -T18G -s externals/MUD_ScriptEngines/snark/snark_in_prolog.pl
-#export OLDPWD="`pwd`"
+export OLDPWD="`pwd`"
 #export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #export SWIPL=/usr/local/lib/swipl-7.1.11/bin/x86_64-linux/swipl
 #export RUNFILE="run_debug.pl"
+
+#export RL_PREFIX='rlwrap -a -A -r -c -N -r'
+%export RL_PREFIX=''
 if [ $# -eq 0 ] 
  then
-    echo "No arguments supplied"
-   #gdb -return-child-result -ex set pagination off -ex run --args rlwrap -a -A -r -c -N -r swipl -l init_mud_server.pl
-    export RUNFILE="rlwrap -a -A -r -c -N -r swipl -l init_mud_server.pl"
+  #  export RUNFILE="${RL_PREFIX} swipl -g consult(init_mud_server) -t prolog"
+     export RUNFILE="${RL_PREFIX} swipl -f init_mud_server.pl"
+#swipl -l init_mud_server.pl"
  else
-    export RUNFILE="rlwrap -a -A -r -c -N -r ${*}"
+    export RUNFILE="${RL_PREFIX} ${*}"
 fi
+
+    export WHOLE="gdb -return-child-result -ex \"set pagination off\" -ex run -ex quit --args ${RUNFILE}"
+	
+cls_putty() {
+ 	clear
+   reset
+   echo -en '\033]50;ClearScrollback\a'
+   echo -en "\ec\e[3J"
+   printf "\ec" #. This can also be 
+   printf "\033c" #or 
+   printf "\x1bc"  
+   # putting everything together
+   echo -en "\e[H\e[J\e[3J"
+   printf '\033[3J'
+   reset -w
+}
 
 while [ 1 ]
 do
-        echo "You should not see this ever";
-        #cd $OLDPWD
-        reset -w
-        killall -9 xterm perl
-	echo -ne '\033]50;ClearScrollback\a'
-	echo -en "\ec\e[3J"
-	echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
-        killall -9 swipl
-        echo gdb -return-child-result -ex "set pagination off" -ex run -ex quit --args $RUNFILE
-        sleep 4;
-        #cd $NEWPWD
-	
-	#rlwrap -A -r gdbexec swipl -l daydream.pl
-        gdb -return-child-result -ex "set pagination off" -ex run -ex quit --args $RUNFILE
-	#cd $OLDPWD
+      echo "You should not see this ever";      
+      cls_putty      
+      cd $OLDPWD
+      #swipl forks xterm making it not die until the xterm it launched is dead
+      echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      killall -9 xterm perl
+      killall -9 rlwrap gdb
+      killall -9 swipl
+      echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      echo $WHOLE
+      echo DISPLAY=$DISPLAY
+      echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+      $WHOLE
+      export COMMAND_LAST=$?
+      cd $OLDPWD
+      reset -c -Q -w -I -w
+      echo ""
+      echo "~~~~~~~~~~~~~~~~~~~~~~~"
+      echo "~~~~ EXIT CODE ${COMMAND_LAST} ~~~~"
+      echo "~~~~~~~~~~~~~~~~~~~~~~~"
+      #echo "Hit CTRL+C ${BASH_SOURCE[0]} 4 secs ";
+      #sleep 1
+      #echo "Hit CTRL+C ${BASH_SOURCE[0]} 3 secs ";
+      #sleep 1 
+      #echo "Hit CTRL+C ${BASH_SOURCE[0]} 2 secs ";
+      #sleep 1
+      echo "Hit CTRL+C ${BASH_SOURCE[0]} 1 secs ";
+      sleep 1
 done
 

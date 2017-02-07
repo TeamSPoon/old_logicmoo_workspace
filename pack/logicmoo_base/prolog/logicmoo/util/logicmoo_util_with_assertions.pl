@@ -24,14 +24,14 @@
             with_each_item/3]).
 
 :- meta_predicate
-        w_tl(0, 0),
-        w_tl_e(0, 0),
-         w_mtl(0, 0),
-         w_mtl_e(0, 0),
-        wno_tl(0, 0),        
-        wno_tl_e(0, 0),        
+        w_tl(:, 0),
+        w_tl_e(:, 0),
+         w_mtl(*, 0),
+         w_mtl_e(*, 0),
+        wno_tl(*, 0),        
+        wno_tl_e(*, 0),        
         with_no_x(0),
-        wtg(0, 0).
+        wtg(*, 0).
 :- module_transparent
         check_thread_local_1m/1,
         to_thread_head_1m/4,
@@ -48,6 +48,7 @@
             with_each_item/3.
 
 :- include('logicmoo_util_header.pi').
+:- use_module(logicmoo_util_database).
 
 %:- use_module(library(gui_tracer)).
 :- meta_predicate with_each_item(:,+,+).
@@ -72,7 +73,7 @@ with_each_item(P,H,S) :- apply(P,[H|S]).
 %
 with_no_x(G):- getenv('DISPLAY',DISP),!,call_cleanup((unsetenv('DISPLAY'),with_no_x(G)),setenv('DISPLAY',DISP)).
 with_no_x(G):- current_prolog_flag(gui,true),!,call_cleanup((set_prolog_flag(gui,false),with_no_x(G)),set_prolog_flag(gui,true)).
-with_no_x(G):- current_prolog_flag(gui_tracer,true),!,call_cleanup((noguitracer,with_no_x(G)),guitracer).
+with_no_x(G):- current_prolog_flag(gui_tracer,true),!,call_cleanup((set_prolog_flag(gui,false),with_no_x(G)),set_prolog_flag(gui,true)).
 with_no_x(G):- w_mtl(tlbugger:show_must_go_on,call(G)).
 
 

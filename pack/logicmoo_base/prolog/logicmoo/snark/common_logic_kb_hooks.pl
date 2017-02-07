@@ -86,7 +86,7 @@ noGenlPreds/1,
 :- meta_predicate with_kb_assertions_matching(?,?,0).
 
 :- dynamic_multifile(el_assertions:el_holds_pred_impl/1).
-:- dynamic_multifile is_cyckb_t_pred/2.
+%:- dynamic_multifile is_cyckb_t_pred/2.
 :- dynamic_multifile el_assertions:el_holds_pred_impl/1.
 %:- dynamic_multifile el_assertions:is_cyckb_t_pred/2.
 :- dynamic cyckb_t/3.

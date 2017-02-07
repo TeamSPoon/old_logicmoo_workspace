@@ -2,13 +2,16 @@
 % :- module(plarkc_cyc_kb_preds,[]).
 :- endif.
 
-end_of_file.
+:- install_constant_renamer_until_eof.
+
 
 :- multifile(is_cyckb_t_pred/2).
 :- dynamic(is_cyckb_t_pred/2).
 :- multifile(is_cyckb_t_pred_rename/2).
 :- dynamic(is_cyckb_t_pred_rename/2).
 
+
+end_of_file.
 
 is_cyckb_t_pred_rename(phrase, 2).
 is_cyckb_t_pred_rename(between, 3).

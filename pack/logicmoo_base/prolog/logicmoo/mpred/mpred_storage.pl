@@ -732,7 +732,7 @@ clr0(P):-
 %
 % Preq.
 %
-preq(P,C0In):- fully_expand_now(query(preq),C0In,C0), agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
+preq(P,C0In):- fully_expand(query(preq),C0In,C0), agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
 
 % -  call_u(Query) = Normal query
 
@@ -766,7 +766,7 @@ mreq_old2(C0):- nop(dmsg(call_u(C0))), agenda_rescan_for_module_ready,
 %
 ireq(C0):- nop(dmsg(ireq(C0))), 
   agenda_rescan_for_module_ready,
-   no_loop_check(w_tl([+t_l:infInstanceOnly(_), +t_l:infAssertedOnly(_),+t_l:noRandomValues(_)],preq(ireq,/*to_exp*/(C0)))).
+   no_loop_check(w_tl(t_l:infInstanceOnly(_), w_tl(t_l:infAssertedOnly(_),w_tl(t_l:noRandomValues(_),preq(ireq,/*to_exp*/(C0)))))).
 
 % -  call_props(Obj,QueryPropSpecs)
 
@@ -1063,7 +1063,7 @@ test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units
 % Managed Predicate Modify.
 %
 mpred_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
-mpred_modify(Op,                 G):- \+ skip_is_asserted_expansion(G),G\=meta_argtypes(_),fully_expand_warn(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
+mpred_modify(Op,                 G):- \+ skip_is_asserted_expansion(G),G\=meta_argtypes(_),full_transform_warn_if_changed(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
 mpred_modify(_,  (:-include(FILE))):- !,must(ensure_mpred_file_loaded(FILE)).
 mpred_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,on_x_rtrace(G))).
 mpred_modify(P,                  G):- t_l:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).

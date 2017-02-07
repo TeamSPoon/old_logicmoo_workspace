@@ -242,6 +242,9 @@ The goal will be here to implement as much of the Common Lisp language as possib
 
 
 
+(defmacro no-errors (code) (ret  (with-error-handler *err-handler* (multiple-value-list `,code ))))
+(csetq *err-handler* #'(lambda () (ret nil)))
+
 (defmacro make-handler (code) 
   (ret #'(lambda (&rest whatevah) (ret (break "~&~&~&~&;; made-handler ~S durring: ~S ~S ~&" *error-message* whatevah code)))))
          ;;(force-format t ";; ERROR ~a ~s ~s~%" (make-tabs (length *error-stack*)) *error-message* (car stack))

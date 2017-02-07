@@ -59,7 +59,7 @@ somtimesBuggyBackChaining ==> (((singleValuedInArgDefault(F, N, Q_SLOT)/is_ftNon
 somtimesBuggy==>((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) <==> relationMostInstance(P,Most,V)).
 
 
-:- if(true;(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity);current_prolog_flag(logicmoo_debug,true))).
+:- if(true;(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity);flag_call(logicmoo_debug == true) )).
 
 :- dynamic(someSV_testeed/3).
 arity(someSV_testeed,3).
@@ -75,7 +75,7 @@ someSV_testeed(a,c,3).
 
 
 
-% :- set_prolog_flag(logicmoo_debug,true).
+% :- flag_call(logicmoo_debug=true).
 
 :- dynamic(someSV_testing/3).
 arity(someSV_testing,3).
@@ -97,7 +97,7 @@ someSV_testing(a,c,4).
 
 
 
-:- if((fail,current_prolog_flag(logicmoo_debug,true);baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity))).
+:- if((fail,flag_call(logicmoo_debug == true) ;baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity))).
 
 :- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_sv.pfc')).
 

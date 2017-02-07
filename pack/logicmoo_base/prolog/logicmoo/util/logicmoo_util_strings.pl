@@ -1099,20 +1099,27 @@ list_to_atomics_list0([],[]):-!.
 text_to_uq_atom(A,Sub):- atom_prefix(A,'"'),ifprolog:atom_suffix(A,1,'"'),sub_atom(A,1,_,1,Sub),!.
 text_to_uq_atom(A,A).
 
+convert_to_string_list(I,O):-string(I), (atom_contains(I,'\n');atom_contains(I,'*')),!,O=[I].
 convert_to_string_list(I,O):-convert_to_atoms_list(I,M),maplist(atom_string,M,O).
 
 convert_to_cycString(I,O):- convert_to_string_list(I,M),delistify_single_element(M,O).
 
-convert_to_string(I,O):- convert_to_atoms_list(I,M),(is_list(M)->atomics_to_string(M," ",O);atom_to_sting(M,O)).
+convert_to_string(I,O):- convert_to_atoms_list(I,M),(is_list(M)->atomics_to_string(M," ",O);atom_to_string(M,O)).
 
-convert_to_atoms_list(A,B):- \+ atomic(A),!,A=B.
-convert_to_atoms_list(A,B):- atom_length(A,L),tokenize_atom(A,T),!,convert_to_atoms_by_len(A,L,T,B),!.
-convert_to_atoms_list(A,B):- text_to_atom(A,B).
+convert_to_atoms_list(A,B):- \+ atomic(A),!,listify(A,B),nop(dmsg(convert_to_atoms_list(A,B))).
+convert_to_atoms_list(A,B):- atom_length(A,L),convert_to_atoms_by_len(A,L,B),!.
+convert_to_atoms_list(A,B):- text_to_string(A,S),string_to_atom(S,M),listify(M,B).
 
 is_upcased(U):- \+ downcase_atom(U,U), upcase_atom(U,U).
 
-convert_to_atoms_by_len(_,0,_,['']):-!.
-convert_to_atoms_by_len(A,L,_,[A]):- L<3,!.
+
+is_guid_text(A):-atom_length(A,36),atomic_list_concat(List,'-',A),List=[L8,_,_,_,L12],atom_length(L8,8),atom_length(L12,12),!.
+
+convert_to_atoms_by_len(_,0,['']):-!.
+convert_to_atoms_by_len(A,L,[A]):- L<3,!.
+convert_to_atoms_by_len(A,36,[B]):- is_guid_text(A),string_to_atom(A,B),!.
+convert_to_atoms_by_len(A,L,B):- tokenize_atom(A,T),!,convert_to_atoms_by_len(A,L,T,B).
+
 convert_to_atoms_by_len(A,_,[],[A]):-!.
 convert_to_atoms_by_len(_,_,[A],[A]):-!.
 % convert_to_atoms_by_len(A,L,B,B):- L>3, \+ atom_contains(A,' '), \+ atom_contains(A,"'"),!.
@@ -1701,6 +1708,8 @@ replace_periods_string_list(A,S):-replace_periods(A,AR),to_word_list(AR,WL),subs
 % Converted To Word List.
 %
 to_word_list(A,SL):-var(A),!,A=SL.
+to_word_list([],[]):-!.
+to_word_list([I|L],List):-L==[],!,to_word_list(I,List).
 to_word_list(I,List):-convert_to_cycString(I,M),listify(M,List).
 /*
 to_word_list(A,SL):-once(hotrace((unused_to_word_list_0(A,S0),(is_list(S0)->delete(S0,'',S);S=S0)))),

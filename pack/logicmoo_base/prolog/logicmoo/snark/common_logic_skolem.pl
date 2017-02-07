@@ -115,7 +115,7 @@ sk_form(sk(Value),Value):-!.
 
 push_cond(X,Form):- annote(cond,X,Form,_Merged).
 
-cond:attr_unify_hook(Cond,Value):- var(Value),!,trace,put_cond(Value,Cond),!.
+cond:attr_unify_hook(Cond,Value):- var(Value),!,trace,push_cond(Value,Cond),!.
 
 % ?- A=a(1),mpred_constrain_w_proxy(A),trace,A=a(Z),Z=1.0.
 

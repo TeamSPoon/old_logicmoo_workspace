@@ -173,9 +173,9 @@ within_user(Call):- '@'(Call,'user').
 
 % :- user:use_module(logicmoo('http/user_page')).
 
-:- meta_predicate(if_version_greater(?,0)).
 
 if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
+:- meta_predicate(if_version_greater(?,0)).
 
 % set to false because we don't want to use the mudconsole
 :- if_flag_true(false, if_version_greater(70109,user:ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
@@ -528,10 +528,13 @@ download_and_install_el:-
 %:- ensure_loaded(logicmoo(dbase/mpred_ext_lisp)).
 %:- ensure_loaded(logicmoo(dbase/mpred_ext_chr)).
 
-
+:- statistics.
 
 % NPC planners
 :-wdmsg(loading_mobs).
+:- flag_call(logicmoo_debug=3).
+:- flag_call(logicmoo_safety=3).
+
 :- expand_file_name('../prologmud/prolog/prologmud/mobs/?*.pl',O),maplist(ensure_mpred_file_loaded,O).
 %:- include_prolog_files(prologmud(mobs/'?*.pl')).
 %:- exists_directory('../src_assets/mobs/')->include_prolog_files('../src_assets/mobs/?*.pl');true.

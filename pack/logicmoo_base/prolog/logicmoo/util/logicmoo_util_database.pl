@@ -243,7 +243,7 @@ if_flag_true(TF,Goal):-
 %
 % Debug Call Generation Of Proof.
 %
-debugCallWhy(Why, C):- notrace(wdmsg(Why)),catch(dtrace(C),E,wdmsg(cont_debugCallWhy(E,Why, C))).
+debugCallWhy(Why, C):- notrace(wdmsg(Why)),trace,catch(dtrace(C),E,wdmsg(cont_debugCallWhy(E,Why, C))).
 
 :- export(mpred_op_prolog/2).
 :- module_transparent(mpred_op_prolog/2).

@@ -31,6 +31,7 @@
           ignore_mpreds_in_file/1,
           ignore_mpreds_in_file/0,
           clause_b/1,
+          same_terms/2,
           warn_if_static/2]).
 
 
@@ -433,7 +434,7 @@ could_safe_virtualize:- prolog_load_context(module,M),\+ clause_b(mtCycL(M)),
      \+ ((current_prolog_flag(dialect_pfc,true); 
        (source_location(F,_W),( atom_concat(_,'.pfc.pl',F);atom_concat(_,'.plmoo',F);atom_concat(_,'.pfc',F))))).
 
-virtualize_source(X,In,Out):-  current_prolog_flag(unsafe_speedups,true),!, 
+virtualize_source(X,In,Out):-  flag_call(unsafe_speedups == true) ,!, 
    (virtualize_code(X,In,Out)->In\=@=Out,nop(dmsg(virtualize_source(X,(In))-->Out))).
 
 virtualize_source(X,In,Out):- callable(In),
@@ -554,6 +555,18 @@ sd_goal_expansion(_,In,_,OOut):-
 %system:sub_body_expansion(In,Out):- Out\== true, Out\=(cwc,_),could_safe_virtualize,virtualize_source(be,In,Out).
 %system:sub_call_expansion(In,Out):-virtualize_source(ce,In,Out).
 
+%= 	 	 
+
+%% same_terms( ?A, :TermB) is semidet.
+%
+% Same Terms.
+%
+same_terms(A,B):-A==B,!.
+same_terms(A,B):-A=@=B,!,A=B.
+same_terms(A,B):- A = B,!,fail.
+same_terms((A:-AA),(B:-BB)):-!,same_terms(A,B),same_terms(AA,BB).
+same_terms(M:A,B):-atom(M),!,same_terms(A,B).
+same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 
 should_base_sd(I):-  nb_current('$goal_term',Was),same_terms(I, Was),!,fail.
 should_base_sd(I):-  

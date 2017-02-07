@@ -1,16 +1,6 @@
 [submodule "pack/swish"]
 	path = pack/swish
-	url = https://github.com/TeamSPoon/swish.git
-[submodule "pack/hMUD"]
-	path = pack/hMUD
-	url = https://github.com/TeamSPoon/hmud.git
-[submodule "pack/MUD_ircbot"]
-	path = pack/MUD_ircbot
-	url = https://github.com/TeamSPoon/MUD_ircbot.git
-[submodule "pack/pldata_larkc"]
-	path = pack/pldata_larkc
-	url = https://gitlab.prologmoo.com/prologmud_data/pldata_larkc.git
-
+	url = https://github.com/logicmoo/swish.git
 [submodule "pack/ClioPatria"]
 	path = pack/ClioPatria
-	url = https://github.com/TeamSPoon/ClioPatria
+	url = https://github.com/ClioPatria/ClioPatria

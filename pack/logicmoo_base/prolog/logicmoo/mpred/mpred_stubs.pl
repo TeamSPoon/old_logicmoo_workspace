@@ -553,7 +553,7 @@ no_rescans.
 agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
 
 %= 
-:- use_module(system:library(statistics)).
+:- use_module(prolog_statistics:library(statistics)).
 % :- reconsult(library(statistics)).
 %% rescan_mpred_props_ilc is semidet.
 %

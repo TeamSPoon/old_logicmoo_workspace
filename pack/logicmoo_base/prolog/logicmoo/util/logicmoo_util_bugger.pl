@@ -55,7 +55,7 @@
             default_ecall/3,
             define_if_missing/2,
             differnt_modules/2,
-            disabled_this/0,
+            disabled_this/0,            
             do_gc/0,
             do_gc0/0,
             do_gc1/0,
@@ -1693,10 +1693,12 @@ singletons(_).
 :- set_prolog_flag(debugger_show_context,true).
 :- set_prolog_flag(trace_gc,true).
 :- set_prolog_flag(gc,true).
-*/
-:- set_prolog_flag(backtrace_depth,   200).
 :- set_prolog_flag(debug,true).
+*/
+:- set_prolog_flag(backtrace_depth,   2000).
 :- set_prolog_flag(backtrace_show_lines, true).
+:- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray),spacing(next_argument)]).
+:- set_prolog_flag(debugger_show_context,true).
 
 %= 	 	 
 
@@ -1903,7 +1905,7 @@ with_each(Wrapper,Goal):-with_each(1,Wrapper,Goal).
 %
 % Whenever Functor Debug.
 %
-on_f_debug(Goal):-  Goal *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal).
+on_f_debug(Goal):-  Goal *-> true; ((nortrace,trace,debugCallWhy(failed(on_f_debug(Goal)),Goal)),fail).
 
 
 %= 	 	 
@@ -2409,7 +2411,8 @@ time_call(Call):-
 %
 % Gripe Time.
 %
-gripe_time(_TooLong,Goal):- current_prolog_flag(safe_speedups,true),!,Goal.
+
+gripe_time(_TooLong,Goal):- nop(flag_call(logicmoo_speed>logicmoo_debug)),!,Goal.
 gripe_time(TooLong,Goal):- statistics(cputime,StartCPU),
   statistics(walltime,[StartWALL,_]),
   NeedGripe=v(yes),
@@ -2698,7 +2701,7 @@ traceIf(_Call):-!.
 traceIf(Call):-ignore((Call,dtrace)).
 
 %getWordTokens(WORDS,TOKENS):-concat_atom(TOKENS,' ',WORDS).
-is_string(S):- pce_expansion:is_string(S).
+%is_string(S):- pce_expansion:is_string(S).
 
 
 
@@ -3005,11 +3008,11 @@ user:message_hook(Term, Kind, Lines):-
 
    fail)),_,true))),fail)))))).
 
-:-hook_message_hook.
-
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
-:- load_files(library(prolog_stack), [silent(true)]).
-prolog_stack:stack_guard(none).
+%:- load_files(library(prolog_stack), [silent(true)]).
+%prolog_stack:stack_guard(none).
+
+% :-hook_message_hook.
 
 %user:prolog_exception_hook(A,B,C,D):- fail,
 %   once(copy_term(A,AA)),catchv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
@@ -3038,6 +3041,8 @@ prolog_stack:stack_guard(none).
 
 % :- mpred_trace_less(dmsg/1).
 %:-mpred_trace_less(system:cnotrace/1). 
+
+
 
 /*
 

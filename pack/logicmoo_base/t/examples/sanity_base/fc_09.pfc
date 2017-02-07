@@ -11,8 +11,8 @@
 
 :- file_begin(pfc).
 
-:- set_prolog_flag(logicmoo_debug,true).
-:- set_prolog_flag(unsafe_speedups,false).
+:- flag_call(logicmoo_debug=true).
+:- flag_call(unsafe_speedups=false).
 
 :- abolish(a,1).
 :- abolish(b,1).

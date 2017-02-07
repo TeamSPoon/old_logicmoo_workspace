@@ -6,10 +6,12 @@
 % Dec 13, 2035
 %
 */
-% :- module(logicmoo_run_old_pttp,[]).
+% :- module(logicmoo_plarkc,[]).
 
 :- ensure_loaded(logicmoo(logicmoo_engine)).
 :- asserta_new(user:file_search_path(pldata,'/opt/cyc/')).
+:- asserta_new(user:file_search_path(pldata,library(pldata))).
+:- asserta_new(user:file_search_path(logicmoo,library)).
 
 /*
 :- (current_prolog_flag(qcompile,PrevValue)->true;PrevValue=false),
@@ -21,30 +23,34 @@
 
 :- baseKB:disable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,false).
-:- wdmsg("loading current_renames").
-:- load_files(pldata(current_renames),[if(not_loaded),qcompile(auto)]).
-:- wdmsg("done with rns").
 :- if(exists_source(rs)).
+:- wdmsg("loading rns").
 :- load_files(rs,[if(not_loaded),qcompile(auto)]).
+:- wdmsg("done with rns").
 :- endif.
-:- wdmsg("done with current_renames").
+
+:- wdmsg("loading current_renames").
+% :- time((user:load_files(library('pldata/kb_7166_current_renames'),[module(baseKB),redefine_module(false),qcompile(auto)]))).
 :- retractall(renames(_)).
 :- baseKB:enable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,true).
+:- wdmsg("done with current_renames").
 
-:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
+%:- set_prolog_stack(local, limit(32*10**9)).
+%:- set_prolog_stack(global, limit(32*10**9)).
+% :- baseKB:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
-:- set_prolog_stack(local, limit(32*10**9)).
-:- set_prolog_stack(global, limit(32*10**9)).
 
 :- if(false).
 :- baseKB:disable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,false).
 :- if(exists_source(pldata('kb_7166.qlf'))).
 :- wdmsg("loading kb_7166").
+:- install_constant_renamer_until_eof.
 :- ensure_loaded(pldata('kb_7166.qlf')).
 :- else.
 :- wdmsg("qcompile kb_7166").
+%:- install_constant_renamer_until_eof.
 :- load_files(pldata(kb_7166),[if(not_loaded),qcompile(auto)]).
 :- endif.
 :- wdmsg("done loading kb_7166").

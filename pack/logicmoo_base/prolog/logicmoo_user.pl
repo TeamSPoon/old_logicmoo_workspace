@@ -5,7 +5,7 @@
 % Douglas Miles
 
 */
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))))).
 :- if(( ( current_prolog_flag(xref,true)) )).
 :- module(logicmoo_user_module,
  [
@@ -50,15 +50,18 @@
 :- if(prolog_load_context(module,system)).
 :- set_prolog_flag(access_level,user).
 :- endif.
+:- at_start((Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)))).
 
 :- set_prolog_flag(pfc_booted,false).
 :- current_prolog_flag(unsafe_speedups,_)->true;set_prolog_flag(unsafe_speedups,true).
-:- user:ensure_loaded(library(logicmoo_utils)).
-:- user:ensure_loaded(library(logicmoo_base)).
+:- system:ensure_loaded(library(logicmoo_utils)).
+:- system:ensure_loaded(library(logicmoo_base)).
 :- set_prolog_flag(pfc_booted,false).
-% :-  time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
-:-  time((baseKB:ensure_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
-:- set_prolog_flag(pfc_booted,true).
+
+:- ((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, baseKB:call_u(G))))).
+:- at_start((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, baseKB:call_u(G))))).
+:-  prolog_statistics:time((baseKB:consult(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
+
 
 /*
 :- set_prolog_flag(report_error,true).
@@ -72,8 +75,6 @@
 :- set_prolog_flag(last_call_optimisation,false).
 :- debug.
 */
-:- at_start((Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)))).
-:- at_start((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, baseKB:call_u(G))))).
 % :- at_start((ignore((logicmoo_util_shared_dynamic:call(retract,(ereq(G):- find_and_call(G))),fail)))).
 
 :- set_prolog_flag(pfc_booted,true).

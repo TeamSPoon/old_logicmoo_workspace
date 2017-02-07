@@ -109,7 +109,7 @@ run_mud_test(Name,Test):-
 
 
 %:- mpred_trace_exec.
-%:- set_prolog_flag(logicmoo_debug,true).
+%:- flag_call(logicmoo_debug=true).
 
 baseKB:mud_test(test_fwc_1,
   (on_x_debug(ain(tAgent(iExplorer1))),

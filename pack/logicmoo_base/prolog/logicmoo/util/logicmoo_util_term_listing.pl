@@ -20,10 +20,11 @@
           pi_to_head_l/2,
           xlisting0/1,
             bad_pred/1,
-            blob_info/3,
+            blob_info/3,            
             bookeepingPredicateXRef/1,
             buggery_ok/0,
             prolog_listing_portray_clause/3,
+            catch_each/3,
             clause_ref/2,
             cur_predicate/2,
             current_atom_or_blob/2,
@@ -452,9 +453,11 @@ searchable_terms(T):-search_refs_use_recorded,!,current_key(Key),unmake_search_k
 searchable_terms(T):-unify_in_thread(main,searchable_terms_tl(T)).
 
 % load statistics to keep ifprolog from overriding time/1.
-:- use_module(system:library(dialect/ifprolog),[current_global/1]).
 :- abolish(system:time/1).
-:- use_module(system:library(statistics),[time/1]).
+:- abolish(time/1).
+:- use_module(ifprolog:library(dialect/ifprolog),[current_global/1]).
+:- abolish(ifprolog:time/1).
+:- use_module(library(statistics),[time/1]).
 
 /*
 :- meta_predicate current_global_ifprolog(:).
@@ -1307,7 +1310,7 @@ catch_each(M:G,E,Or):-
 % Portray One Line.
 %
 portray_one_line(H):- notrace((tlbugger:no_slow_io,!, writeq(H),write('.'),nl)),!.
-portray_one_line(H):-  catch_each(portray_one_line0(H),_,(writeq(H),write('.'),nl)),!.
+portray_one_line(H):-  notrace((catch_each(portray_one_line0(H),_,(writeq(H),write('.'),nl)))),!.
 
 portray_one_line0(H):- baseKB:portray_one_line_hook(H),!.
 portray_one_line0(H):- maybe_separate(H,(format('~N'))),fail.
@@ -1436,6 +1439,7 @@ use_listing_vars(TF):-set_prolog_flag(listing_vars,TF).
 
 %= 	 	 
 
+:- if(true).
 %% locate_clauses( ?A, ?OutOthers) is semidet.
 %
 % Hook To [prolog:locate_clauses/2] For Module Logicmoo_util_term_listing.
@@ -1451,7 +1455,7 @@ prolog:locate_clauses(A, OutOthers) :-
     ignore((predicate_property(baseKB:hook_mpred_listing(A),number_of_clauses(C)),C>0,
       current_prolog_flag(xlisting,true),doall(call_no_cuts(baseKB:hook_mpred_listing(A))))),    
    prolog:locate_clauses(A, OutOthers))))),!.
-
+:- endif.
 
 % Replacement that prints variables in source code
 
@@ -1487,15 +1491,6 @@ prolog_listing_list_clauses(Pred, Source) :-
 	;   true
 	))).
 
-:- if(true).
-
-:- reconsult(library(listing)).
-
-:- redefine_system_predicate(prolog_listing:portray_clause/3).
-:- abolish(prolog_listing:portray_clause/3).
-:- meta_predicate prolog_listing:portray_clause(+,+,:).
-:- prolog_listing:export(prolog_listing:portray_clause/3).
-
 
 % Safe
 prolog_listing_portray_clause(Stream, Term, M:Options) :- fail,
@@ -1507,6 +1502,18 @@ prolog_listing_portray_clause(Stream, Term, M:Options) :- fail,
 	      ),!.
 
 % prolog_listing:portray_clause(Stream, Term, M:Options) :- logicmoo_util_term_listing:prolog_listing_portray_clause(Stream, Term, M:Options).
+
+
+:- if(true).
+
+:- reconsult(library(listing)).
+
+:- redefine_system_predicate(prolog_listing:portray_clause/3).
+:- abolish(prolog_listing:portray_clause/3).
+:- meta_predicate prolog_listing:portray_clause(+,+,:).
+:- prolog_listing:export(prolog_listing:portray_clause/3).
+
+
 
 % Original
 prolog_listing:portray_clause(Stream, Term, M:Options) :-
