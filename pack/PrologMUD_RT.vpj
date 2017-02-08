@@ -51,16 +51,17 @@
 				</Folder>
 			</Folder>
 		</Folder>
-		<Folder Name="call_cleaup_each">
+		<Folder Name="clause_attvars">
 			<Folder Name="prolog">
-				<F N="call_cleaup_each/prolog/call_cleaup_each.pl"/>
+				<F N="clause_attvars/prolog/attvar_reader.pl"/>
+				<F N="clause_attvars/prolog/clause_attvars.pl"/>
 			</Folder>
 			<Folder Name="t">
-				<F N="call_cleaup_each/t/rtrace_tests.plt"/>
+				<F N="clause_attvars/t/rtrace_tests.plt"/>
 			</Folder>
-			<F N="call_cleaup_each/LICENSE.md"/>
-			<F N="call_cleaup_each/pack.pl"/>
-			<F N="call_cleaup_each/README.md"/>
+			<F N="clause_attvars/LICENSE.md"/>
+			<F N="clause_attvars/pack.pl"/>
+			<F N="clause_attvars/README.md"/>
 		</Folder>
 		<Folder Name="ClioPatria">
 			<F
@@ -79,6 +80,17 @@
 			<F N="dictoo/LICENSE.md"/>
 			<F N="dictoo/pack.pl"/>
 			<F N="dictoo/README.md"/>
+		</Folder>
+		<Folder Name="each_call_cleanup">
+			<Folder Name="prolog">
+				<F N="each_call_cleanup/prolog/each_call_cleanup.pl"/>
+			</Folder>
+			<Folder Name="t">
+				<F N="each_call_cleanup/t/rtrace_tests.plt"/>
+			</Folder>
+			<F N="each_call_cleanup/LICENSE.md"/>
+			<F N="each_call_cleanup/pack.pl"/>
+			<F N="each_call_cleanup/README.md"/>
 		</Folder>
 		<Folder Name="eggdrop">
 			<F
@@ -2840,6 +2852,7 @@
 		</Folder>
 		<Folder Name="must_trace">
 			<Folder Name="prolog">
+				<F N="must_trace/prolog/bugger.pl"/>
 				<F N="must_trace/prolog/must_trace.pl"/>
 			</Folder>
 			<Folder Name="t">
@@ -3118,16 +3131,15 @@
 				Refilter="0"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
 		</Folder>
-		<Folder Name="rtrace">
-			<Folder Name="prolog">
-				<F N="rtrace/prolog/rtrace.pl"/>
-			</Folder>
-			<Folder Name="t">
-				<F N="rtrace/t/rtrace_tests.plt"/>
-			</Folder>
-			<F N="rtrace/LICENSE.md"/>
-			<F N="rtrace/pack.pl"/>
-			<F N="rtrace/README.md"/>
+		<Folder Name="reindent">
+			<F N="reindent/cmp.pl"/>
+			<F N="reindent/copy_src.pl"/>
+			<F N="reindent/expand.pl"/>
+			<F N="reindent/parse.pl"/>
+			<F N="reindent/README.md"/>
+			<F N="reindent/reindent.pl"/>
+			<F N="reindent/swi-expand.pl"/>
+			<F N="reindent/swi-indent.pl"/>
 		</Folder>
 		<Folder Name="slack_prolog">
 			<F
@@ -3156,6 +3168,29 @@
 				Recurse="1"
 				Refilter="0"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+		</Folder>
+		<Folder Name="with_thread_local">
+			<Folder Name="prolog">
+				<F N="with_thread_local/prolog/with_thread_local.pl"/>
+			</Folder>
+			<Folder Name="t">
+				<F N="with_thread_local/t/rtrace_tests.plt"/>
+			</Folder>
+			<F N="with_thread_local/LICENSE.md"/>
+			<F N="with_thread_local/pack.pl"/>
+			<F N="with_thread_local/README.md"/>
+		</Folder>
+		<Folder Name="xlisting">
+			<Folder Name="prolog">
+				<F N="xlisting/prolog/listing_vars.pl"/>
+				<F N="xlisting/prolog/xlisting.pl"/>
+			</Folder>
+			<Folder Name="t">
+				<F N="xlisting/t/rtrace_tests.plt"/>
+			</Folder>
+			<F N="xlisting/LICENSE.md"/>
+			<F N="xlisting/pack.pl"/>
+			<F N="xlisting/README.md"/>
 		</Folder>
 		<F N="hmud.diff"/>
 		<F N="PrologMUD_RT.vpj"/>

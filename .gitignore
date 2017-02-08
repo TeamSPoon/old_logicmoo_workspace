@@ -3,6 +3,7 @@ syntax: glob
 #pack/*/
 pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar
 pack/logicmoo_nlu/prolog/pldata/plkb7166/*
+pack/logicmoo_nlu/prolog/e2c/
 *.bak
 *.ori
 *.pl~

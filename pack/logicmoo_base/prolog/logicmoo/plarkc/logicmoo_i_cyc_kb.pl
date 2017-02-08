@@ -618,7 +618,7 @@ do_renames_cyc_to_clif(InTerm,_Info,OutTerm):-
 
 
 :- ((baseKB:consult(logicmoo(plarkc/'logicmoo_i_cyc_kb_preds.pfc')))).
-:- gripe_time(60,baseKB:consult(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb_prolog.pl'))).
+:- gripe_time(60,baseKB:qcompile(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'))).
 logicmoo_i_cyc_xform:- dmsg("Compiling tinyKB should take under a minute"),
                       gripe_time(60,qcompile(logicmoo(plarkc/'logicmoo_i_cyc_xform.pfc'))).
 % :- logicmoo_i_cyc_xform.
