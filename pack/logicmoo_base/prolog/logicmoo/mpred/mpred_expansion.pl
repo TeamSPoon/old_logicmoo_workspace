@@ -53,7 +53,7 @@
 % clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2,  (==>)/1,  (==>)/2, (<-)/1,  (<-)/2, (<==>)/2, fact/1
 %
 */
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+% :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_expansion,
           [ a/2,
             acceptable_xform/2,
@@ -132,6 +132,7 @@
             is_stripped_module/1,
             is_unit/1,
 			is_unit_like/1,
+                        post_expansion/3,
             is_unit_functor/1,
             listToE/2,
             map_f/2,
@@ -144,6 +145,7 @@
             reduce_clause_from_fwd/3,
             same_terms/2,
             show_doall/1,
+            string_to_mws/2,
             simply_functors/3,
             to_reduced_hb/4,
             transform_functor_holds/5,
@@ -163,13 +165,13 @@
          append_as_first_arg/3,
          try_expand_head/3,
          expand_isEach_or_fail/2,
-         expand_kif_string_or_fail/3,
+         % expand_kif_string/3,
          is_elist_functor/1
           ]).
 
 :- include('mpred_header.pi').
 
-:- endif.
+% :- endif.
 
 :- meta_predicate 
    % mpred_expansion
@@ -459,7 +461,7 @@ demodulize(Op,H,HHH):- strip_module(H,M,HH),H\==HH,old_is_stripped_module(M),!,d
 demodulize(Op,[I|HL],[O|HHL]):- \+ is_list(HL), !, demodulize(Op,I,O),demodulize(Op,HL,HHL).
 demodulize(Op,H,HH):- is_list(H),must_maplist(demodulize(Op),H,HH),!.
 demodulize(Op,H,HH):- H=..[F|HL],must_maplist(demodulize(Op),HL,HHL),HH=..[F|HHL],!.
-% completely_expanded
+% lmcache:completely_expanded
 
 
 
@@ -644,7 +646,7 @@ fully_expand_check(Op,Sent,SentO):- break,throw(fully_expand_real(Op,Sent,SentO)
 
 fully_expand_real(Op,Sent,SentO):-
  % must(/*hotrace*/( / nop(deserialize_attvars(Sent,SentI)))),
- memoize_on(fully_expand,Sent->SentO,
+ memoize_on(fully_expand_real,Sent->SentO,
    gripe_time(0.2,w_tl_e(t_l:no_kif_var_coroutines(true),fully_expand_now(Op,Sent,SentO)))).
 
 %% fully_expand_now( ++Op, ^Sent, --SentO) is det.
@@ -660,7 +662,6 @@ fully_expand_now(Op,Sent,SentO):-
     (Sent \=@= baseKB:SentO), dmsg(fully_expand_now(Op,(Sent --> SentO)))))))))))))),!.
 */
      
-:- decl_shared(mtExact/1).
 
 %% is_stripped_module( +Op) is semidet.
 %
@@ -690,7 +691,7 @@ expand_isEach_or_fail_real(Sent,SentO):- compound(Sent),
 %% expand_kif_string_or_fail( ++Op, ++Sent, --SentO) is semidet.
 %
 % Expand if String of KIF.
-expand_kif_string_or_fail(_Why,I,O):- string(I), % atom_contains(I,'('),
+expand_kif_string_or_fail(_Why,I,O):- string(I), 
    input_to_forms(string(I),Wff,Vs)->
    put_variable_names(Vs) ->
    must(sexpr_sterm_to_pterm(Wff,PTerm))->
@@ -698,7 +699,7 @@ expand_kif_string_or_fail(_Why,I,O):- string(I), % atom_contains(I,'('),
    O=PTerm.
 
 
-expand_kif_string(I,O):- any_to_string(I,S),string(S),
+expand_kif_string(I,O):- any_to_string(I,S), string(S),
   input_to_forms(string(S),O,Vs)->
   put_variable_names(Vs).
   
@@ -708,16 +709,16 @@ expand_kif_string(I,O):- any_to_string(I,S),string(S),
 % Fully Expand Clause.
 %
 
-:- dynamic(completely_expanded/3).
+:- dynamic(lmcache:completely_expanded/2).
 
 
 fully_expand_clause_now(Op,Sent,SentO):- ground(Sent),!,fully_expand_ground_clause(Op,Sent,SentO).
 fully_expand_clause_now(Op,Sent,SentO):- fully_expand_clause(Op,Sent,SentO),!.
 
-fully_expand_ground_clause(Op,Sent,SentO):- completely_expanded(Op,_,Sent),!,SentO=Sent.
-fully_expand_ground_clause(Op,Sent,SentO):- completely_expanded(Op,Sent,SentO),!.
+fully_expand_ground_clause(_,Sent,SentO):- lmcache:completely_expanded(_,Sent),!,SentO=Sent.
+fully_expand_ground_clause(_,Sent,SentO):- lmcache:completely_expanded(Sent,SentO),!.
 fully_expand_ground_clause(Op,Sent,SentO):- must(fully_expand_clause_now_really(Op,Sent,SentO)),
-         asserta(completely_expanded(Op,Sent,SentO)).
+         asserta(lmcache:completely_expanded(Sent,SentO)).
 
 /*
 
@@ -731,14 +732,17 @@ subst_All(B,[F|L],R,A):-subst(B,F,R,M),subst_All(M,L,R,A).
 fully_expand_clause_now1a(_Op,SentI,_,Sent,SentO):- completely_expanded_v(_,SentI),!,SentO=Sent.
 
 %  p(A,B).  p(1,2).   ==>  q(2,1).   q(B,A)      SentV-SentIV,   [1,2],[A,B]  % substAll(p(1,2),[1,2],[A,B],O).
-fully_expand_clause_now1a(_Op,SentI,SentV-SentIV,_Sent,SentO):- completely_expanded(SentI,SentOM),!,subst_All(SentOM,SentIV,SentV,SentO).
+fully_expand_clause_now1a(Op,SentI,SentV-SentIV,_Sent,SentO):- lmcache:completely_expanded(SentI,SentOM),!,subst_All(SentOM,SentIV,SentV,SentO).
 fully_expand_clause_now1a(Op,SentI,_,_Sent,SentO):- fully_expand_clause_now_really(Op,SentI,SentO),
-         asserta(completely_expanded(SentI,SentO)).
+         asserta(lmcache:completely_expanded(SentI,SentO)).
 
 */
 fully_expand_clause_now_really(Op,Sent,SentO):- expand_isEach_or_fail(Sent,SentM)->SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
 % fully_expand_clause_now_really(Op,Sent,SentO):- fully_expand_clause(Op,Sent,SentO),!.
-fully_expand_clause_now_really(Op,Sent,SentO):- memoize_on(fully_expand,Sent->SentO,(fully_expand_clause(Op,Sent,SentM),post_expansion(Op,SentM,SentO))),!.
+fully_expand_clause_now_really(Op,Sent,SentO):- memoize_on(fully_expand_clause,Sent->SentO,(fully_expand_clause(Op,Sent,SentM),
+  % post_expansion(Op,SentM,SentO)
+  SentM=SentO
+  )),!.
 
 
 post_expansion(Op,Sent,SentO):- 
@@ -753,7 +757,7 @@ maybe_correctArgsIsa(_ ,SentO,SentO):-!.
 maybe_correctArgsIsa(Op,SentM,SentO):- w_tl(t_l:infMustArgIsa,correctArgsIsa(Op,SentM,SentO)),!.
 
 fully_expand_clause(Op,Sent,SentO):- sanity(is_ftNonvar(Op)),sanity(var(SentO)),var(Sent),!,Sent=SentO.
-fully_expand_clause(Op,Sent,SentO):- string(Sent),expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
+fully_expand_clause(Op,Sent,SentO):- db_expand_final(Op,Sent,SentO),!.
 fully_expand_clause(_,(:-(Sent)),(:-(Sent))):-!.
 
 
@@ -974,13 +978,29 @@ is_parse_type('pkif'(NV)):-nonvar(NV).
 % Database Expand Final.
 %
 
-db_expand_final(_ ,NC,NC):-  var(NC),!.
-db_expand_final(_ ,NC,NCO):- string(NC),!,convert_to_cycString(NC,NCO).
-db_expand_final(_,[String,A|B],[String,A|B]):- (string(String);string(A)),!.
-db_expand_final(_,[String],String):-string(String),!.
-%MAYBE db_expand_final(_,[String|Rest],O):-string(String),!,(Rest==[]->O=String;O=[String|Rest]).
+
+string_to_mws_2(NC,NG):- \+ ground(NC),!, NG=NC.
+string_to_mws_2([String,A|B],OUT):- is_list(B),!,OUT=..[s,String,A|B].
+string_to_mws_2([String],String):-!.
+string_to_mws_2(String,String).
+
+
+string_to_mws(NC,NCO):- string(NC),!,convert_to_cycString(NC,NCM),string_to_mws_2(NCM,NCO).
+string_to_mws(NC,_):- \+ compound(NC),!,fail.
+string_to_mws(NC,NO):- functor(NC,s,_),!,NO=NC.
+string_to_mws([String],NCO):-string(String),!,must((convert_to_cycString(String,NCM),string_to_mws_2(NCM,NCO))).
+
+string_to_mws([String,A|B],OUT):- (string(String);string(A)),!,must((string_to_mws_2([String,A|B],OUT))).
+%MAYBE string_to_mws([String|Rest],O):-string(String),!,(Rest==[]->O=String;O=[String|Rest]).
+
+
+db_expand_final(_ ,NC,NC):-  is_ftVar(NC),!.
+
 db_expand_final(Op, meta_argtypes(Args),    O  ):-is_ftCompound(Args),functor(Args,Pred,A),
     (Pred=t->  (fully_expand_head(Op, Args,ArgsO),O=meta_argtypes(ArgsO)) ; (assert_arity(Pred,A),O=meta_argtypes(Args))).
+
+db_expand_final(_,NC,NCO):- string_to_mws(NC,NCO),!.
+
 %db_expand_final(_ ,NC,NCO):- atom(NC),do_renames_expansion(NC,NCO),!.
 db_expand_final(_ ,NC,NC):- atomic(NC),!.
 db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
@@ -1076,7 +1096,7 @@ db_expand_chain(_,('nesc'(P)),P) :- !.
 
 % covered fully_expand_head(_,Sent,SentO):- as_is_term(Sent),!,SentO=Sent,!.
 fully_expand_head(Op,Sent,SentO):-
-  memoize_on(fully_expand,Sent->SentO,find_and_call(fully_expand_head_now(Op,Sent,SentO))).
+  memoize_on(fully_expand_head,Sent->SentO,find_and_call(fully_expand_head_now(Op,Sent,SentO))).
 
 fully_expand_head_now(Why,Before,After):-
    subst(Before,mpred_isa,isa,Before1),
@@ -1088,15 +1108,9 @@ fully_expand_head_now(Why,Before,After):-
         Before2=After)),!.
 
 
-%db_expand_0(Op,Sent,SentO):- is_meta_functor(Sent,F,List),F\=t,!,must_maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
-%db_expand_0(_ ,NC,OUT):-mpred_expand(NC,OUT),NC\=@=OUT,!.
 try_expand_head(_,A,B):- t_l:infSkipFullExpand,!,A=B.
-%==SKIPPED==% try_expand_head(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> SentO = Template ; SentO = (Pretest,Template)),!.
-%==SKIPPED==% try_expand_head(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
-%==COVERED==% try_expand_head(_Op,Sent,SentO):-to_predicate_isas(Sent,SentO).
-try_expand_head(Op,Sent,SentO):- transitive_lc(db_expand_0(Op),Sent,OO),!,SentO=OO.
-%==SKIPPED==% try_expand_head(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)).
-
+% try_expand_head(Op,Sent,SentO):- transitive_lc(db_expand_0(Op),Sent,OO),!,SentO=OO.
+try_expand_head(Op,Sent,SentO):- db_expand_0(Op,Sent,M),db_expand_0(Op,M,SentO),!.
 
 
 :- meta_predicate temp_comp(*,*,2,?).
@@ -1113,61 +1127,20 @@ temp_comp(H,B,PRED,OUT):- nonvar(H),term_variables(B,Vs1),Vs1\==[], term_attvars
 %
 % Database expand  Primary Helper.
 %
-
-%:- discontiguous baseKB:db_expand_0/3.
-%:- discontiguous db_expand_0/3.
-
-%% db_expand_0( ++Op, +:Sent, -SentO) is det.
-%
-% Database Expand Term Primary Helper.
-%
 % :- meta_predicate(term_expansion(':'(:-),(:-))).
 % :- mode(term_expansion(+,--)).
 db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.
-% covered  db_expand_0(Op,I,O):- sanity(is_ftNonvar(Op)),\+ compound(I),do_renames_expansion(I,O),!.
-% covered db_expand_0(_,mpred_prop(A,B,C),mpred_prop(A,B,C)):-!.
-db_expand_0(Op,pkif(SentI),SentO):- nonvar(SentI),!,must((any_to_string(SentI,Sent),
-  must(expand_kif_string_or_fail(Op,Sent,SentM)),SentM\=@=Sent,!,
-  fully_expand_clause_now(Op,SentM,SentO))).
-db_expand_0(_Op,kif(Sent),SentO):- nonvar(Sent),!, must(expand_kif_string(Sent,SentM)),
-  if_defined(sexpr_sterm_to_pterm(SentM,SentO),SentM=SentO).
 
-% db_expand_0(Op,Sent,SentO):- string(Sent),((expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause_now(Op,SentM,SentO));SentO=Sent),!.
-% db_expand_0(Op,M:Sent,SentO):- db_expand_0(Op,Sent,SentM),!,(is_stripped_module(M)->SentM=SentO;SentO=M:SentM).
-
-% covered db_expand_0(_,Sent,SentO):-as_is_term(Sent),!,SentO=Sent.
-
-%% db_expand_2( +Op, ^ Sent, -- SentO) is semidet.
-%
-% Database expand  Extended Helper.
-%
-% covered db_expand_0(_,Sent,SentO):- get_ruleRewrite(Sent,SentO),!.
-
-/*
-db_expand_0(Op,Sent,SentO):- arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F),fail,
-  asserted_argIsa_known(F,2,_),!,
-  correctArgsIsa(Op,Sent,SentO),!.
-
-db_expand_0(Op,tCol(I),isa(I,tCol)):- \+ compound(I).
-db_expand_0(Op,tSet(I),isa(I,tSet)):- \+ compound(I).
-db_expand_0(Op,tPred(I),isa(I,tPred)):- \+ compound(I).
-*/
-
-%covered db_expand_0(_,not_undoable(Sent),not_undoable(Sent)):-!.
+db_expand_0(Op,pkif(SentI),SentO):- nonvar(SentI),!,must((any_to_string(SentI,Sent),must(expand_kif_string_or_fail(Op,Sent,SentM)),SentM\=@=Sent,!,db_expand_0(Op,SentM,SentO))).
+db_expand_0(_Op,kif(Sent),SentO):- nonvar(Sent),!, must(expand_kif_string(Sent,SentM)),if_defined(sexpr_sterm_to_pterm(SentM,SentO),SentM=SentO).
 
 db_expand_0(_,{Sent},{Sent}):-!.
-%convered db_expand_0(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
-
-% covered db_expand_0(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
 
 db_expand_0(Op,t(Sent),SentO):- is_ftNonvar(Sent),!,fully_expand_head(Op,Sent,SentO).
-%==SKIPPED==%  db_expand_0(_ ,NC,NC):- as_is_term(NC),!.
 
 db_expand_0(_,Sent,SentO):- copy_term(Sent,NoVary),get_ruleRewrite(Sent,SentO),must(Sent\=@=NoVary),SentO \=@= Sent.
 db_expand_0(call(Op),Sent,SentO):-  mreq(quasiQuote(QQuote)),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,must(db_expand_0(call(Op),MID,SentO)).
 
-% covered db_expand_0(_,I,O):- \+ compound(I),!,I=O.
-% covered db_expand_0(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_0(Op,Sent,SentO):- transitive_lc(db_expand_chain(Op),Sent,SentO)-> SentO \=@= Sent.
 
 db_expand_0(Op,EL,O):- is_list(EL),!,must_maplist(db_expand_0(Op),EL,O).
@@ -1185,7 +1158,7 @@ db_expand_0(Op,(H:-B),OUT):- temp_comp(H,B,db_expand_0(Op),OUT),!.
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_0(Op,INot,O).
 db_expand_0(Op,isa(I,O),INot):-Not== ( \+ ) ,!,INot =.. [Not,I],!,db_expand_0(Op,INot,O).
-%db_expand_0(_,THOLDS,ISA):- was_mpred_isa(THOLDS,I,C),to_isa_form(I,C,ISA).
+
 db_expand_0(Op,THOLDS,OUT):- THOLDS=..[t,P|ARGS],atom(P),!,HOLDS=..[P|ARGS],db_expand_0(Op,HOLDS,OUT).
 db_expand_0(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(from_univ(_,Op,[V,S,O],OUT)).
 db_expand_0(Op,G,OUT):- G=..[Pred,InstFn,VO],compound(InstFn),InstFn=isInstFn(Type),is_ftNonvar(Type),from_univ(relationMostInstance,Op,[Pred,Type,VO],OUT).
@@ -1208,7 +1181,6 @@ db_expand_0(Op,(G==>B),(GG==>BB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB).
 
 db_expand_0(Op,(G;B),(GG;BB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB).
 db_expand_0(Op,(G:-B),(GG:-BB)):-!,db_expand_0(Op,G,GG),fully_expand_goal(Op,B,BB).
-% db_expand_0(_,Term,CL):- bagof(O,do_expand_args(isEach,Term,O),L),L\=@=[Term],!,list_to_conjuncts(L,CL).
 
 db_expand_0(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_0(Op,Sent,SentO).
 db_expand_0(Op,M:Sent,R:SentO):- replaced_module(Op,M,R),!,db_expand_0(Op,Sent,SentO).
@@ -1595,7 +1567,7 @@ was_mpred_isa(isa(I,C),I,C):-!.
 was_mpred_isa(t(P,I,C),I,C):-!,P==isa.
 was_mpred_isa(t(C,I),I,C):- nonvar(C),!.
 was_mpred_isa(a(C,I),I,C):-!.
-was_mpred_isa(G,I,C):-was_isa(G,I,C).
+was_mpred_isa(G,I,C):- mpred_type_isa:was_isa(G,I,C).
 
 
 %= 	 	 
@@ -1668,7 +1640,7 @@ foreach_arg([ArgIn1|ARGS],ArgN1,ArgIn,ArgN,ArgOut,Call1,[ArgOut1|ARGSO]):-
 %
 % Transform Functor Holds.
 %
-transform_functor_holds(_,F,ArgInOut,N,ArgInOut):- once(argIsa_ft(F,N,FT)),FT=ftTerm,!.
+transform_functor_holds(_,F,ArgInOut,N,ArgInOut):- once(call_u(argQuotedIsa(F,N,FT))),FT=ftTerm,!.
 transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),!.
 
 
@@ -1916,7 +1888,7 @@ exact_args(Q):- exact_args0(Q),!.
 exact_args0(Q):- \+ compound(Q), !.
 exact_args0(==>(_,_)):-!,fail.
 % exact_args0(Q):- Q=..[_,A],atomic(A),!.
-exact_args0((A/B)):- (is_ftVar(A);is_ftVar(B)),!.
+%exact_args0((A/B)):- (is_ftVar(A);is_ftVar(B)),!.
 exact_args0(Q):- functor(Q,F,A),A>0,!,exact_args_f(F),!.
 
 exact_args_f(wid).
@@ -1931,6 +1903,8 @@ exact_args_f(second_order).
 exact_args_f(retract_eq_quitely).
 exact_args_f(not_undoable).
 exact_args_f(mtExact).
+exact_args_f(vQuotientFn).
+exact_args_f(uSubLQuoteFn).
 exact_args_f(mpred_prop).
 exact_args_f(mpred_ain).
 exact_args_f(meta_argtypes_guessed).
@@ -2144,7 +2118,7 @@ expanded_different_1(G0,G1):- G0 \= G1,!.
 %
 % Converted To Functor Form.
 %
-into_functor_form(HFDS,M:X,M:O):- atom(M),!,into_functor_form(HFDS,X,O),!.
+into_functor_form(HFDS,M:X,M:O):- atom(M),! ,into_functor_form(HFDS,X,O),!.
 into_functor_form(HFDS,X,O):-call((( X=..[F|A],into_functor_form(HFDS, X,F,A,O)))),!.
 
 % TODO finish negations
@@ -2160,4 +2134,7 @@ into_functor_form(Dbase_t,_X,holds_t,A,Call):-Call=..[Dbase_t|A].
 into_functor_form(Dbase_t,_X,t,A,Call):-Call=..[Dbase_t|A].
 into_functor_form(Dbase_t,_X,HFDS,A,Call):- is_holds_true(HFDS), Call=..[Dbase_t|A].
 into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
+
+:- 'ensure_loaded'(mpred_type_isa).
+
 

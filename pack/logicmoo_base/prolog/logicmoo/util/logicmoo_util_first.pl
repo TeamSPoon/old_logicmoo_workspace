@@ -27,7 +27,7 @@ module_predicates_are_not_exported_list/2,
 quiet_all_module_predicates_are_transparent/1,
           export_all_preds/0,
           export_all_preds/1,
-          export_if_noconflict/2,
+          
 
           if_may_hide/1,
           match_predicates/2,
@@ -70,9 +70,7 @@ quiet_all_module_predicates_are_transparent/1,
           ]).
 
 
-:- if(\+ current_predicate(system:nop/1)).
-system:nop(_).
-:- endif.
+:- abolish(system:nop/1),asserta(system:nop(_)).
 
 getenv_safe(Name,ValueO,Default):-
    (getenv(Name,RV)->Value=RV;Value=Default),
@@ -843,7 +841,7 @@ module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor_safe
 module_predicates_are_exported:- source_context_module(CM),module_predicates_are_exported(CM).
 
 
-%= 	 	 
+%= 	 	  
 
 %% module_predicates_are_exported( ?Ctx) is semidet.
 %
@@ -869,7 +867,6 @@ module_predicates_are_exported0(ModuleName):-
 
 :- export(export_if_noconflict_mfa/2).
 :- export(export_if_noconflict_mfa/3).
-:- module_transparent(export_if_noconflict/2).
 :- module_transparent(export_if_noconflict_mfa/2).
 :- module_transparent(export_if_noconflict_mfa/3).
 
@@ -879,7 +876,7 @@ module_predicates_are_exported0(ModuleName):-
 %
 % Export If Noconflict.
 %
-
+:- redefine_system_predicate(system:export_if_noconflict/2),abolish(system:export_if_noconflict/2).
 :- module_transparent(system:export_if_noconflict/2).
 system:export_if_noconflict(M,FA):- export_if_noconflict_mfa(M,FA).
 
@@ -996,5 +993,5 @@ quiet_all_module_predicates_are_transparent(ModuleName):-
 :- multifile(user:term_expansion/2).
 :- dynamic(user:term_expansion/2).
 :- module_transparent(user:term_expansion/2).
-user:term_expansion( (:-export(FA) ),(:- export_if_noconflict(M,FA))):- prolog_load_context(module,M).
-
+% user:term_expansion( (:-export(FA) ),(:- export_if_noconflict(M,FA))):-  current_prolog_flag(lm_expanders,true),prolog_load_context(module,M).
+ 

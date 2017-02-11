@@ -333,7 +333,8 @@ is_ftText(Arg):-is_ftVar(Arg),!,fail.
 is_ftText(Arg):- text_to_string_safe(Arg,_),!.
 is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
 
-ftText(O):-is_ftText(O).
+ftText(A):-!, term_is_ft(A, ftText).
+ftText(O):- is_ftText(O).
 
 % :- was_dynamic(coerce/3).
 :- was_export(coerce/4).

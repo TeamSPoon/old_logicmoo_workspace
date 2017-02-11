@@ -167,7 +167,7 @@
 :- system:use_module(library(operators)).
 :- system:use_module(library(option)).
 :- system:use_module(library(prolog_source)).
-:- system:use_module(library(prolog_history)).
+%:- system:use_module(library(prolog_history)).
 :- system:use_module(library(ansi_term)).
 :- system:use_module(library(prolog_xref)).
 :- system:use_module(library(readutil)).

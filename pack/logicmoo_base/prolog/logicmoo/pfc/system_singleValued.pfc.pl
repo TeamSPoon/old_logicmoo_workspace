@@ -1,8 +1,10 @@
 
+
+:- mpred_unload_file.
+
 :- file_begin(pfc).
 
 :- set_fileAssertMt(baseKB).
-
 
 
 
@@ -50,6 +52,11 @@ somtimesBuggyBackChaining ==> (((singleValuedInArgDefault(F, N, Q_SLOT)/is_ftNon
 
 
 ((singleValuedInArg(Pred,_))==>(prologSingleValued(Pred))).
+
+(((singleValuedInArg(F, N)/atom(F), arity(F,A), \+ singleValuedInArgDefault(F, N, Q_SLOT),
+   {functor(P,F,A),arg(N,P,P_SLOT),replace_arg(P,N,Q_SLOT,Q)})
+       ==> (( P ==> 
+          {dif:dif(Q_SLOT,P_SLOT), call_u(Q), ground(Q)}, \+Q, P)))).
 
 (((singleValuedInArg(F, N), arity(F,A), \+ singleValuedInArgDefault(F, N, Q_SLOT),
    {functor(P,F,A),arg(N,P,P_SLOT),replace_arg(P,N,Q_SLOT,Q)})

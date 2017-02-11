@@ -1,5 +1,5 @@
 
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(common_logic_kb_hooks,
  [kbp_t/1,with_el_holds_disabled/1,noGenlPreds/1,cyckb_t/3,link_to_holds2/2,
    assert_next_queue/1,
@@ -59,9 +59,9 @@ noGenlPreds/1,
   ]).
 
 :- include('../mpred/mpred_header.pi').
-:- endif.
+%:- endif.
 
-:- user:ensure_loaded(library(logicmoo_base)).
+%:- user:ensure_loaded(library(logicmoo_base)).
 
 % :- dynamic_multifile kbp_t_list_prehook/2.
 % % :- '$set_source_module'(common_logic_kb_hooks).

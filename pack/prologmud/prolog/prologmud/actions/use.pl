@@ -63,12 +63,12 @@ action_verb_useable(actStow,tStowAble,mudStowing,mudPossess,mudWielding).
 :- baseKB:import(logicmoo_util_strings:convert_to_cycString/2).
 
 
-action_info(Syntax,String):-
+==>(action_info(Syntax,String):-
  no_repeats([Syntax],(
   call_u(action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed)),
   Syntax=..[ActUse,isAnd([tNearestReachableItem,call(Possessing,isSelfAgent,isThis),Wieldable])])),
    must_maplist(name_text_now,[ActUse,Wieldable,Possessing,NowWielding,Unstowed],List),
-   sformat(String,'~w a ~w that you ~w so it will be ~w and not be ~w afterwards.',List).
+   sformat(String,'~w a ~w that you ~w so it will be ~w and not be ~w afterwards.',List)).
 
 agent_call_command(Agent,Syntax) :- 
     call_u((action_verb_useable(ActUse,_Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Obj])),

@@ -289,3 +289,5 @@ file('store.pl','/mnt/dddd/workspace/ClioPatria/config-available',1485014183).
 file('network.pl','/mnt/dddd/workspace/ClioPatria/config-available',1485014183).
 file('zlib.pl','/mnt/dddd/workspace/ClioPatria/config-available',1485014183).
 file('pengines.pl','/mnt/dddd/workspace/ClioPatria/config-available',1485014183).
+file('EDM.pl','cpack/EDM/config-available',1486751753).
+file('EDM.pl','cpack/EDM/config-available',1486751885).

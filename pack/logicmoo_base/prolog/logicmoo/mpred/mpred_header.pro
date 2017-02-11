@@ -53,8 +53,8 @@
 :- op(1100,fx,(shared_multifile)).
 
                    
-:- ensure_loaded('../../logicmoo_utils').
 /*        
+:- ensure_loaded('../../logicmoo_utils').
 assert_if_new_hh(G):- (catch(G,_,fail)->true;assert(G)).
 :- prolog_load_context(module,M),
  once((M==baseKB ;
@@ -246,37 +246,7 @@ lm_util:register_mpred_impl_file(F):- (current_prolog_flag(xref,true)->true;
           op(1150,fx,(was_export)),
           op(1150,fx,(shared_multifile)).
 
-          
-:- decl_shared(functorDeclares/1).
-:- decl_shared(genlMt/2).
-:- decl_shared(arity/2).
-:- decl_shared(genls/2).
-:- decl_shared(ttStringType/1).
-:- decl_shared(mpred_f/2).
-:- decl_shared(mpred_f/3).
-:- decl_shared(ttExpressionType/1).
-:- decl_shared(tCol/1).
-:- decl_shared(tSet/1).
-:- decl_shared(mtCore/1).
-:- decl_shared(mtCycL/1).
-:- decl_shared(mtExact/1).
-:- decl_shared(mtGlobal/1).
-:- decl_shared(mtProlog/1).
 
-
-:- decl_shared((
-   argIsa/3,
-   bt/2, %basePFC
-   hs/1, %basePFC
-   hs/1, %basePFC
-   nt/3, %basePFC
-   pk/3, %basePFC
-   pt/2, %basePFC
-   que/1, %basePFC
-   pm/1, %basePFC
-   spft/3, %basePFC
-   tms/1, %basePFC
-   prologSingleValued/1)).
 
 /*
 :-ensure_loaded(system:library('logicmoo/mpred/mpred_loader.pl')).
@@ -298,7 +268,7 @@ lm_util:register_mpred_impl_file(F):- (current_prolog_flag(xref,true)->true;
 :-ensure_loaded(system:library('logicmoo/mpred/mpred_agenda.pl')).
 */
 
-:- if(current_prolog_flag(logicmoo_autoload,true)).
+:- if(current_prolog_flag(logicmoo_autoload,false)).
 :- ensure_loaded(library('logicmoo/mpred/mpred_at_box.pl')).
 :- ensure_loaded(library('logicmoo/mpred/mpred_expansion.pl')).
 :- ensure_loaded(library('logicmoo/mpred/mpred_loader.pl')).

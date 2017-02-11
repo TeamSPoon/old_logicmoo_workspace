@@ -28,48 +28,18 @@
             addTinyCycL/1,
             addTiny_added/1,
             as_cycl/2,
-            atom_concatM/3,
-            atom_concatR/3,
-            call_el_stub/3,
-            cycLToMpred/2,
-            cycLToMpred0/2,
-            % BAD?  baseKB:cycPrepending/2,
-            cyc_to_clif/2,
-            cyc_to_clif_notify/2,
-            cyc_to_mpred_idiom/2,
-            cyc_to_mpred_idiom1/2,
-            cyc_to_mpred_idiom_unused/2,
-            cyc_to_mpred_sent_idiom_2/3,
-            % BAD?  baseKB:cyc_to_plarkc/2,
-            finish_asserts/0,
-            expT/1,
-            %lmcache:isCycAvailable_known/0,
-            %lmcache:isCycUnavailable_known/1,
-            isF/1,
-            isFT/1,
-            isPT/1,
-            isRT/1,
-            isV/1,
-            isVT/1,
-            is_better_backchained/1,
-            is_simple_arg/1,
-            is_simple_gaf/1,
-            isa_db/2,
-            ist_tiny/2,
-            
-            label_args/3,
-            list_to_ops/3,
+          is_better_backchained/1,
+          is_simple_arg/1,
+          is_simple_gaf/1,
+          isa_db/2,
+          ist_tiny/2,
+        cycLToMpred/2,
+        cycLToMpred0/2,
             loadTinyKB/0,
             ltkb1/0,
             ltkb1_complete/0,
-            make_el_stub/4,
-            
-            make_kw_functor/3,
-            make_kw_functor/4,
-            maybe_ruleRewrite/2,
-            mpred_postpend_type/2,
-            mpred_prepend_type/2,
-         %   baseKB:mpred_to_cyc/2,
+          call_el_stub/3,
+
             system:mwkb1/0,
             needs_canoncalization/1,
             needs_indexing/1,
@@ -92,14 +62,19 @@
             wkb01/0,
             wkb02/0,
             wkb2/0,
-            wkbe/0
+            wkbe/0,
+   %finish_asserts/0,
+   
+   %make_el_stub/4,
+   %cyc_to_mpred_idiom/2,
+
    
           ]).
 */         
 % :- set_prolog_flag(lm_expanders,false).
 
 % :- set_prolog_flag(gc,false).
-% :- baseKB:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_rewriting)).
+:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_rewriting)).
 
 :- use_module(library('logicmoo/util/logicmoo_util_filestreams')).
 
@@ -129,7 +104,6 @@
 
 
 :- dynamic(cwtdl_failed/1).
-
 
 cwtdl(Goal,DL,TL):- cwc,
   cnotrace((ignore((nortrace,
@@ -187,103 +161,9 @@ reallyLoadTiny:- mpred_notrace.
 :- multifile(t/7).
 :- multifile(t/8).
 
-coreMt(X):-forward(_BaseKB,'CycInternalAnthropacity',isa,X,ID), \+ disabledAssertion(ID).
-% coreMt(X):-forward('BaseKB','CycInternalAnthropacity',isa,X,ID), \+ disabledAssertion(ID).
-
-
-% NOCOMMIT
-isT(X):- fail,isT(_,X).
-
-isAskableT(Gaf):- var(Gaf),!.
-isAskableT(isT(_)):-!,fail.
-isAskableT(call_u(_)):-!,fail.
-isAskableT(Gaf):-compound(Gaf).
-
-isT(Mt,Gaf):- isAskableT(Gaf), 
- ( \+ compound(Gaf)->
-    (isTT(Mt,TGaf)*->(unt_ify(TGaf,Gaf)->true);fail) ;
-    (t_ify(Gaf,TGaf)->isTT(Mt,TGaf))).
-
-:- dynamic(disabledAssertion/1).
-
-disabledAssertion(ID):-fbc(_,_,randomChars,_,ID).
-disabledAssertion(ID):-fbc(_,_,_,randomChars,ID).
-%disabledAssertion(ID):-fbc(_,isa,randomChars,_,ID).
-%disabledAssertion(ID):-fbc(_,genls,randomChars,_,ID).
-
-
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'tCollection',ID).
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'tFirstOrderCollection',ID).
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'ttSecondOrderCollection',ID).
-extra_tcol(Mt,A,ID):- fbc(Mt,gens,B,C,ID),(A=B;A=C).
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'ttVariedOrderCollection',ID).
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'tSetOrCollection',ID).
-
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'ttCollectionType',ID).
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'ttObjectType',ID).
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'ttStuffType',ID).
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'ttExistingStuffType',ID).
-extra_tcol(Mt,A,ID):- fbc(Mt,isa,A,'ttAtemporalNecessarilyEssentialCollectionType',ID).
-
-specFn(X,Y):-  relToOf(_,Y,X).
-superFn(X,Y):-  relToOf(_,X,Y).
-
-
-relToOf(P,X,Y):-nonvar(X),!,relToOf_v_U(P,X,Y). 
-relToOf(P,X,Y):-nonvar(Y),!,chkRelToOf(P,X,Y).
-relToOf(P,X,Y):-freeze(Y,relToOf(P,X,Y)).
-relToOf_v_U(P,X,Y):-var(Y),!,freeze(X,relToOf(P,X,Y)),freeze(Y,relToOf(P,X,Y)).
-relToOf_v_U(P,X,Y):-freeze(X,relToOf(P,X,Y)).
-
-pat(P,A,B):-fbc(_Mt,P,A,B,ID),\+ notrace(disabledAssertion(ID)).
-
-transbin(genlMt).
-transbin(genls).
-
-chkRelToOf(P,X,Y):-dif(X,Y),transbin(P),pat(P,X,RelTo2),(Y=RelTo2;(pat(P,RelTo2,RelTo3),(Y=RelTo3;pat(P,RelTo3,Y)))).
-
 % extra_tcol(Mt,A,ID):- isTT(Mt,t(genls,A,Other),ID),atom(Other),Other\=A,'Thing'\=Other.
 % extra_tcol(Mt,A,ID):- isTT(Mt,t(genls,Other,A),ID),atom(Other),Other\=A,'Thing'\=Other.
 
-isTT(Mt,TGaf):- no_repeats(TGaf,((isTT(Mt,TGaf,ID), \+ disabledAssertion(ID)))).
-
-isTT(Mt,t(P,A),ID):-fbc(Mt,P,A,ID).
-isTT(Mt,t(tCol,A),ID):- extra_tcol(Mt,A,ID).
-isTT(Mt,t(P,A,B),ID):-fbc(Mt,P,A,B,ID).
-isTT(Mt,t(P,A,B,C),ID):-fbc(Mt,P,A,B,C,ID).
-isTT(Mt,t(P,A,B,C,D),ID):-fbc(Mt,P,A,B,C,D,ID).
-isTT(Mt,t(P,A,B,C,D,E),ID):-fbc(Mt,P,A,B,C,D,E,ID).
-isTT(Mt,t(P,A,B,C,D,E,F),ID):-fbc(Mt,P,A,B,C,D,E,F,ID).
-isTT(_,t(ist,Mt,PAB),ID):- nonvar(Mt),!,isTT(Mt,PAB,ID), \+ arg(1,PAB,ist).
-
-
-
-
-fbc(Mt,P,A,B,ID):-forward(Mt,B,P,A,ID).
-fbc(Mt,P,A,B,ID):-backward(Mt,B,P,A,ID).
-fbc(Mt,P,A,B,ID):-code(Mt,B,P,A,ID).
-
-fbc(Mt,P,A,ID):-forward(Mt,P,A,ID).
-fbc(Mt,P,A,ID):-backward(Mt,P,A,ID).
-fbc(Mt,P,A,ID):-code(Mt,P,A,ID).
-
-
-fbc(Mt,P,A,B,C,ID):-forward(Mt,A,P,B,C,ID).
-fbc(Mt,P,A,B,C,ID):-backward(Mt,A,P,B,C,ID).
-fbc(Mt,P,A,B,C,ID):-code(Mt,A,P,B,C,ID).
-
-
-fbc(Mt,P,A,B,C,D,ID):-forward(Mt,A,P,B,C,D,ID).
-fbc(Mt,P,A,B,C,D,ID):-backward(Mt,A,P,B,C,D,ID).
-fbc(Mt,P,A,B,C,D,ID):-code(Mt,A,P,B,C,D,ID).
-
-fbc(Mt,P,A,B,C,D,E,ID):-forward(Mt,A,P,B,C,D,E,ID).
-fbc(Mt,P,A,B,C,D,E,ID):-backward(Mt,A,P,B,C,D,E,ID).
-fbc(Mt,P,A,B,C,D,E,ID):-code(Mt,A,P,B,C,D,E,ID).
-
-fbc(Mt,P,A,B,C,D,E,F,ID):-forward(Mt,A,P,B,C,D,E,F,ID).
-fbc(Mt,P,A,B,C,D,E,F,ID):-backward(Mt,A,P,B,C,D,E,F,ID).
-fbc(Mt,P,A,B,C,D,E,F,ID):-code(Mt,A,P,B,C,D,E,F,ID).
 
 % :- shared_multifile((  argGenl/3,argIsa/3,argQuotedIsa/3)).
 
@@ -311,9 +191,6 @@ isa_db(I,C):-clause(isa(I,C),true).
 :- set_prolog_flag(lm_expanders,true).
 
 :- dynamic(tinyKB0/1).
-
-maybe_ruleRewrite(I,O):-ruleRewrite(I,O),!.
-maybe_ruleRewrite(IO,IO).
 
 
 tinyKB_wstr(P):-mtUndressedMt(MT),tinyKB(P,MT,_).
@@ -375,23 +252,23 @@ tinyKB_All(PO,MT,STR):- current_predicate(_:'TINYKB-ASSERTION'/5),!,
                memberchk(str(STR),PROPS), 
               (member(vars(VARS),PROPS)->(nput_variable_names( []),fixvars(P,0,VARS,PO),nput_variable_names( PO));PO=P ))).
 
-loadTinyKB:-forall(tinyKB(P,MT,STR),((print_assertion(P,MT,STR),ain(P)))).
+loadTinyKB:-forall((tinyKB(C,MT,STR),cyc_to_clif(C,P)),((print_assertion(P,MT,STR),wdmsg(ain(P))))).
 % ssveTinyKB:-tinyKB_All(tinyKB(P,MT,STR),tell((print_assertion(P,MT,STR),ain(P)))).
 
 print_assertion(P,MT,STR):- P=..PL,append([exactlyAssertedEL|PL],[MT,STR],PPL),PP=..PPL, portray_clause(current_output,PP,[numbervars(false)]).
 
 
-mtUndressedMt('UniversalVocabularyImplementationMt').
-mtUndressedMt('LogicalTruthImplementationMt').
-mtUndressedMt('CoreCycLImplementationMt').
-mtUndressedMt('UniversalVocabularyMt').
-mtUndressedMt('LogicalTruthMt').
-mtUndressedMt('CoreCycLMt').
-mtUndressedMt('BaseKB').
+mtUndressedMt('iUniversalVocabularyImplementationMt').
+mtUndressedMt('iLogicalTruthImplementationMt').
+mtUndressedMt('iCoreCycLImplementationMt').
+mtUndressedMt('iUniversalVocabularyMt').
+mtUndressedMt('iLogicalTruthMt').
+mtUndressedMt('iCoreCycLMt').
+mtUndressedMt('iBaseKB').
 
-mtDressedMt('BookkeepingMt').
-mtDressedMt('EnglishParaphraseMt').
-mtDressedMt('TemporaryEnglishParaphraseMt').
+mtDressedMt('iBookkeepingMt').
+mtDressedMt('iEnglishParaphraseMt').
+mtDressedMt('iTemporaryEnglishParaphraseMt').
 
 into_mpred_form_locally(V,V):- current_prolog_flag(logicmoo_load_state,making_renames),!.
 into_mpred_form_locally(V,R):- into_mpred_form(V,R),!. 
@@ -617,8 +494,8 @@ do_renames_cyc_to_clif(InTerm,_Info,OutTerm):-
 
 
 
-:- ((baseKB:consult(logicmoo(plarkc/'logicmoo_i_cyc_kb_preds.pfc')))).
-:- gripe_time(60,baseKB:qcompile(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'))).
+:- ((user:ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_kb_preds.pfc')))).
+% :- gripe_time(60,baseKB:qcompile(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'))).
 logicmoo_i_cyc_xform:- dmsg("Compiling tinyKB should take under a minute"),
                       gripe_time(60,qcompile(logicmoo(plarkc/'logicmoo_i_cyc_xform.pfc'))).
 % :- logicmoo_i_cyc_xform.

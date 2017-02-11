@@ -1,4 +1,4 @@
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :-module(common_logic_sexpr,[
   codelist_to_forms/2,svar_fixvarname/2,input_to_forms/2,input_to_forms/3,
   sexpr_sterm_to_pterm_list/2,
@@ -7,7 +7,7 @@
   to_untyped/2,ok_varname/1,svar_fixvarname/2,
   sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
 
-:- endif.
+%:- endif.
 
  :- meta_predicate with_lisp_translation(*,2).
  :- meta_predicate see_seen(0).
@@ -35,7 +35,6 @@ see_seen(G):-call(G).
 
 
 :- export(fixvars/4).
-
 
 %= 	 	 
 
@@ -87,6 +86,9 @@ is_va_relation('or').
 is_va_relation('and').
 %= 	 	 
 
+:- user:use_module(logicmoo('plarkc/logicmoo_i_cyc_rewriting')).
+
+maybe_var(S,Name,'$VAR'(Name)):- S=='?',atom(Name),!.
 
 %% sexpr_sterm_to_pterm( ?VAR, ?V) is semidet.
 %
@@ -95,6 +97,7 @@ is_va_relation('and').
 sexpr_sterm_to_pterm(VAR,'$VAR'(V)):- atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
 sexpr_sterm_to_pterm(VAR,kw((V))):- atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
 sexpr_sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
+sexpr_sterm_to_pterm(List,PTERM):- append(Left,[S,Name|TERM],List),maybe_var(S,Name,Var),!,append(Left,[Var|TERM],NewList), sexpr_sterm_to_pterm(NewList,PTERM).
 sexpr_sterm_to_pterm([S|TERM],dot_holds(PTERM)):- \+ (is_list(TERM)),sexpr_sterm_to_pterm_list([S|TERM],(PTERM)),!.
 sexpr_sterm_to_pterm([S,Vars|TERM],PTERM):- nonvar(S),
    call_if_defined(common_logic_snark:is_quantifier(S)),
@@ -109,7 +112,9 @@ sexpr_sterm_to_pterm([S|TERM],PTERM):- S==and,!,must_det_l((maplist(sexpr_sterm_
 sexpr_sterm_to_pterm([S|TERM],PTERM):- is_va_relation(S),!,must_det_l((maplist(sexpr_sterm_to_pterm,TERM,PLIST),list_to_conjuncts(S,PLIST,PTERM))).
 sexpr_sterm_to_pterm([S|TERM],PTERM):- is_relation_sexpr(S),must_det_l((sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[S|PLIST])),!.
 sexpr_sterm_to_pterm([S|TERM],PTERM):- !, sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[S|PLIST]),!.
-sexpr_sterm_to_pterm(STERM,PTERM):- STERM=..[S|TERM],sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[S|PLIST]),!.
+% sexpr_sterm_to_pterm(STERM,PTERM):- STERM=..[S|TERM],sexpr_sterm_to_pterm_list(TERM,PLIST),s_univ(PTERM,[S|PLIST]),!.
+sexpr_sterm_to_pterm(Const,NConst):-atom(Const),rename_atom(Const,NConst),!.
+sexpr_sterm_to_pterm(Const,NConst):-string(Const),string_to_mws(Const,NConst),!.
 sexpr_sterm_to_pterm(VAR,VAR).
 
 s_univ(P,[F|ARGS]):- atom(F),is_list(ARGS),length(ARGS,A),l_arity(F,A),P=..[F|ARGS].

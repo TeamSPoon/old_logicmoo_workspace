@@ -139,6 +139,13 @@
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
 		</Folder>
 		<Folder Name="logicmoo_base">
+			<Folder Name="prolog">
+				<Folder Name="logicmoo">
+					<Folder Name="mpred">
+						<F N="logicmoo_base/prolog/logicmoo/mpred/mpred_header.pro"/>
+					</Folder>
+				</Folder>
+			</Folder>
 			<F
 				N="logicmoo_base/*.*"
 				Recurse="1"

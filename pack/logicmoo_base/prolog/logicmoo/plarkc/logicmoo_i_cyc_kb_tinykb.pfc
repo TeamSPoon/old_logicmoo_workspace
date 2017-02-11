@@ -59,6 +59,7 @@ exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not(What,MT,STR),true.
 exactlyAssertedEL_first(isa, xor, 'LogicalConnective', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, xor, 'ELRelation-OneWay', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, xor, 'CommutativeRelation', 'UniversalVocabularyMt', vStrDef).
+
 exactlyAssertedEL_first(isa, xor, 'BinaryRelation', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, xor, 'AssociativeRelation', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, unknownSentence, 'UnaryPredicate', 'UniversalVocabularyMt', vStrDef).
@@ -9148,4 +9149,6 @@ assertedTinyKB_NEVER(coExtensional, 'List', 'List', 'UniversalVocabularyMt', vSt
 assertedTinyKB_NEVER(genls, 'SubLSExpression', 'CharacterString', 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_NEVER(genls, 'CycLExpression', 'CycLTerm', 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_NEVER(genls, 'CycLExpression', 'CycLTerm', 'CoreCycLMt', vStrDef).
+
+:- set_prolog_flag(do_renames,restore).
 

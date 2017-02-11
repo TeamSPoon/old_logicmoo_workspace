@@ -8,8 +8,10 @@
 % Dec 13, 2035
 %
 
+:-ensure_loaded(baseKB:library('logicmoo/mpred/mpred_props')).
 :- include('mpred_header.pro').
 
+%:- if(current_prolog_flag(logicmoo_autoload,false)).
 :- use_module(library('logicmoo/mpred/mpred_type_wff.pl')).
 :- use_module(library('logicmoo/mpred/mpred_at_box.pl')).
 :- use_module(library('logicmoo/mpred/mpred_expansion.pl')).
@@ -43,6 +45,7 @@
 
 :- use_module(library('logicmoo/snark/common_logic_kb_hooks.pl')).
 
+%:- endif.
 /*
 
 

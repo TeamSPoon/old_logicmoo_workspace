@@ -24,7 +24,7 @@ end_of_file.
 :- was_dynamic http:location/3.
 
 :- use_module(library(memfile)).
-:- ensure_loaded(logicmoo_base).
+%:- ensure_loaded(logicmoo_base).
 %:- use_module(server).
 
 /*

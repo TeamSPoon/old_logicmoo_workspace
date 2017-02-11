@@ -21,7 +21,7 @@ type_action_info(tHumanControlled,actHelp(isOptional(ftString,"")), "shows this 
 get_all_templates(Templ):- no_repeats(get_all_templates0(Templ)).
 
 :-export(good_template/1).
-good_template(Templ):- not(contains_singletons(Templ)).
+good_template(Templ):- \+ contains_singletons(Templ).
 
 get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
@@ -35,8 +35,10 @@ get_bad_templates(Templ):- no_repeats_old((action_info(Templ,_),not(good_templat
 
 :- sanity((fully_expand_real(foo,action_info(TEMPL, txtConcatFn(_Text,"does: ",do(_A2,TEMPL))),O),wdmsg(O))).
 
+:- mpred_pfc:import(baseKB:get_agent_text_command_0/4).
 
-:-must(ain_expanded(({between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}==>
+==> ((({between(1,5,L),length(Text,L),
+     get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}==>
          action_info(TEMPL, txtConcatFn(Text,"does: ",do(A2,TEMPL)))))).
 
 (action_rules(_Agent,Verb,[Obj|Objs],List),{atomic(Verb),safe_univ(Syntax,[Verb,Obj|Objs])} ==> 

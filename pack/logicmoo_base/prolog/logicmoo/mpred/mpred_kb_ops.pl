@@ -1153,6 +1153,7 @@ update_single_valued_arg(M,P,N):-
 
 update_single_valued_arg(M,P,N):- 
  call_u((must_det_l((
+
   call_u(mtCycL(M)),
   mpred_type_args \= M,
   mpred_kb_ops \= M,

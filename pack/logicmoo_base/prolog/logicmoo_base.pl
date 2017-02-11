@@ -12,6 +12,41 @@
 %prolog_stack:stack_guard(none).
 
 
+:- decl_shared(arity/2).
+:- decl_shared(functorDeclares/1).
+:- decl_shared(genlMt/2).
+
+:- decl_shared(genls/2).
+:- decl_shared(ttStringType/1).
+:- decl_shared(mpred_f/2).
+:- decl_shared(mpred_f/3).
+:- decl_shared(ttExpressionType/1).
+:- decl_shared(tCol/1).
+:- decl_shared(tSet/1).
+:- decl_shared(mtCore/1).
+:- decl_shared(mtCycL/1).
+:- decl_shared(mtExact/1).
+:- decl_shared(mtGlobal/1).
+:- decl_shared(mtProlog/1).
+:- decl_shared(mtExact/1).
+:- decl_shared(tCol/1).
+
+
+:- decl_shared((
+ rtQuotedPred/1,
+   argIsa/3,
+   bt/2, %basePFC
+   hs/1, %basePFC
+   hs/1, %basePFC
+   nt/3, %basePFC
+   pk/3, %basePFC
+   pt/2, %basePFC
+   que/1, %basePFC
+   pm/1, %basePFC
+   spft/3, %basePFC
+   tms/1, %basePFC
+   prologSingleValued/1)).
+
 :- user:ensure_loaded(logicmoo_utils).
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
 :- ensure_loaded(library('logicmoo/util/logicmoo_util_supp.pl')).
@@ -50,15 +85,14 @@
 %:- guitracer.
 %:- set_prolog_flag(access_level,system).
 
-
-
-:- set_prolog_flag(logicmoo_autoload,false).
-%%% TODO one day :- set_prolog_flag(logicmoo_autoload,true).
+% :- set_prolog_flag(logicmoo_autoload,false).
+:- set_prolog_flag(logicmoo_autoload,true).
 
 
 % must be xref-ing or logicmoo_autoload or used as include file
-% :- set_prolog_flag(logicmoo_include,lmbase:skip_module_decl).
+:- set_prolog_flag(logicmoo_include,lmbase:skip_module_decl).
 % lmbase:skip_module_decl:- source_location(F,L),wdmsg(lmbase:skip_module_decl(F:L)),!,fail.
+lmbase:skip_module_decl:-!,fail.
 lmbase:skip_module_decl:-
    (current_prolog_flag(xref,true)-> false ;
     (current_prolog_flag(logicmoo_autoload,true)-> false ;
@@ -80,7 +114,7 @@ baseKB:mpred_skipped_module(eggdrop).
 % DBASE_T System
 % ================================================    
 
-% :- if(current_prolog_flag(logicmoo_autoload,false)).
+:- if(current_prolog_flag(logicmoo_autoload,false)).
 
 :- dmsg("Ensuring loaded logicmoo/[snark|mpred[online]] ",[]).
 
@@ -118,18 +152,9 @@ baseKB:mpred_skipped_module(eggdrop).
 :- ensure_loaded(library('logicmoo/snark/common_logic_kb_hooks.pl')).
 :- ensure_loaded(library('logicmoo/mpred/mpred_userkb.pl')).
 
-% :- else.
-
-:- dmsg("Adding logicmoo/[snark|mpred[online]] to autoload path",[]).
-:- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
-:- add_library_search_path('./logicmoo/mpred/',[ 'mpred_*.pl']).
-:- must(add_library_search_path('./logicmoo/mpred_online/',[ '*.pl'])).
-%:- add_library_search_path('./logicmoo/../',[ 'logicmoo_*.pl']).
-%:- add_library_search_path('./logicmoo/',[ '*.pl']).
-
-:- reexport(library('logicmoo/mpred/mpred_at_box.pl')).
 :- reexport(library('logicmoo/mpred/mpred_expansion.pl')).
 :- reexport(library('logicmoo/mpred/mpred_loader.pl')).
+:- reexport(library('logicmoo/mpred/mpred_at_box.pl')).
 :- reexport(library('logicmoo/mpred/mpred_pfc.pl')). % except([op(_,_,_)]).
 :- reexport(library('logicmoo/mpred/mpred_prolog_file.pl')).
 :- reexport(library('logicmoo/mpred/mpred_props.pl')).
@@ -161,12 +186,20 @@ baseKB:mpred_skipped_module(eggdrop).
 :- reexport(library('logicmoo/snark/common_logic_kb_hooks.pl')).
 :- reexport(library('logicmoo/mpred/mpred_userkb.pl')).
 
-%:- add_library_search_path('./logicmoo/plarkc/',[ '*.pl']).
+:- else.
+
+:- dmsg("Adding logicmoo/[snark|mpred[online]] to autoload path",[]).
+:- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
+:- add_library_search_path('./logicmoo/mpred/',[ 'mpred_*.pl']).
+:- must(add_library_search_path('./logicmoo/mpred_online/',[ '*.pl'])).
 %:- add_library_search_path('./logicmoo/pttp/',[ 'dbase_i_mpred_*.pl']).
+%:- add_library_search_path('./logicmoo/plarkc/',[ '*.pl']).
+%:- add_library_search_path('./logicmoo/../',[ 'logicmoo_*.pl']).
+%:- add_library_search_path('./logicmoo/',[ '*.pl']).
 
-% :- autoload.
+:- autoload([verbose(false)]).
 
-% :- endif.
+:- endif.
 
 
 %baseKB:sanity_check:- findall(U,(current_module(U),default_module(U,baseKB)),L),must(L==[baseKB]).
@@ -202,7 +235,7 @@ user:lmbf:-
   w_tl( set_prolog_flag(lm_expanders,true),
    w_tl(set_prolog_flag(pfc_booted,false),
      with_umt(baseKB,
-  prolog_statistics:time((consult(baseKB:library(logicmoo/pfc/'system_base.pfc')))))))),
+  prolog_statistics:time((ensure_loaded(baseKB:library(logicmoo/pfc/'system_base.pfc')))))))),
   set_prolog_flag(pfc_booted,true).
 
 
@@ -231,36 +264,85 @@ user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_unde
 :- set_prolog_flag(lmcode:unknown,error).
 :- set_prolog_flag(baseKB:unknown,error).
 
-% system:clause_expansion(I,PosI,O,PosI):- base_clause_expansion(PosI,I,O),!.
-system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),nonvar(I), 
-      base_clause_expansion(PosI,I,O)->I\==O,!.
 
-:- enable_mpred_expansion.
 
-% Load boot base file
-:- consult(library(logicmoo/pfc/'system_base.pfc')).
+%:- thread_local t_l:side_effect_ok/0.
+%:- lmce:reset_modules.
+%system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
+%system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
+
+in_goal_expansion:- prolog_current_frame(F),
+   prolog_frame_attribute(F,parent_goal,expand_goal(_,_,_,_)).
+
+should_base_ce(I):-  nb_current('$goal_term',Was),same_terms(I, Was),!,fail.
+should_base_ce(I):-  
+   (nb_current_or_nil('$source_term',TermWas),\+ same_terms(TermWas, I)),
+   (nb_current_or_nil('$term',STermWas),\+ same_terms(STermWas, I)),!,
+   fail.
+should_base_ce(_).
+
+
+maybe_should_rename(M,O):-current_prolog_flag(do_renames,term_expansion),do_renames(M,O),!.
+maybe_should_rename(O,O).
+
+base_clause_expansion(W,I,O):- should_base_ce(I), \+ t_l:disable_px , base_clause_expansion_r(W,I,M),maybe_should_rename(M,O),!.
+
+%base_clause_expansion_r(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
+base_clause_expansion_r(_,I,_):- \+ compound(I), !, fail.
+base_clause_expansion_r(_,':-'(ain_expanded(I)),':-'(ain_expanded(I))):-!.
+base_clause_expansion_r(_,':-'(ain(I)),':-'(ain(I))):-!.
+base_clause_expansion_r(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
+base_clause_expansion_r(_,I, O):- \+ in_goal_expansion, get_consequent_functor(I,F,A)->base_clause_expansion_fa(I,O,F,A),!.
+base_clause_expansion_r(_,I, O):- expand_isEach_or_fail(I,O),!.
+
+base_clause_expansion_fa(_,_,F,A):- clause_b(mpred_prop(F,A,prologBuiltin)),!,fail.
+base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- needs_pfc(F,A),!.
+base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- in_dialect_pfc,!,ain(mpred_prop(F,A,prologHybrid)).
+base_clause_expansion_fa(_,_,F,A):- ain(mpred_prop(F,A,prologBuiltin)),!,fail.
+
+
+needs_pfc(F,A):- 
+  (clause_b(functorIsMacro(F));clause_b(functorDeclares(F));clause_b(prologHybrid(F));
+  clause_b(mpred_prop(F,A,prologHybrid));clause_b(wrap_shared(F,A,ereq))),!.
+
+/*
+maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
+   \+ (clause_b(functorIsMacro(F));clause_b(functorDeclares(F));clause_b(mpred_prop(F,A,prologHybrid))),
+   ain(prologBui sltin(F/A)).
+
+*/
+
+:- ( defaultAssertMt(_)->true;set_defaultAssertMt(baseKB)).
+
+:- ensure_loaded(library('logicmoo/mpred/mpred_userkb.pl')).
+
+
+
 
 :- set_prolog_flag(read_attvars,false).
 
 :- sanity((clause(baseKB:ignore_file_mpreds(_),B),compound(B))).
 
-% :- autoload([]).
-
-/*
-
-%:- flag_call(logicmoo_debug=true).
-
-:- noguitracer.
-:- call(call,(trace,call(call,(dmiles:mpred_ain(fooaosdasd,(cuz,ax)))))).
-
-:- break.
-:- rtrace(uses_predicate(dmiles:mpred_ain/2,O)).
-:- break.
-
-:- flag_call(logicmoo_debug=false).
-
-*/
-
+:- autoload([verbose(false)]).
 :- statistics.
 :- set_prolog_flag(lm_expanders,true).
+
+:- ain(arity(functorDeclares, 1)).
+% Load boot base file
+%:- dynamic(isa/2).
+
+cannot_expand_current_file:-source_location(File,_)->cannot_expand_file(File),!.
+
+:- multifile(baseKB:ignore_file_mpreds/1).
+:- dynamic(baseKB:ignore_file_mpreds/1).
+cannot_expand_file(File):-baseKB:ignore_file_mpreds(File),!.
+cannot_expand_file(File):-baseKB:ignore_file_mpreds(Stem),atom_concat(Stem,_,File),!,asserta(baseKB:ignore_file_mpreds(File)).
+
+
+% system:clause_expansion(I,PosI,O,PosI):- base_clause_expansion(PosI,I,O),!.
+system:term_expansion(I,PosI,O,PosI):- nonvar(I),nonvar(PosI),current_prolog_flag(lm_expanders,true),
+      \+ cannot_expand_current_file,
+      base_clause_expansion(PosI,I,O)->I\==O,!.
+      
+:- ensure_loaded(library(logicmoo/pfc/'system_base.pfc')).
 

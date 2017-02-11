@@ -23,7 +23,7 @@ directVisible(MT) :- queryMt(MT) .
 impPred(mtVisible) .
 mtVisible(MT) :- directVisible(MT) .
 mtVisible(GENL) :- directVisible(SPEC) & sbhlSentence(genlMt(SPEC, GENL)) .
-mtVisible(MT) :- queryMt(EverythingPSC) & sbhlSentence(isa(MT, Microtheory)) .
+mtVisible(MT) :- queryMt(iEverythingPSC) & sbhlSentence(isa(MT, Microtheory)) .
 
 impPred(call_u_no_bc) .
 call_u_no_bc(P) :- istAsserted(MT, P) & mtVisible(MT) .
@@ -33,8 +33,8 @@ lookupSentence(ASENT) :- call_u_no_bc(ASENT) .
 lookupSentence(ASENT) :- forwardSentence(ASENT) .
 
 impPred(forwardSentence) .
-forwardSentence(arity(R, (2))) :- mtVisible(BaseKB) & removalSentence(isa(R, BinaryRelation)) .
-forwardSentence(isa(NART, COL)) :- mtVisible(BaseKB) & removalSentence(natFunction(NART, F)) & removalSentence(resultIsa(F, COL)) .
+forwardSentence(arity(R, (2))) :- mtVisible(iBaseKB) & removalSentence(isa(R, BinaryRelation)) .
+forwardSentence(isa(NART, COL)) :- mtVisible(iBaseKB) & removalSentence(natFunction(NART, F)) & removalSentence(resultIsa(F, COL)) .
 
 
 impPred(destructureFormula) .

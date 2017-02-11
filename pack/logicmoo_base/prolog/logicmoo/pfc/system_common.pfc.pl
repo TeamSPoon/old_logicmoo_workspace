@@ -33,8 +33,10 @@
 
 % :- require('system_base.pfc').
 
-:- begin_pfc.
+:- mpred_unload_file.
 
+:- begin_pfc.
+:- '$set_source_module'(baseKB).
 :- prolog_load_context(module,Mod),sanity(Mod==baseKB),writeq(prolog_load_context(module,Mod)),nl.
 
 :- % better stack traces..
@@ -144,8 +146,6 @@ conflict(C) ==> {must(with_mpred_trace_exec((resolveConflict(C),\+conflict(C))))
 :- dynamic(rtUnaryPredicate/1).
 :- dynamic(ttExpressionType/1).
 
-{type_prefix(_Prefix,Type)}==>tCol(Type).
-{type_suffix(_Suffix,Type)}==>tCol(Type).
 tSet(completelyAssertedCollection).
 
 
@@ -177,7 +177,7 @@ rtNotForUnboundPredicates(member).
 
 
 :- fully_expand(==>pkif("
-(==> 
+(=> 
     (and 
       (typeGenls ?COLTYPE1 ?COL1) 
       (typeGenls ?COLTYPE2 ?COL2) 
@@ -185,14 +185,14 @@ rtNotForUnboundPredicates(member).
     (disjointWith ?COLTYPE1 ?COLTYPE2))"
 ),O),dmsg(O).
 
-:-must(ain(pkif("
-(==> 
+==>pkif("
+(=> 
     (and 
       (typeGenls ?COLTYPE1 ?COL1) 
       (typeGenls ?COLTYPE2 ?COL2) 
       (disjointWith ?COL1 ?COL2)) 
-    (disjointWith ?COLTYPE1 ?COLTYPE2))"
-))).
+    (disjointWith ?COLTYPE1 ?COLTYPE2))
+                            ").
 
 
 /*
@@ -467,7 +467,6 @@ tSet(completelyAssertedCollection).
 
 ttExpressionType(C) ==> ( \+ completelyAssertedCollection(C), ~ tSet(C), tCol(C)).
 
-((tCol(C)/( \+ ttExpressionType(C))) ==> tSet(C)).
 
 :- sanity(get_lang(pfc)).
 %WEIRD ~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
@@ -477,21 +476,28 @@ ttExpressionType(C) ==> ( \+ completelyAssertedCollection(C), ~ tSet(C), tCol(C)
 % ((tCol(P), \+ ttExpressionType(P)) <==> tSet(P)).
 
 tSet(C) ==>
-({ignore((
-  % kb_dynamic(C/1),
+({((
+  % 
   % dynamic(C/1),
-  % wdmsg(c_tSet(C)),
+  % wdmsg(c_tSet(C)),  
+  %call((shouldnt_be_set(C) -> (show_failure(mpred_why(tSet(C))),
+  %   show_failure(mpred_why(tCol(C))),break) ; true)),
   atom(C),
+  %\+ ttExpressionType(C),
   ( \+ is_static_predicate(C/1)),
   functor(Head,C,1),
   call(BHead=baseKB:Head),
   ( \+(predicate_property(BHead,_))-> kb_dynamic(C/1); true),
+  baseKB:export(baseKB:C/1),
+  mpred_type_isa:import(baseKB:C/1),
   nop(predicate_property(BHead,dynamic)->true;show_pred_info(BHead))))},
   functorDeclares(C),
   pfcControlled(C),
   \+ ttExpressionType(C),
   tCol(C),
   arity(C,1)).
+
+
 
 /*
 tSet(C)==>
@@ -708,7 +714,7 @@ isa(tRelation,ttAbstractType).
 
 :- if(baseKB:startup_option(datalog,sanity);baseKB:startup_option(clif,sanity)).
 
-:- consult(pack(logicmoo_base/t/examples/pfc/'neg_sanity.pfc')).
+:- reconsult(pack(logicmoo_base/t/examples/pfc/'neg_sanity.pfc')).
 
 
 :- endif. % load_time_sanity
@@ -755,7 +761,6 @@ completelyAssertedCollection(completelyAssertedCollection).
 tSet(ttExpressionType).
 
 
-:- consult('system_genls.pfc').
 :- install_constant_renamer_until_eof.
 
 genls(ttSpatialType,ttTemporalType).
@@ -1153,7 +1158,8 @@ arity(typeProps,2).
 % FIXX 
 ==> prologHybrid(isEach( ttNotTemporalType/1,ttTemporalType/1 )).
 % TODO FIX 
-:- decl_mpred(tDeleted(ftID),[prologIsFlag]).
+% :- decl_mpred(tDeleted(ftID),[prologIsFlag]).
+prologIsFlag(tDeleted(ftID)).
 % FIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx
 prologHybrid(genlInverse/2).
 prologHybrid(genlPreds/2).
@@ -1197,7 +1203,6 @@ ttExpressionType(ftPercent).
 isa(vRed,vtColor).
 
 completelyAssertedCollection(vtValue).
-
 
 :- system:op(1199,fx,('==>')).
 :- system:op(1190,xfx,('::::')).
@@ -1310,7 +1315,7 @@ arity(ftDeplictsFn,1).
 arity(tFunction,1).
 tFunction(ftDiceFn(ftInt,ftInt,ftInt)).
 tFunction(ftListFn(tCol)).
-tFunction(ftDeplictsFn(tCol)).
+tFunction(ftDeplictsFn).
 
 completelyAssertedCollection(rtAvoidForwardChain).
 completelyAssertedCollection('SententialOperator').
@@ -1433,7 +1438,7 @@ subFormat(ftVoprop,ftRest(ftVoprop)).
 subFormat(ftVoprop,ftTerm).
 
 subFormat(COL1,COL2)/(atom(COL1);atom(COL2))==>(ttExpressionType(COL1),ttExpressionType(COL2)).
-tCol(W)==>{quietly_u(guess_supertypes(W))}.
+tCol(W)==>{quietly(guess_supertypes(W))}.
 
 
 tSet(tNewlyCreated).
@@ -1463,13 +1468,17 @@ typeGenls(ttTypeType,tCol).
 ttTypeFacet(ttUnverifiableType).
 ttUnverifiableType(ftID).
 % ttUnverifiableType(ftListFn(ftTerm)).
-ttUnverifiableType(ftListFn).
+% ttUnverifiableType(ftListFn).
 % ttUnverifiableType(ftDiceFn(ftInt,ftInt,ftInt)).
-ttUnverifiableType(ftDice).
-ttUnverifiableType(ftString).
-ttUnverifiableType(ftTerm).
-ttUnverifiableType(ftText).
-ttUnverifiableType(ftVoprop).
+
+ttUnverifiableFormatType(C) <==> ttExpressionType(C),ttUnverifiableType(C).
+
+ttUnverifiableFormatType(ftDice).
+ttUnverifiableFormatType(ftString).
+ttUnverifiableFormatType(ftTerm).
+ttUnverifiableFormatType(ftText).
+ttUnverifiableFormatType(ftVoprop).
+
 ttUnverifiableType(tCol).
 ttUnverifiableType(tFunction).
 ttUnverifiableType(tPred).
@@ -1519,7 +1528,8 @@ quotedDefnIff(ftRest(Type),is_rest_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftListFn(Type),is_list_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftCodeIs(SomeCode),SomeCode):- cwc, is_ftNonvar(SomeCode).
 
-(ttExpressionType(FT)/append_term(FT,Arg,Head)==> ((Head:- !, term_is_ft(Arg,FT)))).
+(ttExpressionType(FT)/append_term(FT,Arg,Head) ==> 
+    ((Head:- !, term_is_ft(Arg,FT)))).
 
 % tCol(Type),(rtBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G ==> relationMostInstance(Pred,Type,Value).
 
@@ -1564,12 +1574,34 @@ completelyAssertedCollection(rtBinaryPredicate).
 %(tCol(Super),completelyAssertedCollection(Super),genls(Sub, Super), isa(I,Sub), {ground(I:Sub:Super),\==(Sub, Super)}) ==> isa(I,Super).
 
 :- mpred_trace_exec.
-((genlPreds(P,equals),argIsa(P,1,Col)) ==>  (t(P,A,B):- (nonvar(A),A==B,isa(A,Col)))).
-genlPreds(genls,equals).
+
+/*
+
+(implies 
+    (and 
+      (isa ?PRED ReflexiveBinaryPredicate) 
+      (arg1Isa ?PRED ?CONSTRAINT1) 
+      (isa ?OBJ1 ?CONSTRAINT1) 
+      (equals ?OBJ1 ?OBJ2)) 
+    (?PRED ?OBJ1 ?OBJ2))
+
+*/
+% ((genlPreds(equals,P),argIsa(P,1,Col)) ==>  (t(P,A,B):- (nonvar(A),A==B,isa(A,Col)))).
+% genlPreds(genls,equals).
 :- mpred_notrace_exec.
-rtReflexiveBinaryPredicate(TB)==>genlPreds(TB,equals).
+rtReflexiveBinaryPredicate(TB)==>genlPreds(equals,TB).
 
 % (isa(TypeType,ttTypeType) , isa(Inst,TypeType), genls(SubInst,Inst)) ==> isa(SubInst,TypeType).
+
+ttExpressionType(ftAction).
+{type_prefix(_Prefix,Type),atom(Type),atom_concat(ft,_,Type)}==>ttExpressionType(Type).
+{type_suffix(_Suffix,Type),atom(Type),atom_concat(ft,_,Type)}==>ttExpressionType(Type).
+
+
+{type_prefix(_Prefix,Type)}==>tCol(Type).
+{type_suffix(_Suffix,Type)}==>tCol(Type).
+
+((tCol(C)/( \+ ttExpressionType(C))) ==> tSet(C)).
 
 
 
@@ -1590,11 +1622,13 @@ prologHybrid(formatted_resultIsa/2).
 
 tSet(tPhilosopher).
 
+%:- mpred_trace_all.
 isa(iPlato,'tPhilosopher').
 %:- mpred_test(\+ isa(iPlato,ftAtom)).
 %:- mpred_test(~isa(iPlato,ftAtom)).
-:- mpred_test(~quotedIsa(iPlato,'tPhilosopher')).
-:- mpred_test(quotedIsa(iPlato,ftAtom)).
+:- sanity(mpred_test(~quotedIsa(iPlato,'tPhilosopher'))).
+:- sanity(mpred_test(quotedIsa(iPlato,ftAtom))).
+:- mpred_notrace_all.
 
 ttBarrierStr(A)/(atomic_list_concat([A,"Type"],AType0),
   atomic_list_concat([A,''],Type0),
@@ -1652,5 +1686,7 @@ ttBarrierStr("Topic").
 
 genlsFwd(tItem,'Artifact').
 genlsFwd(tRegion,'Place').
+
+:- set_prolog_flag(do_renames,restore).
 
 

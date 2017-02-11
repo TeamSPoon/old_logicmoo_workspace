@@ -44,7 +44,7 @@
 %=    atmost(X,N,A)
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_compiler.pl
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(common_logic_compiler,         
           [ 
            nnf/3, 
@@ -147,8 +147,8 @@
           ]).
 
 :- include('../mpred/mpred_header.pi').
-:- user:ensure_loaded(library(logicmoo_base)).
-:- endif.
+%:- user:ensure_loaded(library(logicmoo_base)).
+%:- endif.
 
   
 
@@ -164,6 +164,7 @@
 
 :-ain(baseKB:predicateConventionMt(mud_test,baseKB)).
 
+:-reexport(library('logicmoo/snark/common_logic_snark')).
 
 
 :- multifile((        

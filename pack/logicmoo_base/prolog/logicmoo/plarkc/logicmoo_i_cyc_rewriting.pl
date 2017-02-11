@@ -16,6 +16,44 @@
 % Douglas Miles
 
 */
+:- module(logicmoo_i_cyc_rewriting,
+
+          [            atom_concatM/3,
+            atom_concatR/3,
+            % BAD?  baseKB:cycPrepending/2,
+            % cyc_to_clif_notify/2,
+            rename_atom/2,
+            cyc_to_clif/2,
+            cyc_to_mpred_idiom1/2,
+            cyc_to_mpred_idiom_unused/2,
+            cyc_to_mpred_sent_idiom_2/3,
+            % BAD?  baseKB:cyc_to_plarkc/2,
+            expT/1,
+            %lmcache:isCycAvailable_known/0,
+            %lmcache:isCycUnavailable_known/1,
+            isF/1,
+            isFT/1,
+            %isPT/1,
+            isRT/1,
+            isV/1,
+            isVT/1,
+%   baseKB:mpred_to_cyc/2,
+
+            label_args/3,
+            list_to_ops/3,
+
+          must_map_preds/3,
+          maybe_ruleRewrite/2,
+          is_kif_string/1,
+ from_kif_string/2,
+ convert_from_kif/2,
+ convert_if_kif_string/2,
+
+            make_kw_functor/3,
+            make_kw_functor/4,
+            mpred_postpend_type/2,
+            mpred_prepend_type/2
+            ]).
 :- use_module(library('logicmoo/util/logicmoo_util_file_scope')).
 
 :- set_prolog_flag_until_eof(lm_expanders,false).
@@ -24,22 +62,14 @@
 :- module_transparent(show_missing_renames/0).
 :- export(show_missing_renames/0).
 show_missing_renames:-!.
-show_missing_renames:-
-  listing(baseKB:rn(I,I)),
-  % TODO USING? listing(baseKB:mpred_to_cyc(I,I)),
-  listing(baseKB:rename(I,I)),!.
+show_missing_renames:- listing(baseKB:rn_new(I,I)).
   
 :- module_transparent(install_constant_renamer_until_eof/0).
 :- export(install_constant_renamer_until_eof/0).
-install_constant_renamer_until_eof:- 
- call_on_eof(show_missing_renames),
- set_prolog_flag_until_eof(do_renames,term_expansion),
- assert_until_eof((
-     system:term_expansion(I, O):- 
-      compound(I),
-      current_prolog_flag(do_renames,term_expansion),
-      b_getval('$term', Term),Term==I,       
-      do_renames(I,O)->I\==O )).
+install_constant_renamer_until_eof:-  call_on_eof(show_missing_renames), set_prolog_flag_until_eof(do_renames,term_expansion).
+
+
+
 
 :- dynamic(baseKB:cycPrepending/2).
 baseKB:cycPrepending(ft,'Atom').
@@ -143,8 +173,11 @@ baseKB:cycPrepending(vt,'AssertionDirection').
 baseKB:cycPrepending(tt,'InferenceSupportedCollection').
 % BAD?  baseKB:cycPrepending(rt,A):-atom(A),atom_contains(A,'Predicate').
 
-prepender(Pre,C):- best_rename(C,P),atom_concat(Pre,C,P).
+prepender(Pre,C):- builtin_rn_or_rn(C,P),atom_concat(Pre,C,P).
 
+
+
+% documentation(C,'EnglishLanguage',S)=@=>comment(C,S).
 
 % for SUMO
 :- dynamic(baseKB:sumo_to_plarkc/2).
@@ -152,6 +185,7 @@ baseKB:sumo_to_plarkc('domain', 'argIsa').
 baseKB:sumo_to_plarkc('subclass', 'genls').
 baseKB:sumo_to_plarkc('range', 'resultIsa').
 baseKB:sumo_to_plarkc('domainSubclass', 'argGenl').
+baseKB:sumo_to_plarkc(immediateInstance,nearestIsa).
 baseKB:sumo_to_plarkc('rangeSubclass', 'resultGenl').
 baseKB:sumo_to_plarkc('instance', 'isa').
 baseKB:sumo_to_plarkc(subrelation,genlPreds).
@@ -159,45 +193,20 @@ baseKB:sumo_to_plarkc(documentation,comment).
 baseKB:sumo_to_plarkc('Class','tSet').
 baseKB:sumo_to_plarkc('SetOrClass', 'tCol').
 
-renamed_surely(C):- rn(C,_);rn(_,C).
+renamed_surely(C):- kb7166:rnc(C,_);kb7166:rnc(_,C).
 
-ftCycOnlyTerm(C):- rn(C,_), \+ rename(_,C).
-ftCycOnlyTerm(C):- rename(_,C), atom(C).
 
-ftLarkcOnlyTerm(P):- rn(_,P), \+ rename(P,_).
-ftLarkcOnlyTerm(P):- rename(P,_).
 
-cyc_renames(C,P1,P2):- ftCycOnlyTerm(C),atom(C),
-   ((rename(P2,C),atom(P2))->true;P1=P2),
-   gripe_time(0.1,once((cyc_to_mpred_create(C,P1);P1=P2))).
 
-remove_renames(T):- sanity(nonvar(T)),retractall(rn(_,T)).
-
-conflicted_rename(C,P1,P2):- cyc_renames(C,P1,P2), P1\==P2.
-
-is_merge0(C1,C2):- ftLarkcOnlyTerm(P),rn(C1,P),dif(C1,C2),rn(C2,P).
+is_merge0(C1,C2):- ftLarkcOnlyTerm(P),kb7166:rnc(C1,P),dif(C1,C2),kb7166:rnc(C2,P).
 is_merge(O1,O2):- no_repeats([O1,O2],(is_merge0(C1,C2), sort([C1,C2],[O1,O2]))).
-
-best_rename(C,P):- builtin_rn_or_rn(C,P),!,nonvar(C),ignore((rename(_,C),doall(show_call(retract(rename(_,C)))))),!.
-best_rename(C,P):- cyc_renames(C,P1,P2), \+ rn(C,_), once(best_rename(C,P1,P2,P)),!.
-% best_rename(C,P):- cyc_to_mpred_create(C,P),!.
-
-best_rename(_C,P,P,P):-!.
-best_rename(C,C,P2,P):-!,P=P2.
-best_rename(C,P1,C,P):-!,P=P1.
-best_rename(_C,P1,P2,P):-atom_prefix(P1,ft),atom_prefix(P2,xt),!,P=P1.
-best_rename(_C,P1,P2,P):-atom_contains(P1,P2),!,P=P1.
-best_rename(_C,P1,P2,P):-atom_contains(P2,P1),!,P=P2.
-best_rename(_C,_,P2,P):-starts_lower(P2),!,P=P2.
-% best_rename(_C,P1,_,P):-starts_lower(P1),!,P=P1.
-best_rename(_C,P1,_,P1).
 
 :- multifile(baseKB:rn_new/2).
 :- dynamic(baseKB:rn_new/2).
+:- export(baseKB:rn_new/2).
 
 
 builtin_rn_or_rn_new(C,P):-builtin_rn(C,P).
-builtin_rn_or_rn_new(C,P):-rn(C,P).
 builtin_rn_or_rn_new(C,P):-kb7166:rnc(C,P).
 builtin_rn_or_rn_new(C,P):-baseKB:rn_new(C,P).
 
@@ -242,6 +251,9 @@ builtin_rn('SubLExpressionType',ttExpressionType).
 
 builtin_rn('holds', 't').
 builtin_rn('dot_holds', 't').
+
+builtin_rn('SubLListOfStrings', ftListFn(ftString)).
+
 builtin_rn('ArgGenlQuantityTernaryPredicate',rtArgGenlQuantityTernaryPredicate).
 builtin_rn('ELRelation',rtELRelation).
 builtin_rn('InterArgFormatPredicate',rtInterArgFormatPredicate).
@@ -1161,6 +1173,77 @@ builtin_rn('BridgeAlarmEvidentialPredicate', rtBridgeAlarmEvidentialPredicate).
 
 
 
+%load_mpred_name_stream(_Name):- do_gc,repeat,read_one_term(Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
+%load_mpred_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
+
+
+/*
+:- ensure_loaded(plarkc(mpred_sexpr_reader)).
+
+:- parse_to_source(
+  "(documentation instance EnglishLanguage \"An object is an &%instance of a &%SetOrClass if it is included in that &%SetOrClass. 
+  An individual may be an instance of many classes, some of which may be subclasses of others. 
+  Thus, there is no assumption in the meaning of &%instance about specificity or uniqueness.\")",
+  Out),writeq(Out).
+*/
+
+
+
+
+%% is_kif_string( ?String) is det.
+%
+% If Is A Knowledge Interchange Format String.
+%
+is_kif_string([]):- !,fail.
+is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),memberchk(41,Codes).
+
+
+
+
+%% convert_if_kif_string( ?I, ?O) is det.
+%
+% Convert If Knowledge Interchange Format String.
+%
+convert_if_kif_string(I, O):-is_kif_string(I),convert_from_kif(I,O),!, \+ is_list(O).
+
+
+convert_from_kif(I,O):- from_kif_string(I,Wff),quietly_must((sexpr_sterm_to_pterm(Wff,O))),!.
+
+
+%% from_kif_string( ?String, ?Forms) is det.
+%
+% Converted From Knowledge Interchange Format String.
+%
+from_kif_string(I,Wff) :- input_to_forms(I,Wff,Vs),put_variable_names(Vs),!.
+from_kif_string(String,Forms) :- quietly_must((codelist_to_forms(String,Forms);input_to_forms(string(String),Forms))),!.
+from_kif_string(Wff,Wff).
+
+
+:- module_transparent(must_map_preds/3).
+must_map_preds([],IO,IO):-!.
+must_map_preds([one(Pred)|ListOfPreds],IO,Out):- must(call(Pred,IO)),!,
+   must_map_preds(ListOfPreds,IO,Out).
+must_map_preds([Pred|ListOfPreds],In,Out):- must(call(Pred,In,Mid)),!,
+   must_map_preds(ListOfPreds,Mid,Out),!.
+
+
+delay_rule_eval(InOut,InOut):-ground(InOut),!.
+delay_rule_eval(In,rule(In)).
+
+kif_assertion_recipe(D,CycLOut):-
+         must_det_l((must_map_preds([
+           convert_from_kif,
+           maybe_ruleRewrite,
+           cyc_to_clif,
+           unnumbervars_and_save,
+           sexpr_sterm_to_pterm,
+           fully_expand,
+           sexpr_sterm_to_pterm],D,CycLOut))).
+
+maybe_ruleRewrite(documentation(C,'EnglishLanguage',S),comment(C,S)):-!.
+maybe_ruleRewrite(I,O):-clause_b(ruleRewrite(I,O)),!.
+maybe_ruleRewrite(IO,IO).
+
 
 dehyphenize_const(PM,PMO):- atom(PM), atomic_list_concat(List,'-',PM),dehyphenize_const(PM,List,PMO),!.
 
@@ -1375,6 +1458,7 @@ cyc_to_clif_notify(B,A):- cyc_to_clif(B,A) -> B\=@=A, nop(dmsg(B==A)).
 
 re_convert_string(H,H).
 
+:-export(cyc_to_clif/2).
 cyc_to_clif(V,V):-is_ftVar(V),!.
 cyc_to_clif([],[]):-!.
 cyc_to_clif([H],HH):- string(H),re_convert_string(H,HH),!.
@@ -1401,9 +1485,9 @@ fix_var_name(A,B):- atomic_list_concat(AB,'-',A),atomic_list_concat(AB,'_',B).
 
 % rename_atom(A,B):- atom_contains(A,'~'),!,convert_to_cycString(A,B),nb_setval('$has_quote',t),!.
 rename_atom(A,B):- current_prolog_flag(do_renames,never),!,A=B.
-rename_atom(A,B):- best_rename(A,B),!.
-rename_atom(A,B):- atom_contains(A,' '),!,A=B.
+rename_atom(A,B):- builtin_rn_or_rn(A,B),!.
 rename_atom(A,A):- upcase_atom(A,A),!.
+rename_atom(A,B):- atom_contains(A,' '),!,A=B.
 %rename_atom(A,B):- current_prolog_flag(logicmoo_break_atoms,true),atom_contains(A,' '),!,convert_to_cycString(A,B),nb_setval('$has_quote',t),!.
 rename_atom(A,B):-  must(cyc_to_mpred_create(A,B)),azzert_rename(A,B),!.
 
@@ -1509,28 +1593,6 @@ intrinsicPred(sformat).
 intrinsicPred(A):-atom(A),atom_concat('thereE',_,A).
 
 
-
-% unt_ify(TGaf,PGaf):- \+ current_prolog_flag(logicmoo_untify,true),!,TGaf=PGaf.
-unt_ify(TGaf,PGaf):- notrace(unt_ify_a(TGaf,PGaf)).
-
-unt_ify_a(TGaf,PGaf):- compound(TGaf),compound_name_arity(TGaf,UR,_),arg(_,v(uU,nartR),UR),!,TGaf=PGaf.
-unt_ify_a(TGaf,PGaf):- term_variables(TGaf,TVars),
-  freeze_pvars(TVars,unt_ify0(TGaf,PGaf)).
-unt_ify0(TGaf,PGaf):- 
- \+ compound(TGaf)->PGaf=TGaf ;
-  (is_list(TGaf) -> maplist(t_ify0,TGaf,PGaf);
-    ((TGaf=..[t,P|TARGS]) -> (maplist(unt_ify,TARGS,ARGS)-> apply_term(P,ARGS,PGaf) ; PGaf=TGaf))).
-
-% t_ify(PGaf,TGaf):- \+ current_prolog_flag(logicmoo_untify,true),!,TGaf=PGaf.
-t_ify(PGaf,TGaf):- 
- notrace((term_variables(PGaf,PVars),
-  freeze_pvars(PVars,t_ify0(PGaf,TGaf)))).
-
-t_ify0(PGaf,TGaf):- 
- (\+ compound(PGaf)-> PGaf=TGaf;
-  (is_list(PGaf) -> maplist(t_ify0,PGaf,TGaf);
-    (PGaf=..[P|ARGS], (P==t -> PGaf=TGaf ; (maplist(t_ify0,ARGS,TARGS)->TGaf=..[t,P|TARGS]))))).
-
 :- meta_predicate freeze_pvars(*,0).
 freeze_pvars( _ ,Goal):-!,call(Goal). 
 freeze_pvars([ ],Goal):-!,call(Goal).
@@ -1552,32 +1614,16 @@ saveRenames:-
 makeRenames:- 
  w_tl(set_prolog_flag(logicmoo_load_state,making_renames),
      forall(makeRenames0,true)),!.
-
-makeRenames0:- remove_renames('ftExpression').
-makeRenames0:- remove_renames('ftSentence').
-
-makeRenames0:- call((doall((findall(P,(ftLarkcOnlyTerm(P), \+ compound(P), atom_concat('xt',_,P)),L), 
-          member(P,L),remove_renames(P))))).
-
-makeRenames0:- call((doall((findall(P,(ftLarkcOnlyTerm(P), \+ compound(P), atom_concat('vt',_,P)),L), 
-          member(P,L),remove_renames(P))))).
-
-makeRenames0:- call((doall((findall(P,(ftLarkcOnlyTerm(P), \+ compound(P), starts_hungarian('v',P)),L), 
-          member(P,L),remove_renames(P))))).
-
-/*
-makeRenames0:- baseKB:doall((findall(P,((rename(P,_);rn(P,_);rename(_,P);rn(_,P)), \+ atom(P)),L),
-          member(P,L),maplist(retractall,[rename(_,P),rename(P,_),rn(_,P),rn(P,_)]))).
-
-*/
+makeRenames0:- makeCycRenames.
 
 % makeRenames0:- exists_file('./rn2.pl'),must(ensure_loaded('./rn2.pl')),!.
+/*
 makeRenames0:- 
 %  tell('./rn2.pl'),
    when_file_output(writeln('
 
-:- multifile(rn/2).
-:- dynamic(rn/2). 
+:- multifile(kb7166:baseKB:rn_new).
+:- dynamic(kb7166:baseKB:rn_new/2). 
 :- multifile(builtin_rn/2).
 :- dynamic(builtin_rn/2). 
 
@@ -1588,30 +1634,15 @@ makeRenames0:-
     
 makeRenames0:- nl,told.
 % makeRenames0:- makeCycRenames.
+*/
 
 
-check_rename(P):- rn(C,P),baseKB:rename(P,C),!.
-check_rename(C):- catch(check_rename0(C),_,(rtrace,check_rename0(C))).
-
-check_rename0(C):- 
-    ignore((best_rename(C,P),
-         \+ rn(C,P),
-         \+ baseKB:rename(P,C),
-       ( \+ baseKB:rename(_,C)-> true;
-          ((baseKB:rename(WasP,C),
-            retractall((rename(WasP,C))),
-            when_file_output(format('~n~q.',[:- retractall(rn(C,WasP))])),
-            retractall((rn(C,WasP))),          
-            when_file_output(format('~n~q.',[:- retractall(rename(WasP,C))]))
-            ))),
-          when_file_output(format('~n~q.',[baseKB:rn(C,P)])),
-         azzert_rename(C,P))).
 
 makeCycRenames:- dmsg("no need to makeCycRenames!?"),!.
 makeCycRenames:- forall(makeCycRenames_real,true).
 
-actual_cyc_renames0(C,P):-rn(C,P).
-%actual_cyc_renames0(C,P):- builtin_rn(C,P), \+ rn(C,P).
+actual_cyc_renames0(C,P):-kb7166:rnc(C,P).
+%actual_cyc_renames0(C,P):- builtin_rn(C,P), \+ kb7166:rnc(C,P).
 
 actual_cyc_renames(C,P):-actual_cyc_renames0(C,P).
 actual_cyc_renames(C,P):- ftCycOnlyTerm(C),\+actual_cyc_renames0(C,_),rename_atom(C,P).
@@ -1633,11 +1664,6 @@ makeCycRenames1:-
            ), 
     forall(actual_cyc_renames(C,P),format('(safely-rename-or-merge "~w" "~w")~n',[C,P])).
 
-
-
-:- multifile(baseKB:rename/2).
-:- dynamic(baseKB:rename/2).
-
 :- multifile(kb7166:rnc/2).
 :- dynamic(kb7166:rnc/2).
 :- ((kb7166:load_files([library('pldata/plkb7166/kb7166_pt7_constant_renames')],[module(baseKB),redefine_module(false),qcompile(auto)]))).
@@ -1646,15 +1672,13 @@ makeCycRenames1:-
 :- multifile(baseKB:rn_new/2).
 :- dynamic(baseKB:rn_new/2).
 :- ((baseKB:load_files([library('pldata/plkb7166/kb7166_pt7_constant_renames_NEW')],[module(baseKB),redefine_module(false),qcompile(auto)]))).
-:- forall((rn_new(N,Y),(\+atom(N);\+atom(Y))),throw(retract(rn_new(N,Y)))).
+:- forall((baseKB:rn_new(N,Y),(\+atom(N);\+atom(Y))),throw(retract(baseKB:rn_new(N,Y)))).
 
 :- dmsg("I am here").
-:- multifile(baseKB:rn/2).
-:- dynamic(baseKB:rn/2).
-baseKB:rn(C,P):-kb7166:rnc(C,P).
+:- multifile(kb7166:rnc/2).
+:- dynamic(kb7166:rnc/2).
 
 azzert_rename(C,P):- builtin_rn(C,P),!.
-azzert_rename(C,P):- baseKB:rn(C,P),!.
 azzert_rename(C,P):- kb7166:rnc(C,P),!.
 azzert_rename(C,P):- baseKB:rn_new(C,P),!.
 azzert_rename(C,P):- asserta(baseKB:rn_new(C,P)),dmsg_rename(C,P).
@@ -1668,9 +1692,9 @@ re_symbolize(N,V):- catch(atom_concat(':',N,V),_,fail),!.
 re_symbolize(N,V):- ignore(V='?'(N)).
 
 
-:- set_prolog_flag(logicmoo_safety,0).
-:- set_prolog_flag(logicmoo_debug,1).
-:- set_prolog_flag(logicmoo_speed,3).
+%:- set_prolog_flag(logicmoo_safety,0).
+%:- set_prolog_flag(logicmoo_debug,1).
+%:- set_prolog_flag(logicmoo_speed,3).
 
 :- nb_linkval('$ra5_often',1).
 
@@ -1827,4 +1851,10 @@ make_assert_prop(ID,TYPE:VALUE,A4S):-atom(TYPE),atom_concat(assertion_,TYPE,ATYP
 kb_7166_assertions:- ensure_loaded_with(library('pldata/kb_7166_assertions.pl'),kb_transposer).
 % :- (baseKB:load_files([library('pldata/kb_7166_assertions-trans.pl')],[if(not_loaded),redefine_module(false),qcompile(auto)])).
 % :- kb_7166_ensure_translated_2.
-% :- prolog.
+
+
+system:term_expansion(I, Pos, O , Pos):- nonvar(Pos),compound(I), 
+   current_prolog_flag(do_renames,term_expansion),
+   b_getval('$term', Term),Term==I, do_renames(I,O)->I\==O,!.
+
+

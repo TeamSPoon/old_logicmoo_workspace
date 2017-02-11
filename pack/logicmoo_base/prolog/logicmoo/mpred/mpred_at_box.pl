@@ -15,7 +15,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_at_box,[
          assert_setting01/1,
          create_predicate_istAbove/3,
@@ -39,6 +39,7 @@
           has_parent_goal/1,
           has_parent_goal/2,
          fileAssertMt/1,
+          setup_module_ops/1,
 
          in_mpred_kb_module/0,
          istAbove/2,
@@ -75,9 +76,9 @@
          which_file/1
     ]).
 
-:- include('mpred_header.pi').
 
-:- endif.
+
+%:- endif.
 
 :- module_transparent((
      baseKB_hybrid_support/2,
@@ -105,7 +106,7 @@
 
 user_m_check(_Out).
 
-:- meta_predicate make_shared_multifile(+,+,+).
+:- meta_predicate make_shared_multifile(+,+,+), mpred_op_each(3).
 :- meta_predicate make_shared_multifile(*,*,*,*).
 
 :- meta_predicate with_no_retry_undefined(:).
@@ -206,6 +207,7 @@ defaultAssertMt(ABox):- (t_l:current_defaultAssertMt(BBox);find_and_call(fileAss
 
 
 
+
 % :- '$hide'(defaultAssertMt(_)).
 
 
@@ -271,13 +273,35 @@ ensure_abox(M):-
    retractall(baseKB:mtProlog(M)),
    setup_module_ops(M),
    set_prolog_flag(M:unknown,error),
-   forall(mpred_database_term(F,A,_),
+   mpred_pfc:forall(mpred_database_term(F,A,_),
        (((
         M:multifile(M:F/A),
         M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         create_predicate_istAbove(M,F,A),
         M:module_transparent(M:F/A))))),!.
+
+setup_module_ops(M):- mpred_op_each(mpred_op_unless(M)).
+
+mpred_op_unless(M,A,B,C):- op_safe(A,B,M:C).
+
+mpred_op_each(OpEach):-
+            call(OpEach,1199,fx,('==>')), % assert
+            call(OpEach,1199,fx,('?->')), % ask
+            call(OpEach,1190,xfy,('::::')), % Name something
+            call(OpEach,1180,xfx,('==>')), % Forward chaining
+            call(OpEach,1170,xfx,('<==>')), % Forward and backward chaining
+            call(OpEach,1160,xfx,('<==')), % backward chain PFC sytle
+            call(OpEach,1160,xfx,('<-')), % backward chain PTTP sytle (currely really PFC)
+            call(OpEach,1160,xfx,('<=')), % backward chain DRA sytle
+            call(OpEach,1150,xfx,('=>')), % Logical implication
+            call(OpEach,1130,xfx,('<=>')), % Logical bi-implication
+            call(OpEach,600,yfx,('&')), 
+            call(OpEach,600,yfx,('v')),
+            call(OpEach,400,fx,('~')),
+            % call(OpEach,300,fx,('-')),
+            call(OpEach,350,xfx,('xor')).
+
 
 
 
@@ -653,8 +677,9 @@ create_predicate_istAbove(Nonvar,F,A):- sanity(ground(create_predicate_istAbove(
 % TODO unsuspect the next line (nothing needs to see above baseKB)
 
 
-create_predicate_istAbove(baseKB,F,A):- !,make_as_dynamic(create_predicate,baseKB,F,A),
-      ignore((( \+ (defaultAssertMt(CallerMt)),CallerMt\==baseKB,create_predicate_istAbove(CallerMt,F,A) ))).
+create_predicate_istAbove(baseKB,F,A):- !,
+  make_as_dynamic(create_predicate,baseKB,F,A), 
+     ignore((( \+ (defaultAssertMt(CallerMt),CallerMt\==baseKB,create_predicate_istAbove(CallerMt,F,A) )))).
 create_predicate_istAbove(abox,F,A):-  must(defaultAssertMt(CallerMt)),sanity(CallerMt\=abox),!,create_predicate_istAbove(CallerMt,F,A).
 %create_predicate_istAbove(_, do_and_undo, 2):-dtrace.
 create_predicate_istAbove(CallerMt,F,A):- clause_b(mtProlog(CallerMt)), must(\+ clause_b(mtCycL(CallerMt))) ,!,wdmsg(warn(create_predicate_istAbove_mtProlog(CallerMt,F,A))),dtrace.
@@ -731,7 +756,7 @@ retry_undefined(CallerMt,F,A):-
        (PredMt:ensure_loaded(PredMt:File),add_import_module(CallerMt,PredMt,start))),!.
 */
 
-retry_undefined(CallerMt,F,A):-functor(P,F,A),find_module(P,M),show_call(CallerMt:import(F/A)),!.
+retry_undefined(CallerMt,F,A):-functor(P,F,A),find_module(P,M),show_call(CallerMt:import(M:F/A)),!.
 
 
 %retry_undefined(PredMt:must/1) % UNDO % :- add_import_module(PredMt,logicmoo_util_catch,start),!.
@@ -813,6 +838,7 @@ import_predicate(CM,M:F/A):- show_call(nop(CM:z333import(M:F/A))),CM:multifile(M
   icatch(CM:discontiguous(M:F/A)).
 
 
+:- include('mpred_header.pi').
 
 system:call_expansion(T,(mpred_at_box:defaultAssertMt(NewVar),NewT)):- current_predicate(_,get_lang(pfc)), compound(T),
    subst(T,abox,NewVar,NewT),NewT\=@=T.

@@ -1,4 +1,7 @@
 
+
+:- mpred_unload_file.
+
 :- install_constant_renamer_until_eof.
 
 :- file_begin(pfc).

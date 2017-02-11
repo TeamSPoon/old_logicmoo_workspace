@@ -669,3 +669,4 @@ tSourceCode(iSourceCode7).
 :- set_prolog_flag(pfc_booted,true).
 :- ain(isLoaded(iSourceCode7)).
 % :- set_prolog_flag(assert_attvars,true).
+

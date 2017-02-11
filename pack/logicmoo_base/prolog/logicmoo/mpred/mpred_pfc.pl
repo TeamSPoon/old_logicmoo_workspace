@@ -11,7 +11,7 @@
 % ===================================================================
 */
 
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 
 :- module(mpred_pfc, [
 
@@ -32,7 +32,7 @@
   lookup_m_g/3,
   head_to_functor_name/2,
           ain_expanded/1,
-
+  mpred_notrace_exec/0,
   get_consequent_functor/3,
   mpred_post1_rem/2,
   mpred_post1/1,
@@ -110,7 +110,8 @@
   setup_mpred_ops/0,
   mpred_assert_w_support/2,mpred_asserta_w_support/2,mpred_assertz_w_support/2,mpred_basis_list/2,mpred_bt_pt_combine/3,mpred_child/2,mpred_children/2,
   mpred_classifyFacts/4,mpred_collect_supports/1,mpred_unhandled_command/3,mpred_compile_rhs_term/3,mpred_conjoin/3,mpred_neg_connective/1,
-  mpred_database_item/1,mpred_database_term/3,
+  mpred_database_item/1,
+  mpred_database_term/3,
   mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
   mpred_descendants/2,mpred_enqueue/2,mpred_error/1,mpred_error/2,mpred_eval_lhs/2,mpred_eval_lhs_0/2,mpred_eval_rhs/2,mpred_fact/1,
   mpred_fact/2,mpred_facts/1,mpred_facts/2,mpred_facts/3,mpred_fwc/1,mpred_get_support/2,lookup_u/1,lookup_u/2,
@@ -123,7 +124,7 @@
   mpred_trace/0,mpred_trace/1,mpred_trace/2,mpred_trace_maybe_print/3,mpred_trace_maybe_break/3,mpred_trace_exec/0,mpred_trace_op/3,
   mpred_trace_op/2,mpred_trace_msg/1,mpred_trace_msg/2,mpred_trigger_key/2,mpred_trigger_key/2,mpred_undo/1,mpred_unfwc/1,
   mpred_unfwc_check_triggers/1,mpred_union/3,mpred_unique_u/1,mpred_untrace/0,mpred_untrace/1,mpred_warn/0,mpred_warn/1,
-  mpred_warn/2,mpred_watch/0,well_founded_0/2,mpred_why/0,mpred_why/1,mpred_whyBrouse/2,mpred_handle_why_command/3,
+  mpred_warn/2,mpred_watch/0,well_founded_0/2,clear_proofs/0,mpred_why/0,mpred_why/1,mpred_whyBrouse/2,mpred_handle_why_command/3,
   nompred_warn/0,pfcl_do/1,pp_DB/0,pp_db_facts/0,pp_db_facts/1,pp_db_facts/2,pp_db_items/1,
   pp_db_rules/0,pp_db_supports/0,pp_db_triggers/0,mpred_load/1,process_rule/3,
   remove_if_unsupported/1,remove_selection/1,mpred_withdraw1/2,
@@ -190,9 +191,14 @@ push_current_choice/1,
   % trigger_trigger1/2  , trigger_trigger/3,
   ]).
 
+
 :- include('mpred_header.pi').
 
-:- endif.
+:- 'ensure_loaded'(mpred_kb_ops).
+:- 'ensure_loaded'(mpred_expansion).
+
+
+%:- endif.
 
 
 :- meta_predicate
@@ -214,8 +220,9 @@ push_current_choice/1,
       mpred_METACALL(1,-,+),
       mpred_METACALL(1,+),
       call_u_no_bc(+),
+      call_u_mp_lc(*,*,*,*),
       mpred_call_no_bc0(+),
-      call_u(+),
+      call_u(*),
       retract_u0(+),
       mpred_BC_CACHE(+,+),
       mpred_BC_CACHE0(+,+),
@@ -799,9 +806,11 @@ mpred_ain(MTP,S):- sanity(stack_check), strip_module(MTP,MT,P),P\==MTP,!,
 mpred_ain(MTP :- B,S):- strip_module(MTP,MT,P),P\==MTP,!,
   with_umt(MT,mpred_ain(P :- B,S)),!.
 
+/*
 mpred_ain(PIn,S):-
    if_defined(is_motel(PIn),fail),
    with_current_why(S, motel_ain(PIn,S)),!.
+*/
 
 mpred_ain(PIn,S):-
   % must(add_eachRulePreconditional(PIn,P)),
@@ -1577,8 +1586,9 @@ mpred_unfwc1(F):-
   quietly(mpred_run),!.
 
 
-mpred_unfwc_check_triggers(F):- loop_check(mpred_unfwc_check_triggers0(F),
-  (mpred_warn(looped_mpred_unfwc_check_triggers0(F)), mpred_run)).
+mpred_unfwc_check_triggers(F):- 
+ loop_check(mpred_unfwc_check_triggers0(F), 
+    (mpred_warn(looped_mpred_unfwc_check_triggers0(F)),break, mpred_run)).
 
 mpred_unfwc_check_triggers0(F):-
   mpred_db_type(F,fact(_FT)),
@@ -1903,22 +1913,15 @@ call_u(G):- strip_module(G,M,P), no_repeats(gripe_time(5.3,call_u_mp(M,P))).
 
 
 call_u_mp(user, P1 ):-!,  call_u_mp(baseKB,P1).
+call_u_mp(mpred_pfc, P1 ):-!,  call_u_mp(baseKB,P1).
 call_u_mp(M,P):- var(P),!,call((baseKB:mtExact(M)->mpred_fact_mp(M,P);(defaultAssertMt(W),with_umt(W,mpred_fact_mp(W,P))))).
 call_u_mp(_, M:P1):-!,call_u_mp(M,P1).
 call_u_mp(M, (P1,P2)):-!,call_u_mp(M,P1),call_u_mp(M,P2).
-:- if(true).
-call_u_mp(M, (P1;P2)):- !,(call_u_mp(M,P1);call_u_mp(M,P2)).
 call_u_mp(M, (P1*->P2;P3)):-!,(call_u_mp(M,P1)*->call_u_mp(M,P2);call_u_mp(M,P3)).
 call_u_mp(M, (P1->P2;P3)):-!,(call_u_mp(M,P1)->call_u_mp(M,P2);call_u_mp(M,P3)).
 call_u_mp(M, (P1->P2)):-!,(call_u_mp(M,P1)->call_u_mp(M,P2)).
 call_u_mp(M, (P1*->P2)):-!,(call_u_mp(M,P1)*->call_u_mp(M,P2)).
-:- else.
-call_u_mp(M, (P1;P2)):-!,call_u_mp(M,P1);call_u_mp(M,P2).
-call_u_mp(M, (P1*->P2;P3)):-!,call_u_mp(M,P1)*->call_u_mp(M,P2);call_u_mp(M,P3).
-call_u_mp(M, (P1->P2;P3)):-!,call_u_mp(M,P1)->call_u_mp(M,P2);call_u_mp(M,P3).
-call_u_mp(M, (P1->P2)):-!,call_u_mp(M,P1)->call_u_mp(M,P2).
-call_u_mp(M, (P1*->P2)):-!,call_u_mp(M,P1)*->call_u_mp(M,P2).
-:- endif.
+call_u_mp(M, (P1;P2)):- !,(call_u_mp(M,P1);call_u_mp(M,P2)).
 call_u_mp(M,( \+ P1)):-!, \+ call_u_mp(M,P1).
 call_u_mp(M,must(P1)):-!, must( call_u_mp(M,P1)).
 call_u_mp(M, 't'(P1)):-!, call_u_mp(M,P1).
@@ -1927,8 +1930,10 @@ call_u_mp(_,mtCycL(P)):-!,clause(baseKB:mtCycL(P),true).
 %call_u_mp(_,is_string(P)):- !, logicmoo_util_bugger:is_string(P).
 call_u_mp(M,call(O,P1)):- !,M:call(O,P1).
 call_u_mp(M,call(P1)):- !, M:call(P1).
-call_u_mp(M,P1):- predicate_property(M:P1,built_in),!, M:call(P1).
-call_u_mp(M,P1):- predicate_property(M:P1,static),!, M:call(P1).
+%call_u_mp(M,P1):- predicate_property(M:P1,built_in),!, M:call(P1).
+%call_u_mp(M,P1):- predicate_property(M:P1,static),!, M:call(P1).
+%call_u_mp(M,P1):- predicate_property(M:P1,dynamic),!, M:call(P1).
+call_u_mp(M,P1):- predicate_property(M:P1,defined),!, M:call(P1).
 call_u_mp(M,P):- functor(P,F,A), call_u_mp_fa(M,P,F,A).
 
 make_visible(R,M:F/A):- wdmsg(make_visible(R,M:F/A)),fail.
@@ -1936,12 +1941,18 @@ make_visible(M,M:F/A):- must_det(M:export(M:F/A)).
 make_visible(R,M:F/A):- must_det_l((M:export(M:F/A),R:import(M:F/A),R:export(M:F/A))).
 
 
+call_u_mp_fa(M,P,F,A):- !,loop_check(call_u_mp_lc(M,P,F,A)).
 
 call_u_mp_fa(_,P,F,_):- (F==t; ( \+ clause_b(prologBuiltin(F)),
   F \= isT,F \= isTT, \+ predicate_property(P,file(_)))),if_defined(t_ify0(P,TGaf),fail), if_defined(isT(TGaf),false).
 call_u_mp_fa(M,P,F,A):- loop_check(call_u_mp_lc(M,P,F,A)).
 
-call_u_mp_lc(M,P,F,A):- current_predicate(M:F/A),!,catch(M:P,E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
+%call_u_mp_lc(mpred_pfc,P,F,A):-!, call_u_mp_lc(baseKB,P,F,A).
+%call_u_mp_lc(M,P,F,A):- current_predicate(M:F/A),!,throw(current_predicate(M:F/A)),catch(M:P,E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).
+call_u_mp_lc(baseKB,P,F,A):- kb_dynamic(F/A),dmsg(kb_dynamic(F/A)),!, baseKB:call(P).
+call_u_mp_lc(M,P,_,_):- !, M:call(P).
+
+
 call_u_mp_lc(M,P,_,_):- predicate_property(M:P,file(_)),!,call(M:P).
 call_u_mp_lc(M,P,_,_):- source_file(M:P,_),!,call(M:P).
 call_u_mp_lc(R,P,F,A):- source_file(M:P,_),!,make_visible(R,M:F/A),call(R:P).
@@ -2884,12 +2895,18 @@ mpred_warn(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Ar
 mpred_error(Info):- not_not_ignore_mnotrace(((tracing -> wdmsg(error(logicmoo(pfc),Info)) ; mpred_warn(error(Info))))).
 mpred_error(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_error(Info))))).
 
-mpred_trace_exec:- assert_u_no_dep(mpred_is_tracing_exec),set_prolog_flag(mpred_pfc_silent,false).
-mpred_watch:- mpred_trace_exec.
-mpred_trace_all:- mpred_trace_exec,mpred_trace,mpred_set_warnings(true).
-mpred_notrace_exec:- retractall_u(mpred_is_tracing_exec),set_prolog_flag(mpred_pfc_silent,true).
+mpred_pfc_silent(TF):-set_prolog_flag(mpred_pfc_silent,TF).
 
-mpred_nowatch:-  retractall_u(mpred_is_tracing_exec).
+
+mpred_watch:- mpred_trace_exec,mpred_pfc_silent(false).
+mpred_nowatch:-  mpred_notrace_exec.
+
+mpred_trace_exec:- assert_u_no_dep(mpred_is_tracing_exec),mpred_pfc_silent(false).
+mpred_notrace_exec:- retractall_u(mpred_is_tracing_exec).
+
+mpred_trace_all:- mpred_trace_exec,mpred_trace,mpred_set_warnings(true),mpred_pfc_silent(false).
+mpred_notrace_all:- mpred_notrace_exec,mpred_notrace,mpred_set_warnings(false).
+
 
 :- thread_local(t_l:hide_mpred_trace_exec/0).
 
@@ -3326,7 +3343,7 @@ mpred_why:-
 
 pp_why(A):-mpred_why(A).
 
-clear_proofs- retractall(why_buffer(_P,_Js)).
+clear_proofs:- retractall(why_buffer(_P,_Js)).
 
 mpred_why(N):-
   number(N),
@@ -3338,13 +3355,15 @@ mpred_why(M:P):-atom(M),!,call_from_module(M,mpred_why_sub(P)).
 mpred_why(P):-mpred_why_sub(P).
 
 
-mpred_why_sub(P):-
+mpred_why_sub(P):-mpred_why(P,Why),!,wdmsg(mpred_why_sub(P,Why)).
+mpred_why_sub(P):- loop_check(mpred_why_sub_lc(P),trace_or_throw(mpred_why_sub_lc(P))).
+mpred_why_sub_lc(P):- 
   justifications(P,Js),
   nb_setval('$last_printed',[]),
   retractall_u(why_buffer(_,_)),
   assert_u_no_dep(why_buffer(P,Js)),
   mpred_whyBrouse(P,Js).
-
+  
 
 mpred_why_sub_sub(P):-
   justifications(P,Js),
@@ -3428,7 +3447,7 @@ mpred_pp_db_justifications2(Prefix,[C|Rest],JustNo,StepNo):-
   sformat(LP,' ~w.~p.~p',[Prefix,JustNo,StepNo]),
   nb_pushval('$last_printed',LP),
   format("~N  ~w ~p",[LP,C]),
-  ignore(mpred_why_sub_sub(C)),
+  ignore(loop_check(mpred_why_sub_sub(C))),
   StepNext is 1+StepNo,
   mpred_pp_db_justifications2(Prefix,Rest,JustNo,StepNext))).
 

@@ -1,5 +1,8 @@
 
 
+:- mpred_unload_file.
+
+
 :- file_begin(pfc).
 
 

@@ -152,6 +152,7 @@ signal_eof(File):- must(prolog_load_context(module,M)), must(signal_eof(M,File))
 %
 % Do End Of File Actions for Module''s Source File.
 %
+signal_eof_m(_):-!.
 signal_eof_m(M):- trace_or_throw(must(signal_eof_m0(M))).
 % signal_eof_m0(M):- prolog_load_context(source,File), signal_eof(M,File),!.
 signal_eof_m0(M):- prolog_load_context(file,File), signal_eof(M,File),!.
@@ -262,11 +263,12 @@ term_expansion_option(Option,(Head:-Body),Out):-
 vsubst(In,B,A,Out):-var(In),!,(In==B->Out=A;Out=In).
 vsubst(In,B,A,Out):-subst(In,B,A,Out).
 
-
+/*
 system:term_expansion(In,Pos,Out,Pos):- nonvar(Pos),compound(In),functor(In,(:-),_),
    lmfs_data:file_option(Option),
    is_file_enabling(Option)->
    term_expansion_option(Option,In,Out),!.
+*/
 
 system:term_expansion(EOF,Pos,_,_):- EOF==end_of_file,
   nonvar(Pos),once(signal_eof),

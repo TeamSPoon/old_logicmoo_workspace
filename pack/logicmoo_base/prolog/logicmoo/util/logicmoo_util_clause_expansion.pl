@@ -365,6 +365,7 @@ without_lm_expanders(Goal):-
 
 :- module_transparent(user:term_expansion/1).
 % system:term_expansion(I,P,O,P2):- fail, get_named_value_goal(is_fbe(term,I,P)),dmsg(te4(I,P,O,P2)),fail.
+/*
 system:goal_expansion(I,P,O,P2):- 
   current_prolog_flag(lm_special_expanders,true), 
   current_prolog_flag(lm_expanders,true),
@@ -385,6 +386,8 @@ system:term_expansion(I,P,O,P2):- current_prolog_flag(lm_special_expanders,true)
   current_prolog_flag(lm_expanders,true), 
   prolog_load_context(module,Mod), 
    without_lm_expanders((lmce_system_term_expansion(Mod,I,P,O,P2)->(ignore(I=O),I\=@=O))).
+
+*/
 
 :- initialization(nb_setval( '$term_position',[]),restore).
 :- initialization(nb_setval( '$term',[]),restore).

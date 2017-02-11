@@ -28,9 +28,16 @@
 :- dynamic lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 
 */
-
+:- '$set_source_module'(baseKB).
 :- dynamic(agent_call_command/2).
 :- import(agent_call_command/2).
+
+:- set_prolog_flag(logicmoo_speed, 0).
+:- set_prolog_flag(logicmoo_safety, 2).
+:- set_prolog_flag(logicmoo_debug, 2).
+:- set_prolog_flag(unsafe_speedups, false).
+:- mpred_pfc:import(baseKB:ttExpressionType/1).
+
 
 :- assert_until_eof(infSupertypeName).
 :- call_on_eof(dmsg(infSupertypeName)).
@@ -38,11 +45,12 @@
 :- include(prologmud(mud_header)).
 
 
-% :- gripe_time(60,user:consult(library(logicmoo_user))).
+% :- gripe_time(60,user:ensure_loaded(library(logicmoo_user))).
 
 :- set_defaultAssertMt(baseKB).
 :- file_begin(pfc).
 
+:- install_constant_renamer_until_eof.
 
 :- retractall(t_l:disable_px).
 
@@ -234,8 +242,17 @@ tWorld(iWorld7).
 */
 ttExpressionType(ftProlog).
 
-ftChangeQuantity(X):- compound(X),arg(X,1,Q),quotedIsa(Q,ftNumber).
+% :- mpred_trace_exec.
+
+% ~tSet(ftChangeQuantity).
+
+%:-  rtrace((trace,ain(ttExpressionType(ftChangeQuantity)))).
+%:- break.
+
+% :- mpred_post1(ttExpressionType(ftChangeQuantity)).
+
 ttExpressionType(ftChangeQuantity).
+:- assert((ftChangeQuantity(X):- compound(X),arg(X,1,Q),quotedIsa(Q,ftNumber))).
 
 
 % ==> neg(arity(mudAreaConnected,1)).
@@ -262,9 +279,9 @@ genls(tSpatialThing,tTemporalThing).
 genls(ttSpatialType,ttTemporalType).
  
 % ttUnverifiableType(ftListFn(ftTerm)).
-ttUnverifiableType(ftListFn).
+%ttUnverifiableType(ftListFn).
 % ttUnverifiableType(ftDiceFn(ftInt,ftInt,ftInt)).
-ttUnverifiableType(ftDice).
+% ttUnverifiableType(ftDice).
 ttUnverifiableType(vtDirection).
 
 
@@ -564,10 +581,12 @@ prologNegByFailure(tThinking(tAgent),prologHybrid).
 pathName(Region,Dir,Text)==>mudDescription(apathFn(Region,Dir),Text).
 
 prologSingleValued(chargeCapacity(tChargeAble,ftInt),prologHybrid).
+
 prologSingleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt)),prologHybrid).
-prologSingleValued(mudAgentTurnnum(tAgent,ftInt),[argSingleValueDefault(2,0)],prologHybrid).
+==> prologSingleValued(mudAgentTurnnum(tAgent,ftInt),[argSingleValueDefault(2,0)],prologHybrid).
 prologSingleValued(mudArmor(tObj,ftInt),prologHybrid).
 prologSingleValued(mudArmorLevel(tWearAble,ftInt),prologHybrid).
+
 prologSingleValued(mudAtLoc(tObj,xyzFn(tRegion,ftInt,ftInt,ftInt)),prologHybrid).
 prologSingleValued(mudAttack(tObj,ftInt),prologHybrid).
 prologSingleValued(mudBareHandDamage(tAgent,ftInt),prologHybrid).
@@ -578,9 +597,10 @@ prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,90)],prologHyb
 prologSingleValued(mudNonHunger(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
 prologSingleValued(mudHygiene(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
 
+% :- mpred_trace_exec.
 :- ain_expanded((prologSingleValued(mudFacing(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid))).
 
-prologSingleValued(mudHealth(tObj,ftInt),prologHybrid).
+==> prologSingleValued(mudHealth(tObj,ftInt),prologHybrid).
 prologSingleValued(mudHeight(tObj,ftInt),prologHybrid).
 prologSingleValued(mudHeight(tSpatialThing,ftInt),prologHybrid).
 prologSingleValued(mudID(tObj,ftID),prologHybrid).
@@ -597,9 +617,11 @@ prologSingleValued(mudStr(tAgent,ftInt),prologHybrid).
 prologSingleValued(mudToHitArmorClass0(tAgent,ftInt),prologHybrid).
 prologSingleValued(mudWeight(tObj,ftInt),prologHybrid).
 % prologSingleValued(spawn_rate(isPropFn(genls(tObj)),ftInt)).
-prologSingleValued(spawn_rate(tCol,ftInt)).
-prologSingleValued(stat_total(tAgent,ftInt)).
-prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
+
+==> prologSingleValued(spawn_rate(tCol,ftInt)).
+==> prologSingleValued(stat_total(tAgent,ftInt)).
+==> prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
+
 resultIsa(apathFn,tPathway).
 % '<==>'(isa(Whom,tNpcAgent),whenAnd(isa(Whom,tAgent),naf(isa(Whom,tHumanControlled)))).
 '<==>'(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
@@ -747,6 +769,8 @@ is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
 defnSufficient(ftAction,is_vtActionTemplate).
 defnSufficient(ftAction,vtVerb).
 defnSufficient(ftTerm,vtValue).
+
+:- install_constant_renamer_until_eof.
 
 genls('FemaleAnimal',tAgent).
 genls('MaleAnimal',tAgent).
@@ -903,6 +927,7 @@ typeGenls(ttObjectType,tObj).
 typeGenls(ttRegionType,tRegion).
 % cycAssert(A,B):- trace_or_throw(cycAssert(A,B)).
 */
+:- install_constant_renamer_until_eof.
 
 genls('SetOrCollection',tCol).
 genls('Collection',tCol).
@@ -1051,7 +1076,7 @@ mudLabelTypeProps("--",tRegion,[]).
 %NEXT TODO predTypeMax(mudEnergy,tAgent,120).
 
 typeProps(tAgent,[predInstMax(mudHealth,500)]).
-genls('IndoorsIsolatedFromOutside',tRegion).
+genls('Indoors-IsolatedFromOutside',tRegion).
 genls('SpaceInAHOC',tRegion).
 
 typeProps(tAgent,[mudMoveDist(1)]).

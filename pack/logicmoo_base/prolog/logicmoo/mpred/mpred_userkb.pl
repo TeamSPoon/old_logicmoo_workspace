@@ -25,65 +25,9 @@
 :- module(baseKB_user, [mpred_userkb_file/0]).
 :- include('mpred_header.pi').
 :- endif.
-:- if( \+ current_predicate(mpred_userkb_file/0)).
 mpred_userkb_file.
 
-:- endif.
-
 :- '$set_source_module'(baseKB).
-
-
-
-%:- thread_local t_l:side_effect_ok/0.
-%:- lmce:reset_modules.
-%system:goal_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(goal,system,I,P1,O,P2).
-%system:term_expansion(I,P1,O,P2):- current_prolog_flag(mpred_te,true),mpred_te(term,system,I,P1,O,P2).
-
-in_goal_expansion:- prolog_current_frame(F),
-   prolog_frame_attribute(F,parent_goal,expand_goal(_,_,_,_)).
-
-should_base_ce(I):-  nb_current('$goal_term',Was),same_terms(I, Was),!,fail.
-should_base_ce(I):-  
-   (nb_current_or_nil('$source_term',TermWas),\+ same_terms(TermWas, I)),
-   (nb_current_or_nil('$term',STermWas),\+ same_terms(STermWas, I)),!,
-   fail.
-should_base_ce(_).
-
-base_clause_expansion(_,I,_):- notrace((\+ should_base_ce(I))),!,fail.
-base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
-base_clause_expansion(_,I,_):- \+ compound(I), !, fail.
-base_clause_expansion(_,':-'(ain_expanded(I)),':-'(ain_expanded(I))):-!.
-base_clause_expansion(_,':-'(ain(I)),':-'(ain(I))):-!.
-base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
-base_clause_expansion(_,I, O):- \+ in_goal_expansion, get_consequent_functor(I,F,A)->base_clause_expansion_fa(I,O,F,A),!.
-base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.
-
-base_clause_expansion_fa(_,_,F,A):- clause_b(mpred_prop(F,A,prologBuiltin)),!,fail.
-base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- needs_pfc(F,A),!.
-base_clause_expansion_fa(I,':-'(ain_expanded(I)),F,A):- in_dialect_pfc,!,ain(mpred_prop(F,A,prologHybrid)).
-base_clause_expansion_fa(_,_,F,A):- ain(mpred_prop(F,A,prologBuiltin)),!,fail.
-
-
-needs_pfc(F,A):- 
-  (clause_b(functorIsMacro(F));clause_b(functorDeclares(F));clause_b(prologHybrid(F));
-  clause_b(mpred_prop(F,A,prologHybrid));clause_b(wrap_shared(F,A,ereq))),!.
-
-/*
-maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
-   \+ (clause_b(functorIsMacro(F));clause_b(functorDeclares(F));clause_b(mpred_prop(F,A,prologHybrid))),
-   ain(prologBui sltin(F/A)).
-
-*/
-
-:- ( defaultAssertMt(_)->true;set_defaultAssertMt(baseKB)).
-
-:- enable_mpred_expansion.
-
-% :- consult(library('logicmoo/mpred/mpred_userkb.pl')).
-
-
-:- ain(arity(functorDeclares, 1)).
-%:- dynamic(isa/2).
 
 %% base_kb_pred_list( ?VALUE1) is semidet.
 %
@@ -237,6 +181,8 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
  prologSingleValued/1,functorIsMacro/1,notAssertable/1,prologBuiltin/1,prologDynamic/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,prologEquality/1,prologPTTP/1,
  prologSideEffects/1,prologHybrid/1,prologListValued/1]).
 
+          
+
 :- multifile(baseKB:'$exported_op'/3).
 :- discontiguous baseKB:'$exported_op'/3.
 :- thread_local t_l:disable_px.
@@ -244,14 +190,63 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- dynamic(baseKB:use_kif/2).
 
 % :- shared_multifile(baseKB:use_kif/2).
+:- dynamic(baseKB:wrap_shared/3).
+:-ensure_loaded(library('logicmoo/mpred/mpred_hooks')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_loader')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_at_box')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_type_isa')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_expansion')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_kb_ops')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_listing')).
+:-ensure_loaded(library('logicmoo/snark/common_logic_sexpr')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_pfc')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_prolog_file')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_props')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_storage')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_stubs')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_type_constraints')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_type_naming')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_type_wff')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_type_args')).
+:-ensure_loaded(library('logicmoo/mpred/mpred_agenda')).
+:-ensure_loaded(library('logicmoo/snark/common_logic_boxlog')).
+:-ensure_loaded(library('logicmoo/snark/common_logic_skolem')).
+:-ensure_loaded(library('logicmoo/snark/common_logic_kb_hooks')).
+:-ensure_loaded(library('logicmoo/snark/common_logic_compiler')).
 
+
+:- call_u(true).
+
+:-dynamic(   pm/1).
+:- dynamic((
+   argIsa/3,
+   bt/2, %basePFC
+   hs/1, %basePFC
+   hs/1, %basePFC
+   nt/3, %basePFC
+   pk/3, %basePFC
+   pt/2, %basePFC
+   que/1, %basePFC
+   pm/1, %basePFC
+   spft/3, %basePFC
+   tms/1, %basePFC
+   prologSingleValued/1)).
+
+
+
+:- multifile(baseKB:use_cyc_database/0).
+:- thread_local(baseKB:use_cyc_database/0).
+
+/*
 :- set_defaultAssertMt(baseKB).
 :- set_fileAssertMt(baseKB).
+*/
 
 :- '$set_source_module'(baseKB).
 :- '$set_typein_module'(baseKB).
-:- set_defaultAssertMt(baseKB).
-:- set_fileAssertMt(baseKB).
+
+:- 'ensure_loaded'(mpred_props).
+:- 'ensure_loaded'(mpred_expansion).
 
 kb_dynamic_m(E):- with_source_module(baseKB,decl_as(kb_dynamic,E)).
 

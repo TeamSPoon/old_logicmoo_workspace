@@ -9,7 +9,7 @@
 */
 % =======================================================
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_agenda.pl
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_agenda,
           [ 
             add_later/1,
@@ -73,7 +73,7 @@
 
 :- include('mpred_header.pi').
 
-:- endif.
+%:- endif.
 
 :- meta_predicate 
    agenda_slow_op_enqueue(0),

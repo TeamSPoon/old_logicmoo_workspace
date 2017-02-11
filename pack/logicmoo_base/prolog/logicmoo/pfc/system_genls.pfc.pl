@@ -1,6 +1,17 @@
 
+
+:- mpred_unload_file.
+
+:- set_prolog_flag(do_renames,restore).
 :- install_constant_renamer_until_eof.
 
+flatTrans(G)==> ((({differentTerms(A,B)},t(G,A,B)/ground(t(G,A,B)),differentTerms(A,C)),t(G,B,C)/(differentTerms(B,C),must(ground(t(G,A,C))))) ==> t(G,A,C)).
+flatTrans(genls).
+flatTrans(genlPreds).
+flatTrans(subFormat).
+flatTrans(genlFuncs).
+flatTrans(genlFunctions).
+flatTrans(genlMt).
 /*
 
 tCol(tCol).
@@ -135,7 +146,7 @@ rtAvoidForwardChain(meta_argtypes).
 
 ttExpressionType(C)==>rtAvoidForwardChain(C).
 
-% TODO ((completeIsaAsserted(I), isa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ genls/*Fwd*/(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
+% TODO ((completeIsaAsserted(I), isa(I,Sub), {differentTerms(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ genls/*Fwd*/(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 %    \+ genlsFwd(Sub,Super), \+ ttExpressionType(Super))) ==> isa(I,Super).
 
 completeIsaAsserted(I) ==> ((isa(I,Sub)/ (\+ rtAvoidForwardChain(Sub))) ==> mudIsa(I,Sub)).
@@ -146,7 +157,7 @@ mudIsa(I,C),genls(C,P) ==> mudIsa(I,P).
 % (mudIsa(I,Sub)/(ground(mudIsa(I,Sub)), \+ rtAvoidForwardChain(Sub))) ==> isa(I,Sub).
 ((completelyAssertedCollection(Sub) / (\+ rtAvoidForwardChain(Sub)))) ==> ttMudIsaCol(Sub).
 ttMudIsaCol(Sub) ==> (isa(I,Sub) ==> mudIsa(I,Sub)).
-((completeIsaAsserted(I),mudIsa(I,Sub), {dif(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ rtAvoidForwardChain(Super))) ==> mudIsa(I,Super).
+((completeIsaAsserted(I),mudIsa(I,Sub), {differentTerms(Sub, Super)}, genls(Sub,Super),{ground(Sub:Super)}, \+ rtAvoidForwardChain(Super))) ==> mudIsa(I,Super).
 */
 
 

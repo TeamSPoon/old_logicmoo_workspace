@@ -2460,7 +2460,7 @@ cleanup_strings:-garbage_collect_atoms.
 % Loading Module.
 %
 loading_module(M,use_module(U)):- if_defined(parent_goal(_:catch(M:use_module(U),_,_),_)).
-loading_module(M,use_module(U)):- if_defined(parent_goal(_:catch(M:ensure_loaded(U),_,_),_)).
+loading_module(M,ensure_loaded(U)):- if_defined(parent_goal(_:catch(M:ensure_loaded(U),_,_),_)).
 loading_module(M,consult(F)):- if_defined(parent_goal(_:'$consult_file_2'(F,M,_,_,_),_)).
 loading_module(M,source_location(F)):- source_location(F,_),source_file_property(F,module(M)).
 loading_module(M,file(F)):- prolog_load_context(file,F),source_file_property(F,module(M)).

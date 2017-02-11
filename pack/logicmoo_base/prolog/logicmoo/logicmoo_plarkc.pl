@@ -32,13 +32,13 @@
 :- wdmsg("loading current_renames").
 % :- time((user:load_files(library('pldata/kb_7166_current_renames'),[module(baseKB),redefine_module(false),qcompile(auto)]))).
 :- retractall(renames(_)).
-:- baseKB:enable_mpred_expansion.
+:- enable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,true).
 :- wdmsg("done with current_renames").
 
 %:- set_prolog_stack(local, limit(32*10**9)).
 %:- set_prolog_stack(global, limit(32*10**9)).
-% :- baseKB:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
+% :- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
 
 :- if(false).
@@ -55,7 +55,7 @@
 :- endif.
 :- wdmsg("done loading kb_7166").
 :- set_module(kb_7166:class(library)).
-:- baseKB:enable_mpred_expansion.
+:- enable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,true).
 :- endif.
 

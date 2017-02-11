@@ -16,11 +16,12 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_props.pl
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_props,
           [ add_mpred_prop_gleaned/2,
             add_mpred_prop_gleaned_4/4,
             assert_arity/2,
+            bad_arity/2,
             bad_pred_relation_name0/2,
             bad_pred_relation_name1/2,
             (decl_mpred)/1,
@@ -61,7 +62,7 @@
 
 :- include('mpred_header.pi').
 
-:- endif.
+%:- endif.
 
 :- meta_predicate(kb_dynamic(:,+,+,+,+)).
 :- meta_predicate(decl_mpred_prolog(:,+,+,+,+)).
@@ -401,6 +402,11 @@ define_maybe_exact(system,PI):- !,must((defaultAssertMt(Mt),define_maybe_exact(M
 define_maybe_exact(M,PI):- % a(mtExact,M),!, 
    must_det_l((    functor(PI,F,A),
      M:multifile(M:F/A),
+     M:export(M:F/A),
+     baseKB:import(M:F/A),
+     baseKB:export(M:F/A),
+   system:import(M:F/A),
+   system:export(M:F/A),
      once((M==baseKB->true;ain(baseKB:predicateConventionMt(F,M)))),
      asserta_if_new(baseKB:wrap_shared(F,A,ereq)),
      decl_shared(M:PI),     
@@ -511,7 +517,7 @@ assert_arity(F,A):- ain_fast(arity(F,A)),!.
 bad_arity(F,_):- \+ atom(F).
 bad_arity(_,A):- \+ integer(A).
 bad_arity(typeProps,0).
-bad_arity(argsIsa,2).
+bad_arity(argIsa,2).
 bad_arity(prologDynamic,2).
 bad_arity(F,A):- \+ good_pred_relation_name(F,A).
 

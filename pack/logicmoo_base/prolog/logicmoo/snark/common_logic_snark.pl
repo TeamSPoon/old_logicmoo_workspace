@@ -1,15 +1,5 @@
-/* <module> mpred_kif
-% Provides a specific compilation API for KIF axioms
-%
-
-% Logicmoo Project PrologMUD: A MUD server written in Prolog
-% Maintainer: Douglas Miles
-% Dec 13, 2035
-%
-*/
-
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+% :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(common_logic_snark,
           [ add_nesc/2,
             add_poss/2,
@@ -124,8 +114,18 @@
           op(500,yfx,'v')
            
           ]).
+/** <module> common_logic_snark
+% Provides a specific compilation API for KIF axioms
+%
+
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
+
 :- include('../mpred/mpred_header.pi').
-:- endif.
+%:- endif.
 
 :-
             op(1150,fx,(was_dynamic)),
@@ -149,6 +149,8 @@
  op(300,fx,'~'),
  op(300,fx,'-').
 
+:- user:ensure_loaded(logicmoo('plarkc/logicmoo_i_cyc_rewriting')).
+
 
 :- op(1100,fx,(shared_multifile)).
 
@@ -170,8 +172,8 @@
    map_each_clause(1,+),
    map_each_clause(2,+,-),
 
-   '__aux_maplist/3_map_each_clause+1'(*,*,2),
-   '__aux_maplist/2_map_each_clause+1'(*,1),
+   %'__aux_maplist/3_map_each_clause+1'(*,*,2),
+   %'__aux_maplist/2_map_each_clause+1'(*,1),
 
    % common_logic_snark
    to_nonvars(2,?,?).
@@ -968,8 +970,8 @@ kif_to_boxlog(WffIn,Why,Out):-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 %
 % Knowledge Interchange Format Converted To Datalog.
 %
-kif_to_boxlog(I,KB,Why,Flattened):-
-  convert_if_kif_string( I, PTerm),
+kif_to_boxlog(I,KB,Why,Flattened):- trace,
+  logicmoo_i_cyc_rewriting:convert_if_kif_string( I, PTerm),
   kif_to_boxlog(PTerm,KB,Why,Flattened), !.
 
 % kif_to_boxlog(WffInIn,KB,Why,FlattenedO):-  as_dlog(WffInIn,WffIn),kif_to_boxlog_0(WffIn,KB,Why,FlattenedO),!.

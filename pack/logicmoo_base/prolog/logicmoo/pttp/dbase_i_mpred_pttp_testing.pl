@@ -12,7 +12,7 @@
 %%% 
 %%% 
 
-:- consult(library(logicmoo_base)).
+:- ensure_loaded(library(logicmoo_base)).
 :- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 :- ensure_loaded(dbase_i_mpred_pttp).
 

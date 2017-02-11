@@ -62,7 +62,7 @@ can_reorderBody(_ ,Body):-member(M,[did,noreorder,!,call_body_reorder,call_body_
 can_reorderBody(_ ,Body):-member(M,[reorder]),contains_f(M,Body),!.
 % can_reorderBody(Head, _):- reorder_term_expansion,compound(Head),functor(Head, _ ,A),A > 0.
 
-:-meta_predicate(do_body_reorder(+,-)).
+:-meta_predicate(do_body_reorder(+,?,+,-)).
 
 do_body_reorder(_,_,_,_):-!,fail.
 do_body_reorder(_,_,H,H):- \+ compound(H),!.
@@ -128,6 +128,8 @@ call_body_reorder_compare(Code,Head,C1,C2):- notrace(make_reordering_key(Head,C1
 make_body_reorderer(Code,Head,[C2,C1],call_body_reorder_compare(Code,Head,C1,C2)):-!.
 make_body_reorderer(Code,Head,[C3|C12],OUT):- make_body_reorderer(Code,Head,C12,OC12),make_body_reorderer(Code,Head,[OC12,C3],OUT).
 
+call_body_reorder(C,CC):-call_body_reorder(C,C,CC).
+
 :-meta_predicate(call_body_reorder(+,+,+)).
 call_body_reorder(_Code,_Head,[A]):- !,callClause(A).
 call_body_reorder(_Code,_Head,[A|B]):- !,callClause(A),call_body_reorder(_Code,_Head,B).
@@ -173,7 +175,7 @@ guess_reorder(C1,C2,Reordered):-
        Reordered = (C2,C1); 
        Reordered = (C1,C2)).
 
-:-meta_predicate(fasterClause(0,0,-)).
+:-meta_predicate(fasterClause(0,0,+,+)).
 fasterClause(C1,C2,T1,T2):-  
   timeOfFirstAnswer(C1,T1),
   catch(catch(call_with_time_limit(T1,

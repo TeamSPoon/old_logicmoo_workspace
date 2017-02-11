@@ -12,7 +12,7 @@
 :- module(mpred_loader,
           [ add_from_file/1,
           % unused_assertion/1,
-          mpred_ops/0,setup_module_ops/1,
+          mpred_ops/0,
           set_file_lang/1,
           mpred_te/6,
           pfc_dcg/0,
@@ -21,8 +21,6 @@
           set_lang/1,
            simplify_language_name/2,
            %is_undefaulted/1,
-          must_map_preds/3,
-
           current_op_alias/2,
             show_load_call/1,
             add_term/2,
@@ -59,9 +57,9 @@
             % cwc/0,
             decache_file_type/1,
             mpred_ops/0,
-            setup_module_ops/1,
-            mpred_op_each/1,
-            mpred_op_unless/4,
+            %setup_module_ops/1,
+            %mpred_op_each/1,
+            %mpred_op_unless/4,
             declare_load_dbase/1,
             disable_mpred_expansion/0,
             disable_mpreds_in_current_file/0,
@@ -86,9 +84,6 @@
             force_reload_mpred_file/1,
             force_reload_mpred_file/2,
             force_reload_mpred_file2/2,
-            from_kif_string/2,
-            convert_from_kif/2,
-            convert_if_kif_string/2,
             get_file_type/2,
             get_lang/1,
             get_lang0/1,
@@ -102,7 +97,6 @@
             is_code_body/1,
             is_compiling/0,
             is_compiling_sourcecode/0,
-            is_kif_string/1,
             is_directive_form/1,
             is_mpred_file/1,
             lang_op_alias/3,
@@ -173,7 +167,7 @@
             use_was_isa/3,
             was_exported_content/3,
             with_mpred_expansions/1,
-            with_no_mpred_expansions/1,
+            % with_no_mpred_expansions/1,
             lmcache:mpred_directive_value/3,
 
             baseKB:loaded_file_world_time/3,
@@ -197,12 +191,30 @@
             must_expand_term_to_command/2, pl_to_mpred_syntax0/2, 
             
             transform_opers_0/2, transform_opers_1/2,
-            mpred_loader_file/0
+            mpred_loader_file/0,
+            mpred_unload_file/0,
+            mpred_unload_file/1
           ]).
 
 :- include('mpred_header.pi').
 
+:- use_module(library(dictoo)).
+
 :- endif.
+
+:- multifile(prolog:make_hook/2).
+:- dynamic(prolog:make_hook/2).
+:- asserta_if_new((prolog:make_hook(BA, C):- wdmsg(prolog:make_hook(BA, C)),fail)).
+prolog:make_hook(before, FileS):- maplist(mpred_unload_file,FileS).
+
+mpred_unload_file:- source_location(File,_),mpred_unload_file(File).
+mpred_unload_file(File):-
+  findall(mpred_withdraw(Data,(mfl(Module, File, LineNum),AX)),
+     spft(Data, mfl(Module, File, LineNum),ax),ToDo),
+     length(ToDo,Len),
+     wdmsg(mpred_unload_file(File,Len)),
+     maplist(call,ToDo),!.
+
 
  :- module_transparent((load_file_term_to_command_1b/3,pfc_dcg/0, mpred_term_expansion_by_pred_class/3,
    must_expand_term_to_command/2, pl_to_mpred_syntax0/2, 
@@ -227,11 +239,11 @@
         load_init_world(+, :),
         module_typed_term_expand(?, ?),
         mpred_te(+, +, +,+, -,-),
-        mpred_op_each(3),
+        
         mpred_term_expansion(?, ?),
         myDebugOnError(0),        
         with_mpred_expansions(0),
-        with_no_mpred_expansions(0),
+        %with_no_mpred_expansions(0),
         mpred_loader_module_transparent(?),       
         baseKB:loaded_file_world_time(+, +, +).
 :- multifile((t_l:into_form_code/0, t_l:mpred_module_expansion/1, user:term_expansion/2)).
@@ -246,7 +258,8 @@
 %  force_reload_mpred_file2/2, force_reload_mpred_file/2, from_kif_string/2, get_file_type/2, get_lang/1, get_last_time_file/3, get_op_alias/2, gload/0, guess_file_type_loader/2, hdr_debug/2, in_include_file/0, in_mpred_kb_module/0, include_mpred_files/1, get_lang/1, is_code_body/1, is_compiling/0, is_compiling_sourcecode/0, is_kif_string/1, is_mpred_file/1, guess_if_mpred_file0/1, lang_op_alias/3, load_file_dir/2, load_file_some_type/2, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, expand_term_to_load_calls/2, expand_term_to_load_calls/4, load_init_world/2, load_language_file/1, load_mpred_files/0, load_mpred_on_file_end/2, loader_side_effect_capture_only/2, loader_side_effect_verify_only/2, expand_term_to_command/2, loading_source_file/1, make_db_listing/0, make_dynamic/1, module_typed_term_expand/2, module_typed_term_expand/5, mpred_begin/0,  mpred_expand_inside_file_anyways/0, mpred_expand_inside_file_anyways/1, mpred_te/4, mpred_expander_now/2, mpred_expand_file_module_clause/4, mpred_implode_varnames/1, mpred_loader_file/0, mpred_may_expand/0, mpred_may_expand_module/1, mpred_maybe_skip/1, mpred_process_input/2, mpred_process_input_1/1, baseKB:mpred_skipped_module/1, mpred_term_expansion/2, mpred_use_module/1, must_compile_special_clause/1, expand_term_to_load_calls/2, must_locate_file/2, must_expand_term_to_command/2, myDebugOnError/1, op_alias/2, op_lang/1, pl_to_mpred_syntax/2, pl_to_mpred_syntax0/2, pl_to_mpred_syntax_h/2, pop_predicates/2, process_this_script/0, process_this_script/1, process_this_script0/1, prolog_load_file_loop_checked/2, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc/2, prolog_load_file_nlc_0/2, push_predicates/2, read_one_term/2, read_one_term/3, register_module_type/1, register_module_type/2, rsavedb/0, savedb/0, scan_updates/0, show_bool/1, show_interesting_cl/2, show_load_context/0, simplify_why/2, simplify_why_r/4, stream_pos/1, term_expand_local_each/5, transform_opers/3, transform_opers_0/2, transform_opers_1/2, use_file_type_loader/2, use_was_isa/3, was_exported_content/3, with_mpred_expansions/1, with_no_mpred_expansions/1, with_source_module/2, xfile_module_term_expansion_pass_3/7,  (~)/1, baseKB:cl_assert/2, baseKB:cwc/0, baseKB:mpred_provide_clauses/3, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, defaultAssertMt/1, disable_mpred_term_expansions_globally/0, baseKB:loaded_file_world_time/3, mpred_directive_value/3, baseKB:mpred_skipped_module/1, 
 %   never_reload_file/1, prolog_load_file_loop_checked/2, registered_module_type/2).
 :- module_transparent 
-            mpred_ops/0,setup_module_ops/1.
+            mpred_ops/0.
+            %setup_module_ops/1.
 
 :- (thread_local t_l:into_form_code/0, t_l:mpred_module_expansion/1).
 %:- (volatile t_l:into_form_code/0, t_l:mpred_module_expansion/1).
@@ -310,9 +323,7 @@ mpred_prolog_only_file(_).
 
 :- prolog_load_context(directory,Dir),asserta(baseKB:mpred_loader_dir(Dir)).
 
-mpred_te(Type,_,I,_,_,_):- quietly(dont_term_expansion(Type,I)),!,fail.
-mpred_te(_Type,_Module,I,PosI,O,PosI):- expand_kif_string_or_fail(pl_te,I,O),!.
-mpred_te(_Type,_Module,I,PosI,O,PosI):- expand_isEach_or_fail(I,O),!.
+mpred_te(Type,_,I,_,_,_):- !,fail,quietly(dont_term_expansion(Type,I)),!,fail.
 mpred_te(Type,Module,I,PosI,O,PosO):- 
   \+ current_prolog_flag(mpred_te,false),
    % prolog_load_context(file,S),prolog_load_context(source,S),   
@@ -343,7 +354,7 @@ mpred_file_term_expansion(_,_,I,_):- is_ftVar(I),!,fail.
 % mpred_file_term_expansion(Type,LoaderMod,(I:-B),OO):-B==true,!,mpred_file_term_expansion(Type,LoaderMod,I,OO).
 % mpred_file_term_expansion(_Type,_LoaderMod,I,( :- must(ain(I)))):-!.
 
-mpred_file_term_expansion(Type,LoaderMod,I,OO):- !,
+mpred_file_term_expansion(Type,LoaderMod,I,OO):- !,fail,
    no_loop_check(mpred_file_term_expansion0(Type,LoaderMod,I,OO)).
 
 % Ensure rule macro predicates are being used checked just before assert/query time
@@ -386,7 +397,7 @@ mpred_expand_file_module_clause(_,M,I,O):- mpred_expander_now_physically(M,I,O).
 %
 % Managed Predicate Expander Now Physically.
 %
-mpred_expander_now_physically(M,I,OO):-  
+mpred_expander_now_physically(M,I,OO):- !,fail, 
  '$set_source_module'(Old,M),
  call_cleanup(M:((
    quietly_must((source_context_module(CM),CM\==mpred_pfc,CM\==mpred_loader)),
@@ -988,32 +999,6 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 %
 mpred_ops:-  prolog_load_context(module,M),setup_module_ops(M).
 
-:- export(mpred_op_unless/4).
-
-setup_module_ops(M):- mpred_op_each(mpred_op_unless(M)).
-
-mpred_op_unless(M,A,B,C):- op_safe(A,B,M:C).
-
-mpred_op_each(OpEach):-
-            call(OpEach,1199,fx,('==>')), % assert
-            call(OpEach,1199,fx,('?->')), % ask
-            call(OpEach,1190,xfy,('::::')), % Name something
-            call(OpEach,1180,xfx,('==>')), % Forward chaining
-            call(OpEach,1170,xfx,('<==>')), % Forward and backward chaining
-            call(OpEach,1160,xfx,('<==')), % backward chain PFC sytle
-            call(OpEach,1160,xfx,('<-')), % backward chain PTTP sytle (currely really PFC)
-            call(OpEach,1160,xfx,('<=')), % backward chain DRA sytle
-            call(OpEach,1150,xfx,('=>')), % Logical implication
-            call(OpEach,1130,xfx,('<=>')), % Logical bi-implication
-            call(OpEach,600,yfx,('&')), 
-            call(OpEach,600,yfx,('v')),
-            call(OpEach,400,fx,('~')),
-            % call(OpEach,300,fx,('-')),
-            call(OpEach,350,xfx,('xor')).
-
-
-
-
 
 %% pfc_dcg is det.
 %
@@ -1065,14 +1050,14 @@ unload_this_file(File):-
 clause_count(Mask,N):- arg(_,Mask,Var),nonvar(Var),!,
    flag(clause_count,_,0),
     ignore((current_module(M),clause(M:Mask,_,Ref),
-       (clause_property(Ref,module(MW))->must(M==MW);true),
+       (clause_property(Ref,module(MW))->must(ignore((M==MW)));true),
        flag(clause_count,X,X+1),fail)),flag(clause_count,N,0),!.
 clause_count(Mask,N):- 
      flag(clause_count,_,0),
-      ignore((current_module(M),
+      ignore((current_module(M), M\==rdf_rewrite,
          \+ predicate_property(M:Mask,imported_from(_)),
          predicate_property(M:Mask,number_of_clauses(Count)),
-         flag(clause_count,X,X), must(X=0),
+         flag(clause_count,X,X), must(ignore(sanity((X=0,nop(clause_count(Mask,M,Count)))))),
          flag(clause_count,X,X+Count),fail)),flag(clause_count,N,0),!.
 
 
@@ -1095,7 +1080,7 @@ checked_clause_count(genls(_,_)).
 checked_clause_count((_ <- _)).
 checked_clause_count((_ ==> _)).
 checked_clause_count((_ <==> _)).
-checked_clause_count(spft(_,_,ax)).
+%checked_clause_count(spft(_,_,ax)).
 checked_clause_count(agent_command(_,_)).
 checked_clause_count(ignore_file_mpreds(_)).
 
@@ -1113,6 +1098,7 @@ check_clause_count(MMask):- swc,
      ((Diff<0 ,Change is N/abs(Diff ), Change>0.20)
          -> trace_or_throw(bad_count(Mask,(Was --> N))) ; dmsg(good_count(Mask,(Was --> N)))))).
 
+system:check_clause_counts:-!.
 system:check_clause_counts:- flag_call(logicmoo_speed==true),!.
 system:check_clause_counts:- flag_call(unsafe_speedups == true) ,!.
 system:check_clause_counts:- ((forall(checked_clause_count(Mask),sanity(check_clause_count(Mask))))),fail.
@@ -1733,20 +1719,6 @@ load_language_file(Name0):-
 %
 disable_mpreds_in_current_file:- loading_source_file(F),show_call(why,asserta((t_l:disable_px:-loading_source_file(F),!))).
 
-:- thread_local(tlbugger:no_buggery_tl/0).
-:-  /**/ export(with_no_mpred_expansions/1).
-:- meta_predicate(with_no_mpred_expansions(0)).
-
-
-
-%% with_no_mpred_expansions( :GoalGoal) is det.
-%
-% Using No Managed Predicate Expansions.
-%
-with_no_mpred_expansions(Goal):-
-  w_tl(tlbugger:no_buggery_tl,
-    w_tl(t_l:disable_px,Goal)).
-
 
 :-  /**/ export(with_mpred_expansions/1).
 :- meta_predicate(with_mpred_expansions(0)).
@@ -2042,88 +2014,18 @@ load_mpred_on_file_end(World,File):-
    must(signal_eof(File)),!.
 
 
-
-
-
-%load_mpred_name_stream(_Name):- do_gc,repeat,read_one_term(Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
-%load_mpred_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
-
-
-/*
-:- ensure_loaded(plarkc(mpred_sexpr_reader)).
-
-:- parse_to_source(
-  "(documentation instance EnglishLanguage \"An object is an &%instance of a &%SetOrClass if it is included in that &%SetOrClass. 
-  An individual may be an instance of many classes, some of which may be subclasses of others. 
-  Thus, there is no assumption in the meaning of &%instance about specificity or uniqueness.\")",
-  Out),writeq(Out).
-*/
-
-
-
-
-%% is_kif_string( ?String) is det.
-%
-% If Is A Knowledge Interchange Format String.
-%
-is_kif_string([]):- !,fail.
-is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),memberchk(41,Codes).
-
-
-
-
-%% convert_if_kif_string( ?I, ?O) is det.
-%
-% Convert If Knowledge Interchange Format String.
-%
-convert_if_kif_string(I, O):-is_kif_string(I),convert_from_kif(I,O),!, \+ is_list(O).
-
-
-convert_from_kif(I,O):- from_kif_string(I,Wff),quietly_must((sexpr_sterm_to_pterm(Wff,O))),!.
-
-
-%% from_kif_string( ?String, ?Forms) is det.
-%
-% Converted From Knowledge Interchange Format String.
-%
-from_kif_string(I,Wff) :- input_to_forms(I,Wff,Vs),put_variable_names(Vs),!.
-from_kif_string(String,Forms) :- quietly_must((codelist_to_forms(String,Forms);input_to_forms(string(String),Forms))),!.
-from_kif_string(Wff,Wff).
-
-
-:- module_transparent(must_map_preds/3).
-must_map_preds([],IO,IO):-!.
-must_map_preds([one(Pred)|ListOfPreds],IO,Out):- must(call(Pred,IO)),!,
-   must_map_preds(ListOfPreds,IO,Out).
-must_map_preds([Pred|ListOfPreds],In,Out):- must(call(Pred,In,Mid)),!,
-   must_map_preds(ListOfPreds,Mid,Out),!.
-
-
 %% assert_kif( ?String) is det.
 %
 % Assert Knowledge Interchange Format.
 %
-assert_kif(D):-
-         must_det_l((must_map_preds([
-           convert_from_kif,
-           maybe_ruleRewrite,
-           cyc_to_clif,
-           unnumbervars_and_save,
-           sexpr_sterm_to_pterm,
-           fully_expand,
-           sexpr_sterm_to_pterm],D,CycLOut),
-
-         format('~q.~n',[(CycLOut)]),
-         call_u((ground(CycLOut)->ain((CycLOut));ain(tinyKB8(CycLOut)))))).
-
-
+assert_kif(D):- ain(sumoSentenceString(D)).
 
 
 %% assert_kif_dolce( ?String) is det.
 %
 % Assert Knowledge Interchange Format Dolce.
 %
-assert_kif_dolce(String):-convert_from_kif(String,Forms),dmsg(warn(assert_kif_dolce(Forms))),!,ain(tinyKB8(Forms)).
+assert_kif_dolce(String):-convert_from_kif(String,Forms),dmsg(warn(assert_kif_dolce(Forms))),!,ain(rule(Forms)).
 
 
 
@@ -2318,4 +2220,4 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 mpred_loader_file.
 %system:term_expansion(end_of_file,_):-must(check_clause_counts),fail.
-system:term_expansion(EOF,_):-end_of_file==EOF,must(check_clause_counts),fail.
+%system:term_expansion(EOF,_):-end_of_file==EOF,must(check_clause_counts),fail.

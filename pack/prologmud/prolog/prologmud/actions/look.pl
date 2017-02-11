@@ -199,7 +199,7 @@ near_vectors([[vNW,vHere],[vNorth,vHere],[vNE,vHere],
 	[vSW,vHere],[vSouth,vHere],[vSE,vHere]]).
 
 :-dynamic(visually_blocked/2).
-prologDynamic(visually_blocked(tAgent,ftListFn(vtDirection))).
+==>prologDynamic(visually_blocked(tAgent,ftListFn(vtDirection))).
 
 % :-listing(visually_blocked).
 
@@ -216,9 +216,9 @@ check_for_blocks(Agent) :-
 	ain(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_,[]).
 
-meta_argtypes(mudSize(tSpatialThing,ftTerm)).
-meta_argtypes(mudShape(tSpatialThing,vtShape)).
-prologSingleValued(mudHeightOnObj(tSpatialThing,ftNumber)).
+==>prologSingleValued(mudSize(tSpatialThing,ftTerm)).
+==>prologSingleValued(mudShape(tSpatialThing,vtShape)).
+==>prologSingleValued(mudHeightOnObj(tSpatialThing,ftNumber)).
 meta_argtypes(mudTexture(tSpatialThing,vtTexture)).
 
 prologHybrid(mudHeightOnObj(tSpatialThing,ftNumber)).

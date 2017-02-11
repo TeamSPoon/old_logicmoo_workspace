@@ -35,6 +35,6 @@
 :- set_prolog_flag(access_level,user).
 
 
-:- baseKB:enable_mpred_expansion.
+:- enable_mpred_expansion.
 
 

@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_hooks.pl
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(mpred_hooks,[
 /*
 lmcache:agent_session/2,
@@ -157,7 +157,8 @@ update_value/3
 
 :- include('mpred_header.pi').
 
-:- endif.
+%:- endif.
+:- system:import(replace_arg/4).
 /*
 add_arg_parts_of_speech/4,
 agent_action_queue/3,
@@ -865,7 +866,7 @@ add_arg_parts_of_speech(F,N,[A|ARGS0],[ARG|ARGS]):-argIsa_call_or_undressed(F,N,
 %
 % Argument  (isa/2) call or undressed.
 %
-argIsa_call_or_undressed(F,N,Obj,fN(Obj,Type)):- argIsa_call_0(F,N,Type),!.
+argIsa_call_or_undressed(F,N,Obj,fN(Obj,Type)):- call_u(argIsa(F,N,Type)),!.
 argIsa_call_or_undressed(_F,_N,Obj,Obj).
 
 
@@ -914,7 +915,12 @@ relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc),
 
 % ?- member(R,[a,b,c]),when_met(nonvar(Re), dbase:same_arg(same_or(termOfUnit),n,Re)),Re=R,write(chose(R)).
 
+differentTerms(A,B):- dif:dif(A,B).
 
+admittedArgument(P,N,A):-var(P),!,freeze(P,admittedArgument(P,N,A)).
+admittedArgument(P,N,A):-var(A),!,freeze(A,admittedArgument(P,N,A)).
+admittedArgument(P,N,A):-var(N),!,freeze(N,admittedArgument(P,N,A)).
+admittedArgument(P,N,A):-wdmsg(admittedArgument(P,N,A)).
 
 %= 	 	 
 

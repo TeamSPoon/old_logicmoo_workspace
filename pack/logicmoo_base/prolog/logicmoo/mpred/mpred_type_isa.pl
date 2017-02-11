@@ -83,6 +83,25 @@
             type_isa/2,
             was_isa/3,
             was_isa0/3,
+         as_reflexive/3 , % (still imported into mpred_type_wff)
+         assert_hasInstance/2 , % (still imported into mpred_type_wff)
+         call_u_t/2 , % (still imported into mpred_type_wff)
+         call_u_t/3 , % (still imported into mpred_type_wff)
+         call_u_t/4 , % (still imported into mpred_type_wff)
+         call_u_t/5 , % (still imported into mpred_type_wff)
+         if_bound/2 , % (still imported into mpred_type_wff)
+         is_typef/1 , % (still imported into mpred_type_wff)
+         isa_asserted_0/2 , % (still imported into mpred_type_wff)
+         isa_asserted_compound/2 , % (still imported into mpred_type_wff)
+         isa_backchaing/2 , % (still imported into mpred_type_wff)
+         isa_backchaing_1/2 , % (still imported into mpred_type_wff)
+         isa_w_type_atom/2 , % (still imported into mpred_type_wff)
+         map_list_conj/2 , % (still imported into mpred_type_wff)
+         subcache/2 , % (still imported into mpred_type_wff)
+         transitive_subclass_not_same/2 , % (still imported into mpred_type_wff)
+         transitive_superclass_not_same/2 , % (still imported into mpred_type_wff)
+
+
          %    decided_not_was_isa/2,
          % did_learn_from_name/1,
          % isa_pred_now_locked/0,
@@ -124,6 +143,8 @@ transitive_P_r_l(3,?,?,?),
             
 
 
+:- multifile(baseKB:use_cyc_database/0).
+:- thread_local(baseKB:use_cyc_database/0).
 
 :- multifile baseKB:prologBuiltin/1.
 :- discontiguous baseKB:prologBuiltin/1.
@@ -284,7 +305,7 @@ type_prefix(sk,ftSkolemFunction).
 %type_prefix(a,tFunction).
 %type_prefix(t,tCol).
 type_prefix(fn,tFunction).
-type_prefix(mud,tMudPred).
+type_prefix(mud,rtMudPred).
 type_prefix(mud,tPred).
 type_prefix(prop,tPred).
 type_prefix(prolog,ttRelationType).
@@ -353,6 +374,10 @@ was_isa0(M:G,I,C):-atom(M),!,was_isa0(G,I,C).
 was_isa0(G,I,C):-G=..[C,I],!,is_typef(C),!,\+ (is_never_type(C)).
 % was_isa0(t(C,I),I,C):- new_was_isa, atom(C),!.
 
+
+:- export(shouldnt_be_set/1).
+shouldnt_be_set(C):- cwc, a(ttExpressionType,C).
+shouldnt_be_set(C):- cwc, atom(C), atom_concat(ft,_,C).
 
 %= 	 	 
 
@@ -942,6 +967,7 @@ assert_subclass_safe(O,T):-
 %
 % guess  Types.
 %
+guess_types(_):- !. % DONT GUESS
 guess_types(W):- cheaply_u(tried_guess_types_from_name(W)),!.
 guess_types(W):- isa_from_morphology(W,What),ignore(guess_types(W,What)).
 
@@ -973,6 +999,7 @@ guess_types_0(W,ftID):-hotrace((atom(W),atom_concat(i,T,W),
 %
 % Guess Super Types.
 %
+guess_supertypes(_):- !. % DONT GUESS
 guess_supertypes(W):- cheaply_u(tried_guess_types_from_name(W)),!.
 guess_supertypes(W):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_supertypes_0(W))).
 
@@ -983,6 +1010,8 @@ guess_supertypes(W):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_
 %
 % guess super Types  Primary Helper.
 %
+
+guess_supertypes_0(_):- !. % DONT GUESS
 guess_supertypes_0(W):-atom(W),atomic_list_concat(List,'_',W),length(List,S),S>2,!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3, \+ (member(flagged,FirstPart)),
             atomic_list_concat(FirstPart,'_',_NewCol),ain_guess(genls(W,Last)),ain(did_learn_from_name(W)).
 guess_supertypes_0(W):-T=t,to_first_break(W,lower,T,All,upper),to_first_break(All,upper,_UnusedSuper,Rest,_),
@@ -1005,6 +1034,7 @@ ain_guess(G):-show_call(ain_guess,mpred_ain(G)).
 %
 % Guess Type Types.
 %
+guess_typetypes(_):- !. % DONT GUESS
 guess_typetypes(W):- cheaply_u(tried_guess_types_from_name(W)),!.
 guess_typetypes(W):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_typetypes_0(W))).
 
@@ -1087,6 +1117,7 @@ baseKB:prologBuiltin(decl_type/1).
 %
 % Declare Type.
 %
+decl_type(_):-!.
 decl_type(All):- map_list_conj(decl_type,All),!.
 decl_type(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_type_why(Spec,Why)).
 decl_type(_):-!.

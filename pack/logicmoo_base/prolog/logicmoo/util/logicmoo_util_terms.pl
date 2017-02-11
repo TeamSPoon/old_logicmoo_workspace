@@ -1041,7 +1041,7 @@ doall(C):-ignore((C,fail)).
 %
 % Dynamic Load Pl.
 %
-dynamic_load_pl(PLNAME):-consult(PLNAME),!.
+dynamic_load_pl(PLNAME):-ensure_loaded(PLNAME),!.
 
 dynamic_load_pl(PLNAME):- % unload_file(PLNAME),
    open(PLNAME, read, In, []),

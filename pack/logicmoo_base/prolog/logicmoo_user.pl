@@ -50,6 +50,7 @@
 :- if(prolog_load_context(module,system)).
 :- set_prolog_flag(access_level,user).
 :- endif.
+:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 :- at_start((Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)))).
 
 :- set_prolog_flag(pfc_booted,false).
@@ -60,7 +61,7 @@
 
 :- ((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, baseKB:call_u(G))))).
 :- at_start((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, baseKB:call_u(G))))).
-:-  prolog_statistics:time((baseKB:consult(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
+:-  prolog_statistics:time((user:ensure_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
 
 
 /*

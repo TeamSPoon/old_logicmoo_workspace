@@ -1,18 +1,7 @@
 %:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 /*
-:- swi_module(parser_imperative, [
-                   parse_agent_text_command/5,            
-                   parse_agent_text_command_0/5,            
-                   objects_match/3,
-                   match_object/2,
-                   object_string/2,
-                   save_fmt_a_0/2,
-                   save_fmt_a/2,
-                   % coerce/3,
-                   parseIsa//2,
-                   phrase_parseForTypes_9//2,
-                   guess_nameStrings/2,
-                   parseForTypes//2
+:- module(parser_imperative, [
+                  
 ]).
 */
 %:- endif.
@@ -38,6 +27,7 @@
                    save_fmt_a/2,
                    % coerce/3,
                    parseIsa//2,
+                   get_agent_text_command_0/4,
                    phrase_parseForTypes_9//2,
                    guess_nameStrings/2,
                    parseForTypes//2)).
@@ -49,6 +39,7 @@ some_term_to_atom(Term,Atom):- must(\+ is_list(Term)), term_to_atom(Term,Atom).
 % get_agent_text_command/4
 % =====================================================================================================================
 :-export(get_agent_text_command/4).
+:-export(get_agent_text_command_0/4).
 
 get_agent_text_command(Agent,VERBOrListIn,AgentR,CMD):-
    on_x_debug(loop_check(get_agent_text_command_0(Agent,VERBOrListIn,AgentR,CMD),fail)).
@@ -386,7 +377,7 @@ nameString(O,S):-nonvar(O),nonvar(S),nameString(O,SU),same_ci(S,SU).
 
 % :- sanity((clause_u(verb_alias(S,actWhere)),argIsa(verb_alias,1,C),isa(S,C))).
 
-:- must((clause_u(verb_alias(S,actWhere)),argIsa(verb_alias,1,C),isa(S,C))).
+:- must((clause_u(verb_alias(S,actWhere)),(argIsa(verb_alias,1,C);argQuotedIsa(verb_alias,1,C)),(isa(S,C);quotedIsa(S,C)))).
 
 %:- listing(verb_alias/2).
 %:- break.
@@ -487,7 +478,7 @@ name_text(I,O):- nonvar(I),no_repeats(O,(name_text_now(I,M),any_to_string(M,S), 
 :-dynamic(name_text_now/2).
 :-multifile(name_text_now/2).
 :-export(name_text_now/2).
-name_text_now(Name,Text):- name_text_cached(Name,Text).
+name_text_now(Name,Text):- name_text_cached(Name,Text),!.
 name_text_now(Name,Text):- atomic(Name),guess_nameStrings(Name,Text),!.
 
 name_text_cached(Name,Text):-clause_b(nameString(Name,Text)).

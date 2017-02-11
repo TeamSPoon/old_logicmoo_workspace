@@ -205,7 +205,7 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
         must_det_l(0),
         must_det_l_pred(1,+),
         call_must_det(1,+),
-        call_each(+,+),
+        call_each(*,+),
         p_call(+,+),
 
         must_l(0),
@@ -1487,8 +1487,8 @@ must_det_l_pred(Pred,Rest):- call_each(call_must_det(Pred),Rest).
 call_must_det(Pred,Arg):-must_det(call(Pred,Arg)).
 
 call_each(Pred,Goal):-strip_module(Goal,_,P),var(P),trace_or_throw(var_must_det_l_pred(Pred,Goal)),!.
-call_each(Pred,[Goal]):- trace_or_throw(call_each(Pred,[Goal])),!,p_call(Pred,Goal).
-call_each(Pred,[Goal|List]):-  trace_or_throw(call_each(Pred,[Goal|List])), !, p_call(Pred,Goal),!,call_each(Pred,List).
+call_each(Pred,[Goal]):- !, dmsg(trace_syntax(call_each(Pred,[Goal]))),!,p_call(Pred,Goal).
+call_each(Pred,[Goal|List]):- !, dmsg(trace_syntax(call_each(Pred,[Goal|List]))), !, p_call(Pred,Goal),!,call_each(Pred,List).
 % call_each(Pred,Goal):-tlbugger:skip_bugger,!,p_call(Pred,Goal).
 call_each(Pred,M:(Goal,List)):-!, p_call(Pred,M:Goal),!,call_each(Pred,M:List).
 call_each(Pred,(Goal,List)):-!,p_call(Pred,Goal),!,call_each(Pred,List).

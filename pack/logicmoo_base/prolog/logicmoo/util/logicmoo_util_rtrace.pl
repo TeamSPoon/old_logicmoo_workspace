@@ -235,7 +235,7 @@ restore_guitracer:- ignore((retract(t_l:wasguitracer(GWas)),set_prolog_flag(gui_
 %
 % R Trace.
 %
-rtrace:- notrace((save_guitracer,set_prolog_flag(gui_tracer,false),start_rtrace,trace)). % save_guitracer,noguitracer
+rtrace:- notrace,save_guitracer,set_prolog_flag(gui_tracer,false),start_rtrace,trace. % save_guitracer,noguitracer
 
 start_rtrace:- asserta(tl_rtrace:rtracing),visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception).
 

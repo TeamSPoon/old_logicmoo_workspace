@@ -1,4 +1,4 @@
-:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
+%:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(common_logic_skolem,
 	  [ form_sk/2,
 	    sk_form/2,
@@ -17,7 +17,7 @@
             mpred_set_arg_isa/4,
             with_no_kif_var_coroutines/1
 	  ]).
-/** <module> mpred_clausify
+/** <module> common_logic_skolem
 % Provides a prolog database replacement that uses an interpretation of KIF
 %
 %  t/N
@@ -31,7 +31,7 @@
 */
 % NEW
 :- include('../mpred/mpred_header.pi').
-:- endif.
+%:- endif.
 
 :- meta_predicate skolem_test(0).
 :- meta_predicate skolem_unify(*,0).
@@ -93,7 +93,7 @@ form_sk(OtherValue, Skolem):- sk:attr_unify_hook(Skolem, OtherValue),!.
 % push_dom(X,Form2):-annote(dom, X,Form2,_Merged).
 push_dom(X,Dom):- push_cond(X,isaDom(X,Dom)).
 
-isaDom(X,[Y|Z]):- !,maplist(isDom(X),[Y|Z]).
+isaDom(X,[Y|Z]):- !,maplist(isaDom(X),[Y|Z]).
 isaDom(X,Y):- ((call_u(isa(X,Y)) *-> true; true)).
 
 annote(Dom,X,Form2):- must(annote(Dom,X,Form2,_)).
@@ -158,6 +158,13 @@ skolem_test(_):- !.
 skolem_test(Form):- show_call(call_u(Form)).
 
 skolem_unify(_Var,Form):- skolem_test(Form).
+
+
+member_eq(E, [H|T]) :-
+    (   E == H
+    ->  true
+    ;   member_eq(E, T)
+    ).
 
 merge_forms(A,B,A):- A==B,!.
 merge_forms(A,B,B):- member_eq(A,B),!.

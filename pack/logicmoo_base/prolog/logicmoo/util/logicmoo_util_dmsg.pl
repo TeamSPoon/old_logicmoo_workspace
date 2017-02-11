@@ -852,7 +852,7 @@ if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.
 % (debug)message.
 %
 dmsg(C):- notrace((tlbugger:no_slow_io,!,writeln(dmsg(C)))).
-dmsg(V):- w_tl(set_prolog_flag(retry_undefined,false), if_defined(dmsg0(V),logicmoo_util_catch:ddmsg(V))).
+dmsg(V):- w_tl(set_prolog_flag(retry_undefined,false), if_defined(dmsg0(V),logicmoo_util_catch:ddmsg(V))),!.
 %dmsg(F,A):- notrace((tlbugger:no_slow_io,on_x_fail(format(atom(S),F,A))->writeln(dmsg(S));writeln(dmsg_fail(F,A)))),!.
 
 system:dmsg(O):-logicmoo_util_dmsg:dmsg(O).
@@ -881,8 +881,8 @@ dmsginfo(V):-dmsg(info(V)).
 % (debug)message Primary Helper.
 %
 dmsg0(_,_):- is_hiding_dmsgs,!.
-dmsg0(F,A):- is_sgr_on_code(F),!,dmsg(ansi(F,A)).
-dmsg0(F,A):- dmsg(fmt0(F,A)).
+dmsg0(F,A):- is_sgr_on_code(F),!,dmsg(ansi(F,A)),!.
+dmsg0(F,A):- dmsg(fmt0(F,A)),!.
 
 %= 	 	 
 
@@ -911,7 +911,7 @@ dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 %
 % (debug)message Primary Helper.
 %
-dmsg0(V):-notrace(ignore(dmsg00(V))).
+dmsg0(V):-notrace(ignore(dmsg00(V))),!.
 
 %= 	 	 
 
@@ -938,7 +938,7 @@ always_show_dmsg:- tlbugger:tl_always_show_dmsg.
 dmsg000(V):-
    notrace(format(string(K),'~p',[V])),
    (tlbugger:in_dmsg(K)-> dmsg5(V);  % format_to_error('~N% ~q~n',[dmsg0(V)]) ;
-      asserta(tlbugger:in_dmsg(K),Ref),call_cleanup(dmsg1(V),erase(Ref))).
+      asserta(tlbugger:in_dmsg(K),Ref),call_cleanup(dmsg1(V),erase(Ref))),!.
 
 % = :- export(dmsg1/1).
 
@@ -952,8 +952,8 @@ dmsg1(V):- tlbugger:is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,onc
 dmsg1(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 dmsg1(V):- var(V),!,dmsg1(warn(dmsg_var(V))).
 dmsg1(NC):- cyclic_term(NC),!,dtrace,format_to_error('~N% ~q~n',[dmsg_cyclic_term_1]).
-dmsg1(NC):- tlbugger:skipDMsg,!,loop_check_early(dmsg2(NC),format_to_error('~N% ~q~n',[skipDMsg])).
-dmsg1(V):- w_tl(tlbugger:skipDMsg,((once(dmsg2(V)), ignore((tlbugger:dmsg_hook(V),fail))))).
+dmsg1(NC):- tlbugger:skipDMsg,!,loop_check_early(dmsg2(NC),format_to_error('~N% ~q~n',[skipDMsg])),!.
+dmsg1(V):- w_tl(tlbugger:skipDMsg,((once(dmsg2(V)), ignore((tlbugger:dmsg_hook(V),fail))))),!.
 
 % = :- export(dmsg2/1).
 

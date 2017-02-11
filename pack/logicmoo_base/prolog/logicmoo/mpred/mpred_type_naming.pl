@@ -283,7 +283,6 @@ guess_inst_name(Inst,_Type,Inst).
 % ========================================
 
 
-
 %= 	 	 
 
 %% modality( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
@@ -308,7 +307,7 @@ modality(~,[never],[]).
 %
 onSpawn(A):-A==true,!.
 onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
-onSpawn(Class==>Fact):-!,ain((isLoadedType(tSourceData),isRuntime)==>(Class==>Fact)).
+onSpawn(Class==>Fact):-!,ain(onStart(Class==>Fact)).
 onSpawn(ClassFact):-
   fully_expand(clause(assert,onSpawn),ClassFact,ClassFactO),!,
   onSpawn_0(t,ClassFactO).
@@ -334,7 +333,7 @@ onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,Name],
  assert_isa(Inst,FunctArgType),
  assert_isa(Inst,TypeA))),
  fully_expand(clause(assert,onSpawn),t(Modality,genls(TypeA,FunctArgType)),TO),
- call_u(ain(TO)))),!.
+ call_u(ain(onStart(TO))))),!.
 
 onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
   must_det(onSpawn_f_args(Modality,Funct,InstADeclB)).
@@ -351,7 +350,7 @@ onSpawn_f_args(Modality,Funct,List):-
   call_u(must(convertSpawnArgs(Funct,1,List,NewList))),
    Later =.. [Funct|NewList],
    fully_expand(clause(assert,onSpawn),t(Modality,Later),TO),
-   call_u(ain(TO)))),!. 
+   call_u(ain(onStart(TO))))),!. 
   % call_after_mpred_load_slow(w_tl(deduceArgTypes(Funct), ain(Later))))),!.
 
 

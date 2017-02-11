@@ -30,11 +30,21 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+
+
+:- mpred_unload_file.
+
 :- if(current_predicate(initEnvironment/0)).
 % :- must(initEnvironment).
 :- endif.
+:- '$set_source_module'(baseKB).
 
 :- set_prolog_flag(logicmoo_speed,3).
+
+:- set_prolog_flag(logicmoo_speed, 0).
+:- set_prolog_flag(logicmoo_safety, 2).
+:- set_prolog_flag(logicmoo_debug, 2).
+:- set_prolog_flag(unsafe_speedups, false).
 
 :- set_module(baseKB:class(development)).
 
@@ -189,7 +199,7 @@ baseKB:mtCycL(baseKB).
 
 % :- expand_file_search_path(pack(logicmoo_nlu/prolog/pldata),X),exists_directory(X),!,assert_if_new(user:file_search_path(pldata,X)).
 
-%^ :- consult(logicmoo(logicmoo_plarkc)).
+%^ :- ensure_loaded(logicmoo(logicmoo_plarkc)).
 
 
 
@@ -267,6 +277,7 @@ alwaysGaf(pfcRHS).
 alwaysGaf(pfcLHS).
 
 
+% ttExpressionType(A)/atom(A)==> ~tIndividual(A),tCol(A),{decl_type(A), kb_dynamic(A/1)}.
 tSet(A)/atom(A)==> ~tIndividual(A),tCol(A),{decl_type(A), kb_dynamic(A/1)}.
 % tCol(C)/(\+ never_isa_syntax(C))==>{decl_as_isa(C)}.
 :- mpred_notrace_exec.
@@ -658,8 +669,6 @@ mtCycL(O)==>({find_and_call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
 {module_property(Mt,class(user)),
    (atom_concat('common_logic_',_,Mt);atom_concat('logicmoo_',_,Mt);atom_concat('mpred_',_,Mt))} 
     ==>  mtProlog(Mt).
-
-
 {module_property(Mt,class(microtheory))} ==> mtCycL(Mt).
 {module_property(Mt,class(library))} ==> mtProlog(Mt).
 {module_property(Mt,class(system))} ==> mtProlog(Mt).
@@ -749,9 +758,9 @@ nondet.
 
 do_and_undo(mpred_post_exactly,mpred_remove_exactly).
 
-:- if( \+ flag_call(logicmoo_speed==true)).
-(((CI,{was_mpred_isa(CI,I,C)},\+ ~isa(I,C)) ==> actn(mpred_post_exactly(isa(I,C))))).
-:- endif.
+%:- if( \+ flag_call(logicmoo_speed==true)).
+%(((CI,{was_mpred_isa(CI,I,C)},\+ ~isa(I,C)) ==> actn(mpred_post_exactly(isa(I,C))))).
+%:- endif.
 
 :- abolish(system:arity,2).
 :- system:import(arity/2).

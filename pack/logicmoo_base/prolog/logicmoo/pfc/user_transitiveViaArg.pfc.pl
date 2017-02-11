@@ -1,24 +1,31 @@
 
 
+:- mpred_unload_file.
+
 :- install_constant_renamer_until_eof.
 
 :- file_begin(pfc).
 
 :- set_fileAssertMt(baseKB).
 
+argumentsConstrained(G):- cwc,ground(G),!.
+
 % Example specialized
-transitiveViaArg(P,PT,2),arity(P,2)==> (t(P,I,Sub):- (cwc, dif(Sub,Super),t(PT,Sub,Super),t(P,I,Super))).
-transitiveViaArgInverse(P,PT,2),arity(P,2)==> (t(P,I,Sub):- (cwc, dif(Sub,Super),t(PT,Super,Sub),t(P,I,Super))).
+%((transitiveViaArg(P,PT,2)/ \+(P==PT)),arity(P,2)) ==> (t(P,I,Sub):- (cwc, dif(Sub,Super),t(PT,Sub,Super),t(P,I,Super))).
+%((transitiveViaArgInverse(P,PT,2)/ \+(P==PT)),arity(P,2))==> (t(P,I,Sub):- (cwc, dif(Sub,Super),t(PT,Super,Sub),t(P,I,Super))).
 
 functor_any(CONSQ,F,A):- cwc, length(IST,A),apply_term(F,IST,CONSQ),!.
 fa_replace_arg(F,A,N,CONSQ,CSLOT,ASLOT,ANTE):-cwc, functor_any(CONSQ,F,A),arg(N,CONSQ,CSLOT),replace_arg(CONSQ,N,ASLOT,ANTE),!.
 
 % Example generalized
-transitiveViaArg(P,B,N),arity(P,A)/fa_replace_arg(P,A,N,CONSQ,CSLOT,ASLOT,ANTE)==> (CONSQ:- (cwc, dif(CSLOT,ASLOT),t(B,CSLOT,ASLOT),ANTE)).
-transitiveViaArgInverse(P,B,N),arity(P,A)/fa_replace_arg(P,A,N,CONSQ,CSLOT,ASLOT,ANTE)==> (CONSQ:- (cwc, dif(CSLOT,ASLOT),t(B,ASLOT,CSLOT),ANTE)).
+((transitiveViaArg(P,B,N)/ \+(P==B) ),arity(P,A)/fa_replace_arg(P,A,N,CONSQ,CSLOT,ASLOT,ANTE)) ==>  
+  (CONSQ:- (cwc,argumentsConstrained(CONSQ),dif(CSLOT,ASLOT),t(B,CSLOT,ASLOT),argumentsConstrained(ANTE),ANTE)).
+
+transitiveViaArgInverse(P,B,N),arity(P,A)/fa_replace_arg(P,A,N,CONSQ,CSLOT,ASLOT,ANTE)==> 
+  (CONSQ:- (cwc,argumentsConstrained(CONSQ),dif(CSLOT,ASLOT),t(B,ASLOT,CSLOT),argumentsConstrained(ANTE),ANTE)).
 
 
-coExtensional(A,B)==>
+coExtensional(A,B)==> 
   (((genls(A,Supers)<==>genls(B,Supers)) , (genls(Subs,A)<==>genls(Subs,B)),  (isa(I,A)<==>isa(I,B))),
   coExtensional(B,A)).
 
