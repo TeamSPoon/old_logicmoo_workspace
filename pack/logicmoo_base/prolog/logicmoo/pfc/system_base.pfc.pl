@@ -42,8 +42,8 @@
 :- set_prolog_flag(logicmoo_speed,3).
 
 :- set_prolog_flag(logicmoo_speed, 0).
-:- set_prolog_flag(logicmoo_safety, 2).
-:- set_prolog_flag(logicmoo_debug, 2).
+:- set_prolog_flag(logicmoo_safety, 3).
+:- set_prolog_flag(logicmoo_debug, 3).
 :- set_prolog_flag(unsafe_speedups, false).
 
 :- set_module(baseKB:class(development)).
@@ -137,6 +137,11 @@ col_as_unary(Col)==>tCol(Col).
 col_as_isa(Col)==>tCol(Col).
 %:- nortrace.
 %:-break.
+
+
+tCol(P)/atom(P)==>functorIsMacro(P).
+functorIsMacro(functorIsMacro).
+functorIsMacro(Decl)/atom(Decl)==>functorDeclares(Decl).
 
 
 
@@ -515,9 +520,6 @@ mpred_mark(pfcCallCodeTst,F, A)/predicate_is_undefined_fa(F,A)
 */
 
 
-tCol(P)==>functorIsMacro(P).
-functorIsMacro(functorIsMacro).
-
 % (marker_supported(F,A))==>(prologHybrid(F),hybrid_support(F,A)).
 %mpred_mark(pfcPosTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).
 %mpred_mark(pfcNegTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A), afterRemoving(F,lambda(P,mpred_enqueue(~P,(m,m)))).
@@ -630,8 +632,6 @@ ttModule(MtType)==>genls(MtType,tMicrotheory).
 ttModule(mtProlog).
 
 :- sanity(get_lang(pfc)).
-
-tCol(Decl)==>functorDeclares(Decl).
 
 :- sanity(( fully_expand(cuz,==>((ttModule(mtCycL,
   comment("yada....................."),

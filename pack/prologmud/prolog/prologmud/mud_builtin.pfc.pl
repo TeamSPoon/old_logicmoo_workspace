@@ -416,8 +416,8 @@ typeGenls(ttAgentType,tAgent).
 completelyAssertedCollection(Complete)==> {must(\+ ttExpressionType(Complete))}.
 
 
-tSourceCode(iSourceCode7,comment("PrologMUD Server code")).
-tSourceData(iSourceData8,comment("PrologMUD WorldState Data")).
+==> tSourceCode(iSourceCode7,comment("PrologMUD Server code")).
+==> tSourceData(iSourceData8,comment("PrologMUD WorldState Data")).
 
 
 %isLoadedType(tSourceCode) ==> (tPred(Toy),arity(Toy,A)/ ( \+ current_predicate(Toy/A)) ==> dynamic(Toy/A)).

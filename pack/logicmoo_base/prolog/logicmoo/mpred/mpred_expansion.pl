@@ -1009,6 +1009,7 @@ db_expand_final(_,NC,NCO):- string_to_mws(NC,NCO),!.
 db_expand_final(_ ,NC,NC):- atomic(NC),!.
 db_expand_final(_,PARSE,_):- is_parse_type(PARSE),!,fail.
 db_expand_final(_,[_|_],_):- !,fail.
+db_expand_final(_,Arg,Arg):- functor(Arg,s,_),!.
 db_expand_final(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_final(Op,Sent,SentO).
 db_expand_final(_ ,isa(Args,Meta_argtypes),  meta_argtypes(Args)):-Meta_argtypes==meta_argtypes,!,is_ftCompound(Args),!,functor(Args,Pred,A),assert_arity(Pred,A).
 % covered db_expand_final(Op,Sent,Sent):- Sent=..[_,A],atom(A),!.

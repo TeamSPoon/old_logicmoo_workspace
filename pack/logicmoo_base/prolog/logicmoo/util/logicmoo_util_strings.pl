@@ -46,6 +46,7 @@
             convert_members/3,
             convert_to_string/2,
             convert_to_cycString/2,
+            is_s_string/1,
             delistify_single_element/2,
             ctype_continue/2,
             ctype_switch/2,
@@ -1066,6 +1067,7 @@ any_to_string(Atom,String):-   any_to_string1(Atom,StringS),!,StringS=String.
 % Any Converted To String Secondary Helper.
 %
 any_to_string1(Atom,String):- string(Atom),!,Atom=String.
+any_to_string1(Atom,String):- is_s_string(Atom),!,convert_to_string(Atom,String).
 % any_to_string1(Atom,String):- is_string(Atom),!,text_to_string(String).
 
 any_to_string1(_,_):-stack_depth(X),X>2000,!,sanity(fail),fail.
@@ -1100,12 +1102,17 @@ text_to_uq_atom(A,Sub):- atom_prefix(A,'"'),ifprolog:atom_suffix(A,1,'"'),sub_at
 text_to_uq_atom(A,A).
 
 convert_to_string_list(I,O):-string(I), (atom_contains(I,'\n');atom_contains(I,'*')),!,O=[I].
+convert_to_string_list(I,O):-is_s_string(I),I=..[s|M],!,maplist(atom_string,M,O).
 convert_to_string_list(I,O):-convert_to_atoms_list(I,M),maplist(atom_string,M,O).
 
+is_s_string(I):-compound(I),functor(I,s,_),!.
+
+convert_to_cycString(I,O):- is_s_string(I),!,O=I.
 convert_to_cycString(I,O):- convert_to_string_list(I,M),delistify_single_element(M,O).
 
 convert_to_string(I,O):- convert_to_atoms_list(I,M),(is_list(M)->atomics_to_string(M," ",O);atom_to_string(M,O)).
 
+convert_to_atoms_list(I,O):- is_s_string(I),I=..[s|M],!,maplist(atom_string,O,M).
 convert_to_atoms_list(A,B):- \+ atomic(A),!,listify(A,B),nop(dmsg(convert_to_atoms_list(A,B))).
 convert_to_atoms_list(A,B):- atom_length(A,L),convert_to_atoms_by_len(A,L,B),!.
 convert_to_atoms_list(A,B):- text_to_string(A,S),string_to_atom(S,M),listify(M,B).

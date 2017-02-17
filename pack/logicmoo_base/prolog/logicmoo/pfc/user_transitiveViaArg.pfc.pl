@@ -18,10 +18,10 @@ functor_any(CONSQ,F,A):- cwc, length(IST,A),apply_term(F,IST,CONSQ),!.
 fa_replace_arg(F,A,N,CONSQ,CSLOT,ASLOT,ANTE):-cwc, functor_any(CONSQ,F,A),arg(N,CONSQ,CSLOT),replace_arg(CONSQ,N,ASLOT,ANTE),!.
 
 % Example generalized
-((transitiveViaArg(P,B,N)/ \+(P==B) ),arity(P,A)/fa_replace_arg(P,A,N,CONSQ,CSLOT,ASLOT,ANTE)) ==>  
-  (CONSQ:- (cwc,argumentsConstrained(CONSQ),dif(CSLOT,ASLOT),t(B,CSLOT,ASLOT),argumentsConstrained(ANTE),ANTE)).
+(((transitiveViaArg(P,B,N) ),arity(P,A)/(fa_replace_arg(P,A,N,CONSQ,CSLOT,ASLOT,ANTE), P\=B)) ==>  
+  (CONSQ:- (cwc,argumentsConstrained(CONSQ),dif(CSLOT,ASLOT),t(B,CSLOT,ASLOT),argumentsConstrained(ANTE),ANTE))).
 
-transitiveViaArgInverse(P,B,N),arity(P,A)/fa_replace_arg(P,A,N,CONSQ,CSLOT,ASLOT,ANTE)==> 
+transitiveViaArgInverse(P,B,N),arity(P,A)/(fa_replace_arg(P,A,N,CONSQ,CSLOT,ASLOT,ANTE), P\=B)==> 
   (CONSQ:- (cwc,argumentsConstrained(CONSQ),dif(CSLOT,ASLOT),t(B,ASLOT,CSLOT),argumentsConstrained(ANTE),ANTE)).
 
 

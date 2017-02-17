@@ -403,8 +403,8 @@ tSet(functorIsMacro).
 
 :- install_constant_renamer_until_eof.
 
-ttModule(tSourceCode,mudToCyc('ComputerCode'),comment("Source code files containing callable features")).
-ttModule(tSourceData,mudToCyc('PropositionalInformationThing'),comment("Source data files containing world state information")).
+==>ttModule(tSourceCode,mudToCyc('ComputerCode'),comment("Source code files containing callable features")).
+==>ttModule(tSourceData,mudToCyc('PropositionalInformationThing'),comment("Source data files containing world state information")).
 
 ==> prologHybrid(isLoadedType(ttModule),pfcControlled).
 ==> prologHybrid(isLoaded(tMicrotheory),pfcControlled).
@@ -666,6 +666,8 @@ arity(argQuoted,1).
 tSet(vtDirection).
 
 :- sanity(get_lang(pfc)).
+
+disjointWith(tPred,tFunction).
 
 disjointWith(ttTemporalType,ttAbstractType).
 disjointWith(Sub, Super) ==> disjointWith( Super, Sub).

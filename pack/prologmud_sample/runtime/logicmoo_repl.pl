@@ -161,13 +161,3 @@ decl_kb_dynamic_tests:-
 
 
 
-
-/*
-
-
-[logicmoo_repl].
-
-[logicmoo_repl].
-
-*/
-

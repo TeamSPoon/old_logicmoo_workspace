@@ -76,6 +76,15 @@
 :- baseKB:use_module(library(statistics),[time/1]).
 :- autoload([verbose(false)]).
 
+:- if(exists_source(foreign('libedit4pl.so'))). 
+:- use_foreign_library(foreign(libedit4pl)).
+:- initialization(use_foreign_library(foreign(libedit4pl)),restore).
+:- else.
+:- if(exists_source(foreign('edit4pl.dll'))). 
+:- use_foreign_library(foreign(edit4pl)).
+:- endif.
+:- endif.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MAKE SURE CLIOPATRIA RUNS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -178,7 +187,8 @@ with_no_mpred_expansions(Goal):-
 
 
 add_history(O):- format(atom(A),'~q.',[O]),
-      (current_predicate(editline:el_add_history/2) -> editline:el_add_history(user_input,A) ; rl_add_history(A)). 
+   (current_predicate(system:rl_add_history/1) -> system:rl_add_history(A) ; true),
+   (current_predicate(editline:el_add_history/2) -> editline:el_add_history(user_input,A) ; true). 
 
 baseKB:add_history_ideas:- 
         add_history(start_telnet),
@@ -186,18 +196,21 @@ baseKB:add_history_ideas:-
         add_history(list_undefined),
         add_history(listing(after_boot_goal/1)),
 	add_history(ensure_loaded(run_mud_game)),
-	add_history(statistics),
-        add_history(threads),
+	add_history(statistics),        
         add_history(qsave_lm(lm_repl)),        
-        add_history(after_boot_call(must_det)),
-        add_history(after_boot_call),
         add_history(make),        
         add_history(mmake),
         add_history(login_and_run),        
         forall(system:after_boot_goal(G),add_history(G)),
-        add_history([init_mud_server]),
+        add_history(loadSumo),
+        add_history(loadTinyKB),
+        add_history(threads),
+        add_history(after_boot_call(must_det)),
+        add_history(after_boot_call),   
         add_history([init_cliopatria]),
         add_history([logicmoo_repl]),
+        add_history([init_mud_server]),
+        add_history([init_mud_server_run]),
         !.
 
 
@@ -206,8 +219,8 @@ baseKB:add_history_ideas:-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- dynamic(system:after_boot_goal/1).
 :- meta_predicate(system:during_boot(:)).
-system:after_boot_call(How):- forall(system:after_boot_goal(Goal),call(How,Goal)).
-system:after_boot_call:-system:after_boot_call(must_det).
+system:after_boot_call(How):- forall(system:after_boot_goal(Goal),call(How,Goal)),threads.
+system:after_boot_call:- baseKB:after_boot_call(must_det).
 system:during_boot(Goal):- call(Goal),after_boot(Goal). 
 :- meta_predicate(system:after_boot(:)).
 system:after_boot(Goal):- add_history(Goal),system:assertz(after_boot_goal(Goal)).
@@ -228,12 +241,13 @@ logicmoo_goal:-
  nb_setval('$oo_stack',[]),
  threads, 
  make,
+ after_boot_call,
  baseKB:add_history_ideas,
- dmsg("[logicmoo_repl]."),
- dmsg("[logicmoo_engine]."),
- dmsg("[init_mud_server]."),!.
+ dmsg("  [logicmoo_repl]."),
+ dmsg("  [init_mud_server]."),
+ dmsg("  [init_mud_server_run]."),!.
 
-logicmoo_toplevel:- 
+logicmoo_toplevel:-  
  module(baseKB),
  listing(after_boot_goal/1),
  dmsg("logicmoo_toplevel"),

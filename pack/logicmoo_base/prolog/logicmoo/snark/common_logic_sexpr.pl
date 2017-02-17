@@ -133,6 +133,8 @@ rename_sumo('subclass', genls).
 rename_sumo('domain', 'argIsa').
 rename_sumo('disjoint', 'disjointWith').
 
+rename_sumo('Atom', 'tSumoAtomMolecule').
+
 rename_sumo('range', 'resultIsa').
 rename_sumo('domainSubclass', 'argGenl').
 rename_sumo('rangeSubclass', 'resultGenl').
@@ -143,10 +145,12 @@ rename_sumo('ListFn',vTheListFn).
 rename_sumo('ListOrderFn',vSumoListOrderFn).
 rename_sumo('AssignmentFn',uFn).
 rename_sumo('SymbolicString',ftString).
-rename_sumo('Attribute','sumoAttribute').
+rename_sumo('property','sumoProperty').
+rename_sumo('attribute','sumoAttribute').
+rename_sumo('Attribute','vtSumoAttribute').
 rename_sumo('EnglishLanguage','vEnglishLanguage').
 rename_sumo('Formula','ftFormula').
-rename_sumo('Function','rtFunction').
+rename_sumo('Function','tFunction').
 rename_sumo(forall,all).
 rename_sumo(subrelation,genlPreds).
 rename_sumo('Class','tSet').
@@ -374,6 +378,10 @@ file_sexpr('$COMMENT'(Expr)) --> line_comment(Expr),!.
 file_sexpr('$COMMENT'([])) --> sblank_lines,!.
 file_sexpr(end_of_file) --> [end_of_file],!.
 file_sexpr(end_of_file) --> [-1],!.
+
+%   0.0003:   (PICK-UP ANDY IBM-R30 CS-LOUNGE) [0.1000]
+file_sexpr(planStepLPG(Name,Expr,Value)) --> swhite,sym_or_num(Name),`:`,swhite, sexpr(Expr),swhite, `[`,sym_or_num(Value),`]`,swhite.
+
 file_sexpr(Expr) --> sexpr(Expr),!.
 
 
@@ -383,6 +391,7 @@ sexpr(L)                      --> sblank,!,sexpr(L),!.
 sexpr(L)                      --> `(`, !, swhite, sexpr_list(L),!, swhite.
 sexpr('$OBJ'(vector,V))                 --> `#(`, !, sexpr_vector(V,`)`),!, swhite.
 sexpr('$OBJ'(vugly,V))                 --> `#<`, sexpr_vector(V,`>`),!, swhite.
+sexpr('$OBJ'(brack_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
 sexpr('$OBJ'(ugly,V))                 --> `#<`, read_string_until(V,`>`),!, swhite.
 sexpr('#'(t))                 --> `#t`, !, swhite.
 sexpr('#'(f))                 --> `#f`, !, swhite.

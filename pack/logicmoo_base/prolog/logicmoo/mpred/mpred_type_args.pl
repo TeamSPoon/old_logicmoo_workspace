@@ -326,6 +326,7 @@ pl_arg_type(Arg,Type):-
 %
 is_ftText(Arg):-string(Arg),!.
 is_ftText(Arg):- \+ compound(Arg),!,fail.
+is_ftText(Arg):- functor(Arg,s,_),!.
 is_ftText([Arg|_]):-string(Arg),!.
 is_ftText(Arg):-is_ftVar(Arg),!,fail.
 is_ftText(Arg):- text_to_string_safe(Arg,_),!.
