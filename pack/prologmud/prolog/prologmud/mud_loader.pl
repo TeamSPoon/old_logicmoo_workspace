@@ -178,7 +178,7 @@ if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Go
 :- meta_predicate(if_version_greater(?,0)).
 
 % set to false because we don't want to use the mudconsole
-:- if_flag_true(false, if_version_greater(70109,user:ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
+:- if_flag_true(false, if_version_greater(70109,baseKB:ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
 %:- set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').

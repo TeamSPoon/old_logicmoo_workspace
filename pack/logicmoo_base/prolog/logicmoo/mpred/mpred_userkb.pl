@@ -191,29 +191,6 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 
 % :- shared_multifile(baseKB:use_kif/2).
 :- dynamic(baseKB:wrap_shared/3).
-:-ensure_loaded(library('logicmoo/mpred/mpred_hooks')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_loader')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_at_box')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_isa')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_expansion')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_kb_ops')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_listing')).
-:-ensure_loaded(library('logicmoo/snark/common_logic_sexpr')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_pfc')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_prolog_file')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_props')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_storage')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_stubs')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_constraints')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_naming')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_wff')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_type_args')).
-:-ensure_loaded(library('logicmoo/mpred/mpred_agenda')).
-:-ensure_loaded(library('logicmoo/snark/common_logic_boxlog')).
-:-ensure_loaded(library('logicmoo/snark/common_logic_skolem')).
-:-ensure_loaded(library('logicmoo/snark/common_logic_kb_hooks')).
-:-ensure_loaded(library('logicmoo/snark/common_logic_compiler')).
-
 
 :- call_u(true).
 
@@ -245,8 +222,6 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- '$set_source_module'(baseKB).
 :- '$set_typein_module'(baseKB).
 
-:- 'ensure_loaded'(mpred_props).
-:- 'ensure_loaded'(mpred_expansion).
 
 kb_dynamic_m(E):- with_source_module(baseKB,decl_as(kb_dynamic,E)).
 

@@ -381,9 +381,9 @@ pttp_assert_int_wid04(ID,Y,F,A):-
     must((not(internal_functor(F))-> add_functor(external,F/A); (ainz_pttp(wid(ID,F/A,Y)),add_functor(internal,F/A)))))
 */
 
-:- use_module(dbase_i_mpred_pttp_statics).
-:- use_module(dbase_i_mpred_pttp_precompiled).
-:- use_module(dbase_i_mpred_pttp_testing).
+:- ensure_loaded(dbase_i_mpred_pttp_statics).
+:- ensure_loaded(dbase_i_mpred_pttp_precompiled).
+:- ensure_loaded(dbase_i_mpred_pttp_testing).
 
 :- if_startup_script(do_pttp_tests).
 

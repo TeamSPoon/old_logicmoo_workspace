@@ -867,7 +867,7 @@ retractallEnv(Env,Pred/Arity) :-
 	retractall_head(Head), 
 	!.
 
-:- user:ensure_loaded('/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo_utils').
+:- baseKB:ensure_loaded('/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo_utils').
 
 :- getLibraries.
 

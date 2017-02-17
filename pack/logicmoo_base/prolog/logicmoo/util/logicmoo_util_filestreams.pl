@@ -28,6 +28,7 @@
        %     ssl_protocol_hook/4,
             text_to_stream/2,
             l_open_output/2,
+            is_openable/1,
             with_stream_pos/2
           ]).
 
@@ -100,8 +101,9 @@ translate_file_stream(With,Module,In,Out,Options):-
 trans_read_source_term(M, In, Term, Term, Options):- !,
    read_clause(In, Term, [ module(M)| Options ]).
 
+:- ensure_loaded(library(prolog_source)).
 trans_read_source_term(M, In, Term, Expanded, Options) :-
-    prolog_source:maplist(read_clause_option, Options),
+    prolog_source:maplist(prolog_source:read_clause_option, Options),
     !,
  prolog_source:(
     select_option(subterm_positions(TermPos), Options,
@@ -212,8 +214,8 @@ wt(O,P,Vs):- write_term(O,P,[variable_names(Vs),portrayed(true),quoted(true),ful
 % Using Stream Pos.
 %
 with_stream_pos(In,Call):-
-    stream_property(In, position(InitalPos)),
-    PS = position(InitalPos),
+   must(( stream_property(In, position(InitalPos)),
+    PS = position(InitalPos))),
     (Call *-> 
        (stream_property(In, position(NewPos)),nb_setarg(1,PS,NewPos)) ; 
        ((arg(1,PS,Pos),set_stream_position(In, Pos)),!,fail)).
@@ -242,6 +244,16 @@ l_open_input0(In,InS):-l_open_input1(In,InS),!.
 l_open_input0(InS,In):-string(InS),!,open_string(InS,In).
 l_open_input0(Filename,In) :- \+ is_list(Filename),nonvar(Filename),filematch(Filename,File), file_open_read(File,In).
 l_open_input0(InS,In):-!,open_string(InS,In).
+
+
+
+
+is_openable(In):-ground(In),is_openable1(In),!.
+is_openable1(In):-is_stream(In).
+is_openable1(In):-string(In).
+is_openable1(In):-exists_source(In).
+is_openable1(In):-catch(text_to_string(In,Out),_,fail),!,In\==Out.
+is_openable1(In):- compound(In),!,functor(In,F,1),arg(_,v(file,atom,string,alias,codes,chars),F).
 
 
 %= 	 	 

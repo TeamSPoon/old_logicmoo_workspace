@@ -164,7 +164,7 @@
 
 :-ain(baseKB:predicateConventionMt(mud_test,baseKB)).
 
-:-reexport(library('logicmoo/snark/common_logic_snark')).
+% :-reexport(library('logicmoo/snark/common_logic_snark')).
 
 
 :- multifile((        

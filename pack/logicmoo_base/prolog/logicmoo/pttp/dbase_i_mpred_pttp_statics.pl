@@ -752,7 +752,7 @@ pttp1c_wid(_ID,X0,X8,IntProcs,Procs) :-
 
 
 
-:- use_module(dbase_i_mpred_pttp_compile_stickel_orig).
+:- ensure_loaded(dbase_i_mpred_pttp_compile_stickel_orig).
 
 
 %%% ***

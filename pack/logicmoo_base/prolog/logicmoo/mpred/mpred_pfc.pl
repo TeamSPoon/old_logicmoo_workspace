@@ -194,10 +194,6 @@ push_current_choice/1,
 
 :- include('mpred_header.pi').
 
-:- 'ensure_loaded'(mpred_kb_ops).
-:- 'ensure_loaded'(mpred_expansion).
-
-
 %:- endif.
 
 
@@ -3542,7 +3538,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 
 
 
-:- '$current_source_module'(M),forall(mpred_database_term(F,A,_),(abolish(mpred_pfc:F/A),abolish(user:F/A),abolish(M:F/A))).
+% :- '$current_source_module'(M),forall(mpred_database_term(F,A,_),(abolish(mpred_pfc:F/A),abolish(user:F/A),abolish(M:F/A))).
 % :- initialization(ensure_abox(baseKB)).
 % :- dynamic(mpred_is_spying_pred/1).
 

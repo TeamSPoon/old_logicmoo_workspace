@@ -17,6 +17,8 @@ user:file_search_path(library, '../logicmoo_planner/prolog').
 
 :- multifile(mpred_online:semweb_startup/0).
 
+:- multifile(in_logicmoo_repl_source_file/0).
+
 in_logicmoo_repl_source_file.
 
 :- if( \+ (exists_source(library(prolog_slack)))).

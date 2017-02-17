@@ -149,7 +149,7 @@
  op(300,fx,'~'),
  op(300,fx,'-').
 
-:- user:ensure_loaded(logicmoo('plarkc/logicmoo_i_cyc_rewriting')).
+%:- baseKB:ensure_loaded(logicmoo('plarkc/logicmoo_i_cyc_rewriting')).
 
 
 :- op(1100,fx,(shared_multifile)).
@@ -970,8 +970,8 @@ kif_to_boxlog(WffIn,Why,Out):-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 %
 % Knowledge Interchange Format Converted To Datalog.
 %
-kif_to_boxlog(I,KB,Why,Flattened):- trace,
-  logicmoo_i_cyc_rewriting:convert_if_kif_string( I, PTerm),
+kif_to_boxlog(I,KB,Why,Flattened):- % trace,
+  convert_if_kif_string( I, PTerm),
   kif_to_boxlog(PTerm,KB,Why,Flattened), !.
 
 % kif_to_boxlog(WffInIn,KB,Why,FlattenedO):-  as_dlog(WffInIn,WffIn),kif_to_boxlog_0(WffIn,KB,Why,FlattenedO),!.

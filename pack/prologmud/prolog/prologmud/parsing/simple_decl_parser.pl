@@ -1,5 +1,5 @@
 % :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
-% :- swi_module(simple_decl_parser, [parserVars/3,parserVars/4,asserta_parserVars/3]).
+% :- swi_module(mud_simple_decl_parser, [parserVars/3,parserVars/4,asserta_parserVars/3]).
 /* * <module> simple_decl_parser - an example of simple parsing of an inform7 like languages.
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
@@ -51,7 +51,7 @@ typeGenls(ttValueType,vtValue).
 
 :- set_prolog_flag(lm_expanders,false).
 
-:- user:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
+:- baseKB:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
 
 
 asserta_parserVars(N,V,Type):- show_failure(current_agent(A)),asserta(parserVars(A,N,V,Type)).

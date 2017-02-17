@@ -139,6 +139,40 @@ col_as_isa(Col)==>tCol(Col).
 %:-break.
 
 
+
+==>((ttRelationType(isEach(
+                  prologBuiltin,
+                  prologDynamic,
+                  prologHybrid,
+                  prologIsFlag,
+                  prologKIF,
+                  prologListValued,
+                  prologMultiValued,
+                  prologNegByFailure,
+                  prologOrdered,
+                  prologPTTP,
+                  prologSideEffects,
+                  prologSingleValued,
+
+                  rtAvoidForwardChain,
+                  predCanHaveSingletons,
+
+                  pfcControlled,
+                  pfcWatched,
+                  pfcCreates,
+                  pfcNegTrigger,
+                  pfcPosTrigger,
+                  pfcBcTrigger,
+                  pfcRHS,
+                  pfcLHS,
+                  pfcCallCodeBody,
+                  pfcCallCodeTst,
+                  pfcMustFC,
+                  pfcDatabaseTerm)))).
+
+
+ttRelationType(P)==>(tCol(P),completelyAssertedCollection(P),completeExtentAsserted(P)).
+
 % ((prologHybrid(C),{must(callable(C)),get_functor(C,F,A),C\=F}) ==> arity(F,A)).
 
 
@@ -146,17 +180,16 @@ col_as_isa(Col)==>tCol(Col).
 %
 % Completely Asserted Collection.
 %
-t(completelyAssertedCollection,prologNegByFailure).
-t(completeExtentAsserted,pm).
-t(completeExtentAsserted,functorIsMacro).
-t(completelyAssertedCollection,tMicrotheory).
-t(completelyAssertedCollection,mtCycL).
+
+==> t(completeExtentAsserted,pm).
+==> t(completeExtentAsserted,functorIsMacro).
+==> t(completelyAssertedCollection,tMicrotheory).
+==> t(completelyAssertedCollection,mtCycL).
 
 :-assert((t(T,I):- cwc, I==T,completelyAssertedCollection==I,!)).
 :-assert((t(T,I):- cwc, I==T,completeExtentAsserted==I,!)).
 :-assert((t(T,I):- ((cwc, I==T,ttExpressionType==I,!,fail)))).
 
-completelyAssertedCollection(prologNegByFailure).
 completeExtentAsserted(pm).
 completeExtentAsserted(functorIsMacro).
 completelyAssertedCollection(tMicrotheory).

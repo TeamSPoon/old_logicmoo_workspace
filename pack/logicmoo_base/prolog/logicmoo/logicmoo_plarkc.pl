@@ -38,7 +38,7 @@
 
 %:- set_prolog_stack(local, limit(32*10**9)).
 %:- set_prolog_stack(global, limit(32*10**9)).
-% :- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
+% :- baseKB:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
 
 :- if(false).

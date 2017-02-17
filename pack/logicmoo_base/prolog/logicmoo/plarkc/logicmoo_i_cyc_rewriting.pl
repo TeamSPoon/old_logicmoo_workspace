@@ -27,6 +27,8 @@
             cyc_to_mpred_idiom1/2,
             cyc_to_mpred_idiom_unused/2,
             cyc_to_mpred_sent_idiom_2/3,
+            delay_rule_eval/3,
+            
             % BAD?  baseKB:cyc_to_plarkc/2,
             expT/1,
             %lmcache:isCycAvailable_known/0,
@@ -34,20 +36,25 @@
             isF/1,
             isFT/1,
             %isPT/1,
+            
             isRT/1,
             isV/1,
             isVT/1,
 %   baseKB:mpred_to_cyc/2,
-
+           notFormatType/1,
             label_args/3,
             list_to_ops/3,
 
           must_map_preds/3,
-          maybe_ruleRewrite/2,
-          is_kif_string/1,
- from_kif_string/2,
- convert_from_kif/2,
- convert_if_kif_string/2,
+
+% KIF BASED
+         sumo_to_clif/2,
+         is_kif_string/1,
+         from_kif_string/2,
+         convert_if_kif_string/2,
+         kif_assertion_recipe/2,
+
+
 
             make_kw_functor/3,
             make_kw_functor/4,
@@ -72,7 +79,7 @@ install_constant_renamer_until_eof:-  call_on_eof(show_missing_renames), set_pro
 
 
 :- dynamic(baseKB:cycPrepending/2).
-baseKB:cycPrepending(ft,'Atom').
+% baseKB:cycPrepending(ft,'Atom').
 baseKB:cycPrepending(ft,'AtomicAssertion').
 baseKB:cycPrepending(ft,'AtomicSentence').
 baseKB:cycPrepending(ft,'AtomicTerm').
@@ -161,6 +168,7 @@ baseKB:cycPrepending(rt,'UnreifiableFunction').
 baseKB:cycPrepending(rt,'UnaryFunction').
 baseKB:cycPrepending(rt,'LogicalConnective').
 baseKB:cycPrepending(rt,'ELRelationOneWay').
+baseKB:cycPrepending(t,'Function').
 
 
 
@@ -179,26 +187,14 @@ prepender(Pre,C):- builtin_rn_or_rn(C,P),atom_concat(Pre,C,P).
 
 % documentation(C,'EnglishLanguage',S)=@=>comment(C,S).
 
-% for SUMO
-:- dynamic(baseKB:sumo_to_plarkc/2).
-baseKB:sumo_to_plarkc('domain', 'argIsa').
-baseKB:sumo_to_plarkc('subclass', 'genls').
-baseKB:sumo_to_plarkc('range', 'resultIsa').
-baseKB:sumo_to_plarkc('domainSubclass', 'argGenl').
-baseKB:sumo_to_plarkc(immediateInstance,nearestIsa).
-baseKB:sumo_to_plarkc('rangeSubclass', 'resultGenl').
-baseKB:sumo_to_plarkc('instance', 'isa').
-baseKB:sumo_to_plarkc(subrelation,genlPreds).
-baseKB:sumo_to_plarkc(documentation,comment).
-baseKB:sumo_to_plarkc('Class','tSet').
-baseKB:sumo_to_plarkc('SetOrClass', 'tCol').
 
-renamed_surely(C):- kb7166:rnc(C,_);kb7166:rnc(_,C).
+
+renamed_surely(C):- baseKB:rnc(C,_);baseKB:rnc(_,C).
 
 
 
 
-is_merge0(C1,C2):- ftLarkcOnlyTerm(P),kb7166:rnc(C1,P),dif(C1,C2),kb7166:rnc(C2,P).
+is_merge0(C1,C2):- ftLarkcOnlyTerm(P),baseKB:rnc(C1,P),dif(C1,C2),baseKB:rnc(C2,P).
 is_merge(O1,O2):- no_repeats([O1,O2],(is_merge0(C1,C2), sort([C1,C2],[O1,O2]))).
 
 :- multifile(baseKB:rn_new/2).
@@ -207,7 +203,7 @@ is_merge(O1,O2):- no_repeats([O1,O2],(is_merge0(C1,C2), sort([C1,C2],[O1,O2]))).
 
 
 builtin_rn_or_rn_new(C,P):-builtin_rn(C,P).
-builtin_rn_or_rn_new(C,P):-kb7166:rnc(C,P).
+builtin_rn_or_rn_new(C,P):-baseKB:rnc(C,P).
 builtin_rn_or_rn_new(C,P):-baseKB:rn_new(C,P).
 
 builtin_rn_or_rn(P,PP):-builtin_rn_or_rn_new(P,PP),!.
@@ -1204,18 +1200,25 @@ is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),me
 %
 % Convert If Knowledge Interchange Format String.
 %
-convert_if_kif_string(I, O):-is_kif_string(I),convert_from_kif(I,O),!, \+ is_list(O).
+convert_if_kif_string(I, O):-is_kif_string(I),kif_assertion_recipe(I,O),!, \+ is_list(O).
 
 
-convert_from_kif(I,O):- from_kif_string(I,Wff),quietly_must((sexpr_sterm_to_pterm(Wff,O))),!.
+
+last_chance_doc(Wff0,WffO):- atomic(Wff0),atom_contains(Wff0,' '),string_to_mws(Wff0,MWS),last_chance_doc(MWS,WffO),!.
+last_chance_doc(Wff0,comment(Atom,NewStr)):- 
+   Wff0=..[s,"(", "documentation",AntisymmetricRelation, "EnglishLanguage", "\""|REST],
+         append(NOQUOTES,[_,_],REST),
+         string_to_atom(AntisymmetricRelation,Atom),
+         NewStr =..[s|NOQUOTES],!.
+last_chance_doc(IO,IO).
 
 
 %% from_kif_string( ?String, ?Forms) is det.
 %
 % Converted From Knowledge Interchange Format String.
 %
-from_kif_string(I,Wff) :- input_to_forms(I,Wff,Vs),put_variable_names(Vs),!.
-from_kif_string(String,Forms) :- quietly_must((codelist_to_forms(String,Forms);input_to_forms(string(String),Forms))),!.
+from_kif_string(I,Wff) :- input_to_forms(I,Wff,Vs)->must(put_variable_names(Vs)),!.
+from_kif_string(String,Forms) :- codelist_to_forms(String,Forms),!.
 from_kif_string(Wff,Wff).
 
 
@@ -1227,22 +1230,48 @@ must_map_preds([Pred|ListOfPreds],In,Out):- must(call(Pred,In,Mid)),!,
    must_map_preds(ListOfPreds,Mid,Out),!.
 
 
-delay_rule_eval(InOut,InOut):-ground(InOut),!.
-delay_rule_eval(In,rule(In)).
+delay_rule_eval(InOut,_Wrap,InOut):-ground(InOut),!.
+delay_rule_eval(In,Wrap,WIn):- WIn=..[Wrap,In].
+
+:- thread_local(t_l:no_db_expand_props/0).
+
+fully_expand_always(C0,C1):- w_tl(t_l:no_db_expand_props,fully_expand('==>'(C0),C1)),!.
+
+tinykb_assertion_recipe(C,P):- cycLToMpred(C,C0),fully_expand_always(C0,C1),unnumbervars(C1,P),!.
 
 kif_assertion_recipe(D,CycLOut):-
          must_det_l((must_map_preds([
-           convert_from_kif,
-           maybe_ruleRewrite,
-           cyc_to_clif,
-           unnumbervars_and_save,
+           from_kif_string,
            sexpr_sterm_to_pterm,
-           fully_expand,
-           sexpr_sterm_to_pterm],D,CycLOut))).
+           sumo_to_clif,
+           %cyc_to_clif,
+           fully_expand_always,
+           % unnumbervars_and_save,
+           sumo_last_pass],D,CycLOut))).
 
-maybe_ruleRewrite(documentation(C,'EnglishLanguage',S),comment(C,S)):-!.
-maybe_ruleRewrite(I,O):-clause_b(ruleRewrite(I,O)),!.
-maybe_ruleRewrite(IO,IO).
+sumo_last_pass(O,O):- \+ compound(O),!.
+sumo_last_pass((tPred(_),IO),IO):-!.
+sumo_last_pass(SENT,SENTO):- is_list(SENT),!,maplist(sumo_last_pass,SENT,SENTO).
+sumo_last_pass([P,A,B|List],OUT):-atom(P), op_type_head(P,TYPE), OUT=..[TYPE,P,A,B,List],!.
+sumo_last_pass([P,A|List],OUT):-atom(P), op_type_head(P,TYPE), OUT=..[TYPE,P,A,List],!.
+sumo_last_pass([P|List],OUT):-atom(P), op_type_head(P,TYPE), OUT=..[TYPE,P,List],!.
+sumo_last_pass([P|List],[P|List]):-!.
+sumo_last_pass(SENT,SENTO):- SENT=..[CONNECTIVE|ARGS],maplist(sumo_last_pass,ARGS,ARGSO),SENTO=..[CONNECTIVE|ARGSO],!.
+sumo_last_pass(IO,IO).
+
+op_type_head(P,uN):-atom(P), atom_concat(_,'Fn',P).
+op_type_head(P,tN):-atom(P).
+
+is_sent_CONNECTIVE(CONNECTIVE):- intrinsicPred(CONNECTIVE).
+
+sumo_to_clif(documentation(C,'vEnglishLanguage',S),comment(C,S)):-!.
+sumo_to_clif(O,O):- \+ compound(O),!.
+sumo_to_clif(I,O):-clause_b(ruleRewrite(I,O))->I\==O,!.
+sumo_to_clif((tPred(_),IO),IO):-!.
+sumo_to_clif(=>(A,B),=>(AA,BB)):-sumo_to_clif(A,AA),sumo_to_clif(B,BB).
+sumo_to_clif(<=>(A,B),<=>(AA,BB)):-sumo_to_clif(A,AA),sumo_to_clif(B,BB).
+sumo_to_clif(not(A),not(AA)):-sumo_to_clif(A,AA).
+sumo_to_clif(IO,IO).
 
 
 dehyphenize_const(PM,PMO):- atom(PM), atomic_list_concat(List,'-',PM),dehyphenize_const(PM,List,PMO),!.
@@ -1267,7 +1296,7 @@ notFormatType(tThing).
 notFormatType(tIndividual).
 notFormatType(rtInferenceSupportedFunction).
 
-:- forall(notFormatType(NFT),ain(tSet(NFT))).
+% :- forall(notFormatType(NFT),ain(tSet(NFT))).
 
 tinyKB1_if_loaded(G):- if_defined(tinyKB1(G),fail).
 
@@ -1329,8 +1358,6 @@ mpred_prepend_type(X,ft):- isFT(X), \+ isF(X).
 
 mpred_prepend_type(X,tt):- atom_concatR(_,'Collection',X).
 mpred_prepend_type(X,tt):- atom_concatR(_,'Type',X).
-mpred_prepend_type(X,vt):- atom_concat('UnitOf',_,X).
-% mpred_prepend_type(X,vt):- isVT(X),!.
 
 
 %mpred_prepend_type(X,v):- isV(X), \+ isF(X).
@@ -1342,10 +1369,51 @@ mpred_prepend_type(X,vt):- atom_concat('UnitOf',_,X).
 %mpred_prepend_type(X,t):- tinyKB1_if_loaded(isa(_,X)),!.
 %mpred_prepend_type(X,v):- name(X,[C|_]),char_type(C,upper),!.
 
+% sumo
+
+mpred_prepend_type(X,time):- atom_contains(X,'Time').
+mpred_prepend_type(X,time):- atom_contains(X,'Date').
+mpred_prepend_type(X,xt):- atom_concatR(_,'Language',X).
+mpred_prepend_type(X,xt):- atom_contains(X,'Prepos').
+mpred_prepend_type(X,xt):- atom_contains(X,'Noun').
+mpred_prepend_type(X,xt):- atom_contains(X,'Phrase').
+mpred_prepend_type(X,tt):- atom_concatR(_,'Class',X).
+mpred_prepend_type(X,rt):- atom_concatR(_,'Role',X).
+
+mpred_prepend_type(X,ft):- atom_concatR(_,'Formula',X).
+mpred_prepend_type(X,ft):- atom_concatR(_,'Number',X).
+mpred_prepend_type(X,ft):- atom_concatR(_,'Integer',X).
+mpred_prepend_type(X,ft):- atom_concatR(_,'List',X).
+
+mpred_prepend_type(X,tt):- atom_concatR(_,'UnitOfMeasure',X).
+
+mpred_prepend_type(X,vt):- atom_concat('UnitOf',_,X).
+% mpred_prepend_type(X,vt):- isVT(X),!.
+
+
+
+mpred_prepend_type(X,vt):- atom_concatR(_,'Quantity',X).
+mpred_prepend_type(X,vt):- atom_concatR(_,'Measure',X).
+mpred_prepend_type(X,vt):- atom_concatR(_,'Degree',X).
+mpred_prepend_type(X,vt):- atom_concatR(_,'Attribute',X).
+
+mpred_prepend_type(X,mt):- atom_concatR(_,'Context',X).
+mpred_prepend_type(X,mob):- atom_concatR(_,'Agent',X).
+mpred_prepend_type(X,event):- atom_concatR(_,'Event',X).
+
+mpred_prepend_type(X,act):- atom_concatR(_,'Action',X).
+mpred_prepend_type(X,act):- atom_concatR(_,'Process',X).
+mpred_prepend_type(X,act):- atom_concatR(_,'ing',X).
+mpred_prepend_type(X,act):- atom_concatR(_,'tion',X).
+mpred_prepend_type(X,u):- atom_concatR(_,'Fn',X).
+
+
+
 mpred_postpend_type(X,_):- starts_lower(X),!,fail.
 mpred_postpend_type(C,'Fn'):-isF(C).
 
 % mpred_prepend_type_via(C,Pre):-rename(P,C),dehyphenize_const(C,H),atom_concat(Pre,H,P).
+
 
 prepend_constant(PT,C,_,P):- transitive_lc(cyc_to_mpred_idiom1,C,PM),dehyphenize_const(PM,PMH),!, atom_concat(PT,PMH,P).
 
@@ -1378,7 +1446,6 @@ cyc_to_mpred_create(C,PM):-
   cyc_to_mpred_idiom_did(C,PM),
   C\==PM,
   azzert_rename(C,PM).
-% cyc_to_mpred_create(C,PM):- rename(PM,C),!.
 cyc_to_mpred_create(C,PM):- transitive_lc(cyc_to_mpred_idiom1,C,PM),!.
 cyc_to_mpred_create(C,P):- atom_concat(it,C,P).
 
@@ -1489,7 +1556,9 @@ rename_atom(A,B):- builtin_rn_or_rn(A,B),!.
 rename_atom(A,A):- upcase_atom(A,A),!.
 rename_atom(A,B):- atom_contains(A,' '),!,A=B.
 %rename_atom(A,B):- current_prolog_flag(logicmoo_break_atoms,true),atom_contains(A,' '),!,convert_to_cycString(A,B),nb_setval('$has_quote',t),!.
-rename_atom(A,B):-  must(cyc_to_mpred_create(A,B)),azzert_rename(A,B),!.
+rename_atom(A,B):-  must(cyc_to_mpred_create(A,B)),A\==B,azzert_rename(A,B),!.
+rename_atom(A,B):- starts_upper(A),atom_concat('tSumo',A,B),azzert_rename(A,B),!.
+rename_atom(A,A):- azzert_rename(A,A),!.
 
 cyc_to_mpred_sent_idiom_2(and,(','),trueSentence).
 
@@ -1622,8 +1691,8 @@ makeRenames0:-
 %  tell('./rn2.pl'),
    when_file_output(writeln('
 
-:- multifile(kb7166:baseKB:rn_new).
-:- dynamic(kb7166:baseKB:rn_new/2). 
+:- multifile(baseKB:rn_new).
+:- dynamic(baseKB:rn_new/2). 
 :- multifile(builtin_rn/2).
 :- dynamic(builtin_rn/2). 
 
@@ -1641,8 +1710,8 @@ makeRenames0:- nl,told.
 makeCycRenames:- dmsg("no need to makeCycRenames!?"),!.
 makeCycRenames:- forall(makeCycRenames_real,true).
 
-actual_cyc_renames0(C,P):-kb7166:rnc(C,P).
-%actual_cyc_renames0(C,P):- builtin_rn(C,P), \+ kb7166:rnc(C,P).
+actual_cyc_renames0(C,P):-baseKB:rnc(C,P).
+%actual_cyc_renames0(C,P):- builtin_rn(C,P), \+ baseKB:rnc(C,P).
 
 actual_cyc_renames(C,P):-actual_cyc_renames0(C,P).
 actual_cyc_renames(C,P):- ftCycOnlyTerm(C),\+actual_cyc_renames0(C,_),rename_atom(C,P).
@@ -1664,22 +1733,22 @@ makeCycRenames1:-
            ), 
     forall(actual_cyc_renames(C,P),format('(safely-rename-or-merge "~w" "~w")~n',[C,P])).
 
-:- multifile(kb7166:rnc/2).
-:- dynamic(kb7166:rnc/2).
-:- ((kb7166:load_files([library('pldata/plkb7166/kb7166_pt7_constant_renames')],[module(baseKB),redefine_module(false),qcompile(auto)]))).
-:- forall((kb7166:rnc(N,Y),(\+atom(N);\+atom(Y))),throw(retract(kb7166:rnc(N,Y)))).
+:- multifile(baseKB:rnc/2).
+:- dynamic(baseKB:rnc/2).
+:- baseKB:ensure_loaded(library('pldata/plkb7166/kb7166_pt7_constant_renames')).
+:- forall((baseKB:rnc(N,Y),(\+atom(N);\+atom(Y))),throw(retract(baseKB:rnc(N,Y)))).
 
 :- multifile(baseKB:rn_new/2).
 :- dynamic(baseKB:rn_new/2).
-:- ((baseKB:load_files([library('pldata/plkb7166/kb7166_pt7_constant_renames_NEW')],[module(baseKB),redefine_module(false),qcompile(auto)]))).
+:- baseKB:ensure_loaded(library('pldata/plkb7166/kb7166_pt7_constant_renames_NEW')).
 :- forall((baseKB:rn_new(N,Y),(\+atom(N);\+atom(Y))),throw(retract(baseKB:rn_new(N,Y)))).
 
 :- dmsg("I am here").
-:- multifile(kb7166:rnc/2).
-:- dynamic(kb7166:rnc/2).
+:- multifile(baseKB:rnc/2).
+:- dynamic(baseKB:rnc/2).
 
 azzert_rename(C,P):- builtin_rn(C,P),!.
-azzert_rename(C,P):- kb7166:rnc(C,P),!.
+azzert_rename(C,P):- baseKB:rnc(C,P),!.
 azzert_rename(C,P):- baseKB:rn_new(C,P),!.
 azzert_rename(C,P):- asserta(baseKB:rn_new(C,P)),dmsg_rename(C,P).
 
@@ -1739,10 +1808,7 @@ do_vname(Wff,PO):- b_getval('$variable_names',Vs),
 
 :- gripe_time(7.0,makeRenames).
 
-%:- gripe_time(60,load_files(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb_prolog.pl'), [if(not_loaded),redefine_module(false),qcompile(auto)])).
 %:- gripe_time(60,load_files(library('pldata/kb_7166_assertions.pl'), [if(not_loaded),redefine_module(false),qcompile(auto)])).
-
-logicmoo_i_cyc_kb_tinykb_prolog:- ensure_loaded_with(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'),call(call,do_renames_cyc_to_clif)).
 
 gaf_rename(NCMPD,NEW):- \+ compound(NCMPD),!,do_renames(NCMPD,NEW).
 gaf_rename([P|ARGS],NEW):- !,

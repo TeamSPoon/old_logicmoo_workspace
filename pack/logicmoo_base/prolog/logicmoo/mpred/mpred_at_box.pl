@@ -273,7 +273,7 @@ ensure_abox(M):-
    retractall(baseKB:mtProlog(M)),
    setup_module_ops(M),
    set_prolog_flag(M:unknown,error),
-   mpred_pfc:forall(mpred_database_term(F,A,_),
+   forall(mpred_database_term(F,A,_),
        (((
         M:multifile(M:F/A),
         M:dynamic(M:F/A),

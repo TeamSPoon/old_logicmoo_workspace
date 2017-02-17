@@ -6,13 +6,13 @@
 
 :- if(\+ current_module(baseKB)).
 :- threads.
+:- unload_file(init_cliopatria).
 :- set_prolog_flag(logicmoo_qsave,true).
 :- else.
 :- set_prolog_flag(logicmoo_qsave,false).
 :- set_prolog_flag(lm_expanders,false).
 :- statistics.
 :- endif.
-:- unload_file(init_cliopatria).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFAULT PROLOG FLAGS
@@ -48,7 +48,7 @@
 :- set_prolog_flag(compile_meta_arguments,false). % default is false
 */
 :- use_module(library(base32)).
-% :- use_module(library(prolog_history)).
+
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/thread_httpd)).
 :- use_module(thread_httpd:library(http/http_dispatch)).
@@ -61,6 +61,7 @@
 :- use_module(library(shell)).
 :- use_module(library(console_input)).
 :- use_module(library(editline)).
+:- use_module(library(prolog_history)).
 :- if(current_predicate(system:mode/1)).
 :- system:use_module(library(quintus),except([mode/1])). 
 :- else.
@@ -119,8 +120,13 @@ add_relative_search_path(Alias, Rel) :-
 
 %file_search_path(cliopatria, ' /mnt/gggg/PrologMUD/pack/ClioPatria').
 %:- add_relative_search_path(cliopatria, '/mnt/gggg/PrologMUD/pack/ClioPatria').
-file_search_path(cliopatria, '/root/lib/swipl/pack/ClioPatria').
-:- add_relative_search_path(cliopatria, '/root/lib/swipl/pack/ClioPatria').
+%file_search_path(cliopatria, '/root/lib/swipl/pack/ClioPatria').
+:- if(exists_directory('../../ClioPatria/')).
+:- add_relative_search_path(cliopatria, '../../ClioPatria').
+:- endif.
+:- if(exists_directory('../ClioPatria/')).
+:- add_relative_search_path(cliopatria, '../ClioPatria').
+:- endif.
 
 
 % Make loading files silent. Comment if you want verbose loading.
@@ -172,9 +178,9 @@ with_no_mpred_expansions(Goal):-
 
 
 add_history(O):- format(atom(A),'~q.',[O]),
-      (current_prolog_flag(readline,editline) -> el_add_history(user_input,A) ; true). 
+      (current_predicate(editline:el_add_history/2) -> editline:el_add_history(user_input,A) ; rl_add_history(A)). 
 
-add_history_ideas:- 
+baseKB:add_history_ideas:- 
         add_history(start_telnet),
         add_history(help(match_regex/2)),
         add_history(list_undefined),
@@ -200,23 +206,38 @@ add_history_ideas:-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- dynamic(system:after_boot_goal/1).
 :- meta_predicate(system:during_boot(:)).
-system:during_boot(Goal):- initialization(Goal,now),after_boot(Goal). % initialization(Goal,after_load),initialization(Goal,restore)
 system:after_boot_call(How):- forall(system:after_boot_goal(Goal),call(How,Goal)).
 system:after_boot_call:-system:after_boot_call(must_det).
+system:during_boot(Goal):- call(Goal),after_boot(Goal). 
 :- meta_predicate(system:after_boot(:)).
 system:after_boot(Goal):- add_history(Goal),system:assertz(after_boot_goal(Goal)).
 :- meta_predicate(system:after_boot_sanity_test(:)).
 system:after_boot_sanity_test(M:Goal):- after_boot(M:sanity(Goal)).
 
-:- during_boot(add_history_ideas->!;(trace,add_history_ideas)).
+:- during_boot(( (baseKB:add_history_ideas) -> ! ;(trace,baseKB:add_history_ideas))).
 
-:- add_history_ideas.
+:- baseKB:add_history_ideas.
 
 qsave_lm(LM):- statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T),
-  qsave_program(LM,[class(development),autoload(false),toplevel(logicmoo_toplevel),goal(logicmoo_goal),op(save),
-   stand_alone(false),foreign(no_save),global(G),trail(T),local(L)]).
-logicmoo_toplevel:- threads, module(baseKB),add_history_ideas,listing(after_boot_goal/1), dmsg("logicmoo_toplevel"),prolog.
-logicmoo_goal:- logicmoo_toplevel.
+  qsave_program(LM,[class(development),autoload(false),toplevel(logicmoo_toplevel),
+   goal(logicmoo_goal),op(save),stand_alone(false),foreign(no_save),global(G),trail(T),local(L)]).
+
+logicmoo_goal:-
+ dmsg("logicmoo_goal"),
+ module(baseKB),
+ nb_setval('$oo_stack',[]),
+ threads, 
+ make,
+ baseKB:add_history_ideas,
+ dmsg("[logicmoo_repl]."),
+ dmsg("[logicmoo_engine]."),
+ dmsg("[init_mud_server]."),!.
+
+logicmoo_toplevel:- 
+ module(baseKB),
+ listing(after_boot_goal/1),
+ dmsg("logicmoo_toplevel"),
+ prolog.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEFAULT LOGICMOO FLAGS

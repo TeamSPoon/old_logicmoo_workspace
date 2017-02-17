@@ -1905,7 +1905,7 @@ with_each(Wrapper,Goal):-with_each(1,Wrapper,Goal).
 %
 % Whenever Functor Debug.
 %
-on_f_debug(Goal):-  Goal *-> true; ((nortrace,trace,debugCallWhy(failed(on_f_debug(Goal)),Goal)),fail).
+on_f_debug(Goal):-  Goal *-> true; ((nortrace,notrace,debugCallWhy(failed(on_f_debug(Goal)),Goal)),fail).
 
 
 %= 	 	 

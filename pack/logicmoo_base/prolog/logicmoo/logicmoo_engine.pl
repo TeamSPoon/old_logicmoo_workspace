@@ -44,7 +44,7 @@
 end_of_file.
 :- module(logicmoo_engine, [ tsn/0 ] ). 
 
-:- user:ensure_loaded(library(logicmoo_user)).
+:- ensure_loaded(library(logicmoo_user)).
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 

@@ -74,15 +74,14 @@
             pfcNeverTrue/1,
             tCol_gen/1,
 			tSetOrdered/1,
-            to_isa_out/3,
+            
             transitive_P/4,
             transitive_P_l_r/4,
             transitive_P_r_l/4,
             transitive_subclass_or_same/2,
             type_deduced/2,
             type_isa/2,
-            was_isa/3,
-            was_isa0/3,
+            
          as_reflexive/3 , % (still imported into mpred_type_wff)
          assert_hasInstance/2 , % (still imported into mpred_type_wff)
          call_u_t/2 , % (still imported into mpred_type_wff)
@@ -324,55 +323,7 @@ baseKB:prologBuiltin(was_isa/3).
 
 %= 	 	 
 
-%% was_isa( ?VALUE1, ?VALUE2, ?VALUE3) is nondet.
-%
-% was  (isa/2).
-%
-was_isa(G,I,C):- fail, \+(current_predicate(_,G)),
-  is_ftCompound(G),functor(G,F,_),hotrace((( \+ call_u(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),
-  get_source_ref1(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
 
-
-
-
-baseKB:prologBuiltin(to_isa_out/2).
-
-%% to_isa_out( ?I, ?C, ?OUT) is nondet.
-%
-% Converted To  (isa/2) out.
-%
-to_isa_out(I,C,isa(I,C)).
-to_isa_out(I,C,t(C,I)).
-to_isa_out(I,C,OUT):- atom(C)->OUT=..[C,I].
-
-
-
-
-%= 	 	 
-
-%% was_isa0( ?G, ?I, ?C) is nondet.
-%
-% was  (isa/2) Primary Helper.
-%
-was_isa0('$VAR'(_),_,_):-!,fail.
-was_isa0(isa(I,C),I,C):-!.
-was_isa0(is_typef(_),_,_):-!,fail.
-was_isa0(hotrace(_),_,_):-!,fail.
-was_isa0(call(_),_,_):-!,fail.
-was_isa0(dtrace(_),_,_):-!,fail.
-was_isa0( \+ (_),_,_):-!,fail.
-was_isa0( not(_),_,_):-!,fail.
-% was_isa0(a(tCol,I),I,tCol).
-was_isa0(ttNotTemporalType(I),I,ttNotTemporalType).
-was_isa0(tChannel(I),I,tChannel).
-was_isa0(tAgent(I),I,tAgent).
-was_isa0(t(C,_),_,_):- never_type_why(C,_),!,fail.
-was_isa0(t(C,I),I,C).
-was_isa0(t(P,I,C),I,C):-!,P==isa.
-was_isa0(isa(I,C),I,C).
-was_isa0(M:G,I,C):-atom(M),!,was_isa0(G,I,C).
-was_isa0(G,I,C):-G=..[C,I],!,is_typef(C),!,\+ (is_never_type(C)).
-% was_isa0(t(C,I),I,C):- new_was_isa, atom(C),!.
 
 
 :- export(shouldnt_be_set/1).

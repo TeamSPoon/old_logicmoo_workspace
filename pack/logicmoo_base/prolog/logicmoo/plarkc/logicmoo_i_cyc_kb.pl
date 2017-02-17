@@ -43,7 +43,7 @@
             system:mwkb1/0,
             needs_canoncalization/1,
             needs_indexing/1,
-            notFormatType/1,
+            
             print_assertion/3,
             sent_to_conseq/2,
             mtDressedMt/1,
@@ -71,10 +71,6 @@
    
           ]).
 */         
-% :- set_prolog_flag(lm_expanders,false).
-
-% :- set_prolog_flag(gc,false).
-:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_rewriting)).
 
 :- use_module(library('logicmoo/util/logicmoo_util_filestreams')).
 
@@ -494,8 +490,7 @@ do_renames_cyc_to_clif(InTerm,_Info,OutTerm):-
 
 
 
-:- ((user:ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_kb_preds.pfc')))).
-% :- gripe_time(60,baseKB:qcompile(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'))).
+:- ((baseKB:ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_kb_preds.pfc')))).
 logicmoo_i_cyc_xform:- dmsg("Compiling tinyKB should take under a minute"),
                       gripe_time(60,qcompile(logicmoo(plarkc/'logicmoo_i_cyc_xform.pfc'))).
 % :- logicmoo_i_cyc_xform.

@@ -56,7 +56,7 @@ size666_stacks:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_
 :- at_start(size666_stacks).
 
 
-:- user:ensure_loaded(library(logicmoo_user),except([op(_,_,_)])).
+:- baseKB:ensure_loaded(library(logicmoo_user),except([op(_,_,_)])).
 %
 %:- initialization(set_prolog_flag(mpred_te,false)).
 %:- initialization(set_prolog_flag(mpred_te,false),restore).

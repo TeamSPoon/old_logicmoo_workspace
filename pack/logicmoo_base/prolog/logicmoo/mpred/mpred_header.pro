@@ -18,8 +18,7 @@
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
-:- multifile(baseKB:mpred_is_impl_file/1).
-:- dynamic(baseKB:mpred_is_impl_file/1).
+
 :- multifile(baseKB:module_local_init/2).
 :- dynamic(baseKB:module_local_init/2).
 :- discontiguous(baseKB:module_local_init/2).
@@ -77,8 +76,6 @@ assert_if_new_hh(G):- (catch(G,_,fail)->true;assert(G)).
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
-:- multifile(baseKB:mpred_is_impl_file/1).
-:- dynamic(baseKB:mpred_is_impl_file/1).
 
 :- multifile baseKB:startup_option/2. 
 :- dynamic baseKB:startup_option/2. 
@@ -86,8 +83,7 @@ assert_if_new_hh(G):- (catch(G,_,fail)->true;assert(G)).
 :- dynamic baseKB:mpred_system_status/2.
 :- multifile(t_l:disable_px/0).
 :- thread_local(t_l:disable_px/0).
-:- multifile(baseKB:mpred_is_impl_file/1).
-:- dynamic(baseKB:mpred_is_impl_file/1).
+
 :- multifile(baseKB:module_local_init/2).
 :- dynamic(baseKB:module_local_init/2).
 :- discontiguous(baseKB:module_local_init/2).
@@ -170,6 +166,16 @@ user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_
 :- multifile(baseKB:ignore_file_mpreds/1).
 :- dynamic(baseKB:ignore_file_mpreds/1).
 
+
+:- multifile(baseKB:mpred_is_impl_file/1).
+:- dynamic(baseKB:mpred_is_impl_file/1).
+
+/*
+:- prolog_load_context(source,O),
+   (baseKB:mpred_is_impl_file(O)->(debug,dmsg(throw(baseKB:mpred_is_impl_file(O))),dumpsT,break);
+     asserta(baseKB:mpred_is_impl_file(O))).
+*/
+
 :- if(\+ current_predicate(lm_util:register_mpred_impl_file/1)).
 lm_util:register_mpred_impl_file(F):- (current_prolog_flag(xref,true)->true;
    must((((
@@ -248,60 +254,6 @@ lm_util:register_mpred_impl_file(F):- (current_prolog_flag(xref,true)->true;
 
 
 
-/*
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_loader.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_at_box.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_expansion.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_kb_ops.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_listing.pl')).
-:-ensure_loaded(system:library('logicmoo/snark/common_logic_sexpr.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_pfc.pl'),except([op(_,_,_)])).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_prolog_file.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_props.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_storage.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_stubs.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_constraints.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_isa.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_naming.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_wff.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_type_args.pl')).
-:-ensure_loaded(system:library('logicmoo/mpred/mpred_agenda.pl')).
-*/
-
-:- if(current_prolog_flag(logicmoo_autoload,false)).
-:- ensure_loaded(library('logicmoo/mpred/mpred_at_box.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_expansion.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_loader.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_pfc.pl')). % except([op(_,_,_)]).
-:- ensure_loaded(library('logicmoo/mpred/mpred_prolog_file.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_props.pl')).
-
-% :- ensure_loaded(library('logicmoo/mpred/mpred_motel.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_type_isa.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_kb_ops.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_agenda.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_storage.pl')).
-
-:- ensure_loaded(library('logicmoo/mpred/mpred_listing.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_stubs.pl')).
-
-:- ensure_loaded(library('logicmoo/mpred/mpred_type_constraints.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_type_naming.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_type_wff.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_type_args.pl')).
-
-:- ensure_loaded(library('logicmoo/snark/common_logic_snark.pl')). %except([op(_,_,_)]).
-:- ensure_loaded(library('logicmoo/mpred/mpred_hooks.pl')).
-
-:- ensure_loaded(library('logicmoo/snark/common_logic_boxlog.pl')).
-:- ensure_loaded(library('logicmoo/snark/common_logic_skolem.pl')).
-:- ensure_loaded(library('logicmoo/snark/common_logic_compiler.pl')). % ,except([op(_,_,_)])). % ,arity/2,mpred_is_tracing_exec/0, (~)/1
-
-:- ensure_loaded(library('logicmoo/mpred_online/mpred_www.pl')).
-
-:- ensure_loaded(library('logicmoo/snark/common_logic_kb_hooks.pl')).
-:- ensure_loaded(library('logicmoo/snark/common_logic_sexpr.pl')).
-:- endif.
 
 :- prolog_load_context(module,M),
  once((M==baseKB;

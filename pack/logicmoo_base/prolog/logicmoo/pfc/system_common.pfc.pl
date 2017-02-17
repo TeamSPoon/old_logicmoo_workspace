@@ -39,6 +39,10 @@
 :- '$set_source_module'(baseKB).
 :- prolog_load_context(module,Mod),sanity(Mod==baseKB),writeq(prolog_load_context(module,Mod)),nl.
 
+
+==> (ttRelationType(P) ==> ({PBI=..[P,_F/_A]}==>{forall(retract(PBI),ain(==>PBI))})).
+
+
 :- % better stack traces..
  set_prolog_flag(access_level,system).
 
@@ -156,7 +160,13 @@ tSet(completelyAssertedCollection).
 %WRONG prologBuiltin(resolveConflict/1,predicateConventionMt(baseKB)).
 %WRONG prologBuiltin(mpred_select/2,predicateConventionMt(baseKB)).
 %:-rtrace.
-prologBuiltin(agent_text_command/4,prologDynamic).
+
+
+
+% IN =@=> OUT  ==> 
+
+==>prologBuiltin(agent_text_command/4,prologDynamic).
+
 %tPred(t,prologDynamic).
 
 % tPred(member/2,prologBuiltin).
@@ -164,7 +174,7 @@ prologBuiltin(agent_text_command/4,prologDynamic).
 tSet(rtNotForUnboundPredicates).
 
 
-==>tCol(vtVerb).
+tCol(vtVerb).
 
 :- sanity(fileAssertMt(baseKB)).
 :- sanity(defaultAssertMt(baseKB)).
@@ -285,21 +295,14 @@ completelyAssertedCollection(ttRelationType).  % Or they might be a predciate de
 % completelyAssertedCollection(functorDeclares).  % or they might declare other things
 % completelyAssertedCollection(functorIsMacro).  % or they might declare other things
 
-:- ((ain(==>((completelyAssertedCollection(isEach(tPred,prologMultiValued,prologOrdered,prologIsFlag,rtAvoidForwardChain,
- prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologKIF,prologBuiltin,functorIsMacro,prologListValued,prologSingleValued))))))).
 
 
+completelyAssertedCollection(functorIsMacro).
 completelyDecidableCollection(ftTerm).
+
+completelyAssertedCollection(tPred).
 completelyAssertedCollection(meta_argtypes).
-completelyAssertedCollection(pfcControlled).
-completelyAssertedCollection(predCanHaveSingletons).
-completelyAssertedCollection(prologHybrid).
 completelyAssertedCollection(tTemporalThing).
-completelyAssertedCollection(prologMultiValued).
-completelyAssertedCollection(prologDynamic).
-completelyAssertedCollection(prologSideEffects).
-completelyAssertedCollection(prologNegByFailure).
-completelyAssertedCollection(prologSingleValued).
 completelyAssertedCollection(tInferInstanceFromArgType).
 completelyAssertedCollection(ttNotTemporalType).
 completelyAssertedCollection(ttSpatialType).
@@ -310,25 +313,7 @@ completelyAssertedCollection(ttUnverifiableType).
 prologNegByFailure(quotedIsa).
 ~prologNegByFailure(isa).
 
-ttRelationType(pfcDatabaseTerm).
-ttRelationType(pfcControlled).
-ttRelationType(prologSingleValued).
 
-
-ttRelationType(pfcWatched).
-ttRelationType(pfcCreates).
-:- dynamic(pfcNegTrigger/1).
-ttRelationType(pfcNegTrigger).
-ttRelationType(pfcPosTrigger).
-ttRelationType(pfcBcTrigger).
-ttRelationType(pfcRHS).
-
-ttRelationType(pfcMustFC).
-
-((ttRelationType(X)/atom(X)) ==>support_hilog(X,1)).
-
-
-ttRelationType(P)==>(tCol(P),completelyAssertedCollection(P)).
 
 :- dynamic(baseKB:ttTypeType/1).
 
@@ -361,11 +346,7 @@ tCol(tSet).
 
 % :- prolog.
 % tPred
-==>
-ttRelationType(isEach(pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,prologIsFlag,prologMultiValued,
- pfcBcTrigger,
- prologSingleValued,functorIsMacro,notAssertable,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,prologEquality,prologPTTP,
- prologSideEffects,prologHybrid,prologListValued)).
+
 
 ==>
 completelyAssertedCollection(isEach(tCol,tPred,pfcControlled)).
@@ -391,13 +372,6 @@ prologEquality(('==')).
 rtQuotedPred(meta_argtypes).
 rtQuotedPred(functorIsMacro).
 rtQuotedPred(functorDeclares).
-ttRelationType(prologIsFlag).
-ttRelationType(prologDynamic).
-ttRelationType(prologHybrid).
-ttRelationType(pfcControlled).
-ttRelationType(prologKIF).
-ttRelationType(prologBuiltin).
-ttRelationType(prologPTTP).
 
 pfcControlled(genlPreds).
 pfcControlled(isa).
@@ -432,8 +406,8 @@ tSet(functorIsMacro).
 ttModule(tSourceCode,mudToCyc('ComputerCode'),comment("Source code files containing callable features")).
 ttModule(tSourceData,mudToCyc('PropositionalInformationThing'),comment("Source data files containing world state information")).
 
-prologHybrid(isLoadedType(ttModule),pfcControlled).
-prologHybrid(isLoaded(tMicrotheory),pfcControlled).
+==> prologHybrid(isLoadedType(ttModule),pfcControlled).
+==> prologHybrid(isLoaded(tMicrotheory),pfcControlled).
 
 isLoaded(Thing),isa(Thing,ModType), \+ ttExpressionType(ModType) ==> isLoadedType(ModType).
 
@@ -554,8 +528,6 @@ tSet(tKnownID).
 
 % (tInferInstanceFromArgType(Prop),tPred(Prop),arity(Prop,N)/(N>1) ==> ({i_name('vt',Prop,FinalType)},tCol(FinalType),tInferInstanceFromArgType(FinalType),argIsa(Prop,N,FinalType))).
 
-ttRelationType(predCanHaveSingletons).
-ttRelationType(prologSideEffects).
 prologSideEffects(write/1).
 prologSideEffects(resolveConflict/1).
 
@@ -578,9 +550,7 @@ prologSideEffects(resolveConflict/1).
 
 
 arity(functorIsMacro,1).
-==>
-ttRelationType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologHybrid,
-  predCanHaveSingletons,prologDynamic,tPred,functorIsMacro,prologListValued,prologSingleValued)).
+
 functorIsMacro(functorIsMacro).
 ttRelationType(X)==>functorDeclares(X).
 % tCol(X)==>functorDeclares(X).
@@ -607,7 +577,7 @@ arity(argIsa,3).
 %:-mpred_trace_exec.
 
 % Functions
-tFunction(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes),{get_functor(ArgTypes,F)},tFunction(F).
+tFunction(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes),{get_functor(ArgTypes,F)}, tFunction(F).
 % FormatTypes
 ttExpressionType(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
 
@@ -773,11 +743,15 @@ genls(tSpatialThing,tTemporalThing).
 % (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_remove(P)}, (\+P ))).
 
 tSet(ttTypeFacet).
-tCol(rtAvoidForwardChain, comment("rtAvoidForwardChain means that backchain is required for subclasses to gain membership TODO: Give example ")).
+==>tCol(rtAvoidForwardChain, comment("rtAvoidForwardChain means that backchain is required for subclasses 
+     to gain membership TODO: Give example ")).
+
 % genls(ttExpressionType,rtAvoidForwardChain).
 isa('tThing',rtAvoidForwardChain).
+
 %isa('CycLTerm',rtAvoidForwardChain).
-==>prologHybrid(quotedIsa(ftTerm,ttExpressionType)).
+prologHybrid(quotedIsa(ftTerm,ttExpressionType)).
+
 :- kb_dynamic(quotedIsa/2).
 
 /*
@@ -1141,10 +1115,10 @@ arity(typeProps,2).
 
 :- ignore(show_failure(why,arity(typeProps,2))).
 :- must(call_u(arity(typeProps,2))).
-(==>(argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,predCanHaveSingletons,prologDynamic,functorIsMacro,prologListValued,prologSingleValued),1,tPred))).
-==> (==>(argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,functorIsMacro,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
-:- ain_expanded(==>(isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,functorIsMacro,prologListValued,prologSingleValued),functorDeclares))).
-==>(genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologDynamic,prologBuiltin,prologKIF,functorIsMacro,prologListValued,prologSingleValued),tPred)).
+
+% ==> (==>(argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,functorIsMacro,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
+% :- ain_expanded(==>(isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,functorIsMacro,prologListValued,prologSingleValued),functorDeclares))).
+% ==>(genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologDynamic,prologBuiltin,prologKIF,functorIsMacro,prologListValued,prologSingleValued),tPred)).
 :- assert_hasInstance(tCol,tCol).
 :- file_begin(pfc).
 
@@ -1161,14 +1135,16 @@ arity(typeProps,2).
 % :- decl_mpred(tDeleted(ftID),[prologIsFlag]).
 prologIsFlag(tDeleted(ftID)).
 % FIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx
+
 prologHybrid(genlInverse/2).
 prologHybrid(genlPreds/2).
 prologHybrid(argIsa/3).
-prologHybrid(disjointWith/2).
-prologHybrid(instTypeProps/3).
 prologHybrid(predProxyAssert,2).
 prologHybrid(predProxyQuery, 2).
 prologHybrid(predProxyRetract, 2).
+
+prologHybrid(disjointWith/2).
+prologHybrid(instTypeProps/3).
 prologHybrid(predTypeMax/3).
 prologHybrid(prologSingleValued/1).
 prologHybrid(prologSideEffects).
@@ -1268,10 +1244,11 @@ ttExpressionType(Type) ==> (argIsa(Prop,N,Type),{number(N)} ==> argQuotedIsa(Pro
 */
 /* FIX
 ==>
+*/
 prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, 
    genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, 
    completelyAssertedCollection/1, ttExpressionType/1, typeProps/2)).
-*/
+
 
 :- ain(isa(ttExpressionType,ttAbstractType)).
 :- discontiguous(subFormat/2).
@@ -1285,18 +1262,18 @@ prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subForm
 subFormat(ftVoprop,ftSpec).
 
 ==> tFunction(opQuote(isEach(ftRest(ftTerm)))).
-tFunction(isRandom(tCol)).
-tFunction(isAnd(ftRest(ftSpec))).
-tFunction(isMost(ftRest(ftSpec))).
-tFunction(isOneOf(ftRest(ftSpec))).
-tFunction(isNot(ftSpec)).
-tFunction(isOptional(ftSpec,ftTerm)).
-tFunction(isOptionalStr(ftString)).
-tFunction(exactStr(ftString)).
+==> tFunction(isRandom(tCol)).
+==> tFunction(isAnd(ftRest(ftSpec))).
+==> tFunction(isMost(ftRest(ftSpec))).
+==> tFunction(isOneOf(ftRest(ftSpec))).
+==> tFunction(isNot(ftSpec)).
+==> tFunction(isOptional(ftSpec,ftTerm)).
+==> tFunction(isOptionalStr(ftString)).
+==> tFunction(exactStr(ftString)).
 
 resultIsa(ftDeplictsFn,ftSpec).
 
-tPred(quotedDefnIff/2,prologHybrid).
+==> prologHybrid(quotedDefnIff/2).
 
 
 isa(argIsa,prologHybrid).
@@ -1313,9 +1290,9 @@ arity(isLikeFn,2).
 arity(ftDeplictsFn,1).
 
 arity(tFunction,1).
-tFunction(ftDiceFn(ftInt,ftInt,ftInt)).
-tFunction(ftListFn(tCol)).
-tFunction(ftDeplictsFn).
+==> tFunction(ftDiceFn(ftInt,ftInt,ftInt)).
+==> tFunction(ftListFn(tCol)).
+==> tFunction(ftDeplictsFn).
 
 completelyAssertedCollection(rtAvoidForwardChain).
 completelyAssertedCollection('SententialOperator').
@@ -1416,8 +1393,8 @@ prologNegByFailure(tDeleted(ftID)).
 %
 % Prolog Single Valued.
 %
-prologSingleValued(predInstMax(ftID,prologSingleValued,ftInt),prologHybrid).
-prologSingleValued(predTypeMax(prologSingleValued,tCol,ftInt),prologHybrid).
+==>prologSingleValued(predInstMax(ftID,prologSingleValued,ftInt),prologHybrid).
+props(predTypeMax(prologSingleValued,tCol,ftInt),[prologHybrid,prologSingleValued]).
 resultIsa(txtFormatFn,ftText).
 %'<==>'(prologMultiValued(CallSig,[predProxyAssert(aina),predProxyRetract(del),predProxyQuery(call)]),prologDynamic(CallSig)).
 %'<==>'(prologMultiValued(CallSig,[predProxyAssert(pttp_tell),predProxyRetract(pttp_retract),predProxyQuery(pttp_ask)]),prologPTTP(CallSig)).
@@ -1438,7 +1415,7 @@ subFormat(ftVoprop,ftRest(ftVoprop)).
 subFormat(ftVoprop,ftTerm).
 
 subFormat(COL1,COL2)/(atom(COL1);atom(COL2))==>(ttExpressionType(COL1),ttExpressionType(COL2)).
-tCol(W)==>{quietly(guess_supertypes(W))}.
+% tCol(W)==>{quietly(guess_supertypes(W))}.
 
 
 tSet(tNewlyCreated).

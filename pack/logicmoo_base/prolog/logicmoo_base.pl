@@ -47,7 +47,7 @@
    tms/1, %basePFC
    prologSingleValued/1)).
 
-:- user:ensure_loaded(logicmoo_utils).
+:- baseKB:ensure_loaded(logicmoo_utils).
 :- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
 :- ensure_loaded(library('logicmoo/util/logicmoo_util_supp.pl')).
 :- endif.
@@ -102,7 +102,7 @@ lmbase:skip_module_decl:-
 %%% TODO one day :- set_prolog_flag(logicmoo_include,fail).
 
 
-:- include('logicmoo/mpred/mpred_header.pi').
+% :- include('logicmoo/mpred/mpred_header.pi').
 
 baseKB:mpred_skipped_module(eggdrop).
 :- forall(current_module(CM),system:assert(baseKB:mpred_skipped_module(CM))).
@@ -114,19 +114,19 @@ baseKB:mpred_skipped_module(eggdrop).
 % DBASE_T System
 % ================================================    
 
-:- if(current_prolog_flag(logicmoo_autoload,false)).
 
 :- dmsg("Ensuring loaded logicmoo/[snark|mpred[online]] ",[]).
 
 :- ensure_loaded(library('logicmoo/mpred/mpred_at_box.pl')).
+:- ensure_loaded(library('logicmoo/mpred/mpred_type_isa.pl')).
 :- ensure_loaded(library('logicmoo/mpred/mpred_expansion.pl')).
 :- ensure_loaded(library('logicmoo/mpred/mpred_loader.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_pfc.pl')). % except([op(_,_,_)]).
+:- ensure_loaded(library('logicmoo/mpred/mpred_pfc.pl')).
 :- ensure_loaded(library('logicmoo/mpred/mpred_prolog_file.pl')).
 :- ensure_loaded(library('logicmoo/mpred/mpred_props.pl')).
 
 % :- ensure_loaded(library('logicmoo/mpred/mpred_motel.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_type_isa.pl')).
+
 :- ensure_loaded(library('logicmoo/mpred/mpred_kb_ops.pl')).
 :- ensure_loaded(library('logicmoo/mpred/mpred_agenda.pl')).
 :- ensure_loaded(library('logicmoo/mpred/mpred_storage.pl')).
@@ -150,44 +150,8 @@ baseKB:mpred_skipped_module(eggdrop).
 :- ensure_loaded(library('logicmoo/mpred_online/mpred_www.pl')).
 
 :- ensure_loaded(library('logicmoo/snark/common_logic_kb_hooks.pl')).
-:- ensure_loaded(library('logicmoo/mpred/mpred_userkb.pl')).
 
-:- reexport(library('logicmoo/mpred/mpred_expansion.pl')).
-:- reexport(library('logicmoo/mpred/mpred_loader.pl')).
-:- reexport(library('logicmoo/mpred/mpred_at_box.pl')).
-:- reexport(library('logicmoo/mpred/mpred_pfc.pl')). % except([op(_,_,_)]).
-:- reexport(library('logicmoo/mpred/mpred_prolog_file.pl')).
-:- reexport(library('logicmoo/mpred/mpred_props.pl')).
-
-:- reexport(library('logicmoo/mpred/mpred_motel.pl')).
-:- reexport(library('logicmoo/mpred/mpred_type_isa.pl')).
-:- reexport(library('logicmoo/mpred/mpred_kb_ops.pl')).
-:- reexport(library('logicmoo/mpred/mpred_agenda.pl')).
-:- reexport(library('logicmoo/mpred/mpred_storage.pl')).
-
-:- reexport(library('logicmoo/snark/common_logic_sexpr.pl')).
-:- reexport(library('logicmoo/mpred/mpred_listing.pl')).
-:- reexport(library('logicmoo/mpred/mpred_stubs.pl')).
-
-:- reexport(library('logicmoo/mpred/mpred_type_constraints.pl')).
-:- reexport(library('logicmoo/mpred/mpred_type_naming.pl')).
-:- reexport(library('logicmoo/mpred/mpred_type_wff.pl')).
-:- reexport(library('logicmoo/mpred/mpred_type_args.pl')).
-
-:- reexport(library('logicmoo/snark/common_logic_snark.pl')). %except([op(_,_,_)]).
-:- reexport(library('logicmoo/mpred/mpred_hooks.pl')).
-
-:- reexport(library('logicmoo/snark/common_logic_boxlog.pl')).
-:- reexport(library('logicmoo/snark/common_logic_skolem.pl')).
-:- reexport(library('logicmoo/snark/common_logic_compiler.pl')). % ,except([op(_,_,_)])). % ,arity/2,mpred_is_tracing_exec/0, (~)/1
-
-:- reexport(library('logicmoo/mpred_online/mpred_www.pl')).
-
-:- reexport(library('logicmoo/snark/common_logic_kb_hooks.pl')).
-:- reexport(library('logicmoo/mpred/mpred_userkb.pl')).
-
-:- else.
-
+/*
 :- dmsg("Adding logicmoo/[snark|mpred[online]] to autoload path",[]).
 :- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
 :- add_library_search_path('./logicmoo/mpred/',[ 'mpred_*.pl']).
@@ -196,10 +160,10 @@ baseKB:mpred_skipped_module(eggdrop).
 %:- add_library_search_path('./logicmoo/plarkc/',[ '*.pl']).
 %:- add_library_search_path('./logicmoo/../',[ 'logicmoo_*.pl']).
 %:- add_library_search_path('./logicmoo/',[ '*.pl']).
+*/
 
-:- autoload([verbose(false)]).
+% :- autoload([verbose(false)]).
 
-:- endif.
 
 
 %baseKB:sanity_check:- findall(U,(current_module(U),default_module(U,baseKB)),L),must(L==[baseKB]).
@@ -253,11 +217,6 @@ user:lmbf:-
 
 :- flag_call(logicmoo_debug=false).
 
-% Enable System
-system:exception(undefined_predicate,MFA, Action):- trace, current_prolog_flag(retry_undefined,true),
-    must(loop_check(uses_predicate(MFA, Action),Action=error)).
-user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_undefined,true),
-    must(loop_check(uses_predicate(MFA, Action),Action=error)).
 
 :- set_prolog_flag(system:unknown,error).
 :- set_prolog_flag(user:unknown,error).
@@ -312,7 +271,7 @@ maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
 
 */
 
-:- ( defaultAssertMt(_)->true;set_defaultAssertMt(baseKB)).
+% :- ( defaultAssertMt(_)->true;set_defaultAssertMt(baseKB)).
 
 :- ensure_loaded(library('logicmoo/mpred/mpred_userkb.pl')).
 
@@ -344,5 +303,9 @@ system:term_expansion(I,PosI,O,PosI):- nonvar(I),nonvar(PosI),current_prolog_fla
       \+ cannot_expand_current_file,
       base_clause_expansion(PosI,I,O)->I\==O,!.
       
-:- ensure_loaded(library(logicmoo/pfc/'system_base.pfc')).
+% Enable System
+% system:exception(undefined_predicate,MFA, Action):- trace, current_prolog_flag(retry_undefined,true), must(loop_check(uses_predicate(MFA, Action),Action=error)).
+user:exception(undefined_predicate,MFA, Action):- current_prolog_flag(retry_undefined,true),
+    must(loop_check(baseKB:uses_predicate(MFA, Action),Action=error)).
 
+:- ensure_loaded(library(logicmoo/pfc/'system_base.pfc')).

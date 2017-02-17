@@ -683,7 +683,7 @@ parseIsa(Str,A,B,C) :-string(Str),!, parseIsa(exactStr(Str),A,B,C).
 
 parseIsa(ftAction,Goal,Left,Right):-!,one_must(parseFmt_vp1(isSelfAgent,Goal,Left,Right),parseFmt_vp2(isSelfAgent,Goal,Left,Right)).
 
-:- user:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
+:- baseKB:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
 
 parseIsa(t(P,S,O),TermV) -->{!},parseIsa(call(t(P,S,O)),TermV).
 parseIsa(call(Call),TermV) --> {!,subst(Call,isThis,TermV,NewCall)},theText(TermT), {req1(NewCall),match_object(TermT,TermV)}.

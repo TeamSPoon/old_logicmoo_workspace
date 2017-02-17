@@ -61,7 +61,7 @@
 
 :- ((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, baseKB:call_u(G))))).
 :- at_start((logicmoo_util_shared_dynamic:call(asserta_if_new,(ereq(G):- !, baseKB:call_u(G))))).
-:-  prolog_statistics:time((user:ensure_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
+:-  prolog_statistics:time((baseKB:ensure_loaded(baseKB:library(logicmoo/pfc/'autoexec.pfc')))).
 
 
 /*
