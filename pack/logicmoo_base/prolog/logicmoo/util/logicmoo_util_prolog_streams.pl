@@ -1,3 +1,8 @@
+
+:- use_module(library(predicate_streams)).
+end_of_file.
+
+
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_prolog_streams.pl
 
 :- module(logicmoo_util_prolog_streams,
