@@ -109,7 +109,7 @@ run_mud_test(Name,Test):-
 
 
 %:- mpred_trace_exec.
-%:- flag_call(logicmoo_debug=true).
+%:- flag_call(runtime_debug=true).
 
 baseKB:mud_test(test_fwc_1,
   (on_x_debug(ain(tAgent(iExplorer1))),
@@ -166,7 +166,7 @@ mud_test_level2(drop_take,
 :- catch(ignore(noguitracer),_,true).
 
 % [Optionally] load and start sparql server
-%:- at_start(start_servers)
+%:- after_boot(start_servers)
 
 % [Optionaly] Add some game content
 :- if_flag_true(was_runs_tests_pl, declare_load_dbase(logicmoo('rooms/startrek.all.pfc.pl'))).
@@ -235,7 +235,7 @@ prologHybrid(bad_instance(ftTerm,ftTerm)).
 check_consistent(Obj,Scope):-var(Scope),!,check_consistent(Obj,0).
 check_consistent(Obj,Scope):-call(call,lmcache:is_instance_consistent(Obj,Was)),!,Was>=Scope.
 check_consistent(Obj,_):- call(call,t_l:is_checking_instance(Obj)),!.
-check_consistent(Obj,Scope):- w_tl(t_l:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
+check_consistent(Obj,Scope):- locally(t_l:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
 check_consistent_0(Obj,Scope):- once((catch((doall(((clause(hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(lmcache:is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
 check_consistent_0(Type,Scope):- once(tCol(Type)),
  catch((forall(isa(Obj,Type),check_consistent(Obj,Scope)),
@@ -253,16 +253,16 @@ baseKB:mud_test_local:-
 
 % baseKB:mud_test("local sanity tests",  do_mud_test_locals).
 
-% w_tl/2
+% locally/2
 
 % :- 'mpred_hide_childs'(dbase:record_on_thread/2).
 
 % [Manditory] This loads the game and initializes so test can be ran
-:- if_flag_true(was_runs_tests_pl, at_start(run_setup)).
+:- if_flag_true(was_runs_tests_pl, after_boot(run_setup)).
 
 % the real tests now (once)
 do_mud_test_locals:- forall(clause(baseKB:mud_test_local,B),must(B)).
-:- if_flag_true(was_runs_tests_pl,at_start(must_det(run_mud_tests))).
+:- if_flag_true(was_runs_tests_pl,after_boot(must_det(run_mud_tests))).
 
 % the local tests each reload (once)
 :- if_flag_true(was_runs_tests_pl, do_mud_test_locals).
@@ -289,7 +289,7 @@ must_test("tests to see if poorly canonicalized code (unrestricted quantificatio
    forall(mudAtLoc(O,L),fmt(mudAtLoc(O,L)))).
 
 % the real tests now (once)
-baseKB:mud_test_local :- at_start(must_det(run_mud_tests)).
+baseKB:mud_test_local :- after_boot(must_det(run_mud_tests)).
 
 
 % :- forall(clause(mud_regression_test,Call),must(Call)).

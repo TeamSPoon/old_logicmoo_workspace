@@ -31,7 +31,7 @@ in_logicmoo_repl_source_file.
 :- initialization(attach_packs).
 
 :- if((exists_source(library(logicmoo_utils)))).
-:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(system:library(logicmoo_utils)).
 %USER :- ensure_loaded(library(logicmoo_user)).
 
 :- else.
@@ -80,7 +80,7 @@ prmtc:efsp(T,O):-  prmtc2:efsp_e(T,A), once((lmcache777:pmrt(D),absolute_file_na
 :-asserta((user:library_directory(R):- prmtc:efsp(library,R))).
 
 :- attach_packs.
-:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(system:library(logicmoo_utils)).
 :- call(call,retract(lmcache666:restore_working_directory(X))),working_directory(_,X).
 :- endif.
 

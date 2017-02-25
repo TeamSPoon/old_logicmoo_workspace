@@ -105,6 +105,6 @@ explorer_idea(Agent,actLook) :-
 	random_permutation(Old,New),
 	ain(mudMemory(Agent,aDirectionsFn(New))).
 
-:- set_prolog_flag(logicmoo_debug,3).
+:- set_prolog_flag(runtime_debug,3).
 
 :- include(prologmud(mud_footer)).

@@ -17,8 +17,13 @@
 %:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 % :- module(mud_loader,[]).
 %:- endif.
-% restore entry state
-%:- lmce:reset_modules.
+:- set_prolog_flag(pfc_booted,false).
+
+
+:- multifile(t_l:disable_px/0).
+:- thread_local(t_l:disable_px/0).
+:- must(\+ t_l:disable_px).
+:- retractall(t_l:disable_px).
 
 
 %% UNDO % :- add_import_module(mpred_storage,baseKB,end).
@@ -43,8 +48,6 @@
 
 :- include(mud_header).
 
-
-:- retractall(t_l:disable_px).
 
 :- set_prolog_flag(generate_debug_info, true).
 % [Optionaly] Set the Prolog optimize/debug flags
@@ -76,7 +79,6 @@
 % :- make.
 %:- portray_text(true).
 
-:- asserta(t_l:disable_px).
 
 :-set_prolog_stack(global, limit(32*10**9)).
 :-set_prolog_stack(local, limit(32*10**9)).
@@ -91,8 +93,6 @@
 :- has_gui_debug -> true ; remove_pred(pce_principal,send,2).
 :- has_gui_debug -> true ; remove_pred(pce_principal,new,2).
 
-
-:- asserta(t_l:disable_px).
 
 :- export(add_game_dir/2).
 add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_game_dir(Else).
@@ -187,14 +187,15 @@ start_boxer:-
    threads,
    ensure_loaded(logicmoo(candc/parser_boxer)),
    % make,   
-   at_start(prolog_repl).
+   after_boot(prolog_repl).
+
 
 
 % We don't start cliopatria we here. We have to manually start
 %  with  ?- start_servers.
 hard_work:-!.
 hard_work:-
-   with_no_mpred_expansions(wno_tl(op(200,fy,'@'),
+   with_no_mpred_expansions(locally_hide(op(200,fy,'@'),
    ((
  %  use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
   % ensure_loaded(logicmoo(launchcliopatria)),
@@ -209,7 +210,7 @@ hard_work:-
 :- show_entry(gripe_time(40,ensure_loaded(prologmud('mud_builtin.pfc')))).
 % :- show_entry(gripe_time(40,force_reload_mpred_file(prologmud('mud_builtin.pfc')))).
 
-slow_work:- wno_tl( set_prolog_flag(lm_expanders,false) , within_user(at_start(hard_work))).
+slow_work:- locally_hide( set_prolog_flag(lm_expanders,false) , within_user(after_boot(hard_work))).
 
 thread_work:- thread_property(X, status(running)),X=loading_code,!.
 thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
@@ -223,30 +224,30 @@ run_setup_now:-
    % TO UNDO register_timer_thread(npc_ticker,90,npc_tick)
    )).
 
-run_setup:- within_user(at_start(run_setup_now)).
+run_setup:- within_user(after_boot(run_setup_now)).
 
 
 
 
 % [Optionaly] load and start sparql server
 % starts in forground
-%:- at_start(slow_work).
+%:- after_boot(slow_work).
 % starts in thread (the the above was commented out)
-%:- at_start(start_servers).
+%:- after_boot(start_servers).
 % commented out except on run
 
 
 debug_repl_w_cyc(Module,CallFirst):- !,         
-          wno_tl(t_l:useOnlyExternalDBs,
-            w_tl(baseKB:use_cyc_database,
+          locally_hide(t_l:useOnlyExternalDBs,
+            locally(baseKB:use_cyc_database,
                ((decl_type(person),          
                 ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.pfc.pl')),
                 module(Module),
                 show_call(CallFirst), 
                 prolog_repl)))).
 debug_repl_wo_cyc(Module,CallFirst):- !,         
-          w_tl(t_l:useOnlyExternalDBs,
-            wno_tl(baseKB:use_cyc_database,
+          locally(t_l:useOnlyExternalDBs,
+            locally_hide(baseKB:use_cyc_database,
                ((decl_type(person),          
                 ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.pfc.pl')),
                 module(Module),
@@ -277,7 +278,7 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 
 
 % [Optional] This loads boxer
-% :- at_start(w_tl(set_prolog_flag(lm_expanders,false),within_user(ignore(catch(start_boxer,_,true))))).
+% :- after_boot(locally(set_prolog_flag(lm_expanders,false),within_user(ignore(catch(start_boxer,_,true))))).
 
 % [Optional] Testing PTTP
 % :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.
@@ -295,7 +296,7 @@ was_runs_tests_pl:-is_startup_file('run_tests.pl').
 
 
 % the real tests now (once)
-:- ain((mud_test_local :- cwc,if_flag_true(was_runs_tests_pl,at_start(must_det(run_mud_tests))))).
+:- ain((mud_test_local :- cwc,if_flag_true(was_runs_tests_pl,after_boot(must_det(run_mud_tests))))).
 
  % :- if_flag_true(was_runs_tests_pl, doall(now_run_local_tests_dbg)).
 
@@ -332,11 +333,11 @@ cmdresult(statistics,true)
 % :- prolog.
 
 % :-foc_current_agent(P),assertz_if_new(agent_action_queue(P,chat80)).
-:- if_flag_true(was_runs_tests_pl, at_start(login_and_run)).
+:- if_flag_true(was_runs_tests_pl, after_boot(login_and_run)).
 
 
 % So scripted versions don't just exit
-%:- if_flag_true(was_runs_tests_pl,at_start(prolog)).
+%:- if_flag_true(was_runs_tests_pl,after_boot(prolog)).
 
 %:- kill_term_expansion.
 %:- prolog.
@@ -531,9 +532,9 @@ download_and_install_el:-
 :- statistics.
 
 % NPC planners
-:-wdmsg(loading_mobs).
-:- flag_call(logicmoo_debug=3).
-:- flag_call(logicmoo_safety=3).
+:- wdmsg(loading_mobs).
+:- set_prolog_flag(runtime_debug,3).
+:- set_prolog_flag(runtime_safety,3).
 
 :- expand_file_name('../prologmud/prolog/prologmud/mobs/?*.pl',O),maplist(ensure_mpred_file_loaded,O).
 %:- include_prolog_files(prologmud(mobs/'?*.pl')).
@@ -663,10 +664,12 @@ lundef :- A = [],
 
 %:-mred_untrace.
 %:-mred_no_spy_all.
-%:- lmce:reset_modules.
+%.
 
-tSourceCode(iSourceCode7).
+==> tSourceCode(iSourceCode7).
 :- set_prolog_flag(pfc_booted,true).
+:- set_prolog_flag(assert_attvars,true).
+:- prolog.
 :- ain(isLoaded(iSourceCode7)).
-% :- set_prolog_flag(assert_attvars,true).
+
 

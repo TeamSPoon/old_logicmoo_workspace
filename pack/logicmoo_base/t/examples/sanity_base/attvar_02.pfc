@@ -20,7 +20,7 @@
 % :- process_this_script.
 
 :- read_attvars(true).
-:- flag_call(logicmoo_debug=true).
+:- flag_call(runtime_debug=true).
 
 :- assert_mu(sk_in(avar([vn='Ex',sk='SKF-666']))).
 % :- listing_u(sk_in/1).

@@ -10,7 +10,7 @@
 
 :- module(fc_01,[]).
 
-:- set_prolog_flag(logicmoo_debug,true).
+:- set_prolog_flag(runtime_debug,true).
 :- system:ensure_loaded(library(logicmoo_base)).
 
 %:- add_import_module(fc_01,baseKB,start).

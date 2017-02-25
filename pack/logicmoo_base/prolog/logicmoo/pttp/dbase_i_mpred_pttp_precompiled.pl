@@ -22,7 +22,7 @@ univ_tl(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=..LeftSid
 
 
 
-:- shared_multifile was_pttp_functor/3.
+:- kb_shared was_pttp_functor/3.
 :- was_dynamic was_pttp_functor/3.
 
 
@@ -50,9 +50,9 @@ was_pttp_functor(base, pred_t,3-3).
 baseKB:use_mpred_t.
 
 :- was_dynamic t/3.
-:- shared_multifile t/3.
+:- kb_shared t/3.
 :- was_dynamic t/4.
-:- shared_multifile t/4.
+:- kb_shared t/4.
 
 % -- CODEBLOCK  int_asserted_t
 
@@ -79,7 +79,7 @@ map_int_functors(EXT,CALLF,A,PREREQ):-
 % -- CODEBLOCK
 
 :- was_dynamic int_pred_t/10.
-:- shared_multifile int_pred_t/10.
+:- kb_shared int_pred_t/10.
 
 :- map_int_functors(pred_t,t,3,((use_mpred_t, G=call_t,arg(1,G,B),arg(2,G,C),dif(B,C),G))).
 /*
@@ -91,7 +91,7 @@ int_pred_t(A, B, C, H, I, D, E, F, J, G) :-
 % :-listing(int_pred_t).
 
 :- was_dynamic int_not_pred_t/10.
-:- shared_multifile int_not_pred_t/10.
+:- kb_shared int_not_pred_t/10.
 
 :- map_int_functors(pred_t,t,3,((use_mpred_t, G=call_t,arg(1,G,B),arg(2,G,C),dif(B,C),G))).
 int_not_pred_t(A, B, C, H, I, D, E, F, J, G) :- 
@@ -102,7 +102,7 @@ int_not_pred_t(A, B, C, H, I, D, E, F, J, G) :-
 % -- CODEBLOCK
 
 :- was_dynamic int_not_true_t/10.
-:- shared_multifile int_not_true_t/10.
+:- kb_shared int_not_true_t/10.
 
 int_not_true_t(A, B, C, H, I, D, E, F, J, G) :- 
    pretest_call((is_extent_known(A),use_mpred_t,not(baseKB:t(A, B, C)), dif(B,C),D=E)),

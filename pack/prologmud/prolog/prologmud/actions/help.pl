@@ -11,7 +11,7 @@
 isa(tHumanControlled,ttAgentType).
 %genls(ttAgentType,tCol).
 
-:- kb_dynamic type_action_info/3.
+:- kb_shared type_action_info/3.
 
 type_action_info(tHumanControlled,actHelp(isOptional(ftString,"")), "shows this help").
 
@@ -53,11 +53,11 @@ first_pl((BODY,_),PL):- nonvar(BODY),!,
  first_pl(BODY,PL).
 first_pl(PL,PL).
 
-:- kb_dynamic(action_info_db/3).
+:- kb_shared(action_info_db/3).
 
 action_info_db(TEMPL,INFO,WAS):- (PRED=agent_call_command(_,WAS);PRED=agent_text_command(_,_,_,WAS)) ,
    clause(PRED,BODY,REF),clause_property(REF,file(S)),
-   (ground(WAS)->true;once(( ignore((nop(S=S),first_pl(BODY,PL),ignore(catch(((true;no_trace(PL)),!),_,true)))),ground(WAS)))),
+   (ground(WAS)->true;once(( ignore((nop(S=S),first_pl(BODY,PL),ignore(catch(((true;quietly(PL)),!),_,true)))),ground(WAS)))),
    
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
 

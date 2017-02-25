@@ -77,7 +77,7 @@ get_world_agent_plan(W,Who,Idea):-no_repeats(with_agent(Who,call_no_cuts(world_a
 
 do_agent_call_plan_command(A,C):- t_l:agent_current_action(A,CC),dmsg(too_busy(CC,agent_call_plan_command(A,C))),!.
 do_agent_call_plan_command(A,C):-   
-   with_agent(A,w_tl(t_l:agent_current_action(A,C), do_agent_action(A,C))).
+   with_agent(A,locally(t_l:agent_current_action(A,C), do_agent_action(A,C))).
 
 
 command_actIdea(Who,IdeaSO):- (var(Who)->current_agent(Who);true),
@@ -110,8 +110,8 @@ agent_call_command(Agent,actProlog(C)) :- (side_effect_prone),true,nonvar(C),age
 
 :-export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
-agent_call_safely(RC,X,[]) :- !, call_u(no_trace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true))))))))).
-agent_call_safely(RC,X,Vars) :-  call_u(no_trace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,Vars))))))))).
+agent_call_safely(RC,X,[]) :- !, call_u(quietly((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true))))))))).
+agent_call_safely(RC,X,Vars) :-  call_u(quietly((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,Vars))))))))).
 
 atom_to_term_safe(A,T,O):-catch(atom_to_term(A,T,O),_,fail),T\==end_of_file.
 any_to_callable(S,X,Vs):-string(C),!,string_to_atom(S,C),atom_to_term_safe(C,X,Vs).

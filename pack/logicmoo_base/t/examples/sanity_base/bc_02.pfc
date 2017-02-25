@@ -10,9 +10,9 @@
 
 :- use_module(library(logicmoo_base)).
 
-:- flag_call(logicmoo_debug=true).
+:- flag_call(runtime_debug=true).
 :- set_prolog_flag(retry_undefined,true).
-:- flag_call(logicmoo_debug=true).
+:- flag_call(runtime_debug=true).
 :- begin_pfc.
 
 :- dynamic(bc_q/1).

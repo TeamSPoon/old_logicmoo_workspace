@@ -10,7 +10,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- if(\+ current_module(baseKB)).
 :- [logicmoo_repl].
-:- unload_file(init_mud_server).
 :- threads.
 :- set_prolog_flag(logicmoo_qsave,true).
 :- else.
@@ -28,8 +27,7 @@ loadNewTiny:-
   baseKB:ain((tinyKB(C,_MT,_STR),{tinykb_assertion_recipe(C,CycLOut),delay_rule_eval(CycLOut,tiny_rule,NewAsserts)}
   ==> {dmsg(tiny_clif(NewAsserts))}, tiny_kb(NewAsserts))).
 
-:- during_boot(set_prolog_flag(do_renames,restore)).
-
+:- set_prolog_flag(do_renames,term_expansion).
 
 :- baseKB:ensure_loaded(logicmoo('snark/common_logic_sumo.pfc')).
 
@@ -72,13 +70,13 @@ loadSumo2:-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SAVE SUMO KB EXTENSIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- loadSumo1.
+:- after_boot(loadSumo1).
 :- if(current_prolog_flag(logicmoo_qsave,true)).
 :- statistics.
 :- baseKB:qsave_lm(lm_repl1).
 :- endif.
 
-:- loadSumo2.
+:- after_boot(loadSumo2).
 :- if(current_prolog_flag(logicmoo_qsave,true)).
 :- statistics.
 :- baseKB:qsave_lm(lm_repl2).
@@ -88,7 +86,7 @@ loadSumo2:-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SAVE CYC KB EXTENSIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- loadNewTiny.
+:- after_boot(loadTiny1).
 :- if(current_prolog_flag(logicmoo_qsave,true)).
 :- statistics.
 :- baseKB:qsave_lm(lm_repl3).

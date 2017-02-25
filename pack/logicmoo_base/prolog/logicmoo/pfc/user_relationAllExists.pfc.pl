@@ -71,11 +71,11 @@ genls(_,_,MT):-isa(_,_,MT),genls(_,_,MT).
 :- op(1050,xfx,('<-')).
 :- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
-:- kb_dynamic(tCol/1).
-:- kb_dynamic(tHominid/1).
+:- kb_shared(tCol/1).
+:- kb_shared(tHominid/1).
 
-:- kb_dynamic(relationAllOnly/3).
-:- kb_dynamic(rtTransitiveBinaryPredicate/1).
+:- kb_shared(relationAllOnly/3).
+:- kb_shared(rtTransitiveBinaryPredicate/1).
 
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 

@@ -51,7 +51,7 @@ X = 3.
 ````
 
 
-# 3) no_trace/1 fixes the system:notrace/1 determinancy
+# 3) quietly/1 fixes the system:notrace/1 determinancy
 
 
 ````
@@ -64,7 +64,7 @@ Oops it had an implicit once/1
 Dont worry..
 
 ````
-?- trace,no_trace(member(X,[1,2,3])).
+?- trace,quietly(member(X,[1,2,3])).
 X = 1 ;
 X = 2 ;
 X = 3.
@@ -76,7 +76,7 @@ X = 3.
 
 
 
-# 4) special assertion/1 predicates  must/1, sanity/1, on_x_rtrace/1 for code you are in the middle of writing 
+# 4) special assertion/1 predicates  must/1, sanity/1, on_x_debug/1 for code you are in the middle of writing 
 
 ````
 ?- must(true).
@@ -97,18 +97,18 @@ in_dumptrace(logicmoo_util_bugger_catch:on_x_debug(user:fail))
 (11)[_catch] '_catch':one_must(bugger:rtraceOnError('_catch':on_x_debug(user:fail)),bugger:debugCallWhy(failed(debugOnFailure0('_catch':on_x_debug(user:fail))),'_catch':on_x_debug(user:fail))).   %  logicmoo_util_bugger_catch.pl:840:
 (14)[dumpst] dtrace('_catch':on_x_debug(user:fail)).   %  logicmoo_util_dumpst.pl:241:
 (15)[l_dmsg] l_dmsg:with_all_dmsg(dumpst:dtrace('_catch':on_x_debug(user:fail),103)).   %  logicmoo_util_dmsg.pl:231:
-(16)[rtions] rtions:w_tl(bugger:tl_always_show_dmsg,l_dmsg:w_tl(set_prolog_flag(opt_debug,true),w_tl(bugger:dmsg_match(show,_G38117),dumpst:dtrace('_catch':on_x_debug(user:fail),103)))).   %  logicmoo_util_with_assertions.pl:70:
-(17)[system] scc(rtions:asserta(bugger:tl_always_show_dmsg,<clause>(0x1768a40)),l_dmsg:w_tl(set_prolog_flag(opt_debug,true),w_tl(bugger:dmsg_match(show,_G38233),dumpst:dtrace('_catch':on_x_debug(user:fail),103))),rtions:erase(<clause>(0x1768a40))).   %  init.pl:314:
-(18)$[system] sccc(rtions:asserta(bugger:tl_always_show_dmsg,<clause>(0x1768a40)),l_dmsg:w_tl(set_prolog_flag(opt_debug,true),w_tl(bugger:dmsg_match(show,_G38337),dumpst:dtrace('_catch':on_x_debug(user:fail),103))),_G38309,rtions:erase(<clause>(0x1768a40))).   %  init.pl:310:
-(19)[rtions] rtions:w_tl(l_dmsg:set_prolog_flag(opt_debug,true),l_dmsg:w_tl(bugger:dmsg_match(show,_G38423),dumpst:dtrace('_catch':on_x_debug(user:fail),103))).   %  logicmoo_util_with_assertions.pl:61:
-(20)[system] scc(rtions:set_prolog_flag(opt_debug,true),rtions: @(w_tl(bugger:dmsg_match(show,_G38518),dumpst:dtrace('_catch':on_x_debug(user:fail),103)),logicmoo_util_dmsg),rtions: (filter=unUSED->true;set_prolog_flag(opt_debug,filter))).   %  init.pl:314:
-(21)$[system] sccc(rtions:set_prolog_flag(opt_debug,true),rtions: @(w_tl(bugger:dmsg_match(show,_G38604),dumpst:dtrace('_catch':on_x_debug(user:fail),103)),logicmoo_util_dmsg),_G38582,rtions: (filter=unUSED->true;set_prolog_flag(opt_debug,filter))).   %  init.pl:310:
-(22)$[rtions] rtions: @(w_tl(bugger:dmsg_match(show,_G38667),dumpst:dtrace('_catch':on_x_debug(user:fail),103)),logicmoo_util_dmsg).  no(clause)
-(23)[rtions] rtions:w_tl(bugger:dmsg_match(show,_G38739),dumpst:dtrace('_catch':on_x_debug(user:fail),103)).   %  logicmoo_util_with_assertions.pl:70:
+(16)[rtions] rtions:locally(bugger:tl_always_show_dmsg,l_dmsg:locally(set_prolog_flag(opt_debug,true),locally(bugger:dmsg_match(show,_G38117),dumpst:dtrace('_catch':on_x_debug(user:fail),103)))).   %  logicmoo_util_with_assertions.pl:70:
+(17)[system] scc(rtions:asserta(bugger:tl_always_show_dmsg,<clause>(0x1768a40)),l_dmsg:locally(set_prolog_flag(opt_debug,true),locally(bugger:dmsg_match(show,_G38233),dumpst:dtrace('_catch':on_x_debug(user:fail),103))),rtions:erase(<clause>(0x1768a40))).   %  init.pl:314:
+(18)$[system] sccc(rtions:asserta(bugger:tl_always_show_dmsg,<clause>(0x1768a40)),l_dmsg:locally(set_prolog_flag(opt_debug,true),locally(bugger:dmsg_match(show,_G38337),dumpst:dtrace('_catch':on_x_debug(user:fail),103))),_G38309,rtions:erase(<clause>(0x1768a40))).   %  init.pl:310:
+(19)[rtions] rtions:locally(l_dmsg:set_prolog_flag(opt_debug,true),l_dmsg:locally(bugger:dmsg_match(show,_G38423),dumpst:dtrace('_catch':on_x_debug(user:fail),103))).   %  logicmoo_util_with_assertions.pl:61:
+(20)[system] scc(rtions:set_prolog_flag(opt_debug,true),rtions: @(locally(bugger:dmsg_match(show,_G38518),dumpst:dtrace('_catch':on_x_debug(user:fail),103)),logicmoo_util_dmsg),rtions: (filter=unUSED->true;set_prolog_flag(opt_debug,filter))).   %  init.pl:314:
+(21)$[system] sccc(rtions:set_prolog_flag(opt_debug,true),rtions: @(locally(bugger:dmsg_match(show,_G38604),dumpst:dtrace('_catch':on_x_debug(user:fail),103)),logicmoo_util_dmsg),_G38582,rtions: (filter=unUSED->true;set_prolog_flag(opt_debug,filter))).   %  init.pl:310:
+(22)$[rtions] rtions: @(locally(bugger:dmsg_match(show,_G38667),dumpst:dtrace('_catch':on_x_debug(user:fail),103)),logicmoo_util_dmsg).  no(clause)
+(23)[rtions] rtions:locally(bugger:dmsg_match(show,_G38739),dumpst:dtrace('_catch':on_x_debug(user:fail),103)).   %  logicmoo_util_with_assertions.pl:70:
 (24)[system] scc(rtions:asserta(bugger:dmsg_match(show,_G38813),<clause>(0x1768a80)),dumpst:dtrace('_catch':on_x_debug(user:fail),103),rtions:erase(<clause>(0x1768a80))).   %  init.pl:314:
 (25)$[system] sccc(rtions:asserta(bugger:dmsg_match(show,_G38875),<clause>(0x1768a80)),dumpst:dtrace('_catch':on_x_debug(user:fail),103),_G38862,rtions:erase(<clause>(0x1768a80))).   %  init.pl:310:
 (26)*[dumpst] dtrace('_catch':on_x_debug(user:fail),103).   %  logicmoo_util_dumpst.pl:253:
-(27)$[_catch] '_catch':no_trace(dumpst:dumpST(500000000)).   %  logicmoo_util_bugger_catch.pl:706:
+(27)$[_catch] '_catch':quietly(dumpst:dumpST(500000000)).   %  logicmoo_util_bugger_catch.pl:706:
 (28)[dumpst] dumpST(500000000).   %  logicmoo_util_dumpst.pl:71:
 (29)[_check] '_check':loop_check_early(dumpst:dumpST9(500000000),dumpst:dumpST0(500000000)).   %  logicmoo_util_loop_check.pl:181:
 (30)[_check] '_check':loop_check_term_key(dumpst:dumpST9(500000000),dumpst:dumpST9(500000000),dumpst:dumpST0(500000000)).   %  logicmoo_util_loop_check.pl:189:
@@ -127,10 +127,10 @@ r    = run again unleashed
 ````
 
 
-# 5) With Thread Local w_tl/2
+# 5) With Thread Local locally/2
 
 ````
-?- w_tl((doit:-dmsg("hi")),doit).
+?- locally((doit:-dmsg("hi")),doit).
 % "hi".
 true.
 ````
@@ -138,9 +138,9 @@ true.
 Even changes and restores non locals like..
 
 ````
-?- w_tl(set_prolog_flag(xref,true),...).
+?- locally(set_prolog_flag(xref,true),...).
 
-?- w_tl(op(0,xfx,'@'), consult(file_that_dont_like_op)).
+?- locally(op(0,xfx,'@'), consult(file_that_dont_like_op)).
 
 ````
 

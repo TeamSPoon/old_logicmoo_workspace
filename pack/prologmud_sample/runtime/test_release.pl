@@ -75,7 +75,7 @@
 :- endif.
 
 
-%:- flag_call(logicmoo_debug=false).
+%:- flag_call(runtime_debug=false).
 
 %:- set_prolog_flag(trace_gc,false).
 %:- set_prolog_flag(backtrace_depth,400).
@@ -148,8 +148,6 @@ push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
 :- user:test_for_release(debug_mud_game).
-
-:- asserta(t_l:disable_px).
 
 
 % :- statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T),qsave_program(logicmoo_repl,[map('logicmoo_repl.sav'),global(G),trail(T),local(L)]).

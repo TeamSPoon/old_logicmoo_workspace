@@ -7,7 +7,7 @@
 */
 :- module(sanity_neg,[]).
 
-:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(system:library(logicmoo_utils)).
 
 b:-c.
 c:-loop_check(a,true).

@@ -9,12 +9,12 @@
 :- module(bc_01,[]).
 
 :- make.
-:- flag_call(logicmoo_debug=true).
-:- flag_call(logicmoo_debug=true).
+:- flag_call(runtime_debug=true).
+:- flag_call(runtime_debug=true).
 
 :- use_module(library(logicmoo_base)).
 
-:- flag_call(logicmoo_debug=true).
+:- flag_call(runtime_debug=true).
 
 :- dynamic(bc_q/1).
 :- dynamic(bc_p/1).

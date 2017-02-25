@@ -1,7 +1,6 @@
 :- set_prolog_flag(access_level,system).
 :- load_files(library(prolog_stack)).
 prolog_stack:stack_guard(none).
-:- use_module(library(prolog_history)).
 :- use_module(library(base32)).
 :- set_prolog_flag(report_error,true).
 :- set_prolog_flag(fileerrors,false).
@@ -15,6 +14,9 @@ prolog_stack:stack_guard(none).
 :- set_prolog_flag(gc,true).
 :- set_prolog_flag(gc,false).
 
+end_of_file.
+
+:- use_module(library(prolog_history)).
 :- '$toplevel':'$clean_history'.
 :- '$toplevel':setup_history.
 

@@ -88,7 +88,7 @@ usys :- set_prolog_flag(access_level,user).
 
 
 lmv:-lm,call(call,use_listing_vars).
-lm :- use_module(library(logicmoo_utils)).
+lm :- use_module(system:library(logicmoo_utils)).
 lmb :- use_module(library(logicmoo_base)).
 lmu :- ensure_loaded(library(logicmoo_user)).
 

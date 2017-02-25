@@ -72,7 +72,7 @@
           ]).
 */         
 
-:- use_module(library('logicmoo/util/logicmoo_util_filestreams')).
+:- use_module(library('filestreams')).
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('==>')).
@@ -102,7 +102,7 @@
 :- dynamic(cwtdl_failed/1).
 
 cwtdl(Goal,DL,TL):- cwc,
-  cnotrace((ignore((nortrace,
+  quietly((ignore((nortrace,
    (show_failure(why,catch(call_with_time_limit(TL,(((call_with_depth_limit(Goal,DL,DLE),DLE\==depth_limit_exceeded)))),E,(dmsg(E:cwtdl(Goal,DL,TL)),fail)))
      ->true;
     assert(cwtdl_failed(Goal))))))).
@@ -161,7 +161,7 @@ reallyLoadTiny:- mpred_notrace.
 % extra_tcol(Mt,A,ID):- isTT(Mt,t(genls,Other,A),ID),atom(Other),Other\=A,'Thing'\=Other.
 
 
-% :- shared_multifile((  argGenl/3,argIsa/3,argQuotedIsa/3)).
+% :- kb_shared((  argGenl/3,argIsa/3,argQuotedIsa/3)).
 
 :- dynamic((
   
@@ -195,11 +195,11 @@ tinyKB_wstr(ist(MT,P)):-mtDressedMt(MT),tinyKB(P,MT,_).
 
 /*
 :- dynamic(argIsa/3).
-:- shared_multifile(argIsa/3).
+:- kb_shared(argIsa/3).
 :- dynamic(argGenl/3).
-:- shared_multifile(argGenl/3).
+:- kb_shared(argGenl/3).
 :- dynamic(argQuotedIsa/3).
-:- shared_multifile(argQuotedIsa/3).
+:- kb_shared(argQuotedIsa/3).
 isa(I,C):-exactlyAssertedEL(isa,I,C,_,_).
 genls(I,C):-exactlyAssertedEL(genls,I,C,_,_).
 arity(I,C):-exactlyAssertedEL(arity,I,C,_,_).

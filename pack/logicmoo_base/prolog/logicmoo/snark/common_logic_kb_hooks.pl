@@ -340,20 +340,20 @@ cyckb_t(P,A1):- t([P,A1]).
 
 %= 	 	 
 
-%% with_el_holds_enabled( :GoalGoal) is semidet.
+%% with_el_holds_enabled( :Goal) is semidet.
 %
 % Using El Holds Enabled.
 %
-with_el_holds_enabled(Goal):-wno_tl(el_holds_DISABLED_KB,Goal).
+with_el_holds_enabled(Goal):-locally_hide(el_holds_DISABLED_KB,Goal).
 :- meta_predicate(with_el_holds_disabled(0)).
 
 %= 	 	 
 
-%% with_el_holds_disabled( :GoalGoal) is semidet.
+%% with_el_holds_disabled( :Goal) is semidet.
 %
 % Using El Holds Disabled.
 %
-with_el_holds_disabled(Goal):-w_tl(el_holds_DISABLED_KB,Goal).
+with_el_holds_disabled(Goal):-locally(el_holds_DISABLED_KB,Goal).
 
 %:- link_to_holds_DYNAMIC(cyckb_t,el_holds_DISABLED_KB).
 :- link_to_holds2(cyckb_t,el_assertions:el_holds).
@@ -432,7 +432,7 @@ cyckb_t_implies(ANTE,CONSEQ):- nop(cyckb_t_implies(ANTE,CONSEQ)),!,fail.
 %
 % Knowledge Base P- True Structure List Prehook.
 %
-%:- kb_dynamic(kbp_t_list_prehook/2).
+%:- kb_shared(kbp_t_list_prehook/2).
 kbp_t_list_prehook(PLIST,PLIST).
 
 :- was_export(kbp_t_list/1). 
@@ -560,7 +560,7 @@ assert_to_db_list(HOLDS,PLIST):- safe_univ(Call,[HOLDS|PLIST]), assert(assert_ne
 
 %= 	 	 
 
-%% with_kb_assertions_matching( ?PLIST, ?Proof, :GoalCall) is semidet.
+%% with_kb_assertions_matching( ?PLIST, ?Proof, :Goal) is semidet.
 %
 % Using Knowledge Base Assertions Matching.
 %
@@ -574,7 +574,7 @@ with_kb_assertions_matching(PLIST,Proof,Call):- doall((kbp_t_list(PLIST, Proof),
 %
 % Knowledge Base P- Converted To Managed Predicate True Stucture.
 %
-kbp_to_mpred_t:- must_det(w_tl(t_l:useOnlyExternalDBs,kbp_to_mpred_0)).
+kbp_to_mpred_t:- must_det(locally(t_l:useOnlyExternalDBs,kbp_to_mpred_0)).
 
 
 %= 	 	 
@@ -625,7 +625,7 @@ move_implied:-doall((between(2,6,Len),length(PLIST,Len),
 %
 % Hide Term Rewrites.
 %
-hide_term_rewrites :- w_tl(t_l:useOnlyExternalDBs,
+hide_term_rewrites :- locally(t_l:useOnlyExternalDBs,
  % remove badjuju from the KB (that is unbould slots in the middle of GAFs)
  % hl_holds:retractall(assertion_holds(isa, badjuju, 'Thing')),
  % hl_holds:retractall(el_assertions:el_holds(genls, badjuju, 'AerosolStuff',_,_)), 
@@ -643,7 +643,7 @@ hide_term_rewrites :- w_tl(t_l:useOnlyExternalDBs,
 %
 % Hide Empty Strings.
 %
-hide_empty_strings :- w_tl(t_l:useOnlyExternalDBs,
+hide_empty_strings :- locally(t_l:useOnlyExternalDBs,
  % remove more badjuju from the KB (that is unbould slots in the middle of GAFs)
  % the next few lines will cover the top
  doall((between(2,6,Len),length(PLIST,Len),

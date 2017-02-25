@@ -94,7 +94,7 @@ start_agent_action_thread:-
 % restarts if it it died
 one_minute_timer_tick:- start_agent_action_thread.
 
-with_session(ID,CALL):-w_tl(t_l:session_id(ID),CALL).
+with_session(ID,CALL):-locally(t_l:session_id(ID),CALL).
 
 
 % =====================================================================================================================
@@ -103,7 +103,7 @@ with_session(ID,CALL):-w_tl(t_l:session_id(ID),CALL).
 
 agent_call_unparsed(C):-foc_current_agent(A),!,agent_call_unparsed(A,C).
 
-agent_call_unparsed(A,C):-  w_tl(tlbugger:old_no_repeats, must(agent_call_unparsed_0(A,C))).
+agent_call_unparsed(A,C):-  locally(tlbugger:old_no_repeats, must(agent_call_unparsed_0(A,C))).
 
 agent_call_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_unparsed(Agent,Var)).
 
@@ -167,8 +167,8 @@ agent_call_command_now(Agent,CMD  ):- where_atloc(Agent,Where),
 agent_call_command_now_2(Agent,CMD):- loop_check((agent_call_command_now_3(Agent,CMD)),dmsg(looped(agent_call_command_now_2(Agent,CMD)))).
 agent_call_command_now_3(Agent,CMD):-
    with_agent(Agent,
-     w_tl(t_l:side_effect_ok,
-     w_tl(t_l:agent_current_action(Agent,CMD),
+     locally(t_l:side_effect_ok,
+     locally(t_l:agent_current_action(Agent,CMD),
   ((
   % call_no_cuts(agent_call_command(Agent,CMD))
     find_and_call(agent_call_command(Agent,CMD))
@@ -233,7 +233,7 @@ with_agent0(P,CALL):-
  thread_self(Self),
  ((get_agent_session(P,O),lmcache:session_io(O,_In,_Out,Id),Id\=Self)->Wrap=thread_signal_blocked(Id);Wrap=call),!,
   call(Wrap, 
-    w_tl([t_l:put_server_no_max,lmcache:session_agent(TS,P),lmcache:agent_session(P,TS)],
+    locally([t_l:put_server_no_max,lmcache:session_agent(TS,P),lmcache:agent_session(P,TS)],
       with_output_to_pred(deliver_event(P),CALL))).
 
 has_tty(O):-no_repeats(O,lmcache:session_io(O,_,_,_)).

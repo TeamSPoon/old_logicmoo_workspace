@@ -51,7 +51,7 @@ typeGenls(ttValueType,vtValue).
 
 :- set_prolog_flag(lm_expanders,false).
 
-:- baseKB:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
+:- baseKB:ensure_loaded(library(multimodal_dcg)).
 
 
 asserta_parserVars(N,V,Type):- show_failure(current_agent(A)),asserta(parserVars(A,N,V,Type)).
@@ -221,7 +221,7 @@ assert_text(CtxIn,String):- get_ctx_isa(CtxIn,Ctx,CtxISA),!,assert_text(Ctx,CtxI
 assert_text(Ctx,CtxISA,String):-  
                             % context changed   and not the tWorld?                                                  % v this is for when there was no prior context
   (parserVars(context,Ctx0,_) -> (((Ctx0 \==Ctx),CtxISA\==tWorld) -> (asserta_parserVars(isThis,Ctx,CtxISA)); true) ; (asserta_parserVars(isThis,Ctx,CtxISA))), 
-    w_tl(parserVars(context,Ctx,CtxISA),assert_text_now(Ctx,CtxISA,String)).
+    locally(parserVars(context,Ctx,CtxISA),assert_text_now(Ctx,CtxISA,String)).
 
 assert_text_now(Ctx,CtxISA,String):-   
  on_f_log_ignore(( 
@@ -260,11 +260,11 @@ translation_for(_Ctx,_CtxISA,t(M,Prolog),WS,WE):- once((append(LeftSide,RightSid
    append(Left,RightSide,NewWS))),
    translation_w(Prolog,NewWS,WE),!.
 translation_for(_Ctx,_CtxISA,Prolog) --> translation_w(Prolog).
-translation_for(_Ctx,_CtxISA,Prolog,WS,WE):-w_tl(loosePass,translation_w(Prolog,WS,WE)).
+translation_for(_Ctx,_CtxISA,Prolog,WS,WE):-locally(loosePass,translation_w(Prolog,WS,WE)).
 
 
 translation_dbg_on_fail(Ctx,CtxISA,Prolog)-->translation_for(Ctx,CtxISA,Prolog),!.
-translation_dbg_on_fail(Ctx,CtxISA,Prolog,WS,WE):-w_tl(debugPass,translation_for(Ctx,CtxISA,Prolog,WS,WE)).
+translation_dbg_on_fail(Ctx,CtxISA,Prolog,WS,WE):-locally(debugPass,translation_for(Ctx,CtxISA,Prolog,WS,WE)).
 
 %:-assertz_if_new(parserTest(iWorld7,"Buffy the Labrador retriever is lounging here, shedding hair all over the place.")).
 %:-assertz_if_new(parserTest(iWorld7,"You can also see a sugar candy doll house here.")).
@@ -277,8 +277,8 @@ type_action_info(tHumanControlled,actAddText(isOptional(tTemporalThing,isThis),f
 
 
 a_command(Agent,actAddText(What,StringM)):- ground(What:StringM),
- w_tl(parserVars(isThis,What,ftTerm),
-   w_tl(parserVars(isSelfAgent,Agent,tAgent),   
+ locally(parserVars(isThis,What,ftTerm),
+   locally(parserVars(isSelfAgent,Agent,tAgent),   
        must(assert_text(What,StringM)))).
 
 

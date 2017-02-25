@@ -99,7 +99,7 @@ pack/logicmoo_base/prolog/logicmoo/mpred/examples.pl
 pack/logicmoo_base/prolog/logicmoo/mpred/mpred.pl
 pack/logicmoo_base/prolog/logicmoo/mpred/mpred_expansion.pl.txt
 pack/logicmoo_base/prolog/logicmoo/mpred/testMotel.pl
-pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_shared_dynamic.txt
+pack/logicmoo_base/prolog/logicmoo/util/hook_database.txt
 pack/logicmoo_nlu/prolog/Parser_SUPPLE/prolog-impls/sicstus/classes/shef/nlp/supple/prolog/AbstractSICStusProlog.class
 pack/logicmoo_nlu/prolog/Parser_SUPPLE/prolog-impls/sicstus/classes/shef/nlp/supple/prolog/SICStusProlog.class
 pack/logicmoo_nlu/prolog/Parser_SUPPLE/prolog-impls/sicstus/classes/shef/nlp/supple/prolog/SICStusProlog3.class

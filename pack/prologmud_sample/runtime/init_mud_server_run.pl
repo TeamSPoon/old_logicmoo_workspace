@@ -8,11 +8,11 @@
 % INIT LOGICMOO (AUTOEXEC)  Load the infernce engine
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- if(\+ current_module(baseKB)).
+:- [init_mud_server].
 :- threads.
 :- set_prolog_flag(logicmoo_qsave,true).
-:- unload_file(init_mud_server_run).
-:- [init_mud_server].
 :- else.
+:- set_prolog_flag(logicmoo_qsave,true).
 :- statistics.
 :- endif.
 
@@ -28,7 +28,7 @@
 
 :-  baseKB:load_library_system(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
-:- after_boot((set_prolog_flag(pfc_booted,true),flag_call(logicmoo_debug=true),set_prolog_flag(read_attvars,false))).
+:- after_boot((set_prolog_flag(pfc_booted,true),flag_call(runtime_debug=true),set_prolog_flag(read_attvars,false))).
 
 
 % :- baseKB:load_library_system(logicmoo(logicmoo_engine)).
@@ -106,7 +106,7 @@
 
 :- with_mpred_trace_exec(ain(isLoaded(iSourceCode7))).
 
-:- flag_call(logicmoo_debug=true).
+:- flag_call(runtime_debug=true).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -248,7 +248,7 @@ lst :- ensure_loaded('../prologmud_sample/runtime/games/src_game_startrek/?*.pfc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 sanity_test_ifood_rez:- ignore((
      % mpred_notrace_exec,
-     % flag_call(logicmoo_debug>true),
+     % flag_call(runtime_debug>true),
      ain(isa(iFoodRez2,tFood)),must(isa(iFoodRez2,tEatAble)))),
     must((parseIsa_Call(tEatAble,O,["food"],Rest),O=iFoodRez2,Rest=[])).
 
@@ -265,7 +265,7 @@ sanity_test_ifood_rez:- ignore((
 % [Required/Optional]  Ensures...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- after_boot(flag_call(logicmoo_debug=false)).
+:- after_boot(flag_call(runtime_debug=false)).
 :- during_boot(set_prolog_flag(unsafe_speedups,false)).
 
 :- lst,statistics,ain(tSourceData(iWorldData8)),ain(isLoaded(iWorldData8)),ain(isRuntime).

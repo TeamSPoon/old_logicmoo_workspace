@@ -126,7 +126,7 @@ prolog_op(is_asserted,(G)):-!,clause_asserted(G,true).
 
 prolog_op(conjecture,G):-!, mpred_call(G).
 prolog_op(call,G):-!, mpred_call(G).
-prolog_op(Op,G):- reduce_mpred_op(Op,Op2), on_x_rtrace(call(Op2,G)).
+prolog_op(Op,G):- reduce_mpred_op(Op,Op2), on_x_debug(call(Op2,G)).
 
 
 

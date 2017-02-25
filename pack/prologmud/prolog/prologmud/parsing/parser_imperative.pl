@@ -15,26 +15,33 @@
 :- include(prologmud(mud_header)).
 
 
-:- set_prolog_flag(logicmoo_virtualize,true).
+:- set_prolog_flag(virtual_stubs,true).
 
 :-export((
-                   parse_agent_text_command/5,            
-                   parse_agent_text_command_0/5,            
-                   objects_match/3,
-                   match_object/2,
-                   object_string/2,
-                   save_fmt_a_0/2,
-                   save_fmt_a/2,
-                   % coerce/3,
-                   parseIsa//2,
-                   get_agent_text_command_0/4,
-                   phrase_parseForTypes_9//2,
-                   guess_nameStrings/2,
-                   parseForTypes//2)).
+    parse_agent_text_command/5,            
+    parse_agent_text_command_0/5,            
+    objects_match/3,
+    match_object/2,
+    object_string/2,
+    save_fmt_a_0/2,
+    save_fmt_a/2,
+    % coerce/3,
+    parseIsa//2,
+    get_agent_text_command_0/4,
+    phrase_parseForTypes_9//2,
+    guess_nameStrings/2,
+    parseForTypes//2)).
 
 % :- register_module_type (utility).
-some_term_to_atom(Term,Atom):- must(\+ is_list(Term)), term_to_atom(Term,Atom).
 
+:- statistics.
+:- trim_stacks.
+:- garbage_collect_atoms.
+:- garbage_collect.
+:- statistics.
+some_term_to_atom(Term,Atom):- must(\+ is_list(Term)), term_to_atom(Term,Atom).
+:- srtrace.
+:- break.
 % =====================================================================================================================
 % get_agent_text_command/4
 % =====================================================================================================================
@@ -247,7 +254,7 @@ must_make_object_string_list(P,Obj,WList):- call_tabled(must_make_object_string_
 must_make_object_string_list_cached(P,Obj,WList):-
   must((object_string(P,Obj,0-5,String),nonvar(String),non_empty(String),string_ci(String,LString),convert_to_string_list(LString,WList))).
 */
-same_ci(A,B):-no_trace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
+same_ci(A,B):-quietly((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
 
 match_object(S,Obj):-var(S),!,fail,freeze(S,match_object(S,Obj)).
 match_object(S,Obj):-var(Obj),!,fail,freeze(Obj,match_object(S,Obj)).
@@ -267,8 +274,8 @@ match_object_exp(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\
 
 match_object_0([S],Obj):-nonvar(S),match_object_1(S,Obj),!.
 match_object_0(Atoms,Obj):-
-   current_agent_or_var(P),no_trace(must_make_object_string_list(P,Obj,WList)),!,
-   forall(member(A,Atoms),(member(W,WList),no_trace(string_equal_ci(A,W)))).
+   current_agent_or_var(P),quietly(must_make_object_string_list(P,Obj,WList)),!,
+   forall(member(A,Atoms),(member(W,WList),quietly(string_equal_ci(A,W)))).
 
 match_object_1(A,Obj):-same_ci(A,Obj),!.
 match_object_1(A,Obj):-isa(Obj,Type),same_ci(A,Type),!.
@@ -408,7 +415,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    predsort(mostIdiomatic,TEMPLATES_FA,TEMPLATES).
    
 % parses a verb phrase and retuns multiple interps
-parse_vp_real(Agent,SVERB,ARGS,Sorted):- w_tl(t_l:infSkipFullExpand,parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted)).
+parse_vp_real(Agent,SVERB,ARGS,Sorted):- locally(t_l:infSkipFullExpand,parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted)).
 parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted):-
    get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),   
    dmsg_parserm(("TEMPLATES"= (orig([SVERB|ARGS]) = TEMPLATES))),
@@ -683,7 +690,7 @@ parseIsa(Str,A,B,C) :-string(Str),!, parseIsa(exactStr(Str),A,B,C).
 
 parseIsa(ftAction,Goal,Left,Right):-!,one_must(parseFmt_vp1(isSelfAgent,Goal,Left,Right),parseFmt_vp2(isSelfAgent,Goal,Left,Right)).
 
-:- baseKB:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
+:- baseKB:ensure_loaded(library(multimodal_dcg)).
 
 parseIsa(t(P,S,O),TermV) -->{!},parseIsa(call(t(P,S,O)),TermV).
 parseIsa(call(Call),TermV) --> {!,subst(Call,isThis,TermV,NewCall)},theText(TermT), {req1(NewCall),match_object(TermT,TermV)}.
@@ -787,7 +794,7 @@ instances_of_type(Inst,Type):- no_repeats_old(instances_of_type_0(Inst,Type)).
 available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), isa(Obj,Type), mudDistance(Agent,Obj,D),D<6.
 
 % test_with ?- coerce(s,vtDirection,O).
-%TODO add back if usefull instances_of_type_0(Inst,Type):- \+ flag_call(unsafe_speedups == true) , instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
+%TODO add back if usefull instances_of_type_0(Inst,Type):- \+ current_prolog_flag(unsafe_speedups , true) , instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
 % should never need this but .. instances_of_type_0(Inst,Type):- genls(SubType,Type),isa(Inst,SubType).
 instances_of_type_0(Inst,Type):- isa(Inst,Type).
 

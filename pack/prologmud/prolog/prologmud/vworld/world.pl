@@ -80,7 +80,7 @@ mtProlog(world).
           create_agent/2)).
 
 :- dynamic  agent_list/1.
-% :- kb_dynamic(mudDescription/2).
+% :- kb_shared(mudDescription/2).
 
 :- include(prologmud(mud_header)).
 % :- register_module_type (utility).
@@ -177,13 +177,13 @@ create_instance(What,Type,Props):-
 
 create_instance_now(What,Type,Props):-
   must((var(Type);atom_concat('t',_,Type ))),!,
- w_tl(t_l:agenda_suspend_scans,
-  w_tl(t_l:deduceArgTypes(_),
-  wno_tl(t_l:useOnlyExternalDBs,
-   wno_tl(t_l:noRandomValues(_),
-     wno_tl(t_l:infInstanceOnly(_),   
-      wno_tl(t_l:infAssertedOnly(_),
-        wno_tl(baseKB:use_cyc_database, 
+ locally(t_l:agenda_suspend_scans,
+  locally(t_l:deduceArgTypes(_),
+  locally_hide(t_l:useOnlyExternalDBs,
+   locally_hide(t_l:noRandomValues(_),
+     locally_hide(t_l:infInstanceOnly(_),   
+      locally_hide(t_l:infAssertedOnly(_),
+        locally_hide(baseKB:use_cyc_database, 
      ((split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), (create_instance_0(What,Type,Props)->true)))))))))),!.
 
 :-discontiguous create_instance_0/3.

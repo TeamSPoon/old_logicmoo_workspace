@@ -11,7 +11,7 @@
 
 :- file_begin(pfc).
 
-:- flag_call(logicmoo_debug=true).
+:- flag_call(runtime_debug=true).
 :- flag_call(unsafe_speedups=false).
 
 :- abolish(a,1).

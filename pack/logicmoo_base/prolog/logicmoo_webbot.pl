@@ -7,8 +7,6 @@
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 :- endif.
 :- module(logicmoo_webbot_file,[]).
-% restore entry state
-:- lmce:reset_modules.
 
 %:- prolog_ide(thread_monitor).
 %:- prolog_ide(debug_monitor).
@@ -20,7 +18,7 @@
 :- set_prolog_flag(lm_expanders,true).
 :- set_prolog_flag(mpred_te,true).
 
-:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(system:library(logicmoo_utils)).
 :- ensure_loaded(library(logicmoo_base)).
 %:- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 %:- ensure_loaded(library(logicmoo/mpred_online/mpred_pldoc_util)).
@@ -53,7 +51,7 @@ wbg:- eggdrop:egg_go.
 size666_stacks:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 
 :- abolish(system:nondet/1).
-:- at_start(size666_stacks).
+:- after_boot(size666_stacks).
 
 
 :- baseKB:ensure_loaded(library(logicmoo_user),except([op(_,_,_)])).

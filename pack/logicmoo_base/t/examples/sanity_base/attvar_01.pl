@@ -2,7 +2,7 @@
 
 :- module(attvar_01,[]).
 
-:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(system:library(logicmoo_utils)).
 :- ensure_loaded(library(logicmoo_base)).
 :- set_prolog_flag(assert_attvars,true).
 

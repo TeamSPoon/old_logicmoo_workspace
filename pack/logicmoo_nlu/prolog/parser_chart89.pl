@@ -15,7 +15,7 @@
 :-module(parser_chart89, [chart89/0,test_chart89_regressions/0]).
 
 % :- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
-% :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)).
+% :- user:ensure_loaded(library(bugger)).
 % :- register_module_type(utility).
 
 

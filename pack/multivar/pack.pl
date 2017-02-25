@@ -1,7 +1,7 @@
 name(multivar).
 title('User defined datatypes').
 
-version('0.0.1').
+version('0.0.8').
 download('https://github.com/logicmoo/multivar/archive/v0.0.1.zip').
 
 author( 'Douglas R. Miles', 'logicmoo@gmail.com' ).

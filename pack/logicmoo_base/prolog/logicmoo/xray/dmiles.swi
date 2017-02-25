@@ -1590,7 +1590,7 @@ xray(Name) :-
 	
 
 dpttp(Name,X) :-
- w_tl(set_prolog_flag(occurs_check,true),
+ locally(set_prolog_flag(occurs_check,true),
      must_det_l((time(dpttp1(X,Y:Z),'Compilation Phase I'),
 	         time(dpttp2(Name,Y:Z),'Compilation Phase II'),
 	         time(dpttp3(Name),'Compilation Phase III')))).

@@ -7,9 +7,9 @@
 */
 :- module(sanity_neg,[]).
 
-:- ensure_loaded(library(logicmoo_utils)).
+:- ensure_loaded(system:library(logicmoo_utils)).
 
-icatch(G):-catch(G,_,true).
+on_xf_cont(G):-catch(G,_,true).
 
 :- dynamic(isRegisterCycPredFA/3).
 
@@ -23,7 +23,7 @@ icatch(G):-catch(G,_,true).
  forall((current_module(M),module_property(M,class(library)),
    predicate_property(M:P,defined), 
  \+ predicate_property(M:P,imported_from(_)),
- functor(P,F,A),icatch(baseKB:import(M:F/A))),
+ functor(P,F,A),on_xf_cont(baseKB:import(M:F/A))),
      assert(isRegisterCycPredFA(M,F,A))).
 
 
@@ -48,7 +48,7 @@ icatch(G):-catch(G,_,true).
 ({current_module(M),module_property(M,class(library)),
    predicate_property(M:P,defined), 
  \+ predicate_property(M:P,imported_from(_)),
- functor(P,F,A),icatch(baseKB:import(M:F/A))}
+ functor(P,F,A),on_xf_cont(baseKB:import(M:F/A))}
     ==>isRegisterCycPredFW(M,F,A)))).
 
 :- printAll(isRegisterCycPredFW(_,_,_)).

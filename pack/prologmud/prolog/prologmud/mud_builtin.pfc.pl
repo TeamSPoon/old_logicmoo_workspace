@@ -23,19 +23,27 @@
 :- multifile baseKB:agent_action_queue/3.
 :- dynamic baseKB:agent_action_queue/3.
 
+:- must(\+ t_l:disable_px).
+:- multifile(t_l:disable_px/0).
+:- thread_local(t_l:disable_px/0).
+:- retractall(t_l:disable_px).
+
 /*
 :- dynamic   lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 :- dynamic lmcache:session_io/4, lmcache:session_agent/2, lmcache:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 
 */
 :- '$set_source_module'(baseKB).
+:- set_prolog_flag(runtime_speed, 0).
+:- set_prolog_flag(runtime_safety, 2).
+:- set_prolog_flag(runtime_debug, 2).
+:- set_prolog_flag(unsafe_speedups, false).
+
+listing_break(G):-listing(G),break.
+
 :- dynamic(agent_call_command/2).
 :- import(agent_call_command/2).
 
-:- set_prolog_flag(logicmoo_speed, 0).
-:- set_prolog_flag(logicmoo_safety, 2).
-:- set_prolog_flag(logicmoo_debug, 2).
-:- set_prolog_flag(unsafe_speedups, false).
 :- mpred_pfc:import(baseKB:ttExpressionType/1).
 
 
@@ -52,62 +60,60 @@
 
 :- install_constant_renamer_until_eof.
 
-:- retractall(t_l:disable_px).
-
 :- file_begin(code).
-:- op(1150,fx,kb_dynamic).
 
-:- kb_dynamic(  irc_event_hooks/3).
-:- kb_dynamic(  deliver_event_hooks/2).
-:- kb_dynamic   irc_user_plays/3.
+:- kb_shared(  irc_event_hooks/3).
+:- kb_shared(  deliver_event_hooks/2).
+:- kb_shared   irc_user_plays/3.
 
-:- kb_dynamic   mudDescription/2.
-:- kb_dynamic   term_specifier_text/2.
-:- kb_dynamic   type_action_info/3.
-:- kb_dynamic   update_charge/2.
-:- kb_dynamic   update_stats/2.
-:- kb_dynamic   use_usable/4.
-:- kb_dynamic   verb_alias/2.
-:- kb_dynamic   vtActionTemplate/1.
-% :- kb_dynamic   mud_test/0.
-:- kb_dynamic  mud_test/1.
-:- kb_dynamic  mud_test/2.
-:- kb_dynamic  mud_test_local/0.
-:- kb_dynamic  mud_test_local/1.
-:- kb_dynamic  mud_test_local/2.
-:- kb_dynamic   world_agent_plan/3.
-:- kb_dynamic   action_info/2.
-:- kb_dynamic   action_rules/4.
-:- kb_dynamic   action_verb_useable/5.
-:- kb_dynamic   agent_command/2.
-:- kb_dynamic   agent_command_fallback/2.
-:- kb_dynamic   agent_text_command/4.
-:- kb_dynamic   check_permanence/4.
+:- kb_shared   mudDescription/2.
+:- kb_shared   term_specifier_text/2.
+:- kb_shared   type_action_info/3.
+:- kb_shared   update_charge/2.
+:- kb_shared   update_stats/2.
+:- kb_shared   use_usable/4.
+:- kb_shared   verb_alias/2.
+:- kb_shared   vtActionTemplate/1.
+% :- kb_shared   mud_test/0.
+:- kb_shared  mud_test/1.
+:- kb_shared  mud_test/2.
+:- kb_shared  mud_test_local/0.
+:- kb_shared  mud_test_local/1.
+:- kb_shared  mud_test_local/2.
+:- kb_shared   world_agent_plan/3.
+:- kb_shared   action_info/2.
+:- kb_shared   action_rules/4.
+:- kb_shared   action_verb_useable/5.
+:- kb_shared   agent_command/2.
+:- kb_shared   agent_command_fallback/2.
+:- kb_shared   agent_text_command/4.
+:- kb_shared   check_permanence/4.
 
+:- file_begin(pfc).
 
 
 :-op(0,fx,  ('disabled')).
 :-op(0,fx,  ('enabled')).
 :-op(0,fy,  ('disabled')).
 :-op(0,fy,  ('enabled')).
-% :- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
+% :- '@'(ensure_loaded(library(bugger)),user).
 
 :- multifile(user_db:grant_openid_server/2).
 :- dynamic(user_db:grant_openid_server/2).
 
-:- kb_dynamic '$was_imported_kb_content$'/2.
+:- kb_shared '$was_imported_kb_content$'/2.
 :- discontiguous('$was_imported_kb_content$'/2).
-:- kb_dynamic(  disabled/1).
+:- kb_shared(  disabled/1).
 :- discontiguous(  disabled/1).
-:- kb_dynamic(  enabled/1).
+:- kb_shared(  enabled/1).
 :- discontiguous(  enabled/1).
-:- kb_dynamic   was_enabled/1.
+:- kb_shared   was_enabled/1.
 :- discontiguous(  was_enabled/1).
-:- kb_dynamic   listing_mpred_hook/1.
+:- kb_shared   listing_mpred_hook/1.
 
 
-:- kb_dynamic   genls/2.
-:- kb_dynamic(  isa/2).
+:- kb_shared   genls/2.
+:- kb_shared(  isa/2).
 
 :- style_check((-(singleton))).
 
@@ -117,7 +123,6 @@
 :-op(1190,fy,  (disabled)).
 :-op(1190,fy,  (enabled)).
 :-op(1120,fx,  (export)).
-:-op(1120,fx,  (kb_dynamic)).
 */
 
 :- set_prolog_flag(double_quotes, atom).
@@ -125,98 +130,98 @@
 :- set_prolog_flag(generate_debug_info, true).
 
 % these do not get defined!?
-% :- kb_dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
+% :- kb_shared user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
-% :- kb_dynamic(mpred_online:semweb_startup/0).
+% :- kb_shared(mpred_online:semweb_startup/0).
 % :- break.
-:- kb_dynamic(  tChannel/1).
+:- kb_shared(  tChannel/1).
 
 
-:- kb_dynamic pfcManageHybrids/0.
-:- kb_dynamic   defnSufficient/2.
-% :- kb_dynamic   lmcache:loaded_external_kbs/1.
-%:- kb_dynamic t_l:infMustArgIsa/0.
+:- kb_shared pfcManageHybrids/0.
+:- kb_shared   defnSufficient/2.
+% :- kb_shared   lmcache:loaded_external_kbs/1.
+%:- kb_shared t_l:infMustArgIsa/0.
 :- thread_local   t_l:repl_to_string/2.
 :- thread_local   t_l:repl_writer/2.
 :- thread_local t_l:into_form_code/0.
 :- thread_local t_l:current_local_why/2.
 % :- break.
-:- kb_dynamic   loading_module_h/1.
-:- kb_dynamic   registered_module_type/2.
-:- kb_dynamic   must_compile_special_clause_file/1.
+:- kb_shared   loading_module_h/1.
+:- kb_shared   registered_module_type/2.
+:- kb_shared   must_compile_special_clause_file/1.
 
 % HOOKS
-:- kb_dynamic   decl_coerce/3.
-:- kb_dynamic   listen_to_ops/2.
-:- kb_dynamic   deduce_facts/2.
-:- kb_dynamic   default_type_props/3.
-:- kb_dynamic   fact_always_true/1.
-:- kb_dynamic   fact_is_false/2.
-:- kb_dynamic   fact_maybe_deduced/1.
-:- kb_dynamic   never_assert_u/2.
-:- kb_dynamic   impl_coerce_hook/3.
+:- kb_shared   decl_coerce/3.
+:- kb_shared   listen_to_ops/2.
+:- kb_shared   deduce_facts/2.
+:- kb_shared   default_type_props/3.
+:- kb_shared   fact_always_true/1.
+:- kb_shared   fact_is_false/2.
+:- kb_shared   fact_maybe_deduced/1.
+:- kb_shared   never_assert_u/2.
+:- kb_shared   impl_coerce_hook/3.
 
-:- kb_dynamic   create_random_fact/1.
-% :- kb_dynamic   local_term_anglify/2.
-% :- kb_dynamic   term_anglify_last/2.
-% :- kb_dynamic   term_anglify_np/3.
-% :- kb_dynamic   term_anglify_np_last/3.
+:- kb_shared   create_random_fact/1.
+% :- kb_shared   local_term_anglify/2.
+% :- kb_shared   term_anglify_last/2.
+% :- kb_shared   term_anglify_np/3.
+% :- kb_shared   term_anglify_np_last/3.
 
-% :- kb_dynamic   hooked_random_instance/3.
+% :- kb_shared   hooked_random_instance/3.
 
-:- kb_dynamic   now_unused/1.
-:- kb_dynamic   provide_mpred_read_attributes/3.
-:- kb_dynamic   provide_mpred_setup/4.
-:- kb_dynamic   provide_mpred_clauses/3.
-:- kb_dynamic   provide_mpred_op/2.
-:- kb_dynamic   provide_mpred_write_attributes/2.
+:- kb_shared   now_unused/1.
+:- kb_shared   provide_mpred_read_attributes/3.
+:- kb_shared   provide_mpred_setup/4.
+:- kb_shared   provide_mpred_clauses/3.
+:- kb_shared   provide_mpred_op/2.
+:- kb_shared   provide_mpred_write_attributes/2.
 
 % DYN HOOKS
-% :- kb_dynamic   is_never_type/1.
+% :- kb_shared   is_never_type/1.
 
 % DYN FOR CODE
 :- dynamic lmcache:after_mpred_load/0.
 :- thread_local use_cyc_database/0.
-:- kb_dynamic use_cyc_database/0.
+:- kb_shared use_cyc_database/0.
 
-:- kb_dynamic   fact_is_false/2.
-% :- kb_dynamic(kbp_t_list_prehook/2).
+:- kb_shared   fact_is_false/2.
+% :- kb_shared(kbp_t_list_prehook/2).
 
 
 % DYN KB
-:- kb_dynamic   only_if_pttp/0.
-:- kb_dynamic   use_kif/2.
-:- kb_dynamic   is_mpred_prop/2.
-%:- kb_dynamic   hasInstance_dyn/2.
-:- kb_dynamic   arity/2.
-:- kb_dynamic   mpred_prop/2.
-:- kb_dynamic   '<=>'/2.
-% :- kb_dynamic   ruleForward/2.
-:- kb_dynamic   ruleRewrite/2.
-% :- kb_dynamic   ruleBackward/2.
+:- kb_shared   only_if_pttp/0.
+:- kb_shared   use_kif/2.
+:- kb_shared   is_mpred_prop/2.
+%:- kb_shared   hasInstance_dyn/2.
+:- kb_shared   arity/2.
+:- kb_shared   mpred_prop/2.
+:- kb_shared   '<=>'/2.
+% :- kb_shared   ruleForward/2.
+:- kb_shared   ruleRewrite/2.
+% :- kb_shared   ruleBackward/2.
 
 % :-must(not(  mpred_prop(t,prologHybrid))).
 
 
-:- kb_dynamic   term_specifier_text/2.
-:- kb_dynamic   update_charge/2.
-:- kb_dynamic   update_stats/2.
-:- kb_dynamic   use_usable/4.
-:- kb_dynamic   verb_alias/2.
-:- kb_dynamic   vtActionTemplate/1.
-:- kb_dynamic  mud_test/0.
-:- kb_dynamic  mud_test/1.
-:- kb_dynamic  mud_test/2.
-:- kb_dynamic  mud_test_local/0.
-:- kb_dynamic  mud_test_local/1.
-:- kb_dynamic  mud_test_local/2.
-:- kb_dynamic   world_agent_plan/3.
-:- kb_dynamic   action_info/2.
-:- kb_dynamic   action_rules/4.
-:- kb_dynamic   action_verb_useable/5.
-:- kb_dynamic   agent_command/2.
-:- kb_dynamic   agent_text_command/4.
-:- kb_dynamic   check_permanence/4.
+:- kb_shared   term_specifier_text/2.
+:- kb_shared   update_charge/2.
+:- kb_shared   update_stats/2.
+:- kb_shared   use_usable/4.
+:- kb_shared   verb_alias/2.
+:- kb_shared   vtActionTemplate/1.
+:- kb_shared  mud_test/0.
+:- kb_shared  mud_test/1.
+:- kb_shared  mud_test/2.
+:- kb_shared  mud_test_local/0.
+:- kb_shared  mud_test_local/1.
+:- kb_shared  mud_test_local/2.
+:- kb_shared   world_agent_plan/3.
+:- kb_shared   action_info/2.
+:- kb_shared   action_rules/4.
+:- kb_shared   action_verb_useable/5.
+:- kb_shared   agent_command/2.
+:- kb_shared   agent_text_command/4.
+:- kb_shared   check_permanence/4.
 
 predicateConventionMt(agent_call_command,baseKB).
 
@@ -381,7 +386,7 @@ isa(tRelation,ttAbstractType).
 % genlPreds(genls,equals).
 % genls(A, B):- tCol(A),{A=B}.
 
-% must(Goal):- Goal. % (no_trace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
+% must(Goal):- Goal. % (quietly((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 
@@ -501,7 +506,7 @@ prologHybrid(istAsserted(vtAssertion)).
 
 resultIsa(aAssertionFn(tMicrotheory,ftAssertable),vtAssertion).
 
-mudEquals(aAssertionFn(MT,Sent),ist(MT,Sent)):-must(assert_if_new(MT:Sent)).
+:-asserta((mudEquals(aAssertionFn(MT,Sent),ist(MT,Sent)):-must(assert_if_new(MT:Sent)))).
 
 
 
@@ -524,7 +529,7 @@ tCol(tChannel).
 tCol(tItem).
 tCol(vtVerb).
 
-% prologIsFlag(tAgent(ftID),[prologIsFlag]).
+% prologIsFlag(tAgent(ftID),[tSet]).
 % prologDynamic(createableSubclassType/2).
 % alt_forms1(none_AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),call_u(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
 % alt_forms1(none_AR,mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
@@ -539,10 +544,10 @@ tCol(vtVerb).
 %isa(AT,ttAgentType):- genls(AT,ttAgentGeneric).
 %genls(AT,ttAgentGeneric):- isa(AT,ttAgentType).
 %subFormat(ftTextType,ftText).
-%prologIsFlag(tItem(ftID),[prologIsFlag]).
-%prologIsFlag(tRegion(ftID),[prologIsFlag]).
+%prologIsFlag(tItem(ftID)).
+%prologIsFlag(tRegion(ftID),[tSet]).
 %prologIsFlag(tRegion(ftID),tCol).
-prologIsFlag(tThinking(tAgent),[prologIsFlag]).
+prologIsFlag(tThinking(tAgent)).
 
 ==> prologHybrid(isEach(mudLastCmdSuccess/3,mudLastCommand/2,mudNamed/2, mudSpd/2,mudStr/2,typeGrid/3)).
 
@@ -557,10 +562,10 @@ prologIsFlag(tThinking(tAgent),[prologIsFlag]).
 
 
 
-prologMultiValued(mudDescription(ftTerm,ftString),[prologOrdered,prologHybrid]).
+==> prologMultiValued(mudDescription(ftTerm,ftString),[prologOrdered,prologHybrid]).
 prologMultiValued(mudDescription(ftTerm,ftText), [predProxyAssert(add_description),predProxyRetract(remove_description),predProxyQuery(query_description)],prologHybrid).
-prologMultiValued(mudDescription(ftTerm,ftText),[predProxyAssert(add_description),prologHybrid]).
-prologMultiValued(mudKeyword(ftTerm,ftString),prologHybrid).
+==> prologMultiValued(mudDescription(ftTerm,ftText),[predProxyAssert(add_description),prologHybrid]).
+==> prologMultiValued(mudKeyword(ftTerm,ftString),prologHybrid).
 prologMultiValued(mudMemory(tAgent,ftTerm),prologHybrid).
 prologMultiValued(mudNamed(ftTerm,ftTerm),prologHybrid).
 prologMultiValued(mudPossess(tObj,tObj),prologHybrid).
@@ -580,10 +585,13 @@ prologNegByFailure(tRegion(ftID),prologHybrid).
 prologNegByFailure(tThinking(tAgent),prologHybrid).
 pathName(Region,Dir,Text)==>mudDescription(apathFn(Region,Dir),Text).
 
-prologSingleValued(chargeCapacity(tChargeAble,ftInt),prologHybrid).
 
+==> prologSingleValued(chargeCapacity(tChargeAble,ftInt),prologHybrid).
 prologSingleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt)),prologHybrid).
 ==> prologSingleValued(mudAgentTurnnum(tAgent,ftInt),[argSingleValueDefault(2,0)],prologHybrid).
+:- listing( prologSingleValued ).
+
+
 prologSingleValued(mudArmor(tObj,ftInt),prologHybrid).
 prologSingleValued(mudArmorLevel(tWearAble,ftInt),prologHybrid).
 
@@ -682,7 +690,7 @@ prologHybrid(pathDirLeadsTo/3).
 prologDynamic(mudMoveDist/2).
 :- dynamic(mudMoveDist/2).
 meta_argtypes(mudMoveDist(tAgent,ftInt)).
-prologSingleValued(mudMoveDist,[predicateConventionMt(abox),query(call),argSingleValueDefault(2,1)]).
+==>prologSingleValued(mudMoveDist,[predicateConventionMt(abox),query(call),argSingleValueDefault(2,1)]).
 prologDynamic(stat_total/2).
 
 :- dynamic(vtBasicDir/1).
@@ -717,7 +725,9 @@ prologHybrid(mudTextSame(ftText,ftText)).
 prologHybrid(mudTexture(tSpatialThing,vtTexture)).
 prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
 meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
-prologListValued(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[predicateConventionMt(abox)]).
+:- mpred_trace_exec.
+==>prologListValued(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[predicateConventionMt(abox)]).
+:- mpred_notrace_exec.
 prologListValued(mudNearFeet(tAgent,ftListFn(tSpatialThing)),[]).
 prologListValued(mudNearReach(tAgent,ftListFn(tSpatialThing)),[predicateConventionMt(abox)]).
 prologMultiValued(action_rules(tAgent,vtVerb,ftListFn(ftVar),ftVoprop)).
@@ -797,7 +807,7 @@ meta_argtypes(xyzFn(tRegion,ftInt,ftInt,ftInt)).
 
 genls(ttTypeByAction,tCol).
 
-:-w_tl(set_prolog_flag(assert_attvars,true),ain(((ttTypeByAction(X) ==> tCol(X))))).
+:-locally(set_prolog_flag(assert_attvars,true),ain(((ttTypeByAction(X) ==> tCol(X))))).
 
 % (isa(Inst,Type),isa(Type,ttTypeByAction)) ==> isa(Inst,tHasAction).
 
@@ -854,7 +864,7 @@ genls(vtBasicDir,vtBasicDirPlusUpDown).
 genls(vtBasicDirPlusUpDown,vtDirection).
 genls(vtDirection,vtValue).
 
-:- kb_dynamic(vtPosture/1).
+:- kb_shared(vtPosture/1).
 
 tCol(vtPosture).
 genls(vtPosture,vtVerb).
@@ -1312,12 +1322,12 @@ prologHybrid(normalAgentGoal(rtStatPred,ftTerm)).
 (rtStatPred(Pred)==>(rtRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
 
 :- ain(((normalAgentGoal(Pred,N)/atom(Pred) ==>
- ({AT=..[Pred,tAgent,ftPercent]},{kb_dynamic(Pred,2)},
+ ({AT=..[Pred,tAgent,ftPercent]},{kb_shared(Pred,2)},
      meta_argtypes(AT),argSingleValueDefault(Pred,2,N),prologHybrid(Pred),rtStatPred(Pred))))).
 
 
 :- ain(((normalAgentGoal(Pred,N)/atom(Pred) ==>
- ({AT=..[Pred,tAgent,ftPercent]},{kb_dynamic(Pred,2)},
+ ({AT=..[Pred,tAgent,ftPercent]},{kb_shared(Pred,2)},
      meta_argtypes(AT),argSingleValueDefault(Pred,2,N),prologHybrid(Pred),rtStatPred(Pred))))).
 
 
@@ -1362,7 +1372,7 @@ vtActionTemplate(actImprove(rtStatPred)).
 
 
 :- set_prolog_flag(dialect_pfc,false).
-
+:- notrace(kif_to_boxlog(((parent('$VAR'('G'),'$VAR'('P')) & parent('$VAR'('P'),'$VAR'('C'))) => grandparent('$VAR'('G'),'$VAR'('C'))),O)),dmsg(O).
 /*
 
  the CycL language extends Prolog''s first order logic capabilities with some higher order logics.  
@@ -1375,7 +1385,7 @@ vtActionTemplate(actImprove(rtStatPred)).
 
 
 
-?-  kif_to_boxlog(((parent('$VAR'('G'),'$VAR'('P')) & parent('$VAR'('P'),'$VAR'('C'))) => grandparent('$VAR'('G'),'$VAR'('C'))),O). 
+?-  kif_to_boxlog(((parent('$VAR'('G'),'$VAR'('P')) & parent('$VAR'('P'),'$VAR'('C'))) => grandparent('$VAR'('G'),'$VAR'('C'))),O),dmsg(O).
 
 O = [ (-parent(G, P):- -grandparent(G, C), parent(P, C)), 
       (-parent(P, C):- -grandparent(G, C), parent(G, P)), 

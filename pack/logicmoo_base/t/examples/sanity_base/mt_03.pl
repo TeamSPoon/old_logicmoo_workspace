@@ -9,7 +9,7 @@
 */
 :- module(mt_01,[]).
 
-:- user:ensure_loaded(library(logicmoo_utils)).
+:- user:ensure_loaded(system:library(logicmoo_utils)).
 :- ensure_loaded(library(logicmoo_base)).
 
 

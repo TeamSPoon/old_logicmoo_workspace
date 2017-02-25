@@ -37,7 +37,7 @@
 
 :- unload_file(logicmoo_repl).
 :- set_prolog_flag(lm_expanders,false).
-:- use_module(library('logicmoo/util/logicmoo_util_first')).
+%:- use_module(library('logicmoo/util/logicmoo_util_first')).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % LOAD PARTS OF SYSTEM EARLY
@@ -139,7 +139,7 @@ setup_for_debug :- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_e
 
 
 /*
-:- user:ensure_loaded(library(logicmoo_utils)).
+:- user:ensure_loaded(system:library(logicmoo_utils)).
 :- user:ensure_loaded(library(logicmoo_base)).
 :- user:ensure_loaded(library(logicmoo_user)).
 */

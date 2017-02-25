@@ -18,8 +18,6 @@
 :- if( (false , \+ ((current_prolog_flag(logicmoo_include,Call),Call))) ). 
 :- module(logicmoo_swilib,[]).
 :- endif.
-% restore entry state
-%:- lmce:reset_modules.
 
 :- if(((current_prolog_flag(shared_object_extension,dll), once((getenv(path,X),name(X,S),member(0,S)))))).
 :- getenv('JAVA_HOME',Where),directory_file_path(Where,bin,New),setenv('Path',New).
@@ -299,7 +297,7 @@ system:'$term_in_file'(In, Read, RLayout, Term, TLayout, Stream, Parents, Option
    functor(PI,F,A),import(F/A),fail)).
 */
 
-:- lmce:reset_modules.
+.
 
 % :- autoload.
 

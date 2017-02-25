@@ -155,7 +155,7 @@
       writeFailureLog/2,
       debugOnFailure/2,
       debugOnFailure/1,
-      on_x_rtrace/1,
+      on_x_debug/1,
       dynamic_transparent/1,
       trim/2,
       canTrace/0, 
@@ -4297,10 +4297,10 @@ debugOnFailure(arg_domains,CALL):-!,logOnFailure(CALL),!.
 debugOnFailure(Module,CALL):-debugOnFailure(Module:CALL),!.
 
 
-on_x_rtrace((X,Y)):-!,on_x_rtrace(X),on_x_rtrace(Y).
-on_x_rtrace((X;Y)):-!,(on_x_rtrace(X);on_x_rtrace(Y)).
-on_x_rtrace(call(X)):-!,on_x_rtrace(X).
-on_x_rtrace(X):-catch(X,E,(writeFailureLog(E,X),ctrace,call(X))).
+on_x_debug((X,Y)):-!,on_x_debug(X),on_x_debug(Y).
+on_x_debug((X;Y)):-!,(on_x_debug(X);on_x_debug(Y)).
+on_x_debug(call(X)):-!,on_x_debug(X).
+on_x_debug(X):-catch(X,E,(writeFailureLog(E,X),ctrace,call(X))).
 
 
 noDebug(CALL):-CALL.

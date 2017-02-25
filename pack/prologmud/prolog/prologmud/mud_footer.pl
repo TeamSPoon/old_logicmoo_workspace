@@ -17,8 +17,6 @@
 % :- context_module(CM),(registered_module_type(utility,CM))->module_predicates_are_exported(CM);module_predicates_are_exported(CM).
 % :- retract(loading_module_h(_)).
 
-% :- asserta_if_new(t_l:disable_px).
-
 :- all_source_file_predicates_are_transparent.
 
 

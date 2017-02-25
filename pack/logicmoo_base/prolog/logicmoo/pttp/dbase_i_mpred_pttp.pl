@@ -13,6 +13,8 @@
 :- module(mpred_pttp,[]).
 :- endif.
 
+:- multifile(t_l:disable_px/0).
+:- thread_local(t_l:disable_px/0).
 :- ensure_loaded('../logicmoo_utils').
 
 :- ensure_loaded(library(logicmoo_base)).
@@ -22,7 +24,7 @@ ainz_pttp(A):-if_defined(ainz(A),assertz_new(A)).
 %:- was_export(internal_functor/1).
 %:- was_export(was_pttp_functor/1).
 %:- was_dynamic(was_pttp_functor/1).
-:- shared_multifile(wid/3).
+:- kb_shared(wid/3).
 :- was_export(int_query/7).
 :- was_dynamic(int_query/7).
 :- was_export(int_not_query/7).
@@ -55,7 +57,7 @@ pred_subst(_Pred ,P,       _, _,       P     ).
 % -- CODEBLOCK
 :- was_export(must/1).
 :- meta_predicate(must(0)).
-must(Call):-(repeat, (catch(Call,E,(dmsg(E:Call),set_prolog_flag(logicmoo_debug,true),fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),dtrace,Call)),!).
+must(Call):-(repeat, (catch(Call,E,(dmsg(E:Call),set_prolog_flag(runtime_debug,true),fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),dtrace,Call)),!).
 
 */
 
@@ -82,8 +84,8 @@ pttp_assert(X) :- must_pttp_id(ID),pttp_tell_wid(ID,X).
 :- was_export(pttp_tell_wid/2).
 pttp_tell_wid(ID,XY):- 
     with_no_mpred_expansions(
-       w_tl(t_l:disable_px,
-          w_tl(t_l:infSkipFullExpand,must(pttp_assert_wid(ID,pttp,XY))))),!.
+       locally(t_l:disable_px,
+          locally(t_l:infSkipFullExpand,must(pttp_assert_wid(ID,pttp,XY))))),!.
 
 :- was_export(pttp_assert_wid/3).
 pttp_assert_wid(ID,Mode,(X,Y)):- !, pttp_assert_wid(ID,Mode,X),kb_incr(ID,ID2), pttp_assert_wid(ID2,Mode,Y).
@@ -93,7 +95,7 @@ pttp_assert_wid(_, _Mode,uses_logic(Name)):-!,must(pttp_logic(Name,Data)),!,must
 pttp_assert_wid(ID,_Mode,kif(YY)):-!, must((numbervars(YY,'$VAR',7567,_),must(pttp_assert_wid(ID,kif,YY)))).
 pttp_assert_wid(ID,_Mode,call(CALL)):-!, must((save_wid(ID,call,call(CALL)),unnumbervars(CALL,RCALL),show_failure(why,must(RCALL)))).
 %pttp_assert_wid(ID,Mode,(query:-B)):- must(assertz_unumbered((query:-B))),PNF =(query:-B), must( pttp_nnf(PNF,X)),!,must(must(pttp_assert_real_wid(ID,X))).
-pttp_assert_wid(ID,pttp,X):- must((bugger:w_tl(t_l:current_local_why(ID,X), must(( pttp1_wid(ID,X,Y), pttp2_wid(ID,Y)) )))).
+pttp_assert_wid(ID,pttp,X):- must((bugger:locally(t_l:current_local_why(ID,X), must(( pttp1_wid(ID,X,Y), pttp2_wid(ID,Y)) )))).
 % pttp_assert_wid(ID,Mode,KIF):- must(kif_add(ID,KIF)),!.
 pttp_assert_wid(ID,kif,X):- show_failure(why,must(kif_add_boxes1(ID,X))).
 
@@ -273,7 +275,7 @@ gripe_pttp_failure(Test):- pttp_test_fails_is_ok(Test),!.
 gripe_pttp_failure(Test):- dmsg(gripe_pttp_failure(Test)),!.
 gripe_pttp_failure(Test):- ignore(pttp_test_took(Test, failure, Time)),trace_or_throw(pttp_test_took(Test, failure, Time)).
 
-:- shared_multifile(baseKB:sanity_test/0).
+:- kb_shared(baseKB:sanity_test/0).
 % baseKB:sanity_test :- do_pttp_tests.
 
 
@@ -285,7 +287,7 @@ isNegOf(N1,N):-dtrace(not(isNegOf(N1,N))),isNegOf(N,N1).
 
 
 
-:- shared_multifile was_pttp_functor/3.
+:- kb_shared was_pttp_functor/3.
 :- was_dynamic was_pttp_functor/3.
 
 
@@ -320,7 +322,7 @@ pttp_query_wid(ID, Y):- dtrace,pttp_tell_wid(ID,(query:-Y)), pttp_test_prove(ID,
  A thread local safe way to do it
  pttp_query_wid(ID, Y):- term_variables(Y,Vars),gensym(query_pttp,Q),Z=..[Q|Vars],
     atom_concat('int_',Q,Int_query),
-    w_tl(is_query_functor(Q), 
+    locally(is_query_functor(Q), 
            (pttp_assert_int_wid(ID,((Z:-Y))), pttp_test_prove(ID,Int_query))).
 */
 

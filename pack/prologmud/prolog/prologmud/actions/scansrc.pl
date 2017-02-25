@@ -84,7 +84,7 @@ mmake:- update_changed_files.
 
 update_changed_files:-thread_signal(main,update_changed_files0).
 update_changed_files0 :-
-  w_tl(set_prolog_flag(dialect_pfc,false),
+  locally(set_prolog_flag(dialect_pfc,default),
        (( set_prolog_flag(verbose_load,true),
         ensure_loaded(library(make)),
 	findall(File, make:modified_file(File), Reload0),

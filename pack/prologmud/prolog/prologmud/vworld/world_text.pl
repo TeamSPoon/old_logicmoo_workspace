@@ -28,13 +28,16 @@ when_command_show(Agent,ActionType):-
 % ===========================================
 :-export(generatePhrase_local/2).
 
-bugger:term_to_message_string(T,T):-var(T),!.
-bugger:term_to_message_string(T,T):-!.
-bugger:term_to_message_string(txtConcatFn(T),M):-on_x_debug(generatePhrase_local(T,M)),!.
-bugger:term_to_message_string(fmt(T),M):-on_x_debug(generatePhrase_local(T,M)),!.
-bugger:term_to_message_string(C,C):-compound(C),functor(C,F,_),is_leave_alone(F),!.
-bugger:term_to_message_string((T),M):-on_x_fail(generatePhrase_local(T,M)),!.
-bugger:term_to_message_string(T,T):-!.
+:- multifile lmconf:term_to_message_string/2.
+:- dynamic lmconf:term_to_message_string/2.
+
+lmconf:term_to_message_string(T,T):-var(T),!.
+lmconf:term_to_message_string(T,T):-!.
+lmconf:term_to_message_string(txtConcatFn(T),M):-on_x_debug(generatePhrase_local(T,M)),!.
+lmconf:term_to_message_string(fmt(T),M):-on_x_debug(generatePhrase_local(T,M)),!.
+lmconf:term_to_message_string(C,C):-compound(C),functor(C,F,_),is_leave_alone(F),!.
+lmconf:term_to_message_string((T),M):-on_x_fail(generatePhrase_local(T,M)),!.
+lmconf:term_to_message_string(T,T):-!.
 
 is_leave_alone(exact_message).
 is_leave_alone(todo).

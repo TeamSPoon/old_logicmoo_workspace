@@ -31,3 +31,48 @@
 [submodule "pack/with_thread_local"]
 	path = pack/with_thread_local
 	url = https://github.com/TeamSPoon/with_thread_local.git
+[submodule "pack/hilog"]
+	path = pack/hilog
+	url = https://github.com/TeamSPoon/hilog.git
+[submodule "pack/loop_check"]
+	path = pack/loop_check
+	url = https://github.com/TeamSPoon/loop_check.git
+[submodule "pack/hook_hybrid"]
+	path = pack/hook_hybrid
+	url = https://github.com/TeamSPoon/hook_hybrid.git
+[submodule "pack/file_scope"]
+	path = pack/file_scope
+	url = https://github.com/TeamSPoon/file_scope.git
+[submodule "pack/with_open_options"]
+	path = pack/with_open_options
+	url = https://github.com/TeamSPoon/with_open_options.git
+[submodule "pack/multimodal_dcg"]
+	path = pack/multimodal_dcg
+	url = https://github.com/TeamSPoon/multimodal_dcg.git
+[submodule "pack/instant_prolog_docs"]
+	path = pack/instant_prolog_docs
+	url = https://github.com/TeamSPoon/instant_prolog_docs.git
+[submodule "pack/s_expression"]
+	path = pack/s_expression
+	url = https://github.com/TeamSPoon/s_expression.git
+[submodule "pack/subclause_expansion"]
+	path = pack/subclause_expansion
+	url = https://github.com/TeamSPoon/subclause_expansion.git
+[submodule "pack/slack_prolog"]
+	path = pack/slack_prolog
+	url = https://github.com/TeamSPoon/slack_prolog.git
+[submodule "pack/logicmoo_utils"]
+	path = pack/logicmoo_utils
+	url = https://github.com/TeamSPoon/logicmoo_utils
+[submodule "pack/tabling_dra"]
+	path = pack/tabling_dra
+	url = https://github.com/TeamSPoon/tabling_dra
+[submodule "pack/body_reordering"]
+	path = pack/body_reordering
+	url = https://github.com/TeamSPoon/body_reordering
+[submodule "pack/xlisting_web"]
+	path = pack/xlisting_web
+	url = https://github.com/TeamSPoon/xlisting_web
+[submodule "pack/pfc"]
+	path = pack/pfc
+	url = https://github.com/TeamSPoon/pfc

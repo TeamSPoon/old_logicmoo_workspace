@@ -16,9 +16,9 @@
 :- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 :- ensure_loaded(dbase_i_mpred_pttp).
 
-:- shared_multifile(pttp_test/2).
+:- kb_shared(pttp_test/2).
 :- discontiguous(pttp_test/2).
-:- shared_multifile(pttp_logic/2).
+:- kb_shared(pttp_logic/2).
 :- discontiguous(pttp_logic/2).
 
 pttp_test(chang_lee_example1,

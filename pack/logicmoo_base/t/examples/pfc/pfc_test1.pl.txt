@@ -766,7 +766,7 @@ penguin(X) ==> neg(fly(X)).
 % chilly is a penguin.
 :- (ain(==> penguin(chilly))).
 
-% rtrace(Goal):- Goal. % (no_trace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
+% rtrace(Goal):- Goal. % (quietly((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 

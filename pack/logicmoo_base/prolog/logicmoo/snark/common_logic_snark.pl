@@ -104,15 +104,15 @@
             why_to_id/3,
             write_list/1,
             (is_entailed_u)/1,
-            is_not_entailed/1,
-            % if/2,iif/2,
-          op(300,fx,'-'),
-          op(1150,xfx,'=>'),
-          op(1150,xfx,'<=>'),
-          op(350,xfx,'xor'),
-          op(400,yfx,'&'),
-          op(500,yfx,'v')
-           
+   % op(300,fx,'-'),
+   /*op(1150,xfx,'=>'),
+   op(1150,xfx,'<=>'),
+   op(350,xfx,'xor'),
+   op(400,yfx,'&'),
+   op(500,yfx,'v')*/
+   % if/2,iif/2,   
+            is_not_entailed/1
+                    
           ]).
 /** <module> common_logic_snark
 % Provides a specific compilation API for KIF axioms
@@ -130,9 +130,8 @@
 :-
             op(1150,fx,(was_dynamic)),
             op(1150,fx,(was_multifile)),
-            op(1150,fy,(was_module_transparent)),
-            op(1150,fx,(public)),
-            op(1150,fx,(shared_multifile)).
+            op(1150,fy,(was_module_transparent)).
+            
 
 :-
  op(1199,fx,('==>')), 
@@ -151,8 +150,6 @@
 
 %:- baseKB:ensure_loaded(logicmoo('plarkc/logicmoo_i_cyc_rewriting')).
 
-
-:- op(1100,fx,(shared_multifile)).
 
 :- module_transparent(( are_clauses_entailed/1,
             is_prolog_entailed/1,
@@ -281,40 +278,39 @@ delistify_last_arg(Arg,M:Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NA
 delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_failure(NEWCALL),!,member_ele(NEW,Last).
 
 % sanity that mpreds (manage prolog prodicate) are abily to transform
-%:- t_l:disable_px->throw(t_l:disable_px);true.
 
 % cwc "code-wise chaining" is always true in Prolog but will throw programming error if evalled in LogicMOO Prover.
 % Use this to mark code and not axiomatic prolog
 
 
-map_each_clause(P,CLIF,Prolog):- cwc,is_list(CLIF),!,maplist(map_each_clause(P),CLIF,Prolog).
-map_each_clause(P,(H,CLIF),(T,Prolog)):- cwc, sanity(nonvar(H)),!,map_each_clause(P,H,T),map_each_clause(P,CLIF,Prolog).
-map_each_clause(P,A,B):- cwc,call(P,A,B).
+map_each_clause(P,CLIF,Prolog):- is_list(CLIF),!,maplist(map_each_clause(P),CLIF,Prolog).
+map_each_clause(P,(H,CLIF),(T,Prolog)):-  sanity(nonvar(H)),!,map_each_clause(P,H,T),map_each_clause(P,CLIF,Prolog).
+map_each_clause(P,A,B):- call(P,A,B).
 
-map_each_clause(P,CLIF):-  cwc,is_list(CLIF),!,maplist(map_each_clause(P),CLIF).
-map_each_clause(P,(H,CLIF)):- cwc, sanity(nonvar(H)),!,map_each_clause(P,H),map_each_clause(P,CLIF).
-map_each_clause(P,A):- cwc,call(P,A).
+map_each_clause(P,CLIF):-  is_list(CLIF),!,maplist(map_each_clause(P),CLIF).
+map_each_clause(P,(H,CLIF)):-  sanity(nonvar(H)),!,map_each_clause(P,H),map_each_clause(P,CLIF).
+map_each_clause(P,A):- call(P,A).
 
 %% any_to_pfc( :TermCLIF, ?Prolog) is semidet.
 %
 % Converted To Prolog.
 %
-any_to_pfc(B,A):- cwc, must(map_each_clause(any_to_pfc0,B,A)).
+any_to_pfc(B,A):-  must(map_each_clause(any_to_pfc0,B,A)).
 
-any_to_pfc0(B,A):- cwc, is_kif_clause(B),!,kif_to_pfc0(B,A).
-any_to_pfc0(B,A):- cwc, is_pfc_clause(B),!,fully_expand(clause(any_to_pfc,any_to_pfc),B,A).
-any_to_pfc0(B,A):- cwc, is_prolog_clause(B),!,boxlog_to_pfc(B,A).
-any_to_pfc0(B,A):- cwc, !, trace_or_throw(should_never_be_here(any_to_pfc0(B,A))).
-any_to_pfc0((H:-B),PrologO):- cwc,!,must((show_failure(why,boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
+any_to_pfc0(B,A):-  is_kif_clause(B),!,kif_to_pfc0(B,A).
+any_to_pfc0(B,A):-  is_pfc_clause(B),!,fully_expand(clause(any_to_pfc,any_to_pfc),B,A).
+any_to_pfc0(B,A):-  is_prolog_clause(B),!,boxlog_to_pfc(B,A).
+any_to_pfc0(B,A):-  !, trace_or_throw(should_never_be_here(any_to_pfc0(B,A))).
+any_to_pfc0((H:-B),PrologO):- must((show_failure(why,boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
 
 
 %% kif_to_pfc( :TermCLIF, ?Prolog) is semidet.
 %
 % Ieee Standard Common Logic Interchange Format Version Converted To Prolog.
 %
-kif_to_pfc(B,A):- cwc, must(map_each_clause(kif_to_pfc0,B,A)).
+kif_to_pfc(B,A):-  must(map_each_clause(kif_to_pfc0,B,A)).
 
-kif_to_pfc0(CLIF,Prolog):- cwc,
+kif_to_pfc0(CLIF,Prolog):- 
    sanity(is_kif_clause(CLIF)),
   % somehow integrate why_to_id(tell,Wff,Why),
      must_det_l((
@@ -351,7 +347,7 @@ pfc_for_print_right(Prolog,PrintPFC):- =(Prolog,PrintPFC).
 %   
 %
 is_entailed_u(CLIF):- 
- cwc, mpred_run,
+  mpred_run,
  mpred_nochaining((
    any_to_pfc(CLIF,Prolog),!, \+ \+ are_clauses_entailed(Prolog))),!.
 
@@ -361,7 +357,7 @@ is_entailed_u(CLIF):-
 % If Is A Not Entailed.
 %  A good sanity Test for required absence of specific side-effect entailments
 %
-is_not_entailed(CLIF):- cwc, mpred_nochaining((kif_to_pfc(CLIF,Prolog), \+ are_clauses_entailed(Prolog))).
+is_not_entailed(CLIF):-  mpred_nochaining((kif_to_pfc(CLIF,Prolog), \+ are_clauses_entailed(Prolog))).
 
 :- op(1190,xfx,(:-)).
 :- op(1200,fy,(is_entailed_u)).
@@ -374,9 +370,9 @@ is_not_entailed(CLIF):- cwc, mpred_nochaining((kif_to_pfc(CLIF,Prolog), \+ are_c
 %
 % True if an expression is in ISO Common Logic Interchange Format.
 %
-is_clif(all(_,X)):-cwc,compound(X),!.
-is_clif(forall(_,X)):-cwc,compound(X),!,is_clif(X).
-is_clif(CLIF):-cwc,
+is_clif(all(_,X)):-compound(X),!.
+is_clif(forall(_,X)):-compound(X),!,is_clif(X).
+is_clif(CLIF):-
   VVs = v(if,iff,clif_forall,all,exists), % but not: implies,equiv,forall
    (var(CLIF)-> (arg(_,VVs,F),functor(CLIF,F,2));
      compound(CLIF),functor(CLIF,F,2),arg(_,VVs,F)).
@@ -572,7 +568,7 @@ to_nonvars(Type,IN,OUT):- call(Type,IN,OUT),!.
 
 
 
-%% convertAndCall( ?Type, :GoalCall) is semidet.
+%% convertAndCall( ?Type, :Goal) is semidet.
 %
 % Convert And Call.
 %
@@ -800,7 +796,7 @@ write_list([]).
 % Numbervars Using Names.
 %
 
-unnumbervars_with_names(Term,CTerm):- !, must(cnotrace(unnumbervars(Term,CTerm))),!.
+unnumbervars_with_names(Term,CTerm):- !, must(quietly(unnumbervars(Term,CTerm))),!.
 unnumbervars_with_names(Term,CTerm):- ground(Term),!,duplicate_term(Term,CTerm).
 
 unnumbervars_with_names(Term,CTerm):-
@@ -1003,7 +999,7 @@ kif_to_boxlog_attvars(WffIn0,KB0,Why0,FlattenedO):-
    % KB = WffQ,
     check_is_kb(KB),
     must(dif(KB,Why)),
-   %w_tl(t_l:dont_use_mudEquals,defunctionalize('=>',WffQ,Wff)),
+   %locally(t_l:dont_use_mudEquals,defunctionalize('=>',WffQ,Wff)),
    %(WffQ\==Wff-> dmsg(defunctionalize('=>',WffQ,Wff));wdmsgl(kif(Wff))),
    as_dlog(Wff,Wff666),!,
    % kb_nlit(KB,Neg),
@@ -1051,8 +1047,8 @@ check_is_kb(KB):-ignore('$VAR'('KB')=KB).
 %
 add_preconds(X,X):- baseKB:no_rewrites,!.
 add_preconds(X,Z):-
- w_tl(leave_as_is_db('CollectionS666666666666666ubsetFn'(_,_)),
-   w_tl(t_l:dont_use_mudEquals,defunctionalize('=>',X,Y))),add_preconds2(Y,Z).
+ locally(leave_as_is_db('CollectionS666666666666666ubsetFn'(_,_)),
+   locally(t_l:dont_use_mudEquals,defunctionalize('=>',X,Y))),add_preconds2(Y,Z).
 
 
 %= 	 	 
@@ -1246,7 +1242,7 @@ clauses_to_boxlog_5(_KB,_Why,In,Prolog):-dtrace,In=Prolog.
 % Managed Predicate True Structure Canonicalize And Store Knowledge Interchange Format.
 %
 mpred_t_tell_kif(OP2,RULE):-
- w_tl(t_l:current_pttp_db_oper(mud_call_store_op(OP2)),
+ locally(t_l:current_pttp_db_oper(mud_call_store_op(OP2)),
    (show_call(why,call((must(kif_add(RULE))))))).
 
 
@@ -1324,7 +1320,7 @@ kif:- current_input(In),current_output(Out),!,kif_io(In,Out).
 kif_io(InS,Out):-
   l_open_input(InS,In),
    repeat,
-      on_x_rtrace((once((t_l:kif_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
+      on_x_debug((once((t_l:kif_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
         kif_read(In,Wff,Vs),
          put_variable_names( Vs),
            portray_clause(Out,Wff,[variable_names(Vs),quoted(true)]),
@@ -1586,7 +1582,7 @@ simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),l
 % Save Well-founded Semantics Version.
 %
 save_wfs(Why,PrologI):- must_det_l((baseKB:as_prolog_hook(PrologI,Prolog),
-   w_tl(t_l:current_local_why(Why,Prolog),
+   locally(t_l:current_local_why(Why,Prolog),
    ain_h(save_in_code_buffer,Why,Prolog)))).
 
 

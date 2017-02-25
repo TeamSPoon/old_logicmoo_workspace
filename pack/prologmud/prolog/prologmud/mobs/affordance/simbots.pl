@@ -466,10 +466,10 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 :-recreate(verb_affordance/5).
 
 :- check_clause_counts.
-:- kb_dynamic(argIsa/3).
+:- kb_shared(argIsa/3).
 :- check_clause_counts.
-:- kb_dynamic(genls/2).
-:- kb_dynamic(mudActionMaxDistance(vtActionTemplate,  ttObjectType,ftInt)).
+:- kb_shared(genls/2).
+:- kb_shared(mudActionMaxDistance(vtActionTemplate,  ttObjectType,ftInt)).
 
 to_personal(mudEnergy,mudEnergy).
 to_personal(Pred,APred):-atom_concat('',Pred,APred).
@@ -536,7 +536,7 @@ args_match_types(Templ,Templ):-!.
 args_match_types(Obj,Type):-!,isa(Obj,Type).
 
 % hook for toplevel pass 1
-agent_command(Agent,Templ):- on_x_rtrace(agent_command_affordance(Agent,Templ)).
+agent_command(Agent,Templ):- on_x_debug(agent_command_affordance(Agent,Templ)).
 
 % hook for toplevel pass last
 agent_command_fallback(Agent,TemplIn):-agent_command_simbots_real(Agent,TemplIn).

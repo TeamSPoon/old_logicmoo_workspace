@@ -49,12 +49,12 @@
           [ 
            nnf/3, 
            pnf/3, cf/5,
-          op(300,fx,'-'),
-          op(1150,xfx,'=>'),
+          % op(300,fx,'-'),
+          /*op(1150,xfx,'=>'),
           op(1150,xfx,'<=>'),
           op(350,xfx,'xor'),
           op(400,yfx,'&'),  
-          op(500,yfx,'v'),
+          op(500,yfx,'v'),*/
             atom_compat/3,
             axiom_lhs_to_rhs/2,
             axiom_lhs_to_rhs/3,
@@ -159,8 +159,8 @@
             op(1150,fx,(was_dynamic)),
             op(1150,fx,(was_multifile)),
             op(1150,fy,(was_module_transparent)),
-            op(1150,fx,(was_export)),
-            op(1150,fx,(shared_multifile)).
+            op(1150,fx,(was_export)).
+
 
 :-ain(baseKB:predicateConventionMt(mud_test,baseKB)).
 
@@ -222,8 +222,6 @@
  op(350,xfx,'xor'),
  op(300,fx,'~'),
  op(300,fx,'-').
-
-:- op(1100,fx,(shared_multifile)).
 
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
@@ -289,7 +287,7 @@ to_poss(X,poss(X)):-!.
 % Negated Normal Form.
 %
 nnf(KB,FmlNV,NNF):-
-  must(cnotrace(unnumbervars_with_names((KB,FmlNV),(KB0,FmlNV0)))),
+  must(quietly(unnumbervars_with_names((KB,FmlNV),(KB0,FmlNV0)))),
    must( \+ contains_dvar(KB0:FmlNV0)),
    nnf0(KB0,FmlNV0,NNF).
 
@@ -303,7 +301,7 @@ nnf(KB,FmlNV,NNF):-
 nnf0(KB,Fml,NNF):- 
  copy_term(Fml,Original),
  % ignore(KB='$VAR'('KB')),
-   w_tl(t_l:current_form(Original),nnf(KB,Fml,[],NNF,_)),!.
+   locally(t_l:current_form(Original),nnf(KB,Fml,[],NNF,_)),!.
 
 :- thread_local(t_l:skolem_setting/1).
 
@@ -336,7 +334,7 @@ is_skolem_setting(S):- t_l:skolem_setting(SS)->S=SS;is_skolem_setting_default(S)
 % Negated Normal Form Disjunctive Normal Form.
 %
 nnf_dnf(KB,Fml,DNF):-
- w_tl(t_l:skolem_setting(ignore),
+ locally(t_l:skolem_setting(ignore),
   (removeQ(KB,Fml,FmlUQ),
    nnf(KB,FmlUQ,NNF),
    dnf(KB,NNF,DNF))).
@@ -1251,7 +1249,7 @@ demodal_sents(KB,I,O):- must_det_l((demodal(KB,I,M),modal2sent(M,O))).
 % Demodal.
 %
 demodal(KB,In,Prolog):- call_last_is_var(demodal(KB,In,Prolog)),!.
-demodal(_KB,Var, Var):- cnotrace(leave_as_is(Var)),!.
+demodal(_KB,Var, Var):- quietly(leave_as_is(Var)),!.
 demodal(KB,[H|T],[HH|TT]):- !, demodal(KB,H,HH),demodal(KB,T,TT).
 demodal(KB,  ~( H),  ~( HH)):-!, demodal(KB,H, HH),!.
 
@@ -1293,7 +1291,7 @@ atom_compat(F,HF,HHF):- fail,F\=HF, is_sent_op_modality(F),is_sent_op_modality(H
 %
 % Modal2sent.
 %
-modal2sent(Var, Var):- cnotrace(leave_as_is(Var)),!.
+modal2sent(Var, Var):- quietly(leave_as_is(Var)),!.
 modal2sent(G,O):- G=..[F,H], \+ leave_as_is(H), H=..[HF,HH], atom_compat(F,HF,HHF),!, GG=..[HHF,HH], modal2sent(GG,O).
 modal2sent([H|T],[HH|TT]):- !, must(( modal2sent(H,HH),modal2sent(T,TT))),!.
 modal2sent(H,HH ):- H=..[F|ARGS],!,must_maplist(modal2sent,ARGS,ARGSO),!,HH=..[F|ARGSO].
@@ -1677,7 +1675,7 @@ skolem_f(KB, F, X, FreeVIn, SkF):-
         gensym(SKU,SKN),
         concat_atom(['sk',SKN,'Fn'],Fun),
 	SkF =..[Fun|FreeVSet])),
-        mpred_put_attr(X,sk,SkF).
+        oo_put_attr(X,sk,SkF).
 
 
 %= 	 	 

@@ -147,7 +147,7 @@ locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 mudNearbyLocs(L1,L2):- var(L1),nonvar(L2),!,mudNearbyLocs(L2,L1).
 mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),L2=xyzFn(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
 mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,mudNearbyRegions(R1,R2).
-mudNearbyLocs(L1,L2):- must((no_trace(mudNearbyRegions(R1,R2)),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2))).
+mudNearbyLocs(L1,L2):- must((quietly(mudNearbyRegions(R1,R2)),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2))).
 
 % :- decl_not_mpred(locs_near_i,2).
 :-export(locs_near_i/2).
@@ -251,9 +251,9 @@ mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):- call_u(calc_from_center_xyz(Regio
 
 % :-kif_tell(localityOfObject(A,B) &  localityOfObject(B,C) ==> localityOfObject(A,C)).
 
-:- kb_dynamic(mudSubPart/2).
-:- kb_dynamic(predInterArgIsa/1).
-:- kb_dynamic(relationAllExists/3).
+:- kb_shared(mudSubPart/2).
+:- kb_shared(predInterArgIsa/1).
+:- kb_shared(relationAllExists/3).
 
 singleValuedInArgDefault(localityOfObject, 2, isMissing).
 
@@ -537,7 +537,7 @@ mudAtLoc(Agent,_)==>{padd(Agent,mudNeedsLook(vTrue))}.
 in_world_move(LOC,Agent,DirS) :-
         string_to_atom(DirS,Dir),
         ignore(is_asserted(mudAtLoc(Agent,LOC))),
-        must_det((w_tl(t_l:infAssertedOnly(mudAtLoc),in_world_move0(LOC,Agent,Dir)),       
+        must_det((locally(t_l:infAssertedOnly(mudAtLoc),in_world_move0(LOC,Agent,Dir)),       
          is_asserted(mudAtLoc(Agent,LOC2)),
          LOC2 \== LOC)),!.
 

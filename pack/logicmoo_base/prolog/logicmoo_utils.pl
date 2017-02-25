@@ -24,15 +24,14 @@
    (( \+ user:file_search_path(library,Dir)) ->asserta(user:file_search_path(library,Dir));true))).
 :- endif.
 :- endif.
-:- if((set_prolog_flag(logicmoo_utils_file,(exists_source(library('logicmoo/util/logicmoo_util_clause_expansion.pl')),
-       ensure_loaded(library('logicmoo/util/logicmoo_util_clause_expansion.pl')))))).
+:- if((set_prolog_flag(logicmoo_utils_file,(exists_source(library('clause_expansion')),
+       reexport(library('clause_expansion')))))).
 :- endif.
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )).
 :- module(logicmoo_utils_file,[logicmoo_utils_test_msg/0]).
 :- endif.
 
-% restore entry state
-:- current_predicate(lmce:reset_modules/0)->lmce:reset_modules;true.
+
 
 :- set_prolog_flag(lm_expanders,false).
 
@@ -71,8 +70,8 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 
 
 
-:- if( \+ current_predicate(system:setup_call_cleanup_each/3)).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_supp.pl')).
+:- if( \+ current_predicate(system:each_call_cleanup/3)).
+%:- reexport(library('supp')).
 :- endif.
 
 % ======================================================
@@ -83,32 +82,30 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 :- set_prolog_flag(generate_debug_info, true).
 :- set_prolog_flag(lm_expanders,false).
 
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_database.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_first.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_catch.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_dmsg.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_rtrace.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_varnames.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_bugger.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_loop_check.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_no_repeats.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_scce.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_terms.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_dumpst.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_with_assertions.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_preddefs.pl')).
+:- reexport(library('logicmoo/util/logicmoo_util_terms')).
+:- reexport(library('logicmoo/util/logicmoo_util_strings')).
 
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_term_listing.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_strings.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_filestreams.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_filesystem.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_prolog_frames.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_prolog_streams.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_engines.pl')).
-:- ensure_loaded(library('logicmoo/util/logicmoo_util_help.pl')).
 
-% :- baseKB:ensure_loaded(library(logicmoo_swilib)).
-:- system:ensure_loaded(library('logicmoo/util/logicmoo_util_shared_dynamic.pl')).
+:- reexport(library('hook_hybrid')).
+:- reexport(library('must_trace')).
+
+:- reexport(library('loop_check')).
+
+:- reexport(library('no_repeats')).
+
+:- reexport(library('with_thread_local')).
+
+%:- reexport(library('varnames')).
+%:- reexport(library('xlisting')).
+
+:- reexport(library('filestreams')).
+:- reexport(library('filesystem')).
+
+:- reexport(library('predicate_streams')).
+%%:- reexport(library('engines')).
+%%:- reexport(library('help')).
+
+% :- baseKB:reexport(library(logicmoo_swilib)).
 
 :- forall((current_module(M),M\==baseKB),assert_if_new(baseKB:mtProlog(M))).
 
@@ -116,7 +113,7 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 % ======================================================
 % Add Utils files to autoloads
 % ======================================================
-:- add_library_search_path('./logicmoo/util/',[ 'logicmoo_util_*.pl']).
+:- add_library_search_path('./logicmoo/util/',[ 'logicmoo_util_*']).
 
 % ======================================================
 % Pre-release Sanity tests
@@ -179,28 +176,33 @@ baseKB:logicmoo_scan_autoloads:-false.
 
 
 :- thread_local logicmoo_utils_test_tl/0.
-logicmoo_utils_test_msg:- w_tl((
- logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
+logicmoo_utils_test_tl:- throw(writeln("BADDDDDDD! locally/2 did not redefine this")).
+logicmoo_utils_test_msg:- locally((
+ logicmoo_utils_test_tl:- writeln("Adding logicmoo/utils to autoload path")),logicmoo_utils_test_tl).
 :- export(logicmoo_utils_test_msg/0).
 /*
 % the next are loaded idomaticaly later (if needed)
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_clause_expansion.pl')).
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_attvar_reader.pl')).
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_ctx_frame.pl')).
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_dra.pl')).
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_bb_gvar.pl')).
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_bb_env.pl')).
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_dcg.pl')).
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_varfunctors.pl')).
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_structs.pl')).
-% :- ensure_loaded(library('logicmoo/util/logicmoo_util_supp.pl')).
+% %:- reexport(library('clause_expansion')).
+% %:- reexport(library('attvar_reader')).
+% %:- reexport(library('ctx_frame')).
+% %:- reexport(library('dra')).
+% %:- reexport(library('bb_gvar')).
+% %:- reexport(library('bb_env')).
+% %:- reexport(library('dcg')).
+% %:- reexport(library('varfunctors')).
+% %:- reexport(library('structs')).
+% %:- reexport(library('supp')).
 */
+/*
 :- multifile baseKB:prologBuiltin/1.
 :- discontiguous baseKB:prologBuiltin/1.
 :- dynamic baseKB:prologBuiltin/1.
+:- listing(locally/2).
+*/
+% :- rtrace.
 :- logicmoo_utils_test_msg.
 :- set_prolog_flag(lm_expanders,true).
-:- set_prolog_flag(logicmoo_virtualize,true).
-% :- lmce:reset_modules.
+:- set_prolog_flag(virtual_stubs,true).
+% .
 
 

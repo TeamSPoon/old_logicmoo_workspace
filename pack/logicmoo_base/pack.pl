@@ -5,4 +5,5 @@ title('Support for various Prolog programing extensions such reactive [agent] pr
 keywords([pfc,extension,clif,datalog,fol,snark,logicmoo,memoization]).
 home('https://github.com/TeamSPoon/PrologMUD/tree/master/pack/logicmoo_base').
 download('http://www.prologmoo.com/packs/logicmoo_base/release/logicmoo_base-1.1.2.tgz').
+autoload(true).
 

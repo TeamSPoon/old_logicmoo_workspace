@@ -1,11 +1,12 @@
 <!DOCTYPE Workspace SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpw.dtd">
 <Workspace Version="10.0" VendorName="SlickEdit">
 	<Projects>
-		<Project File="pack/PrologMUD_RT.vpj"/>
 		<Project File="pack/logicmoo_base/prolog/LogicmooBase.vpj"/>
-		<Project File="pack/logicmoo_nlu/prolog/MUD_DeepParsing.vpj"/>
 		<Project File="pack/logicmoo_packages/prolog/LogicmooPackages.vpj"/>
 		<Project File="pack/logicmoo_planner/LogicmooPlanner.vpj"/>
+		<Project File="pack/logicmoo_nlu/prolog/MUD_DeepParsing.vpj"/>
 		<Project File="pack/prologmud/PrologMUD.vpj"/>
+		<Project File="pack/PrologMUD_RT.vpj"/>
+		<Project File="pack/TeamSPoon.vpj"/>
 	</Projects>
 </Workspace>
