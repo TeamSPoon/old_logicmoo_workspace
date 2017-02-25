@@ -76,3 +76,6 @@
 [submodule "pack/pfc"]
 	path = pack/pfc
 	url = https://github.com/TeamSPoon/pfc
+[submodule "pack/prologmud"]
+	path = pack/prologmud
+	url = https://github.com/TeamSPoon/prologmud

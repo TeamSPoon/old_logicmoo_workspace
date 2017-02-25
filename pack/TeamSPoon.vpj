@@ -5052,6 +5052,13 @@
 				<F N="W:/root/.swiplrc"/>
 			</Folder>
 		</Folder>
+		<Folder Name="body_reordering">
+			<F
+				N="body_reordering/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+		</Folder>
 		<Folder Name="clause_attvars">
 			<F
 				N="clause_attvars/*.*"
@@ -5140,6 +5147,25 @@
 				</Folder>
 			</Folder>
 		</Folder>
+		<Folder Name="logicmoo_planner">
+			<F
+				N="logicmoo_planner/*.md"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+			<F
+				N="logicmoo_planner/*.pl"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+		</Folder>
+		<Folder Name="logicmoo_utils">
+			<F
+				N="logicmoo_utils/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+		</Folder>
 		<Folder Name="loop_check">
 			<F
 				N="loop_check/*.*"
@@ -5175,6 +5201,13 @@
 				Refilter="1"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
 		</Folder>
+		<Folder Name="pfc">
+			<F
+				N="pfc/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+		</Folder>
 		<Folder Name="predicate_streams">
 			<F
 				N="predicate_streams/*.*"
@@ -5188,6 +5221,419 @@
 				Recurse="1"
 				Refilter="1"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+			<F
+				N="prologmud/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+		</Folder>
+		<Folder Name="prologmud_sample">
+			<Folder Name="runtime">
+				<Folder Name="games">
+					<Folder Name="ontologyportal_sumo/.git">
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/.git/config"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/.git/description"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/.git/HEAD"/>
+					</Folder>
+					<Folder Name="btepisode">
+						<F N="prologmud_sample/runtime/games/btepisode/bt.graphml"/>
+						<F N="prologmud_sample/runtime/games/btepisode/npc.pl"/>
+						<F N="prologmud_sample/runtime/games/btepisode/plot.txt"/>
+						<F N="prologmud_sample/runtime/games/btepisode/plotflow.graphml"/>
+					</Folder>
+					<Folder Name="circlemuddata">
+						<F N="prologmud_sample/runtime/games/circlemuddata/circlemud_data.xml"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/circlemud_data_description.txt"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/convert_cm.sh"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/convert_mob_files.py"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/convert_obj_files.py"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/convert_shp_files.py"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/convert_wld_files.py"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/convert_zon_files.py"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/doall.py"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/smurf.mob"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/smurf.obj"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/smurf.README"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/smurf.wld"/>
+						<F N="prologmud_sample/runtime/games/circlemuddata/smurf.zon"/>
+					</Folder>
+					<Folder Name="ontologyportal_sumo">
+						<Folder Name="development">
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/Biography.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/BrazilianCulture.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/DimensioningAmenities.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/emotion.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/Facebook.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/HouseholdAppliances.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/LinkedInDegrees.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/NIEM-Scenario-Concepts.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/Offers.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/PolishCulture.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/README"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/Robot.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/Society.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/TravelPolicies.kif"/>
+						</Folder>
+						<Folder Name="mappings">
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/mappings/DHS_Taxonomy.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/mappings/FOAFmap.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/mappings/HotelDetail.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/mappings/ISCOgroups.kif"/>
+						</Folder>
+						<Folder Name="tests">
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/tq_notes.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG1.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG10.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG11.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG12.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG13.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG14.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG15.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG16.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG17.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG18.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG19.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG2.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG20.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG21.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG22.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG23.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG24.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG25.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG26.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG27.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG28.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG29.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG3.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG30.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG31.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG32.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG33.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG34.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG35.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG36.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG37.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG38.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG39.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG4.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG40.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG41.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG42.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG43.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG44.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG45.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG46.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG47.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG48.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG49.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG5.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG50.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG6.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG7.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG8.kif.tq"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/tests/TQG9.kif.tq"/>
+						</Folder>
+						<Folder Name="Translations">
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/arabic_format.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/chinese_format.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/french_format.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/index-cz.html"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/index-en.html"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/index-tg.html"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/index.de.html"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/language.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/operators-cb.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/operators-de.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/operators-it.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/operators-tg.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/portuguese_format.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/relations-cb.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/relations-cz.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/relations-de.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/relations-en.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/relations-hindi.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/relations-it.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/relations-ro-sgml.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/relations-ro.kif"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/relations-tg.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/terms-cb.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/terms-cz.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/terms-de.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/terms-hindi.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/terms-it.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/terms-tg.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Translations/termsAndRelations-cnt.txt"/>
+						</Folder>
+						<Folder Name="WordNetMappings">
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/FirstNames.csv"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/MWEmapping-noun.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/README.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/SemRewrite.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/Sense-count.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/sentiment.csv"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/stopwords.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/wordFrequencies.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/wordFrequencies_combined.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/WordNetMappings30-adj.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/WordNetMappings30-adv.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/WordNetMappings30-noun.txt"/>
+							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WordNetMappings/WordNetMappings30-verb.txt"/>
+						</Folder>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/ArabicCulture.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Biography.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Cars.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Catalog.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/CCTrep.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Communications.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/ComputerInput.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/CountriesAndRegions.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Dining.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/domainEnglishFormat.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Economy.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/emotion.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/engineering.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/english_format.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/FinancialOntology.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/FOAFmap.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Food.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Geography.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Government.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Hotel.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Justice.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Languages.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Media.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Merge.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Mid-level-ontology.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Military.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/MilitaryDevices.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/MilitaryPersons.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/MilitaryProcesses.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/mondial.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Music.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/naics.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/People.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/pictureList-ImageNet.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/pictureList.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/QoSontology.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/README.txt"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Sense-count.txt"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Sports.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/TransnationalIssues.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/Transportation.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/TransportDetail.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/UXExperimentalTerms.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/VirusProteinAndCellPart.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WMD.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WorldAirports.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WorldAirportsA-K.kif"/>
+						<F N="prologmud_sample/runtime/games/ontologyportal_sumo/WorldAirportsL-Z.kif"/>
+					</Folder>
+					<Folder Name="src_game_nani">
+						<Folder Name="web">
+							<Folder Name="css">
+								<F N="prologmud_sample/runtime/games/src_game_nani/web/css/README.txt"/>
+							</Folder>
+							<Folder Name="icons">
+								<F N="prologmud_sample/runtime/games/src_game_nani/web/icons/bar.png"/>
+								<F N="prologmud_sample/runtime/games/src_game_nani/web/icons/README.txt"/>
+							</Folder>
+							<Folder Name="js">
+								<F N="prologmud_sample/runtime/games/src_game_nani/web/js/README.txt"/>
+							</Folder>
+							<Folder Name="prolog">
+								<F N="prologmud_sample/runtime/games/src_game_nani/web/prolog/mud_specific.pl"/>
+								<F N="prologmud_sample/runtime/games/src_game_nani/web/prolog/README.txt"/>
+							</Folder>
+							<Folder Name="snd">
+								<F N="prologmud_sample/runtime/games/src_game_nani/web/snd/README.txt"/>
+							</Folder>
+						</Folder>
+						<F N="prologmud_sample/runtime/games/src_game_nani/a_nani_household.pfc.pl"/>
+						<F N="prologmud_sample/runtime/games/src_game_nani/andrew_ke.pfc.pl"/>
+						<F N="prologmud_sample/runtime/games/src_game_nani/annie_ke.pfc.pl"/>
+						<F N="prologmud_sample/runtime/games/src_game_nani/dmiles_ke.pfc.pl"/>
+						<F N="prologmud_sample/runtime/games/src_game_nani/jess_ke.pfc.pl"/>
+						<F N="prologmud_sample/runtime/games/src_game_nani/justin_ke.pfc.pl"/>
+						<F N="prologmud_sample/runtime/games/src_game_nani/meredith_ke.pfc.pl"/>
+						<F N="prologmud_sample/runtime/games/src_game_nani/objs_misc_household.pfc.pl"/>
+					</Folder>
+					<Folder Name="src_game_sims">
+						<Folder Name="web">
+							<Folder Name="css">
+								<F N="prologmud_sample/runtime/games/src_game_sims/web/css/README.txt"/>
+							</Folder>
+							<Folder Name="icons">
+								<F N="prologmud_sample/runtime/games/src_game_sims/web/icons/bar.png"/>
+								<F N="prologmud_sample/runtime/games/src_game_sims/web/icons/README.txt"/>
+							</Folder>
+							<Folder Name="js">
+								<F N="prologmud_sample/runtime/games/src_game_sims/web/js/README.txt"/>
+							</Folder>
+							<Folder Name="prolog">
+								<F N="prologmud_sample/runtime/games/src_game_sims/web/prolog/mud_specific.pl"/>
+								<F N="prologmud_sample/runtime/games/src_game_sims/web/prolog/README.txt"/>
+							</Folder>
+							<Folder Name="snd">
+								<F N="prologmud_sample/runtime/games/src_game_sims/web/snd/README.txt"/>
+							</Folder>
+						</Folder>
+						<F N="prologmud_sample/runtime/games/src_game_sims/objs_misc_household.pfc.pl"/>
+						<F N="prologmud_sample/runtime/games/src_game_sims/plotto.txt"/>
+					</Folder>
+					<Folder Name="src_game_startrek">
+						<Folder Name="holodeck">
+							<F N="prologmud_sample/runtime/games/src_game_startrek/holodeck/maze.map.pfc.pl"/>
+							<F N="prologmud_sample/runtime/games/src_game_startrek/holodeck/objs_misc_household.pfc.pl"/>
+							<F N="prologmud_sample/runtime/games/src_game_startrek/holodeck/objs_misc_monster.pfc.pl"/>
+							<F N="prologmud_sample/runtime/games/src_game_startrek/holodeck/predator.map.pfc.pl"/>
+							<F N="prologmud_sample/runtime/games/src_game_startrek/holodeck/rooms_conf.pl"/>
+							<F N="prologmud_sample/runtime/games/src_game_startrek/holodeck/vacuum.map.pfc.pl"/>
+						</Folder>
+						<Folder Name="mobs">
+							<F N="prologmud_sample/runtime/games/src_game_startrek/mobs/federation.pl"/>
+						</Folder>
+						<Folder Name="web">
+							<Folder Name="css">
+								<F N="prologmud_sample/runtime/games/src_game_startrek/web/css/README.txt"/>
+							</Folder>
+							<Folder Name="icons">
+								<F N="prologmud_sample/runtime/games/src_game_startrek/web/icons/bar.png"/>
+								<F N="prologmud_sample/runtime/games/src_game_startrek/web/icons/README.txt"/>
+							</Folder>
+							<Folder Name="js">
+								<F N="prologmud_sample/runtime/games/src_game_startrek/web/js/README.txt"/>
+							</Folder>
+							<Folder Name="prolog">
+								<F N="prologmud_sample/runtime/games/src_game_startrek/web/prolog/mud_specific.pl"/>
+								<F N="prologmud_sample/runtime/games/src_game_startrek/web/prolog/README.txt"/>
+							</Folder>
+							<Folder Name="snd">
+								<F N="prologmud_sample/runtime/games/src_game_startrek/web/snd/README.txt"/>
+							</Folder>
+						</Folder>
+						<F N="prologmud_sample/runtime/games/src_game_startrek/startrek.all.pfc.pl"/>
+					</Folder>
+					<Folder Name="src_game_wumpus">
+						<F N="prologmud_sample/runtime/games/src_game_wumpus/maze.map.pfc.pl"/>
+						<F N="prologmud_sample/runtime/games/src_game_wumpus/objs_misc_monster.pfc.pl"/>
+					</Folder>
+				</Folder>
+				<Folder Name="hmud">
+					<Folder Name="bridge">
+						<F N="prologmud_sample/runtime/hmud/bridge/AnsiToHtml.hx"/>
+						<F N="prologmud_sample/runtime/hmud/bridge/compile.hxml"/>
+						<F N="prologmud_sample/runtime/hmud/bridge/hmud-bridge.swf"/>
+						<F N="prologmud_sample/runtime/hmud/bridge/HMUD_Bridge.hx"/>
+					</Folder>
+					<Folder Name="flashpolicyd_v0.6">
+						<Folder Name="Perl_xinetd">
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Perl_xinetd/flashpolicyd.xinet"/>
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Perl_xinetd/in.flashpolicyd.pl"/>
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Perl_xinetd/install.sh"/>
+						</Folder>
+						<Folder Name="Python_init">
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Python_init/flashpolicyd.init"/>
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Python_init/flashpolicyd.py"/>
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Python_init/install.sh"/>
+						</Folder>
+						<Folder Name="Python_xinetd">
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Python_xinetd/flashpolicyd.xinet"/>
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Python_xinetd/in.flashpolicyd.py"/>
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Python_xinetd/install.sh"/>
+						</Folder>
+						<Folder Name="Standalone">
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Standalone/flashpolicyd.pl"/>
+							<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/Standalone/flashpolicyd.py"/>
+						</Folder>
+						<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/flashpolicy.xml"/>
+						<F N="prologmud_sample/runtime/hmud/flashpolicyd_v0.6/README.txt"/>
+					</Folder>
+					<Folder Name="swfobject">
+						<Folder Name="src">
+							<F N="prologmud_sample/runtime/hmud/swfobject/src/expressInstall.as"/>
+							<F N="prologmud_sample/runtime/hmud/swfobject/src/expressInstall.fla"/>
+							<F N="prologmud_sample/runtime/hmud/swfobject/src/swfobject.js"/>
+						</Folder>
+						<F N="prologmud_sample/runtime/hmud/swfobject/expressInstall.swf"/>
+						<F N="prologmud_sample/runtime/hmud/swfobject/index.html"/>
+						<F N="prologmud_sample/runtime/hmud/swfobject/index_dynamic.html"/>
+						<F N="prologmud_sample/runtime/hmud/swfobject/swfobject.js"/>
+						<F N="prologmud_sample/runtime/hmud/swfobject/test.swf"/>
+					</Folder>
+					<F N="prologmud_sample/runtime/hmud/.git"/>
+					<F N="prologmud_sample/runtime/hmud/browser-detect.js"/>
+					<F N="prologmud_sample/runtime/hmud/Button-icon-off.gif"/>
+					<F N="prologmud_sample/runtime/hmud/Button-icon.gif"/>
+					<F N="prologmud_sample/runtime/hmud/client.js"/>
+					<F N="prologmud_sample/runtime/hmud/config.js"/>
+					<F N="prologmud_sample/runtime/hmud/cookies.js"/>
+					<F N="prologmud_sample/runtime/hmud/favicon.ico"/>
+					<F N="prologmud_sample/runtime/hmud/guide.js"/>
+					<F N="prologmud_sample/runtime/hmud/hmud.html"/>
+					<F N="prologmud_sample/runtime/hmud/index.html"/>
+					<F N="prologmud_sample/runtime/hmud/INSTALL"/>
+					<F N="prologmud_sample/runtime/hmud/LICENSE"/>
+					<F N="prologmud_sample/runtime/hmud/messages.en.js"/>
+					<F N="prologmud_sample/runtime/hmud/messages.js"/>
+					<F N="prologmud_sample/runtime/hmud/messages.pt.js"/>
+					<F N="prologmud_sample/runtime/hmud/policyd"/>
+					<F N="prologmud_sample/runtime/hmud/README"/>
+					<F N="prologmud_sample/runtime/hmud/Rune-icon.gif"/>
+					<F N="prologmud_sample/runtime/hmud/TODO"/>
+					<F N="prologmud_sample/runtime/hmud/Treasure-icon.gif"/>
+					<F N="prologmud_sample/runtime/hmud/ui.js"/>
+				</Folder>
+				<F N="prologmud_sample/runtime/.buildpath"/>
+				<F N="prologmud_sample/runtime/.ircbot.pl"/>
+				<F N="prologmud_sample/runtime/.project"/>
+				<F N="prologmud_sample/runtime/abcl.sh"/>
+				<F N="prologmud_sample/runtime/ansi2html.sh"/>
+				<F N="prologmud_sample/runtime/bootstrap.ttl"/>
+				<F N="prologmud_sample/runtime/clear_putty.sh"/>
+				<F N="prologmud_sample/runtime/commitpush.sh"/>
+				<F N="prologmud_sample/runtime/composer.json"/>
+				<F N="prologmud_sample/runtime/daemon.pl"/>
+				<F N="prologmud_sample/runtime/daydream.pl"/>
+				<F N="prologmud_sample/runtime/debug_loop.sh"/>
+				<F N="prologmud_sample/runtime/debug_mud_game.pl"/>
+				<F N="prologmud_sample/runtime/debug_once.sh"/>
+				<F N="prologmud_sample/runtime/full_clone_externals.sh"/>
+				<F N="prologmud_sample/runtime/hg_push_pull.sh"/>
+				<F N="prologmud_sample/runtime/init_cliopatria.pl"/>
+				<F N="prologmud_sample/runtime/init_mud_server.pl"/>
+				<F N="prologmud_sample/runtime/init_mud_server_run.pl"/>
+				<F N="prologmud_sample/runtime/logic_example.pl.pfc"/>
+				<F N="prologmud_sample/runtime/logicmoo_pdt.pl"/>
+				<F N="prologmud_sample/runtime/logicmoo_pdt.qlf"/>
+				<F N="prologmud_sample/runtime/logicmoo_repl.pl"/>
+				<F N="prologmud_sample/runtime/logicmoo_util_header.pi"/>
+				<F N="prologmud_sample/runtime/make_ikvm_assemblies.sh"/>
+				<F N="prologmud_sample/runtime/makeREPL.sh"/>
+				<F N="prologmud_sample/runtime/mud.ttl"/>
+				<F N="prologmud_sample/runtime/pbranch.sh"/>
+				<F N="prologmud_sample/runtime/preconfig.sh"/>
+				<F N="prologmud_sample/runtime/pull.sh"/>
+				<F N="prologmud_sample/runtime/README.md"/>
+				<F N="prologmud_sample/runtime/ReplaceSymLinkLinux.sh"/>
+				<F N="prologmud_sample/runtime/run-cyc-java.sh"/>
+				<F N="prologmud_sample/runtime/run_cliopatria.pl"/>
+				<F N="prologmud_sample/runtime/Run_Loop.sh"/>
+				<F N="prologmud_sample/runtime/run_mud_game.pl"/>
+				<F N="prologmud_sample/runtime/settings.db"/>
+				<F N="prologmud_sample/runtime/setup_paths.pl"/>
+				<F N="prologmud_sample/runtime/startGame.sh"/>
+				<F N="prologmud_sample/runtime/test_loop.sh"/>
+				<F N="prologmud_sample/runtime/test_release.pl"/>
+				<F N="prologmud_sample/runtime/TestsMUDServer.bat"/>
+				<F N="prologmud_sample/runtime/TestsMUDServer.sh"/>
+				<F N="prologmud_sample/runtime/TONOTIFY.txt"/>
+				<F N="prologmud_sample/runtime/try_logicmoo_examples.pl"/>
+				<F N="prologmud_sample/runtime/users.db"/>
+				<F N="prologmud_sample/runtime/web_install.sh"/>
+			</Folder>
+			<F N="prologmud_sample/LICENSE.md"/>
+			<F N="prologmud_sample/pack.pl"/>
+			<F N="prologmud_sample/README.md"/>
 		</Folder>
 		<Folder Name="ref_unused">
 			<F N="ref_unused/dbase_i_dolce2_1.pl"/>
@@ -5198,96 +5644,6 @@
 				Recurse="1"
 				Refilter="1"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
-		</Folder>
-		<Folder Name="runtime">
-			<Folder Name="e2c">
-				<Folder Name="microEx">
-					<F N="runtime/e2c/microEx/instant.pl"/>
-					<F N="runtime/e2c/microEx/listes.pl"/>
-					<F N="runtime/e2c/microEx/myinstant.pl"/>
-					<F N="runtime/e2c/microEx/path.pl"/>
-					<F N="runtime/e2c/microEx/queen.pl"/>
-				</Folder>
-				<Folder Name="pjb-micro-prolog-ii">
-					<F N="runtime/e2c/pjb-micro-prolog-ii/benchmark.pl"/>
-					<F N="runtime/e2c/pjb-micro-prolog-ii/init.pl"/>
-				</Folder>
-				<F N="runtime/e2c/e2c.pl"/>
-				<F N="runtime/e2c/kb_interface.pl"/>
-			</Folder>
-			<Folder Name="games">
-				<Folder Name="btepisode">
-					<F N="runtime/games/btepisode/npc.pl"/>
-				</Folder>
-				<Folder Name="src_game_nani">
-					<Folder Name="web">
-						<Folder Name="prolog">
-							<F N="runtime/games/src_game_nani/web/prolog/mud_specific.pl"/>
-						</Folder>
-					</Folder>
-					<F N="runtime/games/src_game_nani/a_nani_household.pfc.pl"/>
-					<F N="runtime/games/src_game_nani/andrew_ke.pfc.pl"/>
-					<F N="runtime/games/src_game_nani/annie_ke.pfc.pl"/>
-					<F N="runtime/games/src_game_nani/dmiles_ke.pfc.pl"/>
-					<F N="runtime/games/src_game_nani/jess_ke.pfc.pl"/>
-					<F N="runtime/games/src_game_nani/justin_ke.pfc.pl"/>
-					<F N="runtime/games/src_game_nani/meredith_ke.pfc.pl"/>
-					<F N="runtime/games/src_game_nani/objs_misc_household.pfc.pl"/>
-				</Folder>
-				<Folder Name="src_game_sims">
-					<Folder Name="web">
-						<Folder Name="prolog">
-							<F N="runtime/games/src_game_sims/web/prolog/mud_specific.pl"/>
-						</Folder>
-					</Folder>
-					<F N="runtime/games/src_game_sims/objs_misc_household.pfc.pl"/>
-				</Folder>
-				<Folder Name="src_game_startrek">
-					<Folder Name="holodeck">
-						<F N="runtime/games/src_game_startrek/holodeck/maze.map.pfc.pl"/>
-						<F N="runtime/games/src_game_startrek/holodeck/objs_misc_household.pfc.pl"/>
-						<F N="runtime/games/src_game_startrek/holodeck/objs_misc_monster.pfc.pl"/>
-						<F N="runtime/games/src_game_startrek/holodeck/predator.map.pfc.pl"/>
-						<F N="runtime/games/src_game_startrek/holodeck/rooms_conf.pl"/>
-						<F N="runtime/games/src_game_startrek/holodeck/vacuum.map.pfc.pl"/>
-					</Folder>
-					<Folder Name="mobs">
-						<F N="runtime/games/src_game_startrek/mobs/federation.pl"/>
-					</Folder>
-					<Folder Name="web">
-						<Folder Name="prolog">
-							<F N="runtime/games/src_game_startrek/web/prolog/mud_specific.pl"/>
-						</Folder>
-					</Folder>
-					<F N="runtime/games/src_game_startrek/startrek.all.pfc.pl"/>
-				</Folder>
-				<Folder Name="src_game_wumpus">
-					<F N="runtime/games/src_game_wumpus/maze.map.pfc.pl"/>
-					<F N="runtime/games/src_game_wumpus/objs_misc_monster.pfc.pl"/>
-				</Folder>
-			</Folder>
-			<F N="runtime/.ircbot.pl"/>
-			<F N="runtime/daemon.pl"/>
-			<F N="runtime/daydream.pl"/>
-			<F N="runtime/debug_loop.sh"/>
-			<F N="runtime/debug_mud_game.pl"/>
-			<F N="runtime/init_cliopatria.pl"/>
-			<F N="runtime/init_mud_server.pl"/>
-			<F N="runtime/init_mud_server_run.pl"/>
-			<F N="runtime/logicmoo_pdt.pl"/>
-			<F N="runtime/logicmoo_repl.pl"/>
-			<F N="runtime/makeREPL.sh"/>
-			<F N="runtime/README.md"/>
-			<F N="runtime/ReplaceSymLinkLinux.sh"/>
-			<F N="runtime/run_cliopatria.pl"/>
-			<F N="runtime/Run_Loop.sh"/>
-			<F N="runtime/run_mud_game.pl"/>
-			<F N="runtime/setup_paths.pl"/>
-			<F N="runtime/startGame.sh"/>
-			<F N="runtime/test_loop.sh"/>
-			<F N="runtime/test_release.pl"/>
-			<F N="runtime/TONOTIFY.txt"/>
-			<F N="runtime/try_logicmoo_examples.pl"/>
 		</Folder>
 		<Folder Name="s_expression">
 			<F
@@ -5304,7 +5660,6 @@
 			<Folder Name="t">
 				<F N="slack_prolog/t/.slack_auth.pl"/>
 				<F N="slack_prolog/t/first_slack_bot.pl"/>
-				<F N="slack_prolog/t/rtrace_tests.plt"/>
 				<F N="slack_prolog/t/slack_mud.pl"/>
 			</Folder>
 			<F
@@ -5325,6 +5680,13 @@
 				Refilter="1"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
 		</Folder>
+		<Folder Name="tabling_dra">
+			<F
+				N="tabling_dra/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="t/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+		</Folder>
 		<Folder Name="with_open_options">
 			<F
 				N="with_open_options/*.*"
@@ -5342,6 +5704,13 @@
 		<Folder Name="xlisting">
 			<F
 				N="xlisting/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+		</Folder>
+		<Folder Name="xlisting_web">
+			<F
+				N="xlisting_web/*.*"
 				Recurse="1"
 				Refilter="1"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
