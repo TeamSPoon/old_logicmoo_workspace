@@ -1,5 +1,5 @@
 
-:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(library(pfc)).
 
 % :- use_listing_vars.
 
@@ -7,9 +7,9 @@
 
 
 % :- set_prolog_flag(umt_local,false).
-% :- ensure_loaded(library(logicmoo/mpred/mpred_pfc)).
-%:- ensure_loaded(library(logicmoo_base)).
-% :- ensure_loaded(library(logicmoo_base)).
+% :- ensure_loaded(library(logicmoo/mpred/mpred_core)).
+%:- ensure_loaded(library(pfc)).
+% :- ensure_loaded(library(pfc)).
 %:- use_module(library(pfc)).
 
 :- use_module('mpred_pfc_test_03').
@@ -128,5 +128,5 @@
 % local_testing
 
 
-:- make,check,ensure_loaded(library(logicmoo_base)),make,check.
+:- make,check,ensure_loaded(library(pfc)),make,check.
 

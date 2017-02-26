@@ -17,7 +17,7 @@
 :- thread_local(t_l:disable_px/0).
 :- ensure_loaded('../logicmoo_utils').
 
-:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(library(pfc)).
 :- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 
 ainz_pttp(A):-if_defined(ainz(A),assertz_new(A)).

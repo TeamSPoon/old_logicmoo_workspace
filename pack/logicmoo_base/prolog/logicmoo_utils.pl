@@ -63,9 +63,9 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 % Save a directory of *this* file into logicmoo(..)
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
-:- if( \+ exists_source(logicmoo(logicmoo_engine))).
-:- add_file_search_path_local(logicmoo,'../../logicmoo_base/prolog/logicmoo/').
-:- exists_source(logicmoo(logicmoo_engine)).
+:- if( \+ exists_source(library(logicmoo_engine))).
+:- add_file_search_path_local(library,'./').
+:- exists_source(library(logicmoo_engine)).
 :- endif.
 
 
@@ -82,8 +82,8 @@ resolve_dir_local(Dir,ABS):- absolute_file_name(library(Dir),ABS),exists_directo
 :- set_prolog_flag(generate_debug_info, true).
 :- set_prolog_flag(lm_expanders,false).
 
-:- reexport(library('logicmoo/util/logicmoo_util_terms')).
-:- reexport(library('logicmoo/util/logicmoo_util_strings')).
+:- reexport(library('logicmoo_util_terms')).
+:- reexport(library('logicmoo_util_strings')).
 
 
 :- reexport(library('hook_hybrid')).

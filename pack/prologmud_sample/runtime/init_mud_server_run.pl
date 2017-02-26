@@ -31,7 +31,7 @@
 :- after_boot((set_prolog_flag(pfc_booted,true),flag_call(runtime_debug=true),set_prolog_flag(read_attvars,false))).
 
 
-% :- baseKB:load_library_system(logicmoo(logicmoo_engine)).
+% :- baseKB:load_library_system(library(logicmoo_engine)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,13 +44,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Mostly Required] Load the Logicmoo Plan Generator System
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- user:load_library_system(library(logicmoo/logicmoo_planner)).
+:- user:load_library_system(library(logicmoo_planner)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% :- user:load_library_system(library(logicmoo/logicmoo_u_cyc_api)).
+% :- user:load_library_system(library(plark/logicmoo/logicmoo_u_cyc_api)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

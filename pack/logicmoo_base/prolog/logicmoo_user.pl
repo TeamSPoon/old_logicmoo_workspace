@@ -29,7 +29,7 @@ logicmoo_user_stacks:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_p
 :- set_prolog_flag(pfc_booted,false).
 :- current_prolog_flag(unsafe_speedups,_)->true;set_prolog_flag(unsafe_speedups,true).
 :- system:ensure_loaded(system:library(logicmoo_utils)).
-:- system:ensure_loaded(library(logicmoo_base)).
+:- system:ensure_loaded(library(pfc)).
 :- set_prolog_flag(pfc_booted,false).
 
 

@@ -7,7 +7,7 @@
 :- dynamic(prolog:make_hook/2).
 
 :- if(\+ current_module(baseKB)).
-:- [init_cliopatria].
+:- ensure_loaded(library(logicmoo_webbot)).
 :- unload_file(logicmoo_repl).
 :- threads.
 :- set_prolog_flag(logicmoo_qsave,true).
@@ -44,7 +44,7 @@ load_library_system(M,File):- during_boot(gripe_time(40,(if_file_exists(ensure_l
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Optionaly] Load the EXTRA Logicmoo WWW System
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% :- baseKB:ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
+% :- baseKB:ensure_loaded(library(logicmoo/mpred_online/xlisting_web)).
 % :- (if_file_exists(ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).
 % :- (if_file_exists(ensure_loaded(library(logicmoo/logicmoo_run_swish)))).
 
@@ -61,7 +61,7 @@ load_library_system(M,File):- during_boot(gripe_time(40,(if_file_exists(ensure_l
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- baseKB:ensure_loaded(system:library(logicmoo_utils)).
 :- set_prolog_flag(do_renames,restore).
-:- baseKB:ensure_loaded(library(logicmoo_base)).
+:- baseKB:ensure_loaded(library(pfc)).
 :- set_prolog_flag(do_renames,restore).
 
 :- ls.
@@ -135,7 +135,7 @@ system:iRR7_test:-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- check_clause_counts.
 
-% :- baseKB:load_library_system(logicmoo(logicmoo_engine)).
+% :- baseKB:load_library_system(library(logicmoo_engine)).
 % :- baseKB:load_library_system(logicmoo(logicmoo_plarkc)).
 
 :- after_boot((set_prolog_flag(pfc_booted,true),flag_call(runtime_debug=true),set_prolog_flag(read_attvars,false))).

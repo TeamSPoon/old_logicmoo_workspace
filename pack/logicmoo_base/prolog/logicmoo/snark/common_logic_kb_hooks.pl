@@ -61,7 +61,7 @@ noGenlPreds/1,
 :- include('../mpred/mpred_header.pi').
 %:- endif.
 
-%:- baseKB:ensure_loaded(library(logicmoo_base)).
+%:- baseKB:ensure_loaded(library(pfc)).
 
 % :- dynamic_multifile kbp_t_list_prehook/2.
 

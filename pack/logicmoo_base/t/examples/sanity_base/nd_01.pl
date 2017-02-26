@@ -1,7 +1,7 @@
 
 :- module(nd_01,[]).
 
-:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(library(pfc)).
 % :- use_listing_vars.
 
 :- nd_01:dynamic((nd_01:p/0,nd_01:px/0,nd_01:py/0,nd_01:pz/0,p1/0,p1x/0,p1y/0,p1z/0,p2/0,p2x/0,p2y/0,p2z/0)).
@@ -19,7 +19,7 @@ p.
 ((p1) ==> {member(X,[p1x,p1y,p1z])},{writeq(X)}).
 p1.
 
-% :-asserta((mpred_pfc:functor_foo(P,F,A):- trace,ground(P),functor(P,F,A))).
+% :-asserta((mpred_core:functor_foo(P,F,A):- trace,ground(P),functor(P,F,A))).
 
 :- set_fc_mode(depth).
 

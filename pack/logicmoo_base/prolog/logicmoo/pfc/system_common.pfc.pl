@@ -859,7 +859,10 @@ argIsa(F,_,ftTerm):-member(F/_, [argIsa/3,predProxyAssert/2,negate_wrapper0/2,mu
                                 ruleBackward/2,formatted_resultIsa/2, pt/_,rhs/_,nt/_,bt/_,bracket/3]),!.
 argIsa(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,Type=argIsaFn(Prop,N1),!.
 */
-
+/*
+$mycont.set({V1=$a.value,V2=$b.value}/(VarIn)>>writeln(my_cont(V1,V2,VarIn))).
+writeln($mycont).
+*/
 
 :- kb_shared(mpred_f/5).
 :- kb_shared(mpred_f/6).
@@ -871,7 +874,7 @@ argIsa(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa(Prop,N1,
 %
 % Argument  (isa/2) Format Type.
 %
-%:- kb_shared(argQuotedIsa/3).
+:- kb_shared(argQuotedIsa/3).
 prologHybrid(argQuotedIsa(tRelation,ftInt,ttExpressionType)).
 
 ((prologHybrid(F),arity(F,A))==>{kb_shared(F/A)}).

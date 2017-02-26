@@ -2,7 +2,7 @@
 
 :- module(sanity_ks_two,[]).
 
-:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(library(pfc)).
 
 :- debug_logicmoo(_).
 :- nodebug_logicmoo(http(_)).

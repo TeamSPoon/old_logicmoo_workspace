@@ -8,7 +8,7 @@
 */
 % :- module(logicmoo_plarkc,[]).
 
-:- ensure_loaded(logicmoo(logicmoo_engine)).
+:- ensure_loaded(library(logicmoo_engine)).
 :- asserta_new(user:file_search_path(pldata,'/opt/cyc/')).
 :- asserta_new(user:file_search_path(pldata,library(pldata))).
 :- asserta_new(user:file_search_path(logicmoo,library)).

@@ -5599,7 +5599,6 @@
 				<F N="prologmud_sample/runtime/debug_once.sh"/>
 				<F N="prologmud_sample/runtime/full_clone_externals.sh"/>
 				<F N="prologmud_sample/runtime/hg_push_pull.sh"/>
-				<F N="prologmud_sample/runtime/init_cliopatria.pl"/>
 				<F N="prologmud_sample/runtime/init_mud_server.pl"/>
 				<F N="prologmud_sample/runtime/init_mud_server_run.pl"/>
 				<F N="prologmud_sample/runtime/logic_example.pl.pfc"/>

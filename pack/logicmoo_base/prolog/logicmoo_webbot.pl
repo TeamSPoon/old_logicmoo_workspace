@@ -1,4 +1,4 @@
-#!/usr/bin/swipl 
+%#!/usr/bin/swipl 
 
 % :- unload_file(init_cliopatria).
 
@@ -119,16 +119,13 @@ add_relative_search_path(Alias, Abs) :-
 add_relative_search_path(Alias, Rel) :-
 	assertz(user:file_search_path(Alias, Rel)).
 
-%file_search_path(cliopatria, ' /mnt/gggg/PrologMUD/pack/ClioPatria').
-%:- add_relative_search_path(cliopatria, '/mnt/gggg/PrologMUD/pack/ClioPatria').
-%file_search_path(cliopatria, '/root/lib/swipl/pack/ClioPatria').
+
 :- if(exists_directory('../../ClioPatria/')).
 :- add_relative_search_path(cliopatria, '../../ClioPatria').
 :- endif.
-:- if(exists_directory('../ClioPatria/')).
-:- add_relative_search_path(cliopatria, '../ClioPatria').
+:- if(exists_directory('../../../ClioPatria/')).
+:- add_relative_search_path(cliopatria, '../../../ClioPatria').
 :- endif.
-
 
 % Make loading files silent. Comment if you want verbose loading.
 
@@ -164,21 +161,7 @@ add_relative_search_path(Alias, Rel) :-
 :- '$set_typein_module'(baseKB).
 :- '$set_source_module'(baseKB).
 
-:- thread_local(tlbugger:no_buggery_tl/0).
-:- multifile(t_l:disable_px/0).
-:- thread_local(t_l:disable_px/0).
-
-:- meta_predicate(with_no_mpred_expansions(:)).
-%% with_no_mpred_expansions( :Goal) is det.
-%
-% Using No Managed Predicate Expansions.
-%
-with_no_mpred_expansions(Goal):-
-  locally(tlbugger:no_buggery_tl,
-    locally(t_l:disable_px,Goal)).
-:- export(with_no_mpred_expansions/1).
-:- system:import(with_no_mpred_expansions/1).
-
+:- ensure_loaded(system:library(xlisting_web)).
 
 
 % invert_varname(NV):-  ignore(((NV=(N=V), V='$VAR'(N)))).
@@ -494,21 +477,21 @@ system:kill_unsafe_preds:-
 :- dmsg("IRC EGGDROP").
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- if(exists_source(library(eggdrop))).
-:- ensure_loaded(user:library(eggdrop)).
-:- during_boot((user:egg_go)).
+:- ensure_loaded(userf:library(eggdrop)).
+% :- during_boot((user:egg_go)).
 :- endif.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- dmsg("CYC Alignment util").
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- set_prolog_flag(do_renames,restore).
-:- baseKB:ensure_loaded(logicmoo('plarkc/logicmoo_i_cyc_rewriting')).
+:- baseKB:ensure_loaded(library('logicmoo/plarkc/logicmoo_i_cyc_rewriting')).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- dmsg("SETUP CYC KB EXTENSIONS").
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- during_boot(set_prolog_flag(do_renames,restore)).
-:- gripe_time(60,baseKB:ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'))).
+:- gripe_time(60,baseKB:ensure_loaded(library('logicmoo/plarkc/logicmoo_i_cyc_kb_tinykb.pfc'))).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- dmsg("SET TOPLEVEL OPTIONS").

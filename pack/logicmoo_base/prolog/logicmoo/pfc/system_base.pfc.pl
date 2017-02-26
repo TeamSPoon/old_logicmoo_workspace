@@ -30,18 +30,19 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- use_module(library('logicmoo/mpred/mpred_at_box.pl')).
-:- use_module(library('logicmoo/mpred/mpred_pfc.pl')).
+:- use_module(library(pfc)).
 :- autoload.
 :- mpred_unload_file.
 :- begin_pfc.
 :- '$set_source_module'(baseKB).
-:- set_module(baseKB:class(development)).
+:- set_module(class(development)).
 :- prolog_load_context(module,Mod),sanity(Mod==baseKB),writeq(prolog_load_context(module,Mod)),nl.
 
 :- if(current_predicate(initEnvironment/0)).
 :- must(initEnvironment).
 :- endif.
+
+:- kb_shared(collectionConventionMt/2).
 
 %:- set_prolog_flag(runtime_speed,3).
 :- set_prolog_flag(runtime_speed, 0).
@@ -49,9 +50,9 @@
 :- set_prolog_flag(runtime_debug, 3).
 :- set_prolog_flag(unsafe_speedups, false).
 
-:- dynamic(baseKB:col_as_isa/1).
-:- dynamic(baseKB:col_as_unary/1).
-:- dynamic(baseKB:col_as_static/1).
+:- dynamic(col_as_isa/1).
+:- dynamic(col_as_unary/1).
+:- dynamic(col_as_static/1).
 
 :- kb_shared(arity/2).
 :- forall(between(1,11,A),kb_shared(t/A)).
@@ -187,9 +188,9 @@ col_as_isa(ttTemporalType).
 
 :- set_prolog_flag(mpred_te,true).
 
-% :- '$set_source_module'(baseKB).
+:- '$set_source_module'(baseKB).
 % :- defprimconcept(naf(tDeleted),tExisting).
-:- abolish(isa,2).
+% :- abolish(isa,2).
 
 do_and_undo(A,U):-atom(A),atom_concat('assert',Suffix,A),!,atom_concat('delete',Suffix,U),current_predicate(U/_).
 do_and_undo(A,U):-atom(A),atom_concat('def',_,A),atom_concat('un',A,U),current_predicate(U/_).
@@ -197,7 +198,7 @@ do_and_undo(A,U):-strip_module(A,M,P),compound(P),P=..[F|ARGS],lookup_u(do_and_u
 ll:- listing([isa/2,mtCycL/1,col_as_unary,col_as_isa,tRRP2/1,tRR/1,tRRP/1]).
 
 
-:- asserta_if_new(baseKB:mtCycL(baseKB)).
+:- asserta_if_new(mtCycL(baseKB)).
 
 ttTypeType(col_as_isa).
 ttTypeType(col_as_unary).
@@ -225,7 +226,7 @@ ttRelationType(rtQuotedPred).
 
 
 %:- start_rtrace,trace.
-:- ain_expanded(baseKB:mtCycL(baseKB)).
+:- ain_expanded(mtCycL(baseKB)).
 col_as_isa(tSet).
 col_as_isa(ttSpatialType).
 
@@ -284,24 +285,24 @@ genls(ttRelationType,completelyAssertedCollection).
 
 %:- set_fileAssertMt(baseKB).
 
-:- dynamic(baseKB:agent_call_command/2).
-:- export(baseKB:agent_call_command/2).
-:- system:import(baseKB:agent_call_command/2).
+:- dynamic(agent_call_command/2).
+:- export(agent_call_command/2).
+:- system:import(agent_call_command/2).
 
 
 :- dynamic(decided_not_was_isa/2).
-:- kb_shared(baseKB:mtCycL/1).
-:- kb_shared(baseKB:mtExact/1).
-:- kb_shared(baseKB:predicateConventionMt/2).
-:- dynamic(baseKB:mtCycL/1).
-:- dynamic(baseKB:mtExact/1).
-:- dynamic(baseKB:predicateConventionMt/2).
+:- kb_shared(mtCycL/1).
+:- kb_shared(mtExact/1).
+:- kb_shared(predicateConventionMt/2).
+:- dynamic(mtCycL/1).
+:- dynamic(mtExact/1).
+:- dynamic(predicateConventionMt/2).
 
 
 :- listing(spft/3).
-baseKB:mtCycL(baseKB).
+mtCycL(baseKB).
 :- mpred_run.
-%baseKB:mtExact(baseKB).
+%mtExact(baseKB).
 
 % :-  abolish(yall:'/' / 2).
 
@@ -412,7 +413,7 @@ functorDeclares(ttModule).
 
 ttExpressionType(ftList(ftInt)).
 
-%:- sanity((fix_mp(clause(assert,sanity),arity(apathFn,2),M,O),M:O=baseKB:arity(apathFn,2))).
+%:- sanity((fix_mp(clause(assert,sanity),arity(apathFn,2),M,O),M:O=arity(apathFn,2))).
 
 :- dynamic(ttRelationType/1).
 
@@ -467,7 +468,7 @@ arity(argsQuoted,1).
 arity(quasiQuote,1).
 argsQuoted(spft).
 
-:-call(asserta_if_new, baseKB:mtCycL(baseKB)).
+:-call(asserta_if_new, mtCycL(baseKB)).
 
 % this mean to leave terms at EL:  foo('xQuoteFn'([cant,touch,me])).
 
@@ -680,10 +681,10 @@ genlMt(Mt1,Mt2),mtProlog(Mt1),mtCycL(Mt2) ==>
   {trace_or_throw(oddly_genlMt(Mt1,Mt2))}.
 */
 
-% baseKB:mtCycL(baseKB).
+% mtCycL(baseKB).
 
-baseKB:predicateConventionMt(predicateConventionMt,baseKB).
-baseKB:predicateConventionMt(collectionConventionMt,baseKB).
+predicateConventionMt(predicateConventionMt,baseKB).
+predicateConventionMt(collectionConventionMt,baseKB).
 
 :- kb_shared( ( =@=> ) /2 ).
 :- kb_shared( ( macroExpandExact ) /2 ).
@@ -706,7 +707,7 @@ predicateConventionMt(regression_test,baseKB).
 functorDeclares(tSet).
 tSet(tMicrotheory,mudToCyc('Microtheory')).
 
-baseKB:collectionConventionMt(tMicrotheory,baseKB).
+collectionConventionMt(tMicrotheory,baseKB).
 collectionConventionMt(mtCycL,baseKB).
 collectionConventionMt(mtExact,baseKB).
 collectionConventionMt(Col,Where) ==> predicateConventionMt(Col,Where).
@@ -814,7 +815,7 @@ mtCycL(O)==>({find_and_call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
 % mtCycL(Mt)==>{skip_user(Mt),set_prolog_flag(Mt:unknown,warning)},genlMt(Mt,baseKB).
 codeRule(mtGlobal(Mt)==>genlMt(baseKB,Mt)).
 
-baseKB:isRegisteredCycPred(apply,maplist,3).
+isRegisteredCycPred(apply,maplist,3).
 
 /*
 (genlMt(Child,Parent), \+ mtCore(Child)) ==>
@@ -823,8 +824,8 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
     system:add_import_module(Child,Parent,start)}.
 */
 
-:- dynamic(baseKB:isRegisteredCycPred/3).
-:- kb_shared(baseKB:isRegisteredCycPred/3).
+:- dynamic(isRegisteredCycPred/3).
+:- kb_shared(isRegisteredCycPred/3).
 
 /*
 :- ((rtrace, dtrace)).
@@ -833,11 +834,11 @@ baseKB:isRegisteredCycPred(apply,maplist,3).
    predicate_property(Mt:P,defined), 
  \+ predicate_property(Mt:P,imported_from(_)),
  functor(P,F,A)})
-  ==>baseKB:isRegisteredCycPred(Mt,F,A)).
+  ==>isRegisteredCycPred(Mt,F,A)).
 */
 
 /* prolog_listing:listing */
-% :- printAll(baseKB:isRegisteredCycPred/3).
+% :- printAll(isRegisteredCycPred/3).
 
 % ~(tCol({})).
 

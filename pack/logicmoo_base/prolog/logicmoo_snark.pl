@@ -38,7 +38,7 @@ with_ukb_snark(KB,G):- with_umt(KB,G).
 % Module Secondary Helper.
 %
 %:- add_library_search_path('./mpred_online/',[ '*.pl']).
-checkKB:m1:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_defined(ensure_webserver), make,list_undefined.
+checkKB:m1:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/xlisting_web))),if_defined(ensure_webserver), make,list_undefined.
 
 % :- hook_message_hook.
 % :- set_prolog_flag(verbose_autoload,false).

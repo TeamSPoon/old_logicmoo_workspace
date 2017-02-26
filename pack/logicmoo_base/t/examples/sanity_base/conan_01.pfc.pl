@@ -3,7 +3,7 @@
 :- module(sanity_ks_two,[]).
 
 :- dynamic(prologHybrid/1).
-:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(library(pfc)).
 
 /*
 

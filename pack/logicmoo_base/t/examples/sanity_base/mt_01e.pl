@@ -9,7 +9,7 @@
 */
 :- module(mt_01e,[]).
 
-:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(library(pfc)).
 
 :- begin_pfc.
 

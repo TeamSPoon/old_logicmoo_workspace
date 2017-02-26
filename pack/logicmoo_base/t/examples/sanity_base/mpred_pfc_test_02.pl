@@ -1,5 +1,5 @@
 
-:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(library(pfc)).
 
 % :- use_listing_vars.
 
@@ -119,5 +119,5 @@
 % local_testing
 
 
-:- make,check,ensure_loaded(library(logicmoo_base)),make,check.
+:- make,check,ensure_loaded(library(pfc)),make,check.
 

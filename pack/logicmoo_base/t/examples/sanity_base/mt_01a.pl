@@ -9,7 +9,7 @@
 */
 :- module(mt_01a,[]).
 
-% :- ensure_loaded(library(logicmoo_base)).
+% :- ensure_loaded(library(pfc)).
 
 :- set_defaultAssertMt(mt_01a).
 

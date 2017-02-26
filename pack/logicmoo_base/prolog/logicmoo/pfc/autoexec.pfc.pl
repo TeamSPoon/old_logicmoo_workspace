@@ -114,7 +114,7 @@
 
 :- ensure_loaded(('system_singleValued.pfc')).
 
-:- ensure_loaded(('logicmoo/snark/common_logic_clif.pfc')).
+:- ensure_loaded(library('logicmoo/snark/common_logic_clif.pfc')).
 
 :- ensure_loaded(('user_relationAllExists.pfc')).
 

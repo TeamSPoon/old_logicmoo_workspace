@@ -2,7 +2,7 @@
 
 :- ensure_loaded('../../../prolog/logicmoo_utils').
 :- statistics.
-:- use_module(library(logicmoo_base)).
+:- use_module(library(pfc)).
 :- statistics.
 :- include('/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo_user.pl').
 :- statistics.

@@ -140,7 +140,7 @@ setup_for_debug :- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_e
 
 /*
 :- user:ensure_loaded(system:library(logicmoo_utils)).
-:- user:ensure_loaded(library(logicmoo_base)).
+:- user:ensure_loaded(library(pfc)).
 :- user:ensure_loaded(library(logicmoo_user)).
 */
 

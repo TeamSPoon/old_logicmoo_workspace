@@ -2,7 +2,7 @@
 :- module(mpred_pttp_static,[]).
 :- endif.
 
-:- ensure_loaded(library(logicmoo_base)).
+:- ensure_loaded(library(pfc)).
 :- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 
 :- 

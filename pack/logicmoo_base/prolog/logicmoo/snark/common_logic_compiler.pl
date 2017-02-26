@@ -147,7 +147,7 @@
           ]).
 
 :- include('../mpred/mpred_header.pi').
-%:- user:ensure_loaded(library(logicmoo_base)).
+%:- user:ensure_loaded(library(pfc)).
 %:- endif.
 
   
