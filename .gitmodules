@@ -1,9 +1,9 @@
-;;[submodule "pack/swish"]
-;;	path = pack/swish
-;;	url = https://github.com/logicmoo/swish.git
-;;[submodule "pack/ClioPatria"]
-;;	path = pack/ClioPatria
-;;	url = https://github.com/ClioPatria/ClioPatria
+[submodule "pack/swish"]
+	path = pack/swish
+	url = https://github.com/logicmoo/swish.git
+[submodule "pack/ClioPatria"]
+	path = pack/ClioPatria
+	url = https://github.com/ClioPatria/ClioPatria
 [submodule "pack/clause_attvars"]
 	path = pack/clause_attvars
 	url = https://github.com/TeamSPoon/clause_attvars.git
@@ -79,3 +79,6 @@
 [submodule "pack/prologmud"]
 	path = pack/prologmud
 	url = https://github.com/TeamSPoon/prologmud
+[submodule "pack/logicmoo_base"]
+	path = pack/logicmoo_base
+	url = https://github.com/TeamSPoon/logicmoo_base

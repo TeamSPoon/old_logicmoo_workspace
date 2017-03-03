@@ -1,7 +1,0 @@
-% -----------------------------------------------------------------------------
-% Name: INCLUDED FILE
-%
-% Included file to test processing of include directives.
-% -----------------------------------------------------------------------------
-
-fof(assumption, axiom, p).
