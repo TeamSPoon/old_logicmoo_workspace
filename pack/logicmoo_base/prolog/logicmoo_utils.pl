@@ -31,9 +31,7 @@
 :- module(logicmoo_utils_file,[logicmoo_utils_test_msg/0]).
 :- endif.
 
-
-
-:- set_prolog_flag(lm_expanders,false).
+:- set_prolog_flag(lm_expanders,default).
 
 % ======================================================
 % Add Extra file_search_paths

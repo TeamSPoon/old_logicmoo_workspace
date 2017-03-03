@@ -1957,3 +1957,6 @@ cf_to_flattened_clauses_0(KB,Why,NCFsI,FlattenedO):-
    must_maplist(demodal_sents(KB),FlattenedS,FlattenedO))),!.
   
 % :- autoload([verbose(false)]).
+
+:- fixup_exports.
+

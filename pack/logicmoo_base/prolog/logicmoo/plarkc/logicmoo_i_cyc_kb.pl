@@ -520,4 +520,5 @@ end_of_file.
 %:- notrace.
 %:- break.
 
+:- fixup_exports.
 

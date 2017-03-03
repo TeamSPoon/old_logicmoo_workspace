@@ -50,8 +50,8 @@ exactlyAssertedEL(A,B,MT,STR):- exactlyAssertedEL_next(A,B,MT,STR),true.
 exactlyAssertedEL(A,B,C,MT,STR):- exactlyAssertedEL_next(A,B,C,MT,STR),true.
 exactlyAssertedEL(A,B,C,D,MT,STR):- exactlyAssertedEL_next(A,B,C,D,MT,STR),true.
 exactlyAssertedEL(A,B,C,D,E,MT,STR):- exactlyAssertedEL_next(A,B,C,D,E,MT,STR),true.
-exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),not(is_better_backchained(=>(A,C))).
-exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),is_better_backchained(=>(A,C)).
+exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),not(if_defined(is_better_backchained(=>(A,C)))).
+exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),if_defined(is_better_backchained(=>(A,C))).
 exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not(What,MT,STR),true.
 
 :- install_constant_renamer_until_eof.

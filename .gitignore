@@ -1,4 +1,8 @@
 syntax: glob
+*.prc
+pack/prologmud_sample/runtime/games/matuszak/
+pack/prologmud_sample/runtime/games/www.cis.upenn.edu/
+pack/logicmoo_base/prolog/cpack/
 **/INDEX.pl
 #pack/*/
 pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar

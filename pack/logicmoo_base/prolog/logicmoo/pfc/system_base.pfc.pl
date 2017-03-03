@@ -33,7 +33,16 @@
 :- use_module(library(pfc)).
 :- autoload.
 :- mpred_unload_file.
+
+%:- set_prolog_flag(runtime_speed,0). % 0 = dont care
+:- set_prolog_flag(runtime_speed, 1). % 1 = default
+:- set_prolog_flag(runtime_debug, 3). % 2 = important but dont sacrifice other features for it
+:- set_prolog_flag(runtime_safety, 3).  % 3 = very important
+:- set_prolog_flag(unsafe_speedups, false).
+
+
 :- begin_pfc.
+:- sanity('$current_source_module'(baseKB)).
 :- '$set_source_module'(baseKB).
 :- set_module(class(development)).
 :- prolog_load_context(module,Mod),sanity(Mod==baseKB),writeq(prolog_load_context(module,Mod)),nl.
@@ -42,21 +51,89 @@
 :- must(initEnvironment).
 :- endif.
 
+:- kb_shared(mpred_prop/3).
+:- kb_shared(ttRelationType/1).
+
+% ttRelationType(RT)==> { decl_rt(RT) }.
+
+==> ttRelationType(isEach(
+                  prologBuiltin,
+                  prologDynamic,
+                  prologHybrid,
+
+                  prologKIF,
+                  prologPTTP,
+                  pfcDatabaseTerm,
+                  pfcMustFC,
+
+                  prologListValued,
+                  prologMultiValued,
+                  prologSingleValued,
+                  prologOrdered,
+
+                  prologNegByFailure,
+                  prologIsFlag,
+
+                  prologSideEffects,
+                  rtAvoidForwardChain,
+                  predCanHaveSingletons,
+
+                  pfcControlled,
+                  pfcWatched,
+                  pfcCreates,
+
+                  pfcCallCode,
+                  pfcCallCodeAnte,
+
+                  rtReflexiveBinaryPredicate,
+
+                  pfcNegTrigger,
+                  pfcPosTrigger,
+                  pfcBcTrigger,
+                  pfcRHS,
+                  pfcLHS)).
+
+
+:- listing(ttRelationType/1).
+
+
+nondet.
+
+:- mpred_trace_exec.
+ttRelationType(RT)==> { decl_rt(RT) },tSet(RT).
+:- mpred_notrace_exec.
+   
+
 :- kb_shared(collectionConventionMt/2).
-
-%:- set_prolog_flag(runtime_speed,3).
-:- set_prolog_flag(runtime_speed, 0).
-:- set_prolog_flag(runtime_safety, 3).
-:- set_prolog_flag(runtime_debug, 3).
-:- set_prolog_flag(unsafe_speedups, false).
-
-:- dynamic(col_as_isa/1).
-:- dynamic(col_as_unary/1).
-:- dynamic(col_as_static/1).
+:- dynamic(col_as_unary/1). % written as COL(ELEM)
+:- dynamic(col_as_isa/1). % members are used thru  isa(ELEM,COL).
+:- dynamic(col_as_static/1). % hard coded like: compound/1
 
 :- kb_shared(arity/2).
 :- forall(between(1,11,A),kb_shared(t/A)).
 :- kb_shared(meta_argtypes/1).
+
+col_as_isa(tCol).
+col_as_isa(tSet).
+col_as_isa(ttExpressionType).
+
+col_as_isa(ttTypeType).
+col_as_isa(ttRelationType).
+col_as_isa(ttValueType).
+col_as_isa(ttActionType).
+
+col_as_isa(ttMicrotheoryType).
+col_as_isa(ttSituationType).
+col_as_isa(ttEventType).
+
+col_as_isa(ttTopicType).
+
+col_as_isa(ttSpatialType).
+col_as_isa(ttTemporalType).
+
+col_as_isa(ttItemType).
+col_as_isa(ttAgentType).
+col_as_isa(ttRegionType).
 
 %:- import_module_to_user(logicmoo_user).
 
@@ -69,7 +146,7 @@
 
 :- discontiguous(completelyAssertedCollection/1).
 completelyAssertedCollection(prologNegByFailure).
-
+prologNegByFailure(prologNegByFailure).
 
 
 
@@ -158,23 +235,7 @@ t(P,A1,A2,A3,A4,A5,A6,A7):- cwc,  mpred_fa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)
 %t(P,A1,A2,A3,A4,A5,A6,A7):- cwc,  call_u(t(P,A1,A2,A3,A4,A5,A6,A7)).
 
 
-col_as_isa(tCol).
-col_as_isa(tSet).
 
-col_as_isa(ttTypeType).
-col_as_isa(ttRelationType).
-col_as_isa(ttExpressionType).
-col_as_isa(ttItemType).
-col_as_isa(ttAgentType).
-col_as_isa(ttMicrotheoryType).
-col_as_isa(ttRegionType).
-col_as_isa(ttValueType).
-col_as_isa(ttTopicType).
-col_as_isa(ttSituationType).
-col_as_isa(ttActionType).
-col_as_isa(ttEventType).
-col_as_isa(ttSpatialType).
-col_as_isa(ttTemporalType).
 
 %denotesTypeType(FT,CT)==>prefered_collection(FT,CT).
 %prefered_collection(ftSubLString,ftString).
@@ -203,6 +264,7 @@ ll:- listing([isa/2,mtCycL/1,col_as_unary,col_as_isa,tRRP2/1,tRR/1,tRRP/1]).
 ttTypeType(col_as_isa).
 ttTypeType(col_as_unary).
 ttTypeType(col_as_static).
+
 col_as_unary(col_as_isa).
 col_as_unary(col_as_unary).
 col_as_unary(col_as_static).
@@ -236,6 +298,7 @@ tSet(ttRelationType).
 col_as_isa(ttRelationType).
 %col_as_isa(completelyAssertedCollection).
 
+rtQuotedPred(rtQuotedPred).
 rtQuotedPred(completeExtentAsserted).
 col_as_unary(completelyAssertedCollection).
 
@@ -248,10 +311,11 @@ col_as_isa(Col)==>tCol(Col).
 
 
 ==>functorIsMacro(functorIsMacro).
-tCol(P)/atom(P)==>functorIsMacro(P).
-functorIsMacro(Decl)/atom(Decl)==>functorDeclares(Decl).
+tCol(P)==>{sanity(atom(P))},functorIsMacro(P).
+functorDeclares(Decl)==>functorIsMacro(Decl).
 functorIsMacro(props).
 functorIsMacro(tiProps).
+
 
 
 ttRelationType(P)==>(tCol(P),completelyAssertedCollection(P),completeExtentAsserted(P)).
@@ -294,9 +358,6 @@ genls(ttRelationType,completelyAssertedCollection).
 :- kb_shared(mtCycL/1).
 :- kb_shared(mtExact/1).
 :- kb_shared(predicateConventionMt/2).
-:- dynamic(mtCycL/1).
-:- dynamic(mtExact/1).
-:- dynamic(predicateConventionMt/2).
 
 
 :- listing(spft/3).
@@ -314,8 +375,8 @@ mtCycL(baseKB).
 
 
 %:- rtrace.
-:- dynamic(mpred_mark/3).
-:- kb_shared(mpred_mark/3).
+:- dynamic(mpred_prop/3).
+:- kb_shared(mpred_prop/3).
 %:- nortrace.
 
 
@@ -339,13 +400,13 @@ tAtemporalNecessarilyEssentialCollectionType(ANECT)==>
 :- dynamic(pass2/0).
 :- dynamic(sometimesSlow/0).
 :- dynamic(sometimesBuggy/0).
-:- dynamic(sometimesUseless/0).
+:- dynamic(redundantMaybe/0).
 :- kb_shared(ttModule/1).
 :- kb_shared(marker_supported/2).
 :- kb_shared(pass2/0).
 :- kb_shared(sometimesSlow/0).
 :- kb_shared(sometimesBuggy/0).
-:- kb_shared(sometimesUseless/0).
+:- kb_shared(redundantMaybe/0).
 
 
 % NEVER (P/mpred_non_neg_literal(P) ==> { remove_negative_version(P) } ).
@@ -438,10 +499,7 @@ arity(F,1):- cwc, is_ftNameArity(F,1), current_predicate(F/1), (col_as_unary(F);
 
 tCol(ttModule).
 arity(tCol,1).
-tCol(ftAssertable).
-tCol(ftCallable).
-tCol(ftAskable).
-tCol(tRelation).
+tSet(tRelation).
 
 /*
 ?- fully_expand((==> (ftSpec(ftListFn(_72012)):- cwc,callable(_72012),ftSpec(_72012))),O).
@@ -457,6 +515,7 @@ tSet(ftListFn(Atom)):- cwc, callable(Atom),!,fail.
 ttExpressionType(ftAssertable).
 ttExpressionType(ftCallable).
 ttExpressionType(ftAskable).
+ttExpressionType(Atom)/atom(Atom)==> arity(Atom,1).
 tCol(ftString).
 tCol(ftAtom).
 tCol(ftProlog).
@@ -486,6 +545,7 @@ argsQuoted(meta_argtypes).
 argsQuoted(ttFormated).
 argsQuoted(ruleRewrite).
 argsQuoted(mpred_action).
+argsQuoted(mpred_prop).
 argsQuoted(ain).
 argsQuoted(mpred_rem).
 argsQuoted(added).
@@ -501,7 +561,7 @@ argsQuoted(vtActionTemplate).
 
 :- dynamic((==>)/2).
 :- kb_shared((==>)/2).
-%doing_slow_rules,
+%doing_slow_rules
 %:-rtrace(ain(((prologBuiltin(F),{atom(F)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)}))).
 %((prologBuiltin(P),{compound(P),get_arity(P,F,A)},arity(F,A),{sanity(integer(A))})==>{make_builtin(F/A)}).
 
@@ -526,12 +586,20 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 ((codeTooSlow,(support_hilog(F,A)
   /(is_ftNameArity(F,A),
     \+ is_static_predicate(F/A), \+ prologDynamic(F)))) ==>
-   (hybrid_support(F,A), 
+   (prop_mpred(pfcVisible,F,A), 
     {% functor(Head,F,A) ,Head=..[F|TTs], TT=..[t,F|TTs],
     %  (CL = (Head :- cwc, call(second_order(TT,CuttedCall)), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall)))
     CL = arity(F,A)
     },
    (CL))).
+
+ttRelationType(compilerDirective).
+
+
+compilerDirective(F)==>{kb_shared(F/0)}.
+compilerDirective(pass2,"Probably not needed at first").
+compilerDirective(redundantMaybe,"Probably redundant").
+compilerDirective(codeTooSlow,"A faster more incomplete version is filling in for it").
 
 
 %:- kb_shared(hybrid_support/2).
@@ -541,11 +609,11 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 :- kb_shared(bt/2).
 bt(P,_)/nonvar(P) ==> (P:- mpred_bc_only(P)).
 
-((sometimesUseless,prologHybrid(F),arity(F,A))==>hybrid_support(F,A)).
-(hybrid_support(F,A))==>prologHybrid(F),arity(F,A).
+redundantMaybe ==> ((prologHybrid(F),arity(F,A))==>prop_mpred(pfcVisible,F,A)).
+redundantMaybe ==> (prop_mpred(pfcVisible,F,A)==>prologHybrid(F),arity(F,A)).
 
-==>((mpred_mark(pfcRHS,F,A)/(A\=0)) ==> {kb_shared(F/A)}).
-% ((mpred_mark(_,F,A)/(A\=0)) ==> {kb_shared(F/A)}).
+==>((mpred_prop(F,A,pfcRHS)/(A\=0)) ==> {kb_shared(F/A)}).
+% ((mpred_prop(F,A,_)/(A\=0)) ==> {kb_shared(F/A)}).
 
 
 (pass2,pfcControlled(X)/get_pifunctor(X,C))==>({kb_shared(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
@@ -559,11 +627,11 @@ bt(P,_)/nonvar(P) ==> (P:- mpred_bc_only(P)).
 
 % prologDynamic(X)/get_pifunctor(X,C)==>({kb_shared(C),decl_mpred_prolog(C),get_functor(C,F,A)},arity(F,A),prologDynamic(F)).
 
-pfcMustFC(F) ==> pfcControlled(F).
+% pfcMustFC(F) ==> pfcControlled(F).
+genls(pfcMustFC, pfcControlled).
 
-
-
-pfcControlled(C)==>prologHybrid(C).
+% pfcControlled(C)==>prologHybrid(C).
+genls(pfcControlled, pfcControlled).
 
 :- dynamic(hybrid_support/2).
 :- dynamic(type_checking/1).
@@ -571,53 +639,68 @@ pfcControlled(C)==>prologHybrid(C).
 :- kb_shared(type_checking/1).
 
 /*
-% catching of misinterpreations
-type_checking, mpred_mark(pfcPosTrigger,F,A)==>{warn_if_static(F,A)}.
-type_checking, mpred_mark(pfcNegTrigger,F,A)==>{warn_if_static(F,A)}.
-type_checking, mpred_mark(pfcBcTrigger,F,A)==>{warn_if_static(F,A)}.
+
+Canonical form
+mpred_prop(kb_dynamic,1,pfcPosTrigger).
+
+mpred_isa(kb_dynamic(ftBound),pfcPosTrigger).
+
+mpred_prop(kb_dynamic,_,pfcPosTrigger).
+isa(kb_dynamic,pfcPosTrigger).
+pfcPosTrigger(kb_dynamic).
+
 */
 
-%'==>'((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A), ==>(isa(F,S1))))).
-% ((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A),t(S1,F)))).
-((mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A),A==1)==>((tCol(S1),arity(F,A),{ASSERT=..[S1,F]},ASSERT)))).
 
-mpred_mark(pfcPosTrigger,F, A)/(\+ ground(F/A))==>{trace_or_throw(mpred_mark(pfcPosTrigger,F, A))}.
-mpred_mark(pfcPosTrigger,F, A)==>marker_supported(F,A).
-mpred_mark(pfcNegTrigger,F, A)==>marker_supported(F,A).
-mpred_mark(pfcBcTrigger,F, A)==>marker_supported(F,A).
-mpred_mark(pfcLHS,F, A)==>arity(F,A),functorIsMacro(F).
-mpred_mark(pfcRHS,F, A)==>
+% catching of misinterpreations
+type_checking ==> (mpred_prop(F,A,pfcPosTrigger)==>{warn_if_static(F,A)}).
+type_checking ==> (mpred_prop(F,A,pfcNegTrigger)==>{warn_if_static(F,A)}).
+type_checking ==> (mpred_prop(F,A,pfcBcTrigger)==>{warn_if_static(F,A)}).
+
+
+%'==>'((mpred_prop(F,A,S1)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A), ==>(isa(F,S1))))).
+% ((mpred_prop(F,A,S1)/(ground(S1),is_ftNameArity(F,A))==>(tCol(S1),arity(F,A),t(S1,F)))).
+% dumb ((mpred_prop(F,A,S1)/(ground(S1),is_ftNameArity(F,A),A==1)==>((tCol(S1),arity(F,A),{ASSERT=..[S1,F]},ASSERT)))).
+
+% mpred_prop(F,A,pfcPosTrigger)/(\+ ground(F/A))==>{trace_or_throw(mpred_prop(F,A,pfcPosTrigger))}.
+mpred_prop(F,A,pfcPosTrigger)==>prop_mpred(pfcWatches,F,A).
+mpred_prop(F,A,pfcNegTrigger)==>prop_mpred(pfcWatches,F,A).
+mpred_prop(F,A,pfcBcTrigger)==>prop_mpred(pfcCreates,F,A).
+mpred_prop(F,A,pfcLHS)==>arity(F,A),functorIsMacro(F),prop_mpred(pfcWatches,F,A).
+mpred_prop(F,A,pfcRHS)==>
   {functor(P,F,A),make_dynamic(P),kb_shared(P),
     create_predicate_istAbove(abox,F,A)},
-    marker_supported(F,A).
+    prop_mpred(pfcCreates,F,A).
 
-mpred_mark(pfcCallCode,F, A)/predicate_is_undefined_fa(F,A)
-    ==> marker_supported(F,A).
+mpred_prop(F,A,pfcCallCode)/predicate_is_undefined_fa(F,A)
+    ==> prop_mpred(needsDefined,F,A).
 /*
-mpred_mark(pfcCallCodeTst,F, A)/predicate_is_undefined_fa(F,A)
-    ==> marker_supported(F,A).
+mpred_prop(F,A,pfcCallCodeAnte)/predicate_is_undefined_fa(F,A)
+    ==> prop_mpred(pfcWatches,F,A).
 */
 
 
-% (marker_supported(F,A))==>(prologHybrid(F),hybrid_support(F,A)).
-%mpred_mark(pfcPosTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).
-%mpred_mark(pfcNegTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A), afterRemoving(F,lambda(P,mpred_enqueue(~P,(m,m)))).
+% (prop_mpred(pfcWatches,F,A))==>(prologHybrid(F),prop_mpred(pfcVisible,F,A)).
+%mpred_prop(F,A,pfcPosTrigger))/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).
+%mpred_prop(F,A,pfcNegTrigger))/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A), afterRemoving(F,lambda(P,mpred_enqueue(~P,(m,m)))).
 
 /*
-mpred_mark(pfcRHSF,1)/(fail,atom(F),functor(Head,F,1), 
+mpred_prop(F,A,pfcRHS)/(fail,atom(F),functor(Head,F,1), 
  \+ argsQuoted(F),
  \+ prologDynamic(F),
  \+ ~(tCol(F)),
  \+ specialFunctor(F),
  \+ predicate_property(Head,built_in))==>completelyAssertedCollection(F).
 */
-% mpred_mark(Type,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
+% mpred_prop(F,A,Type,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
 
 mpred_mark_C(G) ==> {map_mpred_mark_C(G)}.
 map_mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),ain([pfcControlled(F),arity(F,A)]))),G).
-mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>(tPred(F),arity(F,A),pfcControlled(F)).
+% mpred_prop(F,A,pfcRHS)/(is_ftNameArity(F,A),F\==arity)==>(tPred(F),arity(F,A),pfcControlled(F)).
 
-% (hybrid_support(F,A) ==>{\+ is_static_predicate(F/A), must(kb_shared(F/A))}).
+genls(pfcRHS,pfcControlled).
+
+% (prop_mpred(pfcVisible,F,A) ==>{\+ is_static_predicate(F/A), must(kb_shared(F/A))}).
 
 
 %:- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
@@ -626,11 +709,11 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>(tPred(F),arity(F,A),pf
 % becomes         mp_test_agr(+,+,-,?,^,:,0,1,0,0)
 
 
-((marker_supported(F,A)/is_ftNameArity(F,A),prologHybrid(F)))==>hybrid_support(F,A).
-((marker_supported(F,A)/(is_ftNameArity(F,A),correct_module(abox,_,F,A,Mt),Mt\=abox,
+((prop_mpred(pfcWatches,F,A)/is_ftNameArity(F,A),prologHybrid(F)))==>prop_mpred(pfcVisible,F,A).
+((prop_mpred(pfcWatches,F,A)/(is_ftNameArity(F,A),correct_module(abox,_,F,A,Mt),Mt\=abox,
    \+ predicateConventionMt(F,_), mtExact(Mt))))==>predicateConventionMt(F,Mt).
 
-% hybrid_support(F,A) ==>{ nop(must(kb_shared(F/A)))}.
+% prop_mpred(pfcVisible,F,A) ==>{ nop(must(kb_shared(F/A)))}.
 
 % mtExact(Mt)/module_predicate(Mt,F,A)==>predicateConventionMt(F,Mt),arity(F,A).
 
@@ -668,9 +751,10 @@ vtLinguisticObject(vtVerb).
 
 tReifiableFunction(aVerbFn).
 conceptuallyRelated("go",actMove).
+arity(aVerbFn,1).
 resultIsa(aVerbFn(ftString),vtVerb).
 
-
+:- kb_shared(genls/2).
 
 /*
 genlMt(Mt1,Mt2),mtCycL(Mt1),mtProlog(Mt2) ==> 
@@ -712,7 +796,7 @@ collectionConventionMt(mtCycL,baseKB).
 collectionConventionMt(mtExact,baseKB).
 collectionConventionMt(Col,Where) ==> predicateConventionMt(Col,Where).
 
-% mtExact(Mt)==>{kb_shared(Mt)}.
+% mtExact(Mt)==>{kb_shared(Mt/1)}.
 
 
 mtProlog(Mt),predicateConventionMt(F,Mt)/(Mt\==baseKB)==>prologBuiltin(F).
@@ -851,10 +935,7 @@ isRegisteredCycPred(apply,maplist,3).
 
 
 % :- ain(mpred_database_term(F,_,_)==> ~predicateConventionMt(F,_)).
-
-
-:- ain((mpred_database_term(F,_,_)==> ~ predicateConventionMt(F,baseKB))).
-
+% :- ain((mpred_database_term(F,_,_)==> ~ predicateConventionMt(F,baseKB))).
 % :- ain(((predicateConventionMt(F,abox),\+predicateConventionMt(F,baseKB)) ==> ~ predicateConventionMt(F,baseKB))).
 
 
@@ -882,8 +963,6 @@ doRedelMe.
 :- dbreak.
 */
 
-nondet.
-
 % :- set_prolog_flag(dialect_pfc,false).
 :- mpred_trace_exec.
 
@@ -896,40 +975,22 @@ do_and_undo(mpred_post_exactly,mpred_remove_exactly).
 %(((CI,{was_mpred_isa(CI,I,C)},\+ ~isa(I,C)) ==> actn(mpred_post_exactly(isa(I,C))))).
 %:- endif.
 
-:- abolish(system:arity,2).
-:- system:import(arity/2).
+% :- abolish(system:arity,2).
+% :- system:import(arity/2).
 
 
+arity(functorIsMacro,1).
 
-==> ttRelationType(isEach(
-                  prologBuiltin,
-                  prologDynamic,
-                  prologHybrid,
-                  prologIsFlag,
-                  prologKIF,
-                  prologListValued,
-                  prologMultiValued,
-                  prologNegByFailure,
-                  prologOrdered,
-                  prologPTTP,
-                  prologSideEffects,
-                  prologSingleValued,
+functorIsMacro(functorIsMacro).
+ttRelationType(X)==>functorDeclares(X).
+tSet(X)==>functorDeclares(X).
 
-                  rtAvoidForwardChain,
-                  predCanHaveSingletons,
+isa(iExplorer2,C):- C==argsQuoted,!,fail.
+isa(I,C):- cwc, no_repeats(loop_check(isa_backchaing(I,C))), \+ isa(C,ttExpressionType).
 
-                  pfcControlled,
-                  pfcWatched,
-                  pfcCreates,
-                  pfcNegTrigger,
-                  pfcPosTrigger,
-                  pfcBcTrigger,
-                  pfcRHS,
-                  pfcLHS,
-                  pfcCallCodeBody,
-                  pfcCallCodeTst,
-                  pfcMustFC,
-                  pfcDatabaseTerm)).
+tSet(tFoo).
+isa(iBar,tFoo).
+:- sanity(isa(iBar,tFoo)).
 
 :- mpred_notrace_exec.
 

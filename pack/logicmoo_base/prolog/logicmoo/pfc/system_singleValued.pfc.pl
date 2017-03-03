@@ -81,7 +81,6 @@ someSV_testeed(a,c,3).
 :- must(someSV_testeed(a,b,2)).
 
 
-
 % :- flag_call(runtime_debug=true).
 
 :- dynamic(someSV_testing/3).
@@ -97,10 +96,9 @@ someSV_testing(a,c,4).
 
 :- listing(someSV_testing/3).
 :- must(someSV_testing(a,c,4)).
-:- must( \+ someSV_testing(a,b,1)).
 :- must(someSV_testing(a,b,2)).
+:- must( \+ someSV_testing(a,b,1)).
 :- mpred_notrace_exec.
-:- break.
 :- endif.
 
 

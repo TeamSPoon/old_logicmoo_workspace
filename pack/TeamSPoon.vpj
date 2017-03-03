@@ -4735,27 +4735,6 @@
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/clp/linprog.pl"/>
 								</Folder>
 								<Folder Name="core">
-									<Folder Name="reload">
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/add_attr_end.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/add_clause.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/add_meta_predicate.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/add_pred.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/add_thread_local.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/del_attr_end.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/del_clause.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/del_clause_a.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/del_clause_z.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/del_discontiguous.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/del_dynamic.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/del_export.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/del_meta_predicate.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/del_pred.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/keep_thread_local.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/mod_dynamic.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/reload_maplist.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/replace_clause.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/reload/simple.pl"/>
-									</Folder>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_acyclic.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_answer.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_arith.pl"/>
@@ -4798,7 +4777,6 @@
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_qcall.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_qq.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_random.pl"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_reload.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_resource_error.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_scan_options.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/core/test_singleton.pl"/>
@@ -4845,7 +4823,6 @@
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/library/test_prolog_clause.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/library/test_rbtrees.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/library/test_record.pl"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/library/test_sandbox.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/library/test_settings.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/library/test_solution_sequences.pl"/>
 									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/src/Tests/library/test_tabling.pl"/>
@@ -5257,6 +5234,138 @@
 						<F N="prologmud_sample/runtime/games/circlemuddata/smurf.wld"/>
 						<F N="prologmud_sample/runtime/games/circlemuddata/smurf.zon"/>
 					</Folder>
+					<Folder Name="matuszak">
+						<Folder Name="www.cis.upenn.edu">
+							<Folder Name="~matuszek">
+								<Folder Name="cis554-2014">
+									<Folder Name="submissions">
+										<Folder Name="alamuru--lasya_4897668_48619681_Lasya_Assignment2">
+											<Folder Name="Lasya_Assignment2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/alamuru--lasya_4897668_48619681_Lasya_Assignment2/Lasya_Assignment2/dragonballz.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="alle--karthik_4897344_48620066_Karthik Alle-HW2">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/alle--karthik_4897344_48620066_Karthik Alle-HW2/go_harry.pl"/>
+										</Folder>
+										<Folder Name="bahal--akriti_4922324_48611384_HW2">
+											<Folder Name="HW2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/bahal--akriti_4922324_48611384_HW2/HW2/TreeasureHunt.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="bollmann--dominik_5127053_48590865_bollmann">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/bollmann--dominik_5127053_48590865_bollmann/gradstudent.pl"/>
+										</Folder>
+										<Folder Name="colton--gabriel_5157640_48618314_HW_2_Gabe_Colton">
+											<Folder Name="HW_2_Gabe_Colton">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/colton--gabriel_5157640_48618314_HW_2_Gabe_Colton/HW_2_Gabe_Colton/Space_Escape.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="das--anwesha_5126675_48618921_Anwesha Das Assign 2">
+											<Folder Name="PP assign 2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/das--anwesha_5126675_48618921_Anwesha Das Assign 2/PP assign 2/dangerous_waters.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="fnu--sonal_4897942_48619808_hw2Sonal">
+											<Folder Name="hw2Sonal">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/fnu--sonal_4897942_48619808_hw2Sonal/hw2Sonal/how_i_met_your_mum.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="gangadharan--shreejit_5127493_48612477_shreejithw2">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/gangadharan--shreejit_5127493_48612477_shreejithw2/wizard_of_oz.pl"/>
+										</Folder>
+										<Folder Name="gupta--urvashi_4898614_48609641_hw2">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/gupta--urvashi_4898614_48609641_hw2/finding_nemo.pl"/>
+										</Folder>
+										<Folder Name="gupta--varun_3761345_48607143_HW2-Varun_Gupta">
+											<Folder Name="HW2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/gupta--varun_3761345_48607143_HW2-Varun_Gupta/HW2/Breakout.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="hu--xiaoxiang_4898072_48620117_CIS554_AdventureGame">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/hu--xiaoxiang_4898072_48620117_CIS554_AdventureGame/castle.pl"/>
+										</Folder>
+										<Folder Name="katz--jacob_4899026_48598925_katzja_AdventureGame">
+											<Folder Name="katzja_AdventureGame">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/katz--jacob_4899026_48598925_katzja_AdventureGame/katzja_AdventureGame/spacejam.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="kumagai--takumi-late_4928679_48624098_HW2">
+											<Folder Name="HW2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/kumagai--takumi-late_4928679_48624098_HW2/HW2/morning_after.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="lee--jasmine_3761167_48617088_jasmine_lee_hw2">
+											<Folder Name="jasmine_lee_hw2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/lee--jasmine_3761167_48617088_jasmine_lee_hw2/jasmine_lee_hw2/bag_thief.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="lee--paul_4899684_48619518_assignment2">
+											<Folder Name="assignment2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/lee--paul_4899684_48619518_assignment2/assignment2/spacerace.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="lewis--john_4897467_48618635_lewis_john_hw2">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/lewis--john_4897467_48618635_lewis_john_hw2/adventure.pl"/>
+										</Folder>
+										<Folder Name="liu--muruo_5136129_48565801_Archive">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/liu--muruo_5136129_48565801_Archive/locked_room.pl"/>
+										</Folder>
+										<Folder Name="lockett--jemale_5148459_48619853_assignment2">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/lockett--jemale_5148459_48619853_assignment2/theretriever.pl"/>
+										</Folder>
+										<Folder Name="oconnor--michael_4910157_48615290_hwk2_mpo">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/oconnor--michael_4910157_48615290_hwk2_mpo/rainforest.pl"/>
+										</Folder>
+										<Folder Name="pang--lanlan_4898262_48561882_HW2_Lanlan Pang">
+											<Folder Name="HW2_Lanlan Pang">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/pang--lanlan_4898262_48561882_HW2_Lanlan Pang/HW2_Lanlan Pang/RescuePrincess.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="panuganti--deepti_5126998_48619355_Deepti_Game">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/panuganti--deepti_5126998_48619355_Deepti_Game/amnesty_treasure.pl"/>
+										</Folder>
+										<Folder Name="stiefel--aryeh_5126720_48612212_Homework 2">
+											<Folder Name="Homework 2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/stiefel--aryeh_5126720_48612212_Homework 2/Homework 2/house.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="suen--ka-chuan_5123821_48594467_a_day_at_school">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/suen--ka-chuan_5123821_48594467_a_day_at_school/A Day At School.pl"/>
+										</Folder>
+										<Folder Name="swavely--rigel_4902245_48609910_hw2">
+											<Folder Name="hw2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/swavely--rigel_4902245_48609910_hw2/hw2/doha.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="vuppala--navya_4889940_48611746_sols">
+											<Folder Name="sols">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/vuppala--navya_4889940_48611746_sols/sols/assi2.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="wang--yaou_3766634_48561868_hw2">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/wang--yaou_3766634_48561868_hw2/dragon_fire.pl"/>
+										</Folder>
+										<Folder Name="wu--jingyuan_5136734_48593425_hw_2">
+											<Folder Name="hw_2">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/wu--jingyuan_5136734_48593425_hw_2/hw_2/rescue operation.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="xu--zonghan_4910104_48564148_hw2">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/xu--zonghan_4910104_48564148_hw2/heroes.pl"/>
+										</Folder>
+										<Folder Name="yang--ziyi_4927732_48568951_hw2">
+											<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/yang--ziyi_4927732_48568951_hw2/outrun.pl"/>
+										</Folder>
+										<Folder Name="zhu--yifeng_4898159_48561500_hw2_yifengz">
+											<Folder Name="hw2_yifengz">
+												<F N="prologmud_sample/runtime/games/matuszak/www.cis.upenn.edu/~matuszek/cis554-2014/submissions/zhu--yifeng_4898159_48561500_hw2_yifengz/hw2_yifengz/chocolateAdventure.pl"/>
+											</Folder>
+										</Folder>
+									</Folder>
+								</Folder>
+							</Folder>
+						</Folder>
+					</Folder>
 					<Folder Name="ontologyportal_sumo">
 						<Folder Name="development">
 							<F N="prologmud_sample/runtime/games/ontologyportal_sumo/development/Biography.kif"/>
@@ -5604,7 +5713,6 @@
 				<F N="prologmud_sample/runtime/logic_example.pl.pfc"/>
 				<F N="prologmud_sample/runtime/logicmoo_pdt.pl"/>
 				<F N="prologmud_sample/runtime/logicmoo_pdt.qlf"/>
-				<F N="prologmud_sample/runtime/logicmoo_repl.pl"/>
 				<F N="prologmud_sample/runtime/logicmoo_util_header.pi"/>
 				<F N="prologmud_sample/runtime/make_ikvm_assemblies.sh"/>
 				<F N="prologmud_sample/runtime/makeREPL.sh"/>

@@ -45,7 +45,7 @@
             label_args/3,
             list_to_ops/3,
 
-          must_map_preds/3,
+          must_map_preds/3, 
 
 % KIF BASED
          sumo_to_clif/2,
@@ -1928,6 +1928,7 @@ rename_sumo('SetOrClass', 'tCol').
 rename_sumo(I,O):- builtin_rn_or_rn_new(I,O),!.
 
 
+:- fixup_exports.
 
 system:term_expansion(I, Pos, O , Pos):- nonvar(Pos),compound(I), 
    current_prolog_flag(do_renames,term_expansion),

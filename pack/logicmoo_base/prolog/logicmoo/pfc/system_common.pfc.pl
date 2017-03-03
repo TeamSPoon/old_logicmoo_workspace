@@ -40,9 +40,6 @@
 :- prolog_load_context(module,Mod),sanity(Mod==baseKB),writeq(prolog_load_context(module,Mod)),nl.
 
 
-==> (ttRelationType(P) ==> ({PBI=..[P,_F/_A]}==>{forall(retract(PBI),ain(==>PBI))})).
-
-
 :- % better stack traces..
  set_prolog_flag(access_level,system).
 
@@ -80,7 +77,7 @@ prologHybrid(genls/2).
 
 % with_pfa(With,((pfcControlled/1,pfcRHS/1,logical_functor_pttp/1,          add_args/15,argIsa_known/3,call_mt_t/11,call_which_t/9,constrain_args_pttp/2,contract_output_proof/2,get_clause_vars_for_print/2,holds_f_p2/2,input_to_forms/2,is_wrapper_pred/1,lambda/5,mpred_f/1,pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,
 %          quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2,rtNotForUnboundPredicates/1))),
- with_pfa(With,(((bt/2),(nt/3),(pk/3),(pt/2),(spft/3),(tms/1),(hs/1),(que/1),(pm/1),
+ with_pfa(With,(((bt/2),(nt/3),(pk/3),(pt/2),(spft/3),(tms/1),(hs/1),(que/2),(pm/1),
           (('==>')/1),(('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('~')/1),(('nesc')/1),
  ((mpred_action)/1),
           (mpred_do_and_undo_method/2), 
@@ -133,7 +130,7 @@ Unneeded yet
 */
 
 %:- rtrace,dtrace.
-==>(prologBuiltin(mpred_select/2)).
+%==>(prologBuiltin(mpred_select_hook/1)).
 % :- nortrace,quietly.
 
 :- kb_shared(conflict/1).
@@ -144,7 +141,7 @@ conflict(C) ==> {must(with_mpred_trace_exec((resolveConflict(C),\+conflict(C))))
 
 % meta rules to schedule inferencing.
 % resolve conflicts asap
-% mpred_select(conflict(X),W) :- que(conflict(X),W).
+mpred_select_hook(conflict(X)) :- que(conflict(X),_Why).
 
 :- dynamic(rtUnaryPredicate/1).
 :- dynamic(ttExpressionType/1).
@@ -157,7 +154,7 @@ tSet(completelyAssertedCollection).
 % Prolog Builtin.
 %
 %WRONG prologBuiltin(resolveConflict/1,predicateConventionMt(baseKB)).
-%WRONG prologBuiltin(mpred_select/2,predicateConventionMt(baseKB)).
+%WRONG prologBuiltin(mpred_select_hook/1,predicateConventionMt(baseKB)).
 %:-rtrace.
 
 
@@ -179,7 +176,7 @@ tCol(vtVerb).
 :- sanity(defaultAssertMt(baseKB)).
 
 ttRelationType(rtNotForUnboundPredicates).
-rtNotForUnboundPredicates(member).
+rtNotForUnboundPredicates(member/2).
 
 %and(A,B):- cwc, call_u((A,B)).
 %or(A,B):- cwc, call_u((A;B)).
@@ -305,7 +302,7 @@ completelyAssertedCollection(ttRelationType).  % Or they might be a predciate de
 completelyAssertedCollection(functorIsMacro).
 
 completelyAssertedCollection(tPred).
-completelyAssertedCollection(meta_argtypes).
+~completelyAssertedCollection(meta_argtypes).
 completelyAssertedCollection(tTemporalThing).
 completelyAssertedCollection(tInferInstanceFromArgType).
 completelyAssertedCollection(ttNotTemporalType).
@@ -320,31 +317,27 @@ completelyAssertedCollection(ttUnverifiableType).
 % Prolog Negated By Failure.
 %
 prologNegByFailure(prologNegByFailure).
-prologNegByFailure(quotedIsa).
-~prologNegByFailure(isa).
+prologNegByFailure(quotedIsa/3).
+~prologNegByFailure(isa/2).
 
-
+:- listing( ~ / 1).
 
 :- dynamic(baseKB:ttTypeType/1).
 
 ttTypeType(C)==>completelyAssertedCollection(C).
 
-%% mpred_univ( ?C, ?I, ?Head) is semidet.
-%
-% Managed Predicate Univ.
-%
-% TODO decide if still needed 
-mpred_univ(C,I,Head):- cwc,atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
 
-(someTimesBuggy2ndOrder,genlPreds(C1,C2),arity(C1,2)) ==>
+someTimesBuggy2ndOrder ==>
+((someTimesBuggy2ndOrder,genlPreds(C1,C2),arity(C1,2)) ==>
   {P1 =.. [C1,X,Y],
     P2 =.. [C2,X,Y]},
-  clif(P1 => P2).
+  clif(P1 => P2)).
 
-(someTimesBuggy2ndOrder,genlPreds(C1,C2),arity(C1,3)) ==>
+someTimesBuggy2ndOrder ==>
+((genlPreds(C1,C2),arity(C1,3)) ==>
   {P1 =.. [C1,X,Y,Z],
     P2 =.. [C2,X,Y,Z]},
-  clif(P1 => P2).
+  clif(P1 => P2)).
 
 tCol(tCol).  % = isa(tCol,tCol).
 tCol(tSet).
@@ -362,7 +355,7 @@ tCol(tSet).
 completelyAssertedCollection(isEach(tCol,tPred,pfcControlled)).
 ttRelationType(C)==>completelyAssertedCollection(C).
 
-% genls(meta_argtypes,ftSpec).
+% ~genls(meta_argtypes,ftSpec).
 
 :- dynamic(baseKB:mudWielding/2).
 
@@ -371,9 +364,11 @@ prologSingleValued(P)==> \+ prologMultiValued(P).
 
 ~(ttExpressionType(prologEquality)).
 ttRelationType(prologEquality).
-prologEquality(mudEquals).
-prologEquality(('=')).
-prologEquality(('==')).
+prologEquality(mudEquals/2).
+prologEquality(('=')/2).
+prologEquality(('==')/2).
+
+arity(',',2).
 
 ~(isa((','), prologEquality)).
 
@@ -625,6 +620,9 @@ tCol(tRelation).
 tCol(ttSpatialType).
 ttTypeType(ttTypeType).
 ttTypeType(C)==>tSet(C).
+ttTypeType(ttAgentType).
+
+:- must(tSet(ttAgentType)).
 
 tCol(tWorld).
 
@@ -636,10 +634,11 @@ completelyAssertedCollection(ttTemporalType).
 completelyAssertedCollection(tRelation).
 completelyAssertedCollection(tPred).
 
-completelyAssertedCollection(C)==>completeExtentAsserted(C).
+% completelyAssertedCollection(C)==>completeExtentAsserted(C).
 
 completelyAssertedCollection(completeExtentAsserted).
 completeExtentAsserted(completelyAssertedCollection).
+completelyAssertedCollection(completelyAssertedCollection).
 completeExtentAsserted(functorDeclares).
 completeExtentAsserted(completeExtentAsserted).
 arity(completeExtentAsserted,1).
@@ -718,8 +717,9 @@ isa(tRelation,ttAbstractType).
 % (disjointWith(C1,P2) <= (genls(C1,P1), {dif:dif(C1,P1)}, disjointWith(P1,P2))).
 
 tSet(completelyAssertedCollection).
-rtQuotedPred(completeIsaAsserted).
+rtQuotedPred(completeIsaAsserted/1).
 % genls(completeIsaAsserted,tTemporalThing).
+genls(A,B)==>(arity(A,1),arity(B,1)).
 genls(completelyAssertedCollection,tCol).
 completelyAssertedCollection(completelyAssertedCollection).
 completelyAssertedCollection(tPred).
@@ -757,8 +757,11 @@ genls(tSpatialThing,tTemporalThing).
 
 tSet(ttTypeFacet).
 ==>tCol(rtAvoidForwardChain, comment("rtAvoidForwardChain means that backchain is required for subclasses 
-     to gain membership TODO: Give example ")).
+     to gain membership TODO: Give example "
+     )).
 
+tCol('tThing').
+arity('tThing',1).
 % genls(ttExpressionType,rtAvoidForwardChain).
 isa('tThing',rtAvoidForwardChain).
 
@@ -786,8 +789,8 @@ not_isa(I,C):- cwc, mainClass(I,MC),disjointWith(MC,DC),genls(C,DC).
 
 isa([tIndividual(tSack)],C):-C==ftListFn(ftAskable),!.
 isa(iExplorer2,C):- C==argsQuoted,!,fail.
-isa(I,C):- ground(I:C),not_isa(I,C),!,fail.
-isa(I,C):- cwc, no_repeats(loop_check(isa_backchaing(I,C))).
+:- asserta((isa(I,C):- ground(I:C),not_isa(I,C),!,fail)).
+% isa(I,C):- cwc, no_repeats(loop_check(isa_backchaing(I,C))).
 % isa(_,C):- nonvar(C),\+ tSet(C),!,fail.
 
 quotedIsa(_,C):- nonvar(C), tSet(C),!,fail.
@@ -925,7 +928,7 @@ argIsa(predInstMax,1,tObj).
 argIsa(predInstMax,2,tPred).
 argIsa(predInstMax,3,ftInt).
 
-argIsa(props,1,ftID).
+argQuotedIsa(props,1,ftID).
 argIsa(props,N,ftVoprop):- integer(N), system_between(2,31,N).
 
 argIsa(apathFn,1,tRegion).
@@ -1021,7 +1024,7 @@ argsIsa(subFormat,ttExpressionType).
 :- ain(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
 :- ain(((baseKB:action_info(ArgTypes,_)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
 :- ain(((functorIsMacro(Compound)/compound_functor(Compound,F)) ==> functorDeclares(F))).
-(hardCodedExpansion,(ttExpressionType(FT)/is_declarations(FT)))==>meta_argtypes(FT).
+hardCodedExpansion ==> ((ttExpressionType(FT)/is_declarations(FT))==>meta_argtypes(FT)).
 
 
 */
@@ -1182,7 +1185,7 @@ prologHybrid(genls/2).
 prologHybrid(isa/2).
 prologHybrid(genls/2).
 prologDynamic(arg/3).
-tSet(meta_argtypes).
+~tSet(meta_argtypes).
 tSet(prologMultiValued).
 tSet(prologSingleValued).
 tSet(tCol).
@@ -1306,7 +1309,7 @@ resultIsa(ftDeplictsFn,ftSpec).
 
 
 isa(argIsa,prologHybrid).
-isa(determinerString, prologMultiValued).
+isa(determinerString/2, prologMultiValued).
 isa(quotedDefnIff, completeExtentAsserted).
 isa(ftInt,ttExpressionType).
 isa(ftNumber,ttExpressionType).
@@ -1430,7 +1433,7 @@ resultIsa(txtFormatFn,ftText).
 subFormat(ftAtom,ftTerm).
 subFormat(ftCallable,ftProlog).
 resultIsa(ftDiceFn,ftInt).
-subFormat(ftID,ftTerm).
+% subFormat(ftID,ftTerm).
 subFormat(ftInt,ftNumber).
 subFormat(ftInteger,ftNumber).
 subFormat(ftNumber,ftPercent).
@@ -1461,6 +1464,8 @@ ttTypeFacet(ttUnverifiableType).
 typeGenls(ttExpressionTypeType,ttExpressionType).
 typeGenls(ttTypeFacet,tCol).
 typeGenls(ttTypeType,tCol).
+
+typeGenls(ttAgentType,tAgent).
 
 
 (typeGenls(TT,ST) ==> 
@@ -1623,18 +1628,24 @@ tSet(prologIsFlag).
 tSet(prologDynamic).
 prologHybrid(formatted_resultIsa/2).
 
-:-sanity(argIsa(genlPreds,2,_)).
+:- sanity(argIsa(genlPreds,2,_)).
 :- must(tCol(vtVerb)).
 :- must(t(tCol,vtVerb)).
 :- must(isa(vtVerb,tCol)).
 
-tSet(tPhilosopher).
+
+ttAgentType(mobPhilosopher).
+
 
 %:- mpred_trace_all.
-isa(iPlato,'tPhilosopher').
+isa(iPlato,mobPhilosopher).
+
+:-must(isa(iPlato,mobPhilosopher)).
+
+:- mpred_test(\+ isa(iPlato,ftAtom)).
+
 %:- mpred_test(\+ isa(iPlato,ftAtom)).
-%:- mpred_test(~isa(iPlato,ftAtom)).
-:- sanity(mpred_test(~quotedIsa(iPlato,'tPhilosopher'))).
+%:- sanity(mpred_test(~quotedIsa(iPlato,mobPhilosopher))).
 :- sanity(mpred_test(quotedIsa(iPlato,ftAtom))).
 :- mpred_notrace_all.
 
@@ -1649,7 +1660,7 @@ barrierSpindle(TypeType,Type)==>
    generatesAsFirstOrder(Type), isa(TypeType,ttBarrierType),isa(Type,ttBarrier),typeGenls(TypeType,Type).
 
 ttBarrier(C)==>tSet(C).
-ttBarrierType(C)==>tSet(C),ttTypeType(C).
+(ttBarrierType(C)==>(tSet(C),ttTypeType(C))).
 
 /*
 

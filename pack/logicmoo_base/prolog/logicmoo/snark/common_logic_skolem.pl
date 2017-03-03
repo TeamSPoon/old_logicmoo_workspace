@@ -179,4 +179,5 @@ merge_forms(A,B,A):- A=B,!,wdmsg(seeeeeeeeeeeee_merge_forms(A,B)),!.
 merge_forms(A,B,C):- flatten([A,B],AB),list_to_set(AB,C).
 
 
+:- fixup_exports.
 

@@ -1,9 +1,9 @@
-[submodule "pack/swish"]
-	path = pack/swish
-	url = https://github.com/logicmoo/swish.git
-[submodule "pack/ClioPatria"]
-	path = pack/ClioPatria
-	url = https://github.com/ClioPatria/ClioPatria
+;;[submodule "pack/swish"]
+;;	path = pack/swish
+;;	url = https://github.com/logicmoo/swish.git
+;;[submodule "pack/ClioPatria"]
+;;	path = pack/ClioPatria
+;;	url = https://github.com/ClioPatria/ClioPatria
 [submodule "pack/clause_attvars"]
 	path = pack/clause_attvars
 	url = https://github.com/TeamSPoon/clause_attvars.git

@@ -700,7 +700,5 @@ write_assertions:-
  listing(term_rewrites_kb),
  told.
 
-
-
-
+:- fixup_exports.
 

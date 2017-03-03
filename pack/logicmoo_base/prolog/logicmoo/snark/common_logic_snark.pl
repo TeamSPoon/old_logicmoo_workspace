@@ -29,7 +29,6 @@
             % elInverse/2,
             flatten_or_list/3,
             fmtl/1,
-            fresh_varname/2,
             generate_ante/4,
             get_1_var_name/3,
             get_constraints/2,
@@ -906,24 +905,6 @@ wdmsgl_3(NAME,F,NF):-
 wdmsgl_4(NAME,_,NF):- as_symlog(NF,NF2), with_all_dmsg(display_form(_KB,(NAME:-NF2))).
 
 
-
-
-%= 	 	 
-
-%% fresh_varname( :TermF, ?NewVar) is semidet.
-%
-% Fresh Varname.
-%
-fresh_varname(F,NewVar):-is_ftVar(F),NewVar=F.
-fresh_varname(F,NewVar):-var(F),fresh_varname('mudEquals',NewVar).
-fresh_varname([F0|_],NewVar):-!,fresh_varname(F0,NewVar).
-fresh_varname(F,NewVar):- compound(F),arg(_,F,F1),atom(F1),!,functor(F,F0,_),atom_concat(F0,F1,FN),upcase_atom(FN,FUP),gensym(FUP,VARNAME),NewVar = '$VAR'(VARNAME),!.
-fresh_varname(F,NewVar):- functor(F,FN,_),!, upcase_atom(FN,FUP),gensym(FUP,VARNAME),NewVar = '$VAR'(VARNAME),!.
-
-
-
-
-
 %% kif_to_boxlog( ?Wff, ?Out) is semidet.
 %
 % Knowledge Interchange Format Converted To Datalog.
@@ -1760,5 +1741,5 @@ get_constraints(ListA,Isas):-
 
 
 :- source_location(S,_),forall((source_file(H,S),once((clause(H,B),B\=true))),(functor(H,F,A),module_transparent(F/A))).
-:- source_location(S,_),forall((source_file(H,S),functor(H,F,A),\+atom_concat('$',_,F)),export(F/A)).
+:- fixup_exports.
 

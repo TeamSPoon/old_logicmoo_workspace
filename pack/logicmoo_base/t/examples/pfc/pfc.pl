@@ -142,11 +142,11 @@ term_expansion(A,B):- :- current_prolog_flag(lm_expanders,true), once(true ; t_l
 :- dynamic fcUndoMethod/2.
 :- dynamic (mpred_action)/1.
 :- dynamic fcTmsMode/1.
-:- dynamic mpred_queue/1.
+:- kb_shared mpred_queue/1.
 :- dynamic pfcDatabase/1.
 :- dynamic mpred_haltSignal/0.
 :- dynamic pfcDebugging/0.
-:- dynamic mpred_select/1.
+:- dynamic mpred_select_hook/1.
 :- dynamic mpred_search/1.
 
 %%% initialization of global assertons 
@@ -313,7 +313,7 @@ remove_selection(P) :-
 %  the default mechanism.
 
 select_next_fact(P) :- 
-  mpred_select(P),
+  mpred_select_hook(P),
   !.  
 select_next_fact(P) :- 
   defaultmpred_select(P),
