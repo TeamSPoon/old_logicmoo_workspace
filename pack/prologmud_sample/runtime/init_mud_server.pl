@@ -4,35 +4,19 @@
 */
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% LOAD LOGICMOO (entry state)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-:- if(\+ current_module(baseKB)).
-:- use_module(library(logicmoo_engine)).
-:- endif.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SETUP KB EXTENSIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- '$set_source_module'(baseKB).
 :- '$set_typein_module'(baseKB).
-
+:- '$set_source_module'(baseKB).
+:- baseKB:ensure_loaded(library(logicmoo_plarkc)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % LOAD CYC KB EXTENSIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- check_clause_counts.
 
-% :-  baseKB:load_library_system(logicmoo(logicmoo_plarkc)).
-
-:-  baseKB:load_library_system(logicmoo(plarkc/logicmoo_i_cyc_kb)).
-
 :- after_boot((set_prolog_flag(pfc_booted,true),flag_call(runtime_debug=true),set_prolog_flag(read_attvars,false))).
-
-
-% :- baseKB:load_library_system(library(logicmoo_engine)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -157,7 +141,7 @@ genls(mobExplorer,tHominid))).
 :- ain(((localityOfObject(P,_),isRuntime)==>{put_in_world(P)})).
 :- ain(((onStart(Idea)==> ((isLoadedType(tSourceData),isRuntime) ==> {ain_expanded(Idea)})))).
 :- ain((mpred_argtypes(mudAreaConnected(tRegion,tRegion)))).
-:- install_constant_renamer_until_eof.
+:- set_prolog_flag_until_eof(do_renames,term_expansion).
 
 
 

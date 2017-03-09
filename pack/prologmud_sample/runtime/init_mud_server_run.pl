@@ -8,17 +8,15 @@
 % LOAD LOGICMOO (entry state)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- if(\+ current_module(baseKB)).
-:- use_module(library(init_mud_server)).
-:- endif.
+:- use_module(init_mud_server).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INIT LOGICMOO (AUTOEXEC)  Load the infernce engine
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- '$set_source_module'(baseKB).
-:- '$set_typein_module'(baseKB).
+%:- '$set_source_module'(baseKB).
+%:- '$set_typein_module'(baseKB).
 
 
 
@@ -33,23 +31,23 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 % :- assert_setting01(lmconf:eachFact_Preconditional(isRuntime)).
 
 % isa(starTrek,mtCycL).
-lst :- ensure_loaded('../prologmud_sample/runtime/games/src_game_startrek/?*.pfc.pl').
+lst :- ensure_loaded('./games/src_game_startrek/?*.pfc.pl').
 % [Manditory] This loads the game and initializes so test can be ran
-:- declare_load_dbase('../prologmud_sample/runtime/games/src_game_nani/a_nani_household.pfc.pl').
+:- declare_load_dbase('./games/src_game_nani/a_nani_household.pfc.pl').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Optional] the following game files though can be loaded separate instead
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- declare_load_dbase('../prologmud_sample/runtime/games/src_game_nani/objs_misc_household.pfc.pl').
-:- declare_load_dbase('../prologmud_sample/runtime/games/src_game_nani/?*.pfc.pl').
+:- declare_load_dbase('./games/src_game_nani/objs_misc_household.pfc.pl').
+:- declare_load_dbase('./games/src_game_nani/?*.pfc.pl').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Optional] the following worlds are in version control in examples
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% :- add_game_dir('../prologmud_sample/runtime/games/src_game_wumpus',prolog_repl).
-% :- add_game_dir('../prologmud_sample/runtime/games/src_game_sims',prolog_repl).
-% :- add_game_dir('../prologmud_sample/runtime/games/src_game_nani',prolog_repl).
-% :- add_game_dir('../prologmud_sample/runtime/games/src_game_startrek',prolog_repl).
+% :- add_game_dir('./games/src_game_wumpus',prolog_repl).
+% :- add_game_dir('./games/src_game_sims',prolog_repl).
+% :- add_game_dir('./games/src_game_nani',prolog_repl).
+% :- add_game_dir('./games/src_game_startrek',prolog_repl).
 
 %:- check_clause_counts.
 
@@ -95,7 +93,7 @@ lar :- login_and_run.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Required/Optional]  Ensures...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-initialization_after_boot:- listing(system:after_boot_goal/1),dmsg(system:after_boot_call).
+initialization_after_boot:- listing(lmconf:after_boot_goal/1),dmsg(after_boot_call).
 :- initialization(initialization_after_boot,after_load).
 :- initialization(initialization_after_boot,restore).
 

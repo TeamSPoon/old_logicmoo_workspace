@@ -1,9 +1,11 @@
-name(prologmud_sample_game).
-version('1.1.1').
+name(prologmud_sample).
+version('1.1.111').
+title('Online text adventure game - Sample').
 author('Douglas R. Miles','logicmoo@gmail.com').
-title('Online text adventure game').
-keywords([mud,mpred,games,ai,logicmoo]).
-home('http://prologmoo.com/packs').
-requires('logicmoo_base').
-download('https://packs.prologmoo.com/packs/prologmud/release/prologmud-1.1.1.tgz').
+author('Douglas Miles', 'http://www.linkedin.com/in/logicmoo' ).
+packager('TeamSPoon', 'https://github.com/TeamSPoon/' ).
+maintainer('TeamSPoon', 'https://github.com/TeamSPoon/' ).
+home('https://github.com/TeamSPoon/prologmud_sample.git' ).
+download( 'https://github.com/TeamSPoon/prologmud_sample/release/*.zip' ).
+requires(prologmud).
 

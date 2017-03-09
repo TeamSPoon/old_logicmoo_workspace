@@ -8,6 +8,7 @@
 
 :- file_begin(pfc).
 
+:- style_check(-discontiguous).
 
 typeGrid('tSpaceInAHOC',0, [ed,ed,ed,ex,ed,ed,ed]).
 typeGrid('tSpaceInAHOC',1, [ed,--,--,--,--,--,ed]).

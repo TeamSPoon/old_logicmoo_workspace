@@ -75,8 +75,8 @@ prefix(abibui, 'http://accurator.nl/ui/bible#').
 prefix(acl, 'http://semanticweb.cs.vu.nl/accurator/languages/').
 prefix(gn, 'http://www.geonames.org/ontology#').
 prefix(ausr, 'http://accurator.nl/user#').
-prefix(as, 'http://accurator.nl/schema#').
 prefix(accu, 'http://accurator.nl/schema#').
+prefix(as, 'http://accurator.nl/schema#').
 prefix(edm, 'http://www.europeana.eu/schemas/edm/').
 prefix(ens, 'http://www.europeana.eu/schemas/edm/').
 prefix(txn, 'http://lod.taxonconcept.org/ontology/txn.owl#').
