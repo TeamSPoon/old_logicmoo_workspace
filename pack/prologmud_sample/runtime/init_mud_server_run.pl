@@ -5,20 +5,13 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% LOAD LOGICMOO (entry state)
+% INIT MUD SERVER
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- use_module(init_mud_server).
+:- ensure_loaded(init_mud_server).
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% INIT LOGICMOO (AUTOEXEC)  Load the infernce engine
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%:- '$set_source_module'(baseKB).
-%:- '$set_typein_module'(baseKB).
-
-
+:- '$set_source_module'(baseKB).
+:- '$set_typein_module'(baseKB).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,8 +47,6 @@ lst :- ensure_loaded('./games/src_game_startrek/?*.pfc.pl').
 :- sanity(argIsa(genlPreds,2,_)).
 
 :- after_boot_sanity_test(argIsa(genlPreds,2,_)).
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

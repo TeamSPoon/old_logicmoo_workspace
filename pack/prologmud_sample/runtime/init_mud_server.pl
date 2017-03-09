@@ -9,7 +9,7 @@
 
 :- '$set_typein_module'(baseKB).
 :- '$set_source_module'(baseKB).
-:- baseKB:ensure_loaded(library(logicmoo_plarkc)).
+:- ensure_loaded(library(logicmoo_plarkc)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % LOAD CYC KB EXTENSIONS

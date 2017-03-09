@@ -1,5 +1,5 @@
 name(prologmud_sample).
-version('1.1.111').
+version('1.1.112').
 title('Online text adventure game - Sample').
 author('Douglas R. Miles','logicmoo@gmail.com').
 author('Douglas Miles', 'http://www.linkedin.com/in/logicmoo' ).
