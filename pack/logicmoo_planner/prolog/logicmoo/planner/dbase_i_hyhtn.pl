@@ -205,7 +205,6 @@ header_tests :-test_ocl('domains_ocl/*.ocl').
 :-use_module(library(system)).
 
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
-%:- asserta(t_l:disable_px).
 
 /*
  * GIPO COPYRIGHT NOTICE, LICENSE AND DISCLAIMER.

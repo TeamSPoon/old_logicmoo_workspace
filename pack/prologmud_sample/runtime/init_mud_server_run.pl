@@ -71,20 +71,24 @@ sanity_test_ifood_rez:- ignore((
 % [Required/Optional]  Ensures...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- after_boot(flag_call(runtime_debug=false)).
+% :- after_boot(set_prolog_flag(runtime_debug,0)).
 :- during_boot(set_prolog_flag(unsafe_speedups,false)).
 
-:- lst,statistics,ain(tSourceData(iWorldData8)),ain(isLoaded(iWorldData8)),ain(isRuntime).
+:- lst.
+:- statistics.
+:- ain(tSourceData(iWorldData8)).
+:- ain(isLoaded(iWorldData8)).
+:- ain(isRuntime).
 
 lar0 :- dmsg("Ctrl-D to start MUD"),prolog,login_and_run.
 lar :- login_and_run.
 
-:- after_boot(lar).
+% :- after_boot(lar).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Required/Optional]  Ensures...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-initialization_after_boot:- listing(lmconf:after_boot_goal/1),dmsg(after_boot_call).
+initialization_after_boot:- listing(lmconf:after_boot_goal/1),dmsg(after_boot_call),after_boot_call.
 :- initialization(initialization_after_boot,after_load).
 :- initialization(initialization_after_boot,restore).
 
@@ -94,12 +98,5 @@ initialization_after_boot:- listing(lmconf:after_boot_goal/1),dmsg(after_boot_ca
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- statistics.
 :- qsave_lm(lm_init_mud).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% [Required/Optional]  Ensures...
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- initialization(after_boot_call,after_load).
-:- initialization(after_boot_call,restore).
 
 

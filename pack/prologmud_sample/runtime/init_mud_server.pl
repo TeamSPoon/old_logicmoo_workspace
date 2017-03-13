@@ -162,7 +162,7 @@ mudStowing(iExplorer7,'iPhaser776'))).
 
 :- mpred_type_isa:import(baseKB:tCol/1).
 :- mpred_type_isa:import(baseKB:ttCoercable/1).
-:- mpred_type_isa:import(baseKB:ttStringType/1).
+% :- mpred_type_isa:import(baseKB:ttStringType/1).
 % :- add_import_module(mpred_type_isa,baseKB,end).
 :- onSpawn(localityOfObject(iExplorer7,tLivingRoom)).
 
