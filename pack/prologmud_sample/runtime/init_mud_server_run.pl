@@ -88,7 +88,7 @@ lar :- login_and_run.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Required/Optional]  Ensures...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-initialization_after_boot:- listing(lmconf:after_boot_goal/1),dmsg(after_boot_call),after_boot_call.
+initialization_after_boot:- listing(lmconf:after_boot_goal/1),dmsg(after_boot_call),after_boot_call,lar0.
 :- initialization(initialization_after_boot,after_load).
 :- initialization(initialization_after_boot,restore).
 
