@@ -82,3 +82,6 @@
 [submodule "pack/logicmoo_base"]
 	path = pack/logicmoo_base
 	url = https://github.com/TeamSPoon/logicmoo_base
+[submodule "pack/prologmud_samples"]
+	path = pack/prologmud_samples
+	url = https://github.com/TeamSPoon/prologmud_samples.git

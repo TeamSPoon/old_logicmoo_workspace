@@ -1,5 +1,5 @@
 name(logicmoo_planner).
-version('1.1.113').
+version('1.1.114').
 title('Various PDDLish planners - warning: HUGE amount of test data').
 author( 'Douglas Miles', 'http://www.linkedin.com/in/logicmoo' ).
 packager( 'TeamSPoon/LogicMoo', 'https://github.com/TeamSPoon/' ).
