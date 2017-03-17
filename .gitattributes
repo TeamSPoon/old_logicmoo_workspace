@@ -33,7 +33,7 @@ text eol=lf
 *.dll    binary
 *.exe    binary
 *.zip    binary
-*.po 	 binary
+*.po 	 text
 
 pack/logicmoo_nlu/prolog/candc/bin-old/* binary
 *. binary

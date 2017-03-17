@@ -1,6 +1,3 @@
-[submodule "pack/swish"]
-	path = pack/swish
-	url = https://github.com/logicmoo/swish.git
 [submodule "pack/ClioPatria"]
 	path = pack/ClioPatria
 	url = https://github.com/ClioPatria/ClioPatria
