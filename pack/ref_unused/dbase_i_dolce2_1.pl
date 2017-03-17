@@ -4,6 +4,24 @@ end_of_file.
 end_of_file.
 end_of_file.
 
+
+% assert_kif/1, assert_kif_dolce/1,
+%% assert_kif( ?String) is det.
+%
+% Assert Knowledge Interchange Format.
+%
+assert_kif(D):- ain(sumoSentenceString(D)).
+
+
+%% assert_kif_dolce( ?String) is det.
+%
+% Assert Knowledge Interchange Format Dolce.
+%
+assert_kif_dolce(String):-input_to_forms(String,Forms,_Vars),dmsg(warn(assert_kif_dolce(Forms))),!,assert_kif(Forms).
+
+
+
+
 % ==============================================
 :-ensure_loaded(logicmoo_i_sexp_reader).
 % 31 December 03 THIS IS A TRANSLATION IN KIF (ACCORDING TO THE KIF-DRAFT PROPOSED TO THE AMERICAN NATIONAL STANDARD NCITS.T2/98-004
