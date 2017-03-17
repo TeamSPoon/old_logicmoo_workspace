@@ -60,7 +60,7 @@ user:my_pfc_add(A):-if_defined(pfc_add(A),assert_if_new(A)).
 :- use_module(library(timeout)).
 :- use_module(library(lists)).
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_structs)).
-:- user:ensure_loaded(library(logicmoo/snark/common_logic_sexpr)).
+%:- user:ensure_loaded(library(logicmoo/common_logic/common_logic_sexpr)).
 
 :- decl_struct(domain(domain_name, requires, types, constants, predicates, functions, constraints, actions, dict(extraprops))).
 :- decl_struct(problem(problem_name, domain_name, requires, objects, init, goal, constraints, metric, length, dict(extraprops))).
