@@ -1,8 +1,9 @@
 name(logicmoo_packages).
-version('1.1.1').
-author('Douglas R. Miles','logicmoo@gmail.com').
-title('Support for reactive [agent] packages using forward-chaining').
-keywords([packages,fc,reactive,dynamic,runtime,logicmoo]).
-home('http://prologmoo.com/packs').
-download('https://packs.prologmoo.com/packs/logicmoo_packages/release/logicmoo_packages-1.1.1.tgz').
-
+version('1.1.114').
+title('Various packages - warning: HUGE amount of test data').
+author( 'Douglas Miles', 'http://www.linkedin.com/in/logicmoo' ).
+packager( 'TeamSPoon/LogicMoo', 'https://github.com/TeamSPoon/' ).
+maintainer( 'TeamSPoon', 'https://github.com/TeamSPoon/' ).
+home( 'https://github.com/TeamSPoon/logicmoo_packages' ).
+download( 'https://github.com/TeamSPoon/logicmoo_packages/release/*.zip' ).
+requires(logicmoo_utils).
