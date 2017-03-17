@@ -85,3 +85,6 @@
 [submodule "pack/eggdrop"]
 	path = pack/eggdrop
 	url = https://github.com/TeamSPoon/eggdrop
+[submodule "pack/lib_atts"]
+	path = pack/lib_atts
+	url = https://github.com/TeamSPoon/lib_atts.git

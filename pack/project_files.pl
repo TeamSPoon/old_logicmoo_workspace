@@ -113,3 +113,7 @@ subclause_expansion,
 with_open_options,
 with_thread_local,
 xlisting,xlisting_web]).
+
+ git submodule foreach "git commit -am "v1.1.115" && git push || :"
+ git commit -am "v1.1.115" && git push
+
