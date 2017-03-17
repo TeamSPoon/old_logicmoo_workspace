@@ -3231,6 +3231,259 @@
 					</Folder>
 				</Folder>
 			</Folder>
+			<Folder Name="home">
+				<Folder Name="sorton">
+					<Folder Name="lib">
+						<Folder Name="swipl">
+							<Folder Name="pack">
+								<Folder Name="clause_attvars">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/prolog/attvar_reader.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/prolog/attvar_serializer.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/prolog/clause_attvars.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/pack.pl"/>
+								</Folder>
+								<Folder Name="dictoo">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/dictoo/prolog/dictoo.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/dictoo/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/dictoo/pack.pl"/>
+								</Folder>
+								<Folder Name="each_call_cleanup">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/each_call_cleanup/prolog/each_call_cleanup.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/each_call_cleanup/prolog/INDEX.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/each_call_cleanup/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/each_call_cleanup/pack.pl"/>
+								</Folder>
+								<Folder Name="file_scope">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/file_scope/prolog/file_scope.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/file_scope/prolog/INDEX.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/file_scope/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/file_scope/pack.pl"/>
+								</Folder>
+								<Folder Name="gvar_syntax">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/gvar_syntax/prolog/gvar_syntax.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/gvar_syntax/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/gvar_syntax/pack.pl"/>
+								</Folder>
+								<Folder Name="hook_hybrid">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/hook_database.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/hook_hybrid.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/INDEX.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/lockable_vars.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/virtualize_source.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/pack.pl"/>
+								</Folder>
+								<Folder Name="logicmoo_utils">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/INDEX.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_bb_env.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_bb_gvar.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_common.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_ctx_frame.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_dra.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_engines.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_strings.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_structs.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_terms.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/pack.pl"/>
+								</Folder>
+								<Folder Name="loop_check">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/loop_check/prolog/INDEX.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/loop_check/prolog/loop_check.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/loop_check/prolog/old_loop_check.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/loop_check/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/loop_check/pack.pl"/>
+								</Folder>
+								<Folder Name="must_trace">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/block3.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/bugger.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/dmsg.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/dumpst.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/first.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/frames.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/INDEX.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/must_trace.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/rtrace.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/ucatch.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/util_supp.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/must_trace/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/must_trace/pack.pl"/>
+								</Folder>
+								<Folder Name="pfc">
+									<Folder Name="examples">
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/dcg_pfc.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/lion.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/ndcg_pfc.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/show.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/test.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/test_grammar.pl"/>
+									</Folder>
+									<Folder Name="misc">
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/addg.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/bc.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/defeat.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/diagnose.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/diagnose1.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/purgatory.pl"/>
+									</Folder>
+									<Folder Name="pfc1.2">
+										<Folder Name="ex">
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/dcg_pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/lion.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/ndcg_pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/show.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/test.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/test2.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/test_grammar.pl"/>
+										</Folder>
+										<Folder Name="src">
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfccompile.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfccore.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcdb.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcdebug.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcjust.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcsupport.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcsyntax.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcwhy.pl"/>
+										</Folder>
+									</Folder>
+									<Folder Name="prolog">
+										<Folder Name="pfc2.0">
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_agenda.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_at_box.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_core.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_expansion.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_hooks.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_kb_ops.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_listing.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_loader.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_prolog_file.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_props.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_storage.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_stubs.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_args.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_constraints.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_isa.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_naming.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_wff.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_userkb.pl"/>
+										</Folder>
+										<Folder Name="pfclib">
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_autoexec.pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_base.pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_common.pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_genls.pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_if_missing.pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_mdefault.pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_singleValued.pfc.pl"/>
+										</Folder>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc_dcg.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc_toplevel.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<Folder Name="sanity_base">
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/attvar_01.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/attvar_04.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/conan_01.pfc.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mpred_pfc_test_01.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mpred_pfc_test_02.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mpred_pfc_test_03.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mpred_pfc_test_04.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01a.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01b.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01c.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01d.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01e.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_02.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_03.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_04.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_05.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_06.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_07.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_09.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/nd_01.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/shift_01.pl"/>
+											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/shift_02.pl"/>
+										</Folder>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/pfc/pack.pl"/>
+								</Folder>
+								<Folder Name="subclause_expansion">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/subclause_expansion/prolog/subclause_expansion.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/subclause_expansion/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/subclause_expansion/pack.pl"/>
+								</Folder>
+								<Folder Name="with_thread_local">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/prolog/INDEX.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/prolog/with_no_x.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/prolog/with_thread_local.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/pack.pl"/>
+								</Folder>
+								<Folder Name="xlisting">
+									<Folder Name="prolog">
+										<F N="W:/home/sorton/lib/swipl/pack/xlisting/prolog/INDEX.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/xlisting/prolog/listing_vars.pl"/>
+										<F N="W:/home/sorton/lib/swipl/pack/xlisting/prolog/xlisting.pl"/>
+									</Folder>
+									<Folder Name="t">
+										<F N="W:/home/sorton/lib/swipl/pack/xlisting/t/sanity_tests.pl"/>
+									</Folder>
+									<F N="W:/home/sorton/lib/swipl/pack/xlisting/pack.pl"/>
+								</Folder>
+							</Folder>
+						</Folder>
+					</Folder>
+				</Folder>
+			</Folder>
 		</Folder>
 		<Folder Name="body_reordering">
 			<F
@@ -3406,8 +3659,6 @@
 				Recurse="1"
 				Refilter="1"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
-		</Folder>
-		<Folder Name="prologmud">
 			<F
 				N="prologmud/*.*"
 				Recurse="1"
