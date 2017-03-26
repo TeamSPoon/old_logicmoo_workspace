@@ -2443,70 +2443,70 @@
 				N="clause_attvars/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="dictoo">
 			<F
 				N="dictoo/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="each_call_cleanup">
 			<F
 				N="each_call_cleanup/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="eggdrop">
 			<F
 				N="eggdrop/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="file_scope">
 			<F
 				N="file_scope/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="gvar_syntax">
 			<F
 				N="gvar_syntax/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="hilog">
 			<F
 				N="hilog/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="hook_hybrid">
 			<F
 				N="hook_hybrid/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="instant_prolog_docs">
 			<F
 				N="instant_prolog_docs/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="logicmoo_base">
 			<F
 				N="logicmoo_base/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="logicmoo_nlu">
 			<Folder Name="prolog">
@@ -2531,49 +2531,49 @@
 				N="loop_check/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="multimodal_dcg">
 			<F
 				N="multimodal_dcg/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="multivar">
 			<F
 				N="multivar/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="must_trace">
 			<F
 				N="must_trace/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="no_repeats">
 			<F
 				N="no_repeats/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="predicate_streams">
 			<F
 				N="predicate_streams/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="prologmud">
 			<F
 				N="prologmud/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="ref_unused">
 			<F N="ref_unused/dbase_i_dolce2_1.pl"/>
@@ -2583,7 +2583,7 @@
 				N="reindent/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="runtime">
 			<Folder Name="e2c">
@@ -2680,7 +2680,7 @@
 				N="s_expression/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="slack_prolog">
 			<Folder Name="prolog">
@@ -2706,7 +2706,7 @@
 				N="slack_prolog/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 			<F N="slack_prolog/.git"/>
 			<F N="slack_prolog/CHANGELOG.md"/>
 			<F N="slack_prolog/LICENSE.md"/>
@@ -2718,28 +2718,28 @@
 				N="subclause_expansion/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="with_open_options">
 			<F
 				N="with_open_options/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="with_thread_local">
 			<F
 				N="with_thread_local/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="xlisting">
 			<F
 				N="xlisting/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<F N="project_files.pl"/>
 	</old>
@@ -2770,7 +2770,6 @@
 			<F N="../.gitmodules"/>
 			<F N="../.hgignore"/>
 			<F N="../copy_modified.sh"/>
-			<F N="../LICENSE"/>
 			<F N="../LogicMOO.vpw"/>
 			<F N="../maybe.gitmodules"/>
 			<F N="../pack.pl"/>
@@ -2990,6 +2989,879 @@
 							<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/library/writef.pl"/>
 							<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/library/www_browser.pl"/>
 							<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/library/yall.pl"/>
+						</Folder>
+						<Folder Name="packages">
+							<Folder Name="archive">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/archive/archive.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/archive/pltotex.pl"/>
+							</Folder>
+							<Folder Name="bdb">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/bdb/bdb.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/bdb/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/bdb/test_bdb.pl"/>
+							</Folder>
+							<Folder Name="chr">
+								<Folder Name="Benchmarks">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/Benchmarks/benches.pl"/>
+								</Folder>
+								<Folder Name="Examples">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/Examples/deadcode.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/a_star.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/binomialheap.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/builtins.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_compiler_errors.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_compiler_options.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_compiler_utility.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_debug.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_hashtable_store.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_integertable_store.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_messages.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_op.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_op2.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_runtime.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_swi.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_swi_bootstrap.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_test.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_translate.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_translate_bootstrap.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_translate_bootstrap1.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/chr_translate_bootstrap2.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/clean_code.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/find.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/guard_entailment.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/listmap.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/chr/pairlist.pl"/>
+							</Folder>
+							<Folder Name="clib">
+								<Folder Name="demo">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/demo/cgidemo.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/demo/fork.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/demo/pipe.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/demo/win.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/cgi.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/crypt.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/filesex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/hash_stream.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/mallocinfo.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/md5.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/memfile.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/process.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/prolog_server.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/prolog_stream.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/rlimit.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/sha.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/socket.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/streaminfo.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/streampool.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/stresssocket.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/syslog.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/test_cgi.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/test_crypt.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/test_memfile.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/test_process.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/test_readutil.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/test_socket.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/test_stream.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/test_time.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/test_uri.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/time.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/udp_broadcast.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/uid.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/unix.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/uri.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clib/uuid.pl"/>
+							</Folder>
+							<Folder Name="clpqr">
+								<Folder Name="clpq">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpq/bb_q.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpq/bv_q.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpq/fourmotz_q.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpq/ineq_q.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpq/itf_q.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpq/nf_q.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpq/store_q.pl"/>
+								</Folder>
+								<Folder Name="clpqr">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpqr/class.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpqr/dump.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpqr/geler.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpqr/itf.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpqr/ordering.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpqr/project.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpqr/redund.pl"/>
+								</Folder>
+								<Folder Name="clpr">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpr/bb_r.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpr/bv_r.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpr/fourmotz_r.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpr/ineq_r.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpr/itf_r.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpr/nf_r.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpr/store_r.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpq.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/clpqr/clpr.pl"/>
+							</Folder>
+							<Folder Name="cpp">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cpp/likes.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cpp/test.pl"/>
+							</Folder>
+							<Folder Name="cql">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/cql.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/cql_autoschema.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/cql_database.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/cql_demo.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/cql_hooks.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/sql_keywords.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/sql_parser.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/sql_tokenizer.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/sql_write.pl"/>
+							</Folder>
+							<Folder Name="http">
+								<Folder Name="examples">
+									<Folder Name="pwp">
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/pwp/pwpdb.pl"/>
+									</Folder>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/calc.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/custom_404.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/demo_body.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/demo_client.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/demo_daemon.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/demo_digest.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/demo_files.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/demo_openid.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/demo_pwp.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/demo_threads.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/demo_xpce.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/stress_client.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/examples/stress_server.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/ax.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/dcg_basics.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/html_head.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/html_quasiquotations.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/html_write.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_authenticate.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_client.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_cookie.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_cors.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_digest.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_dirindex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_dispatch.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_error.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_exception.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_files.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_header.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_hook.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_host.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_json.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_load.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_log.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_multipart_plugin.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_open.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_openid.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_parameters.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_path.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_proxy.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_pwp.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_server_files.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_session.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_sgml_plugin.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_stream.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_unix_daemon.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/http_wrapper.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/hub.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/inetd_httpd.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/jquery.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/js_grammar.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/js_write.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/json.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/json_convert.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/mimepack.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/mimetype.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/test_cgi_stream.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/test_http.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/test_json.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/test_multipart.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/test_proxy.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/test_websocket.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/thread_httpd.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/txttotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/websocket.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/xpce_httpd.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/http/yadis.pl"/>
+							</Folder>
+							<Folder Name="inclpr">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/benchmarks.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_check.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_compile.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_consistency.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_core.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_interval_arithmetic.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_inversion.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_natural_interval_extension.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_newton.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_ordering.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_symbolic_processing.pl"/>
+							</Folder>
+							<Folder Name="jpl">
+								<Folder Name="examples">
+									<Folder Name="java">
+										<Folder Name="Family">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/java/Family/family.pl"/>
+										</Folder>
+										<Folder Name="FamilyMT">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/java/FamilyMT/family.pl"/>
+										</Folder>
+										<Folder Name="Test">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/java/Test/test.pl"/>
+										</Folder>
+										<Folder Name="Test2">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/java/Test2/test2.pl"/>
+										</Folder>
+										<Folder Name="TestGC">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/java/TestGC/test.pl"/>
+										</Folder>
+										<Folder Name="Time">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/java/Time/time.pl"/>
+										</Folder>
+										<Folder Name="Zahed">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/java/Zahed/zahed.pl"/>
+										</Folder>
+									</Folder>
+									<Folder Name="prolog">
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/prolog/jpl_colour_choose_demo.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/prolog/jpl_jlist_demo.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/prolog/jpl_table_demo.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/prolog/jpl_text_entry_demo.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/examples/prolog/jpl_versions_demo.pl"/>
+									</Folder>
+								</Folder>
+								<Folder Name="src">
+									<Folder Name="java">
+										<Folder Name="org">
+											<Folder Name="jpl7">
+												<Folder Name="test">
+													<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/src/java/org/jpl7/test/family.pl"/>
+													<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/src/java/org/jpl7/test/test.pl"/>
+													<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/src/java/org/jpl7/test/Versions.pl"/>
+												</Folder>
+											</Folder>
+										</Folder>
+									</Folder>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/demo.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/jpl.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/test_jpl.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jpl/test_singleton.pl"/>
+							</Folder>
+							<Folder Name="libedit">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/libedit/editline.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/libedit/pltotex.pl"/>
+							</Folder>
+							<Folder Name="nlp">
+								<Folder Name="libstemmer_c">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/nlp/libstemmer_c/Makefile.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/nlp/double_metaphone.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/nlp/isub.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/nlp/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/nlp/porter_stem.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/nlp/snowball.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/nlp/test.pl"/>
+							</Folder>
+							<Folder Name="odbc">
+								<Folder Name="demo">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/odbc/demo/wordnet.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/odbc/odbc.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/odbc/test_odbc.pl"/>
+							</Folder>
+							<Folder Name="packages-real">
+								<Folder Name="examples">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/packages-real/examples/for_real.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/packages-real/examples/pagerank.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/packages-real/examples/test_real.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/packages-real/pack.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/packages-real/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/packages-real/real.pl"/>
+							</Folder>
+							<Folder Name="PDT">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/PDT/pdt_console.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/PDT/pltotex.pl"/>
+							</Folder>
+							<Folder Name="pengines">
+								<Folder Name="examples">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/examples/client.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/examples/server.pl"/>
+								</Folder>
+								<Folder Name="http">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/http/term_html.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/pengines.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/pengines_io.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/term_to_json.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/test_js.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/test_local.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/test_pengines.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pengines/test_term_html.pl"/>
+							</Folder>
+							<Folder Name="pldoc">
+								<Folder Name="server">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/server/man_server.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_access.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_colour.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_csssrc.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_debug.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_files.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_html.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_htmlsrc.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_http.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_index.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_latex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_library.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_man.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_modes.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_pack.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_process.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_register.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_search.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_util.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/doc_wiki.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/hooks.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/pldoc.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/test_wiki.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/txttotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pldoc/wiki_test_data.pl"/>
+							</Folder>
+							<Folder Name="plunit">
+								<Folder Name="examples">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/plunit/examples/read.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/plunit/examples/simple.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/plunit/plunit.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/plunit/swi.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/plunit/test_cover.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/plunit/test_wizard.pl"/>
+							</Folder>
+							<Folder Name="protobufs">
+								<Folder Name="demo">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/protobufs/demo/vector_demo.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/protobufs/eventually_implies.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/protobufs/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/protobufs/protobufs.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/protobufs/test_protobufs.pl"/>
+							</Folder>
+							<Folder Name="RDF">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/online.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/rdf.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/rdf_diagram.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/rdf_ntriples.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/rdf_parser.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/rdf_triple.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/rdf_write.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/rewrite.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/test_rdf.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/test_write.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/RDF/w3c_test.pl"/>
+							</Folder>
+							<Folder Name="readline">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/readline/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/readline/readline.pl"/>
+							</Folder>
+							<Folder Name="semweb">
+								<Folder Name="Tests">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/Tests/lit.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/Tests/subprop.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/bench.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/litmap_test.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/local_test.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/pce_graph.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/random_graph.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf11.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf11_containers.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_cache.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_compare.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_db.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_edit.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_http_plugin.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_library.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_litindex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_ntriples.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_persistency.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_pl.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_portray.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_sandbox.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_turtle.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_turtle_write.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdf_zlib_plugin.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdfa.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rdfs.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/rnd_test.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/search.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/sparql_client.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/test.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/test_con.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/test_ntriples.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/test_rdf11.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/test_rdf_db.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/test_rdfa.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/test_subprop.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/test_turtle.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/test_turtle2.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/turtle.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/turtle_chars.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/semweb/unicode_map.pl"/>
+							</Folder>
+							<Folder Name="sgml">
+								<Folder Name="Test">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/Test/test.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/Test/wrtest.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/c14n2.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/iso_639.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/pwp.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/sgml.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/sgml_mode.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/sgml_write.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/test_xsd.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/xml_unicode.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/xpath.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/xsdp_types.pl"/>
+							</Folder>
+							<Folder Name="ssl">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/client.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/crypto.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/http_ssl_plugin.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/https.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/saml.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/server.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/ssl.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/test_ssl.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/xmldsig.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/xmlenc.pl"/>
+							</Folder>
+							<Folder Name="table">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/table/table.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/table/table_util.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/table/test.pl"/>
+							</Folder>
+							<Folder Name="tipc">
+								<Folder Name="demo">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/tipc/demo/tipc_examples.pl"/>
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/tipc/demo/tipc_test.pl"/>
+								</Folder>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/tipc/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/tipc/tipc.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/tipc/tipc_broadcast.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/tipc/tipc_linda.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/tipc/tipc_paxos.pl"/>
+							</Folder>
+							<Folder Name="utf8proc">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/utf8proc/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/utf8proc/test.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/utf8proc/unicode.pl"/>
+							</Folder>
+							<Folder Name="windows">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/windows/registry.pl"/>
+							</Folder>
+							<Folder Name="xpce">
+								<Folder Name="man">
+									<Folder Name="course">
+										<Folder Name="lib">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/course/lib/INDEX.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/course/lib/prompt.pl"/>
+										</Folder>
+										<Folder Name="slides">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/course/slides/icon.pl"/>
+										</Folder>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/course/bib.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/course/fam.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/course/ftp.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/course/learner.pl"/>
+									</Folder>
+									<Folder Name="info">
+										<Folder Name="lib">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/info/lib/re_parse.pl"/>
+										</Folder>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/info/asciman.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/info/connect.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/info/dialog.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/info/INDEX.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/info/texinfo.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/info/which.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/info/window.pl"/>
+									</Folder>
+									<Folder Name="userguide">
+										<Folder Name="examples">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/doc1.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/dragdrop.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/editgraphics.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/fileviewer.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/fill1.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/fill5.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/font.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/graphedit.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/masterslave.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/postscript.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/report.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/template.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/examples/wysiwyg.pl"/>
+										</Folder>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/classes.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/httpd-ex.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/man/userguide/mkclasshier.pl"/>
+									</Folder>
+								</Folder>
+								<Folder Name="prolog">
+									<Folder Name="boot">
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_autoload.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_editor.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_error.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_expand.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_expansion.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_global.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_goal_expansion.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_keybinding.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_pl.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_portray.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_principal.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/boot/pce_realise.pl"/>
+									</Folder>
+									<Folder Name="contrib">
+										<Folder Name="rubik">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/contrib/rubik/maplist.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/contrib/rubik/rubik.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/contrib/rubik/rubikpce.pl"/>
+										</Folder>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/contrib/contrib.pl"/>
+									</Folder>
+									<Folder Name="demo">
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/chess.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/colour.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/constraint.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/cursor.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/event_hierarchy.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/fontviewer.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/ftplog.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/graph.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/hsvcolour.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/imageviewer.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/ispell.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/juggler.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/kangaroo.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/demo/pce_demo.pl"/>
+									</Folder>
+									<Folder Name="lib">
+										<Folder Name="compatibility">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/compatibility/bitmap.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/compatibility/event_speak.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/compatibility/frozen.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/compatibility/global.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/compatibility/resource.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/compatibility/send.pl"/>
+										</Folder>
+										<Folder Name="dialog">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/attribute.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/behaviour.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/dialog.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/font.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/generate.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/image_item.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/label.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/layout.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/load.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/menuitem.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/meta.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/pretty_print.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/prompter.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/proto.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dialog/util.pl"/>
+										</Folder>
+										<Folder Name="doc">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/browser.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/emit.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/form.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/html.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/layout.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/load.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/objects.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/sp_errors.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/t2.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/table.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/test.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/url_fetch.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/util.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/vfont.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/window.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/xml_browse.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/doc/xml_hierarchy.pl"/>
+										</Folder>
+										<Folder Name="draw">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/align.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/attribute.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/canvas.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/config.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/draw.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/exportpl.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/gesture.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/importpl.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/menu.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/shapes.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw/undo.pl"/>
+										</Folder>
+										<Folder Name="emacs">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/annotate_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/application.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/bookmarks.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/buffer.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/buffer_menu.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/c_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/chr_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/cpp_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/dde_server.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/emacs.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/find.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/fundamental_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/gdb.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/help.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/history.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/hit_list.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/html_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/java_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/javascript_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/language_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/latex_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/logtalk_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/man_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/outline_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/prolog_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/prompt.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/rdf_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/script_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/server.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/sgml_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/shell.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/swi_prolog.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/text_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/turtle_mode.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs/window.pl"/>
+										</Folder>
+										<Folder Name="english">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/english/pce_messages.pl"/>
+										</Folder>
+										<Folder Name="http">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/http/html_hierarchy.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/http/html_refman.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/http/html_write.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/http/http_image.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/http/http_man.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/http/httpd.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/http/run.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/http/xref.pl"/>
+										</Folder>
+										<Folder Name="man">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/behaviour_item.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/classmap.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/man_index.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/p_card.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/p_data.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/pce_op.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/showevent.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/util.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_card.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_class.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_editor.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_error.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_global.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_group.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_hierarchy.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_inherit.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_inspector.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_instance.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_manual.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_module.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_search.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_select.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_statistics.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_summary.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_tile.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_topic.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/man/v_visual.pl"/>
+										</Folder>
+										<Folder Name="math">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/math/expandmath.pl"/>
+										</Folder>
+										<Folder Name="plot">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/plot/axis.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/plot/barchart.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/plot/demo.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/plot/plotter.pl"/>
+										</Folder>
+										<Folder Name="swi">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi/pce_debug_monitor.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi/pce_profile.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi/swi_console.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi/thread_monitor.pl"/>
+										</Folder>
+										<Folder Name="trace">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/browse.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/browse_xref.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/clause.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/emacs_debug_modes.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/exceptions.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/gui.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/pprint.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/query.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/settings.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/source.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/stack.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/status.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/test.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/trace.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/util.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/trace/viewterm.pl"/>
+										</Folder>
+										<Folder Name="xref">
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/xref/common.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/xref/mkcommon.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/xref/quintus.pl"/>
+											<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/xref/sicstus.pl"/>
+										</Folder>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/area.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/autowin.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dragdict.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/dragdrop.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/draw_extend.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/edit_dialog.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs_extend.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/emacs_tags.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/file_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/find_file.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/find_file_dialog.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/getpass.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/gradient.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/gui_tracer.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/help_message.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/http_client.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/hyper.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/imageops.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/INDEX.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/isocomp.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/keybinding.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/make_dialog.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/MKINDEX.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/password_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_arm.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_arrow_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_class_index.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_colour_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_config.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_configeditor.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_cxx_headers.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_debug.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_dispatch.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_drag_and_drop.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_drag_and_drop_dict_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_edit.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_editable_text.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_emacs.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_float_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_font_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_grapher.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_graphical_browser.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_help_file.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_helper.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_history.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_identifier_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_image.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_image_browser.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_image_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_loadcxx.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_main.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_manual.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_meta.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_objects.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_postscript.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_progress.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_prolog_xref.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_prompter.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_regex_compat.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_renew.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_report.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_require.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_select_set_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_selection.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_server.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_set_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_shell.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_style_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_tagged_connection.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_template.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_tick_box.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_toc.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_type.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_unclip.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_util.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pce_xref.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/pcedraw.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/persistent_frame.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/portray_object.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/print_graphics.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/print_text.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/prolog_predicate.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/prolog_predicate_item.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/qrecompile.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/rdf_diagram.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/scaledbitmap.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/scan_arguments.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/sp_fcompile.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/splash_screen.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/stayup_popup.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi_compatibility.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi_edit.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi_help.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi_hooks.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi_ide.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/swi_preferences.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/tabbed_window.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/tabular.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/toc_filesystem.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/toolbar.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/url_image.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/Xserver.pl"/>
+									</Folder>
+									<Folder Name="unsupported">
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/unsupported/subframe.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/unsupported/twm_geometry_box.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/unsupported/twm_resize_button.pl"/>
+									</Folder>
+								</Folder>
+								<Folder Name="src">
+									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/src/test.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="zlib">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/zlib/test_zlib.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/zlib/zlib.pl"/>
+							</Folder>
 						</Folder>
 						<Folder Name="src">
 							<Folder Name="compat">
@@ -3231,336 +4103,97 @@
 					</Folder>
 				</Folder>
 			</Folder>
-			<Folder Name="home">
-				<Folder Name="sorton">
-					<Folder Name="lib">
-						<Folder Name="swipl">
-							<Folder Name="pack">
-								<Folder Name="clause_attvars">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/prolog/attvar_reader.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/prolog/attvar_serializer.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/prolog/clause_attvars.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/clause_attvars/pack.pl"/>
-								</Folder>
-								<Folder Name="dictoo">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/dictoo/prolog/dictoo.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/dictoo/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/dictoo/pack.pl"/>
-								</Folder>
-								<Folder Name="each_call_cleanup">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/each_call_cleanup/prolog/each_call_cleanup.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/each_call_cleanup/prolog/INDEX.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/each_call_cleanup/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/each_call_cleanup/pack.pl"/>
-								</Folder>
-								<Folder Name="file_scope">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/file_scope/prolog/file_scope.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/file_scope/prolog/INDEX.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/file_scope/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/file_scope/pack.pl"/>
-								</Folder>
-								<Folder Name="gvar_syntax">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/gvar_syntax/prolog/gvar_syntax.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/gvar_syntax/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/gvar_syntax/pack.pl"/>
-								</Folder>
-								<Folder Name="hook_hybrid">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/hook_database.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/hook_hybrid.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/INDEX.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/lockable_vars.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/prolog/virtualize_source.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/hook_hybrid/pack.pl"/>
-								</Folder>
-								<Folder Name="logicmoo_utils">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/INDEX.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_bb_env.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_bb_gvar.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_common.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_ctx_frame.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_dra.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_engines.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_strings.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_structs.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/prolog/logicmoo_util_terms.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/logicmoo_utils/pack.pl"/>
-								</Folder>
-								<Folder Name="loop_check">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/loop_check/prolog/INDEX.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/loop_check/prolog/loop_check.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/loop_check/prolog/old_loop_check.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/loop_check/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/loop_check/pack.pl"/>
-								</Folder>
-								<Folder Name="must_trace">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/block3.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/bugger.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/dmsg.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/dumpst.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/first.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/frames.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/INDEX.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/must_trace.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/rtrace.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/ucatch.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/prolog/util_supp.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/must_trace/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/must_trace/pack.pl"/>
-								</Folder>
-								<Folder Name="pfc">
-									<Folder Name="examples">
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/dcg_pfc.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/lion.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/ndcg_pfc.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/show.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/test.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/examples/test_grammar.pl"/>
-									</Folder>
-									<Folder Name="misc">
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/addg.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/bc.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/defeat.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/diagnose.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/diagnose1.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/misc/purgatory.pl"/>
-									</Folder>
-									<Folder Name="pfc1.2">
-										<Folder Name="ex">
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/dcg_pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/lion.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/ndcg_pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/show.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/test.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/test2.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/ex/test_grammar.pl"/>
-										</Folder>
-										<Folder Name="src">
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfccompile.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfccore.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcdb.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcdebug.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcjust.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcsupport.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcsyntax.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/pfc1.2/src/pfcwhy.pl"/>
-										</Folder>
-									</Folder>
-									<Folder Name="prolog">
-										<Folder Name="pfc2.0">
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_agenda.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_at_box.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_core.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_expansion.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_hooks.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_kb_ops.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_listing.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_loader.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_prolog_file.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_props.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_storage.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_stubs.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_args.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_constraints.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_isa.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_naming.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_type_wff.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc2.0/mpred_userkb.pl"/>
-										</Folder>
-										<Folder Name="pfclib">
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_autoexec.pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_base.pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_common.pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_genls.pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_if_missing.pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_mdefault.pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfclib/system_singleValued.pfc.pl"/>
-										</Folder>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc_dcg.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/pfc/prolog/pfc_toplevel.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<Folder Name="sanity_base">
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/attvar_01.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/attvar_04.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/conan_01.pfc.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mpred_pfc_test_01.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mpred_pfc_test_02.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mpred_pfc_test_03.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mpred_pfc_test_04.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01a.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01b.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01c.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01d.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_01e.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_02.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_03.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_04.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_05.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_06.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_07.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/mt_09.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/nd_01.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/shift_01.pl"/>
-											<F N="W:/home/sorton/lib/swipl/pack/pfc/t/sanity_base/shift_02.pl"/>
-										</Folder>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/pfc/pack.pl"/>
-								</Folder>
-								<Folder Name="subclause_expansion">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/subclause_expansion/prolog/subclause_expansion.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/subclause_expansion/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/subclause_expansion/pack.pl"/>
-								</Folder>
-								<Folder Name="with_thread_local">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/prolog/INDEX.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/prolog/with_no_x.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/prolog/with_thread_local.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/with_thread_local/pack.pl"/>
-								</Folder>
-								<Folder Name="xlisting">
-									<Folder Name="prolog">
-										<F N="W:/home/sorton/lib/swipl/pack/xlisting/prolog/INDEX.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/xlisting/prolog/listing_vars.pl"/>
-										<F N="W:/home/sorton/lib/swipl/pack/xlisting/prolog/xlisting.pl"/>
-									</Folder>
-									<Folder Name="t">
-										<F N="W:/home/sorton/lib/swipl/pack/xlisting/t/sanity_tests.pl"/>
-									</Folder>
-									<F N="W:/home/sorton/lib/swipl/pack/xlisting/pack.pl"/>
-								</Folder>
-							</Folder>
-						</Folder>
-					</Folder>
-				</Folder>
-			</Folder>
 		</Folder>
 		<Folder Name="body_reordering">
 			<F
 				N="body_reordering/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="clause_attvars">
 			<F
 				N="clause_attvars/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="dictoo">
 			<F
 				N="dictoo/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="each_call_cleanup">
 			<F
 				N="each_call_cleanup/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="eggdrop">
 			<F
 				N="eggdrop/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="file_scope">
 			<F
 				N="file_scope/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="gvar_syntax">
 			<F
 				N="gvar_syntax/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="hilog">
 			<F
 				N="hilog/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="hook_hybrid">
 			<F
 				N="hook_hybrid/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="instant_prolog_docs">
 			<F
 				N="instant_prolog_docs/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
+		<Folder Name="lib_atts">
+			<F
+				N="lib_atts/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
+		</Folder>
+		<Folder Name="tmud">
+			<F
+				N="tmud/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.gif"/>
+		</Folder>		
 		<Folder Name="logicmoo_base">
 			<F
 				N="logicmoo_base/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="logicmoo_nlu">
 			<Folder Name="prolog">
@@ -3580,97 +4213,104 @@
 				</Folder>
 			</Folder>
 		</Folder>
+		<Folder Name="logicmoo_packages">
+			<F
+				N="logicmoo_packages/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
+		</Folder>
 		<Folder Name="logicmoo_planner">
 			<F
 				N="logicmoo_planner/*.md"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 			<F
 				N="logicmoo_planner/*.pl"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="logicmoo_utils">
 			<F
 				N="logicmoo_utils/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="loop_check">
 			<F
 				N="loop_check/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="multimodal_dcg">
 			<F
 				N="multimodal_dcg/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="multivar">
 			<F
 				N="multivar/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="must_trace">
 			<F
 				N="must_trace/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="no_repeats">
 			<F
 				N="no_repeats/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="pfc">
 			<F
 				N="pfc/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="predicate_streams">
 			<F
 				N="predicate_streams/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="prologmud">
 			<F
 				N="prologmud/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 			<F
 				N="prologmud/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 			<F
 				N="prologmud/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="prologmud_samples">
 			<F
 				N="prologmud_samples/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="ref_unused">
 			<F N="ref_unused/dbase_i_dolce2_1.pl"/>
@@ -3680,14 +4320,14 @@
 				N="reindent/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="s_expression">
 			<F
 				N="s_expression/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="slack_prolog">
 			<Folder Name="prolog">
@@ -3703,7 +4343,7 @@
 				N="slack_prolog/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 			<F N="slack_prolog/.git"/>
 			<F N="slack_prolog/CHANGELOG.md"/>
 			<F N="slack_prolog/LICENSE.md"/>
@@ -3715,42 +4355,42 @@
 				N="subclause_expansion/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="tabling_dra">
 			<F
 				N="tabling_dra/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="t/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="t/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="with_open_options">
 			<F
 				N="with_open_options/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="with_thread_local">
 			<F
 				N="with_thread_local/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="xlisting">
 			<F
 				N="xlisting/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<Folder Name="xlisting_web">
 			<F
 				N="xlisting_web/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe"/>
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
 		</Folder>
 		<F N="project_files.pl"/>
 	</Files>

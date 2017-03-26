@@ -60,31 +60,31 @@
 	url = https://github.com/TeamSPoon/slack_prolog.git
 [submodule "pack/logicmoo_utils"]
 	path = pack/logicmoo_utils
-	url = https://github.com/TeamSPoon/logicmoo_utils
+	url = https://github.com/TeamSPoon/logicmoo_utils.git
 [submodule "pack/tabling_dra"]
 	path = pack/tabling_dra
-	url = https://github.com/TeamSPoon/tabling_dra
+	url = https://github.com/TeamSPoon/tabling_dra.git
 [submodule "pack/body_reordering"]
 	path = pack/body_reordering
-	url = https://github.com/TeamSPoon/body_reordering
+	url = https://github.com/TeamSPoon/body_reordering.git
 [submodule "pack/xlisting_web"]
 	path = pack/xlisting_web
-	url = https://github.com/TeamSPoon/xlisting_web
+	url = https://github.com/TeamSPoon/xlisting_web.git
 [submodule "pack/pfc"]
 	path = pack/pfc
-	url = https://github.com/TeamSPoon/pfc
+	url = https://github.com/TeamSPoon/pfc.git
 [submodule "pack/prologmud"]
 	path = pack/prologmud
-	url = https://github.com/TeamSPoon/prologmud
+	url = https://github.com/TeamSPoon/prologmud.git
 [submodule "pack/logicmoo_base"]
 	path = pack/logicmoo_base
-	url = https://github.com/TeamSPoon/logicmoo_base
+	url = https://github.com/TeamSPoon/logicmoo_base.git
 [submodule "pack/prologmud_samples"]
 	path = pack/prologmud_samples
 	url = https://github.com/TeamSPoon/prologmud_samples.git
 [submodule "pack/eggdrop"]
 	path = pack/eggdrop
-	url = https://github.com/TeamSPoon/eggdrop
+	url = https://github.com/TeamSPoon/eggdrop.git
 [submodule "pack/lib_atts"]
 	path = pack/lib_atts
 	url = https://github.com/TeamSPoon/lib_atts.git
