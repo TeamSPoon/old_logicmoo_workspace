@@ -31,9 +31,6 @@
 [submodule "pack/hilog"]
 	path = pack/hilog
 	url = https://github.com/TeamSPoon/hilog.git
-[submodule "pack/loop_check"]
-	path = pack/loop_check
-	url = https://github.com/TeamSPoon/loop_check.git
 [submodule "pack/hook_hybrid"]
 	path = pack/hook_hybrid
 	url = https://github.com/TeamSPoon/hook_hybrid.git
@@ -49,9 +46,6 @@
 [submodule "pack/instant_prolog_docs"]
 	path = pack/instant_prolog_docs
 	url = https://github.com/TeamSPoon/instant_prolog_docs.git
-[submodule "pack/s_expression"]
-	path = pack/s_expression
-	url = https://github.com/TeamSPoon/s_expression.git
 [submodule "pack/subclause_expansion"]
 	path = pack/subclause_expansion
 	url = https://github.com/TeamSPoon/subclause_expansion.git
@@ -73,18 +67,24 @@
 [submodule "pack/pfc"]
 	path = pack/pfc
 	url = https://github.com/TeamSPoon/pfc.git
-[submodule "pack/prologmud"]
-	path = pack/prologmud
-	url = https://github.com/TeamSPoon/prologmud.git
 [submodule "pack/logicmoo_base"]
 	path = pack/logicmoo_base
 	url = https://github.com/TeamSPoon/logicmoo_base.git
-[submodule "pack/prologmud_samples"]
-	path = pack/prologmud_samples
-	url = https://github.com/TeamSPoon/prologmud_samples.git
 [submodule "pack/eggdrop"]
 	path = pack/eggdrop
 	url = https://github.com/TeamSPoon/eggdrop.git
 [submodule "pack/lib_atts"]
 	path = pack/lib_atts
 	url = https://github.com/TeamSPoon/lib_atts.git
+[submodule "pack/s_expression"]
+	path = pack/s_expression
+	url = https://github.com/TeamSPoon/s_expression.git
+[submodule "pack/prologmud"]
+	path = pack/prologmud
+	url = https://github.com/TeamSPoon/prologmud.git
+[submodule "pack/prologmud_samples"]
+	path = pack/prologmud_samples
+	url = https://github.com/TeamSPoon/prologmud_samples.git
+[submodule "pack/loop_check"]
+	path = pack/loop_check
+	url = https://github.com/TeamSPoon/loop_check.git

@@ -79,22 +79,21 @@ xlisting]).
 
 
 
-:-asserta((refesh_pack(P):- format(atom(URL),'https://github.com/TeamSPoon/~w.git',[P]),pack_install(URL))).
+:-
+ asserta((refesh_pack(P):- !, format(atom(URL),'https://github.com/TeamSPoon/~w.git',[P]),
+  pack_install(URL,[upgrade(true),git(true),interactive(false)]))).
 
-maplist(refesh_pack,
-[logicmoo_utils,
-predicate_streams,
-gvar_syntax,
-dictoo,
+:-
+  maplist(refesh_pack,[logicmoo_utils,predicate_streams]).
 
-clause_attvars,
-each_call_cleanup,
+:- maplist(refesh_pack,[gvar_syntax,dictoo,clause_attvars]).
+
+maplist(refesh_pack,[each_call_cleanup,
 eggdrop,
 file_scope,
 % hilog,
 hook_hybrid,
 instant_prolog_docs,
-logicmoo_base,
 %logicmoo_experimental,
 %logicmoo_nlu,
 %logicmoo_packages,
@@ -102,17 +101,23 @@ logicmoo_base,
 %logtalk,
 loop_check,
 multimodal_dcg,
-pfc,
 must_trace,
 no_repeats,
-prologmud,
-prologmud_samples,
+subclause_expansion]).
+
+maplist(refesh_pack,[
 s_expression,
-slack_prolog,
-subclause_expansion,
 with_open_options,
 with_thread_local,
 xlisting,xlisting_web]).
+
+logicmoo_base,
+maplist(refesh_pack,[prologmud,prologmud_samples]).
+
+pfc,
+slack_prolog,
+
+]).
 
  git submodule foreach "git commit -am "v1.1.115" && git push || :"
  git commit -am "v1.1.115" && git push
