@@ -1,5 +1,5 @@
 name(logicmoo_packages).
-version('1.1.117').
+version('1.1.118').
 title('Various packages - warning: HUGE amount of test data').
 author( 'Douglas Miles', 'http://www.linkedin.com/in/logicmoo' ).
 packager( 'TeamSPoon/LogicMoo', 'https://github.com/TeamSPoon/' ).
