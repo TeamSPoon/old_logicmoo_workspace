@@ -83,10 +83,9 @@ xlisting]).
  asserta((refesh_pack(P):- !, format(atom(URL),'https://github.com/TeamSPoon/~w.git',[P]),
   pack_install(URL,[upgrade(true),git(true),interactive(false)]))).
 
-:-
   maplist(refesh_pack,[logicmoo_utils,predicate_streams]).
 
-:- maplist(refesh_pack,[gvar_syntax,dictoo,clause_attvars]).
+maplist(refesh_pack,[gvar_syntax,dictoo,clause_attvars]).
 
 maplist(refesh_pack,[each_call_cleanup,
 eggdrop,
@@ -111,7 +110,7 @@ with_open_options,
 with_thread_local,
 xlisting,xlisting_web]).
 
-logicmoo_base,
+maplist(refesh_pack,[logicmoo_base,pfc]).
 maplist(refesh_pack,[prologmud,prologmud_samples]).
 
 pfc,
