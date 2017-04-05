@@ -88,3 +88,6 @@
 [submodule "pack/loop_check"]
 	path = pack/loop_check
 	url = https://github.com/TeamSPoon/loop_check.git
+[submodule "pack/logicmoo_planners"]
+	path = pack/logicmoo_planners
+	url = https://github.com/TeamSPoon/logicmoo_planners.git

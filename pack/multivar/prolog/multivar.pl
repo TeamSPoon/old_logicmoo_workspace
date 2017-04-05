@@ -25,8 +25,7 @@
 
 :- module(multivar,
  [
-   mdwq/1,mdwq_call/1,
-
+   mdwq/1, 
 		  plvar/1,
           nb_var/1, nb_var/2,
           vdict/1, vdict/2,
@@ -39,15 +38,15 @@
    is_mv/1, multivar/1 % create special varaible that cannot be bound
    ]).
 
-:- meta_predicate mdwq_call(0).
 :- meta_predicate user:attvar_variant(0,0).
 :- use_module(library(option),[dict_options/2,option/2]).
 
 mdwq(Q):- format(user_error,'~NMWQ: ~q~n',[Q]).
 
-mdwq_call(Q):- !, Q.
-mdwq_call(Q):- Q *-> mdwq(success:Q); (mdwq(failed:Q),!,fail).
-
+:- meta_predicate system:mdwq_call(:).
+system:mdwq_call(Q):- !, call(Q).
+system:mdwq_call(Q):- call(Q) *-> mdwq(success:Q); (mdwq(failed:Q),!,fail).
+:- system:export(system:mdwq_call/1).
 
 % ==========================================
 %  Unify hook
