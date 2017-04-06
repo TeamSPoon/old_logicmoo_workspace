@@ -4213,7 +4213,6 @@
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/prolog_predicate.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/prolog_predicate_item.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/qrecompile.pl"/>
-										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/rdf_diagram.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/scaledbitmap.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/scan_arguments.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/sp_fcompile.pl"/>
@@ -5175,7 +5174,27 @@
 					<F N="logicmoo_nlu/prolog/pldata/trans_header.pl"/>
 					<F N="logicmoo_nlu/prolog/pldata/transform_dump.pl"/>
 				</Folder>
+				<F N="logicmoo_nlu/prolog/MUD_DeepParsing.vpj"/>
+				<F N="logicmoo_nlu/prolog/parser_all.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_ape.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_candc.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_chart89.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_chat80.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_chat80a.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_CURT.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_e2c.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_ProNTo.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_regulus.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_SIRIDUS.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_stanford.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_SUPPLE.pl"/>
+				<F N="logicmoo_nlu/prolog/parser_talk.pl"/>
+				<F N="logicmoo_nlu/prolog/POSTaggerParser.java"/>
+				<F N="logicmoo_nlu/prolog/README"/>
 			</Folder>
+			<F N="logicmoo_nlu/LICENSE.md"/>
+			<F N="logicmoo_nlu/pack.pl"/>
+			<F N="logicmoo_nlu/README.md"/>
 		</Folder>
 		<Folder Name="logicmoo_packages">
 			<F
@@ -5209,6 +5228,12 @@
 				Recurse="1"
 				Refilter="1"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
+		</Folder>
+		<Folder Name="logtalk">
+			<F N="logtalk/CHANGELOG.md"/>
+			<F N="logtalk/LICENSE.md"/>
+			<F N="logtalk/pack.pl"/>
+			<F N="logtalk/README.md"/>
 		</Folder>
 		<Folder Name="loop_check">
 			<F
@@ -5282,6 +5307,9 @@
 				Recurse="1"
 				Refilter="1"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
+			<F N="pfc/LICENSE.md"/>
+			<F N="pfc/pack.pl"/>
+			<F N="pfc/README.md"/>
 		</Folder>
 		<Folder Name="predicate_streams">
 			<F
