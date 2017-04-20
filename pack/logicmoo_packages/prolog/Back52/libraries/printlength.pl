@@ -15,6 +15,10 @@
 	marketing@quintus.com
 ******************************************************************************/
 
+%
+%bianchi - 5/6/96 introdotta una modifica - vedi piu' avanti.
+%
+
 %   Package: print_length
 %   Author : Richard A. O'Keefe
 %   Updated: 8/29/89
@@ -75,13 +79,20 @@ print_length(Command, StartColumn, EndColumn) :-
 %   Help stamp out stream arguments!
 %   print_length/2 fails if Command fails.
 
+% bianchi - cambiato il controllo di LineNumber .
+% forse il SICSstus numera le linee diversamente. 
 print_length(Command, Length) :-
 	open_null_stream(Stream),
 	'print length'(Command, user, Stream),
 	character_count(Stream, CharsWritten),
 	line_count(Stream, LineNumber),
 	close(Stream),
-	LineNumber = 1,
+% versione originale
+%	LineNumber = 1,
+% per il SICSTUS o altro
+        (che_prolog('SICS')-> 
+         LineNumber = 0;
+         LineNumber =1), 
 	Length = CharsWritten.
 
 

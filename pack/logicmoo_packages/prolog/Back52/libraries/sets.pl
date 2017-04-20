@@ -14,6 +14,14 @@
 	415-813-3800
 	marketing@quintus.com
 ******************************************************************************/
+%
+%         bianchi 6/6/96
+% aggiunto il predicato memberchk/2 perche deve esserci anche in questo 
+% modulo
+%
+
+
+
 
 %   Module : sets
 %   Authors: Lawrence Byrd + Richard A. O'Keefe
