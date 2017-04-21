@@ -24,10 +24,10 @@
 %   Copyright (C) 1987, Quintus Computer Systems, Inc.  All rights reserved.
 
 :- module(between, [
-	between/3,		%   Lower x Upper x Bounded
+ %dmiles        between/3,		%   Lower x Upper x Bounded
 	gen_int/1,		%   Integer
 	gen_nat/1,		%   Natural
-	numlist/3,		%   Lower x Upper -> List
+  %dmiles      numlist/3,		%   Lower x Upper -> List
 	repeat/1		%   Natural
    ]).
 :- use_module(library(types), [

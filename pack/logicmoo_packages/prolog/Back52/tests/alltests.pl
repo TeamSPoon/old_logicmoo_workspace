@@ -1,4 +1,5 @@
 :- dynamic test/2.
+:- op(0,xfy,(.)).
 
 %% jan
 :- ['jantest.tbox'].      
@@ -55,3 +56,6 @@ write_failed_tests :-
 	write('--- '), write(Test), nl,
 	fail.
 write_failed_tests.
+
+:- op(625,xfy,(.)).
+

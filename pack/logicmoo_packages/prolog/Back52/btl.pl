@@ -83,6 +83,8 @@ b5init_only_aboxinit :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+backversion(_Component) :-!,nl.
+
 backversion(Component) :-
 	write(Component),
 	write(' Version '),
@@ -828,9 +830,9 @@ b5par_analyze_term(Role1 comp Role2,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,N
 	!,
 	b5par_analyze_role_term(Role1 comp Role2,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout).
 
-b5par_analyze_term(Role1.Role2,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout) :-
-	!,
-	b5par_analyze_role_term(Role1.Role2,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout).
+b5par_analyze_term(DOT,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout) :-
+	compound(DOT),functor(DOT,'.',2),!,  %  DOT='.'(Role1,Role2),
+	b5par_analyze_role_term(DOT,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout).
 
 b5par_analyze_term(union(Aset1,Aset2),Mode,(a,N),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout) :-
 	!,
@@ -917,13 +919,13 @@ b5par_analyze_concept_term(atleast(N,Role),Mode,(c,0),PN,Varterm,[atleast(N,Key)
 	!,
 	(integer(N),!;N == macrodummy),
 	b5par_correct_role_term(Role),	
-	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/(r,0)/Key|FIin],FIout).
+	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/ (r,0) /Key|FIin],FIout).
 
 b5par_analyze_concept_term(atmost(N,Role),Mode,(c,0),PN,Varterm,[atmost(N,Key)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
 	(integer(N),!;N == macrodummy),
 	b5par_correct_role_term(Role),
-	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/(r,0)/Key|FIin],FIout).
+	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/ (r,0) /Key|FIin],FIout).
 
 
 b5par_analyze_concept_term(all(Role,Conc),Mode,(c,0),PN,Varterm,[all(Key2,Key1)|Varterm],Namesin,Namesout,FIin,FIout) :-
@@ -931,13 +933,13 @@ b5par_analyze_concept_term(all(Role,Conc),Mode,(c,0),PN,Varterm,[all(Key2,Key1)|
 	CType \== (r,0),
 	!,
 	b5par_correct_role_term(Role),
-	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Names1,Namesout,[internal/RVarterm/(r,0)/Key2|FI1],FIout).
+	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Names1,Namesout,[internal/RVarterm/ (r,0) /Key2|FI1],FIout).
 
 b5par_analyze_concept_term(all(Role,Conc),Mode,(c,0),PN,Varterm,[all(Key2,Key1)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
-	b5par_analyze_concept_term(Conc,Mode,(c,0),PN,[],CVarterm,Namesin,Names1,[internal/CVarterm/(c,0)/Key1|FIin],FI1),
+	b5par_analyze_concept_term(Conc,Mode,(c,0),PN,[],CVarterm,Namesin,Names1,[internal/CVarterm/ (c,0) /Key1|FIin],FI1),
 	b5par_correct_role_term(Role),
-	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Names1,Namesout,[internal/RVarterm/(r,0)/Key2|FI1],FIout).
+	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Names1,Namesout,[internal/RVarterm/ (r,0) /Key2|FI1],FIout).
 
 b5par_analyze_concept_term(oneof(ObjectList),Mode,(c,0),_,Varterm,[oneof(KeyList)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
@@ -946,13 +948,13 @@ b5par_analyze_concept_term(oneof(ObjectList),Mode,(c,0),_,Varterm,[oneof(KeyList
 b5par_analyze_concept_term(Role : close(FillerList),Mode,(c,0),PN,Varterm,[close(Key,KeyList)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(Role),
-	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/(r,0)/Key|FIin],FI1),
+	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/ (r,0) /Key|FIin],FI1),
 	b5par_analyze_filler_term(FillerList,Mode,Role,KeyList,FI1,FIout).
 
 b5par_analyze_concept_term(Role : FillerList,Mode,(c,0),PN,Varterm,[fills(Key,KeyList)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(Role),
-	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/(r,0)/Key|FIin],FI1),
+	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/ (r,0) /Key|FIin],FI1),
 	b5par_analyze_filler_term(FillerList,Mode,Role,KeyList,FI1,FIout).
 
 b5par_analyze_concept_term(rvm_equal(Arg1,Arg2),Mode,(c,0),PN,Vartermin,[rvm(RKey1,RKey2)|Vartermin],Namesin,Namesout,FIin,FIout) :-
@@ -961,8 +963,8 @@ b5par_analyze_concept_term(rvm_equal(Arg1,Arg2),Mode,(c,0),PN,Vartermin,[rvm(RKe
 	b5par_determine_role_range(Arg2,RR),
 	b5par_correct_role_term(Arg1),
 	b5par_correct_role_term(Arg2),
-	b5par_analyze_role_term(Arg1,Mode,(r,0),PN,[],Varterm1,Namesin,Names1,[internal/Varterm1/(r,0)/RKey1|FIin],FI1),
-	b5par_analyze_role_term(Arg2,Mode,(r,0),PN,[],Varterm2,Names1,Namesout,[internal/Varterm2/(r,0)/RKey2|FI1],FIout).
+	b5par_analyze_role_term(Arg1,Mode,(r,0),PN,[],Varterm1,Namesin,Names1,[internal/Varterm1/ (r,0) /RKey1|FIin],FI1),
+	b5par_analyze_role_term(Arg2,Mode,(r,0),PN,[],Varterm2,Names1,Namesout,[internal/Varterm2/ (r,0) /RKey2|FI1],FIout).
 
 
 b5par_analyze_concept_term(not(Name),_,(c,0),PN,Varterm,[not(Key)|Varterm],Names,[class/Name|Names],FI,FI) :-
@@ -974,7 +976,7 @@ b5par_analyze_concept_term(not(Name),_,_,_,_,_,_,_,_,_) :-
 	ground(Name),
 	b5st_get_class(Name,_,_,_),!,fail.
 
-b5par_analyze_concept_term(not(Name),_,(c,0),PN,Varterm,[not(PrimKey)|Varterm],Names,[class/Name|Names],FI,[forwardname/Name/(c,0)/PrimKey/_|FI]) :-
+b5par_analyze_concept_term(not(Name),_,(c,0),PN,Varterm,[not(PrimKey)|Varterm],Names,[class/Name|Names],FI,[forwardname/Name/ (c,0) /PrimKey/_|FI]) :-
 	!,b5par_valid_name(Name),
 	b5par_cycle_check(class/Name,PN).
 
@@ -997,11 +999,12 @@ b5par_analyze_concept_term(Name,_,_,_,_,_,_,_,_,_) :-
 b5par_analyze_concept_term(_,no_unknown_names,_,_,_,_,_,_,_,_) :-
 	!,fail.
 
-b5par_analyze_concept_term(Name,_,(c,0),PN,Varterm,[Key|Varterm],Names,[class/Name|Names],FI,[forwardname/Name/(c,0)/_/Key|FI]) :-
+b5par_analyze_concept_term(Name,_,(c,0),PN,Varterm,[Key|Varterm],Names,[class/Name|Names],FI,[forwardname/Name/ (c,0) /_/Key|FI]) :-
 	b5sta_check_flag(introduction,forward),
 	b5par_valid_name(Name),
 	b5par_cycle_check(class/Name,PN).
 
+swiDOT(Role1 , Role2, DOT):- DOT=..['.',Role1 , Role2].
 
 %%%%% analyze roles
 
@@ -1017,29 +1020,29 @@ b5par_analyze_role_term(Role1 comp Role2,Mode,(r,0),PN,Vartermin,[comp(Key1,Key2
 	!,
 	b5par_correct_role_term(Role1),
 	b5par_correct_role_term(Role2),
-	b5par_analyze_role_term(Role1,Mode,(r,0),PN,[],RVarterm1,Namesin,Names1,[internal/RVarterm1/(r,0)/Key1|FIin],FI1),
-	b5par_analyze_role_term(Role2,Mode,(r,0),PN,[],RVarterm2,Names1,Namesout,[internal/RVarterm2/(r,0)/Key2|FI1],FIout).
+	b5par_analyze_role_term(Role1,Mode,(r,0),PN,[],RVarterm1,Namesin,Names1,[internal/RVarterm1/ (r,0) /Key1|FIin],FI1),
+	b5par_analyze_role_term(Role2,Mode,(r,0),PN,[],RVarterm2,Names1,Namesout,[internal/RVarterm2/ (r,0) /Key2|FI1],FIout).
 
-b5par_analyze_role_term(Role1.Role2,Mode,(r,0),PN,Vartermin,[comp(Key1,Key2)|Vartermin],Namesin,Namesout,FIin,FIout) :-
-	!,
+b5par_analyze_role_term(DOT,Mode,(r,0),PN,Vartermin,[comp(Key1,Key2)|Vartermin],Namesin,Namesout,FIin,FIout) :-
+	swiDOT(Role1 , Role2, DOT), !,  
 	b5par_correct_role_term(Role1),
 	b5par_correct_role_term(Role2),
-	b5par_analyze_role_term(Role1,Mode,(r,0),PN,[],RVarterm1,Namesin,Names1,[internal/RVarterm1/(r,0)/Key1|FIin],FI1),
-	b5par_analyze_role_term(Role2,Mode,(r,0),PN,[],RVarterm2,Names1,Namesout,[internal/RVarterm2/(r,0)/Key2|FI1],FIout).
+	b5par_analyze_role_term(Role1,Mode,(r,0),PN,[],RVarterm1,Namesin,Names1,[internal/RVarterm1/ (r,0) /Key1|FIin],FI1),
+	b5par_analyze_role_term(Role2,Mode,(r,0),PN,[],RVarterm2,Names1,Namesout,[internal/RVarterm2/ (r,0) /Key2|FI1],FIout).
 
 b5par_analyze_role_term(domain(Conc),Mode,(r,0),PN,Varterm,[domain(Key)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
-	b5par_analyze_concept_term(Conc,Mode,(c,0),PN,[],CVarterm,Namesin,Namesout,[internal/CVarterm/(c,0)/Key|FIin],FIout).
+	b5par_analyze_concept_term(Conc,Mode,(c,0),PN,[],CVarterm,Namesin,Namesout,[internal/CVarterm/ (c,0) /Key|FIin],FIout).
 
 b5par_analyze_role_term(inv(Role),Mode,(r,0),PN,Varterm,[inv(Key)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(Role),
-	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/(r,0)/Key|FIin],FIout).
+	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/ (r,0) /Key|FIin],FIout).
 
 b5par_analyze_role_term(trans(Role),Mode,(r,0),PN,Varterm,[trans(Key)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(Role),
-	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/(r,0)/Key|FIin],FIout).
+	b5par_analyze_role_term(Role,Mode,(r,0),PN,[],RVarterm,Namesin,Namesout,[internal/RVarterm/ (r,0) /Key|FIin],FIout).
 
 b5par_analyze_role_term(range(Conc),Mode,(r,0),PN,Varterm,[range(Key)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	b5par_main(Conc,Mode,Type,PN,[],CVarterm,Namesin,Namesout,[internal/CVarterm/Type/Key|FIin],FIout),
@@ -1047,7 +1050,7 @@ b5par_analyze_role_term(range(Conc),Mode,(r,0),PN,Varterm,[range(Key)|Varterm],N
 
 b5par_analyze_role_term(range(Conc),Mode,(r,0),PN,Varterm,[range(Key)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
-	b5par_analyze_concept_term(Conc,Mode,(c,0),PN,[],CVarterm,Namesin,Namesout,[internal/CVarterm/(c,0)/Key|FIin],FIout).
+	b5par_analyze_concept_term(Conc,Mode,(c,0),PN,[],CVarterm,Namesin,Namesout,[internal/CVarterm/ (c,0) /Key|FIin],FIout).
 
 b5par_analyze_role_term(not(Name),_,(r,0),PN,Varterm,[not(Key)|Varterm],Names,[class/Name|Names],FI,FI) :-
 	ground(Name),
@@ -1058,7 +1061,7 @@ b5par_analyze_role_term(not(Name),_,_,_,_,_,_,_,_,_) :-
 	ground(Name),
 	b5st_get_class(Name,_,_,_),!,fail.
 
-b5par_analyze_role_term(not(Name),_,(r,0),PN,Varterm,[not(PrimKey)|Varterm],Names,[class/Name|Names],FI,[forwardname/Name/(r,0)/PrimKey/_|FI]) :-
+b5par_analyze_role_term(not(Name),_,(r,0),PN,Varterm,[not(PrimKey)|Varterm],Names,[class/Name|Names],FI,[forwardname/Name/ (r,0) /PrimKey/_|FI]) :-
 	!,
 	b5par_valid_name(Name),
 	b5par_cycle_check(class/Name,PN).
@@ -1081,7 +1084,7 @@ b5par_analyze_role_term(Name,_,_,_,_,_,_,_,_,_) :-
 b5par_analyze_role_term(_,no_unknown_names,_,_,_,_,_,_,_,_) :-
 	!,fail.
 
-b5par_analyze_role_term(Name,_,(r,0),PN,Varterm,[Key|Varterm],Names,[class/Name|Names],FI,[forwardname/Name/(r,0)/_/Key|FI]) :-
+b5par_analyze_role_term(Name,_,(r,0),PN,Varterm,[Key|Varterm],Names,[class/Name|Names],FI,[forwardname/Name/ (r,0) /_/Key|FI]) :-
 	b5sta_check_flag(introduction,forward),
 	b5par_valid_name(Name),
 	b5par_cycle_check(class/Name,PN).
@@ -1102,19 +1105,19 @@ b5par_analyze_number_term(Num1 .. Num2,_,(n,0),_,Vartermin,[fromto(num(Num1),num
 	(number(Num1),!;Num1 == macrodummy),
 	(number(Num2),!;Num2 == macrodummy).
 
-b5par_analyze_number_term(ge(N),_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[ge(N)]/(n,0)/Key|FI]) :-
+b5par_analyze_number_term(ge(N),_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[ge(N)]/ (n,0) /Key|FI]) :-
 	!,(number(N),!;N == macrodummy).
 
-b5par_analyze_number_term(gt(N),_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[gt(N)]/(n,0)/Key|FI]) :-
+b5par_analyze_number_term(gt(N),_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[gt(N)]/ (n,0) /Key|FI]) :-
 	!,(number(N),!;N == macrodummy).
 
-b5par_analyze_number_term(lt(N),_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[lt(N)]/(n,0)/Key|FI]) :-
+b5par_analyze_number_term(lt(N),_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[lt(N)]/ (n,0) /Key|FI]) :-
 	!,(number(N),!;N == macrodummy).
 
-b5par_analyze_number_term(le(N),_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[le(N)]/(n,0)/Key|FI]) :-
+b5par_analyze_number_term(le(N),_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[le(N)]/ (n,0) /Key|FI]) :-
 	!,(number(N),!;N == macrodummy).
 
-b5par_analyze_number_term(Number,_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[num(Number)]/(n,0)/Key|FI]) :-
+b5par_analyze_number_term(Number,_,(n,0),_,Varterm,[Key|Varterm],Names,Names,FI,[internal/[num(Number)]/ (n,0) /Key|FI]) :-
 	!,(number(Number),!;Number == macrodummy).
 
 b5par_analyze_number_term(Name,Mode,(n,0),PN,Vartermin,Vartermout,Namesin,Namesout,FI1,FIout) :-
@@ -1142,13 +1145,13 @@ b5par_analyze_aset_term(intersection(Arg1,Arg2),Mode,(a,N),PN,Vartermin,Vartermo
 
 b5par_analyze_aset_term(union(Aset1,Aset2),Mode,(a,N),PN,Varterm,[union(Key1,Key2)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
-	b5par_analyze_aset_term(Aset1,Mode,(a,N),PN,[],Varterm1,Namesin,Names1,[internal/Varterm1/(a,N)/Key1|FIin],FI1),
-	b5par_analyze_aset_term(Aset2,Mode,(a,N),PN,[],Varterm2,Names1,Namesout,[internal/Varterm2/(a,N)/Key2|FI1],FIout).
+	b5par_analyze_aset_term(Aset1,Mode,(a,N),PN,[],Varterm1,Namesin,Names1,[internal/Varterm1/ (a,N) /Key1|FIin],FI1),
+	b5par_analyze_aset_term(Aset2,Mode,(a,N),PN,[],Varterm2,Names1,Namesout,[internal/Varterm2/ (a,N) /Key2|FI1],FIout).
 
 b5par_analyze_aset_term(without(Aset1,Aset2),Mode,(a,N),PN,Varterm,[without(Key1,Key2)|Varterm],Namesin,Namesout,FIin,FIout) :-
 	!,
-	b5par_analyze_aset_term(Aset1,Mode,(a,N),PN,[],Varterm1,Namesin,Names1,[internal/Varterm1/(a,N)/Key1|FIin],FI1),
-	b5par_analyze_aset_term(Aset2,Mode,(a,N),PN,[],Varterm2,Names1,Namesout,[internal/Varterm2/(a,N)/Key2|FI1],FIout).
+	b5par_analyze_aset_term(Aset1,Mode,(a,N),PN,[],Varterm1,Namesin,Names1,[internal/Varterm1/ (a,N) /Key1|FIin],FI1),
+	b5par_analyze_aset_term(Aset2,Mode,(a,N),PN,[],Varterm2,Names1,Namesout,[internal/Varterm2/ (a,N) /Key2|FI1],FIout).
 
 b5par_analyze_aset_term(aset(Liste),Mode,(a,0),_,Varterm,[aset(KeyListe)|Varterm],Names,Names,FIin,FIout) :-
 	!,
@@ -1236,19 +1239,19 @@ b5par_analyze_fillers(Filler,_,Range,KeyListin,[Key|KeyListin],FI,FI) :-
 
 b5par_analyze_fillers(_,no_unknown_names,_,_,_,_,_) :- !,fail.
 
-b5par_analyze_fillers(Filler,_,(c,0),KeyListin,[Key|KeyListin],FI,[forwardobject/Filler/(c,0)/Key|FI]) :-
+b5par_analyze_fillers(Filler,_,(c,0),KeyListin,[Key|KeyListin],FI,[forwardobject/Filler/ (c,0) /Key|FI]) :-
 	b5sta_check_flag(introduction,forward),
 	atom(Filler),!.
 
-b5par_analyze_fillers(Filler,_,(a,N),KeyListin,[Key|KeyListin],FI,[forwardattribute/Filler/(a,N)/Key|FI]) :-
+b5par_analyze_fillers(Filler,_,(a,N),KeyListin,[Key|KeyListin],FI,[forwardattribute/Filler/ (a,N) /Key|FI]) :-
 	b5sta_check_flag(introduction,forward),
 	atom(Filler),!.
 
-b5par_analyze_fillers(Filler,_,(n,0),KeyListin,[Key|KeyListin],FI,[forwardnumber/Filler/(n,0)/Key|FI]) :-
+b5par_analyze_fillers(Filler,_,(n,0),KeyListin,[Key|KeyListin],FI,[forwardnumber/Filler/ (n,0) /Key|FI]) :-
 	b5sta_check_flag(introduction,forward),
 	number(Filler),!.
 
-b5par_analyze_fillers(Filler,_,(s,0),KeyListin,[Key|KeyListin],FI,[forwardstring/Filler/(s,0)/Key|FI]) :-
+b5par_analyze_fillers(Filler,_,(s,0),KeyListin,[Key|KeyListin],FI,[forwardstring/Filler/ (s,0) /Key|FI]) :-
 	b5sta_check_flag(introduction,forward),
 	atom(Filler).
 
@@ -1277,7 +1280,7 @@ b5par_analyze_object(Object,_,KeyList,[Key|KeyList],Namesin,[object/Object|Names
 
 b5par_analyze_object(_,no_unknown_names,_,_,_,_,_,_) :- !,fail.
 
-b5par_analyze_object(Object,_,KeyList,[Key|KeyList],Namesin,[object/Object|Namesin],FI,[forwardobject/Object/(c,0)/Key|FI]) :-
+b5par_analyze_object(Object,_,KeyList,[Key|KeyList],Namesin,[object/Object|Namesin],FI,[forwardobject/Object/ (c,0) /Key|FI]) :-
 	b5sta_check_flag(introduction,forward),
 	b5par_valid_name(Object).
 
@@ -1712,7 +1715,7 @@ b5par_process([A|Rest],AG,NAG) :-
 	b5par_process(Rest,ZAG,NAG).
 
 
-b5par_at_send(object/Name/Def/Names/KeyTerm/(c,0)/Key,AG,NAG) :-
+b5par_at_send(object/Name/Def/Names/KeyTerm/ (c,0) /Key,AG,NAG) :-
 	var(Name),!,
 	t5out_trace(to_agenda(Name)),
 	b5par_keyterm_to_protoform(KeyTerm,(c,0),Protoform),
@@ -1723,7 +1726,7 @@ b5par_at_send(object/Name/Def/Names/KeyTerm/(c,0)/Key,AG,NAG) :-
 	b5par_at_make_copy(Name,(c,0),Key),
 	b5st_add_instance(Name,(c,0),Key,NewDef).
 
-b5par_at_send(object/Name/Def/Names/KeyTerm/(c,0)/Key,AG,NAG) :-
+b5par_at_send(object/Name/Def/Names/KeyTerm/ (c,0) /Key,AG,NAG) :-
 	!,
 	t5out_trace(to_agenda(Name)),
 	b5par_keyterm_to_protoform(KeyTerm,(c,0),Protoform),
@@ -1767,7 +1770,7 @@ b5par_at_parse(theknown(Term),N,FI) :-
 	 b5par_at_parse(Object,N,FI).
 
 
-b5par_at_parse(O,N,[object/OName/N/[class/N]/[Key]/(c,0)/OK]) :-
+b5par_at_parse(O,N,[object/OName/N/[class/N]/[Key]/ (c,0) /OK]) :-
 	atom(N),
 	(ground(O),b5par_uc(O,OK),!,b5st_get_instance(O,_,OK,_),OName = uc(OK)
     ;
@@ -1782,7 +1785,7 @@ b5par_at_parse(O,T,FI) :-
 	(ground(O),b5par_uc(O,OK),!,b5st_get_instance(O,_,OK,_),OName = uc(OK)
     ;
 	!,b5par_objname_test(O),OName = O),
-	b5par_at_parse_term(T,(c,0),[],VKTX,Def,[],Names,[object/OName/Def/Names/VKTX/(c,0)/OK],FI),!,
+	b5par_at_parse_term(T,(c,0),[],VKTX,Def,[],Names,[object/OName/Def/Names/VKTX/ (c,0) /OK],FI),!,
 	t5out_trace(end(at)),
 	t5out_info(at_parse_ok).
 
@@ -1799,14 +1802,14 @@ b5par_at_parse_term(A1 and A2,Type,VKTin,VKTout,Def1 and Def2,Namesin,Namesout,F
 b5par_at_parse_term(R:close(Fillers),(c,0),VKT,[close(RK,OKL)|VKT],RDef:Def2,Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(R),
-	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/(r,0)/RVKT/RK|FIin],FI1),
+	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/ (r,0) /RVKT/RK|FIin],FI1),
 	b5par_determine_role_range(R,RRType),
 	b5par_at_parse_fillers(Fillers,RRType,[],OKL,Def2,FI1,FIout).
 
 b5par_at_parse_term(R:Fillers,(c,0),VKT,[fills(RK,OKL)|VKT],RDef:Def2,Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(R),
-	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/(r,0)/RVKT/RK|FIin],FI1),
+	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/ (r,0) /RVKT/RK|FIin],FI1),
 	b5par_determine_role_range(R,RRType),
 	b5par_at_parse_fillers(Fillers,RRType,[],OKL,Def2,FI1,FIout).
 
@@ -1818,26 +1821,26 @@ b5par_at_parse_term(atleast(N,R),(c,0),VKT,[atleast(N,RK)|VKT],atleast(N,RDef),N
 	!,
 	integer(N),
 	b5par_correct_role_term(R),
-	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/(r,0)/RVKT/RK|FIin],FIout).
+	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/ (r,0) /RVKT/RK|FIin],FIout).
 
 b5par_at_parse_term(atmost(N,R),(c,0),VKT,[atmost(N,RK)|VKT],atmost(N,RDef),Namesin,Namesout,FIin,FIout) :-
 	!,
 	integer(N),
 	b5par_correct_role_term(R),
-	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/(r,0)/RVKT/RK|FIin],FIout).
+	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/ (r,0) /RVKT/RK|FIin],FIout).
 
 b5par_at_parse_term(rvm_equal(R1,R2),(c,0),VKT,[rvm(R1K,R2K)|VKT],rvm_equal(R1Def,R2Def),Namesin,Namesout,FIin,FIout) :-
 								% ?????????:w
 	!,
 	b5par_correct_role_term(R1),
-	b5par_at_parse_term(R1,(r,0),[],R1VKT,R1Def,Namesin,Names1,[internal/(r,0)/R1VKT/R1K|FIin],R1FI),
+	b5par_at_parse_term(R1,(r,0),[],R1VKT,R1Def,Namesin,Names1,[internal/ (r,0) /R1VKT/R1K|FIin],R1FI),
 	b5par_correct_role_term(R2),
-	b5par_at_parse_term(R2,(r,0),[],R2VKT,R2Def,Names1,Namesout,[internal/(r,0)/R2VKT/R2K|R1FI],FIout).
+	b5par_at_parse_term(R2,(r,0),[],R2VKT,R2Def,Names1,Namesout,[internal/ (r,0) /R2VKT/R2K|R1FI],FIout).
 
 b5par_at_parse_term(all(R,C),(c,0),VKT,[all(RKey,CKey)|VKT],all(RDef,CDef),Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(R),
-	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Names1,[internal/(r,0)/RVKT/RKey|FIin],RFI),
+	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Names1,[internal/ (r,0) /RVKT/RKey|FIin],RFI),
 	b5par_at_parse_term(C,Type,[],CVKT,CDef,Names1,Namesout,[internal/Type/CVKT/CKey|RFI],FIout),
 	Type \== (r,0).
 
@@ -1848,37 +1851,37 @@ b5par_at_parse_term(not(Name),Type,VKT,[not(Key)|VKT],not(Name),Namesin,[class/N
 
 b5par_at_parse_term(domain(C),(r,0),VKT,[domain(CKey)|VKT],domain(CDef),Namesin,Namesout,FIin,FIout) :-
 	!,
-	b5par_at_parse_term(C,(c,0),[],CVKT,CDef,Namesin,Namesout,[internal/(r,0)/CVKT/CKey|FIin],FIout).
+	b5par_at_parse_term(C,(c,0),[],CVKT,CDef,Namesin,Namesout,[internal/ (r,0) /CVKT/CKey|FIin],FIout).
 
 b5par_at_parse_term(range(T),(r,0),VKT,[range(TKey)|VKT],range(TDef),Namesin,Namesout,FIin,FIout) :-
 	!,
-	b5par_at_parse_term(T,Type,[],TVKT,TDef,Namesin,Namesout,[internal/(r,0)/TVKT/TKey|FIin],FIout),
+	b5par_at_parse_term(T,Type,[],TVKT,TDef,Namesin,Namesout,[internal/ (r,0) /TVKT/TKey|FIin],FIout),
 	Type \== (r,0).
 
 
 b5par_at_parse_term(inv(R),(r,0),VKT,[inv(RKey)|VKT],inv(RDef),Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(R),
-	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/(r,0)/RVKT/RKey|FIin],FIout).
+	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/ (r,0) /RVKT/RKey|FIin],FIout).
 
 b5par_at_parse_term(trans(R),(r,0),VKT,[trans(RKey)|VKT],trans(RDef),Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(R),
-	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/(r,0)/RVKT/RKey|FIin],FIout).
+	b5par_at_parse_term(R,(r,0),[],RVKT,RDef,Namesin,Namesout,[internal/ (r,0) /RVKT/RKey|FIin],FIout).
 
 b5par_at_parse_term(R1 comp R2,(r,0),VKT,[comp(RKey1,RKey2)|VKT],RDef1 comp RDef2,Namesin,Namesout,FIin,FIout) :-
 	!,
 	b5par_correct_role_term(R1),
 	b5par_correct_role_term(R1),
-	b5par_at_parse_term(R1,(r,0),[],RVKT1,RDef1,Namesin,Names1,[internal/(r,0)/RVKT1/RKey1|FIin],FI1),
-	b5par_at_parse_term(R2,(r,0),[],RVKT2,RDef2,Names1,Namesout,[internal/(r,0)/RVKT2/RKey2|FI1],FIout).
+	b5par_at_parse_term(R1,(r,0),[],RVKT1,RDef1,Namesin,Names1,[internal/ (r,0) /RVKT1/RKey1|FIin],FI1),
+	b5par_at_parse_term(R2,(r,0),[],RVKT2,RDef2,Names1,Namesout,[internal/ (r,0) /RVKT2/RKey2|FI1],FIout).
 
-b5par_at_parse_term(R1.R2,(r,0),VKT,[comp(RKey1,RKey2)|VKT],RDef1.RDef2,Namesin,Namesout,FIin,FIout) :-
-	!,
+b5par_at_parse_term(DOT,(r,0),VKT,[comp(RKey1,RKey2)|VKT],RDefDOT,Namesin,Namesout,FIin,FIout) :-
+	swiDOT(R1 , R2, DOT),swiDOT(RDef1 , RDef2, RDefDOT),!,
 	b5par_correct_role_term(R1),
 	b5par_correct_role_term(R1),
-	b5par_at_parse_term(R1,(r,0),[],RVKT1,RDef1,Namesin,Names1,[internal/(r,0)/RVKT1/RKey1|FIin],FI1),
-	b5par_at_parse_term(R2,(r,0),[],RVKT2,RDef2,Names1,Namesout,[internal/(r,0)/RVKT2/RKey2|FI1],FIout).
+	b5par_at_parse_term(R1,(r,0),[],RVKT1,RDef1,Namesin,Names1,[internal/ (r,0) /RVKT1/RKey1|FIin],FI1),
+	b5par_at_parse_term(R2,(r,0),[],RVKT2,RDef2,Names1,Namesout,[internal/ (r,0) /RVKT2/RKey2|FI1],FIout).
 
 b5par_at_parse_term(intersection(A1,A2),Type,VKTin,VKTout,intersection(Def1,Def2),Namesin,Namesout,FIin,FIout) :-
 	!,
@@ -1887,13 +1890,13 @@ b5par_at_parse_term(intersection(A1,A2),Type,VKTin,VKTout,intersection(Def1,Def2
 
 b5par_at_parse_term(union(A1,A2),(a,N),VKTin,[union(Key1,Key2)|VKTin],union(Def1,Def2),Namesin,Namesout,FIin,FIout) :-
 	!,
-	b5par_at_parse_term(A1,(a,N),[],VKT1,Def1,Namesin,Names1,[internal/(r,0)/VKT1/Key1|FIin],FI1),
-	b5par_at_parse_term(A2,(a,N),[],VKT2,Def2,Names1,Namesout,[internal/(r,0)/VKT2/Key2|FI1],FIout).
+	b5par_at_parse_term(A1,(a,N),[],VKT1,Def1,Namesin,Names1,[internal/ (r,0) /VKT1/Key1|FIin],FI1),
+	b5par_at_parse_term(A2,(a,N),[],VKT2,Def2,Names1,Namesout,[internal/ (r,0) /VKT2/Key2|FI1],FIout).
 
 b5par_at_parse_term(without(A1,A2),(a,N),VKTin,[without(Key1,Key2)|VKTin],without(Def1,Def2),Namesin,Namesout,FIin,FIout) :-
 	!,
-	b5par_at_parse_term(A1,(a,N),[],VKT1,Def1,Namesin,Names1,[internal/(r,0)/VKT1/Key1|FIin],FI1),
-	b5par_at_parse_term(A2,(a,N),[],VKT2,Def2,Names1,Namesout,[internal/(r,0)/VKT2/Key2|FI1],FIout).
+	b5par_at_parse_term(A1,(a,N),[],VKT1,Def1,Namesin,Names1,[internal/ (r,0) /VKT1/Key1|FIin],FI1),
+	b5par_at_parse_term(A2,(a,N),[],VKT2,Def2,Names1,Namesout,[internal/ (r,0) /VKT2/Key2|FI1],FIout).
 
 b5par_at_parse_term(aset(AL),(a,0),VKT,[aset(KL)|VKT],aset(AL),Namesin,Namesin,FIin,FIout) :-
 	!,
@@ -1959,7 +1962,7 @@ b5par_at_parse_objects([],_,VKT,VKT,FI,FI) :- !.
 b5par_at_parse_objects([Object|Rest],(c,0),VKTin,[OK|VKTout],FIin,FIout) :-
 	b5st_get_instance(Object,Type,OK,_),!,
 	b5par_at_parse_objects(Rest,Type,VKTin,VKTout,FIin,FIout).
-b5par_at_parse_objects([Object|Rest],(c,0),VKTin,[OK|VKTout],FIin,[object/Object/Name/[]/[Key]/(c,0)/OK|FIout]) :-
+b5par_at_parse_objects([Object|Rest],(c,0),VKTin,[OK|VKTout],FIin,[object/Object/Name/[]/[Key]/ (c,0) /OK|FIout]) :-
 	b5sta_check_flag(introduction,forward),
 	b5st_get_domain(Name,(c,0),Key,open,_),
 	b5par_at_parse_objects(Rest,(c,0),VKTin,VKTout,FIin,FIout).
@@ -1995,7 +1998,7 @@ b5par_at_parse_fillers([X|R],_,_,_,_,_,_) :-
 	fail.
 
 
-b5par_at_parse_fillers(O::N,(c,0),VKT,[OK|VKT],O,FIin,[object/O/[N]/[class/N]/[Key]/(c,0)/OK|FIin]) :-
+b5par_at_parse_fillers(O::N,(c,0),VKT,[OK|VKT],O,FIin,[object/O/[N]/[class/N]/[Key]/ (c,0) /OK|FIin]) :-
 	(atom(O);b5par_uc(O,_)),
 	atom(N),!,
 	b5st_get_class(N,(c,0),Key,_).
@@ -2003,9 +2006,9 @@ b5par_at_parse_fillers(O::N,(c,0),VKT,[OK|VKT],O,FIin,[object/O/[N]/[class/N]/[K
 
 b5par_at_parse_fillers(O::T,(c,0),VKT,[OK|VKT],O,FIin,FIout) :-
 	(atom(O);b5par_uc(O,_)),!,
-	b5par_at_parse_term(T,(c,0),[],VKTX,Def,[],Names,[object/O/Def/Names/VKTX/(c,0)/OK|FIin],FIout).
+	b5par_at_parse_term(T,(c,0),[],VKTX,Def,[],Names,[object/O/Def/Names/VKTX/ (c,0) /OK|FIin],FIout).
 
-b5par_at_parse_fillers(UCi::N,(c,0),VKT,[OK|VKT],UCi,FIin,[object/UCi/[N]/[class/N]/[Key]/(c,0)/OK|FIin]) :-
+b5par_at_parse_fillers(UCi::N,(c,0),VKT,[OK|VKT],UCi,FIin,[object/UCi/[N]/[class/N]/[Key]/ (c,0) /OK|FIin]) :-
 	var(UCi),
 	atom(N),!,
 	b5st_get_class(N,(c,0),Key,_).
@@ -2013,7 +2016,7 @@ b5par_at_parse_fillers(UCi::N,(c,0),VKT,[OK|VKT],UCi,FIin,[object/UCi/[N]/[class
 
 b5par_at_parse_fillers(UCi::T,(c,0),VKT,[OK|VKT],UCi,FIin,FIout) :-
 	var(UCi),!,
-	b5par_at_parse_term(T,(c,0),[],VKTX,Def,[],Names,[object/UCi/Def/Names/VKTX/(c,0)/OK|FIin],FIout).
+	b5par_at_parse_term(T,(c,0),[],VKTX,Def,[],Names,[object/UCi/Def/Names/VKTX/ (c,0) /OK|FIin],FIout).
 
 b5par_at_parse_fillers(someknown(_),(c,0),_,_,_,_,_) :-
 	!,t5out_error('Illegal FillerExpression: someknown.'),fail.
@@ -2184,7 +2187,7 @@ b5par_aa_parse_rq(R:F,FI,FI2,[RK:FKE]) :-
 
 b5par_aa_parse_rq(inv(R):F,FI,FI2,[RK:FKE]) :-
 	atom(R),
-	b5par_main(inv(R),no_unknown_names,_,[],[],RVKT,_,_,[internal/RVKT/(r,0)/RK|FI],FI1),
+	b5par_main(inv(R),no_unknown_names,_,[],[],RVKT,_,_,[internal/RVKT/ (r,0) /RK|FI],FI1),
 	b5par_determine_role_range(R,RT),
 	b5par_aa_parse_fillers(F,RT,FKE,FI1,FI2).
 
@@ -2434,7 +2437,8 @@ b5par_determine_role_range(trans(Role),Range) :-
 	!,b5par_determine_role_range(Role,Range).
 b5par_determine_role_range(_ comp Role2,Range) :-
 	!,b5par_determine_role_range(Role2,Range).
-b5par_determine_role_range(_.Role2,Range) :-
+b5par_determine_role_range(DOT,Range) :-
+      swiDOT(_ , Role2, DOT),
 	!,b5par_determine_role_range(Role2,Range).
 b5par_determine_role_range(Name,Range) :-
 	atom(Name),
@@ -6350,8 +6354,8 @@ b5par_transform_term_to_key((r,0),trans(R),Key) :-
 	!,
 	b5par_transform_term_to_key((r,0),R,RKey),
 	b5par_introduce_internal((r,0),[trans(RKey)],Key,_).	
-b5par_transform_term_to_key((r,0),R1.R2,Key) :-
-	!,
+b5par_transform_term_to_key((r,0),R1R2,Key) :-
+	swiDOT(R1 , R2, R1R2),!,
 	b5par_transform_term_to_key((r,0),R1,RKey1),
 	b5par_transform_term_to_key((r,0),R2,RKey2),
 	b5par_introduce_internal((r,0),[comp(RKey1,RKey2)],Key,_).

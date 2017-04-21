@@ -25,8 +25,8 @@
 
 :- module(basics, [
 	%append/3,		% append/3 has become a built-in predicate
-	member/2,
-	memberchk/2,
+	%dmiles member/2,
+	%dmiles memberchk/2,
 	nonmember/2
    ]).
 

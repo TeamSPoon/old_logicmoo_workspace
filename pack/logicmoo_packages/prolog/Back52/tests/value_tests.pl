@@ -1,3 +1,5 @@
+:- op(0,xfy,(.)).
+:- op(999,xfy,(.)).
 
 valuetest :-
 	write('*** TEST FILE: value_tests.pl'), nl,
@@ -52,6 +54,7 @@ asettbox(1) :-
 	write('+++ aset tbox test 1 succeeded'),
 	nl,
 	!.
+asettbox(2) :- skip_dots,!.
 asettbox(2) :-
 	r1aset :< range(aset),
 	r1d_closed :< range(d_closed),
@@ -159,5 +162,5 @@ numberabox :-
 	nl.
 
 
-
+:- op(625,xfy,(.)).
 

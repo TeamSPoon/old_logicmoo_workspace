@@ -24,7 +24,7 @@
 %   Adapted from shared code written by the same authors; all changes
 %   Copyright (C) 1987, Quintus Computer Systems, Inc.  All rights reserved.
 
-:- module(lists, [
+:- module(lists_quint, [
 	append/2,			%   ListOfLists -> List
 	append/5,			%   List x List x List x List x List
 	correspond/4,			%   Elem <- List x List -> Elem

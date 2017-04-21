@@ -82,7 +82,7 @@
 	times_to_list/2,	%  product -> list of factors
 	list_to_times/2,	%  list of factors -> product
 
-	flatten/2,		%  list of lists -> list
+  %dmiles      flatten/2,		%  list of lists -> list
 
 	binary_to_list/4,	%  Term,Operator -> DifferenceList
 	binary_to_list/5,	%  Term,Operator,Unit -> DifferenceList

@@ -44,6 +44,7 @@ che_prolog('SWI').
                       
 :- op(1150, fx, [(mode), (public)]).
 
+:- debug.
 
 
 :- dynamic b5st_class_db/4.
@@ -89,10 +90,10 @@ no_style_check :- prolog_flag(redefine_warnings,_,off).
 
 */
 no_style_check :- 
-	style_check([-singleton,-atom,-dollar,-discontiguous,-string]).
+	maplist(style_check,[-singleton,-discontiguous /*,-atom,-dollar,-string*/ ]).
 
 style_check :- 
-	style_check([+singleton,+atom,-dollar,+discontiguous,-string]).
+        maplist(style_check,[+singleton,+discontiguous /*,+atom,-dollar,-string*/ ]).
 
 
 
@@ -105,9 +106,10 @@ style_check :-
 %       Quintus 
 %    2) they are not yet exhaustively tested !
 
+:- if( \+ current_predicate(on_exception/3)).
 on_exception(_,Goal,_) :-
 	call(Goal).
-
+:- endif.
 /* bianchi - read_clause non esiste nel SICSTUS
              read_term dovrebbe esserci indagare?????? */ 
 
@@ -126,7 +128,8 @@ read_term(Stream,Term) :-
 	read(Stream,Term). 
 
 
- 
+:- if( \+ current_predicate(on_exception/3)).
+
 compound(X) :-
 	nonvar(X),
 	functor(X,_,A), A > 0.
@@ -136,6 +139,8 @@ atom_chars(Atom,String) :-
 
 number_chars(Number,String) :-
 	name(Number,String).
+
+:- endif.
 
 load_files([]) :-
 	!.
@@ -174,8 +179,9 @@ back :-				%% compile BACK
         compile_patches,
 	msg_back_loaded,
 	style_check,
-        backinit,
-	backread(backmacros).
+        call(call,backinit),
+	call(call,backread(backmacros)).
+	
 
 %%
 %% ----------------------------------------
@@ -214,7 +220,7 @@ load_testfiles :-
 	['tests/alltests'].
 
 start_testing :-
-	alltests,
+	call(call,alltests),
 	!.
 
 msg_loading_prels :-

@@ -35,30 +35,30 @@
 :- module(sets, [
 	add_element/3,		%  Elem x Set -> Set
 	del_element/3,		%  Elem x Set -> Set
-	is_set/1,		%  List ->
+    %dmiles      is_set/1,		%  List ->
 	disjoint/2,		%  Set x Set ->
 	disjoint_union/3,	%  Set x Set -> Set
 	intersect/2,		%  Set x Set ->
 	intersect/3,		%  Set x Set -> Set
 	intersection/2,		%  list(Set) -> Set
-	intersection/3,		%  Set x Set -> Set
-	list_to_set/2,		%  List -> Set
+%dmiles	intersection/3,		%  Set x Set -> Set
+%dmiles	list_to_set/2,		%  List -> Set
 	pairfrom/4,		%  Set -> Elem x Elem x Set
 	power_set/2,		%  Set -> Set of Sets
-	select/3,		%  Elem <- Set -> Set
-	selectchk/3,		%  Elem x Set -> Set
+   %dmiles      select/3,		%  Elem <- Set -> Set
+   %dmiles      selectchk/3,		%  Elem x Set -> Set
 	seteq/2,		%  Set x Set ->
 	setproduct/3,		%  Set x Set -> Pairs
-	subset/2,		%  Set x Set ->
-	subtract/3,		%  Set x Set -> Set
+%dmiles  	subset/2,		%  Set x Set ->
+%dmiles  	subtract/3,		%  Set x Set -> Set
 	symdiff/3,		%  Set x Set -> Set
 	union/2,		%  list(Set) -> Set
-	union/3,		%  Set x Set -> Set
+   %dmiles  union/3,		%  Set x Set -> Set
 	union/4			%  Set x Set -> Set x Set
    ]).
 :- use_module(library(basics)). /*
-	member/2,		%  Elem x Set ->
-	memberchk/2,		%  Elem x Set ->
+   %dmiles       member/2,		%  Elem x Set ->
+   %dmiles  	memberchk/2,		%  Elem x Set ->
 	nonmember/2		%  Elem x Set ->
    */
 

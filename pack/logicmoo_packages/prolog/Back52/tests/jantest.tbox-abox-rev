@@ -1,3 +1,10 @@
+:- op(0,xfy,(.)).
+:- op(600,xfx,(.)).
+% system:term_expansion('$dicts':'.'(H,T,DOT),DOT=..['.',H,T]). 
+
+'$dicts':'.'(H,T,DOT):- DOT=..['.',H,T].
+
+
 %% Testfaelle fuer TBox-ABox-Revision
 %% 
 %% geg. eine revision von c; es gibt drei klassen von objekten:
@@ -448,7 +455,6 @@ tartest(T) :-
     x ?: p2, y ?: p3,
     backretrieve(X = [msc] for [x,y]), X = [[[p2]],[[p2,p3]]],
     write_succ(T), !.
-
 
 %% (18) x benutzt r weder direkt noch indirekt; aufgrund von rollen-
 %%      komplettierung wird *vor* revision r:y  zu x hinzugefuegt;
@@ -921,3 +927,7 @@ tartest(T) :-
 tartest(T) :-
    	write_fail(T),
 	assert(test(tbox_abox_revision_test(T), failed)).
+
+
+:- op(625,xfy,(.)).
+
