@@ -7,7 +7,7 @@
 
 /*========================================================================
    Succeeds if there is no binding violation in a DRS
-*/
+========================================================================*/
 
 noBindingViolationDrs(B):- bindingViolationDrs(B), !, fail.
 noBindingViolationDrs(_).
@@ -15,7 +15,7 @@ noBindingViolationDrs(_).
 
 /*========================================================================
    Succeeds if there is a binding violation in a DRS
-*/
+========================================================================*/
 
 bindingViolationDrs(sdrs([B|_],_)):- bindingViolationDrs(B), !.
 bindingViolationDrs(sdrs([_|L],R)):- !, bindingViolationDrs(sdrs(L,R)).
@@ -39,7 +39,7 @@ bindingViolationDrs([_|L]):- !, bindingViolationDrs(L).
 
 /*========================================================================
    Succeeds if there is a binding violation in a set of DRS condition
-*/
+========================================================================*/
 
 bindingViolationConds(Conds):- 
    member(_:_:role(E1,X1,Role1,1),Conds),
@@ -66,7 +66,7 @@ bindingViolationConds(Conds):-
 
 /*========================================================================
    Succeeds if there is a binding violation in a DRS condition
-*/
+========================================================================*/
 
 bindingViolationCond(not(drs([],[_:_:eq(X,Y)]))):- !, X==Y.
 

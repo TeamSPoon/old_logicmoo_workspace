@@ -5,13 +5,13 @@
 
 :- use_module(boxer(slashes)).
 :- use_module(boxer(transform),[topcat/2]).
-:- use_module(semlib(options),[candc_option/2]).
+:- use_module(semlib(options),[option/2]).
 :- use_module(semlib(errors),[error/2,warning/2]).
 
 
 /*========================================================================
     Declare Dynamic Predicates
-*/
+========================================================================*/
 
 :- multifile ccg/2, id/2, sem/5, coref/2.
 :- discontiguous ccg/2, id/2, sem/5, coref/2.
@@ -23,26 +23,22 @@
 ------------------------------------------------------------------------*/
 
 openInput:-
-  candc_option('--loaded',do),!,
-  checkInputType.
-
-openInput:-
-   candc_option('--input',user_input), 
-   candc_option('--stdin',do), !,
+   option('--input',user_input), 
+   option('--stdin',do), !,
    prompt(_,''),
    catch(load_files('',[autoload(true),encoding(utf8),stream(user_input)]),_,fail),
    checkInputType.
 
 openInput:-
-   candc_option('--stdin',dont), 
-   candc_option('--input',File), 
+   option('--stdin',dont), 
+   option('--input',File), 
    \+ File = user_input, !,
    checkInput(File).
 
 
 /*========================================================================
    Check Input File
-*/
+========================================================================*/
 
 checkInput(File):-
    \+ atom(File), !,
@@ -70,7 +66,7 @@ checkInput(File):-
 
 /*========================================================================
    Check Input Type
-*/
+========================================================================*/
 
 checkInputType:-
    input:ccg(_,_), !,
@@ -97,12 +93,12 @@ identifyIDs(List):-
    \+ List=[], !.
 
 identifyIDs(List):-
-   candc_option('--integrate',false), 
+   option('--integrate',false), 
    ccg(_,_),
    setof(id(Id,[Id]),X^ccg(Id,X),List), !.
 
 identifyIDs([id(1,List)]):-
-   candc_option('--integrate',true), 
+   option('--integrate',true), 
    ccg(_,_),
    setof(Id,X^ccg(Id,X),List), !.
 
@@ -116,10 +112,7 @@ identifyIDs([]):-
 ------------------------------------------------------------------------*/
    
 preferred(N,CCG):-
-   preferred([t:_,s:_,np],N,CCG),!.
-
-preferred(C,CCG):-
-   throw(missing(preferred(C,CCG))).
+   preferred([t:_,s:_,np],N,CCG).
 
 preferred([],N,CCG):-
    ccg(N,CCG), !.
@@ -130,5 +123,3 @@ preferred([Cat|_],N,CCG):-
 
 preferred([_|L],N,CCG):-
    preferred(L,N,CCG).
-
-

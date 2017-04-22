@@ -1,9 +1,13 @@
 #!/bin/bash
 
 WORKING=working
-OUTDIR=${WORKING}/sicktest
+OUTDIR=${WORKING}/sick
 RESULTS=${WORKING}/results.raw
-rm -f ${RESULTS}
+
+init()
+{
+    rm -f ${RESULTS}
+}
 
 eval()
 {
@@ -19,7 +23,7 @@ eval()
     P1=`cat ${RESULTS} | grep proof | wc -l | tr -s " "`
     N1=`cat ${RESULTS} | grep ENTAILMENT | wc -l | tr -s " "`
     C2=`cat ${RESULTS} | grep -v proof | grep -v inconsistency | grep NEUTRAL | wc -l | tr -s " " `
-    P2=`cat ${RESULTS} | grep -v proof | grep -v inconsistency | wc -l | tr -s " " `
+    #P2=`cat ${RESULTS} | grep -v proof | grep -v inconsistency | wc -l | tr -s " " `
     P2=`cat ${RESULTS} | grep word | wc -l | tr -s " " `
     N2=`cat ${RESULTS} | grep NEUTRAL | wc -l | tr -s " "`
     C3=`cat ${RESULTS} | grep inconsistency | grep CONTRADICTION | wc -l | tr -s " "`
@@ -33,9 +37,35 @@ eval()
     echo -n "NEUTRAL       ($C2/$N2): R=0"; echo "3 k $C2 $N2 / p" | dc 
     C=`echo $((C1+C2+C3)) | tr -s " "`
     N=`echo $((N1+N2+N3)) | tr -s " "`
-    echo "baseline: $N2 / $N = $((N2*100/N)) %"
-    echo "accuracy: $C / $N = $((C*100/N)) %"
+    echo "* baseline: $N2 / $N = $((N2*10000/N)) %" | sed 's/.. %$/.\0/'
+    echo "* accuracy: $C / $N = $((C*10000/N)) %" | sed 's/.. %$/.\0/'
 }
+
+evalnowordnet()
+{
+    C1=`cat ${RESULTS} | grep "simple proof" | grep ENTAILMENT | wc -l | tr -s " "`
+    P1=`cat ${RESULTS} | grep "simple proof" | wc -l | tr -s " "`
+    N1=`cat ${RESULTS} | grep ENTAILMENT | wc -l | tr -s " "`
+    C2=`cat ${RESULTS} | grep -v proof | grep -v "simple inconsistency" | grep NEUTRAL | wc -l | tr -s " " `
+    #P2=`cat ${RESULTS} | grep -v proof | grep -v "simple inconsistency" | wc -l | tr -s " " `
+    P2=`cat ${RESULTS} | grep word | wc -l | tr -s " " `
+    N2=`cat ${RESULTS} | grep NEUTRAL | wc -l | tr -s " "`
+    C3=`cat ${RESULTS} | grep "simple inconsistency" | grep CONTRADICTION | wc -l | tr -s " "`
+    P3=`cat ${RESULTS} | grep "simple inconsistency" | wc -l | tr -s " "`
+    N3=`cat ${RESULTS} | grep CONTRADICTION | wc -l | tr -s " "`
+    echo -n "ENTAILMENT    ($C1/$P1): P=0"; echo "3 k $C1 $P1 / p" | dc 
+    echo -n "ENTAILMENT    ($C1/$N1): R=0"; echo "3 k $C1 $N1 / p" | dc 
+    echo -n "CONTRADICTION ($C3/$P3): P=0"; echo "3 k $C3 $P3 / p" | dc 
+    echo -n "CONTRADICTION ($C3/$N3): R=0"; echo "3 k $C3 $N3 / p" | dc 
+    echo -n "NEUTRAL       ($C2/$P2): P=0"; echo "3 k $C2 $P2 / p" | dc 
+    echo -n "NEUTRAL       ($C2/$N2): R=0"; echo "3 k $C2 $N2 / p" | dc 
+    C=`echo $((C1+C2+C3)) | tr -s " "`
+    N=`echo $((N1+N2+N3)) | tr -s " "`
+    echo "* baseline: $N2 / $N = $((N2*10000/N)) %" | sed 's/.. %$/.\0/'
+    echo "* accuracy (without WordNet): $C / $N = $((C*10000/N)) %" | sed 's/.. %$/.\0/'
+}
+
+
 
 falsenegatives()
 {
@@ -98,4 +128,7 @@ test()
 
 #falsenegatives
 #test
+
+init
 eval
+evalnowordnet

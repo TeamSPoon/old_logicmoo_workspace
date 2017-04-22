@@ -355,3 +355,4 @@ iboxtest(T) :-
 
 iboxtest(T) :-
 	write_ibox_failed(T).
+

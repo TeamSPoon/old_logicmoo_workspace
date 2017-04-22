@@ -3,13 +3,13 @@
                      xfdrs2html/2,
                      xdrs2html/2]).
 
-:- use_module(semlib(options),[candc_option/2]).
+:- use_module(semlib(options),[option/2]).
 :- use_module(semlib(errors),[warning/2]).
 
 
 /*========================================================================
    Converting DRSs to XML
-*/
+========================================================================*/
 
 drs2html(DRS,Stream):-
    drs2html(DRS,Stream,3).
@@ -30,7 +30,7 @@ xfdrs2html(XDRS,Stream):-
 
 /*========================================================================
    Converting DRSs to XML (with tab insertion)
-*/
+========================================================================*/
 
 drs2html(drs(D,C),Stream,Tab):-
    tab(Stream,Tab), format(Stream,'<table>~n',[]),
@@ -62,7 +62,7 @@ drs2html(merge(B1,B2),Stream,Tab):- !,
 
 /*========================================================================
    Converting DRS-domains to XML (with tab insertion)
-*/
+========================================================================*/
 
 dom2html([],_,_).
 
@@ -76,7 +76,7 @@ dom2html([_Index:X|L],Stream,Tab):- !,
    dom2html(L,Stream,Tab).
 
 dom2html([X|L],Stream,Tab):-
-   candc_option('--warnings',true), !,
+   option('--warnings',true), !,
    warning('cannot print DR ~p',[X]),
    dom2html(L,Stream,Tab).
 
@@ -86,7 +86,7 @@ dom2html([_|L],Stream,Tab):-
 
 /*========================================================================
    Converting DRS-conditions to XML (with tab insertion)
-*/
+========================================================================*/
 
 conds2html([],_,_).
 
@@ -201,7 +201,7 @@ conds2html([_Index:eq(X,Y)|L],Stream,Tab):- !,
    conds2html(L,Stream,Tab).
 
 conds2html([X|L],Stream,Tab):-
-   candc_option('--warnings',true), !,
+   option('--warnings',true), !,
    warning('cannot print DR-Condition ~p',[X]),
    conds2html(L,Stream,Tab).
 
@@ -211,7 +211,7 @@ conds2html([_|L],Stream,Tab):-
 
 /*========================================================================
    Timex
-*/
+========================================================================*/
 
 timex2html(date(_:A,_:B,_:C),Stream):- !,
    format(Stream,'~w~w~w',[A,B,C]).
@@ -228,7 +228,7 @@ timex2html(X,Stream):- !,
 
 /*========================================================================
    Words
-*/
+========================================================================*/
 
 words2html([],_).
 
@@ -240,7 +240,7 @@ words2html([word(Index,Word)|L],Stream):-
 
 /*========================================================================
    POS tags
-*/
+========================================================================*/
 
 tags2html([],_).
 
@@ -255,7 +255,7 @@ tags2html([ne(Index,NE)|L],Stream):-
 
 /*========================================================================
    Flat DRSs
-*/
+========================================================================*/
 
 cons2html([],_).
 
@@ -376,7 +376,7 @@ cons2html([Label:Index:duplex(_,L1,_,L2)|Cons],Stream):- !,
 
 /*========================================================================
    Labels
-*/
+========================================================================*/
 
 labels2html([],_).
 
@@ -387,7 +387,7 @@ labels2html([Label|L],Stream):-
 
 /*========================================================================
    Indexes
-*/
+========================================================================*/
 
 index2html([],_,_):- !.
 
@@ -404,7 +404,7 @@ index2html([_|L],Stream,Tab):-
 
 /*========================================================================
    Deal with special symbols
-*/
+========================================================================*/
 
 symbol(S1,S2):-
    name(S1,C1),

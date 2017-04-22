@@ -13,10 +13,10 @@
 
 /* ========================================================================
     Load Modules
-*/
+======================================================================== */
 
 :- use_module(library(lists),[member/2,append/3,select/3]).
-:- use_module(semlib(options),[candc_option/2]).
+:- use_module(semlib(options),[option/2]).
 :- use_module(semlib(errors),[error/2,warning/2]).
 :- use_module(semlib(drs2fol),[symbol/4,timex/2]).
 
@@ -26,42 +26,55 @@
 
 /* ========================================================================
    Load WordNet
-*/
+======================================================================== */
 
 :- [working/wordnet/wordnet].
+
+%:- [working/wordnet/vanilla_train_s].
+%:- [working/wordnet/vanilla_train_l].
+%:- [working/wordnet/vanilla_train_xxxl].
+
+%:- [working/wordnet/vanilla_test_xl].
+
+%:- [working/wordnet/human_test].
+
+%:- [working/wordnet/elliesimple].
+%:- [working/wordnet/ellie_train].
+
+%:- [working/wordnet/combined].
 
 
 /* ========================================================================
     Declare Dynamic Predicates
-*/
+======================================================================== */
 
 :- dynamic concept/2, % concept(Concept, ConceptId)
            isa/2,     % isa(ConceptId1, ConceptId2)
-           ant/2,     % ant(ConceptId1, ConceptId2)
+           isnota/2,  % isnota(ConceptId1, ConceptId2)
            word/5.    % word(Word,Cat,Sense,Freq,ConceptId),
 
 
 /* ========================================================================
    Minimum Frequence for words under consideration
-*/
+======================================================================== */
 
 minFreq(0).
 
 
 /* ========================================================================
    Clear Background Knowledge
-*/
+======================================================================== */
 
 clearMWN:-  
    retractall(word(_,_,_,_,_)),
    retractall(isa(_,_)),
-   retractall(ant(_,_)),
+   retractall(isnota(_,_)),
    retractall(concept(_,_)).
 
 
 /* ========================================================================
    Compute Concepts for one DRS
-*/
+======================================================================== */
 
 compConcepts(DRS,DRS):-
    findSymDrs(DRS,[]-_,[]-Concepts),
@@ -72,7 +85,7 @@ compConcepts(DRS,DRS).
 
 /* ========================================================================
    Get all symbols from a DRS
-*/
+======================================================================== */
 
 findSymDrs(smerge(A,B),X1-X3,R1-R2):- !,
    findSymDrs(A,X1-X2,R1-R3),  
@@ -99,7 +112,7 @@ findSymDrs(drs([],Conds),X1-X2,R1-R2):- !,
 
 /* ========================================================================
    Get all symbols from a DRS-Condition
-*/
+======================================================================== */
 
 findSymConds([],X-X,R-R).
 
@@ -156,7 +169,7 @@ findSymConds(L1,X1-X2,R1-R2):-
    ; findSymConds(L2,[Y|X1]-X2,[s(Sym,r,Sense)|R1]-R2) ).
 
 findSymConds([_:card(_,N,_)|L],X1-X2,R1-[s(Sym,cardinal,1),s(numeral,n,1)|R2]):- 
-   candc_option('--plural',false),
+   option('--plural',false),
    integer(N), N > 0, !,
    symbol(c,number,N,Sym),
    findSymConds(L,X1-X2,R1-R2).
@@ -177,7 +190,7 @@ findSymConds([_|L],X1-X2,R1-R2):-
 
 /* ========================================================================
    Select relevant nouns and verbs as concepts
-*/
+======================================================================== */
 
 selectConcepts([]).
 
@@ -232,19 +245,31 @@ selectConcepts([_|L]):-
 
 /* ========================================================================
    Synonyms
-*/
+======================================================================== */
 
 syn(n,Sym1,Sense1,Sym2,Sense2):-
    synn(Sym1,Sense1,Sym2,Sense2), !.    %%% WordNet (nouns)
 
+syn(n,Sym1,Sense1,Sym2,Sense2):-
+   synn(Sym2,Sense2,Sym1,Sense1), !.    %%% WordNet (nouns)
+
 syn(v,Sym1,Sense1,Sym2,Sense2):-
    synv(Sym1,Sense1,Sym2,Sense2), !.    %%% WordNet (verbs)
+
+syn(v,Sym1,Sense1,Sym2,Sense2):-
+   synv(Sym2,Sense2,Sym1,Sense1), !.    %%% WordNet (verbs)
 
 syn(a,Sym1,Sense1,Sym2,Sense2):-
    syna(Sym1,Sense1,Sym2,Sense2), !.    %%% WordNet (adjectives)
 
+syn(a,Sym1,Sense1,Sym2,Sense2):-
+   syna(Sym2,Sense2,Sym1,Sense1), !.    %%% WordNet (adjectives)
+
 syn(r,Sym1,Sense1,Sym2,Sense2):-
    synr(Sym1,Sense1,Sym2,Sense2), !.    %%% WordNet (adverbs)
+
+syn(r,Sym1,Sense1,Sym2,Sense2):-
+   synr(Sym2,Sense2,Sym1,Sense1), !.    %%% WordNet (adverbs)
 
 syn(per,Sym1,Sense1,Sym2,Sense2):-
    synp(Sym1,Sense1,Sym2,Sense2), !.    %%% WordNet (names)
@@ -258,7 +283,7 @@ syn(org,Sym1,Sense1,Sym2,Sense2):-
 
 /* ========================================================================
    Calculate WordNet ISA Relations (first select all relevant concepts)
-*/
+======================================================================== */
 
 compISA:- 
    minFreq(Min),
@@ -271,7 +296,7 @@ compISA.
 
 /* ========================================================================
    Calculate WordNet ISA Relations
-*/
+======================================================================== */
 
 compISA([]).
 
@@ -282,7 +307,7 @@ compISA([s(_,_,_,ID)|L]):-
 
 /* ------------------------------------------------------------------------
    Time and Numeric Expressions
--- */
+------------------------------------------------------------------------ */
 
 compISA([s(_,timex,1,ID1)|L]):- !,       % timex
    addConcept(time,n,5,ID2),
@@ -296,7 +321,7 @@ compISA([s(_,cardinal,1,ID1)|L]):- !,    % cardinal
 
 /* ------------------------------------------------------------------------
    Locations
--- */
+------------------------------------------------------------------------ */
 
 %compISA([s(Sym1,loc,Sense1,ID1)|L]):-    % location in WordNet
 %   isap(Sym1,Sense1,Sym2,Sense2), !,
@@ -311,7 +336,7 @@ compISA([s(_,loc,_,ID1)|L]):-            % location not in WordNet
 
 /* ------------------------------------------------------------------------
    Organisations
--- */
+------------------------------------------------------------------------ */
 
 %compISA([s(Sym1,org,Sense1,ID1)|L]):-    % organisation in WordNet
 %   isap(Sym1,Sense1,Sym2,Sense2), !,
@@ -326,7 +351,7 @@ compISA([s(_,org,_,ID1)|L]):-            % organisation not in WordNet
 
 /* ------------------------------------------------------------------------
    Persons
--- */
+------------------------------------------------------------------------ */
 
 %compISA([s(Sym1,per,Sense1,ID1)|L]):-    % person in WordNet
 %   isap(Sym1,Sense1,Sym2,Sense2), !,
@@ -341,17 +366,31 @@ compISA([s(_,per,_,ID1)|L]):-            % person not in WordNet
 
 /* ------------------------------------------------------------------------
    Nouns
--- */
+------------------------------------------------------------------------ */
 
-compISA([s(Sym1,n,Sense1,ID1)|L]):-      % nouns in WordNet
-   isan(Sym1,Sense1,Sym2,Sense2), !,
-   addConcept(Sym2,n,Sense2,ID2),
-   assert(isa(ID1,ID2)),
-   compISA([s(Sym2,n,Sense2,ID2)|L]).
+% take all isa relations
+%
+compISA([s(Sym1,n,Sense1,ID1)|L1]):-      % nouns in WordNet
+%   option('--x',true),
+   findall(s(Sym2,n,Sense2,ID2),( isan(Sym1,Sense1,Sym2,Sense2),
+                                  addConcept(Sym2,n,Sense2,ID2),
+                                  assert(isa(ID1,ID2)) ), New),
+   New = [_|_], !,
+   append(New,L1,L2),
+   compISA(L2).
+
+% take only first isa relation
+%
+%compISA([s(Sym1,n,Sense1,ID1)|L]):-      % nouns in WordNet
+%   option('--x',false),
+%   isan(Sym1,Sense1,Sym2,Sense2), !,
+%   addConcept(Sym2,n,Sense2,ID2),
+%   assert(isa(ID1,ID2)),
+%   compISA([s(Sym2,n,Sense2,ID2)|L]).
 
 /* ------------------------------------------------------------------------
    Verbs
--- */
+------------------------------------------------------------------------ */
 
 compISA([s(Sym1,v,Sense1,ID1)|L]):-      % verbs in WordNet (+ ISA)
    isav(Sym1,Sense1,Sym2,Sense2), !,
@@ -369,7 +408,7 @@ compISA([s(Sym,v,Sense,_)|L]):-          % verbs in WordNet (- ISA)
 
 /* ------------------------------------------------------------------------
    All Other Cases
--- */
+------------------------------------------------------------------------ */
 
 compISA([s(Sym1,nam,Sense1,ID1)|L]):-    % named entity in WordNet
    isap(Sym1,Sense1,Sym2,Sense2), !,
@@ -390,14 +429,14 @@ compISA([_|L]):-
 
 /*========================================================================
    compISNOTA
-*/
+========================================================================*/
 
 compISNOTA([]).
 
 compISNOTA([s(Sym1,a,Sense1,ID1)|L]):-    
    isnotaa(Sym1,Sense1,Sym2,Sense2), 
    member(s(Sym2,a,Sense2,ID2),L), !,
-   assert(ant(ID1,ID2)),
+   assert(isnota(ID1,ID2)),
    compISNOTA(L).
 
 compISNOTA([_|L]):-    
@@ -406,7 +445,7 @@ compISNOTA([_|L]):-
 
 /*========================================================================
     Get a new concept Id
-*/
+========================================================================*/
 
 getConceptId(I3):-
    concept(_,I1),
@@ -418,24 +457,27 @@ getConceptId(1).
 
 /*========================================================================
    Calculate First-Order Axioms 
-*/
+========================================================================*/
 
 axiomsWN(Axioms):-
-   candc_option('--modal',false), !,
+   option('--modal',false), !,
    findall(isa(A,B),(isa(A,B),\+A=B,\+B=0),ISA),
-   findall(isnota(A,B),(isa(A,C), concept([s(_,T,_)|_],A),
-                        isa(B,C), concept([s(_,T,_)|_],B),
-                        A<B       ),ISNOTA),
+
+   findall(isnota(A,B),isnota(A,B),ISNOTA),
+%  co-hyponyms
+%   findall(isnota(A,B),(isa(A,C), concept([s(_,T,_)|_],A),
+%                        isa(B,C), concept([s(_,T,_)|_],B),
+%                        A<B       ),ISNOTA),
+
    append(ISA,ISNOTA,Ax1),
    findall(iseq(A,B),(concept([A|L],Id1),
                       member(B,L),
                       \+ (concept(Other,Id2), \+ Id1=Id2, member(B,Other))),ISEQ),
    append(ISEQ,Ax1,Ax2),
-%  findall(antonym(A,B),(concept(
    axiomsWN(Ax2,Axioms).
 
 axiomsWN(Axioms):-
-   candc_option('--modal',true), !,
+   option('--modal',true), !,
    findall(isa(A,B),(isa(A,B),\+A=B,\+B=0),Ax1),
    findall(iseq(A,B),(concept([A|L],Id1),
                       member(B,L),
@@ -446,7 +488,7 @@ axiomsWN(Axioms):-
 
 /*========================================================================
    Calculate First-Order Axioms given isa/2, isnota/2, iseq/2
-*/
+========================================================================*/
 
 axiomsWN([],[]):- !.
 
@@ -455,7 +497,7 @@ axiomsWN([isa(I1,I2)|L1],[Axiom|L2]):- !,
    axiomsWN(L1,L2).
 
 axiomsWN([isnota(I1,I2)|L1],[Axiom|L2]):-
-   candc_option('--contradiction',true), !,
+   option('--contradiction',true), !,
    isnota2fol(I1,I2,Axiom), 
    axiomsWN(L1,L2).
 
@@ -469,10 +511,10 @@ axiomsWN([_|L1],L2):- !,
 
 /*========================================================================
    Translate IS-A to FOL 
-*/
+========================================================================*/
 
 isa2fol(I1,I2,Axiom):-
-   candc_option('--modal',false), !,
+   option('--modal',false), !,
    concept2sym(I1,B1),
    concept2sym(I2,B2),
    Axiom = all(X,imp(F1,F2)),
@@ -480,7 +522,7 @@ isa2fol(I1,I2,Axiom):-
    F2 =.. [B2,X].
 
 isa2fol(I1,I2,Axiom):-
-   candc_option('--modal',true), !,
+   option('--modal',true), !,
    concept2sym(I1,B1),
    concept2sym(I2,B2),
    Axiom = all(W,imp(possible_world(W),all(X,imp(F1,F2)))),
@@ -490,10 +532,10 @@ isa2fol(I1,I2,Axiom):-
 
 /*========================================================================
    Translate IS-NOT-A to FOL 
-*/
+========================================================================*/
 
 isnota2fol(I1,I2,Axiom):-
-   candc_option('--modal',false), !,
+   option('--modal',false), !,
    concept2sym(I1,B1),
    concept2sym(I2,B2),
    Axiom = all(X,imp(F1,not(F2))),
@@ -501,7 +543,7 @@ isnota2fol(I1,I2,Axiom):-
    F2 =.. [B2,X].
 
 isnota2fol(I1,I2,Axiom):-
-   candc_option('--modal',true), !,
+   option('--modal',true), !,
    concept2sym(I1,B1),
    concept2sym(I2,B2),
    Axiom = all(W,imp(possible_world(W),all(X,imp(F1,not(F2))))),
@@ -511,10 +553,10 @@ isnota2fol(I1,I2,Axiom):-
 
 /*========================================================================
    Translate IS-EQUAL to FOL 
-*/
+========================================================================*/
 
 iseq2fol(s(A1,T1,S1),s(A2,T2,S2),Axiom):-
-   candc_option('--modal',false), !,
+   option('--modal',false), !,
    symbol(T1,A1,S1,B1),
    symbol(T2,A2,S2,B2),
    Axiom = all(X,bimp(F1,F2)),
@@ -522,7 +564,7 @@ iseq2fol(s(A1,T1,S1),s(A2,T2,S2),Axiom):-
    F2 =.. [B2,X].
 
 iseq2fol(s(A1,T1,S1),s(A2,T2,S2),Axiom):-
-   candc_option('--modal',true), !,
+   option('--modal',true), !,
    symbol(T1,A1,S1,B1),
    symbol(T2,A2,S2,B2),
    Axiom = all(W,imp(possible_world(W),all(X,bimp(F1,F2)))),
@@ -532,7 +574,7 @@ iseq2fol(s(A1,T1,S1),s(A2,T2,S2),Axiom):-
 
 /*========================================================================
    Translate concept to symbol
-*/
+========================================================================*/
 
 concept2sym(I,Sym):-
    concept([s(Sym,timex,1)|_],I), !.
@@ -547,10 +589,10 @@ concept2sym(I,B):-
 
 /*========================================================================
    Print MiniWordNet 
-*/
+========================================================================*/
 
 graphMWN(Dir,File):-
-   candc_option('--graph',true),
+   option('--graph',true),
    atomic_list_concat([Dir,'/',File,'.mwn','.dot'],DOT),
    atomic_list_concat([Dir,'/',File,'.mwn','.pdf'],PDF),
    open(DOT,write,Stream),
@@ -566,7 +608,7 @@ graphMWN(_,_).
 
 /*========================================================================
    Create Graph using the dot program
-*/
+========================================================================*/
 
 createGraph(File1,File2):-
    shell('which dot',0), 
@@ -631,7 +673,7 @@ printIsa(Stream):-
 
 /*========================================================================
    Add Concept 
-*/
+========================================================================*/
 
 addConcept(Sym,Cat,Sense,ID):-
    concept(Concept,ID),
@@ -651,7 +693,7 @@ addConcept(Sym,Cat,Sense,ID):-
 
 /*========================================================================
    Check for inconsistencies
-*/
+========================================================================*/
 
 checkConsBK:-
    isa(A,B),
@@ -663,7 +705,7 @@ checkConsBK.
 
 /*========================================================================
    Cut down redundant nodes
-*/
+========================================================================*/
 
 cutDownMWN:-!,
    findall(I,concept(_,I),C), 
@@ -695,7 +737,7 @@ cutDown([_|L]):-
 
 /*========================================================================
    Add Top Concept (if there is not one yet)
-*/
+========================================================================*/
 
 addTopMWN:-
    concept(E,B), member(s(event,n,1),E),     %%% place all verbs under
@@ -727,7 +769,7 @@ addTopMWN1.
 
 /* ========================================================================
    Size WordNet (number of disjoint concepts)
-*/
+======================================================================== */
 
 sizeMWN(Size):-
    findall(X,isa(X,_),L),
@@ -736,7 +778,7 @@ sizeMWN(Size):-
 
 /* ========================================================================
    Symbol Stop List
-*/
+======================================================================== */
 
 stoplist(')',_).
 stoplist('(',_).
@@ -759,7 +801,7 @@ stoplist(more,n).
 
 /*========================================================================
    Output MWN (prolog)
-*/
+========================================================================*/
 
 outputMWN(Dir,File):-
    atomic_list_concat([Dir,'/',File,'.mwn'],Name),
@@ -770,7 +812,7 @@ outputMWN(Dir,File):-
 
 /*========================================================================
    Output terminal symbols
-*/
+========================================================================*/
 
 printTerminals(Stream):-
    format(Stream,'%~n% word(+Word, +Cat, +Sense, +Frequency, +ConceptID).~n%~n',[]),
@@ -791,9 +833,9 @@ printTerminals(Stream):-
    fail.
 
 printTerminals(Stream):-
-   format(Stream,'%~n% ant(+ConceptID, +ConceptID).~n%~n',[]),
-   ant(I,J),
-   format(Stream,'~p.~n',[ant(I,J)]),
+   format(Stream,'%~n% isnota(+ConceptID, +ConceptID).~n%~n',[]),
+   isnota(I,J),
+   format(Stream,'~p.~n',[isnota(I,J)]),
    fail.
 
 printTerminals(_).
@@ -801,7 +843,7 @@ printTerminals(_).
 
 /*========================================================================
    Adjacent Indexes
-*/
+========================================================================*/
 
 adjacent([I],[J]):- !, J is I + 1.
 adjacent(Is,Js):- member(I,Is), member(J,Js), J is I + 1, !.

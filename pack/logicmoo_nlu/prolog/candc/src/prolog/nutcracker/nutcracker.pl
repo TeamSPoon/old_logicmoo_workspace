@@ -3,7 +3,7 @@
 
 /* ========================================================================
    File Search Paths
-*/
+======================================================================== */
 
 file_search_path(semlib,     'src/prolog/lib').
 file_search_path(nutcracker, 'src/prolog/nutcracker').
@@ -12,14 +12,14 @@ file_search_path(knowledge,  'src/prolog/boxer/knowledge').
 
 /* ========================================================================
    Dynamic Predicates
-*/
+======================================================================== */
 
 :- dynamic axiom/3.
 
 
 /* ========================================================================
    Load other libraries
-*/
+======================================================================== */
 
 :- use_module(library(lists),[member/2,append/3]).
 :- use_module(library(ordsets),[list_to_ord_set/2,ord_intersection/3]).
@@ -27,7 +27,7 @@ file_search_path(knowledge,  'src/prolog/boxer/knowledge').
 
 :- use_module(semlib(drs2fol),[drs2fol/2]).
 :- use_module(semlib(errors),[error/2,warning/2,inform/2]).
-:- use_module(semlib(options),[candc_option/2,parseOptions/2,setOption/3,
+:- use_module(semlib(options),[option/2,parseOptions/2,setOption/3,
                                showOptions/1,setDefaultOptions/1]).
 
 :- use_module(nutcracker(version),[version/1]).
@@ -43,10 +43,10 @@ file_search_path(knowledge,  'src/prolog/boxer/knowledge').
 
 /* ========================================================================
    Main
-*/
+======================================================================== */
 
 main:-
-   candc_option(Option,do), 
+   option(Option,do), 
    member(Option,['--version','--help']), !, 
    version,
    help.
@@ -63,7 +63,7 @@ main:-
 
 /*========================================================================
    Main (traverse directories)
-*/
+========================================================================*/
 
 main([]).
 
@@ -88,20 +88,20 @@ main([_|Dirs]):-
 ------------------------------------------------------------------------*/
 
 pipeline(X,Overlap):-
-   candc_option('--inference',yes),
+   option('--inference',yes),
    meta(X), parse(X), wsd(X), box(X), 
    mwn(X,Ax1,Ax2,Ax3,Novelty),
    nc(X,Ax1,Ax2,Ax3), !,
    prediction(X,Novelty,Overlap).
 
 pipeline(X,Overlap):-
-   candc_option('--inference',no),
+   option('--inference',no),
    meta(X), parse(X), wsd(X), box(X), 
    mwn(X,_,_,_,Novelty), !,
    prediction(X,Novelty,Overlap).
 
 pipeline(X,Overlap):-
-   candc_option('--inference',only),
+   option('--inference',only),
    box(X),
    mwn(X,Ax1,Ax2,Ax3,Novelty), 
    nc(X,Ax1,Ax2,Ax3), !,
@@ -120,14 +120,14 @@ checkDir(Dirs):-
    checkDir2(Dir,Dirs).   % check permissions
 
 checkDir1(NewDir):-
-   candc_option('--dir',Dir),
+   option('--dir',Dir),
    atom_chars(Dir,Chars),
    append(NewChars,['/'],Chars), !,
    atom_chars(NewDir,NewChars),
    setOption(nutcracker,'--dir',NewDir).
 
 checkDir1(Dir):-
-   candc_option('--dir',Dir).
+   option('--dir',Dir).
 
 checkDir2(Dir,[Dir]):-
    exists_directory(Dir), 
@@ -181,10 +181,10 @@ checkFiles(Dir):-
 ------------------------------------------------------------------------*/
 
 printTHG(_,_,_,_):-
-   candc_option('--info',false), !.
+   option('--info',false), !.
 
 printTHG(Dir,TFile,HFile,GFile):-
-   candc_option('--info',true), 
+   option('--info',true), 
    inform('[=====> ~p <=====]',[Dir]),
    inform('Text:',[]),
    atomic_list_concat(['cat',TFile],' ',Shell1),
@@ -200,10 +200,10 @@ printTHG(_,_,_,_):-
    error('failed to access t and h file',[]).
 
 printTHG(_,_,_):-
-   candc_option('--info',false), !.
+   option('--info',false), !.
 
 printTHG(Dir,TFile,HFile):-
-   candc_option('--info',true), 
+   option('--info',true), 
    inform('[=====> ~p <=====]',[Dir]),
    inform('Text:',[]),
    atomic_list_concat(['cat',TFile],' ',Shell1),
@@ -257,7 +257,7 @@ tokeniseFile(In,_):-
    T : a b c d      a b c    a b c       a b 
    H :     c d e      b          c d e       c d
    O = 2/3          1/1      1/3         0/2
--- */
+------------------------------------------------------------------------ */
 
 bagofwords(File,Bag):-
    open(File,read,Stream),
@@ -322,7 +322,7 @@ parse(Dir):-
 ------------------------------------------------------------------------*/
 
 parse(In,Out):-
-   candc_option('--soap',true),
+   option('--soap',true),
    atomic_list_concat(['bin/soap_client',
                 '--url http://localhost:9000',
                 '--input',In,
@@ -331,7 +331,7 @@ parse(In,Out):-
    shell(Shell,0), !.
 
 parse(In,Out):-
-   candc_option('--soap',false),
+   option('--soap',false),
    atomic_list_concat(['bin/candc',
                 '--input',In,
                 '--output',Out,
@@ -350,7 +350,7 @@ parse(In,_):-
 ------------------------------------------------------------------------*/
 
 box(Dir):-
-   ( candc_option('--wsd',true), !, Ext = 'ccg.wsd'; Ext = 'ccg' ),
+   ( option('--wsd',true), !, Ext = 'ccg.wsd'; Ext = 'ccg' ),
    atomic_list_concat([Dir,'/', 't.',Ext], TFileCCG),
    atomic_list_concat([Dir,'/', 'h.',Ext], HFileCCG),
    atomic_list_concat([Dir,'/','th.',Ext],THFileCCG),
@@ -374,15 +374,15 @@ box(Dir):-
 ------------------------------------------------------------------------*/
 
 box(In,Out):-
-   candc_option('--plural',PluralOpt), 
-   candc_option('--modal',ModalOpt), 
-%  candc_option('--vpe',VpeOpt), 
-   candc_option('--copula',CopOpt), 
-   candc_option('--warnings',WarOpt), 
-   candc_option('--roles',RolesOpt), 
-   candc_option('--resolve',ResolveOpt), 
-   candc_option('--nn',NNOpt), 
-   candc_option('--x',XOpt), 
+   option('--plural',PluralOpt), 
+   option('--modal',ModalOpt), 
+%  option('--vpe',VpeOpt), 
+   option('--copula',CopOpt), 
+   option('--warnings',WarOpt), 
+   option('--roles',RolesOpt), 
+   option('--resolve',ResolveOpt), 
+   option('--nn',NNOpt), 
+   option('--x',XOpt), 
    atomic_list_concat([Out,xml],'.',OutXML),
    atomic_list_concat(['bin/boxer',
                 '--input',In,
@@ -428,7 +428,7 @@ box(In,_):-
 ------------------------------------------------------------------------*/
 
 wsd(Dir):-
-   candc_option('--wsd',true), 
+   option('--wsd',true), 
    atomic_list_concat([Dir,'/','t.ccg'],TFileCCG),
    atomic_list_concat([Dir,'/','h.ccg'],HFileCCG),
    atomic_list_concat([Dir,'/','th.ccg'],THFileCCG),
@@ -443,12 +443,12 @@ wsd(Dir):-
    wsd(THFileCCG,THFileWSD).
 
 wsd(Dir):-
-   candc_option('--wsd',true), 
+   option('--wsd',true), 
    error('directory ~p does not contain files named t.ccg and h.ccg',[Dir]), 
    !, fail.   
 
 wsd(_):- 
-   candc_option('--wsd',false).
+   option('--wsd',false).
 
 
 /*------------------------------------------------------------------------
@@ -471,7 +471,7 @@ wsd(_,In):-
 
 /* =======================================================================
    Textual Entailment (logical inference)
-*/
+========================================================================*/
 
 nc(Dir,KT,KH,KTH):-
    openInput(Dir),
@@ -503,33 +503,33 @@ nc(Dir,KT,KH,KTH):-
 
 /* =======================================================================
    Load Axioms
-*/
+========================================================================*/
 
 axioms(_):-
-   candc_option('--axioms',File), 
+   option('--axioms',File), 
    File = none, !.
 
 axioms(Dir):-
-   candc_option('--axioms',File), 
+   option('--axioms',File), 
    access_file(File,read),
    catch(load_files([File],[autoload(true),encoding(utf8)]),_,fail),
    findall(imp(A,B),imp(A,B),Axioms), !,
    preprocessAxioms(Axioms,Dir,0).
    
 axioms(_):-
-   candc_option('--axioms',File), 
+   option('--axioms',File), 
    error('cannot access axioms ~p',[File]).
 
 
 /* =======================================================================
    Process Axioms
-*/
+========================================================================*/
 
 preprocessAxioms([],_,N):-
    inform('Background knowledge: ~p axioms',[N]).
 
 preprocessAxioms([imp(A,B)|L],Dir,M):-
-   candc_option('--modal',true), N is M+1,
+   option('--modal',true), N is M+1,
    drs2fol(drs([],[nec(drs([],[imp(A,B)]))]),Axiom), 
    drs2fol(A,Antecedent), !,
    callTPandMB(Dir,[],not(Antecedent),Antecedent,1,10,Model,_Engine),
@@ -539,7 +539,7 @@ preprocessAxioms([imp(A,B)|L],Dir,M):-
    preprocessAxioms(L,Dir,N).
 
 preprocessAxioms([imp(A,B)|L],Dir,M):-
-   candc_option('--modal',false), N is M+1,
+   option('--modal',false), N is M+1,
    drs2fol(drs([],[imp(A,B)]),Axiom), !,
    callTPandMB(Dir,[],not(Axiom),Axiom,1,10,Model,_Engine),
    Model = model(_,F),
@@ -550,7 +550,7 @@ preprocessAxioms([imp(A,B)|L],Dir,M):-
 
 /* =======================================================================
    Include Background Knowledge
-*/
+========================================================================*/
 
 bk(model(_,F),In,Out):-
    findall(N,axiom(N,_,_),L),
@@ -575,7 +575,7 @@ bk([_|L],F,N,In,Out):-
 
 /* =======================================================================
    Textual Entailment (WordNet)
-*/
+========================================================================*/
 
 mwn(Dir,AxiomsKT,AxiomsKH,AxiomsKTH,Novelty):-
    openInput(Dir),
@@ -594,7 +594,7 @@ mwn(Dir,AxiomsKT,AxiomsKH,AxiomsKTH,Novelty):-
 
 /* =======================================================================
    Inference -- consistency check
-*/
+========================================================================*/
 
 consistent(_,_,Dir,Name,DomSize,Model):- 
    DomSize = 0, !, 
@@ -604,7 +604,7 @@ consistent(_,_,Dir,Name,DomSize,Model):-
 
 consistent(B,BK,Dir,Name,MinDom,Model):-
    drs2fol(B,F),
-   candc_option('--domsize',MaxDom),
+   option('--domsize',MaxDom),
    callTPandMB(Dir,BK,not(F),F,MinDom,MaxDom,TmpModel,TmpEngine),
    ( member(Name,[kt,kh,kth]), !, callMBbis(Dir,BK,F,TmpModel,Model,TmpEngine,Engine)
    ; TmpModel = Model, TmpEngine = Engine ),
@@ -617,13 +617,13 @@ consistent(B,BK,Dir,Name,MinDom,Model):-
 
 /* =======================================================================
    Inference -- informativeness check
-*/
+========================================================================*/
 
 informative(B1,B2,BK,Dir,Name,MinDom,Model):-
    drs2fol(B1,F1),
    drs2fol(B2,F2),
    F = imp(F1,F2),
-   candc_option('--domsize',MaxDom),
+   option('--domsize',MaxDom),
    callTPandMB(Dir,BK,F,not(F),MinDom,MaxDom,Model,Engine),
    outputModel(Model,Name,Dir,DomSize),
    ( DomSize > 0, !, Result = 'informative'
@@ -634,7 +634,7 @@ informative(B1,B2,BK,Dir,Name,MinDom,Model):-
 
 /* =======================================================================
    Prediction (try inference first, else back off to WordNet)
-*/
+========================================================================*/
  
 prediction(Dir,WNNovelty,Overlap):-
 
@@ -679,19 +679,19 @@ prediction(Dir,WNNovelty,Overlap):-
               +WNNovelty, 
               +WordOverlap, 
               -Prediction )              %%% prediction description
-*/
+========================================================================*/
 
 % PROOF without BK by THEOREM PROVER: INPUT INCONSISTENT
 %
 makePrediction(T,H,_,_,_,_,_,_,_,_,_,_,Prediction):-
-   candc_option('--contradiction',true), 
+   option('--contradiction',true), 
    (T = 0; H = 0), !,
    Prediction = 'unknown (simple input contradiction)'.
 
 % PROOF without BK by THEOREM PROVER: INCONSISTENT
 %
 makePrediction(T,H,TH,_,_,_,_,_,_,_,_,_,Prediction):-
-   candc_option('--contradiction',true), 
+   option('--contradiction',true), 
    T > 0, H > 0, TH = 0, !,
    Prediction = 'informative (simple inconsistency)'.
 
@@ -704,14 +704,14 @@ makePrediction(T,H,TH,TNH,_,_,_,_,_,_,_,_,Prediction):-
 % PROOF with BK by THEOREM PROVER: INPUT INCONSISTENT
 %
 makePrediction(T,H,TH,_,KT,KH,_,_,_,_,_,_,Prediction):-
-   candc_option('--contradiction',true), 
+   option('--contradiction',true), 
    T > 0, H > 0, TH > 0, (KT = 0; KH = 0),  !,
    Prediction = 'unknown (complex input contradiction)'.
 
 % PROOF with BK by THEOREM PROVER: INCONSISTENT
 %
 makePrediction(T,H,TH,_,KT,KH,KTH,_,_,_,_,_,Prediction):-
-   candc_option('--contradiction',true), 
+   option('--contradiction',true), 
    T > 0, H > 0, TH > 0, KT > 0, KH > 0, KTH = 0, !,
    Prediction = 'informative (complex inconsistency)'.
 
@@ -725,7 +725,7 @@ makePrediction(T,H,TH,TNH,KT,KH,KTH,KTNH,_,_,_,_,Prediction):-
 % WORDNET NOVELTY
 %
 makePrediction(_,_,_,_,_,_,_,_,DomNovelty,_,WNNovelty,_,Prediction):-
-   candc_option('--modal',false), WNNovelty >= 0, DomNovelty < 0, !, 
+   option('--modal',false), WNNovelty >= 0, DomNovelty < 0, !, 
    %%% DRS but no model could be computed, back off to WN novelty
 %  Threshold = 0.416667, %%% RTE-2 dev  (J48, 59.6%, n= 768)
 %  Threshold = 0.25,     %%% RTE-2 test (J48, 59.1%, n= 766)
@@ -769,7 +769,7 @@ makePrediction(_,_,_,_,_,_,_,_,DomNovelty,_,_,_,Prediction):-
 
 /* =======================================================================
    Output Model
-*/
+========================================================================*/
 
 outputModel(Model,Name,Dir,Size):-
    atomic_list_concat([Dir,'/',Name,'.mod'],File),
@@ -782,7 +782,7 @@ outputModel(Model,Name,Dir,Size):-
 
 /* =======================================================================
    Print Model
-*/
+========================================================================*/
 
 printModel(model(D,[]),Stream):- !, format(Stream,'model(~p, [])',[D]).
 
@@ -822,7 +822,7 @@ modelSize([f(_,Symbol,[E|Xtension])|L],Old,New):-
    
 modelSize([_|L],Old,New):-
    modelSize(L,Old,New).
-*/
+========================================================================*/
 
 compareModels(Dir,model(_,F1),model(_,F2)):- !, 
    atomic_list_concat([Dir,'/','novel.txt'],File),
@@ -846,7 +846,7 @@ compareExtensions([_|L],F,Stream):-
 
 /* =======================================================================
    Determine Domain Size 
-*/
+========================================================================*/
 
 domSize(Model,Size):-
    Model = model(Dom,_), !,
@@ -857,7 +857,7 @@ domSize(_,-1).
 
 /* =======================================================================
    Determine Model Size (Relations)
-*/
+========================================================================*/
 
 relSize(Model,Size):-
    Model = model(_,F), !,
@@ -870,7 +870,7 @@ relSize(_,-1).
 
 /* =======================================================================
    Output Prediction
-*/
+========================================================================*/
 
 outputPrediction(Dir,Prediction,Proof,Contra,DomNovelty,RelNovelty,WNNovelty,SizeNovelty,Overlap):-
    atomic_list_concat([Dir,'/','prediction.txt'],File),
@@ -883,7 +883,7 @@ outputPrediction(Dir,Prediction,Proof,Contra,DomNovelty,RelNovelty,WNNovelty,Siz
 
 /* =======================================================================
    Output Domain Size Difference
-*/
+========================================================================*/
 
 outputDomSizeDif(Dir,Proof,Contradiction,Dom,Rel,WordNet,Model,Overlap):-
    atomic_list_concat([Dir,'/','modsizedif.txt'],File),
@@ -902,7 +902,7 @@ outputDomSizeDif(Dir,Proof,Contradiction,Dom,Rel,WordNet,Model,Overlap):-
 
 /* ========================================================================
    Compute Novelty of H given T
-*/
+======================================================================== */
 
 computeNovelty(SizeT,SizeH,SizeTH,Novelty):-
    SizeT > 0, SizeH > 0, SizeTH > 0, !,
@@ -913,10 +913,10 @@ computeNovelty(_,_,_,-1).
 
 /* ========================================================================
    MiniWordNet
-*/
+======================================================================== */
 
 computeMWN(DRS,Dir,File,Size):-   
-   candc_option('--wordnet',true), !,
+   option('--wordnet',true), !,
    clearMWN,
    compConcepts(DRS,_),
    compISA,
@@ -931,10 +931,10 @@ computeMWN(_,_,_,0).
 
 /* =======================================================================
    Version
-*/
+========================================================================*/
 
 version:-
-   candc_option('--version',do), !,
+   option('--version',do), !,
    version(V),
    format(user_error,'~p~n',[V]).
 
@@ -943,20 +943,20 @@ version.
 
 /* =======================================================================
    Help
-*/
+========================================================================*/
 
 help:-
-   candc_option('--help',do), !,
+   option('--help',do), !,
    format(user_error,'usage: nc [options]~n~n',[]),
    showOptions(nutcracker).
 
 help:-
-   candc_option('--help',dont), !.
+   option('--help',dont), !.
 
 
 /* =======================================================================
    Definition of start
-*/
+========================================================================*/
 
 start:-
    current_prolog_flag(argv,[_Comm|Args]), 

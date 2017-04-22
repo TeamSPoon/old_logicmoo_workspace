@@ -1,36 +1,54 @@
 #!/bin/bash
 
 mkdir -p working
+
+SICK=working/sick
 SICK=working/sicktest
+
 AXIOMS=working/sick_axioms.pl
-RUN=working/sicktest.run
+RUN=working/sickrun.BoxerHumanTest
 
 puncher()
 {
-    OPTIONS0="--tp vampire --mb paradox --mbbis mace --contradiction false --copula false --x --info --resolve --soap --axioms ${AXIOMS}"
-    OPTIONS1="--tp vampire --mb paradox --mbbis mace --contradiction true  --copula true  --x --info --resolve --soap"
-    OPTIONS2="--tp vampire --mb paradox --mbbis mace --contradiction true  --copula false --x --info --resolve --soap"
+    WORDNET="--wordnet true"
+    TIMELIM="--timelim 300"
+    OPTIONSA="--tp vampire --mb paradox ${TIMELIM} --contradiction false --copula false --x --info --resolve ${WORDNET} --soap --axioms ${AXIOMS}"
+    OPTIONS0="--tp vampire --mb paradox ${TIMELIM} --contradiction false --copula false --x --info --resolve ${WORDNET} --soap"
+    OPTIONS1="--tp vampire --mb paradox ${TIMELIM} --contradiction true  --copula true  --x --info --resolve ${WORDNET} --soap"
+    OPTIONS2="--tp vampire --mb paradox ${TIMELIM} --contradiction true  --copula false --x --info --resolve ${WORDNET} --soap"
     bin/nc --dir $1 ${OPTIONS0}
     if [ `cat $1/prediction.txt | grep word | wc -l` -gt 0 ]; then
+	# no proof was found, now try to find a contradiction with --copula true
 	bin/nc --dir $1 ${OPTIONS1}
 	if [ `cat $1/prediction.txt | grep contradiction | wc -l` -gt 0 ]; then
+	    # input contained contradiction, try to find a contradiction with --copula false 
 	    bin/nc --dir $1 ${OPTIONS2}
 	    if [ `cat $1/prediction.txt | grep contradiction | wc -l` -gt 0 ]; then
+		# input contained contradiction, back off to first results 		
 		bin/nc --dir $1 ${OPTIONS0}
 	    fi
 	fi
     fi
 }
 
-run()
+startsoap()
 {
     echo "killing any existing soap servers"
+    STARTUPTIME=40
     killall soap_server
     echo "start the soap server"
     bin/soap_server --models models/boxer --server localhost:9000 --candc-printer boxer &
-    echo "give soap some time to be ready"
-    sleep 20 
+    echo "give soap some ${STARTUPTIME} seconds to be ready"
+    sleep ${STARTUPTIME}
+}
+
+run()
+{
+    startsoap
     for I in `ls ${SICK}`; do
+	if [ `ps -e | grep soap_server | wc -l` -lt 1 ]; then
+	    startsoap
+	fi
 	if [ -f ${SICK}/${I}/t ]; then
 	    rm -fr ${SICK}/${I}/PARAPHRASE
 	    puncher ${SICK}/${I}
@@ -135,5 +153,5 @@ createrun()
 #init
 run
 createrun
-R --no-save --slave --vanilla --args ${RUN} working/SICK_all.txt < working/sick_evaluation.R 
-
+#R --no-save --slave --vanilla --args ${RUN} working/SICK_all.txt < working/sick_evaluation.R 
+R --no-save --slave --vanilla --args ${RUN} working/SICK_test_annotated.txt < working/sick_evaluation.R 

@@ -6,12 +6,12 @@
 :- use_module(boxer(freeVarCheck),[freeVarCheckDrs/1]).
 :- use_module(boxer(sortalCheck),[sortalCheckDrs/2]).
 :- use_module(library(lists),[member/2,append/3,select/3]).
-:- use_module(semlib(options),[candc_option/2]).
+:- use_module(semlib(options),[option/2]).
 :- use_module(semlib(errors),[warning/2]).
 
 /* ========================================================================
    Main predicate: resolveDrs/2
-*/
+======================================================================== */
 
 resolveDrs(B1,B2):- 
    resolveDrs(B1,B2,_).
@@ -19,37 +19,37 @@ resolveDrs(B1,B2):-
 
 /* ========================================================================
    Main predicate: resolveDrs/3 (DRS)
-*/
+======================================================================== */
 
 resolveDrs(alfa(top,B1,B2),RDRS,Links):- 
-   candc_option('--theory',drt), !,
+   option('--theory',drt), !,
    resolveDrs(alfa(top,B1,B2),RDRS,[],Links).
 
 resolveDrs(smerge(alfa(top,B1,B2),B3),RDRS,Links):-
-   candc_option('--theory',drt), !,
+   option('--theory',drt), !,
    resolveDrs(alfa(top,B1,smerge(B2,B3)),RDRS,[],Links).
 
 resolveDrs(B,RDRS,Links):- 
-   candc_option('--theory',drt), !,
+   option('--theory',drt), !,
    resolveDrs(alfa(top,drs([],[]),B),RDRS,[],Links).
 
 
 /* ========================================================================
    Main predicate: resolveDrs/3 (SDRS)
-*/
+======================================================================== */
 
 resolveDrs(B,SDRS,Links):- 
-   candc_option('--theory',sdrt), 
+   option('--theory',sdrt), 
    \+ B = sdrs(_,_), !,
    resolveDrs(sdrs([sub(lab(K1,drs([],[])),lab(K2,B))],[[]:rel(K1,K2,presupposition)]),SDRS,[],Links).
 
 resolveDrs(B,SDRS,Links):- 
-   candc_option('--theory',sdrt), 
+   option('--theory',sdrt), 
    B = sdrs(_,Rel), \+ member(_:rel(_,_,presupposition),Rel), !, 
    resolveDrs(sdrs([sub(lab(K1,drs([],[])),lab(K2,B))],[[]:rel(K1,K2,presupposition)]),SDRS,[],Links).
 
 resolveDrs(B,SDRS,Links):- 
-   candc_option('--theory',sdrt), 
+   option('--theory',sdrt), 
    resolveDrs(B,SDRS,[],Links).
 
 
@@ -62,7 +62,7 @@ resolveDrs(B,SDRS,Links):-
    binding links. "Ac" holds a list of accommodation sites (represented as 
    a/1 terms), and "Bi" a list of binding sites (represented as r/2 terms).
 
-*/
+======================================================================== */
 
 resolveDrs(ADRS,DRS,L1,L3):-
    findAlfaDrs(ADRS,RDRS,alfa(Type,Alfa),Ac,[]-Bi), !,
@@ -76,7 +76,7 @@ resolveDrs(RDRS,DRS,L0,L0):-
 
 /* ========================================================================
    Find First Alfa-DRS (DRSs)
-*/
+======================================================================== */
 
 findAlfaDrs(alfa(top,B1,B3),Res,Alfa,Ac,Bi1-Bi2):- !,
    mergeDrs(B1,M1),
@@ -151,7 +151,7 @@ findAlfaDrs(sdrs(D1,C),sdrs(D2,C),Alfa,Ac,Bi1-Bi2):-
 
 /* ========================================================================
    Find First Alfa-DRS (DRS-Conditions)
-*/
+======================================================================== */
 
 findAlfaConds([I:X1|C1],[I:X2|C2],Alfa,Ac,Bi1-Bi2):- !,
    findAlfaConds([X1|C1],[X2|C2],Alfa,Ac,Bi1-Bi2).
@@ -205,10 +205,10 @@ findAlfaConds([Cond|C1],[Cond|C2],Alfa,Ac,Bi1-Bi2):-
 
 /* ========================================================================
    Resolve alfa: binding or accommodation
-*/
+======================================================================== */
 
 resolveAlfa(Alfa,Type,Ac,Bi,B,L1,L2):-
-   candc_option('--presup',max),
+   option('--presup',max),
    bindAlfa(Type,Bi,Alfa,L1,L2),
    dontResolve(Ac),
    \+ bindingViolationDrs(B),
@@ -222,7 +222,7 @@ resolveAlfa(Alfa,Type,Ac,Bi,B,L0,L0):-
 
 /* ------------------------------------------------------------------------
    Typology:   atype(Type, Global, Local, Binding)
--- */
+------------------------------------------------------------------------ */
 
 atype(def,1,1,1). % definite descriptions
 atype(nam,1,0,1). % proper names
@@ -235,7 +235,7 @@ atype(ind,0,1,0). % indefinites
 
 /* ------------------------------------------------------------------------
    Binding: select an antecedent, then merge the domain and the conditions
--- */
+------------------------------------------------------------------------ */
 
 bindAlfa(Type,[a(drs([],[]))|P],Alfa,L1,L2):- 
    !,  %%% cannot bind here, so try next level of DRS
@@ -253,7 +253,7 @@ bindAlfa(_,[r(drs(D2,C2),DRS)|P],drs([AnaIndex:X|D1],C1),L,[bind(AnaIndex,AntInd
    dontResolve(P).
 
 bindAlfa(Type,[r(drs(D2,C2),DRS)|P],drs([AnaIndex:X|D1],C1),L,[bind(AnaIndex,AntIndex)|L]):-
-   \+ candc_option('--semantics',drg),
+   \+ option('--semantics',drg),
    atype(Type,_,_,1),                            % check whether type permits binding
    member(AntIndex:X,D2),                        % select candidate antecedent discourse referent
    match(Type,C1,C2,X),                          % check if this candidate matches
@@ -265,7 +265,7 @@ bindAlfa(Type,[r(drs(D2,C2),DRS)|P],drs([AnaIndex:X|D1],C1),L,[bind(AnaIndex,Ant
    dontResolve(P).
 
 bindAlfa(Type,[r(drs(D2,C2),DRS)|P],drs([AnaIndex:X|D1],C1),L,[bind(AnaIndex,AntIndex)|L]):-
-   candc_option('--semantics',drg),
+   option('--semantics',drg),
    atype(Type,_,_,1),                            % check whether type permits binding
    member(AntIndex:Y,D2),                        % select candidate antecedent discourse referent
    coordinated(AnaIndex,AntIndex,L),             % copied material must have same antecedent
@@ -282,14 +282,14 @@ bindAlfa(Type,[r(R,R)|P],Alfa,L1,L2):-
 
 /* ------------------------------------------------------------------------
    Check if two indices share a common element
--- */
+------------------------------------------------------------------------ */
 
 common(Index1,Index2):- member(X,Index1), member(X,Index2), !.
 
 
 /* ------------------------------------------------------------------------
    Check if coordinated items are resolved to the same antecedent 
--- */
+------------------------------------------------------------------------ */
 
 coordinated(AnaIndex,AntIndex,Bound):-
    \+ ( member(bind(AnaIndex,OtherIndex),Bound),
@@ -344,14 +344,14 @@ match(pro,C1,C2,X0):-
 
 
 /* ------------------------------------------------------------------------
-   Forced local accommodation (candc_option 'presup --min')
--- */
+   Forced local accommodation (option 'presup --min')
+------------------------------------------------------------------------ */
 
 accommodateAlfa(_,[a(Alfa)],Alfa):- 
-   candc_option('--presup',min), !. %%% force local accommodation
+   option('--presup',min), !. %%% force local accommodation
 
 accommodateAlfa(Type,[a(drs([],[]))|P],Alfa):- 
-   candc_option('--presup',min), !, %%% force local accommodation
+   option('--presup',min), !, %%% force local accommodation
    accommodateAlfa(Type,P,Alfa).
 
 
@@ -362,7 +362,7 @@ accommodateAlfa(Type,[a(drs([],[]))|P],Alfa):-
    order of the list corresponds to the level of the accommodation
    site: the first a/1 term is the most global site, the last element
    the most local accommodation site. 
--- */
+------------------------------------------------------------------------ */
 
 accommodateAlfa(Type,[r(R,R)|P],Alfa):- !,
    accommodateAlfa(Type,P,Alfa).
@@ -390,7 +390,7 @@ accommodateAlfa(Type,[a(B)|P],Alfa):-
 
 /* ========================================================================
    Do not resolve remaining of projection path
-*/
+======================================================================== */
 
 dontResolve([]):- !.
 
@@ -403,12 +403,12 @@ dontResolve([r(X,X)|L]):- !,
 
 /* ========================================================================
    Merge Domains - Check for Duplicates; Copy Indexes
-*/
+======================================================================== */
 
 mergeDomains([],L,L):- !.
 
 mergeDomains([I1:X|R],L1,L3):-
-   candc_option('--semantics',tacitus),
+   option('--semantics',tacitus),
    select(I2:Y,L1,L2), X==Y, !,
    append(I1,I2,I3), sort(I3,I4),
    mergeDomains(R,[I4:X|L2],L3).
@@ -418,7 +418,7 @@ mergeDomains([_:X|R],L1,L3):-
    mergeDomains(R,[I:X|L2],L3).
 
 mergeDomains([X|R],L1,[X|L2]):-
-   candc_option('--semantics',tacitus), !,
+   option('--semantics',tacitus), !,
    mergeDomains(R,L1,L2).
 
 mergeDomains([_:X|R],L1,[[]:X|L2]):-
@@ -427,7 +427,7 @@ mergeDomains([_:X|R],L1,[[]:X|L2]):-
 
 /* ========================================================================
    Merge Conditions - Check for Duplicates; Copy Indexes
-*/
+======================================================================== */
 
 mergeConditions([],L,L):- !.
 
@@ -436,7 +436,7 @@ mergeConditions([],L,L):- !.
 %   mergeConditions(R,[I:named(X,Sym,Type,Sense)|L2],L3).
 
 mergeConditions([I1:X|R],L1,L3):-
-   candc_option('--semantics',tacitus),  
+   option('--semantics',tacitus),  
    select(I2:Y,L1,L2), X==Y, !,
    append(I1,I2,I3), sort(I3,I4),
    mergeConditions(R,[I4:X|L2],L3).
@@ -446,7 +446,7 @@ mergeConditions([_:X|R],L1,L3):-                         %%% merge identical
    mergeConditions(R,[I:X|L2],L3).                       %%% index of antecedent
 
 mergeConditions([I1:timex(X,date(D1,D2,D3,D4))|R],L1,L3):-
-   candc_option('--semantics',drg),
+   option('--semantics',drg),
    select(I2:timex(Y,date(E1,E2,E3,E4)),L1,L2), 
    mergeConditions([D1],[E1],[F1]),
    mergeConditions([D2],[E2],[F2]),

@@ -7,7 +7,7 @@
 
 /* ========================================================================
    Translates formula to otter syntax on Stream
-*/
+======================================================================== */
 
 fol2bliksem(Formula,Stream):-
    format(Stream,'~nAuto.~n~n',[]),
@@ -21,7 +21,7 @@ fol2bliksem(Axioms,Formula,Stream):-
 
 /* ========================================================================
    Print a Bliksem formula (introducing tab)
-*/
+======================================================================== */
 
 printBliksemFormula(Stream,F):-
    \+ \+ ( numbervars(F,0,_),
@@ -31,7 +31,7 @@ printBliksemFormula(Stream,F):-
 
 /* ========================================================================
    Print a list of Bliksem formulas
-*/
+======================================================================== */
 
 printBliksemFormulas([],_):- !.
 
@@ -42,7 +42,7 @@ printBliksemFormulas([F|L],Stream):-
 
 /* ========================================================================
    Print Bliksem formulas
-*/
+======================================================================== */
 
 printBliksem(some(X,Formula),Tab,Stream):- !,
    write(Stream,'(< '),

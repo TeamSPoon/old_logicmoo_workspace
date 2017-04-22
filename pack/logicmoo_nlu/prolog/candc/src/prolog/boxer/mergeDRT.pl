@@ -1,13 +1,13 @@
 
 :- module(mergeDRT,[mergeDrs/2]).
 
-:- use_module(library(lists),[member/2]).
+:- use_module(library(lists),[member/2,append/3]).
 :- use_module(boxer(noncomp),[noncomp/3]).
 
 
 /* ========================================================================
    Merge reduction
-*/
+======================================================================== */
 
 mergeDrs(Var,Var):- var(Var), !.
 
@@ -40,7 +40,7 @@ mergeDrs(B,R):-
 
 /* ========================================================================
    Merge reduction
-*/
+======================================================================== */
 
 % Cannot reduce a variable
 %
@@ -55,9 +55,6 @@ reduceMerge(alfa(T,B,Var),alfa(T,R,Var)):- var(Var), !, reduceMerge(B,R).
 
 % Reduce if both are basic DRSs
 %
-reduceMerge(merge(B:drs([],[C1]),B:drs([],[C2|L])),B:drs([],[C3|L])):- 
-   noncomp(C1,C2,C3), !.
-
 reduceMerge(merge(B:B1,B:B2),B:B3):- !,
    merge(B1,B2,B3).
 
@@ -92,7 +89,6 @@ reduceMerge(alfa(T,sdrs([lab(K,K1:B1)],R),B2),SDRS):- !,
 
 reduceMerge(alfa(T,sdrs([sub(lab(K,K1),B3)],R),B2),SDRS):- !,
    mergeDrs(sdrs([sub(lab(K,alfa(T,K1,B2)),B3)],R),SDRS).
-
 
 % Recursive case 
 %
@@ -143,7 +139,7 @@ reduceMerge(M,M).
 
 /* ========================================================================
    Projection Normal Form
-*/
+======================================================================== */
 
 pnf(Var,Var):- var(Var), !.
 pnf(alfa(T1,alfa(T2,B1,B2),B3),alfa(T2,N1,N2)):- !, pnf(B1,N1), pnf(alfa(T1,B2,B3),N2).
@@ -158,7 +154,7 @@ pnf(B,B).
 
 /*========================================================================
    DRS-merge (Conditions)
-*/
+========================================================================*/
 
 mergeConds([B:F:Cond1|C1],[B:F:Cond2|C2]):- !,
    mergeConds([Cond1|C1],[Cond2|C2]).
@@ -223,9 +219,11 @@ mergeConds([],[]).
 
 /* ========================================================================
    Merge
-*/
+======================================================================== */
 
+merge(drs([],[C1]),drs(D,[C2|L]),drs(D,[C3|L])):- noncomp(C1,C2,C3), !.
 merge(drs(D1,C1),drs(D2,C2),drs(D3,C3)):- !, merge(D1,D2,D3), merge(C1,C2,C3).
 merge([],L,L):- !.
 merge([X|L1],L2,L3):- member(Y,L2), X==Y, !, merge(L1,L2,L3).
 merge([X|L1],L2,[X|L3]):- merge(L1,L2,L3).
+

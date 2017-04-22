@@ -3,12 +3,11 @@
 
 :- use_module(library(lists),[member/2]).
 :- use_module(semlib(errors),[warning/2]).
-:- use_module(knowledge(relations),[nn/3]).
 
 
 /*========================================================================
    Alpha Conversion (introducing substitutions)
-*/
+========================================================================*/
 
 alphaConvertDRS(B1,B2):-
    alphaConvertDRS(B1,[]-_,[]-_,B2), !.
@@ -16,7 +15,7 @@ alphaConvertDRS(B1,B2):-
 
 /*========================================================================
    Variable
-*/
+========================================================================*/
 
 variable(X):- var(X), !.
 variable(X):- functor(X,'$VAR',1), !.
@@ -24,7 +23,7 @@ variable(X):- functor(X,'$VAR',1), !.
 
 /*========================================================================
    Alpha Conversion (terms)
-*/
+========================================================================*/
 
 alphaConvertVar(X,Vars,New):-
    variable(X), !,
@@ -40,22 +39,8 @@ alphaConvertVar(X,_,X).
 
 
 /*========================================================================
-   Alpha Conversion (symbols)
-*/
-
-alphaConvertSym(f(_,_,V),_,Ptr-Ptr,V):- atomic(V), !.
-
-alphaConvertSym(f(Type,[A1,B1],V),Vars,Ptr1-Ptr3,F):- !,
-   alphaConvertDRS(A1,Vars-_,Ptr1-Ptr2,A2),
-   alphaConvertDRS(B1,Vars-_,Ptr2-Ptr3,B2),
-   interpretFunction(f(Type,[A2,B2],V),F).
-
-alphaConvertSym(X,_,Ptr-Ptr,X).
-
-
-/*========================================================================
    Alpha Conversion (DRSs)
-*/
+========================================================================*/
 
 alphaConvertDRS(X1,Var-Var,Ptr-Ptr,X2):-
    variable(X1), !,
@@ -115,7 +100,7 @@ alphaConvertDRS(U,_,_,_):- !,
 
 /*========================================================================
    Alpha Conversion (DRS-Conditions)
-*/
+========================================================================*/
 
 alphaConvertCondition(nec(B1),Vars,Ptr,nec(B2)):- !,
    alphaConvertDRS(B1,Vars-_,Ptr,B2).
@@ -151,10 +136,10 @@ alphaConvertCondition(rel(Arg1,Arg2,Sym),Var,Ptr-Ptr,rel(Arg3,Arg4,Sym)):- !,
    alphaConvertVar(Arg2,Var,Arg4).
 
 alphaConvertCondition(rel(Arg1,Arg2,'=',0),Var,Ptr,Rel):- !,
+   warning('Unexpected relation symbol: ~p = ~p',[Arg1,Arg2]),
    alphaConvertCondition(eq(Arg1,Arg2),Var,Ptr,Rel).
 
-alphaConvertCondition(rel(Arg1,Arg2,Sym1,Sense),Var,Ptr,rel(Arg3,Arg4,Sym2,Sense)):- !,
-   alphaConvertSym(Sym1,Var,Ptr,Sym2),
+alphaConvertCondition(rel(Arg1,Arg2,Sym,Sense),Var,Ptr-Ptr,rel(Arg3,Arg4,Sym,Sense)):- !,
    alphaConvertVar(Arg1,Var,Arg3),
    alphaConvertVar(Arg2,Var,Arg4).
 
@@ -178,40 +163,3 @@ alphaConvertCondition(eq(X1,X2),Vars,Ptr-Ptr,eq(Y1,Y2)):- !,
 
 alphaConvertCondition(U,_,_,_):- !,
    warning('Unknown condition: ~p',[U]), fail.
-
-
-/*========================================================================
-   Eta Conversion (DRSs)
-*/
-
-etaConversion(Var,Var):- var(Var), !, fail.
-etaConversion(Sym,Sym):- atomic(Sym).
-etaConversion(lam(X,_:drs(_,C)),Sym):- member(_:_:pred(Y,Sym,_,_),C), X==Y, !.
-etaConversion(lam(X,_:drs(_,C)),Sym):- member(_:_:named(Y,Sym,_,_),C), X==Y, !.
-etaConversion(_,thing).
-
-
-/*========================================================================
-  Function Interpretation: NN
-*/
-
-interpretFunction(f(noun,_,Sym),Sym):-
-   candc_option('--nn',false), !, Sym = of.
-
-interpretFunction(f(name,_,Sym),Sym):-
-   candc_option('--nn',false), !, Sym = '='.
-
-interpretFunction(f(noun,[A1,B1],Sym),Sym):-
-   etaConversion(A1,A2),
-   etaConversion(B1,B2), !,
-   ( nn(A2,B2,Sym), !
-   ; nn(_ ,B2,Sym), !
-   ; nn(A2,_, Sym), !
-   ; Sym = of ).
-
-interpretFunction(f(name,[_,B1],Sym),Sym):-
-   etaConversion(B1,B2), !,
-   ( nn(_,B2,Sym), !
-   ; Sym = '=' ).
-
-interpretFunction(F,F).

@@ -9,7 +9,7 @@
 
 /*========================================================================
    Translates formula to Otter syntax on Stream
-*/
+========================================================================*/
 
 fol2otter(Formula,Stream):-
    headerOtter(Stream),
@@ -25,7 +25,7 @@ fol2otter(Axioms,Formula,Stream):-
 
 /*========================================================================
    Header and Footer OTTER
-*/
+========================================================================*/
 
 headerOtter(Stream):- 
    format(Stream,'set(auto).~n~n',[]),
@@ -40,7 +40,7 @@ footerOtter(Stream):-
 
 /*========================================================================
    Translates formula to MACE syntax on Stream
-*/
+========================================================================*/
 
 fol2mace(Formula,Stream):- 
    headerMace(Stream),
@@ -56,7 +56,7 @@ fol2mace(Axioms,Formula,Stream):-
 
 /*========================================================================
    Header and footer MACE
-*/
+========================================================================*/
 
 headerMace(Stream):-
    format(Stream,'set(auto).~n~n',[]),
@@ -70,7 +70,7 @@ footerMace(Stream):-
 
 /*========================================================================
    Print an Otter formula (introducing tab)
-*/
+========================================================================*/
 
 printOtterFormula(F,Stream):-
    \+ \+ ( numbervars(F,0,_),
@@ -80,7 +80,7 @@ printOtterFormula(F,Stream):-
 
 /*========================================================================
    Print a set of Otter formulas
-*/
+========================================================================*/
 
 printOtterFormulas([],_).
 
@@ -91,7 +91,7 @@ printOtterFormulas([F|L],Stream):-
 
 /*========================================================================
    Print Otter formulas
-*/
+========================================================================*/
 
 printOtter(some(X,Formula),Tab,Stream):- !, 
    write(Stream,'(exists '),

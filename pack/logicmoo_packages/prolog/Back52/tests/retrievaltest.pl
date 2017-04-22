@@ -1,4 +1,4 @@
-retrievaltest('tests/retrievaltest.pl','retrieval test',53).
+retrievaltest('tests/retrievaltest.pl','retrieval test',54).
 
 retrievaltest :-
 	retrievaltest(FN,TN,Max),
@@ -263,8 +263,12 @@ retrievaltest(45) :-
 	backretrieve(X = 17),
 	X == [[17]].
 
-retrievaltest(46) :-
+retrievaltest(54) :-
 	backretrieve(X = uc_30),
+	X == [[o]].
+
+retrievaltest(46) :-
+	backretrieve(X = uc(30)),
 	X == [[o]].
 
 retrievaltest(47) :-

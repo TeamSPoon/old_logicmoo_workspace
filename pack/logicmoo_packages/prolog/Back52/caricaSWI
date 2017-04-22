@@ -8,6 +8,8 @@
 %% 
 %% -------------------------------------------------------------------
 
+:- set_prolog_flag(gvar_nondict_ok,true).
+:- use_module(library(gvar_syntax)).
 
 %
 % bianchi - modifiche per SWI-Prolog
@@ -77,7 +79,7 @@ che_prolog('SWI').
 :- ['library.quintus'].
 %:- prolog_flag(redefine_warnings,_,on).
 
-% :- ensure_loaded(library(quintus)).
+:- ensure_loaded(library(quintus)).
 
 
 /* bianchi - style_check non definito nel SIXTUS  

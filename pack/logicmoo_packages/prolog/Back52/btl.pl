@@ -830,9 +830,9 @@ b5par_analyze_term(Role1 comp Role2,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,N
 	!,
 	b5par_analyze_role_term(Role1 comp Role2,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout).
 
-b5par_analyze_term(DOT,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout) :-
-	compound(DOT),functor(DOT,'.',2),!,  %  DOT='.'(Role1,Role2),
-	b5par_analyze_role_term(DOT,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout).
+b5par_analyze_term(Role1.Role2,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout) :-
+	!,
+	b5par_analyze_role_term(Role1.Role2,Mode,(r,0),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout).
 
 b5par_analyze_term(union(Aset1,Aset2),Mode,(a,N),PN,Vartermin,Vartermout,Namesin,Namesout,FIin,FIout) :-
 	!,
@@ -1004,7 +1004,6 @@ b5par_analyze_concept_term(Name,_,(c,0),PN,Varterm,[Key|Varterm],Names,[class/Na
 	b5par_valid_name(Name),
 	b5par_cycle_check(class/Name,PN).
 
-swiDOT(Role1 , Role2, DOT):- DOT=..['.',Role1 , Role2].
 
 %%%%% analyze roles
 
@@ -1023,8 +1022,8 @@ b5par_analyze_role_term(Role1 comp Role2,Mode,(r,0),PN,Vartermin,[comp(Key1,Key2
 	b5par_analyze_role_term(Role1,Mode,(r,0),PN,[],RVarterm1,Namesin,Names1,[internal/RVarterm1/ (r,0) /Key1|FIin],FI1),
 	b5par_analyze_role_term(Role2,Mode,(r,0),PN,[],RVarterm2,Names1,Namesout,[internal/RVarterm2/ (r,0) /Key2|FI1],FIout).
 
-b5par_analyze_role_term(DOT,Mode,(r,0),PN,Vartermin,[comp(Key1,Key2)|Vartermin],Namesin,Namesout,FIin,FIout) :-
-	swiDOT(Role1 , Role2, DOT), !,  
+b5par_analyze_role_term(Role1.Role2,Mode,(r,0),PN,Vartermin,[comp(Key1,Key2)|Vartermin],Namesin,Namesout,FIin,FIout) :-
+	!,
 	b5par_correct_role_term(Role1),
 	b5par_correct_role_term(Role2),
 	b5par_analyze_role_term(Role1,Mode,(r,0),PN,[],RVarterm1,Namesin,Names1,[internal/RVarterm1/ (r,0) /Key1|FIin],FI1),
@@ -1876,8 +1875,8 @@ b5par_at_parse_term(R1 comp R2,(r,0),VKT,[comp(RKey1,RKey2)|VKT],RDef1 comp RDef
 	b5par_at_parse_term(R1,(r,0),[],RVKT1,RDef1,Namesin,Names1,[internal/ (r,0) /RVKT1/RKey1|FIin],FI1),
 	b5par_at_parse_term(R2,(r,0),[],RVKT2,RDef2,Names1,Namesout,[internal/ (r,0) /RVKT2/RKey2|FI1],FIout).
 
-b5par_at_parse_term(DOT,(r,0),VKT,[comp(RKey1,RKey2)|VKT],RDefDOT,Namesin,Namesout,FIin,FIout) :-
-	swiDOT(R1 , R2, DOT),swiDOT(RDef1 , RDef2, RDefDOT),!,
+b5par_at_parse_term(R1.R2,(r,0),VKT,[comp(RKey1,RKey2)|VKT],RDef1.RDef2,Namesin,Namesout,FIin,FIout) :-
+	!,
 	b5par_correct_role_term(R1),
 	b5par_correct_role_term(R1),
 	b5par_at_parse_term(R1,(r,0),[],RVKT1,RDef1,Namesin,Names1,[internal/ (r,0) /RVKT1/RKey1|FIin],FI1),
@@ -2437,8 +2436,7 @@ b5par_determine_role_range(trans(Role),Range) :-
 	!,b5par_determine_role_range(Role,Range).
 b5par_determine_role_range(_ comp Role2,Range) :-
 	!,b5par_determine_role_range(Role2,Range).
-b5par_determine_role_range(DOT,Range) :-
-      swiDOT(_ , Role2, DOT),
+b5par_determine_role_range(_.Role2,Range) :-
 	!,b5par_determine_role_range(Role2,Range).
 b5par_determine_role_range(Name,Range) :-
 	atom(Name),
@@ -6354,8 +6352,8 @@ b5par_transform_term_to_key((r,0),trans(R),Key) :-
 	!,
 	b5par_transform_term_to_key((r,0),R,RKey),
 	b5par_introduce_internal((r,0),[trans(RKey)],Key,_).	
-b5par_transform_term_to_key((r,0),R1R2,Key) :-
-	swiDOT(R1 , R2, R1R2),!,
+b5par_transform_term_to_key((r,0),R1.R2,Key) :-
+	!,
 	b5par_transform_term_to_key((r,0),R1,RKey1),
 	b5par_transform_term_to_key((r,0),R2,RKey2),
 	b5par_introduce_internal((r,0),[comp(RKey1,RKey2)],Key,_).

@@ -3,7 +3,7 @@
 
 /* ========================================================================
    File Search Paths
-*/
+======================================================================== */
 
 file_search_path(semlib, 'src/prolog/lib').
 file_search_path(boxer,  'src/prolog/boxer').
@@ -11,29 +11,29 @@ file_search_path(boxer,  'src/prolog/boxer').
 
 /* ========================================================================
    Dynamic Predicates
-*/
+======================================================================== */
 
 :- dynamic split/7, title/1.
 
 
 /* ========================================================================
    Load other libraries
-*/
+======================================================================== */
 
 :- use_module(library(lists),[member/2,append/3,reverse/2]).
 :- use_module(library(readutil),[read_stream_to_codes/2]).
 :- use_module(semlib(abbreviations),[iAbb/2,tAbb/2]).
 :- use_module(semlib(errors),[error/2,warning/2]).
-:- use_module(semlib(options),[candc_option/2,parseOptions/2,setOption/3,
+:- use_module(semlib(options),[option/2,parseOptions/2,setOption/3,
                                showOptions/1,setDefaultOptions/1]).
 
 
 /* ========================================================================
    Main
-*/
+======================================================================== */
 
 tokkie:-
-   candc_option(Option,do), 
+   option(Option,do), 
    member(Option,['--help']), !, 
    help.
 
@@ -54,7 +54,7 @@ tokkie:-
 
 /* ----------------------------------------------------------------------
    Read lines
- */
+---------------------------------------------------------------------- */
 
 readLines(Codes1,I1,S1,Stream,[Tokens|L]):-
    begSent(Codes1,I1,Codes2,I2), !,       % determine begin of a new sentence
@@ -71,7 +71,7 @@ readLines(_,_,_,_,[]).
 
 /* ----------------------------------------------------------------------
    Determine beginning of sentence
- */
+---------------------------------------------------------------------- */
 
 begSent([Sep|C1],I1,C2,I3):- 
    sep(Sep), !,               % skip space, tab or newline
@@ -91,7 +91,7 @@ begSent([C|L],I,[C|L],I).
            +CodesR,             % Rest string
            +CodesLast)          % Last token
 
- */
+---------------------------------------------------------------------- */
 
 endSent([],I,[],I,[],_):- !.
 
@@ -141,7 +141,7 @@ endSent([C|C1],I1,[C|C2],I3,Rest,_):-
                       Next,     % Codes following
                       Last)     % Last token
 
- */
+---------------------------------------------------------------------- */
 % Case 1: full stop after uppercase one-character token (i.e. initial)
 noSentenceBoundary(".",_,Last):- Last = [Upper], upper(Upper).
 % Case 2: full stop after a title 
@@ -154,7 +154,7 @@ noSentenceBoundary(".",[N|_],_):- num(N).
 
 /* ----------------------------------------------------------------------
    Split Line into Tokens
- */
+---------------------------------------------------------------------- */
 
 % Nothing left to do, no tokens in queue
 %
@@ -229,14 +229,14 @@ tokenise([X|Codes],CurrentPos,StartPos,Sofar-Tail,Tokens):-
 
 /* ----------------------------------------------------------------------
    Output Tokens
- */
+---------------------------------------------------------------------- */
 
 outputTokens(Tokens,S,Stream):-
-   candc_option('--mode',poor), !,
+   option('--mode',poor), !,
    printTokens(Tokens,S,1,Stream).
 
 outputTokens(Tokens,S,Stream):-
-   candc_option('--mode',rich), !,
+   option('--mode',rich), !,
    printTokens(Tokens,S,1,Stream).
 
 outputTokens(_,_,_).
@@ -244,10 +244,10 @@ outputTokens(_,_,_).
 
 /* ----------------------------------------------------------------------
    Wrapper IOB format
- */
+---------------------------------------------------------------------- */
 
 outputIOB(Codes,Tokens,Stream):-
-   candc_option('--mode',iob), !,
+   option('--mode',iob), !,
    printIOB(Codes,0,Tokens,Stream).
 
 outputIOB(_,_,_).
@@ -255,7 +255,7 @@ outputIOB(_,_,_).
 
 /* ----------------------------------------------------------------------
    Output IOB format
- */
+---------------------------------------------------------------------- */
 
 printIOB([],_,_,_).
 
@@ -288,52 +288,52 @@ printIOB([X|L],N1,TokenSet,Stream):-
 
 /* ----------------------------------------------------------------------
    Tuple IOB format
- */
+---------------------------------------------------------------------- */
 
 tupleIOB(_,X,Tag,_,Stream):- 
-   candc_option('--format',txt), !,
+   option('--format',txt), !,
    format(Stream,'~p ~p~n',[X,Tag]).
 
 tupleIOB(N,X,Tag,Tok,Stream):- 
-   candc_option('--format',prolog), !,
+   option('--format',prolog), !,
    format(Stream,'tok(~p,\'~p\'). % ~p ~s~n',[X,Tag,N,Tok]).
 
 
 /* ----------------------------------------------------------------------
    Print Tokens
- */
+---------------------------------------------------------------------- */
 
 printTokens([],_,_,_). 
 
 printTokens([tok(_,_,Tok)],_,_,Stream):- 
-   candc_option('--mode',poor), !,
+   option('--mode',poor), !,
    format(Stream,'~s~n',[Tok]). 
 
 printTokens([tok(I,J,Tok)|L],S,T1,Stream):- 
-   candc_option('--format',prolog),
-   candc_option('--mode',rich), !,
+   option('--format',prolog),
+   option('--mode',rich), !,
    Index is S*1000+T1,
    format(Stream,'tok(~p, ~p, ~p, ~s).~n',[I,J,Index,Tok]), 
    T2 is T1+1,
    printTokens(L,S,T2,Stream).
 
 printTokens([tok(I,J,Tok)|L],S,T1,Stream):- 
-   candc_option('--format',txt),
-   candc_option('--mode',rich), !,
+   option('--format',txt),
+   option('--mode',rich), !,
    Index is S*1000+T1,
    format(Stream,'~p ~p ~p ~s~n',[I,J,Index,Tok]), 
    T2 is T1+1,
    printTokens(L,S,T2,Stream).
 
 printTokens([tok(_,_,Tok)|L],S,T,Stream):- 
-   candc_option('--mode',poor), !,
+   option('--mode',poor), !,
    format(Stream,'~s ',[Tok]), 
    printTokens(L,S,T,Stream).
 
 
 /* ----------------------------------------------------------------------
    Type checking
- */
+---------------------------------------------------------------------- */
 
 sep(10).    % new line
 sep(13).    % new line
@@ -363,7 +363,7 @@ num(X):- var(X), member(X,"0123456789").
 /* ----------------------------------------------------------------------
    Rules for splitting tokens
    split(+Left,+ConditionsOnLeft,+Right,+ConditionsOnRight,+Context)
- */
+---------------------------------------------------------------------- */
 
 split("can",[], "not",[], []).
 split([_],[], "n't",[], []).
@@ -400,7 +400,7 @@ split([Q],[quote(Q)], [X],[alphanum(X)], []).
 
 /* ----------------------------------------------------------------------
    Exceptions (do not split)
- */
+---------------------------------------------------------------------- */
 
 dontsplit(Input,Rest,N,Old-OldTail,Old-NewTail):- 
    nosplit(Left,N),
@@ -414,14 +414,14 @@ nosplit([79,Q,U],3):- rsq(Q), upper(U).   % Irish names
 
 /* ----------------------------------------------------------------------
    Initialisation
- */
+---------------------------------------------------------------------- */
 
 initTokkie:-  
    initTitles,
    initSplitRules.
 
 initTitles:-
-   candc_option('--language',Language), !,
+   option('--language',Language), !,
    findall(Title,
            ( tAbb(Language,Title),
              reverse(Title,Reversed),
@@ -439,7 +439,7 @@ initSplitRules:-
 
 /* ----------------------------------------------------------------------
    Rules for final tokens
- */
+---------------------------------------------------------------------- */
 
 final("?", "?", [], 1).
 final(".", ".", [], 1).
@@ -449,7 +449,7 @@ final([46,Q],[46], [Q],1):- quote(Q).
 
 /* ----------------------------------------------------------------------
    Try a splitting rule on the input
- */
+---------------------------------------------------------------------- */
 
 trysplit(Input,Left,Right,Rest,LenLeft,LenRight):-
    split(Left,LenLeft,CondsLeft,Right,LenRight,CondsRight,RightContext),
@@ -462,7 +462,7 @@ trysplit(Input,Left,Right,Rest,LenLeft,LenRight):-
 
 /* ----------------------------------------------------------------------
    Check Conditions
- */
+---------------------------------------------------------------------- */
 
 checkConds([]).
 checkConds([C|L]):- call(C), !, checkConds(L).
@@ -470,7 +470,7 @@ checkConds([C|L]):- call(C), !, checkConds(L).
 
 /* ----------------------------------------------------------------------------------
    Codes for right single quotation marks (used in genitives)
------------- */
+---------------------------------------------------------------------------------- */
 
 rsq(39).
 rsq(8217).
@@ -478,7 +478,7 @@ rsq(8217).
 
 /* ----------------------------------------------------------------------------------
    Codes for single-character quotes
------------- */
+---------------------------------------------------------------------------------- */
 
 quote(34).    %%% "
 quote(39).    %%% '
@@ -493,7 +493,7 @@ quote(8222).  %%% low double quotation mark
 
 /* ----------------------------------------------------------------------------------
    Codes for double quotes
------------- */
+---------------------------------------------------------------------------------- */
 
 quotes(96).    %%% ``
 quotes(39).    %%% ''
@@ -505,16 +505,16 @@ quotes(8218).
 
 /* =======================================================================
    Open Input File
-*/
+========================================================================*/
 
 openInput(Stream):-
-   candc_option('--stdin',dont),
-   candc_option('--input',File),
+   option('--stdin',dont),
+   option('--input',File),
    exists_file(File), !,
    open(File,read,Stream,[encoding(utf8)]).
 
 openInput(Stream):-
-   candc_option('--stdin',do), 
+   option('--stdin',do), 
    set_prolog_flag(encoding,utf8),
    warning('reading from standard input',[]),
    prompt(_,''),
@@ -523,10 +523,10 @@ openInput(Stream):-
 
 /* =======================================================================
    Open Output File
-*/
+========================================================================*/
 
 openOutput(Stream):-
-   candc_option('--output',Output),
+   option('--output',Output),
    atomic(Output),
    \+ Output=user_output,
    ( access_file(Output,write), !,
@@ -539,20 +539,20 @@ openOutput(user_output).
 
 /* =======================================================================
    Help
-*/
+========================================================================*/
 
 help:-
-   candc_option('--help',do), !,
+   option('--help',do), !,
    format(user_error,'usage: tokkie [options]~n~n',[]),
    showOptions(tokkie).
 
 help:-
-   candc_option('--help',dont), !.
+   option('--help',dont), !.
 
 
 /* =======================================================================
    Definition of start
-*/
+========================================================================*/
 
 start:-
    current_prolog_flag(argv,[_Comm|Args]),

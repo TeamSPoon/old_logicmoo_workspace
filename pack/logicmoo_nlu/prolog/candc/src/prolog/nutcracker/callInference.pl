@@ -8,15 +8,15 @@
 :- use_module(nutcracker(fol2bliksem),[fol2bliksem/3]).
 :- use_module(nutcracker(fol2tptp),[fol2tptp/3,fol2tptpOld/3]).
 
-:- use_module(semlib(options),[candc_option/2]).
+:- use_module(semlib(options),[option/2]).
 
 
 /*========================================================================
    Initialise Theorem Provers
-*/
+========================================================================*/
 
 initEngine(Opt,Temp,Axioms,Formula,vampire):-   
-   candc_option(Opt,vampire), 
+   option(Opt,vampire), 
    access_file('ext/bin/vampire',execute), !,
    atom_concat(Temp,'/vampire.in',InFile),
    open(InFile,write,Stream),
@@ -24,7 +24,7 @@ initEngine(Opt,Temp,Axioms,Formula,vampire):-
    close(Stream).
 
 initEngine(Opt,Temp,Axioms,Formula,otter):- 
-   candc_option(Opt,otter), 
+   option(Opt,otter), 
    access_file('ext/bin/otter',execute), !,
    atom_concat(Temp,'/otter.in',InFile),
    open(InFile,write,Stream),
@@ -32,7 +32,7 @@ initEngine(Opt,Temp,Axioms,Formula,otter):-
    close(Stream).
 
 initEngine(Opt,Temp,Axioms,Formula,bliksem):- 
-   candc_option(Opt,bliksem), 
+   option(Opt,bliksem), 
    access_file('ext/bin/bliksem',execute), !,
    atom_concat(Temp,'/bliksem.in',InFile),
    open(InFile,write,Stream),
@@ -40,7 +40,7 @@ initEngine(Opt,Temp,Axioms,Formula,bliksem):-
    close(Stream).
 
 initEngine(Opt,Temp,Axioms,Formula,mace):- 
-   candc_option(Opt,mace),
+   option(Opt,mace),
    access_file('ext/bin/mace',execute), !,
    atom_concat(Temp,'/mace.in',InFile),
    open(InFile,write,Stream),
@@ -48,7 +48,7 @@ initEngine(Opt,Temp,Axioms,Formula,mace):-
    close(Stream).
 
 initEngine(Opt,Temp,Axioms,Formula,paradox):- 
-   candc_option(Opt,paradox),
+   option(Opt,paradox),
    access_file('ext/bin/paradox',execute), !,
    atom_concat(Temp,'/paradox.in',InFile),
    open(InFile,write,Stream),
@@ -56,17 +56,17 @@ initEngine(Opt,Temp,Axioms,Formula,paradox):-
    close(Stream).
 
 initEngine(Opt,_,_,_,_):- 
-   candc_option(Opt,X),
+   option(Opt,X),
    error('inference engine ext/bin/~p not accessible',[X]),
    !, fail.
 
 
 /* ========================================================================
    Time Limit
-*/
+======================================================================== */
 
 timeLimit(TimeLim):-
-   candc_option('--timelim',TimeLim),
+   option('--timelim',TimeLim),
    access_file('ext/bin/CPULimitedRun',execute), !.
 
 timeLimit(0).
@@ -74,7 +74,7 @@ timeLimit(0).
 
 /* ========================================================================
    Calls to Theorem Provers and Model Builders
-*/
+======================================================================== */
 
 callTPandMB(Dir,Axioms,TPProblem,MBProblem,MinDom,MaxDom,Model,Engine):-
    timeLimit(TimeLim),
@@ -88,10 +88,10 @@ callTPandMB(Dir,Axioms,TPProblem,MBProblem,MinDom,MaxDom,Model,Engine):-
 
 /* ========================================================================
    Call to Model Builder ("second opinion")
-*/
+======================================================================== */
 
 callMBbis(_,_,_,Model,Model,Engine,Engine):-
-   candc_option('--mbbis',none), !.
+   option('--mbbis',none), !.
 
 callMBbis(Dir,Axioms,MBProblem,FirstModel,Model,FirstEngine,Engine):-
    FirstModel = model(Dom,_), length(Dom,DomSize), DomSize > 0,
@@ -109,7 +109,7 @@ callMBbis(_,_,_,Model,Model,Engine,Engine).
 
 /* ========================================================================
    Read result and translatate into standard format
-*/
+======================================================================== */
 
 readResult(Model,Temp,Engine):-
    atom_concat(Temp,'/tpmb.out',File),
@@ -136,7 +136,7 @@ readResult(Model,Temp,Engine):-
 
 /*========================================================================
    Translate Paradox-type Model into Blackburn & Bos Models
-*/
+========================================================================*/
 
 paradox2blackburnbos(Paradox,model(D,F)):-
    Paradox = paradox(Terms), \+ Terms=[],
@@ -152,7 +152,7 @@ paradox2blackburnbos(Paradox,unknown):-
 
 /*========================================================================
    Translate Paradox Terms to Domain
-*/
+========================================================================*/
 
 paradox2d([],D-D).
 
@@ -191,7 +191,7 @@ paradox2d([_|L],D1-D2):-
 
 /*========================================================================
    Translate Paradox Terms to Interpretation Function
-*/
+========================================================================*/
 
 paradox2f([],F-F).
 
@@ -272,7 +272,7 @@ paradox2f([_|L],D1-D2):-
 
 /*========================================================================
    Translate Mace-type Model into Blackburn & Bos Models
-*/
+========================================================================*/
 
 mace2blackburnbos(Mace,model(D,F)):-
    Mace = interpretation(Size,Terms),
@@ -285,7 +285,7 @@ mace2blackburnbos(Mace,unknown):-
 
 /*========================================================================
    Translate Mace Model to Domain
-*/
+========================================================================*/
 
 mace2d(N,N,[V]):-
 	name(N,Codes),
@@ -301,7 +301,7 @@ mace2d(I,N,[V|D]):-
 
 /*========================================================================
    Translate Mace Model to Interpretation Function
-*/
+========================================================================*/
 
 mace2f([],_,[]):- !.
 
@@ -340,7 +340,7 @@ mace2f([_|Terms],D,F):-
 
 /*========================================================================
    Take positive values of one-place predicates
-*/
+========================================================================*/
 
 positiveValues([],_,[]).
 
@@ -357,7 +357,7 @@ positiveValues([0|Values],I1,Rest):-
 
 /*========================================================================
    Take positive values of two-place predicates
-*/
+========================================================================*/
 
 positivePairValues([],_,_,_,[]).
 

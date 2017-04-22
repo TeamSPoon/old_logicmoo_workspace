@@ -1,3 +1,10 @@
+:- op(624,xfy,(.)).
+:- op(0,xfy,(.)).
+:- op(624,xfx,(.)).
+:- set_prolog_flag(gvar_nondict_ok,true).
+:- use_module(library(gvar_syntax)).
+:- back.
+
 % LAST EDIT: Mon Jul 13 17:19:22 1992 by Jan Thomsen (madonna!jt) 
 %% ---------------------------------------------------------------------
 %%  test file for testing assertional consequences of implication links

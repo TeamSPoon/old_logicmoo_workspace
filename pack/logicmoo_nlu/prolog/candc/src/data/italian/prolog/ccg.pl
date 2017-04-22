@@ -54,7 +54,7 @@ debugging(_,_,_).
 topcat(t(C1,_,_,_),C2):- !, C2=C1.
 topcat(ba(C1,_,_),C2):- !, C2=C1.
 topcat(fa(C1,_,_),C2):- !, C2=C1.
-topcat(CCG,_):- !, trace,error('topcat not defined for ~p~n',[CCG]), fail.
+topcat(CCG,_):- !, error('topcat not defined for ~p~n',[CCG]), fail.
 
 
 /* ----------------------------------------------------------
@@ -455,7 +455,7 @@ ccg(tree(Node,m:T1,h:T2),_,Stack,fa(Fun,C1,C2)):- !,
 
 /* ----------------------------------------------------------------------------------
    Leaf Nodes: MOD (quotes and parentheticals)
------------- */
+---------------------------------------------------------------------------------- */
 
 ccg(leaf(Pos,Ind,Tok), m, [modrigh(X)], t(Cat,Pos,Ind,Tok)):- 
    Pos = 'PUNCT-OPEN+QUOTES', !, 
@@ -475,7 +475,7 @@ ccg(leaf(Pos,Ind,Tok), m, [modleft(X/p:F)], t(Cat,Pos,Ind,Tok)):-
 
 /* ----------------------------------------------------------------------------------
    Leaf Nodes: MOD (general case)
------------- */
+---------------------------------------------------------------------------------- */
 
 ccg(leaf(Pos,Ind,Tok), m, [modrigh(X)], t(Cat,Pos,Ind,Tok)):- !, Cat = (X/X).
 ccg(leaf(Pos,Ind,Tok), m, [modleft(X)], t(Cat,Pos,Ind,Tok)):- !, Cat = (X\X).
@@ -533,7 +533,7 @@ ccg(Leaf, a, Cat, _):- Leaf = leaf(_,_,_), write('PROBLEM':a:Leaf:Cat),nl, fail.
 
 /* ------------------------------------------------------------------------
    Mapping from POS to basic CCG categories [possible arguments]
--- */
+------------------------------------------------------------------------ */
 
 pos2cat(Pos, s:pss,    S):- main_verb(Pos,_),    member(argrigh('NP-LGS'),S).
 pos2cat(Pos, s:F,      S):- main_verb(Pos,F), \+ member(argrigh('NP-LGS'),S).
@@ -582,7 +582,7 @@ pos2cat('CONJ',            _,  _).
 
 /* ------------------------------------------------------------------------
    Determine base of functor category
--- */
+------------------------------------------------------------------------ */
 
 build([],Cat,Cat):- !.
 build([modleft(X)],_,(X\X)):- !.

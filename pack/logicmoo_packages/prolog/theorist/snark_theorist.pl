@@ -678,6 +678,8 @@ I assume that the reader is familiar with such notation.}:
 \index{new\_lit}
 \index{add\_prefix}
 \begin{verbatim} */
+
+
 new_lit(Prefix, Reln, NewArgs, NewReln) :-
    Reln =.. [Pred | Args],
    add_prefix(Prefix,Pred,NewPred),
@@ -688,6 +690,9 @@ add_prefix(Prefix,Pred,NewPred) :-
    name(Pred,PredName),
    append(Prefix, PredName, NewPredName),
    name(NewPred,NewPredName).
+
+
+
 /* \end{verbatim}
 \subsection{Compiling Rules}
 The next simplest compilation form we consider is the intermediate form
@@ -834,6 +839,8 @@ and $ExB$ a body of the forms $ex\_b_i$.
 
 \index{make\_bodies}
 \begin{verbatim} */
+
+
 make_bodies((H,B), T, [ths(T1,T3,D1,D3), Anc, ans(A1,A3)],
                     (ProveH,ProveB), (ExH,ExB)) :-
    !,
@@ -857,6 +864,9 @@ make_bodies(A, T, [Ths,Anc,Ans], ProveA, ExA) :-
    !,
    new_lit("prove_", A, [T,Anc], ProveA),
    new_lit("ex_", A, [Ths,Anc,Ans], ExA).
+
+
+
 /* \end{verbatim}
 
 The procedure $rule(F,R)$ declares $R$ to be a fact
@@ -880,6 +890,8 @@ and can be ignored on first reading.
 \index{rule}
 \index{drule}
 \begin{verbatim} */
+
+
 rule(F,R) :-
    flag((sound_unification,on)),!,
    make_sound(R,S),
@@ -905,6 +917,9 @@ drule(F,H) :-
    ( F='fact',
      prolog_cl(ExH)
    ; F=constraint).
+
+
+
 /* \end{verbatim}
 
 $form\_anc(L,A1,A2)$ means that $A2$ is the ancestor form for
@@ -912,8 +927,13 @@ subgoal $L$ with previous ancestor form $A1$.
 
 \index{form\_anc}
 \begin{verbatim} */
+
+
 form_anc(n(G), anc(P,N), anc(P,[G|N])) :- !.
 form_anc(G, anc(P,N), anc([G|P],N)).
+
+
+
 /* \end{verbatim}
 \subsection{Forming Contrapositives}
 For both facts and constraints we convert the user
@@ -931,6 +951,8 @@ The declarations are as follows:
 \index{declare\_fact}
 \index{declare\_constraint}
 \begin{verbatim} */
+
+
 declare_fact(F) :-
    nnf(F,even,N),
    rulify(fact,N).
@@ -938,6 +960,9 @@ declare_fact(F) :-
 declare_constraint(C) :-
    nnf(C,even,N),
    rulify(constraint,N).
+
+
+
 /* \end{verbatim}
 
 {\em nnf\/$($Wff,Parity,Nnf\/$)$} (section \ref{nnf})
@@ -954,6 +979,8 @@ means that all rules which can be formed from $N$ (by allowing each
 atom in $N$ being the head of some rule) should be declared as such.
 \index{rulify}
 \begin{verbatim} */
+
+
 rulify(H,(A,B)) :- !,
    contrapos(H,B,A),
    contrapos(H,A,B).
@@ -967,6 +994,9 @@ rulify(H,n(A)) :- !,
 
 rulify(H,A) :-
    rule(H,n(A)).
+
+
+
 /* \end{verbatim}
 
 $contrapos(H,D,T)$ where $H$ is either ``{\em fact\/}'' 
@@ -979,6 +1009,8 @@ have been formed, and $T$ as those which remain to be as the head of
 some rule.
 \index{contrapos}
 \begin{verbatim} */
+
+
 contrapos(H,D, (L,R)) :- !,
    contrapos(H,(R,D),L),
    contrapos(H,(L,D),R).
@@ -992,6 +1024,9 @@ contrapos(H,D,n(A)) :- !,
 
 contrapos(H,D,A) :-
    rule(H,if(n(A),D)).
+
+
+
 /* \end{verbatim}
 \begin{example} \em
 if we are to {\em rulify} the negation normal form
@@ -1016,6 +1051,8 @@ Stickel's implementation.
 \index{make\_sound}
 \index{rms}
 \begin{verbatim} */
+
+
 make_sound(if(H,B),if(NH,NB)) :- !,
    rms(H,NH,[],_,B,NB).
 
@@ -1038,11 +1075,16 @@ rms(S,S2,L1,L2,B1,B2) :-
    S =.. L,
    rms(L,LR,L1,L2,B1,B2),
    S2 =.. LR.
+
+
+
 /* \end{verbatim}
 
 \index{unif}
 \index{appears\_in}
 \begin{verbatim} */
+
+
 unif(X,Y) :-
    var(X), var(Y), X=Y,!.
 unif(X,Y) :-
@@ -1072,6 +1114,9 @@ appears_in(X,S) :-
    \+ atomic(S),
    S =.. L,
    appears_in(X,L).
+
+
+
 /* \end{verbatim}
 \subsection{Possible Hypotheses}
 The other class of things we have to worry about is the class
@@ -1115,6 +1160,8 @@ $\backslash+($variable\_free$(d(-args-))).$
 The following compiles directly into such code:
 \index{declare\_default}
 \begin{verbatim} */
+
+
 declare_default(D) :-
    make_anc(D),
    new_lit("prove_",D,[T,_],Pr_D),
@@ -1127,6 +1174,9 @@ declare_default(D) :-
                  \+Pr_not_D)),
    new_lit("ex_",D, [ths(T,T,Defer,[D|Defer]), _, ans(A,A)], ExDefer),
    prolog_cl((ExDefer :- \+ variable_free(D))).
+
+
+
 /* \end{verbatim}
 
 \begin{example}\em
@@ -1154,11 +1204,16 @@ This means that we can prove the $prove$ and $ex$ forms by calling
 the appropriate Prolog definition.
 \index{declare\_prolog}
 \begin{verbatim} */
+
+
 declare_prolog(G) :-
    new_lit("ex_",G, [ths(T,T,D,D), _, ans(A,A)], ExG),
    prolog_cl((ExG :- G)),
    new_lit("prove_",G,[_,_],PrG),
    prolog_cl((PrG :- G)).
+
+
+
 /* \end{verbatim}
 
 \subsection{Explaining Observations}
@@ -1167,21 +1222,31 @@ the alternate answers) from the facts given $T0$ is already assumed.
 $G$ is an arbitrary wff.
 \index{expl}
 \begin{verbatim} */
+
+
 expl(G,T0,T1,Ans) :-
    make_ground(N),
    declare_fact('<-'(newans(N,G) , G)),
    ex_newans(N,G,ths(T0,T,[],D),anc([],[]),ans([],Ans)),
    make_ground(D),
    check_consis(D,T,T1).
+
+
+
 /* \end{verbatim}
 
 \index{check\_consis}
 \begin{verbatim} */
+
+
 check_consis([],T,T).
 check_consis([H|D],T1,T) :-
    new_lit("prove_not_",H, [T1,anc([],[])], Pr_n_H),
    \+ Pr_n_H,
    check_consis(D,[H|T1],T).
+
+
+
 /* \end{verbatim}
 To obtain disjunctive answers we have to know if the negation of the top
 level goal is called. This is done by declaring the fact
@@ -1194,6 +1259,8 @@ answer, but only adding redundant information).
 \index{ex\_not\_newans}
 \index{id\_anc}
 \begin{verbatim} */
+
+
 :- dynamic ex_not_newans/5.
 :- dynamic prove_not_newans/4.
 ex_not_newans(N,G,ths(T,T,D,D),anc(Pos,Neg),ans(A,[G|A])) :-
@@ -1202,6 +1269,9 @@ ex_not_newans(N,G,ths(T,T,D,D),anc(Pos,Neg),ans(A,[G|A])) :-
 
 id_anc(n(G),anc(_,N)) :- !, id_member(G,N).
 id_anc(G,anc(P,_)) :- id_member(G,P).
+
+
+
 /* \end{verbatim}
 
 \subsection{Ancestor Search} \label{anc-section}
@@ -1217,6 +1287,8 @@ ancestor search rules.
 \index{flag,ancestor\_search}
 \index{flag,loop\_check}
 \begin{verbatim} */
+
+
 :- dynamic ancestor_recorded/1.
 make_anc(_) :-
    flag((ancestor_search,off)),
@@ -1262,6 +1334,9 @@ make_anc(Goal) :-
    ),
    assert(ancestor_recorded(NG)),
    !.
+
+
+
 /* \end{verbatim}
 
 \begin{example} \em
@@ -1296,6 +1371,8 @@ Here we use the standard Edinburgh operator declarations which are
 given in the spirit of being enough to make the rest of the description
 self contained.
 \begin{verbatim} */
+
+
 :- (dynamic((flag)/1)).
 :- op(1150,fx,'default').
 :- op(1150,fx,'fact').
@@ -1321,6 +1398,9 @@ self contained.
 :- op(1000,xfy,&).
 :- op(950,fy,~).
 :- op(950,fy,not).
+
+
+
 /* \end{verbatim}
 
 
@@ -1347,6 +1427,9 @@ if parity is even and the negation normal form of $Fla$ if parity is odd.
 \end{description}
 \index{nnf}
 \begin{verbatim} */
+
+
+
 nnf((X equiv Y), P,B) :- !,
    nnf(((Y or not X) and (X or not Y)),P,B).
 nnf((X == Y), P,B) :- !,
@@ -1376,11 +1459,20 @@ nnf((not X),P,B) :- !,
 nnf(F,odd,F).
 nnf(n(F),even,F) :- !.
 nnf(F,even,n(F)).
+
+
+
+
 /* \end{verbatim}
 \index{opposite\_parity}
 \begin{verbatim} */
+
+
 opposite_parity(even,odd).
 opposite_parity(odd,even).
+
+
+
 /* \end{verbatim}
 
 \begin{example} \em
@@ -1406,13 +1498,20 @@ instruction. These commands cannot be undone by doing a retry to them;
 the compiler assertions will be undone on backtracking.
 \index{fact}
 \begin{verbatim} */
+
+
 fact F :- declare_fact(F),!.
+
+
+
 /* \end{verbatim}
 
 The $default$ declaration makes the appropriate equivalences between the
 named defaults and the unnamed defaults.
 \index{default}
 \begin{verbatim} */
+
+
 default N : H :-
    !,
    declare_default(N),
@@ -1421,12 +1520,20 @@ default N : H :-
 default N :-
    declare_default(N),
    !.
+
+
+
 /* \end{verbatim}
 \index{default}
 \begin{verbatim} */
+
+
 constraint C :-
    declare_constraint(C),
    !.
+
+
+
 /* \end{verbatim}
 The $prolog$ command says that the atom $G$ should be proven in the
 Prolog system. The argument of the $define$ statement is a Prolog
@@ -1434,13 +1541,23 @@ definition which should be asserted (N.B. that it should be in
 parentheses if it contains a ``{\tt :-}''.
 \index{prolog}
 \begin{verbatim} */
+
+
 prolog G :-
    declare_prolog(G).
+
+
+
 /* \end{verbatim}
 \index{define}
 \begin{verbatim} */
+
+
 define G :-
    prolog_cl(G).
+
+
+
 /* \end{verbatim}
 
 The $explain$ command keeps writing out all of the explanations found.
@@ -1449,6 +1566,8 @@ the next answer is found. This is done so that the computation is left in
 an appropriate state at the end of the computation.
 \index{explain}
 \begin{verbatim} */
+
+
 % :- dynamic statistics/2.
 
 explain G :-
@@ -1464,10 +1583,15 @@ explain G :-
     expl(G,[],D,A),
     writeans(G,D,A),
     fail.
+
+
+
 /* \end{verbatim}
 \index{writeans}
 \index{writedisj}
 \begin{verbatim} */
+
+
 writeans(G,D,A) :-
    format('~nAnswer is ~w', [G]),
    writedisj(A),
@@ -1478,6 +1602,9 @@ writedisj([]).
 writedisj([H|T]) :-
    writedisj(T),
    format(' or ~w',[H]).
+
+
+
 /* \end{verbatim}
 
 \subsection{Prediction}
@@ -1513,6 +1640,8 @@ and then just print the explanations needed.
 
 \index{predict}
 \begin{verbatim} */
+
+
 predict G :-
   bagof(E,expl(G,[],E,[]),Es),
   predct(G,Es). 
@@ -1524,24 +1653,37 @@ predct(G,Es) :-
       format('No, ~q is not explainable from ~q.~n',[G,S])
     ; format('Yes, ~q is in all extensions.~nExplanations are:~n',[G]),
       list_scens(1,SEs)).
+
+
+
 /* \end{verbatim}
 
 \index{find\_counter}
 \begin{verbatim} */
+
+
 find_counter([],S,S).
 find_counter([E|R],S0,S2) :-
    member(D,E),
    expl2not(D,S0,S1),
    find_counter(R,S1,S2).
+
+
+
 /* \end{verbatim}
 
 \index{list\_scens}
 \begin{verbatim} */
+
+
 list_scens(_,[]).
 list_scens(N,[H|T]) :-
    format('~q: ~q.~n',[N,H]),
    N1 is N+1,
    list_scens(N1,T).
+
+
+
 /* \end{verbatim}
 
 $expl2not(G,T0,T1)$ is true if ground $\neg G$ is explainable starting from
@@ -1549,24 +1691,36 @@ scenario $T0$, with resulting explanation $T1$. No disjunctive answers are
 formed.
 \index{expl2}
 \begin{verbatim} */
+
+
 expl2not(G,T0,T1) :-
    new_lit("ex_not_",G,[ths(T0,T,[],D),anc([],[]),ans([],[])],ExG),
    ExG,
    make_ground(D),
    check_consis(D,T,T1).
+
+
+
 /* \end{verbatim}
 
 \subsection{Simplifying Explanations}
 \index{simplify\_obs}
 \begin{verbatim} */
+
+
 simplify_expls([S],[S]).
 
 simplify_expls([H|T], S) :-
    simplify_expls(T, TS),
    mergeinto(H,TS,S).
+
+
+
 /* \end{verbatim}
 \index{mergeinto}
 \begin{verbatim} */
+
+
 mergeinto(L,[],[L]).
 
 mergeinto(L,[A|R],[A|R]) :-
@@ -1580,12 +1734,20 @@ mergeinto(L,[A|R],N) :-
 
 mergeinto(L,[A|R],[A|N]) :-
    mergeinto(L,R,N).
+
+
+
 /* \end{verbatim}
 
 \index{instance\_of}
 \begin{verbatim} */
+
+
 instance_of(D,S) :-
    remove_all(D,S,_).
+
+
+
 /* \end{verbatim}
 
 \subsection{File Handling}
@@ -1597,6 +1759,8 @@ The following is the definition of {\em thconsult}. Basicly we just
 keep reading the file and executing the commands in it until we stop.
 \index{thconsult}
 \begin{verbatim} */
+
+
 thconsult File :-
    current_input(OldFile),
    open(File,read,Input),
@@ -1604,9 +1768,14 @@ thconsult File :-
    read(T),
    read_all(T),
    set_input(OldFile).
+
+
+
 /* \end{verbatim}
 \index{read\_all}
 \begin{verbatim} */
+
+
 read_all(end_of_file) :- !.
 
 read_all(T) :-
@@ -1614,12 +1783,17 @@ read_all(T) :-
    (call(T);format('Warning: ~w failed~n',[T])),
    read(T2),
    read_all(T2).
+
+
+
 /* \end{verbatim}
 
 {\em thtrans} is like the previous version, but the generated code is written
 to a file. This code is neither loaded or compiled.
 \index{thtrans}
 \begin{verbatim} */
+
+
 thtrans File :-
    current_input(Oldinput),
    open(File,read,Input),
@@ -1638,6 +1812,9 @@ thtrans File :-
    set_input(Oldinput),
    set_output(Oldoutput),
    (reset asserting).
+
+
+
 /* \end{verbatim}
 To compile a Theorist file, you should do a,
 \begin{verse}
@@ -1650,10 +1827,15 @@ This translates the code to Prolog and then compiles the prolog code.
 which is then compiled using the Prolog compiler.
 \index{thcompile}
 \begin{verbatim} */
+
+
 thcompile File :-
    (thtrans File),
 %   no_style_check(all),
    compile(File).
+
+
+
 /* \end{verbatim}
 
 
@@ -1680,20 +1862,37 @@ The list of all flags is given by the command
 The following is the definition of these
 \index{set}
 \begin{verbatim} */
+
+
 set F,V :-
    prolog_decl((flag F,V1 :- !,V=V1)).
+
+
+
 /* \end{verbatim}
 \index{flag}
 \begin{verbatim} */
+
+
 flag _,on.
+
+
+
 /* \end{verbatim}
 \index{reset}
 \begin{verbatim} */
+
+
 reset F :-
    retract((flag F,_ :- !,_=_)).
+
+
+
 /* \end{verbatim}
 \index{flags}
 \begin{verbatim} */
+
+
 flags :- list_flags([asserting,ancestor_search,loop_check,
                      depth_bound,sound_unification,timing]).
 list_flags([]).
@@ -1701,6 +1900,9 @@ list_flags([H|T]) :-
    (flag H,V),
    format('flag ~w,~w.~n',[H,V]),
    list_flags(T).
+
+
+
 /* \end{verbatim}
 \subsection{Compiler Directives}
 There are some compiler directives which need to be added to Theorist
@@ -1720,6 +1922,8 @@ The following gives the appropriate translation.
 Essentially we then must say that the appropriate Prolog code is dynamic.
 \index{explainable}
 \begin{verbatim} */
+
+
 :- op(1150,fx,dyn).
 dyn _ :-
    (flag asserting, on),
@@ -1740,6 +1944,9 @@ dyn G :-
    PrL is NA + 2,
    format(':- dynamic ~a/~d.~n',[PrNR,PrL]),
    format(':- dynamic ~a/~d.~n',[PrR,PrL]).
+
+
+
 /* \end{verbatim}
 
 \subsection{Using the Compiled Rules}
@@ -1749,6 +1956,8 @@ The second is to be a backtrackable assert otherwise.
 \index{prolog\_cl}
 \index{flag,asserting}
 \begin{verbatim} */
+
+
 prolog_cl(C) :-
    flag((asserting,off)),
    !,
@@ -1762,11 +1971,16 @@ prolog_cl(C) :-
 prolog_cl(C) :-
    retract(C),
    fail.
+
+
+
 /* \end{verbatim}
 $prolog\_decl$ is like the above predicate, but is both
 written to the file and asserted.
 \index{prolog\_decl}
 \begin{verbatim} */
+
+
 prolog_decl(C) :-
    flag((asserting,off)),
    numbervars(C,0,_),
@@ -1779,6 +1993,9 @@ prolog_decl(C) :-
 prolog_decl(C) :-
    retract(C),
    fail.
+
+
+
 /* \end{verbatim}
 \subsection{Saving Theorist}
 The command ``save'' automagically saves the state of the Theorist code
@@ -1786,11 +2003,16 @@ as the command "theorist". This is normally done straight after compiling this
 file.
 \index{save}
 \begin{verbatim} */
+
+
 save :-
    save_program(th,
    format('~nWelcome to THEORIST 1.1.1  (4 December 89 version)
 For help type ``h.''.
 Any Problems see David Poole (poole@cs.ubc.ca)~n',[])).
+
+
+
 /* \end{verbatim}
 \section{Utility Functions}
 \subsection{List Predicates}
@@ -1805,47 +2027,74 @@ append([H|X],Y,[H|Z]) :-
 
 \index{member}
 \begin{verbatim} */
+
+
 /*
 member(A,[A|_]).
 member(A,[_|R]) :-
    member(A,R).
 */
+
+
+
 /* \end{verbatim}
 
 $id\_member(X,L)$ is true if $X$ is identical to some member of list $L$.
 \index{id\_member}
 \begin{verbatim} */
+
+
 id_member(A,[B|_]) :-
    A==B.
 id_member(A,[_|R]) :-
    id_member(A,R).
+
+
+
 /* \end{verbatim}
 
 \index{same\_length}
 \begin{verbatim} */
+
+
 same_length([],[]).
 same_length([_|L1],[_|L2]) :-
    same_length(L1,L2).
+
+
+
 /* \end{verbatim}
 
 \index{remove}
 \begin{verbatim} */
+
+
 remove(A,[A|B],B).
 remove(A,[H|T],[H|R]) :-
    remove(A,T,R).
+
+
+
 /* \end{verbatim}
 
 \index{remove\_all}
 \begin{verbatim} */
+
+
 remove_all([],L,L).
 remove_all([H|T],L,L2) :-
    remove(H,L,L1),
    remove_all(T,L1,L2).
+
+
+
 /* \end{verbatim}
 
 \subsection{Looking at Terms}
 \index{variable\_free}
 \begin{verbatim} */
+
+
 variable_free(X) :-
    atomic(X),
    !.
@@ -1860,10 +2109,15 @@ variable_free([H|T]) :-
 variable_free(X) :-
    X =.. Y,
    variable_free(Y).
+
+
+
 /* \end{verbatim}
 
 \index{make\_ground}
 \begin{verbatim} */
+
+
 make_ground(X) :-
    retract(groundseed(N)),
    numbervars(X,N,NN),
@@ -1872,18 +2126,28 @@ make_ground(X) :-
 :- dynamic groundseed/1.
 groundseed(26).
 
+
+
+
 /* \end{verbatim}
 
 \index{reverse}
 \begin{verbatim} */
+
+
 reverse([],T,T).
 reverse([H|T],A,B) :-
    reverse(T,A,[H|B]).
+
+
+
 /* \end{verbatim}
 
 \subsection{Help Commands}
 \index{h}
 \begin{verbatim} */
+
+
 (h) :- format('This is Theorist 1.1 (all complaints to David Poole)
 For more details issue the command:
    h H.
@@ -1893,6 +2157,9 @@ where H is one of:~n',[]),
 (h H) :- !,
    add_prefix("more /faculty/poole/theorist/help/",H,Cmd),
    unix(system(Cmd)).
+
+
+
 
 /* \end{verbatim}
 

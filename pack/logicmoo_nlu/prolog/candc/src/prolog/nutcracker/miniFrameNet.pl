@@ -2,15 +2,15 @@
 :- module(miniFrameNet,[axiomsFN/2]).
 
 :- use_module(library(lists),[member/2,append/3]).
-:- use_module(semlib(options),[candc_option/2]).
+:- use_module(semlib(options),[option/2]).
 
 
 /* ------------------------------------------------------------------------
    Main Predicate
--- */
+------------------------------------------------------------------------ */
 
 axiomsFN(DRS,Axioms):- 
-   candc_option('--roles',framenet),
+   option('--roles',framenet),
    framenetfile(File),
    exists_file(File), !,
    findFrames(DRS,[]-Frames), 
@@ -21,14 +21,14 @@ axiomsFN(_,[]).
 
 /* ------------------------------------------------------------------------
    File with Framenet Axioms
--- */
+------------------------------------------------------------------------ */
 
 framenetfile('working/framenet/framenet.pl').
 
 
 /* ------------------------------------------------------------------------
    Find Frames in DRS
--- */
+------------------------------------------------------------------------ */
 
 findFrames(drs(_,C),F1-F2):- !, findFrames(C,F1-F2).
 findFrames(smerge(A,B),F1-F3):- !, findFrames(A,F1-F2), findFrames(B,F2-F3).
@@ -50,7 +50,7 @@ findFrames([_|C],F1-F2):- findFrames(C,F1-F2).
 
 /* ------------------------------------------------------------------------
    Select Axioms
--- */
+------------------------------------------------------------------------ */
 
 selectAxioms([],[]).
 
@@ -64,7 +64,7 @@ selectAxioms([F|L],Axioms):-
 
 /* ------------------------------------------------------------------------
    Load FrameNet
--- */
+------------------------------------------------------------------------ */
 
 loadFN:-
    framenetfile(File),

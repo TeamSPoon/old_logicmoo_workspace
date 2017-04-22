@@ -7,7 +7,8 @@ inizio :- backinit, set, generic_class, int, ruoli_soc, persone, oggetti, luoghi
 
 
 /* DEFINIZIONE DEGLI INSIEMI */
-set :- nomi_propri := aset([john,mary]),
+set :- 
+   nomi_propri := aset([john,mary]),
        masfem      := aset([maschio,femmina]),
        pol         := 0..1,
        special     := aset([in,on,under,near]).
@@ -121,51 +122,40 @@ fatto :- fact(_,isa,[arg:X,arg:ev],1,A,B),
 	X :: ev and time:A and locazione:B.
 
 
-fatto :- fact(_,isa,[arg:X,arg:pr],1,A,_),
-	X :: pr and time:A.
+fatto :- fact(_,isa,[arg:X,arg:pr],1,A,_),	X :: pr and time:A.
 
 
-fatto :- fact(_,isa,[arg:X,arg:tloc],1,_,_),
-	X :: tempo.
+fatto :- fact(_,isa,[arg:X,arg:tloc],1,_,_), X :: tempo.
 
 
-fatto :- fact(_,isa,[arg:X,arg:st],1,A,_),	
-	X :: st and time:A.		        
+fatto :- fact(_,isa,[arg:X,arg:st],1,A,_), X :: st and time:A.		        
 												
 
-fatto :- fact(_,isa,[arg:X,arg:Y],1,A,B),
-	X :: Y and time:A and locazione:B.
+fatto :- fact(_,isa,[arg:X,arg:Y],1,A,B), 	X :: Y and time:A and locazione:B.
 
 
 /******************************************************************************/
 
 
-fatto :- fact(X,go,[agente:Z,locat:A],1,B,_),   
-	X :: go and agente:Z and locazione:A and time:B.
+fatto :- fact(X,go,[agente:Z,locat:A],1,B,_),   	X :: go and agente:Z and locazione:A and time:B.
 
 
-fatto :- fact(X,there_be,[tema_nonaff:Z],1,B,_),    
-	X :: there_be and tema_nonaff:Z and time:B. 
+fatto :- fact(X,there_be,[tema_nonaff:Z],1,B,_),    	X :: there_be and tema_nonaff:Z and time:B. 
 
 
-fatto :- fact(X,take_order,[actor:Z,goal:A],1,B,_),	
-	X :: take_order and agente:Z and goal:A and time:B. 
+fatto :- fact(X,take_order,[actor:Z,goal:A],1,B,_),		X :: take_order and agente:Z and goal:A and time:B. 
 
 
-fatto :- fact(X,read,[agente:Z,tema_aff:A],1,B,_),    
-	X :: read and agente:Z and tema_aff:A and time:B.
+fatto :- fact(X,read,[agente:Z,tema_aff:A],1,B,_),    	X :: read and agente:Z and tema_aff:A and time:B.
 
 
-fatto :- fact(X,begin,[agente:Z,prop:A],1,B,_),	
-	X :: begin and agente:Z and prop:A and time:B.
+fatto :- fact(X,begin,[agente:Z,prop:A],1,B,_),		X :: begin and agente:Z and prop:A and time:B.
 
 
-fatto :- fact(_,X,[arg:Y,poss:Z],1,B,_),	
-	X :: have and agente:Z and tema_aff:Y and time:B.
+fatto :- fact(_,X,[arg:Y,poss:Z],1,B,_),		X :: have and agente:Z and tema_aff:Y and time:B.
 
 
-fatto :- fact(_,X,[arg:Y,locativo:Z],1,A,B),	
-	Y :: thing and spec:X and locaz:Z and time:A and locazione:B.
+fatto :- fact(_,X,[arg:Y,locativo:Z],1,A,B),		Y :: thing and spec:X and locaz:Z and time:A and locazione:B.
 
 
 
@@ -195,6 +185,7 @@ fatto :- fact(_,X,[arg:Y,locativo:Z],1,A,B),
    infon27 = there_in
    infon77 = have 
 */
+
 
 
 /*INTERROGAZIONI***************************************************************/

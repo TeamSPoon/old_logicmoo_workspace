@@ -1,8 +1,9 @@
-:- op(0,xfy,(.)).
-:- op(600,xfx,(.)).
-% system:term_expansion('$dicts':'.'(H,T,DOT),DOT=..['.',H,T]). 
+:- op(624,xfy,(.)).
+%:- op(0,xfy,(.)).
+:- op(624,xfx,(.)).
 
-'$dicts':'.'(H,T,DOT):- DOT=..['.',H,T].
+% system:term_expansion('$dicts':'.'(H,T,DOT),DOT=..['.',H,T]). 
+% '$dicts':'.'(H,T,DOT):- DOT=..['.',H,T].
 
 
 %% Testfaelle fuer TBox-ABox-Revision

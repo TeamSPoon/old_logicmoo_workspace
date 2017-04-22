@@ -3,12 +3,12 @@
 
 :- use_module(library(lists),[select/3,member/2]).
 :- use_module(semlib(errors),[warning/2]).
-:- use_module(semlib(options),[candc_option/2]).
+:- use_module(semlib(options),[option/2]).
 
 
 /* ========================================================================
    Main Predicate
-*/
+======================================================================== */
 
 drs2tac(DRS,Tags,N,TAC):- 
    drs2tac(DRS,Tags,[],TAC0,N-_,_),
@@ -17,7 +17,7 @@ drs2tac(DRS,Tags,N,TAC):-
 
 /* ========================================================================
    Replacing equality statements
-*/
+======================================================================== */
 
 replace(TAC1,TAC4):-
    select(replace(Old,New),TAC1,TAC2), !,
@@ -46,7 +46,7 @@ replace([Term1|L1],Old,New,[Term2|L2]):-
 
 /* ========================================================================
    Label
-*/
+======================================================================== */
 
 label(X,Label,Var,Y):-
    var(Var), number(X),
@@ -60,7 +60,7 @@ label(X,_,_,X).
 
 /* ========================================================================
    Translate DRSs into TACITUS formulas 
-*/
+======================================================================== */
 
 drs2tac(alfa(_,B1,B2),P,T1,T2,N,H):- !, 
    drs2tac(merge(B1,B2),P,T1,T2,N,H).
@@ -89,7 +89,7 @@ drs2tac(sub(B1,B2),P,T1,T3,N1-N3,H):-
 
 /* ========================================================================
    Translate DRS-Conditions into TACITUS formulas (wrapper)
-*/
+======================================================================== */
 
 conds2tac(Conds,P,T1,T2,N,Head):- 
    roles(Conds,Roles,NewConds),   
@@ -98,7 +98,7 @@ conds2tac(Conds,P,T1,T2,N,Head):-
 
 /* ========================================================================
    Translate DRS-Conditions into TACITUS formulas 
-*/
+======================================================================== */
   
 conds2tac([],_,_,T1,T2,N-N,Heads,Head):- !,
    adjustMods(Heads,T1,T2),
@@ -111,7 +111,10 @@ conds2tac([Cond|L],P,Roles,T1,T3,N1-N3,Heads,Head):-
 
 /* ========================================================================
    Make a guess as to what the head of a list of DRS-conditions is...
-*/
+======================================================================== */
+
+pickHead(Heads,Event):- 
+   member(closing:_:Event,Heads), !.
 
 pickHead(Heads,Event):- 
    member(event:[I]:Event,Heads),
@@ -124,7 +127,7 @@ pickHead(_,_).
 
 /* ========================================================================
    Adjust modifier modifiers...
-*/
+======================================================================== */
 
 adjustMods(Heads,T1,T3):-
    select(mod:[P1]:E1,Heads,Rest),
@@ -140,16 +143,16 @@ adjustMods(_,T,T).
 
 /* ========================================================================
    Separate roles from other DRS-conditions
-*/
+======================================================================== */
 
 roles([],[],[]).
-roles([_:R|L1],[R|Roles],L2):- R = rel(_,_,Role,_), member(Role,[topic,agent,patient,theme,recipient]), !, roles(L1,Roles,L2).
+roles([_:R|L1],[R|Roles],L2):- R = rel(_,_,Role,_), member(Role,[experiencer,topic,agent,patient,theme,recipient]), !, roles(L1,Roles,L2).
 roles([Cond|L1],Roles,[Cond|L2]):- roles(L1,Roles,L2).
 
 
 /* ========================================================================
    Translate a DRS-Condition into TACITUS formulas 
-*/
+======================================================================== */
 
 cond2tac(I:nec(Drs),P,_,T1,[I:nec(E1,E2)|T2],N1-N3,complex:I:E1):- !,
    label(N1,e,E1,N2), 
@@ -205,6 +208,8 @@ cond2tac(I:timex(X,D1),_,_,T,[I:F|T],N1-N2,timex:I:E):-
 cond2tac(I:eq(X,Y),_,_,T,[I:equal(E,X,Y)|T],N1-N2,equal:I:E):- !,
    label(N1,e,E,N2).      
 
+cond2tac(I:pred(X,closing,v,99),_,_,T,T,N-N,closing:I:X):- !.
+
 cond2tac(I:pred(X,S1,r,_),L,_,T,[I:F|T],N1-N2,mod:I:E):- !,
    pos(I,L,Pos),
    label(N1,e,E,N2),      
@@ -259,7 +264,7 @@ cond2tac(I:X,_,_,T,T,N-N,unknown:I:_):-
 
 /* ========================================================================
    Add roles as arguments
-*/
+======================================================================== */
 
 addRoles([],_,F,N1-N4):- 
    F =.. [_,_,A1,A2,A3], !,
@@ -275,24 +280,24 @@ addRoles([rel(E,X,agent,0)|L],E,F,N):-
    F =.. [_,E,X,_,_], !,
    addRoles(L,E,F,N).
 
-addRoles([rel(E,X,topic,0)|L],E,F,N):-
-   F =.. [_,E,X,_,_], !,
-   addRoles(L,E,F,N).
-
 addRoles([rel(E,X,patient,0)|L],E,F,N):-
    F =.. [_,E,_,X,_], !,
    addRoles(L,E,F,N).
 
-addRoles([rel(E,X,theme,0)|L],E,F,N):-
+addRoles([rel(E,X,recipient,0)|L],E,F,N):-
    F =.. [_,E,_,X,_], !,
    addRoles(L,E,F,N).
 
-addRoles([rel(E,X,recipient,0)|L],E,F,N):-
+addRoles([rel(E,X,topic,0)|L],E,F,N):-
+   F =.. [_,E,_,_,X], !,
+   addRoles(L,E,F,N).
+
+addRoles([rel(E,X,theme,0)|L],E,F,N):-
    F =.. [_,E,_,_,X], !,
    addRoles(L,E,F,N).
 
 addRoles([rel(E,X,Role,0)|L],E,F,N):-
-   member(Role,[topic,agent,patient,theme,recipient]),
+   member(Role,[experiencer,topic,agent,patient,theme,recipient]),
    F =.. [_,E,X], !,
    addRoles(L,E,F,N).
 
@@ -302,7 +307,7 @@ addRoles([_|L],E,F,N):-
 
 /*========================================================================
    Time Expressions
-*/
+========================================================================*/
 
 timex(date(_:_,_:Y,_:M,_:D),Timex):- !,
    timex(date(Y,M,D),Timex).
@@ -328,7 +333,7 @@ timex(time(H,M,S),Timex):-
 
 /* ========================================================================
    Time Expressions (year)
-*/
+======================================================================== */
 
 year(Y,C):- var(Y), !, name('XXXX',C).
 year(Y,C):- name(Y,C).
@@ -336,7 +341,7 @@ year(Y,C):- name(Y,C).
 
 /* ========================================================================
    Time Expressions (month)
-*/
+======================================================================== */
 
 month(Y,C):- var(Y), !, name('XX',C).
 month(Y,C):- name(Y,C).
@@ -344,7 +349,7 @@ month(Y,C):- name(Y,C).
 
 /* ========================================================================
    Time Expressions (day)
-*/
+======================================================================== */
 
 day(Y,C):- var(Y), !, name('XX',C).
 day(Y,C):- name(Y,C).
@@ -352,7 +357,7 @@ day(Y,C):- name(Y,C).
 
 /* ========================================================================
    Time Expressions (other)
-*/
+======================================================================== */
 
 hour(A,C):- day(A,C).
 minute(A,C):- day(A,C).
@@ -361,7 +366,7 @@ second(A,C):- day(A,C).
 
 /* ========================================================================
    Determine POS
-*/
+======================================================================== */
 
 pos(Is,T,POS):-
    member(I,Is),
@@ -374,7 +379,7 @@ pos(_,_,'').
 
 /* ========================================================================
    Map POS tags
-*/
+======================================================================== */
 
 mappos('NN',  '-n').
 mappos('NNS', '-n').
@@ -405,7 +410,7 @@ mappos('RP',  '-r').
 
 /* ========================================================================
    Print TACITUS formula
-*/
+======================================================================== */
 
 printTAC([],Stream):- !, nl(Stream).
 printTAC([X],Stream):- !, write(Stream,X), nl(Stream).

@@ -5,7 +5,7 @@
 
 /* ========================================================================
    Bound Variable Check (main predicate)
-*/
+======================================================================== */
 
 boundVarCheckContext(Context,ADRS):-
    \+ \+ ( numbervars(Context,0,_),
@@ -14,7 +14,7 @@ boundVarCheckContext(Context,ADRS):-
 
 /* ========================================================================
    Bound Variable Check (traversing lists of DRSs, last one most global)
-*/
+======================================================================== */
 
 boundVarDrs([K1:drs(D1,_),K2:B2|L],D2,S,ADRS):- !,
    append(D1,D2,D3), 
@@ -35,7 +35,7 @@ boundVarDrs([X],_,_,_):- !,
 
 /* ========================================================================
    Adding free pointers to subordination constraints
-*/
+======================================================================== */
 
 freePointers([],_,S,S):- !.
 freePointers([X:_:_|L],K,S1,S2):- member(sub(X,_),S1), !, freePointers(L,K,S1,S2).
@@ -46,7 +46,7 @@ freePointers([_:_:_|L],K,S1,S2):- freePointers(L,K,S1,S2).
 
 /* ========================================================================
    A variable is bound if it is not free
-*/
+======================================================================== */
 
 bound(Dom,Sub,ADRS):- \+ free(Dom,Sub,ADRS).
 
@@ -54,7 +54,7 @@ bound(Dom,Sub,ADRS):- \+ free(Dom,Sub,ADRS).
 /* ========================================================================
    A variable is free if there is a condition with a variable that is not
    in the domain of a super-ordinated DRS
-*/
+======================================================================== */
 
 free(Dom,Sub,_:drs(_,Conds)):- 
    member(L2:_:Cond,Conds),
@@ -64,7 +64,7 @@ free(Dom,Sub,_:drs(_,Conds)):-
 
 /* ========================================================================
    Subordination
-*/
+======================================================================== */
 
 subordinates(L1,L2,_):- L1=L2.
 subordinates(L1,L2,S):- member(sub(L1,L2),S).
@@ -73,7 +73,7 @@ subordinates(L1,L2,S):- member(sub(L1,L3),S), subordinates(L3,L2,S).
 
 /* ========================================================================
    Basic Conditions
-*/
+======================================================================== */
 
 drsCondition(X,pred(X,_,_,_)).
 drsCondition(X,named(X,_,_,_)).
@@ -89,7 +89,7 @@ drsCondition(X,role(_,X,_,_)).
 
 /*========================================================================
    Free Variable Check (main predicate)
-*/
+========================================================================*/
 
 freeVarCheckDrs(Drs):-
    freeVarCheckDrs(Drs,[]-_).
@@ -97,7 +97,7 @@ freeVarCheckDrs(Drs):-
 
 /*========================================================================
    Free Variable Check (DRSs)
-*/
+========================================================================*/
 
 freeVarCheckDrs([],L-L):- !.
 
@@ -137,7 +137,7 @@ freeVarCheckDrs(alfa(_,B1,B2),L1-L3):- !,
 
 /*========================================================================
    Free Variable Check (List of conditions)
-*/
+========================================================================*/
 
 freeVarCheckConds([],_):- !.
 
@@ -148,7 +148,7 @@ freeVarCheckConds([_:_:X|C],L):-
 
 /*========================================================================
    Free Variable Check (Conditions)
-*/
+========================================================================*/
 
 freeVarCheckCond(not(B),L):- !,
    freeVarCheckDrs(B,L-_).
@@ -203,7 +203,7 @@ freeVarCheckCond(eq(Arg1,Arg2),L):- !,
 
 /*========================================================================
    Check Term
-*/
+========================================================================*/
 
 checkTerm(X,L):- var(X), member(Y,L), X==Y, !.
 checkTerm(X,_):- atomic(X), !.

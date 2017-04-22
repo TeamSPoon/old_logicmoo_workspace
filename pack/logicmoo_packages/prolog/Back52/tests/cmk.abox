@@ -1,5 +1,3 @@
-:- op(0,xfy,(.)).
-:- op(999,xfy,(.)).
 
 cmktest :-
 	write('*** TEST FILE: cmk.abox'), nl,
@@ -22,7 +20,6 @@ cmkInit :-
 	     cmk_success(cmkinit)
 	;    cmk_fail(cmkinit)).
 
-cmkinit :- skip_dots,!.
 cmkinit :-
 	backinit,
 	backstate(verbosity = warning),

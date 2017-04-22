@@ -1,1 +1,4 @@
-ERROR: Modality (can/must/should/may) cannot be applied to complex structures.
+ERROR: Invalid ACE text:
+The word "file" is unknown.
+"John can access every <> file.": This is the first sentence that was not ACE. The sign <> indicates the position where parsing failed.
+

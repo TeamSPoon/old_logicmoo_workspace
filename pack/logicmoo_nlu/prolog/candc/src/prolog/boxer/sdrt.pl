@@ -6,7 +6,7 @@
 
 /* =========================================================================
    Subordinate SDRT relations
- */
+========================================================================= */
 
 subordinate(elaboration).
 subordinate(instance).
@@ -19,7 +19,7 @@ subordinate(correction).
 
 /* =========================================================================
    Coordinate SDRT relations
- */
+========================================================================= */
 
 coordinate(continuation).
 coordinate(narration).
@@ -29,7 +29,7 @@ coordinate(result).
 
 /* =========================================================================
    Insert DRS into SDRS
- */
+========================================================================= */
 
 mergeSDRS(smerge(S1,S2,Rel,_Pops),S3):-
    subordinate(Rel), !,
@@ -38,11 +38,11 @@ mergeSDRS(smerge(S1,S2,Rel,_Pops),S3):-
 mergeSDRS(smerge(S1,S2,Rel,_Pops),S3):-
    coordinate(Rel), !,
    cooDRS(S1,Rel,S2,S3).
-  
+
 
 /* =========================================================================
    Insert subordinate DRS into SDRS
- */
+========================================================================= */
 
 % DRS + (S)DRS
 %
@@ -68,7 +68,7 @@ subDRS(sdrs([X|L1],R1),Rel,New,sdrs([X|L2],R2)):-
 
 /* =========================================================================
    Insert coordinate DRS into SDRS
- */
+========================================================================= */
 
 % Make SDRSs of both DRSs (if needed)
 %
@@ -113,7 +113,6 @@ cooDRS(sdrs([lab(K1,B1)],R1),Rel,sdrs([sub(lab(K2,B2),B4)|L],R2),SDRS):- !,
 %
 cooDRS(sdrs([X|L1],R1),Rel,New,sdrs([X|L2],R2)):- !,
    cooDRS(sdrs(L1,R1),Rel,New,sdrs(L2,R2)).
-
 
 
 

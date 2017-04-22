@@ -3,20 +3,20 @@
 
 /*========================================================================
     Load Modules
-*/
+========================================================================*/
 
-:- use_module(semlib(options),[candc_option/2]).
+:- use_module(semlib(options),[option/2]).
 
 
 /* =======================================================================
    Get Background Knowledge (Counting)
-*/
+========================================================================*/
 
 countingAxioms(F,F):-
-   candc_option('--plural',false), !.
+   option('--plural',false), !.
 
 countingAxioms(F,BK):-
-   candc_option('--plural',true), !,
+   option('--plural',true), !,
 
    BK = [A0,A1,A2,A3,A4,A5,A6,A7,A8|F],
 

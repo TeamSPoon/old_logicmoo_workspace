@@ -4,11 +4,12 @@
 :- use_module(boxer(alphaConversionDRT),[alphaConvertDRS/2]).
 :- use_module(boxer(mergeDRT),[mergeDrs/2]).
 :- use_module(semlib(errors),[warning/2]).
+:- use_module(semlib(options),[option/2]).
 
 
 /* ========================================================================
    Beta-Conversion (introducing stack)
-*/
+======================================================================== */
 
 betaConvert(X,Y):- betaConvert(X,Y,[]), !.
 
@@ -17,7 +18,7 @@ betaConvert(X,X):- warning('beta-conversion failed for ~p',[X]).
 
 /* ========================================================================
    Beta-Conversion (core stuff)
-*/
+======================================================================== */
 
 betaConvert(X,Y,[]):- var(X), !, Y=X.
 
@@ -54,6 +55,12 @@ betaConvert(sub(B1,B3),sub(B2,B4),[]):- !,
    betaConvert(B1,B2),
    betaConvert(B3,B4).
 
+betaConvert(B1:drs(D1,C1),B1:drs(D2,C3),[]):- 
+   option('--elimeq',true),
+   select(_:[]:eq(X1,Y1),C1,C2),
+   select(B2:[]:Y2,D1,D2), B1==B2, Y1==Y2, !, X1=Y1,
+   betaConvertConditions(C2,C3).
+
 betaConvert(B:drs(D,C1),B:drs(D,C2),[]):- !, 
    betaConvertConditions(C1,C2).
 
@@ -72,7 +79,7 @@ betaConvert(X,Y,L):- !,
 
 /* ========================================================================
    Beta-Convert DRS Conditions
-*/
+======================================================================== */
 
 betaConvertConditions([],[]).
 
@@ -83,7 +90,7 @@ betaConvertConditions([B:I:C1|L1],[B:I:C2|L2]):- !,
 
 /* ========================================================================
    Beta-Convert DRS Condition
-*/
+======================================================================== */
 
 betaConvertCond(not(A1),not(B1)):- !, betaConvert(A1,B1).
 betaConvertCond(pos(A1),pos(B1)):- !, betaConvert(A1,B1).
@@ -97,7 +104,7 @@ betaConvertCond(C,C).
 
 /* ========================================================================
    Wrapping arguments from stack
-*/
+======================================================================== */
 
 wrapArguments([],X,X).
 

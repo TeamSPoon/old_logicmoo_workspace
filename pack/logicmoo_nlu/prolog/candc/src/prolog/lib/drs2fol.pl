@@ -2,26 +2,26 @@
 :- module(drs2fol,[drs2fol/2,symbol/4,timex/2]).
 
 :- use_module(semlib(errors),[warning/2]).
-:- use_module(semlib(options),[candc_option/2]).
+:- use_module(semlib(options),[option/2]).
 :- use_module(library(lists),[append/3]).
 
 
 /* ========================================================================
     Main Predicate
-*/
+======================================================================== */
 
 drs2fol(B,some(W,and(possible_world(W),F))):-
-   candc_option('--modal',true), !,
+   option('--modal',true), !,
    drsfol(B,W,F).
 
 drs2fol(B,F):-
-   candc_option('--modal',false), !,
+   option('--modal',false), !,
    drsfol(B,F).
 
 
 /* ========================================================================
    Translate DRSs into FOL formulas 
-*/
+======================================================================== */
 
 drsfol(lab(_,B),Form):- !, drsfol(B,Form).
 
@@ -43,11 +43,11 @@ drsfol(drs([Indexed|Referents],Conds),Formula):-
    drsfol(drs([Var|Referents],Conds),Formula).
 
 drsfol(drs([X|Referents],Conds),some(X,and(some(Y,member(Y,X)),Formula))):- 
-   candc_option('--plural',true), !,
+   option('--plural',true), !,
    drsfol(drs(Referents,Conds),Formula).
 
 drsfol(drs([X|Referents],Conds),some(X,Formula)):-
-   candc_option('--plural',false), !,
+   option('--plural',false), !,
    drsfol(drs(Referents,Conds),Formula).
 
 drsfol(merge(B1,B2),Formula):- !, 
@@ -59,7 +59,7 @@ drsfol(X,_):-
 
 /* ========================================================================
    Translate DRSs into FOL formulas (Modal translation)
-*/
+======================================================================== */
 
 drsfol(lab(_,B),W,Form):- !, drsfol(B,W,Form).
 
@@ -95,7 +95,7 @@ drsfol(X,_,_):-
 
    This is to ensure that discourse referents in the LHS of a merge
    bind occurrences of DRSs in the RHS of a merge. 
-*/
+======================================================================== */
 
 drsfolGap(sdrs([B],_),F):- !, drsfolGap(B,F).
 
@@ -115,17 +115,17 @@ drsfolGap(drs([Indexed|Refs],Conds),F):-
    drsfolGap(drs([Ref|Refs],Conds),F).
 
 drsfolGap(drs([X],[]),Gap^some(X,and(some(Y,member(Y,X)),Gap))):-  
-   candc_option('--plural',true), !.
+   option('--plural',true), !.
 
 drsfolGap(drs([X|Dom],Conds),Gap^some(X,and(some(Y,member(Y,X)),F))):-  
-   candc_option('--plural',true), !,
+   option('--plural',true), !,
    drsfolGap(drs(Dom,Conds),Gap^F).
 
 drsfolGap(drs([X],[]),Gap^some(X,Gap)):-
-   candc_option('--plural',false), !.
+   option('--plural',false), !.
 
 drsfolGap(drs([X|Dom],Conds),Gap^some(X,F)):- 
-   candc_option('--plural',false), !,
+   option('--plural',false), !,
    drsfolGap(drs(Dom,Conds),Gap^F).
 
 drsfolGap(drs([],Conds),Gap^and(F,Gap)):- !,
@@ -140,7 +140,7 @@ drsfolGap(X,_):-
 
    This is to ensure that discourse referents in the LHS of a merge
    bind occurrences of DRSs in the RHS of a merge. 
-*/
+======================================================================== */
 
 drsfolGap(sdrs([B],_),W,F):- !, drsfolGap(B,W,F).
 
@@ -173,7 +173,7 @@ drsfolGap(X,_,_):-
 
 /* ========================================================================
    Translate DRS-Conditions into FOL formulas 
-*/
+======================================================================== */
 
 cond2fol(_:C,F):- !,
    cond2fol(C,F).
@@ -215,11 +215,11 @@ cond2fol(duplex(_,Drs1,_,Drs2),F):- !,
 cond2fol(imp(B1,B2),Formula):- !,
    cond2fol(not(merge(B1,drs([],[not(B2)]))),Formula).
 
-cond2fol(card(X,1,eq),one(X)):- candc_option('--plural',true), !.
+cond2fol(card(X,1,eq),one(X)):- option('--plural',true), !.
 
-cond2fol(card(X,2,eq),two(X)):- candc_option('--plural',true), !.
+cond2fol(card(X,2,eq),two(X)):- option('--plural',true), !.
 
-cond2fol(card(X,3,eq),three(X)):- candc_option('--plural',true), !.
+cond2fol(card(X,3,eq),three(X)):- option('--plural',true), !.
 
 cond2fol(card(X,C,_),some(Y,and(card(X,Y),and(F1,F2)))):-
    integer(C), C > 0,
@@ -245,22 +245,22 @@ cond2fol(eq(X),eq(X,X)):- !.
 cond2fol(eq(X,Y),eq(X,Y)):- !.
 
 cond2fol(pred(X,Sym1,Type,Sense),all(Y,imp(member(Y,X),F))):- 
-   candc_option('--plural',true), 
+   option('--plural',true), 
    symbol(Type,Sym1,Sense,Sym2), !,
    F=..[Sym2,Y].
 
 cond2fol(pred(X,Sym1,Type,Sense),F):- 
-   candc_option('--plural',false),
+   option('--plural',false),
    symbol(Type,Sym1,Sense,Sym2), !,
    F=..[Sym2,X].
 
 cond2fol(rel(X,Y,Sym1,Sense),all(A,imp(member(A,X),all(B,imp(member(B,Y),F))))):- 
-   candc_option('--plural',true), 
+   option('--plural',true), 
    symbol(r,Sym1,Sense,Sym2), !,
    F=..[Sym2,A,B].
 
 cond2fol(rel(X,Y,Sym1,Sense),F):- 
-   candc_option('--plural',false), 
+   option('--plural',false), 
    symbol(r,Sym1,Sense,Sym2), !,
    F=..[Sym2,X,Y].
 
@@ -278,7 +278,7 @@ cond2fol(X,_):-
 
 /*========================================================================
    Translate DRS-Conditions into FOL formulas (modal translation)
-*/
+========================================================================*/
 
 cond2fol(_:C,W,F):- !,
    cond2fol(C,W,F).
@@ -353,7 +353,7 @@ cond2fol(X,_,_):-
 
 /* ========================================================================
    Normalising Symbols
-*/
+======================================================================== */
 
 symbol(t,D,_Sense,F):- !, timex(D,F).
 
@@ -373,7 +373,7 @@ symbol(Type,F1,Sense,F2):-
 
 /* ========================================================================
    Max Length Symbol (for mace, and other theorem provers)
-*/
+======================================================================== */
 
 maxLen(In,Out):-
    In =  [A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,B1,B2,B3,B4,B5,B6,B7,B8,B9,B0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C0,D1,_|_], !,
@@ -387,7 +387,7 @@ maxLen(L,L).
 
 /* ========================================================================
    Normalising Symbols
-*/
+======================================================================== */
 
 normSymbol([],[]):- !.
 
@@ -407,7 +407,7 @@ normSymbol([X|L1],L3):-
 
 /* ========================================================================
    Time Expressions
-*/
+======================================================================== */
 
 timex(date(_:_,_:Y,_:M,_:D),Timex):- !,
    timex(date(Y,M,D),Timex).
@@ -433,7 +433,7 @@ timex(time(H,M,S),Timex):-
 
 /* ========================================================================
    Time Expressions (year)
-*/
+======================================================================== */
 
 year(Y,C):- variable(Y), !, name('XXXX',C).
 year(Y,C):- name(Y,C).
@@ -441,7 +441,7 @@ year(Y,C):- name(Y,C).
 
 /* ========================================================================
    Time Expressions (month)
-*/
+======================================================================== */
 
 month(Y,C):- variable(Y), !, name('XX',C).
 month(Y,C):- name(Y,C).
@@ -449,7 +449,7 @@ month(Y,C):- name(Y,C).
 
 /* ========================================================================
    Time Expressions (day)
-*/
+======================================================================== */
 
 day(Y,C):- variable(Y), !, name('XX',C).
 day(Y,C):- name(Y,C).
@@ -457,7 +457,7 @@ day(Y,C):- name(Y,C).
 
 /* ========================================================================
    Time Expressions (other)
-*/
+======================================================================== */
 
 hour(A,C):- day(A,C).
 minute(A,C):- day(A,C).
@@ -466,7 +466,7 @@ second(A,C):- day(A,C).
 
 /* ========================================================================
    Variable
-*/
+======================================================================== */
 
 variable(X):- var(X), !.
 variable(X):- functor(X,'$VAR',1), !.

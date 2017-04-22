@@ -12,7 +12,7 @@
 
 /* ========================================================================
    Select TPTP syntax style (default: New style)
-*/
+======================================================================== */
 
 fol2tptp(Conjecture,Stream):- fol2tptpNew(Conjecture,Stream).
 fol2tptp(Axioms,Conjecture,Stream):- fol2tptpNew(Axioms,Conjecture,Stream).
@@ -20,7 +20,7 @@ fol2tptp(Axioms,Conjecture,Stream):- fol2tptpNew(Axioms,Conjecture,Stream).
 
 /* ========================================================================
    Translates formula to TPTP syntax on Stream (new style TPTP)
-*/
+======================================================================== */
 
 fol2tptpNew(Formula,Stream):- 
    write(Stream,'fof(nutcracker,conjecture,'),
@@ -31,7 +31,7 @@ fol2tptpNew(Formula,Stream):-
 
 /* ========================================================================
    Translates axioms+formula to TPTP syntax on Stream (new style TPTP)
-*/
+======================================================================== */
 
 fol2tptpNew([],Formula,Stream):- !,
    fol2tptpNew(Formula,Stream).
@@ -45,7 +45,7 @@ fol2tptpNew([Axiom|L],Formula,Stream):-
 
 /* ========================================================================
    Translates formula to TPTP syntax on Stream (old style TPTP)
-*/
+======================================================================== */
 
 fol2tptpOld(Formula,Stream):-
    write(Stream,'input_formula(nutcracker,conjecture,'),
@@ -56,7 +56,7 @@ fol2tptpOld(Formula,Stream):-
 
 /* ========================================================================
    Translates axioms+formula to TPTP syntax on Stream (old style TPTP)
-*/
+======================================================================== */
 
 fol2tptpOld([],Formula,Stream):- !,
    fol2tptpOld(Formula,Stream).
@@ -70,7 +70,7 @@ fol2tptpOld([Axiom|L],Formula,Stream):-
 
 /* ========================================================================
    Print TPTP formulas
-*/
+======================================================================== */
 
 printTPTP(some(X,Formula),Stream):- !,
    write(Stream,'(? ['),
@@ -132,7 +132,7 @@ printTPTP(Pred,Stream):-
 
 /* ========================================================================
    Print arguments
-*/
+======================================================================== */
 
 printArgs([X],Stream):- !,
    printArg(Stream,X).
@@ -145,7 +145,7 @@ printArgs([X|L],Stream):-
 
 /* ========================================================================
    Print argument
-*/
+======================================================================== */
 
 printArg(Stream,X):- 
    functor(X,'$VAR',1), !,

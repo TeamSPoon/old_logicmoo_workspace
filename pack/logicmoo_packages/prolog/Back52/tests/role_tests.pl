@@ -1,7 +1,3 @@
-:- op(0,xfy,(.)).
-:- op(999,xfy,(.)).
-
-skip_dots.
 
 roletest :-
 	write('*** TEST FILE: role_tests.pl'), nl,
@@ -64,8 +60,7 @@ rottest(2) :-
 	write('+++ role tbox test 2 succeeded'),
 	nl,
 	!.
-rottest(3) :-  skip_dots,!.
-rottest(3) :- 
+rottest(3) :-
 	r0_comp_r1 := r0.r1,
 	r1_comp_r0 := r1.r0,
 	r0_comp_r1_comp_r1_comp_r0 := r0_comp_r1.r1_comp_r0,
@@ -77,7 +72,6 @@ rottest(3) :-
 	write('+++ role tbox test 3 succeeded'),
 	nl,
 	!.
-rottest(4) :-  skip_dots,!.
 rottest(4) :-
 	inv_r5_comp_inv_r5 := inv_r5.inv_r5,
 	inv_r5_comp_r5 := inv(r5_comp_r5),
@@ -91,7 +85,6 @@ rottest(4) :-
 	nl,
 	!.
 
-rottest(inc) :- skip_dots,!.
 rottest(inc) :-
 	backinit,
 	c1 :< anything,
@@ -186,8 +179,6 @@ rocotest(2) :-
 	write('+++ role completion test 2 succeeded'),
 	nl,
 	!.
-
-rocotest(3) :-  skip_dots,!.
 rocotest(3) :-
 	backinit,
 	backstate(verbosity = warning),
@@ -216,7 +207,6 @@ rocotest(3) :-
 	write('+++ role completion test 3 succeeded'),
 	nl,
 	!.
-rocotest(4) :-  skip_dots,!.
 rocotest(4) :-
 	backinit,
 	backstate(verbosity = warning),
@@ -279,5 +269,4 @@ arevtest(N):-
 	nl.
 
 
-:- op(625,xfy,(.)).
 
