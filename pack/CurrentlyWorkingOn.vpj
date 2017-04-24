@@ -69,47 +69,14 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
-		<Folder Name="must_trace/.git">
-			<Folder Name="hooks">
-				<F N="must_trace/.git/hooks/applypatch-msg.sample"/>
-				<F N="must_trace/.git/hooks/commit-msg.sample"/>
-				<F N="must_trace/.git/hooks/post-update.sample"/>
-				<F N="must_trace/.git/hooks/pre-applypatch.sample"/>
-				<F N="must_trace/.git/hooks/pre-commit.sample"/>
-				<F N="must_trace/.git/hooks/pre-push.sample"/>
-				<F N="must_trace/.git/hooks/pre-rebase.sample"/>
-				<F N="must_trace/.git/hooks/prepare-commit-msg.sample"/>
-				<F N="must_trace/.git/hooks/update.sample"/>
-			</Folder>
-			<Folder Name="info">
-				<F N="must_trace/.git/info/exclude"/>
-			</Folder>
-			<Folder Name="logs">
-				<Folder Name="refs">
-					<Folder Name="heads">
-						<F N="must_trace/.git/logs/refs/heads/master"/>
-					</Folder>
-					<Folder Name="remotes">
-						<Folder Name="origin">
-							<F N="must_trace/.git/logs/refs/remotes/origin/HEAD"/>
-							<F N="must_trace/.git/logs/refs/remotes/origin/master"/>
-						</Folder>
-					</Folder>
-				</Folder>
-				<F N="must_trace/.git/logs/HEAD"/>
-			</Folder>
-			<F N="must_trace/.git/COMMIT_EDITMSG"/>
-			<F N="must_trace/.git/config"/>
-			<F N="must_trace/.git/description"/>
-			<F N="must_trace/.git/HEAD"/>
-			<F N="must_trace/.git/index"/>
-			<F N="must_trace/.git/packed-refs"/>
-		</Folder>
 		<Folder Name="clause_attvars">
 			<Folder Name="prolog">
 				<F N="clause_attvars/prolog/attvar_reader.pl"/>
+				<F N="clause_attvars/prolog/attvar_serializer.next"/>
 				<F N="clause_attvars/prolog/attvar_serializer.pl"/>
 				<F N="clause_attvars/prolog/clause_attvars.pl"/>
+				<F N="clause_attvars/prolog/INDEX.pl"/>
+				<F N="clause_attvars/prolog/toplevel_variable_names.pl"/>
 			</Folder>
 			<Folder Name="t">
 				<F N="clause_attvars/t/sanity_tests.pl"/>
@@ -180,6 +147,13 @@
 			<F N="hook_hybrid/pack.pl"/>
 			<F N="hook_hybrid/README.md"/>
 		</Folder>
+		<Folder Name="lib_atts">
+			<Folder Name="prolog">
+				<F N="lib_atts/prolog/atts.new"/>
+				<F N="lib_atts/prolog/atts.old"/>
+				<F N="lib_atts/prolog/atts.pl"/>
+			</Folder>
+		</Folder>
 		<Folder Name="logicmoo_base">
 			<Folder Name="prolog">
 				<Folder Name="logicmoo">
@@ -212,7 +186,6 @@
 					<Folder Name="plarkc">
 						<F N="logicmoo_base/prolog/logicmoo/plarkc/INDEX.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_kb.pl"/>
-						<F N="logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_ke_tex.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_ke_text.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_rewriting.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_xform.pfc"/>
@@ -5214,6 +5187,13 @@
 			<F N="tabling_dra/make_pack.sh"/>
 			<F N="tabling_dra/pack.pl"/>
 			<F N="tabling_dra/README.md"/>
+		</Folder>
+		<Folder Name="xlisting">
+			<Folder Name="prolog">
+				<F N="xlisting/prolog/INDEX.pl"/>
+				<F N="xlisting/prolog/listing_vars.pl"/>
+				<F N="xlisting/prolog/xlisting.pl"/>
+			</Folder>
 		</Folder>
 		<F N="bump_packs.sh"/>
 	</Files>
