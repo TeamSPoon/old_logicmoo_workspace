@@ -3533,6 +3533,11 @@
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/odbc/odbc.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/odbc/test_odbc.pl"/>
 							</Folder>
+							<Folder Name="pcre">
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pcre/pcre.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pcre/pltotex.pl"/>
+								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/pcre/test_pcre.pl"/>
+							</Folder>
 							<Folder Name="PDT">
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/PDT/config.h"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/PDT/pdt_console.c"/>
@@ -4213,6 +4218,7 @@
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/prolog_predicate.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/prolog_predicate_item.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/qrecompile.pl"/>
+										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/rdf_diagram.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/scaledbitmap.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/scan_arguments.pl"/>
 										<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/xpce/prolog/lib/sp_fcompile.pl"/>
