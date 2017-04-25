@@ -17705,11 +17705,7 @@
 				<Folder Name="pfc2.0">
 					<F N="pfc/prolog/pfc2.0/mpred_agenda.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_at_box.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_core-1490668303.pl.bak"/>
 					<F N="pfc/prolog/pfc2.0/mpred_core.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_expansion-1490668352.pl.bak"/>
-					<F N="pfc/prolog/pfc2.0/mpred_expansion-1490668837.pl.bak"/>
-					<F N="pfc/prolog/pfc2.0/mpred_expansion-1490668859.pl.bak"/>
 					<F N="pfc/prolog/pfc2.0/mpred_expansion.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_header.pi"/>
 					<F N="pfc/prolog/pfc2.0/mpred_header.pro"/>
@@ -17720,14 +17716,11 @@
 					<F N="pfc/prolog/pfc2.0/mpred_prolog_file.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_props.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_storage.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_stubs-1490668460.pl.bak"/>
 					<F N="pfc/prolog/pfc2.0/mpred_stubs.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_type_args.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_type_constraints.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_type_isa.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_type_naming.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_type_wff-1490668536.pl.bak"/>
-					<F N="pfc/prolog/pfc2.0/mpred_type_wff-1490668558.pl.bak"/>
 					<F N="pfc/prolog/pfc2.0/mpred_type_wff.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_userkb.pl"/>
 				</Folder>
