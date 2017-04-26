@@ -274,6 +274,8 @@
 						<F N="logicmoo_base/t/examples/fol/fol_birdt.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/kif_sanity.pl"/>
 						<F N="logicmoo_base/t/examples/fol/lefty.pfc"/>
+						<F N="logicmoo_base/t/examples/fol/make.sh"/>
+						<F N="logicmoo_base/t/examples/fol/make_wff_01.pl"/>
 						<F N="logicmoo_base/t/examples/fol/missing_count_01.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/missing_count_02.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/missing_count_03.pfc"/>
