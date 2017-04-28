@@ -1,6 +1,8 @@
 % this is both a latex file and a quintus prolog file
 % the only difference is that the latex version comments out the following
 % line:
+
+
 /* 
 \documentstyle[12pt,makeidx]{article}
 \pagestyle{myheadings}
@@ -687,10 +689,10 @@ new_lit(Prefix, Reln, NewArgs, NewReln) :-
    NewReln =.. [NewPred | AllArgs].
 
 add_prefix(Prefix,Pred,NewPred) :-
-   name(Pred,PredName),
-   append(Prefix, PredName, NewPredName),
-   name(NewPred,NewPredName).
-
+   string_codes(Prefix,PrefixC),
+   string_codes(Pred,PredName),
+   append(PrefixC, PredName, NewPredName),
+   string_codes(NewPred,NewPredName).
 
 
 /* \end{verbatim}
@@ -866,7 +868,6 @@ make_bodies(A, T, [Ths,Anc,Ans], ProveA, ExA) :-
    new_lit("ex_", A, [Ths,Anc,Ans], ExA).
 
 
-
 /* \end{verbatim}
 
 The procedure $rule(F,R)$ declares $R$ to be a fact
@@ -906,18 +907,17 @@ drule(F,if(H,B)) :-
    form_anc(H,Anc,Newanc),
    make_bodies(B,T,[Ths,Newanc,Ans],ProveB,ExB),
    prolog_cl((ProveH:-ProveB)),
-   ( F= 'fact',
-     prolog_cl((ExH :- ExB))
+   ( F=fact,
+     prolog_cl((ExH:-ExB))
    ; F=constraint).
 
 drule(F,H) :-
    make_anc(H),
    make_bodies(H,T,[ths(T,T,D,D),_,ans(A,A)],ProveH,ExH),
    prolog_cl(ProveH),
-   ( F='fact',
+   ( F=fact,
      prolog_cl(ExH)
    ; F=constraint).
-
 
 
 /* \end{verbatim}
@@ -931,7 +931,6 @@ subgoal $L$ with previous ancestor form $A1$.
 
 form_anc(n(G), anc(P,N), anc(P,[G|N])) :- !.
 form_anc(G, anc(P,N), anc([G|P],N)).
-
 
 
 /* \end{verbatim}
@@ -960,7 +959,6 @@ declare_fact(F) :-
 declare_constraint(C) :-
    nnf(C,even,N),
    rulify(constraint,N).
-
 
 
 /* \end{verbatim}
@@ -996,7 +994,6 @@ rulify(H,A) :-
    rule(H,n(A)).
 
 
-
 /* \end{verbatim}
 
 $contrapos(H,D,T)$ where $H$ is either ``{\em fact\/}'' 
@@ -1024,7 +1021,6 @@ contrapos(H,D,n(A)) :- !,
 
 contrapos(H,D,A) :-
    rule(H,if(n(A),D)).
-
 
 
 /* \end{verbatim}
@@ -1077,7 +1073,6 @@ rms(S,S2,L1,L2,B1,B2) :-
    S2 =.. LR.
 
 
-
 /* \end{verbatim}
 
 \index{unif}
@@ -1114,7 +1109,6 @@ appears_in(X,S) :-
    \+ atomic(S),
    S =.. L,
    appears_in(X,L).
-
 
 
 /* \end{verbatim}
@@ -1176,7 +1170,6 @@ declare_default(D) :-
    prolog_cl((ExDefer :- \+ variable_free(D))).
 
 
-
 /* \end{verbatim}
 
 \begin{example}\em
@@ -1213,7 +1206,6 @@ declare_prolog(G) :-
    prolog_cl((PrG :- G)).
 
 
-
 /* \end{verbatim}
 
 \subsection{Explaining Observations}
@@ -1232,7 +1224,6 @@ expl(G,T0,T1,Ans) :-
    check_consis(D,T,T1).
 
 
-
 /* \end{verbatim}
 
 \index{check\_consis}
@@ -1244,7 +1235,6 @@ check_consis([H|D],T1,T) :-
    new_lit("prove_not_",H, [T1,anc([],[])], Pr_n_H),
    \+ Pr_n_H,
    check_consis(D,[H|T1],T).
-
 
 
 /* \end{verbatim}
@@ -1262,6 +1252,7 @@ answer, but only adding redundant information).
 
 
 :- dynamic ex_not_newans/5.
+:- dynamic ex_newans/5.
 :- dynamic prove_not_newans/4.
 ex_not_newans(N,G,ths(T,T,D,D),anc(Pos,Neg),ans(A,[G|A])) :-
    member(newans(N,_),Pos),
@@ -1269,7 +1260,6 @@ ex_not_newans(N,G,ths(T,T,D,D),anc(Pos,Neg),ans(A,[G|A])) :-
 
 id_anc(n(G),anc(_,N)) :- !, id_member(G,N).
 id_anc(G,anc(P,_)) :- id_member(G,P).
-
 
 
 /* \end{verbatim}
@@ -1336,7 +1326,6 @@ make_anc(Goal) :-
    !.
 
 
-
 /* \end{verbatim}
 
 \begin{example} \em
@@ -1373,9 +1362,9 @@ self contained.
 \begin{verbatim} */
 
 
-:- (dynamic((flag)/1)).
-:- op(1150,fx,'default').
-:- op(1150,fx,'fact').
+:- dynamic flag/1.
+:- op(1150,fx,default).
+:- op(1150,fx,fact).
 :- op(1150,fx,constraint).
 :- op(1150,fx,prolog).
 :- op(1150,fx,explain).
@@ -1398,7 +1387,6 @@ self contained.
 :- op(1000,xfy,&).
 :- op(950,fy,~).
 :- op(950,fy,not).
-
 
 
 /* \end{verbatim}
@@ -1429,13 +1417,14 @@ if parity is even and the negation normal form of $Fla$ if parity is odd.
 \begin{verbatim} */
 
 
-
 nnf((X equiv Y), P,B) :- !,
    nnf(((Y or not X) and (X or not Y)),P,B).
 nnf((X == Y), P,B) :- !,
    nnf(((Y or not X) and (X or not Y)),P,B).
-nnf((X => Y), P,B) :- !, nnf((Y or not X),P,B).
-nnf((Y <- X), P,B) :- !, nnf((Y or not X),P,B).
+nnf((X => Y), P,B) :- !,
+   nnf((Y or not X),P,B).
+nnf((Y <- X), P,B) :- !,
+   nnf((Y or not X),P,B).
 nnf((X & Y), P,B) :- !,
    nnf((X and Y),P,B).
 nnf((X , Y), P,B) :- !,
@@ -1461,8 +1450,6 @@ nnf(n(F),even,F) :- !.
 nnf(F,even,n(F)).
 
 
-
-
 /* \end{verbatim}
 \index{opposite\_parity}
 \begin{verbatim} */
@@ -1470,7 +1457,6 @@ nnf(F,even,n(F)).
 
 opposite_parity(even,odd).
 opposite_parity(odd,even).
-
 
 
 /* \end{verbatim}
@@ -1503,7 +1489,6 @@ the compiler assertions will be undone on backtracking.
 fact F :- declare_fact(F),!.
 
 
-
 /* \end{verbatim}
 
 The $default$ declaration makes the appropriate equivalences between the
@@ -1522,7 +1507,6 @@ default N :-
    !.
 
 
-
 /* \end{verbatim}
 \index{default}
 \begin{verbatim} */
@@ -1531,7 +1515,6 @@ default N :-
 constraint C :-
    declare_constraint(C),
    !.
-
 
 
 /* \end{verbatim}
@@ -1547,7 +1530,6 @@ prolog G :-
    declare_prolog(G).
 
 
-
 /* \end{verbatim}
 \index{define}
 \begin{verbatim} */
@@ -1555,7 +1537,6 @@ prolog G :-
 
 define G :-
    prolog_cl(G).
-
 
 
 /* \end{verbatim}
@@ -1574,8 +1555,7 @@ explain G :-
    (flag timing,on),
     statistics(cputime,_),
     expl(G,[],D,A),
-    % statistics(cputime,[_,Time]),
-    statistics(runtime,[_,Time]),
+    statistics(cputime,[_,Time]),
     writeans(G,D,A),
     format('took ~3d sec.~n~n',[Time]),
     fail
@@ -1583,7 +1563,6 @@ explain G :-
     expl(G,[],D,A),
     writeans(G,D,A),
     fail.
-
 
 
 /* \end{verbatim}
@@ -1602,7 +1581,6 @@ writedisj([]).
 writedisj([H|T]) :-
    writedisj(T),
    format(' or ~w',[H]).
-
 
 
 /* \end{verbatim}
@@ -1655,7 +1633,6 @@ predct(G,Es) :-
       list_scens(1,SEs)).
 
 
-
 /* \end{verbatim}
 
 \index{find\_counter}
@@ -1669,7 +1646,6 @@ find_counter([E|R],S0,S2) :-
    find_counter(R,S1,S2).
 
 
-
 /* \end{verbatim}
 
 \index{list\_scens}
@@ -1681,7 +1657,6 @@ list_scens(N,[H|T]) :-
    format('~q: ~q.~n',[N,H]),
    N1 is N+1,
    list_scens(N1,T).
-
 
 
 /* \end{verbatim}
@@ -1700,7 +1675,6 @@ expl2not(G,T0,T1) :-
    check_consis(D,T,T1).
 
 
-
 /* \end{verbatim}
 
 \subsection{Simplifying Explanations}
@@ -1713,7 +1687,6 @@ simplify_expls([S],[S]).
 simplify_expls([H|T], S) :-
    simplify_expls(T, TS),
    mergeinto(H,TS,S).
-
 
 
 /* \end{verbatim}
@@ -1736,7 +1709,6 @@ mergeinto(L,[A|R],[A|N]) :-
    mergeinto(L,R,N).
 
 
-
 /* \end{verbatim}
 
 \index{instance\_of}
@@ -1745,7 +1717,6 @@ mergeinto(L,[A|R],[A|N]) :-
 
 instance_of(D,S) :-
    remove_all(D,S,_).
-
 
 
 /* \end{verbatim}
@@ -1770,7 +1741,6 @@ thconsult File :-
    set_input(OldFile).
 
 
-
 /* \end{verbatim}
 \index{read\_all}
 \begin{verbatim} */
@@ -1783,7 +1753,6 @@ read_all(T) :-
    (call(T);format('Warning: ~w failed~n',[T])),
    read(T2),
    read_all(T2).
-
 
 
 /* \end{verbatim}
@@ -1814,7 +1783,6 @@ thtrans File :-
    (reset asserting).
 
 
-
 /* \end{verbatim}
 To compile a Theorist file, you should do a,
 \begin{verse}
@@ -1833,7 +1801,6 @@ thcompile File :-
    (thtrans File),
 %   no_style_check(all),
    compile(File).
-
 
 
 /* \end{verbatim}
@@ -1868,14 +1835,12 @@ set F,V :-
    prolog_decl((flag F,V1 :- !,V=V1)).
 
 
-
 /* \end{verbatim}
 \index{flag}
 \begin{verbatim} */
 
 
 flag _,on.
-
 
 
 /* \end{verbatim}
@@ -1885,7 +1850,6 @@ flag _,on.
 
 reset F :-
    retract((flag F,_ :- !,_=_)).
-
 
 
 /* \end{verbatim}
@@ -1900,7 +1864,6 @@ list_flags([H|T]) :-
    (flag H,V),
    format('flag ~w,~w.~n',[H,V]),
    list_flags(T).
-
 
 
 /* \end{verbatim}
@@ -1946,7 +1909,6 @@ dyn G :-
    format(':- dynamic ~a/~d.~n',[PrR,PrL]).
 
 
-
 /* \end{verbatim}
 
 \subsection{Using the Compiled Rules}
@@ -1962,7 +1924,7 @@ prolog_cl(C) :-
    flag((asserting,off)),
    !,
    \+ \+ (
-     numbervars(C,0,_),
+     tnumbervars(C,0,_),
      writeq(C),
      write('.'),
      nl).
@@ -1971,7 +1933,6 @@ prolog_cl(C) :-
 prolog_cl(C) :-
    retract(C),
    fail.
-
 
 
 /* \end{verbatim}
@@ -1983,7 +1944,7 @@ written to the file and asserted.
 
 prolog_decl(C) :-
    flag((asserting,off)),
-   numbervars(C,0,_),
+   tnumbervars(C,0,_),
    writeq(C),
    write('.'),
    nl,
@@ -1993,7 +1954,6 @@ prolog_decl(C) :-
 prolog_decl(C) :-
    retract(C),
    fail.
-
 
 
 /* \end{verbatim}
@@ -2012,7 +1972,6 @@ For help type ``h.''.
 Any Problems see David Poole (poole@cs.ubc.ca)~n',[])).
 
 
-
 /* \end{verbatim}
 \section{Utility Functions}
 \subsection{List Predicates}
@@ -2029,12 +1988,9 @@ append([H|X],Y,[H|Z]) :-
 \begin{verbatim} */
 
 
-/*
 member(A,[A|_]).
 member(A,[_|R]) :-
    member(A,R).
-*/
-
 
 
 /* \end{verbatim}
@@ -2050,7 +2006,6 @@ id_member(A,[_|R]) :-
    id_member(A,R).
 
 
-
 /* \end{verbatim}
 
 \index{same\_length}
@@ -2060,7 +2015,6 @@ id_member(A,[_|R]) :-
 same_length([],[]).
 same_length([_|L1],[_|L2]) :-
    same_length(L1,L2).
-
 
 
 /* \end{verbatim}
@@ -2074,7 +2028,6 @@ remove(A,[H|T],[H|R]) :-
    remove(A,T,R).
 
 
-
 /* \end{verbatim}
 
 \index{remove\_all}
@@ -2085,7 +2038,6 @@ remove_all([],L,L).
 remove_all([H|T],L,L2) :-
    remove(H,L,L1),
    remove_all(T,L1,L2).
-
 
 
 /* \end{verbatim}
@@ -2111,7 +2063,6 @@ variable_free(X) :-
    variable_free(Y).
 
 
-
 /* \end{verbatim}
 
 \index{make\_ground}
@@ -2120,12 +2071,11 @@ variable_free(X) :-
 
 make_ground(X) :-
    retract(groundseed(N)),
-   numbervars(X,N,NN),
+   tnumbervars(X,N,NN),
    asserta(groundseed(NN)).
 
 :- dynamic groundseed/1.
 groundseed(26).
-
 
 
 
@@ -2138,7 +2088,6 @@ groundseed(26).
 reverse([],T,T).
 reverse([H|T],A,B) :-
    reverse(T,A,[H|B]).
-
 
 
 /* \end{verbatim}
@@ -2157,7 +2106,6 @@ where H is one of:~n',[]),
 (h H) :- !,
    add_prefix("more /faculty/poole/theorist/help/",H,Cmd),
    unix(system(Cmd)).
-
 
 
 
@@ -2381,13 +2329,15 @@ IJCAI-87, Milan, Italy.
 \end{document}
 */
 
-%numbervars(Term, N, Nplus1) :-
-%  var(Term), !,
-%  Term = var/N,
-%  Nplus1 is N + 1.
-%numbervars(Term, N, M) :-
-%  Term =.. [_|Args],
-%  numberargs(Args,N,M).
+
+
+tnumbervars(Term, N, Nplus1) :-
+  var(Term), !,
+  Term = var/N,
+  Nplus1 is N + 1.
+tnumbervars(Term, N, M) :-
+  Term =.. [_|Args],
+  numberargs(Args,N,M).
 
 numberargs([],N,N) :- !.
 numberargs([X|L], N, M) :-

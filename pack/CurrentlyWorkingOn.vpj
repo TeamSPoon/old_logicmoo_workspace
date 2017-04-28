@@ -219,15 +219,6 @@
 				<F N="logicmoo_base/prolog/logicmoo_xray.pl"/>
 			</Folder>
 			<Folder Name="t">
-				<Folder Name="docs">
-					<F N="logicmoo_base/t/docs/ABoxTBox.ppt"/>
-					<F N="logicmoo_base/t/docs/AI9.ppt"/>
-					<F N="logicmoo_base/t/docs/km-algorithm.ppt"/>
-					<F N="logicmoo_base/t/docs/LOGICMOO_SOUNDNESS.pptx"/>
-					<F N="logicmoo_base/t/docs/openCyc-Aruna_Weerakoon.pptx"/>
-					<F N="logicmoo_base/t/docs/pfcman.pdf"/>
-					<F N="logicmoo_base/t/docs/SAT_learning_clauses.pdf"/>
-				</Folder>
 				<Folder Name="examples">
 					<Folder Name="api">
 						<F N="logicmoo_base/t/examples/api/chr_01.pl"/>
@@ -263,7 +254,6 @@
 					<Folder Name="fol">
 						<F N="logicmoo_base/t/examples/fol/boxlog_sanity.pl"/>
 						<F N="logicmoo_base/t/examples/fol/dislikes.pfc"/>
-						<F N="logicmoo_base/t/examples/fol/einstein_simpler.pfc-1492952302.pl.bak"/>
 						<F N="logicmoo_base/t/examples/fol/einstein_simpler.pfc.pl"/>
 						<F N="logicmoo_base/t/examples/fol/exactly.clif"/>
 						<F N="logicmoo_base/t/examples/fol/exactly_one_has_the_value.clif"/>
@@ -294,11 +284,7 @@
 						<F N="logicmoo_base/t/examples/fol/sanity_poss_03.pl"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_sk_human.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_sk_two.pfc"/>
-						<F N="logicmoo_base/t/examples/fol/test_fol"/>
 						<F N="logicmoo_base/t/examples/fol/test_header.pfc"/>
-						<F N="logicmoo_base/t/examples/fol/zebra0-1492951585.clif.bak"/>
-						<F N="logicmoo_base/t/examples/fol/zebra0-1492951598.clif.bak"/>
-						<F N="logicmoo_base/t/examples/fol/zebra0-1492951697.clif.bak"/>
 						<F N="logicmoo_base/t/examples/fol/zebra0.clif"/>
 						<F N="logicmoo_base/t/examples/fol/zebra1.clif"/>
 						<F N="logicmoo_base/t/examples/fol/zebra2.clif"/>
@@ -2979,10 +2965,8 @@
 						<F N="logicmoo_packages/prolog/Back52/libraries/flatten.pl"/>
 						<F N="logicmoo_packages/prolog/Back52/libraries/lists.pl"/>
 						<F N="logicmoo_packages/prolog/Back52/libraries/ordsets.pl"/>
-						<F N="logicmoo_packages/prolog/Back52/libraries/printlength-1492687644.pl.bak"/>
 						<F N="logicmoo_packages/prolog/Back52/libraries/printlength.pl"/>
 						<F N="logicmoo_packages/prolog/Back52/libraries/printlength.pl~"/>
-						<F N="logicmoo_packages/prolog/Back52/libraries/sets-1492687619.pl.bak"/>
 						<F N="logicmoo_packages/prolog/Back52/libraries/sets.pl"/>
 						<F N="logicmoo_packages/prolog/Back52/libraries/sets.pl~"/>
 						<F N="logicmoo_packages/prolog/Back52/libraries/types.pl"/>
@@ -3979,40 +3963,6 @@
 					<F N="logicmoo_packages/prolog/indigolog/wumpus_simulator_2_3.pl"/>
 				</Folder>
 				<Folder Name="MaLARea">
-					<Folder Name="bin">
-						<F N="logicmoo_packages/prolog/MaLARea/bin/clausefilter"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/clausefilter.old"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/e_axfilter"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/epclextract"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/eproof"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/eprover"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/fofshared"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/fofshared.c"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/GetSymbols"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/interpfilter"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/interpformat"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/ladr_to_tptp"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/mace4"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/NumberVars"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/paradox"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/prdx2p9.pl"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/prdxprep.pl"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/runepar.pl"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/runparadox"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/runparadox1"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/runwtlcached"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/runwtlimit"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/snow"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/SPASS"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/SPASS37"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/tptp4X"/>
-						<F N="logicmoo_packages/prolog/MaLARea/bin/tptp_to_ladr"/>
-					</Folder>
-					<Folder Name="data">
-						<F N="logicmoo_packages/prolog/MaLARea/data/DummyAllAxMZT"/>
-						<F N="logicmoo_packages/prolog/MaLARea/data/MZT1000TrainingData"/>
-						<F N="logicmoo_packages/prolog/MaLARea/data/MZT900TrainingData"/>
-					</Folder>
 					<Folder Name="doc">
 						<F N="logicmoo_packages/prolog/MaLARea/doc/BatchSampleMZRMZR"/>
 						<F N="logicmoo_packages/prolog/MaLARea/doc/BatchTst100MZRMZR"/>
