@@ -291,6 +291,7 @@
 						<F N="logicmoo_base/t/examples/fol/sanity_fi_sk.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_poss_01.pl"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_poss_02.pl"/>
+						<F N="logicmoo_base/t/examples/fol/sanity_poss_03.pl"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_sk_human.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_sk_two.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/test_fol"/>
