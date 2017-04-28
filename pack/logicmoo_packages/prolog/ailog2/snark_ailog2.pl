@@ -30,7 +30,7 @@ get_runtime(T,U) :-   catch((statistics(cputime,T),U=secs),_,
 :- op(900,fy,~).
 % "\=" is inequality
 :- op(700,xfx,\=).
-% "#=" is can't be equal
+% "#=" is can''t be equal
 :- op(700,xfx,#=).
 %  ":" is used for probability declarations.
 :- op(800,xfx,:).

@@ -4644,7 +4644,300 @@
 					<F N="logicmoo_packages/prolog/thea2/tutorial.txt"/>
 				</Folder>
 				<Folder Name="theorist">
+					<Folder Name="www.cs.ubc.ca">
+						<Folder Name="~poole">
+							<Folder Name="aibook">
+								<Folder Name="code">
+									<Folder Name="ailog">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/aibook/code/ailog/ailog2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/aibook/code/ailog/ailog21.pl"/>
+									</Folder>
+									<Folder Name="Prolog">
+										<Folder Name="ch12">
+											<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/aibook/code/Prolog/ch12/cfg_simple.pl"/>
+											<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/aibook/code/Prolog/ch12/nl_interface.pl"/>
+											<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/aibook/code/Prolog/ch12/nl_numbera.pl"/>
+											<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/aibook/code/Prolog/ch12/trans.pl"/>
+										</Folder>
+									</Folder>
+								</Folder>
+							</Folder>
+							<Folder Name="ci">
+								<Folder Name="code">
+									<Folder Name="apb">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apb/code.pl"/>
+									</Folder>
+									<Folder Name="apc">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/ask.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/ask_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/bnet.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/bnet_t1.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/bnet_t2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/bnet_t3.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/csp.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/csp_t1.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/csp_t2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/csp_t3.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/fwd.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/fwd_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/fwdab.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/fwdab_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/fwdnf.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/fwdnf_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/how.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/how_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/iprove.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/iprove_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/nnl_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/nnlearn.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/pop.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/pop_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/prall.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/prall_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/sim.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/sim_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/apc/standard.pl"/>
+									</Folder>
+									<Folder Name="ch10">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch10/bnet_new.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch10/relevant.pl"/>
+									</Folder>
+									<Folder Name="ch11">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/dtlearn1.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/dtlearn2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/dtlearn3.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/dtlearn4.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/dtlearn_t1.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/dtlearn_t2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/dtlearn_t3.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/ebl.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/ebl2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/ebl_course.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/ebl_mitchell.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/nnl_t1.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/nnl_t2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/nnl_t3.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/nnlearn.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch11/nnlearn2.pl"/>
+									</Folder>
+									<Folder Name="ch12">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch12/sim2.pl"/>
+									</Folder>
+									<Folder Name="ch2">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch2/times.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch2/west.pl"/>
+									</Folder>
+									<Folder Name="ch3">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/bin_arith.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/course.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/elect.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/exp_parser.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/lists.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/nl_cfg.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/nl_interface.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/nl_numbera.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/sorting.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/trans.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/trans2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/univ.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch3/univ2.pl"/>
+									</Folder>
+									<Folder Name="ch4">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/csp.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/csp_gt.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/csp_t1.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/csp_t2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/csp_t3.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/graph.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/graph2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/hsearch.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/pq.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/rand_csp.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/random.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/search.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch4/standard.pl"/>
+									</Folder>
+									<Folder Name="ch5">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch5/semnet.pl"/>
+									</Folder>
+									<Folder Name="ch6">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/ask.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/ask_why.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/bprove.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/bsorting.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/dprove.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/elect_a.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/elect_b.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/elect_d.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/elect_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/trace.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch6/trace2.pl"/>
+									</Folder>
+									<Folder Name="ch7">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch7/confl.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch7/confl_id.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch7/confl_t1.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch7/confl_t2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch7/ineq.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch7/ineq_t.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch7/thpr.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch7/thpr_t1.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch7/thpr_t2.pl"/>
+									</Folder>
+									<Folder Name="ch8">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch8/bprove.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch8/delrob_sitc.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch8/delrob_strips.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch8/pop.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch8/pop_sics.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch8/regr_strips.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch8/regr_strips_sim.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch8/strips_strips.pl"/>
+									</Folder>
+									<Folder Name="ch9">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch9/iass.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch9/iass_t1.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch9/iass_t2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch9/iass_t3.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch9/iass_t4.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/ch9/iass_t5.pl"/>
+									</Folder>
+									<Folder Name="cilog">
+										<Folder Name="cilog_code">
+											<Folder Name="ch2">
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch2/times.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch2/west.pl"/>
+											</Folder>
+											<Folder Name="ch3">
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch3/course.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch3/elect.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch3/lists.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch3/univ.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch3/univ2.pl"/>
+											</Folder>
+											<Folder Name="ch4">
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch4/graph.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch4/graph2.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch4/hsearch.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch4/idastar.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch4/idsearch.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch4/search.pl"/>
+											</Folder>
+											<Folder Name="ch6">
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch6/bprove.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch6/dprove.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch6/elect_askable.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch6/elect_con.pl"/>
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch6/elect_delay_base.pl"/>
+											</Folder>
+											<Folder Name="ch9">
+												<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_code/ch9/elect_abd.pl"/>
+											</Folder>
+										</Folder>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_sics.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/code/cilog/cilog_swi.pl"/>
+									</Folder>
+								</Folder>
+								<Folder Name="problems">
+									<Folder Name="ch3">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/problems/ch3/elect.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/problems/ch3/ohp.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/problems/ch3/plumbing.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/problems/ch3/plumbing2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/problems/ch3/video.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/problems/ch3/video2.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/problems/ch3/video3.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/problems/ch3/video4.pl"/>
+									</Folder>
+									<Folder Name="ch4">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/ci/problems/ch4/csp-search.pl"/>
+									</Folder>
+								</Folder>
+							</Folder>
+							<Folder Name="code">
+								<Folder Name="code_icl">
+									<Folder Name="code_icl">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/blocks1"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/blocks2"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/blocks3"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/blocks4"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/dtp.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/help"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/icl_int.tex"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/load"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/ReadMe"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/rob_key"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/sexam1"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/sexam2"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/code/code_icl/code_icl/widget"/>
+									</Folder>
+								</Folder>
+							</Folder>
+							<Folder Name="cs312">
+								<Folder Name="2016">
+									<Folder Name="as1">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/as1/cs312_2016.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/as1/plumbing.pl"/>
+									</Folder>
+									<Folder Name="as2">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/as2/sillyeg.pl"/>
+									</Folder>
+									<Folder Name="as3">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/as3/as3sol.pl"/>
+									</Folder>
+									<Folder Name="as4">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/as4/as4sol.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/as4/geography.pl"/>
+									</Folder>
+									<Folder Name="exams">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/exams/mid1prolog.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/exams/mid1prologb.pl"/>
+									</Folder>
+									<Folder Name="prolog">
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/as3q3sol.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/backeg.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/beach.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/cfg_simple.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/dcg.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/elect_naf.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/elect_prop.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/elect_reln.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/enrolled.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/family.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/fun.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/funlog.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/lists.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/myis.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/mylist.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/nl_interface.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/nl_interface_direct.pl"/>
+										<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/prolog/sem_web_schema_org.pl"/>
+									</Folder>
+									<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/finalprsol.pl"/>
+									<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/cs312/2016/mid2prsol.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="law">
+								<F N="logicmoo_packages/prolog/theorist/www.cs.ubc.ca/~poole/law/icl_int.tex"/>
+							</Folder>
+						</Folder>
+					</Folder>
+					<F N="logicmoo_packages/prolog/theorist/ailog2.pl"/>
+					<F N="logicmoo_packages/prolog/theorist/bats"/>
+					<F N="logicmoo_packages/prolog/theorist/birdsfly"/>
+					<F N="logicmoo_packages/prolog/theorist/cilog_swi.pl"/>
+					<F N="logicmoo_packages/prolog/theorist/cir2"/>
+					<F N="logicmoo_packages/prolog/theorist/depiction"/>
+					<F N="logicmoo_packages/prolog/theorist/emu"/>
+					<F N="logicmoo_packages/prolog/theorist/hunt"/>
+					<F N="logicmoo_packages/prolog/theorist/lookslike"/>
+					<F N="logicmoo_packages/prolog/theorist/nixon"/>
+					<F N="logicmoo_packages/prolog/theorist/nqueens"/>
+					<F N="logicmoo_packages/prolog/theorist/nrev"/>
+					<F N="logicmoo_packages/prolog/theorist/README"/>
 					<F N="logicmoo_packages/prolog/theorist/snark_theorist.pl"/>
+					<F N="logicmoo_packages/prolog/theorist/theorist.tex"/>
+					<F N="logicmoo_packages/prolog/theorist/users-guide.tex"/>
 				</Folder>
 				<Folder Name="trill">
 					<Folder Name="probabilistic">

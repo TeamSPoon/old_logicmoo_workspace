@@ -2,6 +2,9 @@
 % the only difference is that the latex version comments out the following
 % line:
 
+:- module(snark_theorist,[]).
+
+:- module(snark_theorist).
 
 /* 
 \documentstyle[12pt,makeidx]{article}
@@ -682,6 +685,7 @@ I assume that the reader is familiar with such notation.}:
 \begin{verbatim} */
 
 
+
 new_lit(Prefix, Reln, NewArgs, NewReln) :-
    Reln =.. [Pred | Args],
    add_prefix(Prefix,Pred,NewPred),
@@ -690,9 +694,9 @@ new_lit(Prefix, Reln, NewArgs, NewReln) :-
 
 add_prefix(Prefix,Pred,NewPred) :-
    string_codes(Prefix,PrefixC),
-   string_codes(Pred,PredName),
+   name(Pred,PredName),
    append(PrefixC, PredName, NewPredName),
-   string_codes(NewPred,NewPredName).
+   name(NewPred,NewPredName).
 
 
 /* \end{verbatim}
@@ -907,7 +911,7 @@ drule(F,if(H,B)) :-
    form_anc(H,Anc,Newanc),
    make_bodies(B,T,[Ths,Newanc,Ans],ProveB,ExB),
    prolog_cl((ProveH:-ProveB)),
-   ( F=fact,
+   ( F= (fact),
      prolog_cl((ExH:-ExB))
    ; F=constraint).
 
@@ -915,9 +919,9 @@ drule(F,H) :-
    make_anc(H),
    make_bodies(H,T,[ths(T,T,D,D),_,ans(A,A)],ProveH,ExH),
    prolog_cl(ProveH),
-   ( F=fact,
+   ( F= 'fact',
      prolog_cl(ExH)
-   ; F=constraint).
+   ; F='constraint').
 
 
 /* \end{verbatim}
@@ -1079,7 +1083,8 @@ rms(S,S2,L1,L2,B1,B2) :-
 \index{appears\_in}
 \begin{verbatim} */
 
-
+unif(X,Y) :- unify_with_occurs_check(X,Y).
+/*
 unif(X,Y) :-
    var(X), var(Y), X=Y,!.
 unif(X,Y) :-
@@ -1109,7 +1114,7 @@ appears_in(X,S) :-
    \+ atomic(S),
    S =.. L,
    appears_in(X,L).
-
+*/
 
 /* \end{verbatim}
 \subsection{Possible Hypotheses}
@@ -1153,7 +1158,7 @@ $\backslash+($variable\_free$(d(-args-))).$
 
 The following compiles directly into such code:
 \index{declare\_default}
-\begin{verbatim} */
+\begin{verbatim} )*/
 
 
 declare_default(D) :-
@@ -1197,7 +1202,7 @@ This means that we can prove the $prove$ and $ex$ forms by calling
 the appropriate Prolog definition.
 \index{declare\_prolog}
 \begin{verbatim} */
-
+            
 
 declare_prolog(G) :-
    new_lit("ex_",G, [ths(T,T,D,D), _, ans(A,A)], ExG),
@@ -1361,10 +1366,10 @@ given in the spirit of being enough to make the rest of the description
 self contained.
 \begin{verbatim} */
 
-
-:- dynamic flag/1.
-:- op(1150,fx,default).
-:- op(1150,fx,fact).
+     
+:- dynamic((flag)/1).
+:- op(1150,fx,'default').
+:- op(1150,fx,'fact').
 :- op(1150,fx,constraint).
 :- op(1150,fx,prolog).
 :- op(1150,fx,explain).
@@ -1378,6 +1383,7 @@ self contained.
 :- op(1150,fx,thtrans).
 :- op(1150,fx,thcompile).
 :- op(1130,xfx,:).
+
 :- op(1120,xfx,==).
 :- op(1120,xfx,equiv).
 :- op(1110,xfx,<-).
@@ -1486,7 +1492,7 @@ the compiler assertions will be undone on backtracking.
 \begin{verbatim} */
 
 
-fact F :- declare_fact(F),!.
+fact(F) :- declare_fact(F),!.
 
 
 /* \end{verbatim}
@@ -1497,12 +1503,12 @@ named defaults and the unnamed defaults.
 \begin{verbatim} */
 
 
-default N : H :-
+default((N : H)):-
    !,
    declare_default(N),
    declare_fact((H <-N)),
    !.
-default N :-
+default( N ):-
    declare_default(N),
    !.
 
@@ -1512,21 +1518,23 @@ default N :-
 \begin{verbatim} */
 
 
-constraint C :-
+constraint(C) :-
    declare_constraint(C),
    !.
 
-
+                       
 /* \end{verbatim}
 The $prolog$ command says that the atom $G$ should be proven in the
 Prolog system. The argument of the $define$ statement is a Prolog
 definition which should be asserted (N.B. that it should be in
 parentheses if it contains a ``{\tt :-}''.
 \index{prolog}
-\begin{verbatim} */
+\begin{verbatim} 
+)
+*/
 
-
-prolog G :-
+                                   
+prolog( G ) :-
    declare_prolog(G).
 
 
@@ -1535,7 +1543,7 @@ prolog G :-
 \begin{verbatim} */
 
 
-define G :-
+define( G ):-
    prolog_cl(G).
 
 
@@ -1551,11 +1559,11 @@ an appropriate state at the end of the computation.
 
 % :- dynamic statistics/2.
 
-explain G :-
-   (flag timing,on),
-    statistics(cputime,_),
+'explain'(G) :-
+   (flag((timing,on))),
+    statistics(runtime,_),
     expl(G,[],D,A),
-    statistics(cputime,[_,Time]),
+    statistics(runtime,[_,Time]),
     writeans(G,D,A),
     format('took ~3d sec.~n~n',[Time]),
     fail
@@ -1572,15 +1580,15 @@ explain G :-
 
 
 writeans(G,D,A) :-
-   format('~nAnswer is ~w', [G]),
+   format('~nAnswer is ~p', [G]),
    writedisj(A),
-   format('~nTheory is ~w~n', [D]),
+   format('~nTheory is ~p~n', [D]),
    !.
 
 writedisj([]).
 writedisj([H|T]) :-
    writedisj(T),
-   format(' or ~w',[H]).
+   format(' or ~p',[H]).
 
 
 /* \end{verbatim}
@@ -1598,18 +1606,18 @@ that $g$ is not explainable from $S$.
 The intuition is that
 if $g$ is not in every extension then there is no reason to rule out
 $S$ (based on the information given) and so we should not predict $g$.
-
+                      
 We can use theorem \ref{everythm} to consider another way to view membership
 in every extension. Consider two antagonistic agents $Y$ and $N$ trying to
 determine whether $g$ should be predicted or not. $Y$ comes
 up with explanations of $g$, and $N$ tries to find where these explanations
 fall down (i.e., tries to find a scenario $S$ which is inconsistent with
-all of $Y$'s explanations). $Y$ then tries to find an explanation of $g$
+all of $Y$''s explanations). $Y$ then tries to find an explanation of $g$
 given $S$.
 If $N$ cannot find a defeater for $Y$'s explanations then
 $g$ is in every extension, and if $Y$ cannot find an explanation from
 some $S$ constructed by $N$ then $g$ is not in every extension.
-
+                                                                       
 The following code implements this, but (as we cannot implement
 coroutines as needed above in Prolog), it may generate more
 explanations of the goal than is needed. What we really want is for the
@@ -1618,9 +1626,9 @@ and then just print the explanations needed.
 
 \index{predict}
 \begin{verbatim} */
+                     
 
-
-predict G :-
+predict(( G )):-
   bagof(E,expl(G,[],E,[]),Es),
   predct(G,Es). 
  
@@ -1680,7 +1688,7 @@ expl2not(G,T0,T1) :-
 \subsection{Simplifying Explanations}
 \index{simplify\_obs}
 \begin{verbatim} */
-
+                                   
 
 simplify_expls([S],[S]).
 
@@ -1708,7 +1716,7 @@ mergeinto(L,[A|R],N) :-
 mergeinto(L,[A|R],[A|N]) :-
    mergeinto(L,R,N).
 
-
+                         
 /* \end{verbatim}
 
 \index{instance\_of}
@@ -1717,7 +1725,7 @@ mergeinto(L,[A|R],[A|N]) :-
 
 instance_of(D,S) :-
    remove_all(D,S,_).
-
+                           
 
 /* \end{verbatim}
 
@@ -1731,12 +1739,13 @@ keep reading the file and executing the commands in it until we stop.
 \index{thconsult}
 \begin{verbatim} */
 
+th_read(T):- read_term(T,[module(snark_theorist),variable_names(Vs)]),b_setval('$variable_names',Vs).
 
-thconsult File :-
+thconsult(( File )):-
    current_input(OldFile),
    open(File,read,Input),
    set_input(Input),
-   read(T),
+   th_read(T),
    read_all(T),
    set_input(OldFile).
 
@@ -1746,14 +1755,15 @@ thconsult File :-
 \begin{verbatim} */
 
 
+:- meta_predicate(read_all(*)).
 read_all(end_of_file) :- !.
 
 read_all(T) :-
-   ((flag asserting,on),!; format('~n% ~w.~n',[T])),
-   (call(T);format('Warning: ~w failed~n',[T])),
-   read(T2),
+   ((flag(( asserting,on))),!; format('~n% ~p.~n',[T])),
+   (call(T) *-> true ; format('% Warning: ~p failed~n',[T])),
+   th_read(T2),
    read_all(T2).
-
+                 
 
 /* \end{verbatim}
 
@@ -1763,25 +1773,30 @@ to a file. This code is neither loaded or compiled.
 \begin{verbatim} */
 
 
-thtrans File :-
-   current_input(Oldinput),
-   open(File,read,Input),
-   set_input(Input),
-   name(File, Fname),
-   append(Fname,".pl",Plfname),
+thtrans(( File )):-
+   string_codes(File, Fname),
+   append(Fname,`.pl`,Plfname),
    name(Plfile, Plfname),
    current_output(Oldoutput),
    open(Plfile,write,Output),
    set_output(Output),
-   format(':- dynamic contrapos_recorded/1.~n',[]),
-   (set asserting,off),
-   read(T),
-   read_all(T),
+   thtrans2out(File),
    close(Output),
-   set_input(Oldinput),
-   set_output(Oldoutput),
-   (reset asserting).
+   set_output(Oldoutput),!.
+   
 
+thtrans2out(File):-
+   current_input(Oldinput),
+   open(File,read,Input),
+   set_input(Input),
+   format(':- dynamic contrapos_recorded/1.~n',[]),
+   format(':- style_check(- singleton).~n',[]),
+   format(':- style_check(- discontiguous).~n',[]),
+   (set((asserting,off))),
+   th_read(T),
+   read_all(T),
+   set_input(Oldinput),
+   reset(( asserting)),!.
 
 /* \end{verbatim}
 To compile a Theorist file, you should do a,
@@ -1797,10 +1812,10 @@ which is then compiled using the Prolog compiler.
 \begin{verbatim} */
 
 
-thcompile File :-
-   (thtrans File),
+thcompile(( File )):-
+   (thtrans(( File))),
 %   no_style_check(all),
-   compile(File).
+   compile(File).  
 
 
 /* \end{verbatim}
@@ -1831,8 +1846,8 @@ The following is the definition of these
 \begin{verbatim} */
 
 
-set F,V :-
-   prolog_decl((flag F,V1 :- !,V=V1)).
+set((F,V)):-
+   prolog_decl((flag((F,V1)):- !,V=V1)),!.
 
 
 /* \end{verbatim}
@@ -1840,7 +1855,7 @@ set F,V :-
 \begin{verbatim} */
 
 
-flag _,on.
+flag((_,on)).
 
 
 /* \end{verbatim}
@@ -1848,8 +1863,8 @@ flag _,on.
 \begin{verbatim} */
 
 
-reset F :-
-   retract((flag F,_ :- !,_=_)).
+reset(F) :-
+   retract((flag((F,_)) :- !,_=_)).
 
 
 /* \end{verbatim}
@@ -1861,10 +1876,10 @@ flags :- list_flags([asserting,ancestor_search,loop_check,
                      depth_bound,sound_unification,timing]).
 list_flags([]).
 list_flags([H|T]) :-
-   (flag H,V),
-   format('flag ~w,~w.~n',[H,V]),
+   (flag((H,V))),
+   format('flag((~w,~w)).~n',[H,V]),
    list_flags(T).
-
+                          
 
 /* \end{verbatim}
 \subsection{Compiler Directives}
@@ -1887,14 +1902,14 @@ Essentially we then must say that the appropriate Prolog code is dynamic.
 \begin{verbatim} */
 
 
-:- op(1150,fx,dyn).
-dyn _ :-
-   (flag asserting, on),
+:- op(1150,fx,(dyn)).
+dyn(_) :-
+   (flag((asserting, on))),
    !.
-dyn n(G) :-
+dyn(n(G)) :-
    !,
-   (dyn G).
-dyn G :-
+   (dyn(G)).
+dyn(G):-
    G =.. [R|Args],
    add_prefix("ex_not_",R,ExNR),
    add_prefix("ex_",R,ExR),
@@ -1908,7 +1923,7 @@ dyn G :-
    format(':- dynamic ~a/~d.~n',[PrNR,PrL]),
    format(':- dynamic ~a/~d.~n',[PrR,PrL]).
 
-
+                          
 /* \end{verbatim}
 
 \subsection{Using the Compiled Rules}
@@ -1920,14 +1935,18 @@ The second is to be a backtrackable assert otherwise.
 \begin{verbatim} */
 
 
-prolog_cl(C) :-
-   flag((asserting,off)),
-   !,
-   \+ \+ (
+print_clause(C) :- portray_clause(C).
+/*
+print_clause(C) :- 
+   \+ \+ (    
      tnumbervars(C,0,_),
      writeq(C),
      write('.'),
      nl).
+*/
+prolog_cl(C) :-    
+   flag((asserting,off)),!,
+   print_clause(C),!.
 prolog_cl(C) :-
    assertz(C).
 prolog_cl(C) :-
@@ -1940,21 +1959,18 @@ $prolog\_decl$ is like the above predicate, but is both
 written to the file and asserted.
 \index{prolog\_decl}
 \begin{verbatim} */
-
+                     
 
 prolog_decl(C) :-
    flag((asserting,off)),
-   tnumbervars(C,0,_),
-   writeq(C),
-   write('.'),
-   nl,
+   print_clause(C),
    fail.
 prolog_decl(C) :-
    asserta(C).
 prolog_decl(C) :-
    retract(C),
-   fail.
-
+   fail.          
+              
 
 /* \end{verbatim}
 \subsection{Saving Theorist}
@@ -1966,10 +1982,11 @@ file.
 
 
 save :-
-   save_program(th,
+   call(call,quintus:save_program(th,
    format('~nWelcome to THEORIST 1.1.1  (4 December 89 version)
 For help type ``h.''.
-Any Problems see David Poole (poole@cs.ubc.ca)~n',[])).
+Any Problems see David Poole (poole@cs.ubc.ca)~n',
+  []))).
 
 
 /* \end{verbatim}
@@ -2046,6 +2063,7 @@ remove_all([H|T],L,L2) :-
 \index{variable\_free}
 \begin{verbatim} */
 
+variable_free(X) :- !, \+ ground(X).
 
 variable_free(X) :-
    atomic(X),
@@ -2091,7 +2109,7 @@ reverse([H|T],A,B) :-
 
 
 /* \end{verbatim}
-
+                                                     
 \subsection{Help Commands}
 \index{h}
 \begin{verbatim} */
@@ -2100,13 +2118,14 @@ reverse([H|T],A,B) :-
 (h) :- format('This is Theorist 1.1 (all complaints to David Poole)
 For more details issue the command:
    h H.
-where H is one of:~n',[]),
+where H is one of:~n',
+[]),
    unix(system('ls /faculty/poole/theorist/help')).
 
-(h H) :- !,
+(h(( H))) :- !,
    add_prefix("more /faculty/poole/theorist/help/",H,Cmd),
    unix(system(Cmd)).
-
+                              
 
 
 /* \end{verbatim}
@@ -2137,7 +2156,7 @@ prolog so that we can use the advances in Prolog implementation Technology.
 
 As far as this compiler is concerned there are a few issues which
 arise:
-\begin{itemize}
+\begin{itemize}                      
 \item Is there a more efficient way to determine that a goal can succeed because
 it unifies with an ancestor \cite{poole:grace,loveland87}?
 \item Can we incorporate a cycle check that has a low overhead?
@@ -2314,7 +2333,7 @@ R.\ Reiter,
 ``A Logic for Default Reasoning'',
 {\em Artificial Intelligence},
 Vol.\ 13, pp 81-132.
-
+                      
 \bibitem[Smith86]{smith86}
 D.~Smith and M.~Genesereth,
 ``Ordering Conjunctive Queries'',
@@ -2329,8 +2348,8 @@ IJCAI-87, Milan, Italy.
 \end{document}
 */
 
-
-
+tnumbervars(Term, N, M):- numbervars(Term, N, M).
+/*
 tnumbervars(Term, N, Nplus1) :-
   var(Term), !,
   Term = var/N,
@@ -2342,4 +2361,7 @@ tnumbervars(Term, N, M) :-
 numberargs([],N,N) :- !.
 numberargs([X|L], N, M) :-
   numberargs(X, N, N1),
-  numberargs(L, N1, M).
+  numberargs(L, N1, M).      
+*/
+
+:- fixup_exports.
