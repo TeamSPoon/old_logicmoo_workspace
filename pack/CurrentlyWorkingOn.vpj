@@ -5300,6 +5300,122 @@
 				<F N="pfc/t/try_logicmoo_examples.pl"/>
 			</Folder>
 		</Folder>
+		<Folder Name="prologmud">
+			<Folder Name="prolog">
+				<Folder Name="prologmud">
+					<Folder Name="actions">
+						<F N="prologmud/prolog/prologmud/actions/actions_conf.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/actions_db.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/any.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/as_agent.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/attack.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/chat.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/climb.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/create.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/drink.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/drop.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/eat.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/get_set.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/help.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/inventory.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/kiss.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/logon.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/look.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/move.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/planner.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/push.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/put_at.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/scansrc.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/showdebug.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/sit.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/stats.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/take.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/teleport.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/use.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/where.pfc.pl"/>
+					</Folder>
+					<Folder Name="mobs">
+						<Folder Name="affordance">
+							<F N="prologmud/prolog/prologmud/mobs/affordance/improve.pfc.pl"/>
+							<F N="prologmud/prolog/prologmud/mobs/affordance/simbots.pfc.pl"/>
+						</Folder>
+						<F N="prologmud/prolog/prologmud/mobs/explorer.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/mobs_conf.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/monster.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/pddl_agent.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/predator.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/prey.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/vacuum.pfc.pl"/>
+					</Folder>
+					<Folder Name="objs">
+						<F N="prologmud/prolog/prologmud/objs/basic_objs.pfc.pl"/>
+					</Folder>
+					<Folder Name="parsing">
+						<F N="prologmud/prolog/prologmud/parsing/parser_imperative.pl"/>
+						<F N="prologmud/prolog/prologmud/parsing/simple_decl_parser.pl"/>
+					</Folder>
+					<Folder Name="server">
+						<F N="prologmud/prolog/prologmud/server/mud_http_hmud.pl"/>
+						<F N="prologmud/prolog/prologmud/server/mud_irc.pl"/>
+						<F N="prologmud/prolog/prologmud/server/mud_telnet.pl"/>
+						<F N="prologmud/prolog/prologmud/server/mud_testing.pl"/>
+					</Folder>
+					<Folder Name="vworld">
+						<F N="prologmud/prolog/prologmud/vworld/world.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_2d.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_agent.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_effects.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_events.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_npc.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_text.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_text_output.pfc.pl"/>
+					</Folder>
+					<F N="prologmud/prolog/prologmud/mud_builtin.pfc.pl"/>
+					<F N="prologmud/prolog/prologmud/mud_footer.pl"/>
+					<F N="prologmud/prolog/prologmud/mud_header.pl"/>
+					<F N="prologmud/prolog/prologmud/mud_loader.pl"/>
+					<F N="prologmud/prolog/prologmud/mud_startup.pl"/>
+				</Folder>
+				<Folder Name="prologmud_web">
+					<Folder Name="src_assets">
+						<F N="prologmud/prolog/prologmud_web/src_assets/README.txt"/>
+					</Folder>
+					<Folder Name="src_webui">
+						<Folder Name="assetsources">
+							<F N="prologmud/prolog/prologmud_web/src_webui/assetsources/favicon.png"/>
+							<F N="prologmud/prolog/prologmud_web/src_webui/assetsources/favicon.psd"/>
+						</Folder>
+						<Folder Name="http">
+							<Folder Name="web">
+								<Folder Name="css">
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/css/mudconsole.css"/>
+								</Folder>
+								<Folder Name="icons">
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/icons/favicon.ico"/>
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/icons/foo.png"/>
+								</Folder>
+								<Folder Name="js">
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/js/jquery-1.7.1.js"/>
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/js/jquery.form.js"/>
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/js/mudconsole.js"/>
+								</Folder>
+							</Folder>
+							<F N="prologmud/prolog/prologmud_web/src_webui/http/user_page.pl"/>
+						</Folder>
+						<Folder Name="model">
+							<F N="prologmud/prolog/prologmud_web/src_webui/model/substance.pl"/>
+						</Folder>
+						<Folder Name="mudconsole">
+							<F N="prologmud/prolog/prologmud_web/src_webui/mudconsole/mudconsole.pl"/>
+							<F N="prologmud/prolog/prologmud_web/src_webui/mudconsole/mudconsolestart.pl"/>
+						</Folder>
+						<F N="prologmud/prolog/prologmud_web/src_webui/cliopatria_binding.pl"/>
+						<F N="prologmud/prolog/prologmud_web/src_webui/launchcliopatria.pl"/>
+						<F N="prologmud/prolog/prologmud_web/src_webui/testwebconsole.pl"/>
+					</Folder>
+				</Folder>
+			</Folder>
+		</Folder>
 		<Folder Name="prologmud_samples">
 			<Folder Name="prolog">
 				<Folder Name="prologmud_sample_games">
