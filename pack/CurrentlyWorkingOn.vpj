@@ -168,6 +168,7 @@
 						<F N="logicmoo_base/prolog/logicmoo/common_logic/common_logic_skolem.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/common_logic/common_logic_snark.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/common_logic/common_logic_sumo.pfc"/>
+						<F N="logicmoo_base/prolog/logicmoo/common_logic/common_logic_theorist.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/common_logic/INDEX.pl"/>
 					</Folder>
 					<Folder Name="motel">
@@ -4114,7 +4115,10 @@
 								<F N="logicmoo_packages/prolog/protein/EQTrafo/src/RCS/Makefile,v"/>
 								<F N="logicmoo_packages/prolog/protein/EQTrafo/src/RCS/myread.pl,v"/>
 							</Folder>
+							<F N="logicmoo_packages/prolog/protein/EQTrafo/src/eqtrafo-1493525732.pl.bak"/>
 							<F N="logicmoo_packages/prolog/protein/EQTrafo/src/eqtrafo.pl"/>
+							<F N="logicmoo_packages/prolog/protein/EQTrafo/src/johan-11-from-eqt.tme"/>
+							<F N="logicmoo_packages/prolog/protein/EQTrafo/src/johan-11-from.tme"/>
 							<F
 								N="logicmoo_packages/prolog/protein/EQTrafo/src/Makefile"
 								Type="Makefile"/>
@@ -4200,6 +4204,7 @@
 							<F N="logicmoo_packages/prolog/protein/ProSpec/Test/t2-sort.tme"/>
 							<F N="logicmoo_packages/prolog/protein/ProSpec/Test/test-sort.tme"/>
 							<F N="logicmoo_packages/prolog/protein/ProSpec/Test/test.sort"/>
+							<F N="logicmoo_packages/prolog/protein/ProSpec/Test/test.sort~"/>
 						</Folder>
 						<F
 							N="logicmoo_packages/prolog/protein/ProSpec/Makefile"
@@ -4308,6 +4313,81 @@
 						<F N="logicmoo_packages/prolog/protein/SAMPLES/spezi-sort-eqt.tme"/>
 						<F N="logicmoo_packages/prolog/protein/SAMPLES/spezi-sort.tme"/>
 						<F N="logicmoo_packages/prolog/protein/SAMPLES/spezi.sort"/>
+					</Folder>
+					<Folder Name="SCAN-IT">
+						<Folder Name="BIB">
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/antisym.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/assoc1_p.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/assoc2_p.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/assoc_f.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/assoc_f_1.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/assoc_f_2.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/assoc_p.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/asym_trans.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/equal.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/f_group.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/f_sub1.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/f_sub2.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/f_sub3.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/f_sub4.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/f_total2.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/irref.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/lctest.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/ord_le.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/ord_lt.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/p_commut.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/p_group.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/p_sub1.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/p_sub2.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/p_sub3.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/p_sub4.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/p_total2.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pc_group.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord_fsub1.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord_fsub2.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord_fsub3.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord_fsub4.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord_psub1.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord_psub2.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord_psub3.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord_psub4.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/pre_ord_rsub2.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/r_sub2.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/sym.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/test.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/theory.bib"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/theory.bib~"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/trans-sym.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/BIB/trans.lc"/>
+						</Folder>
+						<Folder Name="doc">
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/doc/scan-it.aux"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/doc/scan-it.dvi"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/doc/scan-it.log"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/doc/scan-it.ps"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/doc/scan-it.tex"/>
+						</Folder>
+						<Folder Name="Examples">
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/Examples/GRP002-3-th.tme"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/Examples/GRP002-3.lc"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/Examples/GRP002-3.th"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/Examples/GRP002-3.tme"/>
+						</Folder>
+						<Folder Name="src">
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/src/myread.pl"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/src/perm_clause.pl"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/src/pre-compiler.pl"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/src/pre-lc.pl"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/src/scanner.pl"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/src/schema-unif.pl"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/src/th-builder.pl"/>
+							<F N="logicmoo_packages/prolog/protein/SCAN-IT/src/theory.pl"/>
+						</Folder>
+						<F
+							N="logicmoo_packages/prolog/protein/SCAN-IT/Makefile"
+							Type="Makefile"/>
+						<F N="logicmoo_packages/prolog/protein/SCAN-IT/scan-it.config"/>
 					</Folder>
 					<Folder Name="TME2X">
 						<F N="logicmoo_packages/prolog/protein/TME2X/misc.pl"/>

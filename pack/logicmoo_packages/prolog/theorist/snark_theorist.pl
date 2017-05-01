@@ -958,10 +958,12 @@ The declarations are as follows:
 
 declare_fact(F) :-
    nnf(F,even,N),
+   wdmsgl(nnf=N),
    rulify(fact,N).
 
 declare_constraint(C) :-
    nnf(C,even,N),
+   wdmsgl(cnnf=N),
    rulify(constraint,N).
 
 
@@ -2365,3 +2367,229 @@ numberargs([X|L], N, M) :-
 */
 
 :- fixup_exports.
+
+
+end_of_file.
+
+fact askable_t(KB,IDEA) ; fallacy_t(KB,IDEA).
+% autoloading snark_theorist:append/3 from /usr/local/lib/swipl-7.5.4/library/lists
+% autoloading snark_theorist:portray_clause/1 from /usr/local/lib/swipl-7.5.4/library/listing
+prove_askable_t(A, B, _, anc(C, _)) :-
+        id_member(askable_t(A, B), C), !,
+        fail.
+prove_not_askable_t(A, B, _, anc(_, C)) :-
+        id_member(askable_t(A, B), C), !,
+        fail.
+ex_askable_t(D, E, ths(A, A, B, B), anc(F, _), ans(C, C)) :-
+        id_member(askable_t(D, E), F), !,
+        fail.
+ex_not_askable_t(D, E, ths(A, A, B, B), anc(_, F), ans(C, C)) :-
+        id_member(askable_t(D, E), F), !,
+        fail.
+prove_askable_t(A, B, _, anc(_, C)) :-
+        member(askable_t(A, B), C).
+prove_not_askable_t(A, B, _, anc(C, _)) :-
+        member(askable_t(A, B), C).
+ex_askable_t(D, E, ths(A, A, B, B), anc(_, F), ans(C, C)) :-
+        member(askable_t(D, E), F).
+ex_not_askable_t(D, E, ths(A, A, B, B), anc(F, _), ans(C, C)) :-
+        member(askable_t(D, E), F).
+prove_askable_t(_, _, _, anc(B, C)) :-
+        flag((depth_bound, A)),
+        number(A),
+        length(B, D),
+        length(C, E),
+        D+E>A, !,
+        fail.
+prove_not_askable_t(_, _, _, anc(B, C)) :-
+        flag((depth_bound, A)),
+        number(A),
+        length(B, D),
+        length(C, E),
+        D+E>A, !,
+        fail.
+ex_askable_t(_, _, ths(A, A, B, B), anc(E, F), ans(C, C)) :-
+        flag((depth_bound, D)),
+        number(D),
+        length(E, G),
+        length(F, H),
+        G+H>D, !,
+        fail.
+ex_not_askable_t(_, _, ths(A, A, B, B), anc(E, F), ans(C, C)) :-
+        flag((depth_bound, D)),
+        number(D),
+        length(E, G),
+        length(F, H),
+        G+H>D, !,
+        fail.
+prove_askable_t(A, B, C, anc(D, E)) :-
+        prove_not_fallacy_t(A,
+                            B,
+                            C,
+                            anc([askable_t(A, B)|D], E)).
+ex_askable_t(A, B, C, anc(D, E), F) :-
+        ex_not_fallacy_t(A,
+                         B,
+                         C,
+                         anc([askable_t(A, B)|D], E),
+                         F).
+
+prove_fallacy_t(A, B, _, anc(C, _)) :-
+        id_member(fallacy_t(A, B), C), !,
+        fail.
+prove_not_fallacy_t(A, B, _, anc(_, C)) :-
+        id_member(fallacy_t(A, B), C), !,
+        fail.
+ex_fallacy_t(D, E, ths(A, A, B, B), anc(F, _), ans(C, C)) :-
+        id_member(fallacy_t(D, E), F), !,
+        fail.
+ex_not_fallacy_t(D, E, ths(A, A, B, B), anc(_, F), ans(C, C)) :-
+        id_member(fallacy_t(D, E), F), !,
+        fail.
+prove_fallacy_t(A, B, _, anc(_, C)) :-
+        member(fallacy_t(A, B), C).
+prove_not_fallacy_t(A, B, _, anc(C, _)) :-
+        member(fallacy_t(A, B), C).
+ex_fallacy_t(D, E, ths(A, A, B, B), anc(_, F), ans(C, C)) :-
+        member(fallacy_t(D, E), F).
+ex_not_fallacy_t(D, E, ths(A, A, B, B), anc(F, _), ans(C, C)) :-
+        member(fallacy_t(D, E), F).
+prove_fallacy_t(_, _, _, anc(B, C)) :-
+        flag((depth_bound, A)),
+        number(A),
+        length(B, D),
+        length(C, E),
+        D+E>A, !,
+        fail.
+prove_not_fallacy_t(_, _, _, anc(B, C)) :-
+        flag((depth_bound, A)),
+        number(A),
+        length(B, D),
+        length(C, E),
+        D+E>A, !,
+        fail.
+ex_fallacy_t(_, _, ths(A, A, B, B), anc(E, F), ans(C, C)) :-
+        flag((depth_bound, D)),
+        number(D),
+        length(E, G),
+        length(F, H),
+        G+H>D, !,
+        fail.
+ex_not_fallacy_t(_, _, ths(A, A, B, B), anc(E, F), ans(C, C)) :-
+        flag((depth_bound, D)),
+        number(D),
+        length(E, G),
+        length(F, H),
+        G+H>D, !,
+        fail.
+prove_fallacy_t(A, B, C, anc(D, E)) :-
+        prove_not_askable_t(A,
+                            B,
+                            C,
+                            anc([fallacy_t(A, B)|D], E)).
+ex_fallacy_t(A, B, C, anc(D, E), F) :-
+        ex_not_askable_t(A,
+                         B,
+                         C,
+                         anc([fallacy_t(A, B)|D], E),
+                         F).
+
+
+
+true.
+
+
+prove_askable_t(A, B, C, anc(D, E)) :-
+        prove_not_fallacy_t(A,
+                            B,
+                            C,
+                            anc([askable_t(A, B)|D], E)).
+ex_askable_t(A, B, C, anc(D, E), F) :-
+        ex_not_fallacy_t(A,
+                         B,
+                         C,
+                         anc([askable_t(A, B)|D], E),
+                         F).
+
+
+prove_fallacy_t(A, B, C, anc(D, E)) :-
+        prove_not_askable_t(A,
+                            B,
+                            C,
+                            anc([fallacy_t(A, B)|D], E)).
+ex_fallacy_t(A, B, C, anc(D, E), F) :-
+        ex_not_askable_t(A,
+                         B,
+                         C,
+                         anc([fallacy_t(A, B)|D], E),
+                         F).
+
+
+
+
+
+
+
+
+
+
+snark_theorist:  ?- fact foo(1,2,3).
+prove_foo(A, B, C, _, anc(D, _)) :-
+        id_member(foo(A, B, C), D), !,
+        fail.
+prove_not_foo(A, B, C, _, anc(_, D)) :-
+        id_member(foo(A, B, C), D), !,
+        fail.
+ex_foo(D, E, F, ths(A, A, B, B), anc(G, _), ans(C, C)) :-
+        id_member(foo(D, E, F), G), !,
+        fail.
+ex_not_foo(D, E, F, ths(A, A, B, B), anc(_, G), ans(C, C)) :-
+        id_member(foo(D, E, F), G), !,
+        fail.
+prove_foo(A, B, C, _, anc(_, D)) :-
+        member(foo(A, B, C), D).
+prove_not_foo(A, B, C, _, anc(D, _)) :-
+        member(foo(A, B, C), D).
+ex_foo(D, E, F, ths(A, A, B, B), anc(_, G), ans(C, C)) :-
+        member(foo(D, E, F), G).
+ex_not_foo(D, E, F, ths(A, A, B, B), anc(G, _), ans(C, C)) :-
+        member(foo(D, E, F), G).
+prove_foo(_, _, _, _, anc(B, C)) :-
+        flag((depth_bound, A)),
+        number(A),
+        length(B, D),
+        length(C, E),
+        D+E>A, !,
+        fail.
+prove_not_foo(_, _, _, _, anc(B, C)) :-
+        flag((depth_bound, A)),
+        number(A),
+        length(B, D),
+        length(C, E),
+        D+E>A, !,
+        fail.
+ex_foo(_, _, _, ths(A, A, B, B), anc(E, F), ans(C, C)) :-
+        flag((depth_bound, D)),
+        number(D),
+        length(E, G),
+        length(F, H),
+        G+H>D, !,
+        fail.
+ex_not_foo(_, _, _, ths(A, A, B, B), anc(E, F), ans(C, C)) :-
+        flag((depth_bound, D)),
+        number(D),
+        length(E, G),
+        length(F, H),
+        G+H>D, !,
+        fail.
+
+
+prove_foo(1, 2, 3, _, _).
+ex_foo(1, 2, 3, ths(A, A, B, B), _, ans(C, C)).
+true.
+
+
+snark_theorist:  ?- fact foo(1,2,4).
+prove_foo(1, 2, 4, _, _).
+ex_foo(1, 2, 4, ths(A, A, B, B), _, ans(C, C)).
+

@@ -1,6 +1,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $ID$
 % $Log: eqtrafo.pl,v $
+% Revision 1.14  2000/06/14 15:26:16  bthomas
+% no more numbervars and no infix notation anymore
+%
+% Revision 1.13  2000/06/14 15:09:12  bthomas
+% no more numbervars and no infix output
+%
 % Revision 1.10  1999/04/19 12:25:04  peter
 % one more bug fix
 %
@@ -111,7 +117,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-version_number("$Revision: 1.10 $").
+version_number("$Revision: 1.14 $").
 
 :- dynamic func_tpos/3,
 	   p_funcs/1,
@@ -1100,7 +1106,7 @@ write_clauses(OUT,[[]|MC]) :-
 	write_clauses(OUT,MC), !.
 write_clauses(OUT,[Clause|MC]) :-
 	nl(OUT),
-	numbervars(Clause,0,_),
+%	numbervars(Clause,0,_),
 	build_rule(Clause,HEAD,BODY),
 	incval(nr_output),
 	( getval(name_ok,1),eqtrafo_flag(output,ilf) ->
@@ -1142,26 +1148,26 @@ write_query(OUT,[Q|MQ]) :-
 	write(OUT,'?- '),
 	term_list(TQ,Q),
 	neg_term_list(TQ,NQ),
-	numbervars(NQ,0,_),
+%	numbervars(NQ,0,_),
 	write_body(OUT,NQ,nocost),
 	write_query(OUT,MQ).
 
 write_disjunc(OUT,[LAST],FLAG) :-
-	printf(OUT,'%VDQw',[LAST]),
+	printf(OUT,'%OVDw',[LAST]),
 	( FLAG = cost, write(OUT,' # (0,0)') ; true ),
 	write(OUT,'.\n'), !.
 write_disjunc(OUT,[L|ML],FLAG) :-
-	printf(OUT,'%VDQw',[L]),
+	printf(OUT,'%OVDw',[L]),
 	write(OUT,'; \n'),
 	write_disjunc(OUT,ML,FLAG).
 
 write_body(OUT,[LAST],FLAG) :-
 	( eqtrafo_flag(output,pretty) ->
-	    write(OUT,'\t '),printf(OUT,'%VDQw',[LAST]),
+	    write(OUT,'\t '),printf(OUT,'%OVDw',[LAST]),
 	    ( FLAG = cost, write(OUT,' # (0,0)') ; true ),
 	    write(OUT,'.\n')
 	;
-	printf(OUT,'%VDQw',[LAST]),
+	printf(OUT,'%OVDw',[LAST]),
 	( FLAG = cost, write(OUT,' # (0,0)') ; true ), 
 	write(OUT,'.')
        ).
@@ -1169,14 +1175,14 @@ write_body(OUT,[LAST],FLAG) :-
 write_body(OUT,[L|ML],FLAG) :-
 	( eqtrafo_flag(output,pretty) ->
 	    write(OUT,'\t '),
-	    printf(OUT,'%VDQw',[L]), write(OUT,',\n')
+	    printf(OUT,'%OVDw',[L]), write(OUT,',\n')
 	;
-	   printf(OUT,'%VDQw',[L]), write(OUT,' , ')
+	   printf(OUT,'%OVDw',[L]), write(OUT,' , ')
        ),
 	write_body(OUT,ML,FLAG), !.
 
 write_head( OUT,[LAST] ) :-
-	printf(OUT,'%VDQw',[LAST]),
+	printf(OUT,'%OVDw',[LAST]),
 	( eqtrafo_flag(output,pretty) -> 
 	   write(OUT,' :- \n')
         ; 
@@ -1185,7 +1191,7 @@ write_head( OUT,[LAST] ) :-
         !.
 
 write_head( OUT,[H|MH] ) :-
-        printf(OUT,'%VDQw',[H]),
+        printf(OUT,'%OVDw',[H]),
 	( eqtrafo_flag(output,pretty) -> 
 	    write(OUT,'; \n')
 	;
@@ -1299,20 +1305,23 @@ tail(OUT) :-
 %% numbervars may do some strange things ...
 msg([]) :- nl,flush(stdout),!.
 msg([E|ME]) :-
-	numbervars(E,0,_),
+%	numbervars(E,0,_),
 	write(E),
 	msg(ME), !.
 
 msg(S,[]) :- nl(S),!.
 msg(S,[E|ME]) :-
-	numbervars(E,0,_),
-	printf(S,'%VDQw',[E]),
+%	numbervars(E,0,_),
+	%
+	% Benno 14.6.2000: important here we have to keep infix notation (:-) for rules
+	%  e.g. tpos_create ...
+	printf(S,'%VDw',[E]),
 %	write(S,E),
 	msg(S,ME), !.
 
 mmsg(S,[]) :- nl(S),!.
 mmsg(S,[E|ME]) :-
-	numbervars(E,0,_),
+%	numbervars(E,0,_),
 	write(S,E),
 	mmsg(S,ME), !.
 
