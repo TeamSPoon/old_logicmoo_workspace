@@ -263,10 +263,15 @@
 						<F N="logicmoo_base/t/examples/fol/family_inheritance.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/family_regress.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/fol_birdt.pfc"/>
+						<F N="logicmoo_base/t/examples/fol/fol_options.pl"/>
 						<F N="logicmoo_base/t/examples/fol/kif_sanity.pl"/>
 						<F N="logicmoo_base/t/examples/fol/lefty.pfc"/>
+						<F N="logicmoo_base/t/examples/fol/lm_repl3"/>
 						<F N="logicmoo_base/t/examples/fol/make.sh"/>
+						<F N="logicmoo_base/t/examples/fol/make_types_wff_01.pl"/>
 						<F N="logicmoo_base/t/examples/fol/make_wff_01.pl"/>
+						<F N="logicmoo_base/t/examples/fol/make_wff_01a.pl"/>
+						<F N="logicmoo_base/t/examples/fol/make_wff_02.pfc.pl"/>
 						<F N="logicmoo_base/t/examples/fol/missing_count_01.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/missing_count_02.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/missing_count_03.pfc"/>
@@ -278,6 +283,7 @@
 						<F N="logicmoo_base/t/examples/fol/poss_forall_exists_03.pl"/>
 						<F N="logicmoo_base/t/examples/fol/poss_forall_exists_04.pl"/>
 						<F N="logicmoo_base/t/examples/fol/poss_forall_exists_05.pl"/>
+						<F N="logicmoo_base/t/examples/fol/sanity_exists_01.pl"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_fi_human.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_fi_sk.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_poss_01.pl"/>
@@ -285,7 +291,9 @@
 						<F N="logicmoo_base/t/examples/fol/sanity_poss_03.pl"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_sk_human.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_sk_two.pfc"/>
+						<F N="logicmoo_base/t/examples/fol/test_fol"/>
 						<F N="logicmoo_base/t/examples/fol/test_header.pfc"/>
+						<F N="logicmoo_base/t/examples/fol/tiny_kb_cache"/>
 						<F N="logicmoo_base/t/examples/fol/zebra0.clif"/>
 						<F N="logicmoo_base/t/examples/fol/zebra1.clif"/>
 						<F N="logicmoo_base/t/examples/fol/zebra2.clif"/>
