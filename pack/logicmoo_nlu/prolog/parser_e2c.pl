@@ -4011,7 +4011,7 @@ end_of_file.
 (dictionary/3),
 (form80/2),
 (wnS/6)
-(tag_pos/2),
+% (tag_pos/2),
 
         common_logic_kb_hooks:t/1),
         common_logic_sexpr:is_quantifier/1),

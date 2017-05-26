@@ -253,9 +253,12 @@
 						<F N="logicmoo_base/t/examples/csp/einstein_simpler.pfc.pl"/>
 					</Folder>
 					<Folder Name="fol">
+						<F N="logicmoo_base/t/examples/fol/__tmp18806.prc"/>
 						<F N="logicmoo_base/t/examples/fol/boxlog_sanity.pl"/>
 						<F N="logicmoo_base/t/examples/fol/dislikes.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/einstein_simpler.pfc.pl"/>
+						<F N="logicmoo_base/t/examples/fol/einstein_simpler2.pfc.pl"/>
+						<F N="logicmoo_base/t/examples/fol/einsteins_riddle.owl"/>
 						<F N="logicmoo_base/t/examples/fol/exactly.clif"/>
 						<F N="logicmoo_base/t/examples/fol/exactly_one_has_the_value.clif"/>
 						<F N="logicmoo_base/t/examples/fol/exactly_one_instance.clif"/>
@@ -272,6 +275,7 @@
 						<F N="logicmoo_base/t/examples/fol/make_wff_01.pl"/>
 						<F N="logicmoo_base/t/examples/fol/make_wff_01a.pl"/>
 						<F N="logicmoo_base/t/examples/fol/make_wff_02.pfc.pl"/>
+						<F N="logicmoo_base/t/examples/fol/MakeTester.sh"/>
 						<F N="logicmoo_base/t/examples/fol/missing_count_01.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/missing_count_02.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/missing_count_03.pfc"/>
