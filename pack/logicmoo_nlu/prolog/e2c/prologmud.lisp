@@ -7,6 +7,7 @@
 ;;(load "e2c/const-renamer.lisp")
 (load "e2c/renames-fixed.lisp")
 (load "e2c/export.lisp")
+(load "e2c/renames.lisp")
 ;;(load "e2c/remove-instances.lisp")
 ;;(load "e2c/cogbot-ke.lisp")
 ;; (cdo ((*x* 0  (+ *x* 1))) ((= *x* (constant-count))) (fi-assert `(,(foc "plainCycConstant") ,(find-constant-by-internal-id *x*)) '#$UniversalVocabularyMt))

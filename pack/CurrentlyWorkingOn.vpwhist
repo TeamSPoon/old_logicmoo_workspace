@@ -1,0 +1,1087 @@
+[Global]
+CurrentProject=CurrentlyWorkingOn.vpj
+[ActiveConfig]
+CurrentlyWorkingOn.vpj=Release
+TeamSPoon.vpj=Release
+[ProjectDates]
+CurrentlyWorkingOn.vpj=20170602190124730
+TeamSPoon.vpj=20170601055955343
+[TreeExpansion2]
+- CurrentlyWorkingOn.vpj
+  - clause_attvars
+    - prolog
+    + t
+  - dictoo
+    - prolog
+    + t
+  + each_call_cleanup
+    + prolog
+    + t
+  + file_scope
+    + prolog
+    + t
+  + fluxplayer-prolog-engine
+  - gvar_syntax
+    - prolog
+    + t
+  - hook_hybrid
+    - prolog
+    + t
+  + lib_atts
+    + prolog
+  - logicmoo_base
+    - prolog
+      + config-enabled
+        + now_disabled
+      - logicmoo
+        - common_logic
+        - motel
+        - pfc
+        - plarkc
+        - pttp
+        + xray
+    + t
+      + examples
+        + api
+        + bugs
+        + csp
+        + fol
+        + modified-files-20170426_092611
+        + perf
+        + pfc
+        + sanity_user
+        + snark
+        + tptp
+  + logicmoo_nlu
+    + prolog
+      + ace_in_gf
+        + docs
+          + bib
+          + d11_1
+            + images
+        + grammars
+          + ace
+          + acewiki_aceowl
+          + attempto
+          + exclude
+        + lib
+          + src
+            + ace
+            + api
+        + probs
+        + tests
+          + ace
+          + acewiki_aceowl
+          + Geography
+            + Ace
+            + Ger
+            + Spa
+          + geo
+          + no
+          + ontograph_40
+          + ontograph_ext
+          + Words300
+        + tools
+          + APE
+          + Codeco
+        + words
+          + acewiki_aceowl
+          + clex
+          + Geography
+          + geo
+          + ontograph_40
+          + Simple
+          + test
+          + Words300
+      + AceRules
+        + engine
+          + court_interpreter
+          + examples
+          + parser
+          + skolemizer
+          + stable_interpreter
+          + testcases
+            + court
+              + input
+              + output
+            + stable
+              + input
+              + output
+            + stable_strong
+              + input
+              + output
+          + verbalizer
+          + webservice
+        + webapp
+          + src
+            + ch
+              + uzh
+                + ifi
+                  + attempto
+                    + acerules
+                      + help
+                        + page
+                          + error
+                          + ref
+                      + resource
+                      + style
+          + war
+            + WEB-INF
+        + webclient
+      + ape
+        + examples
+        + java
+          + src
+            + main
+              + java
+                + ch
+                  + uzh
+                    + ifi
+                      + attempto
+                        + ape
+            + test
+              + java
+                + ch
+                  + uzh
+                    + ifi
+                      + attempto
+                        + ape
+        + lexicon
+        + logger
+        + parser
+        + tests
+          + testruns
+        + tools
+        + utils
+          + owlswrl
+      + candc
+        + src
+          + api
+            + ccg
+            + nlp
+            + python
+            + soap
+          + data
+            + italian
+              + prolog
+            + vpe
+          + prolog
+            + boxer
+              + knowledge
+              + lex
+            + lib
+            + nutcracker
+          + scripts
+            + boxer
+              + sick
+            + ccg
+            + class
+            + memex
+          + tests
+            + ccg
+          + web
+        + working
+      + chart89
+      + chat80
+      + chat80_regress
+      + CURT
+        + bb0
+        + bb1
+        + bb2
+      + SIRIDUS
+        + UGOT-D31
+          + godis
+            + doc
+              + LaTeX
+            + general
+            + godis-all
+              + rule_libs
+            + godis-aod
+            + godis-basic
+            + godis-grounding
+            + godis-iod
+          + godis-apps
+            + cellphone
+            + domain-agendatalk
+              + Resources
+              + Speech
+            + domain-icecream
+              + Resources
+            + domain-legoturtle
+              + asrg_legoturtle_english
+              + asrg_vcr_english
+              + logs
+              + OLD
+              + rcxTcl
+            + domain-medical
+              + Database
+                + org
+                  + mitre
+                    + midiki
+                      + workshop
+              + Experiments
+            + domain-player
+              + DBaseAgent
+              + DJGoDisGram
+                + DBase
+                  + English
+                  + Swedish
+                + MultiModal
+                + Numbers
+                + Shared
+                + System
+                + User
+              + inoutnuance
+              + player-old
+                + Resources
+              + Resources
+              + Speech
+            + domain-ta
+              + Resources
+            + domain-tel
+            + domain-telvcr
+            + domain-tram
+              + Resources
+            + domain-vcr
+              + Resources
+              + Speech
+              + Trash
+                + asrg_vcr_english
+            + domain-x10
+              + Resources
+            + ToUpgrade
+              + Autoroute
+              + Cellphone
+              + domain-tel
+              + Home
+                + OLD
+              + IMDiS
+              + VcrPhone
+                + OLD
+          + trindikit4-0.1alpha
+            + examples
+              + godis-basic
+                + Agents
+                + datatypes
+                + modules
+                + resource_interfaces
+                + resources
+                + TISdefs
+  - logicmoo_packages
+    - prolog
+      + ailog2
+      + aleph
+      + asn
+      + Back52
+        + libraries
+        + tests
+        + translate
+      + cec
+        + doc
+          + cec
+            + example
+            + induction
+        + lib
+          + cec
+            + help
+            + standard
+          + examples
+            + math
+            + osspecs
+        + obj
+          + cec
+        + src
+          + cec
+            + acUni
+            + completion
+            + compute
+            + cr
+            + display
+            + help
+            + inout
+            + make
+            + panndas
+            + prolog
+            + rg
+            + specVars
+            + terms
+            + tps
+              + kns
+              + polyn
+            + worlds
+      + cltools
+        + bin
+        + t
+      + dctg
+      + flux
+      + galliwasp-1.3.5
+        + compiler
+        + interpreter
+          + include
+      + gasp
+      + grips
+        + compiler
+      + indigolog
+        + Doc
+          + source
+        + Env
+        + Eval
+        + Examples
+          + ElevatorSim-BAT\.xpce
+          + CLIMA
+          + Delivery-BAT
+          + Elevator-Vanilla
+          + ElevatorLego-BAT
+          + ElevatorSim-BAT
+          + ER1Test-BAT
+          + PMS
+          + Wumpus-FLUX
+            + WumpusApplet
+          + Wumpus-KBAT
+            + Screenshots
+            + WumpusApplet
+        + flux_WumpusApplet
+        + Interpreters
+          + flux
+        + lib
+      + MaLARea
+        + doc
+        + script
+          + malecop
+      + mike
+      + MIndiGolog0
+      + motel
+        + misc
+      + PKnows-0.9.9
+        + vpdl
+      - protein
+        + EQTrafo
+          + Examples
+          + Misc
+          + src
+            + RCS
+        + Papers relevant to PROTEIN and LC_files
+        + ProSpec
+          + DOC
+            + auto
+          + Examples
+          + Misc
+          + src
+            + RCS
+          + Test
+        + SAMPLES
+        + SCAN-IT
+          + BIB
+          + doc
+          + Examples
+          + src
+        + TME2X
+        + www
+      + thea2
+        + apps
+          + labelgen
+            + grammars
+          + mireot
+          + opencalais
+            + thea_opencalais.txt_files
+          + owlmacros
+          + semsim
+          + webthea
+          + webthea_old
+            + css
+            + js
+        + benchmarks
+        + bin
+        + examples
+          + owllink
+        + iso
+        + owl2java
+        + owlgres
+        + testfiles
+        + tools
+        + util
+      + theorist
+        + www.cs.ubc.ca
+          + ~poole
+            + aibook
+              + code
+                + ailog
+                + Prolog
+                  + ch12
+            + ci
+              + code
+                + apb
+                + apc
+                + ch10
+                + ch11
+                + ch12
+                + ch2
+                + ch3
+                + ch4
+                + ch5
+                + ch6
+                + ch7
+                + ch8
+                + ch9
+                + cilog
+                  + cilog_code
+                    + ch2
+                    + ch3
+                    + ch4
+                    + ch6
+                    + ch9
+              + problems
+                + ch3
+                + ch4
+            + code
+              + code_icl
+                + code_icl
+            + cs312
+              + 2016
+                + as1
+                + as2
+                + as3
+                + as4
+                + exams
+                + prolog
+            + law
+      + trill
+        + probabilistic
+      + upv_curry
+        + examples
+        + turtorial
+          + chapter2
+          + chapter3
+          + chapter4
+          + chapter5
+      + xray
+      + yadlr
+        + examples
+          + iris
+          + trains
+        + pl
+  - logicmoo_utils
+    - prolog
+    + t
+  - loop_check
+    - prolog
+  - must_trace
+    - prolog
+    + t
+  - pfc
+    - prolog
+      - pfc2.0
+      - pfclib
+    - t
+      - sanity_base
+  + prologmud
+    - prolog
+      - prologmud
+        + actions
+        + mobs
+          + affordance
+        + objs
+        + parsing
+        - server
+        + vworld
+      + prologmud_web
+        + src_assets
+        + src_webui
+          + assetsources
+          + http
+            + web
+              + css
+              + icons
+              + js
+          + model
+          + mudconsole
+  - prologmud_samples
+    + prolog
+      - prologmud_sample_games
+        - btepisode
+        - hmud
+          + flashpolicyd_v0.6
+            + Perl_xinetd
+            + Standalone
+        + ontologyportal_sumo
+          + development
+          + mappings
+          + Translations
+        + src_game_nani
+          + web
+            + prolog
+        + src_game_sims
+          + web
+            + prolog
+        + src_game_startrek
+          + holodeck
+          + mobs
+          + web
+            + prolog
+        + src_game_wumpus
+  - s_expression
+    - prolog
+  - tabling_dra
+    - prolog
+  - xlisting
+    - prolog
+scroll:36
+[State]
+SCREEN: 1920 1200 379 288 652 457 0 0 M 0 0 0 0 1546 753
+CWD: \devel\LogicmooDeveloperFramework\swipl-devel\boot
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\boot\load.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2353 CL=29 LE=0 CX=28 CY=17 WI=5 BI=261 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\packages\plunit\plunit.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=259 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\boot\init.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4510 CL=6 LE=0 CX=5 CY=17 WI=5 BI=262 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_ctx_frame.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=271 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\boot\syspred.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=260 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\boot\toplevel.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.17506 CL=98 LE=0 CX=97 CY=16 WI=5 BI=263 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\must_trace.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4384 CL=33 LE=0 CX=32 CY=51 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\rtrace.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.9350 CL=55 LE=0 CX=54 CY=51 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\frames.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=268 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\block3.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=270 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\bugger.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.48200 CL=85 LE=0 CX=84 CY=51 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="each_call_cleanup\pack.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.344 CL=36 LE=0 CX=35 CY=9 WI=5 BI=240 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\dumpst.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.12186 CL=41 LE=0 CX=40 CY=17 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_dra.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=264 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="xlisting\prolog\xlisting.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.20696 CL=44 LE=0 CX=43 CY=51 WI=5 BI=43 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="hook_hybrid\prolog\virtualize_source.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1330 CL=31 LE=0 CX=30 CY=42 WI=5 BI=255 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="loop_check\prolog\loop_check.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2802 CL=86 LE=0 CX=85 CY=51 WI=5 BI=265 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pfc\autoexec.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1474 CL=3 LE=0 CX=2 CY=16 WI=5 BI=253 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pfc\user_transitiveViaArg.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=229 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pfc\user_type_barriers.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=228 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_expansion.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.671 CL=36 LE=0 CX=35 CY=15 WI=5 BI=217 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_isa.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=195 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_constraints.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=216 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_userkb.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=194 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="clause_attvars\prolog\attvar_reader.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=188 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="clause_attvars\prolog\attvar_serializer.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=189 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="clause_attvars\prolog\clause_attvars.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=187 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="clause_attvars\prolog\toplevel_variable_names.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=186 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="gvar_syntax\prolog\gvar_syntax.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=185 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="dictoo\prolog\dictoo.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8081 CL=12 LE=0 CX=11 CY=17 WI=5 BI=190 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_loader.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=193 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_kb_ops.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=192 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_hooks.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=191 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_autoexec.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=215 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_constraints.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=214 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_genls.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=212 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_domains.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=209 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\INDEX.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=211 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\t\sanity_base\shift_01.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=208 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="tabling_dra\prolog\assert_db_dra.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=207 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="tabling_dra\prolog\record_db_dra.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=206 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="s_expression\prolog\sexpr_reader.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=205 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="bump_packs.sh"
+BI: MA=1 74 1  TABS=1 4  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Slick-C	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=210 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prologmud_samples\prolog\prologmud_sample_games\init_mud_server.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=204 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prologmud\prolog\prologmud\server\mud_http_hmud.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=201 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\t\sanity_base\df_04.pfc"
+BI: MA=1 254 1  TABS=1 9  WWS=3 IWT=0 ST=0 IN=0 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=202 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\t\sanity_base\dmost_02.pfc"
+BI: MA=1 254 1  TABS=1 9  WWS=3 IWT=0 ST=0 IN=0 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=203 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_snark.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.51940 CL=3 LE=0 CX=2 CY=17 WI=5 BI=237 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_common.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=213 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=227 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp_compile_dalit.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=226 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp_precompiled.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=198 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_wff.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=197 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_naming.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=196 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_snark.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=225 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_pttp.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=221 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_repl.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=220 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_user.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=219 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_compiler.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.10858 CL=22 LE=0 CX=21 CY=17 WI=5 BI=231 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_skolem.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2078 CL=21 LE=0 CX=20 CY=17 WI=5 BI=235 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\motel\examples.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=218 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_engine.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=224 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_cycqlf.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=223 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_cyc_exec.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=222 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\util_supp.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2396 CL=4 LE=0 CX=3 CY=51 WI=5 BI=269 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2282 CL=1 LE=0 CX=0 CY=23 WI=5 BI=256 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_kb.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.629 CL=99 LE=0 CX=98 CY=17 WI=5 BI=251 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_unused.txt"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=200 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp_statics.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=199 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_xform.pfc"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=248 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_u_cyc_flora_rules.pfc"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=247 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_u_dolce_2_1.kif"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=245 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="xlisting\prolog\listing_vars.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8502 CL=46 LE=0 CX=45 CY=17 WI=5 BI=47 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_rewriting.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.90266 CL=55 LE=0 CX=54 CY=19 WI=5 BI=249 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_plarkc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1043 CL=1 LE=0 CX=0 CY=5 WI=5 BI=250 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_boxlog.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=239 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_theorist.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=241 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_sumo.pfc"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=238 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_sanity.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=236 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_kb_hooks.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=233 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_convert.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=232 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_clif.pfc"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=230 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_u_cyc_kb_tinykb.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1459864 CL=30 LE=0 CX=29 CY=16 WI=5 BI=246 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_loader.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=234 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="hook_hybrid\prolog\lockable_vars.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=257 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_webbot.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.16992 CL=44 LE=0 CX=43 CY=17 WI=5 BI=252 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_common.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1281 CL=60 LE=0 CX=59 CY=20 WI=5 BI=266 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\ucatch.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=267 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\first.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\dmsg.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=49 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1312 519 -1 -1 N  WF=0 WT=75 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud\prolog\prologmud\server\mud_http_hmud.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=570 BI=201 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1312 519 -1 -1 N  WF=0 WT=31 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_rewriting.pl"
+VIEW: LN=.89769 CL=33 LE=0 CX=32 CY=13 WI=494 BI=249 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1312 519 -1 -1 N  WF=0 WT=60 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\motel\examples.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=550 BI=218 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1312 519 -1 -1 N  WF=0 WT=68 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\INDEX.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=563 BI=211 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1312 519 -1 -1 N  WF=0 WT=64 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_constraints.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=558 BI=214 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1312 519 -1 -1 N  WF=0 WT=41 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_snark.pl"
+VIEW: LN=.51940 CL=3 LE=0 CX=2 CY=17 WI=512 BI=237 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1312 519 -1 -1 N  WF=0 WT=77 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\t\sanity_base\dmost_02.pfc"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=572 BI=203 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1312 519 -1 -1 N  WF=0 WT=76 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\t\sanity_base\df_04.pfc"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=571 BI=202 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1312 519 -1 -1 N  WF=0 WT=74 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud_samples\prolog\prologmud_sample_games\init_mud_server.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=569 BI=204 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=73 "Default Fixed Font,14,0,1"
+BUFFER: BN="bump_packs.sh"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=568 BI=210 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=72 "Default Fixed Font,14,0,1"
+BUFFER: BN="s_expression\prolog\sexpr_reader.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=567 BI=205 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1312 519 -1 -1 N  WF=0 WT=71 "Default Fixed Font,14,0,1"
+BUFFER: BN="tabling_dra\prolog\record_db_dra.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=566 BI=206 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1312 519 -1 -1 N  WF=0 WT=70 "Default Fixed Font,14,0,1"
+BUFFER: BN="tabling_dra\prolog\assert_db_dra.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=565 BI=207 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1312 519 -1 -1 N  WF=0 WT=69 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\t\sanity_base\shift_01.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=564 BI=208 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1312 519 -1 -1 N  WF=0 WT=67 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_domains.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=562 BI=209 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1312 519 -1 -1 N  WF=0 WT=66 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_genls.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=561 BI=212 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1312 519 -1 -1 N  WF=0 WT=65 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_common.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=560 BI=213 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=63 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_autoexec.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=556 BI=215 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1312 519 -1 -1 N  WF=0 WT=50 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pfc\user_type_barriers.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=530 BI=228 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=43 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_skolem.pl"
+VIEW: LN=.2078 CL=21 LE=0 CX=20 CY=17 WI=516 BI=235 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1312 519 -1 -1 N  WF=0 WT=47 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_compiler.pl"
+VIEW: LN=.10858 CL=22 LE=0 CX=21 CY=17 WI=524 BI=231 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1312 519 -1 -1 N  WF=0 WT=59 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_user.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=548 BI=219 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1312 519 -1 -1 N  WF=0 WT=58 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_repl.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=546 BI=220 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1312 519 -1 -1 N  WF=0 WT=57 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_pttp.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=544 BI=221 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=53 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_snark.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=536 BI=225 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1312 519 -1 -1 N  WF=0 WT=56 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_cyc_exec.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=542 BI=222 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1312 519 -1 -1 N  WF=0 WT=55 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_cycqlf.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=540 BI=223 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1312 519 -1 -1 N  WF=0 WT=54 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_engine.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=538 BI=224 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1312 519 -1 -1 N  WF=0 WT=49 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pfc\user_transitiveViaArg.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=528 BI=229 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1312 519 -1 -1 N  WF=0 WT=25 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pfc\autoexec.pfc.pl"
+VIEW: LN=.1474 CL=3 LE=0 CX=2 CY=16 WI=410 BI=253 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1312 519 -1 -1 N  WF=0 WT=37 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_boxlog.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=504 BI=239 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1312 519 -1 -1 N  WF=0 WT=46 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_convert.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=522 BI=232 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1312 519 -1 -1 N  WF=0 WT=45 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_kb_hooks.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=520 BI=233 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=42 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_sanity.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=514 BI=236 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1312 519 -1 -1 N  WF=0 WT=44 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_loader.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=518 BI=234 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1312 519 -1 -1 N  WF=0 WT=40 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_sumo.pfc"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=510 BI=238 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1312 519 -1 -1 N  WF=0 WT=39 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_theorist.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=508 BI=241 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1312 519 -1 -1 N  WF=0 WT=38 ",,,"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_boxlog.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=506 BI=239 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1312 519 -1 -1 N  WF=0 WT=28 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_plarkc.pl"
+VIEW: LN=.1043 CL=1 LE=0 CX=0 CY=5 WI=398 BI=250 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1312 519 -1 -1 N  WF=0 WT=26 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_webbot.pl"
+VIEW: LN=.16992 CL=44 LE=0 CX=43 CY=17 WI=488 BI=252 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1312 519 -1 -1 N  WF=0 WT=15 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_common.pl"
+VIEW: LN=.2376 CL=14 LE=0 CX=13 CY=17 WI=478 BI=266 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=23 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc.pl"
+VIEW: LN=.2282 CL=1 LE=0 CX=0 CY=23 WI=484 BI=256 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1312 519 -1 -1 N  WF=0 WT=7 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\dumpst.pl"
+VIEW: LN=.11784 CL=53 LE=0 CX=52 CY=12 WI=462 BI=40 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1312 519 -1 -1 N  WF=0 WT=36 "Default Fixed Font,14,0,1"
+BUFFER: BN="each_call_cleanup\pack.pl"
+VIEW: LN=.344 CL=36 LE=0 CX=35 CY=9 WI=431 BI=240 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1312 519 -1 -1 N  WF=0 WT=35 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_u_dolce_2_1.kif"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=502 BI=245 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=33 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_u_cyc_flora_rules.pfc"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=498 BI=247 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=32 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_xform.pfc"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=496 BI=248 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1312 519 -1 -1 N  WF=0 WT=30 ",,,"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp_statics.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=492 BI=199 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1312 519 -1 -1 N  WF=0 WT=27 "Default Fixed Font,14,0,1"
+BUFFER: BN="hook_hybrid\prolog\lockable_vars.pl"
+VIEW: LN=.3747 CL=1 LE=0 CX=0 CY=17 WI=411 BI=257 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=12 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\util_supp.pl"
+VIEW: LN=.2396 CL=4 LE=0 CX=3 CY=19 WI=472 BI=269 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1312 519 -1 -1 N  WF=0 WT=14 "Default Fixed Font,14,0,1"
+BUFFER: BN="loop_check\prolog\loop_check.pl"
+VIEW: LN=.2802 CL=86 LE=0 CX=85 CY=19 WI=476 BI=265 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1312 519 -1 -1 N  WF=0 WT=24 "Default Fixed Font,14,0,1"
+BUFFER: BN="hook_hybrid\prolog\virtualize_source.pl"
+VIEW: LN=.1330 CL=31 LE=0 CX=30 CY=19 WI=486 BI=255 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1312 519 -1 -1 N  WF=0 WT=4 "Default Fixed Font,14,0,1"
+BUFFER: BN="xlisting\prolog\xlisting.pl"
+VIEW: LN=.20696 CL=44 LE=0 CX=43 CY=19 WI=456 BI=43 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1312 519 -1 -1 N  WF=0 WT=5 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\rtrace.pl"
+VIEW: LN=.9350 CL=55 LE=0 CX=54 CY=11 WI=458 BI=42 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=2 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\must_trace.pl"
+VIEW: LN=.4080 CL=1 LE=0 CX=0 CY=2 WI=453 BI=44 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1312 519 -1 -1 N  WF=0 WT=19 "Default Fixed Font,14,0,1"
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\boot\load.pl"
+VIEW: LN=.2353 CL=4 LE=0 CX=3 CY=17 WI=442 BI=261 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1312 519 -1 -1 N  WF=0 WT=18 "Default Fixed Font,14,0,1"
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\boot\toplevel.pl"
+VIEW: LN=.17506 CL=98 LE=0 CX=97 CY=16 WI=402 BI=263 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1312 519 -1 -1 N  WF=0 WT=21 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_ctx_frame.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=482 BI=271 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=22 "Default Fixed Font,14,0,1"
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\packages\plunit\plunit.pl"
+VIEW: LN=.8981 CL=6 LE=0 CX=5 CY=16 WI=433 BI=259 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1312 519 -1 -1 N  WF=0 WT=17 "Default Fixed Font,14,0,1"
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\boot\init.pl"
+VIEW: LN=.4510 CL=6 LE=0 CX=5 CY=17 WI=406 BI=262 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1312 519 -1 -1 N  WF=0 WT=20 "Default Fixed Font,14,0,1"
+BUFFER: BN="\devel\LogicmooDeveloperFramework\swipl-devel\boot\syspred.pl"
+VIEW: LN=.7821 CL=6 LE=0 CX=5 CY=16 WI=436 BI=260 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1312 519 -1 -1 N  WF=0 WT=16 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_dra.pl"
+VIEW: LN=.562 CL=53 LE=0 CX=52 CY=19 WI=480 BI=264 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1312 519 -1 -1 N  WF=0 WT=9 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\bugger.pl"
+VIEW: LN=.48200 CL=85 LE=0 CX=84 CY=17 WI=466 BI=39 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1312 519 -1 -1 N  WF=0 WT=10 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\block3.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=468 BI=270 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1312 519 -1 -1 N  WF=0 WT=8 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\dmsg.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=464 BI=49 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=13 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\frames.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=474 BI=268 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1312 519 -1 -1 N  WF=0 WT=11 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\ucatch.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=470 BI=267 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1312 519 -1 -1 N  WF=0 WT=6 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\first.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=460 BI=41 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1312 519 -1 -1 N  WF=0 WT=78 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_unused.txt"
+VIEW: LN=.840 CL=21 LE=0 CX=20 CY=18 WI=573 BI=200 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=93 "Default Fixed Font,14,0,1"
+BUFFER: BN="gvar_syntax\prolog\gvar_syntax.pl"
+VIEW: LN=.224 CL=42 LE=0 CX=41 CY=8 WI=588 BI=185 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1312 519 -1 -1 N  WF=0 WT=88 "Default Fixed Font,14,0,1"
+BUFFER: BN="dictoo\prolog\dictoo.pl"
+VIEW: LN=.4800 CL=92 LE=0 CX=91 CY=20 WI=583 BI=190 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=92 "Default Fixed Font,14,0,1"
+BUFFER: BN="clause_attvars\prolog\toplevel_variable_names.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=587 BI=186 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1312 519 -1 -1 N  WF=0 WT=91 "Default Fixed Font,14,0,1"
+BUFFER: BN="clause_attvars\prolog\clause_attvars.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=586 BI=187 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1312 519 -1 -1 N  WF=0 WT=90 "Default Fixed Font,14,0,1"
+BUFFER: BN="clause_attvars\prolog\attvar_serializer.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=585 BI=189 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1312 519 -1 -1 N  WF=0 WT=89 "Default Fixed Font,14,0,1"
+BUFFER: BN="clause_attvars\prolog\attvar_reader.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=584 BI=188 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1312 519 -1 -1 N  WF=0 WT=84 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_userkb.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=579 BI=194 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=3 "Default Fixed Font,14,0,1"
+BUFFER: BN="xlisting\prolog\listing_vars.pl"
+VIEW: LN=.39806 CL=86 LE=0 CX=85 CY=12 WI=454 BI=47 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1312 519 -1 -1 N  WF=0 WT=48 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\common_logic\common_logic_clif.pfc"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=526 BI=230 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1312 519 -1 -1 N  WF=0 WT=83 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_isa.pl"
+VIEW: LN=.8413 CL=111 LE=0 CX=110 CY=16 WI=578 BI=195 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1312 519 -1 -1 N  WF=0 WT=61 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_expansion.pl"
+VIEW: LN=.671 CL=36 LE=0 CX=35 CY=15 WI=552 BI=217 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1312 519 -1 -1 N  WF=0 WT=87 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_hooks.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=582 BI=191 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1312 519 -1 -1 N  WF=0 WT=86 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_kb_ops.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=581 BI=192 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1312 519 -1 -1 N  WF=0 WT=85 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_loader.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=580 BI=193 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=62 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_constraints.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=554 BI=216 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=82 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_naming.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=577 BI=196 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1312 519 -1 -1 N  WF=0 WT=81 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_wff.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=576 BI=197 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1312 519 -1 -1 N  WF=0 WT=80 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp_precompiled.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=575 BI=198 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1312 519 -1 -1 N  WF=0 WT=52 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp_compile_dalit.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=534 BI=226 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1312 519 -1 -1 N  WF=0 WT=51 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=532 BI=227 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1312 519 -1 -1 N  WF=0 WT=79 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp_statics.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=574 BI=199 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1312 519 -1 -1 N  WF=0 WT=29 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_kb.pl"
+VIEW: LN=.629 CL=99 LE=0 CX=98 CY=17 WI=490 BI=251 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1312 519 -1 -1 M  WF=0 WT=34 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo\plarkc\logicmoo_u_cyc_kb_tinykb.pl"
+VIEW: LN=.319293 CL=65 LE=0 CX=64 CY=16 WI=500 BI=246 HT=0 HN=0 HF=0 HC=4
+FILEHIST: 9
+xlisting\prolog\listing_vars.pl
+dictoo\prolog\dictoo.pl
+clause_attvars\prolog\attvar_reader.pl
+clause_attvars\prolog\attvar_serializer.pl
+clause_attvars\prolog\clause_attvars.pl
+clause_attvars\prolog\toplevel_variable_names.pl
+gvar_syntax\prolog\gvar_syntax.pl
+logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_rewriting.pl
+logicmoo_base\prolog\logicmoo\plarkc\logicmoo_u_cyc_kb_tinykb.pl

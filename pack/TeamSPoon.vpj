@@ -3248,20 +3248,6 @@
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cpp/SWI-cpp.h"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cpp/test.pl"/>
 							</Folder>
-							<Folder Name="cppproxy">
-								<Folder Name="examples">
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/examples/parms.pl"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/examples/person.pl"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/examples/sqrt.pl"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/examples/time.pl"/>
-								</Folder>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/cpp_codegen.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/cpp_interface.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/cpp_server.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/serialize.c"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/SWI-proxy.h"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cppproxy/typedef.pl"/>
-							</Folder>
 							<Folder Name="cql">
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/cql.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/cql/cql_autoschema.pl"/>
@@ -3374,14 +3360,6 @@
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_ordering.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/inclpr/inclpr_symbolic_processing.pl"/>
 							</Folder>
-							<Folder Name="jasmine">
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jasmine/error.c"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jasmine/error.h"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jasmine/jasmine.c"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jasmine/jasmine.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jasmine/setup.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/jasmine/test.pl"/>
-							</Folder>
 							<Folder Name="jpl">
 								<Folder Name="examples">
 									<Folder Name="java">
@@ -3442,16 +3420,6 @@
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/libedit/editline.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/libedit/libedit4pl.c"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/libedit/pltotex.pl"/>
-							</Folder>
-							<Folder Name="ltx2htm">
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ltx2htm/debug.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ltx2htm/latex2html.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ltx2htm/pl.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ltx2htm/ps2gif.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ltx2htm/psfile.c"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ltx2htm/run.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ltx2htm/tex.c"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ltx2htm/xpce.pl"/>
 							</Folder>
 							<Folder Name="nlp">
 								<Folder Name="libstemmer_c">
@@ -3755,30 +3723,6 @@
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/xpath.pl"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/xsd.c"/>
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/sgml/xsdp_types.pl"/>
-							</Folder>
-							<Folder Name="space">
-								<Folder Name="src">
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/src/debug.h"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/src/globals.h"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/src/Index.h"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/src/lock.h"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/src/Search.h"/>
-									<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/src/Shapes.h"/>
-								</Folder>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/dbpedia.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/demo_space.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/freebase.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/georss.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/gml.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/kml.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/pltotex.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/space.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/space_web_loader.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/spacetimeindex.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/test_space.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/timeindex.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/wgs84.pl"/>
-								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/space/wkt.pl"/>
 							</Folder>
 							<Folder Name="ssl">
 								<F N="W:/devel/LogicmooDeveloperFramework/swipl-devel/packages/ssl/client.pl"/>
@@ -7978,15 +7922,6 @@
 						<F N="logicmoo_nlu/prolog/e2c/setup/doom.trans"/>
 						<F N="logicmoo_nlu/prolog/e2c/setup/startrek.lisp"/>
 					</Folder>
-					<Folder Name="sublisp">
-						<F N="logicmoo_nlu/prolog/e2c/sublisp/export.lisp"/>
-						<F N="logicmoo_nlu/prolog/e2c/sublisp/export.lisp.old"/>
-					</Folder>
-					<Folder Name="translatedCode">
-						<Folder Name="sublisp">
-							<F N="logicmoo_nlu/prolog/e2c/translatedCode/sublisp/export.java"/>
-						</Folder>
-					</Folder>
 					<F N="logicmoo_nlu/prolog/e2c/cb-prolog.lisp"/>
 					<F N="logicmoo_nlu/prolog/e2c/cb-pttp.lisp"/>
 					<F N="logicmoo_nlu/prolog/e2c/cb-swi-prolog.lisp"/>
@@ -8012,7 +7947,6 @@
 					<F N="logicmoo_nlu/prolog/e2c/doom.c"/>
 					<F N="logicmoo_nlu/prolog/e2c/doom.h"/>
 					<F N="logicmoo_nlu/prolog/e2c/doom.trans"/>
-					<F N="logicmoo_nlu/prolog/e2c/dump_consts.lisp"/>
 					<F N="logicmoo_nlu/prolog/e2c/e2c-new-0.ke"/>
 					<F N="logicmoo_nlu/prolog/e2c/e2c-new-1.ke"/>
 					<F N="logicmoo_nlu/prolog/e2c/e2c-new.ke"/>
@@ -8020,10 +7954,7 @@
 					<F N="logicmoo_nlu/prolog/e2c/e2c.pl"/>
 					<F N="logicmoo_nlu/prolog/e2c/e2c_unused.ke"/>
 					<F N="logicmoo_nlu/prolog/e2c/emacs.lisp"/>
-					<F N="logicmoo_nlu/prolog/e2c/export.java"/>
 					<F N="logicmoo_nlu/prolog/e2c/export.lisp"/>
-					<F N="logicmoo_nlu/prolog/e2c/export.lisp.waht"/>
-					<F N="logicmoo_nlu/prolog/e2c/export.trans"/>
 					<F N="logicmoo_nlu/prolog/e2c/f.p"/>
 					<F N="logicmoo_nlu/prolog/e2c/hash-dollar.lisp"/>
 					<F N="logicmoo_nlu/prolog/e2c/kb_interface.pl"/>
@@ -8052,7 +7983,6 @@
 					<F N="logicmoo_nlu/prolog/e2c/startrek.lisp"/>
 					<F N="logicmoo_nlu/prolog/e2c/subl-grep.lisp"/>
 					<F N="logicmoo_nlu/prolog/e2c/sublisp-cl.lisp"/>
-					<F N="logicmoo_nlu/prolog/e2c/system-manifest.lisp"/>
 					<F N="logicmoo_nlu/prolog/e2c/trace.lisp"/>
 				</Folder>
 				<Folder Name="Parser_SUPPLE">
@@ -17951,7 +17881,6 @@
 				<F N="slack_prolog/prolog/slack_client.pl"/>
 			</Folder>
 			<Folder Name="t">
-				<F N="slack_prolog/t/.slack_auth.pl"/>
 				<F N="slack_prolog/t/first_slack_bot.pl"/>
 				<F N="slack_prolog/t/slack_mud.pl"/>
 			</Folder>
@@ -17960,7 +17889,6 @@
 				Recurse="1"
 				Refilter="0"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
-			<F N="slack_prolog/.git"/>
 			<F N="slack_prolog/CHANGELOG.md"/>
 			<F N="slack_prolog/LICENSE.md"/>
 			<F N="slack_prolog/pack.pl"/>
