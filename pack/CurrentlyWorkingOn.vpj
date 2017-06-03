@@ -285,6 +285,28 @@
 			<F N="ClioPatria/parms.pl"/>
 			<F N="ClioPatria/setup.pl"/>
 		</Folder>
+		<Folder Name="cpack-prologmud">
+			<Folder Name="config-available">
+				<F N="cpack-prologmud/config-available/DEFAULTS"/>
+				<F N="cpack-prologmud/config-available/prologmud.pl"/>
+			</Folder>
+			<Folder Name="lib">
+				<F N="cpack-prologmud/lib/opmv_schema.pl"/>
+				<F N="cpack-prologmud/lib/opmvc_schema.pl"/>
+				<F N="cpack-prologmud/lib/prologmud_diff.pl"/>
+				<F N="cpack-prologmud/lib/prologmud_schema.pl"/>
+			</Folder>
+			<Folder Name="rdf">
+				<Folder Name="cpack">
+					<F N="cpack-prologmud/rdf/cpack/prologmud.ttl"/>
+				</Folder>
+				<F N="cpack-prologmud/rdf/prologmud-o.ttl"/>
+				<F N="cpack-prologmud/rdf/void.ttl"/>
+			</Folder>
+			<F N="cpack-prologmud/.gitignore"/>
+			<F N="cpack-prologmud/LICENSE.md"/>
+			<F N="cpack-prologmud/README.md"/>
+		</Folder>
 		<Folder Name="cplint">
 			<Folder Name="prolog">
 				<Folder Name="examples">
@@ -562,15 +584,18 @@
 				</Folder>
 				<F N="logicmoo_base/prolog/.buildpath"/>
 				<F N="logicmoo_base/prolog/.project"/>
+				<F N="logicmoo_base/prolog/logicmoo_clif.pl"/>
+				<F N="logicmoo_base/prolog/logicmoo_cliop.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_cyc_exec.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_cycqlf.pl"/>
-				<F N="logicmoo_base/prolog/logicmoo_engine.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_motel.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_plarkc.pl"/>
+				<F N="logicmoo_base/prolog/logicmoo_plweb.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_pttp.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_repl.pl"/>
-				<F N="logicmoo_base/prolog/logicmoo_snark.pl"/>
+				<F N="logicmoo_base/prolog/logicmoo_sumo.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_swilib.pl"/>
+				<F N="logicmoo_base/prolog/logicmoo_swish.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_user.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_utils.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_webbot.pl"/>
@@ -578,6 +603,15 @@
 				<F N="logicmoo_base/prolog/LogicmooBase.vpj"/>
 			</Folder>
 			<Folder Name="t">
+				<Folder Name="docs">
+					<F N="logicmoo_base/t/docs/ABoxTBox.ppt"/>
+					<F N="logicmoo_base/t/docs/AI9.ppt"/>
+					<F N="logicmoo_base/t/docs/km-algorithm.ppt"/>
+					<F N="logicmoo_base/t/docs/LOGICMOO_SOUNDNESS.pptx"/>
+					<F N="logicmoo_base/t/docs/openCyc-Aruna_Weerakoon.pptx"/>
+					<F N="logicmoo_base/t/docs/pfcman.pdf"/>
+					<F N="logicmoo_base/t/docs/SAT_learning_clauses.pdf"/>
+				</Folder>
 				<Folder Name="examples">
 					<Folder Name="api">
 						<F N="logicmoo_base/t/examples/api/chr_01.pl"/>
@@ -626,7 +660,6 @@
 						<F N="logicmoo_base/t/examples/fol/fol_options.pl"/>
 						<F N="logicmoo_base/t/examples/fol/kif_sanity.pl"/>
 						<F N="logicmoo_base/t/examples/fol/lefty.pfc"/>
-						<F N="logicmoo_base/t/examples/fol/lm_repl3"/>
 						<F N="logicmoo_base/t/examples/fol/make_types_wff_01.pl"/>
 						<F N="logicmoo_base/t/examples/fol/make_wff_01.pl"/>
 						<F N="logicmoo_base/t/examples/fol/make_wff_01a.pl"/>
@@ -651,7 +684,6 @@
 						<F N="logicmoo_base/t/examples/fol/sanity_poss_03.pl"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_sk_human.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/sanity_sk_two.pfc"/>
-						<F N="logicmoo_base/t/examples/fol/test_fol"/>
 						<F N="logicmoo_base/t/examples/fol/test_header.pfc"/>
 						<F N="logicmoo_base/t/examples/fol/zebra0.clif"/>
 						<F N="logicmoo_base/t/examples/fol/zebra1.clif"/>
@@ -804,7 +836,13 @@
 				<F N="logicmoo_base/t/run_tests.sh"/>
 				<F N="logicmoo_base/t/sanity_tests.pl"/>
 			</Folder>
+			<F N="logicmoo_base/.buildpath"/>
+			<F N="logicmoo_base/.gitignore"/>
+			<F N="logicmoo_base/.pdtproperties"/>
+			<F N="logicmoo_base/.project"/>
+			<F N="logicmoo_base/LICENSE.md"/>
 			<F N="logicmoo_base/pack.pl"/>
+			<F N="logicmoo_base/README.md"/>
 		</Folder>
 		<Folder Name="logicmoo_nlu">
 			<Folder Name="prolog">
@@ -5119,7 +5157,6 @@
 		</Folder>
 		<Folder Name="logicmoo_utils">
 			<Folder Name="prolog">
-				<F N="logicmoo_utils/prolog/INDEX.pl"/>
 				<F N="logicmoo_utils/prolog/logicmoo_util_bb_env.pl"/>
 				<F N="logicmoo_utils/prolog/logicmoo_util_bb_gvar.pl"/>
 				<F N="logicmoo_utils/prolog/logicmoo_util_common.pl"/>
@@ -5487,29 +5524,101 @@
 				</Folder>
 			</Folder>
 		</Folder>
-		<Folder Name="prologmud_cpack">
-			<Folder Name="config-available">
-				<F N="prologmud_cpack/config-available/prologmud.pl"/>
-			</Folder>
-			<Folder Name="lib">
-				<F N="prologmud_cpack/lib/opmv_schema.pl"/>
-				<F N="prologmud_cpack/lib/opmvc_schema.pl"/>
-				<F N="prologmud_cpack/lib/prologmud_diff.pl"/>
-				<F N="prologmud_cpack/lib/prologmud_schema.pl"/>
-			</Folder>
-			<Folder Name="rdf">
-				<Folder Name="cpack">
-					<F N="prologmud_cpack/rdf/cpack/prologmud.ttl"/>
-				</Folder>
-				<F N="prologmud_cpack/rdf/prologmud-o.ttl"/>
-				<F N="prologmud_cpack/rdf/void.ttl"/>
-			</Folder>
-		</Folder>
 		<Folder Name="prologmud_samples">
 			<Folder Name="prolog">
 				<Folder Name="prologmud_sample_games">
 					<Folder Name="btepisode">
+						<F N="prologmud_samples/prolog/prologmud_sample_games/btepisode/bt.graphml"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/btepisode/npc.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/btepisode/plot.txt"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/btepisode/plotflow.graphml"/>
+					</Folder>
+					<Folder Name="circlemuddata">
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/circlemud_data.xml"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/circlemud_data_description.txt"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/convert_cm.sh"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/convert_mob_files.py"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/convert_obj_files.py"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/convert_shp_files.py"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/convert_wld_files.py"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/convert_zon_files.py"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/doall.py"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/smurf.mob"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/smurf.README"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/smurf.wld"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/smurf.zon"/>
+					</Folder>
+					<Folder Name="config-available">
+						<Folder Name="now_disabled">
+							<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/now_disabled/config.pl"/>
+							<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/now_disabled/debug.pl"/>
+							<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/now_disabled/store.pl"/>
+							<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/now_disabled/zlib.pl"/>
+						</Folder>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/010-packs.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/020-prefixes.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/020-yaz-namespaces.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/025-amalgame.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/accurator.pl.hide"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/aers_rewrite.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/ag_lod.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/ag_menu.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/ag_modules.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/ag_preferences.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/ag_skin.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/ag_strat_prov_graph_viz.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/ann_preferences.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/annotation_dashboard.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/annotation_service.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/autocompletion.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/cache.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/cloud.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/cluster_search.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/command.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/config.done"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/config.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/cpack_repository.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/cpack_server.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/debug.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/econnect.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/EDM.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/enable_autocomplete.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/find_resource.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/flint.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/foaf_user.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/image_annotation.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/isearch.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/jquery.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/load_rma_example.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/lod.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/logging.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/media_cache.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/network.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/oac_graphviz.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/opmv.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/pengines.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/prov.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/rda_gr2.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/rdf-mt.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/rdf_qa.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/rdfpath.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/README.txt"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/skin_fix_menu.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/skos.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/skos_browser.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/store.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/swish.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/tag_matcher.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/versioned_graph.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/versioned_graphviz.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/virgil.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/waisda.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/waisda_search.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/winpath.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/xmlrdf.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/yaz.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/yui3.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/zlib.pl"/>
 					</Folder>
 					<Folder Name="config-enabled">
 						<Folder Name="gitty">
@@ -5527,14 +5636,48 @@
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/network.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/notifications.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/r_serve.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/README.md"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/rlimit.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/rpc.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/user_profile.pl"/>
 					</Folder>
+					<Folder Name="data">
+						<Folder Name="avatars">
+							<F N="prologmud_samples/prolog/prologmud_sample_games/data/avatars/.gitignore"/>
+						</Folder>
+						<Folder Name="chat">
+							<F N="prologmud_samples/prolog/prologmud_sample_games/data/chat/.gitignore"/>
+						</Folder>
+						<Folder Name="storage">
+							<Folder Name="ref">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/data/storage/ref/.gitignore"/>
+							</Folder>
+						</Folder>
+					</Folder>
+					<Folder Name="log">
+						<F N="prologmud_samples/prolog/prologmud_sample_games/log/httpd.log"/>
+					</Folder>
+					<Folder Name="RDF-store">
+						<F N="prologmud_samples/prolog/prologmud_sample_games/RDF-store/prefixes.db"/>
+					</Folder>
 					<Folder Name="src_game_nani">
 						<Folder Name="web">
+							<Folder Name="css">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_nani/web/css/README.txt"/>
+							</Folder>
+							<Folder Name="icons">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_nani/web/icons/bar.png"/>
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_nani/web/icons/README.txt"/>
+							</Folder>
+							<Folder Name="js">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_nani/web/js/README.txt"/>
+							</Folder>
 							<Folder Name="prolog">
 								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_nani/web/prolog/mud_specific.pl"/>
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_nani/web/prolog/README.txt"/>
+							</Folder>
+							<Folder Name="snd">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_nani/web/snd/README.txt"/>
 							</Folder>
 						</Folder>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_nani/a_nani_household.pfc.pl"/>
@@ -5548,11 +5691,26 @@
 					</Folder>
 					<Folder Name="src_game_sims">
 						<Folder Name="web">
+							<Folder Name="css">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_sims/web/css/README.txt"/>
+							</Folder>
+							<Folder Name="icons">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_sims/web/icons/bar.png"/>
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_sims/web/icons/README.txt"/>
+							</Folder>
+							<Folder Name="js">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_sims/web/js/README.txt"/>
+							</Folder>
 							<Folder Name="prolog">
 								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_sims/web/prolog/mud_specific.pl"/>
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_sims/web/prolog/README.txt"/>
+							</Folder>
+							<Folder Name="snd">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_sims/web/snd/README.txt"/>
 							</Folder>
 						</Folder>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_sims/objs_misc_household.pfc.pl"/>
+						<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_sims/plotto.txt"/>
 					</Folder>
 					<Folder Name="src_game_startrek">
 						<Folder Name="holodeck">
@@ -5567,8 +5725,22 @@
 							<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/mobs/federation.pl"/>
 						</Folder>
 						<Folder Name="web">
+							<Folder Name="css">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/web/css/README.txt"/>
+							</Folder>
+							<Folder Name="icons">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/web/icons/bar.png"/>
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/web/icons/README.txt"/>
+							</Folder>
+							<Folder Name="js">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/web/js/README.txt"/>
+							</Folder>
 							<Folder Name="prolog">
 								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/web/prolog/mud_specific.pl"/>
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/web/prolog/README.txt"/>
+							</Folder>
+							<Folder Name="snd">
+								<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/web/snd/README.txt"/>
 							</Folder>
 						</Folder>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/startrek.all.pfc.pl"/>
@@ -5577,13 +5749,42 @@
 						<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_wumpus/maze.map.pfc.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/src_game_wumpus/objs_misc_monster.pfc.pl"/>
 					</Folder>
-					<F N="prologmud_samples/prolog/prologmud_sample_games/daemon.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_domainEnglishFormat_kif.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_english_format_kif.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_Merge_kif.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_Mid-level-ontology_kif.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_Translations_relations-en_txt.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/ansi2html.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/bootstrap.ttl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/clear_putty.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/commitpush.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/debug_once.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/full_clone_externals.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/gdbinit"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/hg_push_pull.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/init_mud_server.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/killchilds.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/lm_repl3"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/mud.ttl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/passwd"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/pbranch.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/preconfig.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/pull.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/remote_ide.pl"/>
-					<F N="prologmud_samples/prolog/prologmud_sample_games/run.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/ReplaceSymLinkLinux.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/Run_Loop.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/run_mud_server.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/settings.db"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/startGame.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/swish_daemon.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/test_loop.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/test_release.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/TestsMUDServer.bat"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/TestsMUDServer.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/tiny_kb_cache"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/TONOTIFY.txt"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/users.db"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/web_install.sh"/>
 				</Folder>
 			</Folder>
 			<F N="prologmud_samples/pack.pl"/>
