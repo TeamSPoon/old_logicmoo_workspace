@@ -91,3 +91,12 @@
 [submodule "pack/logicmoo_planners"]
 	path = pack/logicmoo_planners
 	url = https://github.com/TeamSPoon/logicmoo_planners.git
+[submodule "pack/swish-with-filesystem-interaction"]
+	path = pack/swish-with-filesystem-interaction
+	url = https://github.com/TeamSPoon/swish-with-filesystem-interaction
+[submodule "pack/cpack-prologmud"]
+	path = pack/cpack-prologmud
+	url = https://github.com/TeamSPoon/cpack-prologmud
+[submodule "pack/plweb"]
+	path = pack/plweb
+	url = https://github.com/swi-prolog/plweb
