@@ -69,6 +69,12 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
+		<Folder Name="aleph">
+			<Folder Name="prolog">
+				<F N="aleph/prolog/aleph.pl"/>
+				<F N="aleph/prolog/aleph_orig.pl"/>
+			</Folder>
+		</Folder>
 		<Folder Name="auc">
 			<Folder Name="prolog">
 				<Folder Name="examples">
@@ -426,6 +432,11 @@
 				<F N="cplint/prolog/slipcover.pl"/>
 			</Folder>
 			<F N="cplint/pack.pl"/>
+		</Folder>
+		<Folder Name="cplint_r">
+			<Folder Name="prolog">
+				<F N="cplint_r/prolog/cplint_r.pl"/>
+			</Folder>
 		</Folder>
 		<Folder Name="dictoo">
 			<Folder Name="prolog">
@@ -2451,6 +2462,23 @@
 						<F N="logicmoo_nlu/prolog/CURT/bb2/worldKnowledge.pl"/>
 					</Folder>
 					<F N="logicmoo_nlu/prolog/CURT/logicmooCURT2.pl"/>
+				</Folder>
+				<Folder Name="pldata">
+					<Folder Name="plkb7166">
+						<F N="logicmoo_nlu/prolog/pldata/plkb7166/.gitignore"/>
+						<F N="logicmoo_nlu/prolog/pldata/plkb7166/add_header.script"/>
+						<F N="logicmoo_nlu/prolog/pldata/plkb7166/dir.header"/>
+						<F N="logicmoo_nlu/prolog/pldata/plkb7166/kb7166.pl"/>
+						<F N="logicmoo_nlu/prolog/pldata/plkb7166/kb7166_pt7_constant_renames_NEW.pl"/>
+						<F N="logicmoo_nlu/prolog/pldata/plkb7166/sumo_renames.pl"/>
+					</Folder>
+					<F N="logicmoo_nlu/prolog/pldata/clex_iface.pl"/>
+					<F N="logicmoo_nlu/prolog/pldata/el_assertions.pl.hide"/>
+					<F N="logicmoo_nlu/prolog/pldata/mworld0_declpreds.pl"/>
+					<F N="logicmoo_nlu/prolog/pldata/nldata_dictionary_some01.pl"/>
+					<F N="logicmoo_nlu/prolog/pldata/tiny_kb.pl"/>
+					<F N="logicmoo_nlu/prolog/pldata/trans_header.pl"/>
+					<F N="logicmoo_nlu/prolog/pldata/transform_dump.pl"/>
 				</Folder>
 				<Folder Name="SIRIDUS">
 					<Folder Name="UGOT-D31">
@@ -5193,6 +5221,21 @@
 			</Folder>
 			<F N="matrix/pack.pl"/>
 		</Folder>
+		<Folder Name="multivar">
+			<Folder Name="prolog">
+				<F N="multivar/prolog/answer_sources.pl"/>
+				<F N="multivar/prolog/multivar.pl"/>
+				<F N="multivar/prolog/stlc.pl"/>
+			</Folder>
+			<Folder Name="t">
+				<F N="multivar/t/sanity_tests.pl"/>
+			</Folder>
+			<F N="multivar/.gitignore"/>
+			<F N="multivar/dmiles.patch"/>
+			<F N="multivar/LICENSE.md"/>
+			<F N="multivar/pack.pl"/>
+			<F N="multivar/README.md"/>
+		</Folder>
 		<Folder Name="must_trace">
 			<Folder Name="prolog">
 				<F N="must_trace/prolog/block3.pl"/>
@@ -5548,11 +5591,6 @@
 						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/smurf.wld"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/circlemuddata/smurf.zon"/>
 					</Folder>
-					<Folder Name="config-available">
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/cp_debug.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/cp_logging.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-available/cp_network.pl"/>
-					</Folder>
 					<Folder Name="config-enabled">
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/010-packs.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/020-prefixes.pl"/>
@@ -5564,16 +5602,13 @@
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/ag_skin.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/ag_strat_prov_graph_viz.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/autocompletion.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/cache.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/cloud.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/config.done"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/config.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/cpack_repository.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/cpack_server.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/debug.pl.disabled"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/econnect.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/EDM.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/email.pl.disaBLED"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/find_resource.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/flint.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/foaf_user.pl"/>
@@ -5586,48 +5621,8 @@
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/skos.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/skos_browser.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/store.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/trill_on_swish.pl.disabled"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/yui3.pl"/>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled/zlib.pl"/>
-					</Folder>
-					<Folder Name="config-enabled-swish">
-						<Folder Name="gitty">
-							<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/gitty/Help.swinb"/>
-						</Folder>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/010-packs.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/020-prefixes.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_google.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_http_always.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_stackoverflow.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_unity.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/cache.pl.broke"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/config.done"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/config.pl.odd"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/cp_debug.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/cp_logging.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/cp_network.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/cpack_repository.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/cpack_server.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/data.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/debug.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/EDM.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/email.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/flint.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/foaf_user.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/hdt.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/isearch.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/lod.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/logging.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/network.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/pengines.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/r_serve.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/README.md"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/README.txt"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/rlimit.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/rpc.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/store.pl.disabled"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/user_profile.pl"/>
-						<F N="prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/zlib.pl.disabled"/>
 					</Folder>
 					<Folder Name="cpack">
 						<Folder Name="cpack_repository">
@@ -5763,22 +5758,12 @@
 						</Folder>
 					</Folder>
 					<Folder Name="data">
-						<Folder Name="avatars">
-							<F N="prologmud_samples/prolog/prologmud_sample_games/data/avatars/.gitignore"/>
-						</Folder>
-						<Folder Name="chat">
-							<F N="prologmud_samples/prolog/prologmud_sample_games/data/chat/.gitignore"/>
-						</Folder>
 						<Folder Name="storage">
 							<Folder Name="ref">
-								<F N="prologmud_samples/prolog/prologmud_sample_games/data/storage/ref/.gitignore"/>
 								<F N="prologmud_samples/prolog/prologmud_sample_games/data/storage/ref/head"/>
 							</Folder>
 						</Folder>
 						<F N="prologmud_samples/prolog/prologmud_sample_games/data/profiles.db"/>
-					</Folder>
-					<Folder Name="log">
-						<F N="prologmud_samples/prolog/prologmud_sample_games/log/httpd.log"/>
 					</Folder>
 					<Folder Name="RDF-store">
 						<F N="prologmud_samples/prolog/prologmud_sample_games/RDF-store/prefixes.db"/>
@@ -5895,14 +5880,16 @@
 					<F N="prologmud_samples/prolog/prologmud_sample_games/preconfig.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/pull.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/remote_ide.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/remote_swish.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/ReplaceSymLinkLinux.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/run.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/run_clio.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/Run_Loop.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/run_mud_server.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/run_swish.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/server.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/settings.db"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/startGame.sh"/>
-					<F N="prologmud_samples/prolog/prologmud_sample_games/swish_daemon.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/test_loop.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/test_release.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/TestsMUDServer.bat"/>
@@ -5937,6 +5924,14 @@
 				<F N="s_expression/prolog/sexpr_reader.pl"/>
 			</Folder>
 		</Folder>
+		<Folder Name="sldnfdraw">
+			<Folder Name="prolog">
+				<Folder Name="examples">
+					<F N="sldnfdraw/prolog/examples/member.pl"/>
+				</Folder>
+				<F N="sldnfdraw/prolog/sldnfdraw.pl"/>
+			</Folder>
+		</Folder>
 		<Folder Name="swish-with-filesystem-interaction">
 			<F
 				N="swish-with-filesystem-interaction/*.*"
@@ -5961,6 +5956,23 @@
 			<F N="tabling_dra/make_pack.sh"/>
 			<F N="tabling_dra/pack.pl"/>
 			<F N="tabling_dra/README.md"/>
+		</Folder>
+		<Folder Name="trill">
+			<Folder Name="prolog">
+				<Folder Name="examples">
+					<F N="trill/prolog/examples/biopaxLevel3.pl"/>
+					<F N="trill/prolog/examples/BRCA.pl"/>
+					<F N="trill/prolog/examples/commander.pl"/>
+					<F N="trill/prolog/examples/DBPedia.pl"/>
+					<F N="trill/prolog/examples/johnEmployee.pl"/>
+					<F N="trill/prolog/examples/peoplePets.pl"/>
+					<F N="trill/prolog/examples/vicodi.pl"/>
+				</Folder>
+				<F N="trill/prolog/translate_rdf.pl"/>
+				<F N="trill/prolog/trill.pl"/>
+				<F N="trill/prolog/trill_internal.pl"/>
+				<F N="trill/prolog/trillp_internal.pl"/>
+			</Folder>
 		</Folder>
 		<Folder Name="/usr">
 			<Folder Name="local">
@@ -6695,7 +6707,6 @@
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/bitmaps/32x32/vishier.xpm"/>
 								</Folder>
 								<Folder Name="patterns">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/bitmaps/patterns/1_README"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/bitmaps/patterns/Arches.xbm"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/bitmaps/patterns/Balls.xbm"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/bitmaps/patterns/Bats.xbm"/>
@@ -7004,131 +7015,9 @@
 								<F N="/usr/local/lib/swipl-7.5.7/xpce/bitmaps/typing.bm"/>
 								<F N="/usr/local/lib/swipl-7.5.7/xpce/bitmaps/web.bm"/>
 							</Folder>
-							<Folder Name="Colour">
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/Colour/vga.html"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/Colour/vga.txt"/>
-							</Folder>
-							<Folder Name="lib">
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/lib/cursor.fon"/>
-								<F
-									N="/usr/local/lib/swipl-7.5.7/xpce/lib/makefile"
-									Type="Makefile"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/lib/rgb.txt"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/lib/x11.crs"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/lib/xcnvcurs.c"/>
-							</Folder>
 							<Folder Name="man">
-								<Folder Name="course">
-									<Folder Name="figs">
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/figs/control.pdf"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/figs/ftp.pdf"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/figs/hello.pdf"/>
-									</Folder>
-									<Folder Name="lib">
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/lib/INDEX.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/lib/prompt.pl"/>
-									</Folder>
-									<Folder Name="slides">
-										<Folder Name="figs">
-											<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/figs/editvalue.ps"/>
-											<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/figs/error.ps"/>
-											<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/figs/ftp.ps"/>
-											<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/figs/link.ps"/>
-											<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/figs/multilang.ps"/>
-											<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/figs/pceemacs.ps"/>
-										</Folder>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/icon.pl"/>
-										<F
-											N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/Makefile"
-											Type="Makefile"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/slides.doc"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/slides/slides.tex"/>
-									</Folder>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/bib.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/course.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/doc.bbl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/doc.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/fam.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/ftp.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/intro.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/learner.pl"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/man/course/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/course/process.doc"/>
-								</Folder>
 								<Folder Name="faq">
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/faq/faq.html"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/faq/pce.hlp"/>
-								</Folder>
-								<Folder Name="info">
-									<Folder Name="lib">
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/lib/re_parse.pl"/>
-									</Folder>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/animate.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/asciman.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/code.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/complete.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/compounddata.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/connect.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/customise.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/data.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/debugging.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/dialog.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/dialog.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/dict.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/event.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/footer.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/globals.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/graphics.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/graphicsdata.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/graphicsorg.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/group.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/header.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/host.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/INDEX.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/intro.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/language.def"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/man/info/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/manual.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/meta.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/notation.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/object.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/passing.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/pce.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/primitivedata.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/README"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/relate.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/summary.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/texinfo.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/texinfo.tex"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/text.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/titlepage.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/TODO"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/tree.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/unix.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/variable.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/which.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/window.def"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/info/window.pl"/>
-								</Folder>
-								<Folder Name="interface">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/callback.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/data.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/doc.bbl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/doc.blg"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/doc.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/event.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/examples.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/files.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/functions.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/intro.doc"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/interface/miscellaneous.doc"/>
 								</Folder>
 								<Folder Name="reference">
 									<Folder Name="class">
@@ -7332,140 +7221,6 @@
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/reference/tools.doc"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/reference/topics.doc"/>
 								</Folder>
-								<Folder Name="userguide">
-									<Folder Name="examples">
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/doc1.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/dragdrop.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/editgraphics.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/fileviewer.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/fill1.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/fill5.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/font.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/graphedit.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/masterslave.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/postscript.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/report.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/template.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/examples/wysiwyg.pl"/>
-									</Folder>
-									<Folder Name="figs">
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/arch1.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/axis.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/bishop.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/boot.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/broadcast.pd"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/buttonicon.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/card.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/chess.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/classbrowser.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/classbrowser.pd"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/classhierarchy.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/classhierarchy.pd"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/connect.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/control.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/diaaskname.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/diacond.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/diaeditor1.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/diaeditor2.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/diaeditor3.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/diaeditor4.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/dialog.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/dialoghierarchy.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/diaprolog.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/doc1.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/docclasses.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/docclasses.pd"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/dochtml.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/editgraphical.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/employee.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/fileviewer.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/flayout1.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/graphics.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/httpd.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/hyperdemo.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/inspector.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/ispell.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/keyword.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/layoutdemo1.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/layoutmgr.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/layoutmgr.pd"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/libdia.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/libtoc.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/linkhyper.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/parbox1.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/plotclasses.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/plotsine.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/printps.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/reportdemo.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/searchtool.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/tabular.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/textitemicon.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/tilehier1.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/title.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/tracedialog.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/username.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/viewer.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/vishierarchy.eps"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/vishierarchy.pd"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/figs/wysiwyg.eps"/>
-									</Folder>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/application.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/balloon.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/body.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/classes.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/classvar.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/code.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/control.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/debug.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/diaedit.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/dialog.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/doc.bbl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/docrender.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/document.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/dragdrop.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/error.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/findfile.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/font.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/font2.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/frame.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/globalarch.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/glossary.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/graphics.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/httpd-ex.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/httpd.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/hyper.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/images.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/interface.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/intro.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/libdia.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/libplot.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/libs.doc"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/memory.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/mkclasshier.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/mlingual.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/mswin.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/namedref.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/online.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/pceprolog.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/printing.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/README"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/report.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/resource.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/starting.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/summary.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/tabular.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/techniques.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/toc.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/trouble.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/udc.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/ugraphics.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/whoiswho.doc"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/xpceusg.bbl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/man/userguide/xpceusg.doc"/>
-								</Folder>
 							</Folder>
 							<Folder Name="prolog">
 								<Folder Name="boot">
@@ -7533,7 +7288,6 @@
 										</Folder>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/dialog/attribute.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/dialog/behaviour.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/dialog/dialog.hlp"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/dialog/dialog.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/dialog/dialog.qlf"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/dialog/font.pl"/>
@@ -7581,15 +7335,10 @@
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/attribute.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/canvas.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/config.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/doc.doc"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/draw.hlp"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/draw.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/exportpl.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/gesture.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/importpl.pl"/>
-										<F
-											N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/Makefile"
-											Type="Makefile"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/menu.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/README"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/draw/shapes.pl"/>
@@ -7604,10 +7353,7 @@
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/c_mode.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/chr_mode.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/cpp_mode.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/customise.hlp"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/dde_server.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/edit.sh"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/emacs.hlp"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/emacs.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/emacs.qlf"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/find.pl"/>
@@ -7624,14 +7370,12 @@
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/logtalk_mode.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/man_mode.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/outline_mode.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/prolog_mode.html"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/prolog_mode.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/prolog_mode.qlf"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/prompt.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/rdf_mode.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/script_mode.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/server.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/sgml_mode.html"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/sgml_mode.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/shell.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/emacs/swi_prolog.pl"/>
@@ -7696,14 +7440,10 @@
 									<Folder Name="swi">
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/swi/pce_debug_monitor.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/swi/pce_profile.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/swi/README.TXT"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/swi/swi_console.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/swi/thread_monitor.pl"/>
 									</Folder>
 									<Folder Name="trace">
-										<Folder Name="doc">
-											<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/trace/doc/implementation.doc"/>
-										</Folder>
 										<Folder Name="icons">
 											<Folder Name="16x16">
 												<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/trace/icons/16x16/butterfly.xpm"/>
@@ -7800,12 +7540,9 @@
 									<Folder Name="xref">
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/xref/common.pl"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/xref/mkcommon.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/xref/quintus.def"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/xref/quintus.pl"/>
-										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/xref/sicstus.def"/>
 										<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/xref/sicstus.pl"/>
 									</Folder>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/.gitignore"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/.pwd"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/area.pl"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/autowin.pl"/>
@@ -7822,7 +7559,6 @@
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/getpass.pl"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/gradient.pl"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/gui_tracer.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/help.hlp"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/help_message.pl"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/http_client.pl"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/hyper.pl"/>
@@ -7834,7 +7570,6 @@
 									<F
 										N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/Makefile"
 										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/Makefile.in"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/MKINDEX.pl"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/Overview"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/password_item.pl"/>
@@ -7921,857 +7656,10 @@
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/url_image.pl"/>
 									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/lib/Xserver.pl"/>
 								</Folder>
-								<Folder Name="unsupported">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/unsupported/subframe.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/unsupported/twm_geometry_box.pl"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/prolog/unsupported/twm_resize_button.pl"/>
-								</Folder>
 							</Folder>
-							<Folder Name="src">
-								<Folder Name="adt">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/area.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/area.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/atable.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/atable.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/attribute.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/attribute.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/bool.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/bool.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/chain.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/chain.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/chaintable.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/chaintable.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/constant.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/constant.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/date.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/date.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/dict.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/dict.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/dictitem.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/dictitem.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/hashtable.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/hashtable.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/number.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/number.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/point.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/point.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/real.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/real.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/region.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/region.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/sheet.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/sheet.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/size.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/size.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/tuple.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/tuple.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/vector.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/adt/vector.o"/>
-								</Folder>
-								<Folder Name="ari">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ari/equation.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ari/equation.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ari/expression.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ari/expression.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/ari/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ari/proto.h"/>
-								</Folder>
-								<Folder Name="autom4te.cache">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/autom4te.cache/output.0"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/autom4te.cache/requests"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/autom4te.cache/traces.0"/>
-								</Folder>
-								<Folder Name="bitmaps">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/black_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/cnode.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/cycle_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/down.xpm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/enode.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/exclamation.xpm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/grey12_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/grey25_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/grey50_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/grey75_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/hadjusttile.xpm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/intarrows.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/left.xpm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/macarrow"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/mark_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/mark_handle_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/ms_left_arrow.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/ms_mark.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/ms_nomark.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/nomark_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/ol_cycle.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/ol_pulldown.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/ol_pullright.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/pce.bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/pce16.xpm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/pullright_bm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/right.xpm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/up.xpm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/vadjusttile.xpm"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/bitmaps/white_bm"/>
-								</Folder>
-								<Folder Name="box">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/boxes.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/boxes.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/boxes.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/grbox.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/grbox.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/hbox.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/hbox.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/lbox.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/lbox.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/parbox.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/parbox.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/README.PAR"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/README.XML"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/rubber.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/rubber.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/tbox.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/box/tbox.o"/>
-								</Folder>
-								<Folder Name="evt">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/browserselgesture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/browserselgesture.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/clickgesture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/clickgesture.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/conngesture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/conngesture.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/edittextgest.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/edittextgest.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/event.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/event.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/eventnode.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/eventnode.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/eventtree.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/eventtree.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/gesture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/gesture.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/handler.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/handler.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/handlergroup.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/handlergroup.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/modifier.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/modifier.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/movegesture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/movegesture.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/mvolgesture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/mvolgesture.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/popupgesture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/popupgesture.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/recogniser.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/recogniser.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/resizegesture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/resizegesture.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/resizetabslice.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/resizetabslice.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/rzolgesture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/evt/rzolgesture.o"/>
-								</Folder>
-								<Folder Name="fmt">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/layoutitf.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/layoutitf.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/layoutmgr.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/layoutmgr.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/paragraph.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/tabcell.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/tabcell.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/table.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/table.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/tabslice.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/fmt/tabslice.o"/>
-								</Folder>
-								<Folder Name="gnu">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gnu/getdate-source.y"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gnu/getdate.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gnu/getdate.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gnu/getdate.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/gnu/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gnu/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gnu/regex.c.diff"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gnu/system.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gnu/y.tab"/>
-								</Folder>
-								<Folder Name="gra">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/arc.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/arc.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/arrow.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/arrow.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/bezier.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/bezier.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/bitmap.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/bitmap.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/box.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/box.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/circle.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/circle.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/colour.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/colour.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/colourmap.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/colourmap.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/connection.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/connection.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/cursor.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/cursor.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/device.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/device.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/draw.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/draw.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/elevation.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/elevation.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/ellipse.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/ellipse.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/figure.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/figure.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/font.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/font.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/format.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/format.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/graphical.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/graphical.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/graphstate.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/handle.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/handle.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/hsv.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/hsv.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/image.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/image.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/joint.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/joint.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/line.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/line.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/link.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/link.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/listbrowser.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/listbrowser.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/node.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/node.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/objects"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/path.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/path.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/pen.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/pen.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/pixmap.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/pixmap.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/postscript.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/postscript.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/scrollbar.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/scrollbar.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/text.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/text.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/tree.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/tree.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/visual.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/gra/visual.o"/>
-								</Folder>
-								<Folder Name="h">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/arith.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/dialog.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/graphics.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/interface.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/kernel.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/lang.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/layout.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/names.ic"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/names.ih"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/str.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/stream.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/syntax.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/text.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/trace.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/types.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/unix.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/utf8.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/wst.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/xos.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/h/XPCE.h"/>
-								</Folder>
-								<Folder Name="img">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/gif.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/gifread.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/gifread.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/giftoxpm.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/giftoxpm.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/gifwrite.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/gifwrite.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/gifwrite.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/imgutil.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/imgutil.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/jdatadst.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/jdatadst.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/jdatasrc.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/jdatasrc.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/jpeg.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/jpegtoxpm.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/img/jpegtoxpm.o"/>
-								</Folder>
-								<Folder Name="itf">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/asfile.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/asfile.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/c.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/c.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/c.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/console.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/console.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/cpointer.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/cpointer.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/cpp.cxx"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/cpp.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/host.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/host.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/hostdata.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/hostdata.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/interface.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/interface.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/iostream.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/iostream.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/main.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/main.cxx"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/public.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/public.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/rc.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/rc.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/srcsink.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/srcsink.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/stub.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/stub.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/stub.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/xmalloc.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/itf/xmalloc.o"/>
-								</Folder>
-								<Folder Name="ker">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/alloc.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/alloc.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/alloc.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/assoc.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/assoc.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/behaviour.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/behaviour.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/class.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/class.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/classstub.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/classvar.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/classvar.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/conversion.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/conversion.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/debug.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/debug.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/declarations.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/declarations.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/error.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/error.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/gc.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/gc.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/getmethod.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/getmethod.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/glob.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/glob.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/global.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/global.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/goodies.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/goodies.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/inline.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/inline.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/method.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/method.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/name.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/name.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/name.ic"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/name.ih"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/name.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/object.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/object.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/passing.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/passing.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/programobject.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/programobject.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/save.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/save.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/self.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/self.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/sendmethod.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/sendmethod.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/srclocation.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/srclocation.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/timer.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/timer.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/trace.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/trace.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/type.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/type.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/variable.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/variable.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/version.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/xref.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/ker/xref.o"/>
-								</Folder>
-								<Folder Name="md">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/md/md-win32.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/md/md-win64.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/md/md-windows.h"/>
-								</Folder>
-								<Folder Name="men">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/button.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/button.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/diagroup.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/diagroup.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/dialogitem.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/dialogitem.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/intitem.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/intitem.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/label.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/label.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/labelbox.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/labelbox.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/men/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/menu.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/menu.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/menubar.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/menubar.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/menuitem.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/menuitem.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/popup.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/popup.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/slider.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/slider.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/tab.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/tab.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/tabstack.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/tabstack.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/textitem.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/men/textitem.o"/>
-								</Folder>
-								<Folder Name="msg">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/and.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/and.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/assign.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/assign.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/binding.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/binding.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/block.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/block.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/code.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/code.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/create.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/create.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/equal.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/equal.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/function.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/function.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/if.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/if.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/message.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/message.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/nameref.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/nameref.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/nonequal.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/nonequal.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/not.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/not.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/obtain.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/obtain.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/or.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/or.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/progn.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/progn.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/quote.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/quote.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/var.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/var.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/when.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/when.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/while.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msg/while.o"/>
-								</Folder>
-								<Folder Name="msw">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/include.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/mkxcolours"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/mscolour.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/mscommon.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/mscursor.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msdisplay.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msdraw.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msevent.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msfont.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msframe.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msimage.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msjpeg.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msmenu.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msmetafile.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msppm.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msprinter.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msprocess.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msproto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msreadimage.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/msstream.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/mstimer.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/mswin.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/mswin.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/mswindow.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/multimon.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/simx.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/stream.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/xcolours.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/xcursor.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/xcursors.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/xpcemh.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/xpcemh.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/msw/xpm.h"/>
-								</Folder>
-								<Folder Name="pl">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/pl/pcecall.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/pl/so-interface.o"/>
-								</Folder>
-								<Folder Name="prg">
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/prg/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/prg/operator.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/prg/operator.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/prg/parser.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/prg/parser.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/prg/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/prg/tokeniser.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/prg/tokeniser.o"/>
-								</Folder>
-								<Folder Name="rel">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/constraint.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/constraint.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/hyper.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/hyper.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/identity.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/identity.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/relation.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/relation.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/spatial.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel/spatial.o"/>
-								</Folder>
-								<Folder Name="rgx">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/COPYRIGHT"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regc_color.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regc_cvec.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regc_lex.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regc_locale.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regc_nfa.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regcomp.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regcompW.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regcustom.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/rege_dfa.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regerror.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regerror.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regerrs.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regex.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regexec.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regexecW.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regfree.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regfree.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regfronts.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regguts.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/regtypes.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rgx/test.c"/>
-								</Folder>
-								<Folder Name="test">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/test/m-model.c"/>
-								</Folder>
-								<Folder Name="txt">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/chararray.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/chararray.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/editor.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/editor.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/fragment.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/fragment.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/i18n.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/i18n.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/keybinding.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/keybinding.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/regex.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/regex.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/str.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/str.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/string.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/string.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/style.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/style.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/syntax.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/syntax.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/textbuffer.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/textbuffer.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/textcursor.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/textcursor.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/textimage.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/textimage.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/textmargin.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/textmargin.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/undo.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/undo.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/utf8.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/txt/utf8.o"/>
-								</Folder>
-								<Folder Name="unx">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/client.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/directory.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/directory.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/file.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/file.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/mswinsock.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/process.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/process.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/socket.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/socket.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/stream.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/unx/stream.o"/>
-								</Folder>
-								<Folder Name="win">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/application.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/application.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/browser.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/browser.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/decorate.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/decorate.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/dialog.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/dialog.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/display.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/display.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/displaymgr.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/displaymgr.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/frame.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/frame.o"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/win/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/monitor.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/monitor.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/picture.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/picture.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/proto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/rclass.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/setup.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/setup.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/tile.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/tile.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/tileadjust.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/tileadjust.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/view.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/view.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/window.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/win/window.o"/>
-								</Folder>
-								<Folder Name="x11">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/canvas.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/canvas.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/canvas.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/canvasP.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/fshell.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/fshell.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/fshell.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/fshellP.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/include.h"/>
-									<F
-										N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/Makefile"
-										Type="Makefile"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/wstproto.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/x11-compat.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/x11-compat.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/x11.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/x11.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xcolour.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xcolour.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xcommon.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xcommon.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xconvert.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xconvert.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xcursor.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xcursor.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xdisplay.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xdisplay.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xdnd.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xdnd.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xdnd.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xdraw.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xdraw.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xevent.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xevent.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xfont.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xfont.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xframe.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xframe.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/ximage.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/ximage.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xjpeg.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xjpeg.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xmenu.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xmenu.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xppm.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xppm.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xstream.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xstream.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xtimer.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xtimer.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xunix.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xunix.o"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xversion.h"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xwindow.c"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/src/x11/xwindow.o"/>
-								</Folder>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/.gitignore"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/.names-sentinel"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/.ranlib"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/aclocal.m4"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/AGENDA"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/CheckCommon"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/config.guess"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/config.h"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/config.h.in"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/config.log"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/config.status"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/config.sub"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/configure"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/configure.in"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/find_names"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/find_names.c"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/install-sh"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/install.in"/>
-								<F
-									N="/usr/local/lib/swipl-7.5.7/xpce/src/Makefile"
-									Type="Makefile"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/Makefile.def"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/Makefile.in"/>
-								<F
-									N="/usr/local/lib/swipl-7.5.7/xpce/src/Makefile.mak"
-									Type="Makefile"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/md.h"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/mkproto.sh"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/mktags"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/nomd"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/Pce.in"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/PROBLEMS"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/rel-ln"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/test.pl"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/TODO"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/TODO.MT"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/TODO.win"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/version.h"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/xpce-client"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/xpce-copy"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/xpce-copy.c"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/xpce.sh"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/src/xpce.sh.in"/>
-							</Folder>
-							<Folder Name="swipl">
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/interface.c"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/link.c"/>
-								<F
-									N="/usr/local/lib/swipl-7.5.7/xpce/swipl/Makefile"
-									Type="Makefile"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/Makefile.bin"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/Makefile.bin.in"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/pcecall.c"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/swipl-rc"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/swipl.ico"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/table.c"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/xpce-stub.c"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/swipl/xpce-stub.rc"/>
-							</Folder>
-							<Folder Name="TeX">
-								<Folder Name="figs">
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/figs/manpce.eps"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/figs/manpce.gif"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/figs/swi.eps"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/figs/swi.pd"/>
-									<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/figs/uva.eps"/>
-								</Folder>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/fancychap.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/html.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/local.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/logo.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/makeindex.ist"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/name.bst"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/pce.bib"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/pcepage.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/pceslide.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/pl.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/qp.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/sli.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/url.sty"/>
-								<F N="/usr/local/lib/swipl-7.5.7/xpce/TeX/xpce.sty"/>
-							</Folder>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/.fileheader"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/.gitignore"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/config.guess"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/config.sub"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/configure"/>
 							<F N="/usr/local/lib/swipl-7.5.7/xpce/Defaults"/>
 							<F N="/usr/local/lib/swipl-7.5.7/xpce/Defaults.user"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/EXTENDING"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/FAQ"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/INFO"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/INSTALL"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/install-sh"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/INSTALL.notes"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/make-bin-tape"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/make-bin-tape.in"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/make-so-bin.in"/>
-							<F
-								N="/usr/local/lib/swipl-7.5.7/xpce/Makefile"
-								Type="Makefile"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/Makefile.in"/>
-							<F
-								N="/usr/local/lib/swipl-7.5.7/xpce/Makefile.mak"
-								Type="Makefile"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/newversion"/>
 							<F N="/usr/local/lib/swipl-7.5.7/xpce/README"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/README.customise"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/README.CXX"/>
-							<F N="/usr/local/lib/swipl-7.5.7/xpce/VERSION"/>
 						</Folder>
 						<F
 							N="/usr/local/lib/swipl-7.5.7/Makefile"

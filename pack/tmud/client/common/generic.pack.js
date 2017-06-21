@@ -1,0 +1,5 @@
+/*
+ * Generic functions for the JSMC
+ * (c) 2010, The Two Towers MUD. All rights reserved.
+*/
+function gup(a,b,c){a=a.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");var d="[\\?&]"+a+"=([^&#]*)";var e=new RegExp(d);var f=e.exec(window.location.href);if(f==null)return c;else{if(b=="int")return parseInt(f[1]);else if(b=="bool")return f[1]=="1"||f[1].toLowerCase()=="yes"||f[1].toLowerCase()=="y"||f[1].toLowerCase()=="true";return f[1]}};var is_ie=(/msie/i).test(navigator.userAgent)&&!(/opera/i).test(navigator.userAgent);var is_opera=(/opera/i).test(navigator.userAgent);var is_firefox=(/Mozilla.*Firefox/i).test(navigator.userAgent);function get_page(a){var b;if(window.XMLHttpRequest){b=new XMLHttpRequest()}else{b=new ActiveXObject("Microsoft.XMLHTTP")}b.open("GET",a,false);b.send(null);return b.responseText};

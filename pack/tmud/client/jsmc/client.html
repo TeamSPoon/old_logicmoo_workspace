@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+ * JSMC - the JavaScript Mud Client
+ * (c) 2010, The Two Towers MUD. All rights reserved.
+ * Features:
+ *  - telnet negotiation: ECHO, NAWS, COMPRESS2, TTYPE
+ *  - IAC GA prompt detection
+ *  - ANSI support
+ *  - MCCP2 support via FZlib
+ *  - partial MXP support (-frames, -cursor positioning, -custom ESC tags)
+ *  - Unicode (UTF-8) support - and only that.  ISO-8859-1 can work unless 2+ bytes make a valid UTF-8 char.
+-->
+<html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>JSMC</title>
+
+	<!-- IE8 sucks.  It produces some unexplainable CPU spikes on long HTMLs -->
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+
+	<!-- stylesheets -->
+	<link href="client.css" rel="stylesheet" type="text/css"/>
+	
+	<!-- external libraries -->
+	<script type="text/javascript" src="../libs/jquery/jquery-1.4.2.min.js"></script>
+	
+	<!-- starter - socket bridge load callback -->
+	<script type="text/javascript">
+		var flash_ready = false, dom_ready = false;
+		function flash_loaded()
+		{	
+			flash_ready = true;
+			if(dom_ready && window.initialize_flash)
+				window.initialize_flash();
+		};
+		
+		$(function() 
+		{ 
+			if(window.initialize_dom)
+				window.initialize_dom();
+			if(flash_ready && window.initialize_flash)
+				window.initialize_flash();
+			dom_ready = true;
+		});
+	</script>
+	
+	<!-- client .js code -->
+	<script type="text/javascript" src="../common/generic.pack.js"></script>
+	<script type="text/javascript" src="client.pack.js"></script>
+</head>
+
+<body class="mudtext noborder" style="overflow:hidden">
+
+	<!-- The flash socket bridge - this is what actually connects to the MUD -->
+	<object id="socket_bridge" 
+		class="socket_bridge_hidden noborder"
+		classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+		codebase="http://fpdownload.adobe.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0">
+		<param name="movie" value="socket_bridge.swf?onloadcallback=flash_loaded" />
+		<param name="allowScriptAccess" value="always" />
+		<embed src="socket_bridge.swf?onloadcallback=flash_loaded" class="socket_bridge_hidden noborder"
+			allowScriptAccess="always"
+			type="application/x-shockwave-flash"
+			pluginspage="http://www.adobe.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"/>
+	</object>
+
+	<!-- The flash external talker - used to talk to another flash via actionscript LocalConnection;
+	       this is used for facebook integration -->
+	<object id="external_talker" 
+		class="socket_bridge_hidden noborder"
+		classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+		codebase="http://fpdownload.adobe.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0">
+		<param name="movie" value="external_talker.swf" />
+		<param name="allowScriptAccess" value="always" />
+		<embed src="external_talker.swf" class="socket_bridge_hidden noborder"
+			allowScriptAccess="always"
+			type="application/x-shockwave-flash"
+			pluginspage="http://www.adobe.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"/>
+	</object>
+
+	<!-- The MUD buffer -->
+	<div id="output_window" class="noborder" style="overflow:hidden; width:100%"></div>
+	<!-- The input window, with prompt display and input area -->
+	<table id="input_window" class="input_table" style="height:0px" cellspacing="0" cellpadding="0"><tbody>
+	<tr class="input_separator"><td></td><td></td></tr>
+	<tr>
+		<td align="left" valign="top" class="prompt" id="client_prompt"></td>
+		<td align="left" valign="top" id="client_input"></td>
+	</tr>
+	<tr class="input_separator"><td></td><td></td></tr>
+	</tbody></table>
+	<!-- Helper for filling MUD buffer -->
+	<div id="buffer_parser" class="noborder" style="visibility:hidden; display:none"></div>
+</body>
+</html>

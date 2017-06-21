@@ -1,0 +1,891 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+	Version="10.0"
+	VendorName="SlickEdit"
+	WorkingDir=".">
+	<Config
+		Name="Debug"
+		Type="java"
+		AppTypeList="application,applet,j2me,custom"
+		DebugCallbackName="jdwp"
+		ObjectDir="classes"
+		AppType="application"
+		Version="6"
+		OutputFile=""
+		CompilerConfigName="">
+		<Menu>
+			<Target
+				Name="Compile"
+				MenuCaption="&amp;Compile"
+				Dialog="_java_options_form Compiler"
+				EnableBuildFirst="0"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec CmdLine='javac -g %jbd %cp "%f"'/>
+			</Target>
+			<Target
+				Name="Build"
+				MenuCaption="&amp;Build"
+				Dialog="_java_options_form Compiler"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine="javamake"/>
+			</Target>
+			<Target
+				Name="Rebuild"
+				MenuCaption="&amp;Rebuild"
+				Dialog="_java_options_form Compiler"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine="javarebuild"/>
+			</Target>
+			<Target
+				Name="Debug"
+				MenuCaption="&amp;Debug"
+				Dialog="_java_options_form Debugger"
+				BuildFirst="1"
+				Deletable="0"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw">
+				<Exec CmdLine="java -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 %cp ."/>
+			</Target>
+			<Target
+				Name="Execute"
+				MenuCaption="E&amp;xecute"
+				Dialog="_java_options_form Interpreter"
+				BuildFirst="1"
+				Deletable="0"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw">
+				<Exec CmdLine="java %cp"/>
+			</Target>
+			<Target
+				Name="UnitTest"
+				MenuCaption="Unit Test"
+				ShowOnMenu="Never"
+				Dialog=""
+				BuildFirst="1"
+				Deletable="0"
+				CaptureOutputWith="ProcessBuffer"
+				PreMacro="unittest_pre_build"
+				PostMacro="unittest_post_build"
+				RunFromDir="%rw">
+				<Exec CmdLine="java %cp junit.slickedit.TestRunner"/>
+			</Target>
+			<Target
+				Name="dash"
+				MenuCaption="-">
+				<Exec/>
+			</Target>
+			<Target
+				Name="View Javadoc"
+				MenuCaption="&amp;View Javadoc"
+				ShowOnMenu="HideIfNoCmdLine"
+				Dialog="_java_options_form javadoc"
+				Deletable="0"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec
+					CmdLine="javaviewdoc"
+					Type="Slick-C"/>
+			</Target>
+			<Target
+				Name="Javadoc All"
+				MenuCaption="Javadoc All"
+				ShowOnMenu="HideIfNoCmdLine"
+				Dialog="_java_options_form javadoc"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine="javamakedoc javadoc -d docs %cp %{*.java}"/>
+			</Target>
+			<Target
+				Name="GUI Builder"
+				MenuCaption="&amp;Show GUI Builder"
+				Deletable="0">
+				<Exec
+					CmdLine="javagui_editor"
+					Type="Slick-C"/>
+			</Target>
+			<Target
+				Name="dash2"
+				MenuCaption="-">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Make Jar"
+				MenuCaption="Make &amp;Jar"
+				ShowOnMenu="HideIfNoCmdLine"
+				Dialog="_java_options_form jar"
+				CaptureOutputWith="ProcessBuffer"
+				BuildFirst="1"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine='javamakejar jar cvf "swish.jar" %{*}'/>
+			</Target>
+			<Target
+				Name="Java Options"
+				MenuCaption="Java &amp;Options"
+				ShowOnMenu="HideIfNoCmdLine"
+				Deletable="0">
+				<Exec
+					CmdLine="javaoptions"
+					Type="Slick-C"/>
+			</Target>
+		</Menu>
+		<AppTypeTargets Name="Debug">
+			<AppTypeTarget
+				MenuCaption="&amp;Debug"
+				Dialog="_java_options_form Appletviewer"
+				BuildFirst="1"
+				Deletable="0"
+				AppType="applet"
+				RunFromDir="%rw">
+				<Exec CmdLine="appletviewer -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 %h"/>
+			</AppTypeTarget>
+			<AppTypeTarget
+				MenuCaption="&amp;Debug"
+				BuildFirst="1"
+				Deletable="0"
+				AppType="custom"
+				RunFromDir="%rw">
+				<Exec CmdLine="jdb %cp %&lt;e"/>
+			</AppTypeTarget>
+		</AppTypeTargets>
+		<AppTypeTargets Name="Execute">
+			<AppTypeTarget
+				MenuCaption="E&amp;xecute"
+				Dialog="_java_options_form Appletviewer"
+				BuildFirst="1"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				AppletClass="swish"
+				Deletable="0"
+				AppType="applet"
+				RunFromDir="%rw">
+				<Exec CmdLine="appletviewer %h"/>
+			</AppTypeTarget>
+			<AppTypeTarget
+				MenuCaption="E&amp;xecute"
+				BuildFirst="1"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				Deletable="0"
+				AppType="custom"
+				RunFromDir="%rw">
+				<Exec CmdLine="java %cp %&lt;e"/>
+			</AppTypeTarget>
+		</AppTypeTargets>
+	</Config>
+	<Config
+		Name="Release"
+		Type="java"
+		AppTypeList="application,applet,custom"
+		DebugCallbackName="jdwp"
+		ObjectDir="classes"
+		AppType="application"
+		Version="6"
+		OutputFile=""
+		CompilerConfigName="">
+		<Menu>
+			<Target
+				Name="Compile"
+				MenuCaption="&amp;Compile"
+				Dialog="_java_options_form Compiler"
+				EnableBuildFirst="0"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec CmdLine='javac %jbd %cp "%f"'/>
+			</Target>
+			<Target
+				Name="Build"
+				MenuCaption="&amp;Build"
+				Dialog="_java_options_form Compiler"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine="javamake"/>
+			</Target>
+			<Target
+				Name="Rebuild"
+				MenuCaption="&amp;Rebuild"
+				Dialog="_java_options_form Compiler"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine="javarebuild"/>
+			</Target>
+			<Target
+				Name="Debug"
+				MenuCaption="&amp;Debug"
+				Dialog="_java_options_form Debugger"
+				BuildFirst="1"
+				Deletable="0"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw">
+				<Exec CmdLine="java -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 %cp ."/>
+			</Target>
+			<Target
+				Name="Execute"
+				MenuCaption="E&amp;xecute"
+				Dialog="_java_options_form Interpreter"
+				BuildFirst="1"
+				Deletable="0"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw">
+				<Exec CmdLine="java %cp"/>
+			</Target>
+			<Target
+				Name="UnitTest"
+				MenuCaption="Unit Test"
+				ShowOnMenu="Never"
+				Dialog=""
+				BuildFirst="1"
+				Deletable="0"
+				CaptureOutputWith="ProcessBuffer"
+				PreMacro="unittest_pre_build"
+				PostMacro="unittest_post_build"
+				RunFromDir="%rw">
+				<Exec CmdLine="java %cp junit.slickedit.TestRunner"/>
+			</Target>
+			<Target
+				Name="dash"
+				MenuCaption="-">
+				<Exec/>
+			</Target>
+			<Target
+				Name="View Javadoc"
+				MenuCaption="&amp;View Javadoc"
+				ShowOnMenu="HideIfNoCmdLine"
+				Dialog="_java_options_form javadoc"
+				Deletable="0"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec
+					CmdLine="javaviewdoc"
+					Type="Slick-C"/>
+			</Target>
+			<Target
+				Name="Javadoc All"
+				MenuCaption="Javadoc All"
+				ShowOnMenu="HideIfNoCmdLine"
+				Dialog="_java_options_form javadoc"
+				CaptureOutputWith="ProcessBuffer"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine="javamakedoc javadoc -d docs %cp %{*.java}"/>
+			</Target>
+			<Target
+				Name="GUI Builder"
+				MenuCaption="&amp;Show GUI Builder"
+				Deletable="0">
+				<Exec
+					CmdLine="javagui_editor"
+					Type="Slick-C"/>
+			</Target>
+			<Target
+				Name="dash2"
+				MenuCaption="-">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Make Jar"
+				MenuCaption="Make &amp;Jar"
+				ShowOnMenu="HideIfNoCmdLine"
+				Dialog="_java_options_form jar"
+				CaptureOutputWith="ProcessBuffer"
+				BuildFirst="1"
+				Deletable="0"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine='javamakejar jar cvf "swish.jar" %{*}'/>
+			</Target>
+			<Target
+				Name="Java Options"
+				MenuCaption="Java &amp;Options"
+				ShowOnMenu="HideIfNoCmdLine"
+				Deletable="0">
+				<Exec
+					CmdLine="javaoptions"
+					Type="Slick-C"/>
+			</Target>
+		</Menu>
+		<AppTypeTargets Name="Debug">
+			<AppTypeTarget
+				MenuCaption="&amp;Debug"
+				Dialog="_java_options_form Appletviewer"
+				BuildFirst="1"
+				Deletable="0"
+				AppType="applet"
+				RunFromDir="%rw">
+				<Exec CmdLine="appletviewer -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 %h"/>
+			</AppTypeTarget>
+			<AppTypeTarget
+				MenuCaption="&amp;Debug"
+				BuildFirst="1"
+				Deletable="0"
+				AppType="custom"
+				RunFromDir="%rw">
+				<Exec CmdLine="jdb %cp %&lt;e"/>
+			</AppTypeTarget>
+		</AppTypeTargets>
+		<AppTypeTargets Name="Execute">
+			<AppTypeTarget
+				MenuCaption="E&amp;xecute"
+				Dialog="_java_options_form Appletviewer"
+				BuildFirst="1"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				AppletClass="swish"
+				Deletable="0"
+				AppType="applet"
+				RunFromDir="%rw">
+				<Exec CmdLine="appletviewer %h"/>
+			</AppTypeTarget>
+			<AppTypeTarget
+				MenuCaption="E&amp;xecute"
+				BuildFirst="1"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				Deletable="0"
+				AppType="custom"
+				RunFromDir="%rw">
+				<Exec CmdLine="java %cp %&lt;e"/>
+			</AppTypeTarget>
+		</AppTypeTargets>
+	</Config>
+	<CustomFolders>
+		<Folder
+			Name="Source Files"
+			Filters="*.java;*.c;*.cpp;*.cxx;*.hxx;*.prg;*.pas;*.dpr;*.asm;*.bas;*.sc;*.e"/>
+		<Folder
+			Name="Bitmaps"
+			Filters="*.jpg;*.gif;*.bmp"/>
+		<Folder
+			Name="Other Files"
+			Filters=""/>
+	</CustomFolders>
+	<Files AutoFolders="DirectoryView">
+		<Folder Name="swish-with-filesystem-interaction">
+			<Folder Name="applications">
+				<F N="swish-with-filesystem-interaction/applications/swish.pl"/>
+			</Folder>
+			<Folder Name="config-available">
+				<Folder Name="gitty">
+					<F N="swish-with-filesystem-interaction/config-available/gitty/Help.swinb"/>
+				</Folder>
+				<F N="swish-with-filesystem-interaction/config-available/auth_google.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/auth_http.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/auth_http_always.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/auth_stackoverflow.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/auth_unity.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/data.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/debug.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/email.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/hdt.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/logging.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/network.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/notifications.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/r_serve.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/rlimit.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/rpc.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/swish.pl"/>
+				<F N="swish-with-filesystem-interaction/config-available/user_profile.pl"/>
+			</Folder>
+			<Folder Name="examples">
+				<Folder Name="aleph">
+					<F N="swish-with-filesystem-interaction/examples/aleph/abduce.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/aleph_examples.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/animals.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/constraints.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/features.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/gcws.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/good.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/modes.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/posonly.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/recursion.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/refine.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/train.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/weather.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/aleph/wedge.pl"/>
+				</Folder>
+				<Folder Name="inference">
+					<F N="swish-with-filesystem-interaction/examples/inference/admission.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/alarm.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/alarm_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/arithm.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/arithm_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/bloodtype.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/bloodtype_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coin.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coin.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coin2.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coin2_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coin_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coinmc.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coinmc_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coinmsw.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coinmsw_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/cont.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/cora.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/cora_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/coupon.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/dice.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/dice.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/dice_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/dirichlet_process.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/dirichlet_process_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/dp_chinese.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/dp_chinese_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/dp_mix.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/dp_mix_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/earthquake.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/earthquake_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/epidemic.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/epidemic_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/eruption.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/eruption_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/flexprob.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/gauss_mean_est.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/gauss_mean_est_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/gaussian_mixture.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/gaussian_mixture_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/gaussian_process.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/gpl.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/gpr.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/gpr_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/hmm.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/hmm_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/hmmpos.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/hmmpos.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/hmmpos2.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/indian_gpa.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/indian_gpadc.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/inference_examples.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/iris.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/iris_c3.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/jail.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/jail.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/kalman_filter.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/kalman_filter.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/kalman_filter_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/kalman_filtermsw.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/kalman_filtermsw_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/lda.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/lda.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/light.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/markov_chain.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/markov_chain_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/markov_chaindb.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/markov_factor.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/markov_network.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/mendel.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/mendelc.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/meta.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/metacomb.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/mln.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/monty.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/monty.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/monty_general.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/monty_simple.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/mvg.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/nballs.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/nballsdc.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/path.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/path.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/path_tabling.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/path_tabling.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/pcfg.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/pcfglr.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/pcfglr_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/pcfglrdb.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/pctl_slep.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/persons.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/plcg.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/plcg_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/pre_plcg.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/prefix.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/prefix_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/random_walk.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/rmc.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/seven_scientists.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/seven_scientists_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/simpson.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/simpson.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/slp_pcfg.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/slp_pdcg.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/slp_pdcg_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/smoking.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/sneezing.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/testdb.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/threesideddice.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/threesideddicemc.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/tile_map.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/tile_map.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/tile_mapcond.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/tile_mapnocut.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/tiny_event_calculus.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/tiny_event_calculusmc.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/trigger.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/truel.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/truel.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/uwcse.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/var_obj.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/var_obj_geom.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/var_obj_geom_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/var_obj_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/var_objdb.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/viral.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/viral.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/viralpb.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/viraltab.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/widget.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/widget_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/widgetmsw.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/inference/widgetmsw_R.pl"/>
+				</Folder>
+				<Folder Name="learning">
+					<F N="swish-with-filesystem-interaction/examples/learning/bongard.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/bongardkeys.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/exauc.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/exauc_R.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/hmmlearn.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/learn_effect_axioms.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/learning_examples.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/mach.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/muta.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/registration.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/shop.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/learning/university.pl"/>
+				</Folder>
+				<Folder Name="lemur">
+					<F N="swish-with-filesystem-interaction/examples/lemur/bongard.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/lemur/bongardkeys.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/lemur/lemur_examples.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/lemur/mach.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/lemur/registration.pl"/>
+				</Folder>
+				<Folder Name="logicmoo">
+					<F N="swish-with-filesystem-interaction/examples/logicmoo/logicmoo_examples.swinb"/>
+				</Folder>
+				<Folder Name="pfc">
+					<F N="swish-with-filesystem-interaction/examples/pfc/pfc_examples.swinb"/>
+				</Folder>
+				<Folder Name="prologmud">
+					<F N="swish-with-filesystem-interaction/examples/prologmud/prologmud_examples.swinb"/>
+				</Folder>
+				<Folder Name="trill">
+					<F N="swish-with-filesystem-interaction/examples/trill/biopaxLevel3.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/trill/BRCA.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/trill/commander.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/trill/DBPedia.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/trill/examples_trill.swinb"/>
+					<F N="swish-with-filesystem-interaction/examples/trill/johnEmployee.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/trill/peoplePets.pl"/>
+					<F N="swish-with-filesystem-interaction/examples/trill/vicodi.pl"/>
+				</Folder>
+				<F N="swish-with-filesystem-interaction/examples/basic_graph_examples.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/c3_examples.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/clpfd_queens.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/clpfd_sudoku.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/database.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/dict.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/eliza.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/enumerating_examples.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/examples.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/examples_swish.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/expert_system.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/grammar.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/houses_puzzle.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/htmlcell.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/io.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/iris.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/japanese.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/jquery.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/kb.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/knights_and_knaves.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/lists.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/literal_examples.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/member.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/movies.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/prefix_examples.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/prolog_tutorials.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/queens.pl"/>
+				<F N="swish-with-filesystem-interaction/examples/Rdataframe.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/rdf_examples.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/Rdownload.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/render_bdd.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/render_c3.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/render_chess.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/render_codes.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/render_graphviz.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/render_sudoku.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/render_svgtree.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/render_table.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/render_XXX.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/rendering.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/Rserve.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/siatec.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/stats.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/swish_tutorials.swinb"/>
+				<F N="swish-with-filesystem-interaction/examples/tabling.swinb"/>
+			</Folder>
+			<Folder Name="lib">
+				<Folder Name="data">
+					<F N="swish-with-filesystem-interaction/lib/data/csv.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/data/scrape.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/data/sparql.pl"/>
+				</Folder>
+				<Folder Name="plugin">
+					<F N="swish-with-filesystem-interaction/lib/plugin/email.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/plugin/hdt.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/plugin/http_authenticate.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/plugin/login.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/plugin/notify.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/plugin/profile.pl"/>
+				</Folder>
+				<Folder Name="render">
+					<F N="swish-with-filesystem-interaction/lib/render/bdd.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/c3.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/chess.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/codes.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/cp_rdf.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/graphviz.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/html.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/lpad.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/prolog.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/rdf.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/sldnf.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/sudoku.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/svgtree.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/swish.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/table.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/tiles.pl"/>
+					<F N="swish-with-filesystem-interaction/lib/render/url.pl"/>
+				</Folder>
+				<F N="swish-with-filesystem-interaction/lib/authenticate.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/avatar.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/bootstrap.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/chat.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/chatstore.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/config.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/cp_authenticate.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/dashboard.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/data_source.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/download.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/examples.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/filesystems.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/flags.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/form.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/gitty.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/gitty_bdb.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/gitty_driver_bdb.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/gitty_driver_files.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/gitty_tools.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/help.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/highlight.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/include.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/jquery.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/logging.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/markdown.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/messages.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/noble_avatar.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/oauth2.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/page.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/patch.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/paths.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/pep.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/procps.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/profiles.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/projection.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/r_swish.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/render.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/replay.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/replay_cm.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/search.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/session.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/ssl_certificate.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/storage.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/swish_chr.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/swish_csv.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/swish_debug.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/template_hint.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/trace.pl"/>
+				<F N="swish-with-filesystem-interaction/lib/tutorial.pl"/>
+			</Folder>
+			<Folder Name="profiles">
+				<F N="swish-with-filesystem-interaction/profiles/00-Empty.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/00-Empty.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/10-PITA.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/10-PITA.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/10-RDF11.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/10-RDF11.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/11-PFC.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/11-PFC.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/12-LogicMOO.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/12-LogicMOO.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/13-MUD.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/13-MUD.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/20-MCINTYRE.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/20-MCINTYRE.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/20-Non-Probabilistic-TRILL.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/20-Non-Probabilistic-TRILL.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/30-Probabilistic-TRILL.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/30-Probabilistic-TRILL.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/30-SLIPCOVER.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/30-SLIPCOVER.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/35-LEMUR.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/35-LEMUR.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/40-ALEPH.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/40-ALEPH.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/50-Student.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/50-Student.swinb"/>
+				<F N="swish-with-filesystem-interaction/profiles/60-CLP.pl"/>
+				<F N="swish-with-filesystem-interaction/profiles/60-CLP.swinb"/>
+			</Folder>
+			<Folder Name="rdf">
+				<Folder Name="cpack">
+					<F N="swish-with-filesystem-interaction/rdf/cpack/swish.ttl"/>
+				</Folder>
+			</Folder>
+			<Folder Name="test">
+				<F N="swish-with-filesystem-interaction/test/test_gitty.pl"/>
+				<F N="swish-with-filesystem-interaction/test/test_patch.pl"/>
+			</Folder>
+			<Folder Name="tutorial">
+				<Folder Name="inference">
+					<F N="swish-with-filesystem-interaction/tutorial/inference/arithm.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/inference/coin.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/inference/coinmc.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/inference/dice.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/inference/earthquake.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/inference/epidemic.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/inference/markov_chain.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/inference/pctl_slep.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/inference/sneezing.swinb"/>
+				</Folder>
+				<Folder Name="learning">
+					<F N="swish-with-filesystem-interaction/tutorial/learning/bongard.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/learning/mach.swinb"/>
+					<F N="swish-with-filesystem-interaction/tutorial/learning/registration.swinb"/>
+				</Folder>
+				<F N="swish-with-filesystem-interaction/tutorial/lpad.swinb"/>
+				<F N="swish-with-filesystem-interaction/tutorial/tutorial.swinb"/>
+			</Folder>
+			<Folder Name="web">
+				<Folder Name="css">
+					<F N="swish-with-filesystem-interaction/web/css/css-inline.pl"/>
+				</Folder>
+				<Folder Name="js">
+					<Folder Name="codemirror">
+						<Folder Name="mode">
+							<Folder Name="prolog">
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/index.html"/>
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/prolog-enhanced.png"/>
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/prolog-template-hint.css"/>
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/prolog-template-hint.js"/>
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/prolog.js"/>
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/prolog_keys.js"/>
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/prolog_op.js"/>
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/prolog_query.js"/>
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/prolog_server.js"/>
+								<F N="swish-with-filesystem-interaction/web/js/codemirror/mode/prolog/README.md"/>
+							</Folder>
+						</Folder>
+					</Folder>
+					<F N="swish-with-filesystem-interaction/web/js/.gitignore"/>
+					<F N="swish-with-filesystem-interaction/web/js/answer.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/build.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/build.js.in"/>
+					<F N="swish-with-filesystem-interaction/web/js/chat.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/chatroom.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/conf.json"/>
+					<F N="swish-with-filesystem-interaction/web/js/config.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/diff.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/difflib.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/diffview.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/download.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/editor.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/empty.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/form.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/gitty.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/history.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/jquery.jsdoc"/>
+					<F N="swish-with-filesystem-interaction/web/js/jswish.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/links.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/login.js"/>
+					<F
+						N="swish-with-filesystem-interaction/web/js/Makefile"
+						Type="Makefile"/>
+					<F N="swish-with-filesystem-interaction/web/js/mkjsbuild.pl"/>
+					<F N="swish-with-filesystem-interaction/web/js/modal.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/navbar.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/notebook.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/pane.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/preferences.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/prolog.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/query.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/README.md"/>
+					<F N="swish-with-filesystem-interaction/web/js/require.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/runner.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/search.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/storage.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/swish.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/tabbed.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/term.js"/>
+					<F N="swish-with-filesystem-interaction/web/js/utils.js"/>
+				</Folder>
+				<F N="swish-with-filesystem-interaction/web/.gitignore"/>
+				<F
+					N="swish-with-filesystem-interaction/web/Makefile"
+					Type="Makefile"/>
+				<F N="swish-with-filesystem-interaction/web/split.html"/>
+				<F N="swish-with-filesystem-interaction/web/swish.html"/>
+			</Folder>
+			<F N="swish-with-filesystem-interaction/.bowerrc"/>
+			<F N="swish-with-filesystem-interaction/.fileheader"/>
+			<F N="swish-with-filesystem-interaction/.gitignore"/>
+			<F N="swish-with-filesystem-interaction/.gitmodules"/>
+			<F N="swish-with-filesystem-interaction/bower.json"/>
+			<F N="swish-with-filesystem-interaction/daemon.pl"/>
+			<F N="swish-with-filesystem-interaction/httpd.log"/>
+			<F N="swish-with-filesystem-interaction/ide.pl"/>
+			<F N="swish-with-filesystem-interaction/LICENSE"/>
+			<F
+				N="swish-with-filesystem-interaction/Makefile"
+				Type="Makefile"/>
+			<F N="swish-with-filesystem-interaction/README.md"/>
+			<F N="swish-with-filesystem-interaction/remote_ide.pl"/>
+			<F N="swish-with-filesystem-interaction/robots.txt"/>
+			<F N="swish-with-filesystem-interaction/run.pl"/>
+			<F N="swish-with-filesystem-interaction/server.pl"/>
+			<F N="swish-with-filesystem-interaction/sitemap.xml"/>
+			<F N="swish-with-filesystem-interaction/swish.pl"/>
+			<F N="swish-with-filesystem-interaction/TODO.md"/>
+		</Folder>
+		<F N="swish.java"/>
+                
+         <Folder Name="xlisting_web">
+                        <F
+                                N="xlisting_web/*.*"
+                                Recurse="1"
+                                Refilter="1"
+                                Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak"/>
+                </Folder>
+
+
+	</Files>
+</Project>

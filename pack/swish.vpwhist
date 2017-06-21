@@ -1,0 +1,34 @@
+[Global]
+CurrentProject=swish.vpj
+[ProjectDates]
+swish.vpj=20170608140943377
+[ActiveConfig]
+swish.vpj=Debug
+[TreeExpansion2]
++ swish.vpj
+scroll:0
+[State]
+SCREEN: 1920 1200 379 309 652 457 0 0 M 0 0 0 0 1561 918
+CWD: ..\pack
+BUFFER: BN="swish.java"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Java	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.78 CL=27 LE=0 CX=26 CY=4 WI=5 BI=274 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1275 632 -1 -1 M  WF=0 WT=1 "Default Fixed Font,14,0,1"
+BUFFER: BN="swish.java"
+VIEW: LN=.78 CL=28 LE=0 CX=27 CY=4 WI=465 BI=274 HT=0 HN=0 HF=0 HC=4
+FILEHIST: 9
+swish-with-filesystem-interaction\lib\cp_authenticate.pl
+swish-with-filesystem-interaction\web\js\search.js
+swish-with-filesystem-interaction\web\js\config.js
+swish-with-filesystem-interaction\lib\examples.pl
+swish-with-filesystem-interaction\lib\profiles.pl
+swish-with-filesystem-interaction\web\js\tabbed.js
+swish-with-filesystem-interaction\lib\filesystems.pl
+swish-with-filesystem-interaction\lib\page.pl
+swish.java
+DEBUG: 0 0 0 0 5 0
+java.*
+javax.*
+com.sun.*
+com.ibm.*
+sun.*

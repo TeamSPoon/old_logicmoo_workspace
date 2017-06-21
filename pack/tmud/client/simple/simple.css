@@ -1,0 +1,494 @@
+/*
+ * "Simple" GUI wrapper for the JSMC.
+ * (c) 2010, The Two Towers MUD. All rights reserved.
+*/
+body {
+	background-image:url('/images/newsback.gif');
+	margin:0px;
+	padding:0;
+	font:normal 0.8em/1.2em verdana,aria,sans-serif;
+	min-width:740px;
+	overflow:hidden;
+	}
+#wrapper1 {
+	border-width: 0px;
+	position:relative;
+	text-align:left;
+	width:100%;
+	background:#000 url("../images/rightborder.png") repeat-y top right;
+	min-width:740px;
+	}
+#wrapper2 {
+	border-width: 0px;
+	position:relative;
+	text-align:left;
+	width:100%;
+	background:url("../images/leftborder.png") repeat-y top left;
+	min-width:740px;
+	}
+#header {
+	border-width: 0px;
+	background:#000;
+        background-image: url('../images/topbar.png');
+	padding:0px;
+	margin:0;
+	text-align:center;
+	color:#FFF;
+        height:38px;
+	min-width:740px;
+	}
+#main {
+	border-width: 0px;
+	position:relative;
+	margin:0;
+	padding:0px;
+	}
+#leftcol { 
+	border-width: 0px;
+	position:relative;
+	top:0px;
+	left:0px;
+	float:left;
+	width:57px;  /* for IE5/WIN */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	width:37px; /* actual value */
+	margin:0 0 0 0;
+	padding:0px;
+	z-index:100;
+	}
+#rightcol {
+	border-width: 0px;
+	position:relative;
+	top:0px;
+	right:0px;
+	float:right;
+	width:57px;  /* for IE5/WIN */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	width:37px; /* actual value */
+	margin:0 0 0 0;
+	padding:0px;
+	z-index:99;
+	}
+#centercol {
+	border-width: 0px;
+	position:relative;
+	padding:0 37px;
+	}
+#footer {
+	border-width: 0px;
+	position:relative;
+	top:0px;
+        background-image: url('../images/botbar.png');
+        height:38px;
+	width:100%;
+	clear:both;
+        /*margin-top:26px;*/
+	text-align:center;
+	color:#CCC;
+	min-width:740px;
+    	}
+
+.dlg_top {
+	border-width: 0px;
+	background:#000;
+	background-image: url('../images/dlg_t.png');
+	padding:0px;
+	margin:0;
+	text-align:center;
+	color:#FFF;
+	height:14px;
+}
+
+.dlg_bottom {
+	border-width: 0px;
+	position:relative;
+	top:0px;
+	background-image: url('../images/dlg_b.png');
+    height:14px;
+	width:100%;
+	clear:both;
+	text-align:center;
+	color:#CCC;
+}
+
+.dlg_left {
+	border-width: 0px;
+	position:relative;
+	text-align:left;
+	width:100%;
+	background:url("../images/dlg_l.png") repeat-y top left;
+}
+
+.dlg_right {
+	border-width: 0px;
+	position:relative;
+	text-align:left;
+	width:100%;
+	background:#000 url("../images/dlg_r.png") repeat-y top right;
+}
+
+.dlg_center {
+	border-width: 0px;
+	position:relative;
+	margin:0 14px;
+	background-image: url("../images/overlay.png");
+}
+
+.ui-dialog.dlg .ui-widget-content {
+	color: #ddd;
+}
+
+.ui-dialog.dlg .ui-dialog-buttonpane
+{
+	background: transparent;
+	border-width: 0px;
+}
+
+.ui-dialog.dlg .ui-dialog-titlebar
+{
+	background-image: none;
+	background-color: #2a5a74;
+	border-width: 0px 0px 2px 0px;
+	border-color: #aaa;
+}
+
+.ui-dialog.dlg .ui-dialog-content.tab_dlg
+{
+	padding:0px;
+}
+
+.tab_dlg .ui-tabs-nav
+{
+	background:transparent;
+	border-width: 0px 0px 1px 0px;
+	border-color: #aaa;
+}
+
+.tab_dlg .ui-tabs-nav.ui-widget-header li
+{
+	background-image: url("../images/overlay.png");
+	/*background-color: #2a5a74;*/
+	border-color: #aaa;
+}
+
+.tab_dlg .ui-tabs-nav li a { outline: none; }
+.tab_dlg .ui-tabs-nav li.ui-state-default a { color: #bb0; }
+.tab_dlg .ui-tabs-nav li.ui-state-active a { color: #ff0; }
+.tab_dlg .ui-tabs-nav li.ui-state-hover a { color: #f00; }
+
+#options_window {overflow:hidden;}
+
+.option_tab
+{
+	overflow:auto;
+}
+
+.options_split_border
+{
+	margin: 0px;
+	padding: 0px;
+	border-color: #aaa;
+	border-width: 1px;
+	border-style: solid;
+	height: 300px;
+	overflow:hidden;
+}
+
+.options_splitter
+{
+	border-width: 0px 2px 0px 2px;
+	cursor:e-resize;
+	border-style: outset;
+	width: 0px;
+	background-color: #aaa;
+	float:left;
+	padding: 0px;
+	margin: 0px;
+	height: auto;
+	overflow:hidden;
+}
+
+.options_split_panel
+{
+	float:left;
+	border-width:0px;
+	margin:0px;
+	padding:0px;
+	overflow:auto;
+}
+
+.options_split_panel.left
+{
+	position:relative;
+	left:-4px;
+}
+
+.options_split_panel_content
+{
+	border-width: 0px;
+	margin:0px;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+li.setting_category 
+{
+	list-style:none outside none;
+	outline:none;
+	white-space:nowrap;
+	color:#ddd;
+	padding: 0.2em;
+	background-color:transparent;
+	cursor:pointer;
+	min-width: 125px;
+	border: 1px solid transparent;
+}
+
+li.setting_category:hover
+{
+	color:#f00;
+}
+
+li.setting_category.selected
+{
+	color:#ff0;
+	background-color:#2a5a74;
+	border: 1px solid #fff;
+}
+
+li.setting_category_tree
+{
+	list-style:none outside none;
+	outline:none;
+	white-space:nowrap;
+	color:#dd0;
+	padding: 0.2em;
+	background-color:transparent;
+	min-width: 125px;
+	border: 1px solid transparent;
+}
+
+.font_attribute
+{
+	background-color:transparent; 
+	border-width: 0px; padding: 0px; margin: 0px;
+	width: 30px; height:26px;
+	background-image:url(../images/button_up30.png);
+	color:#ff0;
+	display:inline-block;
+	text-align:center;
+	cursor:pointer;
+}
+
+.font_attribute.chosen
+{
+	background-image:url(../images/button_down30.png);
+}
+
+.font_attribute .text
+{
+	position:relative;
+	top:5px;
+}
+
+.font_attribute.chosen .text
+{
+	color:#f60;
+}
+
+.font_attribute.chosen .text:hover
+{
+	color:#f00;
+}
+
+.font_attribute:hover
+{
+	color:#f00;
+}
+
+.color_box
+{
+	margin:1px;
+	padding:0px;
+	border: 1px solid black;
+	width:19px;
+	height:1.2em;
+	cursor: pointer;
+}
+
+.color_box.unav
+{
+	background-color:transparent !important;
+	border: 1px solid transparent;
+	cursor: auto;
+}
+
+.color_box.transp
+{
+	background-color:transparent !important;
+	width:35px;
+	padding:2px;
+	border-color:transparent;
+}
+
+.color_box_selection
+{
+	padding:0px;
+	margin:0px;
+	border: 2px solid transparent;
+}
+
+.color_box_selection.chosen
+{
+	border-color: #fff;
+}
+
+.setting_tree_icon { display:inline-block; width: 16px; height: 16px; background-image: url(../images/jquery-ui/ui-icons_dddddd_256x240.png); }
+
+.ft_input
+{
+	width:50px;
+}
+
+#ft {
+left:auto;
+position:absolute;
+top:auto;
+width:200px;
+background-color:#fff;
+border:1px solid #000;
+}
+
+#color_content tr
+{
+	margin:0px;
+}
+
+#color_sample
+{
+	font-size:1.6em;
+	width:300px;
+	height:100px;
+	border:2px inset #bbb;
+	background-image:url(../images/bluebackground.png);
+	margin:0px;
+	padding:0px;
+	overflow:auto;
+	white-space:pre-wrap;
+	word-wrap: break-word;
+}
+
+
+.percentText {
+	color:#FFF;
+}
+.noborder {
+	border-width: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+
+.strip a:link {text-decoration:none;}
+.strip a:visited {text-decoration:none;}
+.strip a:hover {text-decoration:none;}
+.strip a:active {text-decoration:none;}
+
+.fullfill {
+	height:100%;
+	width:100%;
+	min-height:100%;
+	max-height:100%;
+	max-width:100%;
+}
+
+.fullwidth {
+	width:100%;
+	max-width:100%;
+}
+
+div.frameborder {
+	border-width: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+
+div.dlg.ui-dialog { background:transparent; border-width: 0px; padding: 0px; }
+.dlg .ui-dialog-titlebar .ui-state-focus { background:transparent; border: 1px solid transparent;}
+.dlg .ui-dialog-titlebar .ui-state-hover { border: 1px solid transparent; background: transparent; }
+
+.ui-autocomplete { overflow: auto; max-height: 300px; 	}
+
+button.b90.ui-button, a.b90.ui-button, .ui-dialog .ui-dialog-buttonpane button.b90 {background:transparent; border-width: 0px; padding: 0px; width: 84px; height:26px;}
+button.b90.ui-button.ui-state-default, a.b90.ui-button.ui-state-default {background-image:url(../images/button_up90.png)}
+button.b90.ui-button.ui-state-active, a.b90.ui-button.ui-state-active {background-image:url(../images/button_down90.png)}
+
+button.b30.ui-button {background:transparent; border-width: 0px; padding: 0px; width: 30px; height:26px;}
+button.b30.ui-button.ui-state-default {background-image:url(../images/button_up30.png)}
+button.b30.ui-button.ui-state-active {background-image:url(../images/button_down30.png)}
+
+button.b40e.ui-button, a.b40e.ui-button, .ui-dialog .ui-dialog-buttonpane button.b40e {background:transparent; border-width: 0px; padding: 0px; width: 40px; height:38px;}
+button.b40e.ui-button.ui-state-default, a.b40e.ui-button.ui-state-default {background:transparent}
+button.b40e.ui-button.ui-state-active, a.b40e.ui-button.ui-state-active {background:transparent}
+
+
+#connect_btn.ui-state-default .ui-button-text { background-image:url(../images/connect.png) }
+#connect_btn.ui-state-hover .ui-button-text { background-image:url(../images/connect_hl.png) }
+#connect_btn.ui-state-disabled .ui-button-text { background-image:url(../images/connect_dis.png) }
+
+#disconnect_btn.ui-state-default .ui-button-text { background-image:url(../images/disconnect.png) }
+#disconnect_btn.ui-state-hover .ui-button-text { background-image:url(../images/disconnect_hl.png) }
+#disconnect_btn.ui-state-disabled .ui-button-text { background-image:url(../images/disconnect_dis.png) }
+
+#options_btn.ui-state-default .ui-button-text { background-image:url(../images/options.png) }
+#options_btn.ui-state-hover .ui-button-text { background-image:url(../images/options_hl.png) }
+#options_btn.ui-state-disabled .ui-button-text { background-image:url(../images/options_dis.png) }
+
+#help_btn.ui-state-default .ui-button-text { background-image:url(../images/help.png) }
+#help_btn.ui-state-hover .ui-button-text { background-image:url(../images/help_hl.png) }
+#help_btn.ui-state-disabled .ui-button-text { background-image:url(../images/help_dis.png) }
+
+#options_ok_btn.ui-state-default .ui-button-text { background-image:url(../images/ok.png) }
+#options_ok_btn.ui-state-hover .ui-button-text { background-image:url(../images/ok_hl.png) }
+#options_ok_btn.ui-state-disabled .ui-button-text { background-image:url(../images/ok_dis.png) }
+
+#options_apply_btn.ui-state-default .ui-button-text { background-image:url(../images/apply.png) }
+#options_apply_btn.ui-state-hover .ui-button-text { background-image:url(../images/apply_hl.png) }
+#options_apply_btn.ui-state-disabled .ui-button-text { background-image:url(../images/apply_dis.png) }
+
+#options_cancel_btn.ui-state-default .ui-button-text { background-image:url(../images/cancel.png) }
+#options_cancel_btn.ui-state-hover .ui-button-text { background-image:url(../images/cancel_hl.png) }
+#options_cancel_btn.ui-state-disabled .ui-button-text { background-image:url(../images/cancel_dis.png) }
+
+#help_go_btn.ui-state-default .ui-button-text { background-image:url(../images/go.png) }
+#help_go_btn.ui-state-hover .ui-button-text { background-image:url(../images/go_hl.png) }
+#help_go_btn.ui-state-disabled .ui-button-text { background-image:url(../images/go_dis.png) }
+
+#help_close_btn.ui-state-default .ui-button-text { background-image:url(../images/close.png) }
+#help_close_btn.ui-state-hover .ui-button-text { background-image:url(../images/close_hl.png) }
+#help_close_btn.ui-state-disabled .ui-button-text { background-image:url(../images/close_dis.png) }
+
+#fb_login_button a.ui-state-default.login .ui-button-text { background-image:url(../images/fb_login.png) }
+#fb_login_button a.ui-state-hover.login .ui-button-text { background-image:url(../images/fb_login_hl.png) }
+
+#fb_login_button a.ui-state-default.logout .ui-button-text { background-image:url(../images/fb_logout.png) }
+#fb_login_button a.ui-state-hover.logout .ui-button-text { background-image:url(../images/fb_logout_hl.png) }
+
+#menu_hide_btn.ui-state-default .ui-button-text { background-image:url(../images/hide_menu.png) }
+#menu_hide_btn.ui-state-hover .ui-button-text { background-image:url(../images/hide_menu_hl.png) }
+
+#full_screen_btn.ui-state-default .ui-button-text { background-image:url(../images/full_screen.png) }
+#full_screen_btn.ui-state-hover .ui-button-text { background-image:url(../images/full_screen_hl.png) }
+
+
+.help_button
+{
+	width: 30px;
+	height: 26px;
+}
+
+.subwindow_table
+{
+	width: 100%;
+}

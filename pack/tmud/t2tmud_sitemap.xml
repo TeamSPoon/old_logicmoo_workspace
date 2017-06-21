@@ -1,0 +1,1946 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset 
+		xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 
+		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+>
+<url>
+    <loc>http://t2tmud.org</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/style.css</loc>
+    <lastmod>2011-02-13T13:49:11-05:00</lastmod>
+</url>
+<url>
+    <loc>http://t2tmud.org/sdmenu/sdmenu.css</loc>
+    <lastmod>2007-08-12T11:24:46-04:00</lastmod>
+</url>
+<url>
+    <loc>http://t2tmud.org/</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/client/simple/simple.php?port=8080</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/getstarted.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/connect.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/rules.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/features.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/maps.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/guilds.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/tolkien.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/players.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/clients.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/gamesites.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/list.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/password.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/contact.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/howcanyouhelp.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/voting.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/donations.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/client/simple/jquery-ui-1.8.1.custom.css</loc>
+    <lastmod>2010-08-17T14:59:14-04:00</lastmod>
+</url>
+<url>
+    <loc>http://t2tmud.org/manifesto.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/boards/news.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/client/simple/simple.css</loc>
+    <lastmod>2010-08-17T14:59:14-04:00</lastmod>
+</url>
+<url>
+    <loc>http://t2tmud.org/connect.old_clients.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/havingtrouble.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/client/libs/farbtastic/farbtastic.css</loc>
+    <lastmod>2010-08-17T15:00:03-04:00</lastmod>
+</url>
+<url>
+    <loc>http://t2tmud.org/client/jsmc/client.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/profanity.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/comm_policy.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/harassment.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/spam.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/multiplaying.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/bug_abuse.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/triggers.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/botting.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/client_abuse.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/killstealing.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/playerkilling.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/levelbashing.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/spreekilling.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/playerstealing.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/questinfo.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/roleplaying.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/names.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/titles.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/advertising.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/troublemaking.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/proxies.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/punishments.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/policies.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/topics.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/law.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/surnames.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/client/simple/simple.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/settings.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/races.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/professions.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/races.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/professions.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/skills.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/transportation.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/guild.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/lawsys.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/lawless.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/helpers.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/communicate.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/roleplaying.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/instruments.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/armies.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/auction.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/shops.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/forging.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/tradeskills.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/inventory.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/builtin.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/color.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/ui.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/games.php</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Middleearth.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Adornas.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Belegost.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Bree.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Bywater.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Druwaur.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/GreyHavens.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Rivendell.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Asubuhi.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Azrakadar.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/EasterlingCamp.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Tavorus.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/Turseg.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/westgrid.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/eastgrid.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/pel.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/south.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/mordor.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/nearharad.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/umbar.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/harondor.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/farharad.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/resources/maps/pelargir.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/abbreviations.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/game_concepts.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/linkdead.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sight.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/age.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/helpers.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mud_alignment.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/speedwalking.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/alignment.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/highlevels.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/namechange.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/spellcasting.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/autoloads.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hints.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/parties.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/cap.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hitpoints.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/portals.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tongues.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/channels.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/idle.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/quit.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/drunkenness.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/item_tags.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/racechange.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unique.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/encumbrance.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/lag.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/reboots.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/endurance.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/level_quests.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/semotes.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/experience.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/levels.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/serving.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/immorting.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/inactivity.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/surveys.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/legends.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mortal_ranks.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/donations.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/questions.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/user_privacy.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/fsi.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/reimbursements.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/valinor.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/gold_transfer.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/nuke.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/reports.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/playtest_rules.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/reward.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/helper_rules.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/playtesting.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/fighting.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guides.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/levelling.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/newbie.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/start.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/golding.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/healing.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/lost.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/questing.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/arda.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/maiar.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/theme.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/arda_map.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ring.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tolkien_books.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/introduction.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/setting.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/valar.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/dunedain.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/easterling.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/haradrim.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/uruk-hai.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/dunlending.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/edain.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hobbit.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/silvan.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/variag.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/dwarf.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/eorling.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/numenorean.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sindar.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/archer.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sniffer.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.rider.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/assassin.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/thief.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.sniffer.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/civilian.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.archer.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.thief.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/minion.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.assassin.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.warrior.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/necromancer.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.civilian.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.wizard.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.minion.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/warrior.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ranger.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.necromancer.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/wizard.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/rider.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/title.ranger.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/6th_sense.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/deflecting.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/prowling.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/aim.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/dodge.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/resist_magic.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/archery.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/evasion.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/riding.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/assassination.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/fire_building.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/skills2.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/attack.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/fletching.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/skills3.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/awareness.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/intuition.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/stalking.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/balance.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/lethal_precision.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/stealth.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/battle_instincts.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/locksmith.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tactics.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/blocking.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/motivation.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/taming.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/butchery.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mounted_combat.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/theft.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/combat_arms.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/nature&#x27;s_grace.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tracking.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/concentration.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/nature&#x27;s_lore.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/warp_magic.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/control_magic.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/necromancy.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/wilderness.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/deception.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/nimbleness.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/will.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/defense.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/positioning.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/alchemy.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/fishing.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sewing.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/cooking.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/harvesting.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tradeskills_about.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/agility.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/constitution.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/intelligence.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/strength.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/charisma.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/coordination.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/stats.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/combat.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/death.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/kills.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/critical_hits.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hits.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/arrest.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/lawsys.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/pvp_flag.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sparring.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/blessing.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/pvp_system.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/contracts.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/raid.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/fines.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/report.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/clan_creation.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_equipment.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_prices.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/clan_stages.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_foods.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_protecting.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/clans.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_halls.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_reinforcing.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/flee.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_livery.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_rent.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_activity.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_maintenance.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_rules.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_alliances.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_membership.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_stable.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_application.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_missions.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_weapon.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_armoury.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_mount.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guilds.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_banners.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_new.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_disband.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild_pack.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/armour_traders.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/bars.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/inns.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/smiths.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/auction.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/bribe.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mailrooms.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/stables.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/auction_faq.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/cemeteries.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/memorials.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/trainers.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/auction_tags.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/courthouses.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/services.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/banks.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/healers.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/shops.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/armies.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/bows.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mounts.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/special_objects.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/army_ranks.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/cards.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/notebundle.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/spellbooks.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/arrows.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/climbing_gear.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/orders.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/wagons.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/boards.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/flying_mounts.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/panniers.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/boats.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/gossiper.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/pelt_strings.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/books.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/instruments.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/pipes.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/acro.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/golf.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/poker.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/blackout.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hobboku.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/chess.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/killtracker_event.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/roulette.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/darts.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/lottery.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sattim_daira.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/draughts.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/morris.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sharkey.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/el-ixir.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/obelisk_race.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/stones.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/event.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/pebbles.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/games.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/pigs.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/abilities.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/control_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/room_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/character_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/general_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/social_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/combat_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/interaction_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/system_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/item_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/travel_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/config_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/restricted_commands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/color_classes.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mccp.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/prompt.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/technical.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/colorcodes.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/more.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sets.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/encryption.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mxp.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/shell.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ips.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/password.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ssl_certificate.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/facebook.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/forum.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/web_client.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/website.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ainurs.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mud.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/rl.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/thinking.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/disclaimer.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mudding.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sex.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/cease.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/faq.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/help.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/look.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/rest.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/warscape.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/daytime.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/glance.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hint.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/map.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sleep.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/alias.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/do.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/history.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/trigger.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unalias.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/go.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/swim.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/travelto.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/afk.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guildinfo.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/legendinfo.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/serve.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/storyedit.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/autoaccept.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hp.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/pose.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/skills.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/surname.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/charinfo.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hpq.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/quests.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/speak.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tradeskills.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/describe.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/languages.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/removetag.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/speech.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/undescribe.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/exp.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/laston.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/score.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/spells.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/wardrobe.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/clan.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/er.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mutter.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/rpscore.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/trivia.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/comm.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/fr.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/newbiecomm.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/say.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unignore.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/comms.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/friend.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/overthrow.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/semote.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/whisper.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/converse.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guild.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/party.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/shout.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/who.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/emote.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ignore.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/plea.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/story.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/emoteat.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/kudo.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/privacy.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tell.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/enemy.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/legend.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/respond.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tellhist.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/brief.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/chfn.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/group.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/set.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/snoopable.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/charset.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/color.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/passwd.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unset.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/camp.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/exits.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/forage.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/knock.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/search.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/align.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/give.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mount.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tradeskill.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ask.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hitch.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ride.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unhitch.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/dismount.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/lead.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tame.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/brew.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/enc.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/inventory.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/retrieve.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/take.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/close.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/extinguish.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/light.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sheath.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/throw.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/cook.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/fill.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/lock.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sheathe.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unhand.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/draw.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/get.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/open.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/shift.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unlock.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/drink.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/gold.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/packtag.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/skin.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unsheathe.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/drop.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hands.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/poison.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sling.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/untag.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/eat.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hold.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/put.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/store.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/wear.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/empty.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ignite.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/remove.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tag.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/wield.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/armour.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/focus.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/merciful.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/shape.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unprotect.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/bandage.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/handcuff.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/protect.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/shield.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unshield.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/consider.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/investigate.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/pvp.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/spar.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/wanted.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/evade.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/kill.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/shackle.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/stop.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/wimpy.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/bug.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/harass.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mudtime.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/save.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/uptime.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/commend.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hibernate.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/mudvote.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/suicide.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/vote.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/conninfo.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/idea.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/news.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/survey.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/warnings.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/depart.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/immort.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/prop.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/typo.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/dev.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/resume.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/updates.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/change.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hnews.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/newbiehelper.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/submission.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/gm.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/jail.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/playtest.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/gmnews.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/makeprof.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ptcomm.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/guildap.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/namerestrict.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/ptnews.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/appraise.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/counter.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hide.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/restring.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/track.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/attune.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/disguise.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/hunt.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sacrifice.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/trample.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/backstab.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/eaglesight.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/imbue.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/salvage.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/trap.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/bash.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/enchant.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/kickback.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sense.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/unseat.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/camouflage.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/feint.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/leech.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/shiv.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/warcry.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/cast.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/find.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/multinock.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sneak.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/compare.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/fletch.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/pick.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/sniff.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/condition.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/headbutt.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/prowl.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/steal.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/conjure.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/heal.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/repair.html</loc>
+</url>
+<url>
+    <loc>http://t2tmud.org/mudhelp/tie.html</loc>
+</url>
+</urlset>

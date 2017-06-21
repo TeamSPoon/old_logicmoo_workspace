@@ -2,6 +2,6 @@
 <Workspace Version="10.0" VendorName="SlickEdit">
 	<Projects>
 		<Project File="CurrentlyWorkingOn.vpj"/>
-		<Project File="TeamSPoon.vpj"/>
+		<Project File="../../elFinder.vpj"/>
 	</Projects>
 </Workspace>
