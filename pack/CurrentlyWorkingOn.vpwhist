@@ -6,8 +6,8 @@ TeamSPoon.vpj=Release
 swish.vpj=Debug
 ..\..\elFinder.vpj=Release
 [ProjectDates]
-..\..\elFinder.vpj=20170614110123470
-CurrentlyWorkingOn.vpj=20170620181813532
+..\..\elFinder.vpj=20170621132401954
+CurrentlyWorkingOn.vpj=20170626213514822
 [TreeExpansion2]
 - CurrentlyWorkingOn.vpj
   + aleph
@@ -58,28 +58,28 @@ CurrentlyWorkingOn.vpj=20170620181813532
         + lemur
   + cplint_r
     + prolog
-  + dictoo
-    + prolog
+  - dictoo
+    - prolog
     + t
   + each_call_cleanup
     + prolog
     + t
   + eggdrop
     + prolog
-  + file_scope
-    + prolog
+  - file_scope
+    - prolog
     + t
   + fluxplayer-prolog-engine
-  + gvar_syntax
-    + prolog
+  - gvar_syntax
+    - prolog
     + t
-  + hook_hybrid
-    + prolog
+  - hook_hybrid
+    - prolog
     + t
   + lib_atts
     + prolog
-  + logicmoo_base
-    + prolog
+  - logicmoo_base
+    - prolog
       + logicmoo
         + common_logic
         + motel
@@ -100,7 +100,7 @@ CurrentlyWorkingOn.vpj=20170620181813532
         + snark
         + tptp
   + logicmoo_nlu
-    + prolog
+    - prolog
       + ace_in_gf
         + docs
           + bib
@@ -235,6 +235,8 @@ CurrentlyWorkingOn.vpj=20170620181813532
         + bb0
         + bb1
         + bb2
+      + pldata
+        + plkb7166
       + SIRIDUS
         + UGOT-D31
           + godis
@@ -452,33 +454,39 @@ CurrentlyWorkingOn.vpj=20170620181813532
           + iris
           + trains
         + pl
-  + logicmoo_utils
-    + prolog
+  - logicmoo_utils
+    - prolog
     + t
-  + loop_check
-    + prolog
+  - loop_check
+    - prolog
   + matrix
     + prolog
       + examples
-  + must_trace
-    + prolog
+  - multivar
+    - prolog
     + t
-  + pfc
-    + prolog
-      + pfc2.0
-      + pfclib
+  - must_trace
+    - prolog
+    + t
+  - pfc
+    - prolog
+      - pfc2.0
+      - pfclib
     + t
       + sanity_base
   + plweb
     + logs
-  + prologmud
-    + prolog
-      + prologmud
-        + actions
+  - predicate_streams
+    - prolog
+    + t
+  - prologmud
+    - prolog
+      - prologmud
+        - actions
         + mobs
           + affordance
         + objs
-        + parsing
+        - parsing
         + server
         + vworld
       + prologmud_web
@@ -492,7 +500,7 @@ CurrentlyWorkingOn.vpj=20170620181813532
               + js
           + model
           + mudconsole
-  - prologmud_samples
+  + prologmud_samples
     - prolog
       - prologmud_sample_games
         + btepisode
@@ -609,6 +617,140 @@ CurrentlyWorkingOn.vpj=20170620181813532
       + learning
       + lemur
       + logicmoo
+      + logtalk
+        + ack
+        + adventure
+        + aliases
+        + assignvars
+        + assumptions
+        + attvars
+        + benchmarks
+        + birds
+        + blocks
+        + bottles
+        + bricks
+        + carengines
+        + cc
+          + files
+        + classmethods
+        + classvars
+        + coinduction
+        + complements
+          + allow
+          + restrict
+        + constraints
+          + bp
+          + eclipse
+          + gprolog
+          + sicstus
+          + swipl
+          + yap
+        + dcgs
+        + debug_hooks
+        + delegates
+        + diamonds
+        + dynpred
+        + encodings
+        + engines
+          + ebench
+          + emetas
+          + fluents
+          + interactors
+          + lazy
+          + sums
+          + tbbt
+          + whisper
+          + yield
+        + errors
+        + expansion
+        + family
+        + family_alt
+        + hailstone
+        + hello_world
+        + hooks
+        + includes
+        + inheritance
+        + inlining
+        + instmethods
+        + instvars
+        + java
+        + lambdas
+        + lambdas_compiled
+        + laptops
+        + lo
+          + planner
+          + travellers
+        + localizations
+        + logging
+        + logic
+        + lpa
+          + faults
+          + timetables
+        + metaclasses
+        + metainterpreters
+        + metapredicates
+        + metapredicates_compiled
+        + mi
+        + miscellaneous
+        + modules
+        + msglog
+        + multifile
+        + my_types
+        + named_databases
+        + operators
+        + parametric
+        + pardicts
+        + patches
+        + patching
+        + people
+        + poem
+        + points
+        + polygons
+        + profiling
+        + prototypes
+        + proxies
+        + puzzles
+        + quick_check
+        + recipes
+        + redis
+        + reflection
+        + relations
+        + roots
+        + searching
+        + securemp
+        + shapes
+          + ch
+          + ph
+        + sicstus
+        + symbiosis
+        + symdiff
+        + tabling
+        + testing
+        + threads
+          + barriers
+          + birthdays
+          + blackboard
+          + buckets
+          + buffer
+          + checkpoint
+          + fft
+          + fibonacci
+          + functions
+          + hanoi
+          + integration
+          + integration2d
+          + metered_concurrency
+          + mtbatch
+          + nondet
+          + philosophers
+          + primes
+          + sorting
+          + sync
+          + tak
+          + team
+        + viewpoints
+        + wrappers
+        + xpce
       + pfc
       + prologmud
       + trill
@@ -616,7 +758,6 @@ CurrentlyWorkingOn.vpj=20170620181813532
       + data
       + plugin
       + render
-    + log
     + node_modules
       + ui-contextmenu\.github
       + jquery
@@ -670,16 +811,136 @@ CurrentlyWorkingOn.vpj=20170620181813532
       + learning
     + web
       + bower_components
+        + ace
+          + api
+            + resources
+              + csses
+              + font
+              + images
+              + javascripts
+          + build
+            + demo
+              + kitchen-sink
+            + textarea
+              + images
+          + build_support
+          + demo
+            + kitchen-sink
+              + docs
+            + r.js
+            + static-highlighter
+          + doc
+            + site
+              + images
+              + js
+            + template
+              + jade
+              + resources
+                + csses
+                + font
+                + images
+                + javascripts
+          + experiments
+          + lib
+            + ace
+              + autocomplete
+              + commands
+              + css
+              + edit_session
+              + ext
+                + beautify
+                + menu_tools
+              + keyboard
+              + layer
+              + lib
+              + mode
+                + _test
+                + behaviour
+                + coffee
+                + css
+                + folding
+                + html
+                + javascript
+                + json
+                + lua
+                + php
+                + xml
+                + xquery
+              + model
+              + mouse
+              + requirejs
+              + snippets
+              + test
+                + asyncjs
+              + theme
+              + worker
+          + node_modules
+            + amd-loader\.c9
+              + metadata
+                + workspace
+            + asyncjs\.c9
+              + metadata
+                + workspace
+            + amd-loader
+              + test
+                + node_modules
+            + asyncjs
+              + demo
+                + assets
+              + lib
+                + plugins
+              + test
+                + assets
+                  + dir1
+                  + dir11
+                  + dir2
+                  + nonemptydir
+                  + symlink-dir
+                  + walk
+                    + dir1
+                    + dir2
+                      + dir22
+          + tool
+            + templates
+            + tmthemes
         + ace-builds
+          + demo
+            + kitchen-sink
+              + docs
           + src
+            + autocomplete
+            + commands
+            + css
+            + edit_session
+            + ext
+              + beautify
+              + menu_tools
+            + keyboard
+            + layer
+            + lib
+            + mode
+              + _test
+              + behaviour
+              + coffee
+              + css
+              + folding
+              + html
+              + javascript
+              + json
+              + lua
+              + php
+              + xml
+              + xquery
+            + model
+            + mouse
+            + requirejs
             + snippets
-          + src-min
-            + snippets
-          + src-min-noconflict
-            + snippets
-          + src-noconflict
-            + snippets
+            + test
+              + asyncjs
+            + theme
+            + worker
           + textarea
+            + images
             + src
         + bootstrap
           + dist
@@ -993,9 +1254,9 @@ CurrentlyWorkingOn.vpj=20170620181813532
     - prolog
       - examples
   + \usr
-    + local
-      + lib
-        + swipl-7.5.7
+    - local
+      - lib
+        - swipl-7.5.7
           + bin
           + boot
           + customize
@@ -1029,7 +1290,7 @@ CurrentlyWorkingOn.vpj=20170620181813532
           + include
             + sicstus
             + Yap
-          + library
+          - library
             + chr
             + clp
               + clpq
@@ -1045,7 +1306,7 @@ CurrentlyWorkingOn.vpj=20170620181813532
               + swi
               + yap
             + DTD
-            + http
+            - http
               + web
                 + css
                 + icons
@@ -1087,8 +1348,8 @@ CurrentlyWorkingOn.vpj=20170620181813532
                   + icons
                     + 16x16
                 + xref
-  + xlisting
-    + prolog
+  - xlisting
+    - prolog
 - ..\..\elFinder.vpj
   - elFinder
     + node_modules\.bin
@@ -1096,13 +1357,14 @@ CurrentlyWorkingOn.vpj=20170620181813532
     + files\.trash
     + css
     - files
+      + prologmud_sample_games\.xpce
       + ClioPatria
         + api
-        + applications
+        - applications
           + help
         + client
           + Java
-        + components
+        - components
         + config-available
         + cpack
         + entailment
@@ -1328,6 +1590,140 @@ CurrentlyWorkingOn.vpj=20170620181813532
         + learning
         + lemur
         + logicmoo
+        + logtalk
+          + ack
+          + adventure
+          + aliases
+          + assignvars
+          + assumptions
+          + attvars
+          + benchmarks
+          + birds
+          + blocks
+          + bottles
+          + bricks
+          + carengines
+          + cc
+            + files
+          + classmethods
+          + classvars
+          + coinduction
+          + complements
+            + allow
+            + restrict
+          + constraints
+            + bp
+            + eclipse
+            + gprolog
+            + sicstus
+            + swipl
+            + yap
+          + dcgs
+          + debug_hooks
+          + delegates
+          + diamonds
+          + dynpred
+          + encodings
+          + engines
+            + ebench
+            + emetas
+            + fluents
+            + interactors
+            + lazy
+            + sums
+            + tbbt
+            + whisper
+            + yield
+          + errors
+          + expansion
+          + family
+          + family_alt
+          + hailstone
+          + hello_world
+          + hooks
+          + includes
+          + inheritance
+          + inlining
+          + instmethods
+          + instvars
+          + java
+          + lambdas
+          + lambdas_compiled
+          + laptops
+          + lo
+            + planner
+            + travellers
+          + localizations
+          + logging
+          + logic
+          + lpa
+            + faults
+            + timetables
+          + metaclasses
+          + metainterpreters
+          + metapredicates
+          + metapredicates_compiled
+          + mi
+          + miscellaneous
+          + modules
+          + msglog
+          + multifile
+          + my_types
+          + named_databases
+          + operators
+          + parametric
+          + pardicts
+          + patches
+          + patching
+          + people
+          + poem
+          + points
+          + polygons
+          + profiling
+          + prototypes
+          + proxies
+          + puzzles
+          + quick_check
+          + recipes
+          + redis
+          + reflection
+          + relations
+          + roots
+          + searching
+          + securemp
+          + shapes
+            + ch
+            + ph
+          + sicstus
+          + symbiosis
+          + symdiff
+          + tabling
+          + testing
+          + threads
+            + barriers
+            + birthdays
+            + blackboard
+            + buckets
+            + buffer
+            + checkpoint
+            + fft
+            + fibonacci
+            + functions
+            + hanoi
+            + integration
+            + integration2d
+            + metered_concurrency
+            + mtbatch
+            + nondet
+            + philosophers
+            + primes
+            + sorting
+            + sync
+            + tak
+            + team
+          + viewpoints
+          + wrappers
+          + xpce
         + pfc
         + prologmud
         + trill
@@ -1352,6 +1748,140 @@ CurrentlyWorkingOn.vpj=20170620181813532
             + sanity_user
             + snark
             + tptp
+      + logtalk
+        + ack
+        + adventure
+        + aliases
+        + assignvars
+        + assumptions
+        + attvars
+        + benchmarks
+        + birds
+        + blocks
+        + bottles
+        + bricks
+        + carengines
+        + cc
+          + files
+        + classmethods
+        + classvars
+        + coinduction
+        + complements
+          + allow
+          + restrict
+        + constraints
+          + bp
+          + eclipse
+          + gprolog
+          + sicstus
+          + swipl
+          + yap
+        + dcgs
+        + debug_hooks
+        + delegates
+        + diamonds
+        + dynpred
+        + encodings
+        + engines
+          + ebench
+          + emetas
+          + fluents
+          + interactors
+          + lazy
+          + sums
+          + tbbt
+          + whisper
+          + yield
+        + errors
+        + expansion
+        + family
+        + family_alt
+        + hailstone
+        + hello_world
+        + hooks
+        + includes
+        + inheritance
+        + inlining
+        + instmethods
+        + instvars
+        + java
+        + lambdas
+        + lambdas_compiled
+        + laptops
+        + lo
+          + planner
+          + travellers
+        + localizations
+        + logging
+        + logic
+        + lpa
+          + faults
+          + timetables
+        + metaclasses
+        + metainterpreters
+        + metapredicates
+        + metapredicates_compiled
+        + mi
+        + miscellaneous
+        + modules
+        + msglog
+        + multifile
+        + my_types
+        + named_databases
+        + operators
+        + parametric
+        + pardicts
+        + patches
+        + patching
+        + people
+        + poem
+        + points
+        + polygons
+        + profiling
+        + prototypes
+        + proxies
+        + puzzles
+        + quick_check
+        + recipes
+        + redis
+        + reflection
+        + relations
+        + roots
+        + searching
+        + securemp
+        + shapes
+          + ch
+          + ph
+        + sicstus
+        + symbiosis
+        + symdiff
+        + tabling
+        + testing
+        + threads
+          + barriers
+          + birthdays
+          + blackboard
+          + buckets
+          + buffer
+          + checkpoint
+          + fft
+          + fibonacci
+          + functions
+          + hanoi
+          + integration
+          + integration2d
+          + metered_concurrency
+          + mtbatch
+          + nondet
+          + philosophers
+          + primes
+          + sorting
+          + sync
+          + tak
+          + team
+        + viewpoints
+        + wrappers
+        + xpce
       + pfc
         + examples
         + man
@@ -1374,14 +1904,12 @@ CurrentlyWorkingOn.vpj=20170620181813532
         + server
         + vworld
       + prologmud_sample_games
+        + tempDir\.xpce
         + btepisode
         + circlemuddata
         + config-enabled
-          + gitty
-        + config-enabled-cp
         + config-enabled-swish
           + gitty
-        + config-enabled-swish-back
         + cpack
           + amalgame
             + api
@@ -1489,6 +2017,14 @@ CurrentlyWorkingOn.vpj=20170620181813532
             + lib
             + rdf
               + cpack
+          + rdf_qa
+            + applications
+            + components
+            + config-available
+            + rdf
+              + cpack
+            + web
+              + css
           + skos
             + components
               + skos
@@ -1542,6 +2078,140 @@ CurrentlyWorkingOn.vpj=20170620181813532
               + learning
               + lemur
               + logicmoo
+              + logtalk
+                + ack
+                + adventure
+                + aliases
+                + assignvars
+                + assumptions
+                + attvars
+                + benchmarks
+                + birds
+                + blocks
+                + bottles
+                + bricks
+                + carengines
+                + cc
+                  + files
+                + classmethods
+                + classvars
+                + coinduction
+                + complements
+                  + allow
+                  + restrict
+                + constraints
+                  + bp
+                  + eclipse
+                  + gprolog
+                  + sicstus
+                  + swipl
+                  + yap
+                + dcgs
+                + debug_hooks
+                + delegates
+                + diamonds
+                + dynpred
+                + encodings
+                + engines
+                  + ebench
+                  + emetas
+                  + fluents
+                  + interactors
+                  + lazy
+                  + sums
+                  + tbbt
+                  + whisper
+                  + yield
+                + errors
+                + expansion
+                + family
+                + family_alt
+                + hailstone
+                + hello_world
+                + hooks
+                + includes
+                + inheritance
+                + inlining
+                + instmethods
+                + instvars
+                + java
+                + lambdas
+                + lambdas_compiled
+                + laptops
+                + lo
+                  + planner
+                  + travellers
+                + localizations
+                + logging
+                + logic
+                + lpa
+                  + faults
+                  + timetables
+                + metaclasses
+                + metainterpreters
+                + metapredicates
+                + metapredicates_compiled
+                + mi
+                + miscellaneous
+                + modules
+                + msglog
+                + multifile
+                + my_types
+                + named_databases
+                + operators
+                + parametric
+                + pardicts
+                + patches
+                + patching
+                + people
+                + poem
+                + points
+                + polygons
+                + profiling
+                + prototypes
+                + proxies
+                + puzzles
+                + quick_check
+                + recipes
+                + redis
+                + reflection
+                + relations
+                + roots
+                + searching
+                + securemp
+                + shapes
+                  + ch
+                  + ph
+                + sicstus
+                + symbiosis
+                + symdiff
+                + tabling
+                + testing
+                + threads
+                  + barriers
+                  + birthdays
+                  + blackboard
+                  + buckets
+                  + buffer
+                  + checkpoint
+                  + fft
+                  + fibonacci
+                  + functions
+                  + hanoi
+                  + integration
+                  + integration2d
+                  + metered_concurrency
+                  + mtbatch
+                  + nondet
+                  + philosophers
+                  + primes
+                  + sorting
+                  + sync
+                  + tak
+                  + team
+                + viewpoints
+                + wrappers
+                + xpce
               + pfc
               + prologmud
               + trill
@@ -1549,7 +2219,6 @@ CurrentlyWorkingOn.vpj=20170620181813532
               + data
               + plugin
               + render
-            + log
             + node_modules
               + ui-contextmenu\.github
               + jquery
@@ -1603,16 +2272,136 @@ CurrentlyWorkingOn.vpj=20170620181813532
               + learning
             + web
               + bower_components
+                + ace
+                  + api
+                    + resources
+                      + csses
+                      + font
+                      + images
+                      + javascripts
+                  + build
+                    + demo
+                      + kitchen-sink
+                    + textarea
+                      + images
+                  + build_support
+                  + demo
+                    + kitchen-sink
+                      + docs
+                    + r.js
+                    + static-highlighter
+                  + doc
+                    + site
+                      + images
+                      + js
+                    + template
+                      + jade
+                      + resources
+                        + csses
+                        + font
+                        + images
+                        + javascripts
+                  + experiments
+                  + lib
+                    + ace
+                      + autocomplete
+                      + commands
+                      + css
+                      + edit_session
+                      + ext
+                        + beautify
+                        + menu_tools
+                      + keyboard
+                      + layer
+                      + lib
+                      + mode
+                        + _test
+                        + behaviour
+                        + coffee
+                        + css
+                        + folding
+                        + html
+                        + javascript
+                        + json
+                        + lua
+                        + php
+                        + xml
+                        + xquery
+                      + model
+                      + mouse
+                      + requirejs
+                      + snippets
+                      + test
+                        + asyncjs
+                      + theme
+                      + worker
+                  + node_modules
+                    + amd-loader\.c9
+                      + metadata
+                        + workspace
+                    + asyncjs\.c9
+                      + metadata
+                        + workspace
+                    + amd-loader
+                      + test
+                        + node_modules
+                    + asyncjs
+                      + demo
+                        + assets
+                      + lib
+                        + plugins
+                      + test
+                        + assets
+                          + dir1
+                          + dir11
+                          + dir2
+                          + nonemptydir
+                          + symlink-dir
+                          + walk
+                            + dir1
+                            + dir2
+                              + dir22
+                  + tool
+                    + templates
+                    + tmthemes
                 + ace-builds
+                  + demo
+                    + kitchen-sink
+                      + docs
                   + src
+                    + autocomplete
+                    + commands
+                    + css
+                    + edit_session
+                    + ext
+                      + beautify
+                      + menu_tools
+                    + keyboard
+                    + layer
+                    + lib
+                    + mode
+                      + _test
+                      + behaviour
+                      + coffee
+                      + css
+                      + folding
+                      + html
+                      + javascript
+                      + json
+                      + lua
+                      + php
+                      + xml
+                      + xquery
+                    + model
+                    + mouse
+                    + requirejs
                     + snippets
-                  + src-min
-                    + snippets
-                  + src-min-noconflict
-                    + snippets
-                  + src-noconflict
-                    + snippets
+                    + test
+                      + asyncjs
+                    + theme
+                    + worker
                   + textarea
+                    + images
                     + src
                 + bootstrap
                   + dist
@@ -1920,6 +2709,32 @@ CurrentlyWorkingOn.vpj=20170620181813532
                 + render
                 + tutorials
               + patches
+          + trill_on_swish
+            + applications
+            + client
+            + config-available
+            + examples
+              + trill
+            + lib
+              + trill_on_swish
+                + render
+            + profiles
+            + rdf
+              + cpack
+            + web
+              + bower_components
+                + bootstrap
+                  + dist
+                    + fonts
+                + codemirror
+                  + mode
+                    + css
+                    + htmlmixed
+                    + javascript
+              + css
+              + help
+              + icons
+              + js
           + void
             + lib
             + rdf
@@ -1953,6 +2768,10 @@ CurrentlyWorkingOn.vpj=20170620181813532
               + 15
             + 43
               + 11
+            + 4a
+              + 00
+            + 5d
+              + aa
             + 5f
               + 55
             + 63
@@ -1961,14 +2780,28 @@ CurrentlyWorkingOn.vpj=20170620181813532
               + c9
             + b0
               + a1
+            + b8
+              + 46
             + ba
+              + 52
+            + c1
+              + 7f
+            + c4
+              + ff
+            + d3
               + 52
             + d7
               + 9b
+            + e6
+              + f9
             + ea
               + 78
             + f0
               + 80
+            + f8
+              + f6
+            + fd
+              + 75
             + ref
         + gv.git
           + hooks
@@ -2103,6 +2936,8 @@ CurrentlyWorkingOn.vpj=20170620181813532
             + df
           + fc
             + 2e
+          + fd
+            + f9
           + ff
             + 24
             + 82
@@ -2135,12 +2970,389 @@ CurrentlyWorkingOn.vpj=20170620181813532
         + tempDir
           + data
             + avatars
+            + chat
+              + a3
+                + 8a
             + storage
+              + 02
+                + 58
+              + 13
+                + 95
+              + 1a
+                + 9f
+              + 29
+                + d9
+              + 36
+                + 15
+              + 43
+                + 11
+              + 4a
+                + 00
+              + 5d
+                + aa
+              + 5f
+                + 55
+              + 63
+                + 8a
+              + 8a
+                + c9
+              + b0
+                + a1
+              + b8
+                + 46
+              + ba
+                + 52
+              + c1
+                + 7f
+              + c4
+                + ff
+              + d3
+                + 52
+              + d7
+                + 9b
+              + e6
+                + f9
+              + ea
+                + 78
+              + f0
+                + 80
+              + f8
+                + f6
+              + fd
+                + 75
               + ref
           + gv.git
             + hooks
             + info
+          + log
+          + logtalk-scratch
           + RDF-store
+            + 00
+              + 98
+            + 04
+              + e1
+            + 05
+              + f0
+            + 0c
+              + 3b
+              + e9
+            + 0d
+              + 50
+            + 15
+              + c9
+            + 17
+              + 38
+              + 91
+            + 1b
+              + 33
+              + 3e
+              + 8b
+            + 1d
+              + 08
+            + 20
+              + 15
+            + 21
+              + ee
+            + 26
+              + c0
+            + 27
+              + 02
+            + 2c
+              + eb
+            + 31
+              + 10
+              + 40
+              + 5d
+            + 35
+              + e4
+            + 36
+              + 5e
+            + 3e
+              + b5
+            + 43
+              + 0c
+            + 46
+              + 60
+              + 87
+            + 4d
+              + 0b
+            + 54
+              + ba
+            + 5c
+              + 1f
+            + 5e
+              + 42
+              + ab
+              + e3
+            + 63
+              + 49
+            + 6b
+              + 7a
+            + 6c
+              + cf
+            + 71
+              + 03
+              + 35
+            + 77
+              + 7e
+            + 80
+              + c7
+            + 82
+              + 84
+            + 84
+              + 02
+            + 87
+              + d1
+            + 89
+              + 72
+            + 92
+              + 6a
+            + 95
+              + ab
+              + d2
+            + 98
+              + 2b
+              + 2c
+            + 9d
+              + e9
+            + a2
+              + d6
+              + e5
+            + b1
+              + 72
+            + b8
+              + b1
+              + e2
+            + bb
+              + f9
+            + be
+              + 4f
+            + ca
+              + 32
+            + cd
+              + df
+            + ce
+              + 32
+            + d1
+              + b5
+            + d5
+              + f1
+            + d6
+              + db
+            + d9
+              + c3
+            + dd
+              + 7c
+            + e6
+              + 39
+              + 4a
+            + e9
+              + 54
+            + f1
+              + 9d
+            + f6
+              + 83
+              + df
+            + fc
+              + 2e
+            + fd
+              + f9
+            + ff
+              + 24
+              + 82
+          + storage
+            + ref
+        + tempDirReal
+          + data
+            + avatars
+            + chat
+              + a3
+                + 8a
+            + storage
+              + 02
+                + 58
+              + 13
+                + 95
+              + 1a
+                + 9f
+              + 29
+                + d9
+              + 36
+                + 15
+              + 43
+                + 11
+              + 4a
+                + 00
+              + 5d
+                + aa
+              + 5f
+                + 55
+              + 63
+                + 8a
+              + 8a
+                + c9
+              + b0
+                + a1
+              + b8
+                + 46
+              + ba
+                + 52
+              + c1
+                + 7f
+              + c4
+                + ff
+              + d3
+                + 52
+              + d7
+                + 9b
+              + e6
+                + f9
+              + ea
+                + 78
+              + f0
+                + 80
+              + f8
+                + f6
+              + fd
+                + 75
+              + ref
+          + gv.git
+            + hooks
+            + info
+          + log
+          + logtalk-scratch
+          + RDF-store
+            + 00
+              + 98
+            + 04
+              + e1
+            + 05
+              + f0
+            + 0c
+              + 3b
+              + e9
+            + 0d
+              + 50
+            + 15
+              + c9
+            + 17
+              + 38
+              + 91
+            + 1b
+              + 33
+              + 3e
+              + 8b
+            + 1d
+              + 08
+            + 20
+              + 15
+            + 21
+              + ee
+            + 26
+              + c0
+            + 27
+              + 02
+            + 2c
+              + eb
+            + 31
+              + 10
+              + 40
+              + 5d
+            + 35
+              + e4
+            + 36
+              + 5e
+            + 3e
+              + b5
+            + 43
+              + 0c
+            + 46
+              + 60
+              + 87
+            + 4d
+              + 0b
+            + 54
+              + ba
+            + 5c
+              + 1f
+            + 5e
+              + 42
+              + ab
+              + e3
+            + 63
+              + 49
+            + 6b
+              + 7a
+            + 6c
+              + cf
+            + 71
+              + 03
+              + 35
+            + 77
+              + 7e
+            + 80
+              + c7
+            + 82
+              + 84
+            + 84
+              + 02
+            + 87
+              + d1
+            + 89
+              + 72
+            + 92
+              + 6a
+            + 95
+              + ab
+              + d2
+            + 98
+              + 2b
+              + 2c
+            + 9d
+              + e9
+            + a2
+              + d6
+              + e5
+            + b1
+              + 72
+            + b8
+              + b1
+              + e2
+            + bb
+              + f9
+            + be
+              + 4f
+            + ca
+              + 32
+            + cd
+              + df
+            + ce
+              + 32
+            + d1
+              + b5
+            + d5
+              + f1
+            + d6
+              + db
+            + d9
+              + c3
+            + dd
+              + 7c
+            + e6
+              + 39
+              + 4a
+            + e9
+              + 54
+            + f1
+              + 9d
+            + f6
+              + 83
+              + df
+            + fc
+              + 2e
+            + ff
+              + 24
+              + 82
           + storage
             + ref
       - swish-with-filesystem-interaction
@@ -2174,6 +3386,140 @@ CurrentlyWorkingOn.vpj=20170620181813532
           + learning
           + lemur
           + logicmoo
+          + logtalk
+            + ack
+            + adventure
+            + aliases
+            + assignvars
+            + assumptions
+            + attvars
+            + benchmarks
+            + birds
+            + blocks
+            + bottles
+            + bricks
+            + carengines
+            + cc
+              + files
+            + classmethods
+            + classvars
+            + coinduction
+            + complements
+              + allow
+              + restrict
+            + constraints
+              + bp
+              + eclipse
+              + gprolog
+              + sicstus
+              + swipl
+              + yap
+            + dcgs
+            + debug_hooks
+            + delegates
+            + diamonds
+            + dynpred
+            + encodings
+            + engines
+              + ebench
+              + emetas
+              + fluents
+              + interactors
+              + lazy
+              + sums
+              + tbbt
+              + whisper
+              + yield
+            + errors
+            + expansion
+            + family
+            + family_alt
+            + hailstone
+            + hello_world
+            + hooks
+            + includes
+            + inheritance
+            + inlining
+            + instmethods
+            + instvars
+            + java
+            + lambdas
+            + lambdas_compiled
+            + laptops
+            + lo
+              + planner
+              + travellers
+            + localizations
+            + logging
+            + logic
+            + lpa
+              + faults
+              + timetables
+            + metaclasses
+            + metainterpreters
+            + metapredicates
+            + metapredicates_compiled
+            + mi
+            + miscellaneous
+            + modules
+            + msglog
+            + multifile
+            + my_types
+            + named_databases
+            + operators
+            + parametric
+            + pardicts
+            + patches
+            + patching
+            + people
+            + poem
+            + points
+            + polygons
+            + profiling
+            + prototypes
+            + proxies
+            + puzzles
+            + quick_check
+            + recipes
+            + redis
+            + reflection
+            + relations
+            + roots
+            + searching
+            + securemp
+            + shapes
+              + ch
+              + ph
+            + sicstus
+            + symbiosis
+            + symdiff
+            + tabling
+            + testing
+            + threads
+              + barriers
+              + birthdays
+              + blackboard
+              + buckets
+              + buffer
+              + checkpoint
+              + fft
+              + fibonacci
+              + functions
+              + hanoi
+              + integration
+              + integration2d
+              + metered_concurrency
+              + mtbatch
+              + nondet
+              + philosophers
+              + primes
+              + sorting
+              + sync
+              + tak
+              + team
+            + viewpoints
+            + wrappers
+            + xpce
           + pfc
           + prologmud
           + trill
@@ -2181,7 +3527,6 @@ CurrentlyWorkingOn.vpj=20170620181813532
           + data
           + plugin
           + render
-        + log
         + node_modules
           + ui-contextmenu\.github
           + jquery
@@ -2235,16 +3580,136 @@ CurrentlyWorkingOn.vpj=20170620181813532
           + learning
         - web
           + bower_components
+            + ace
+              + api
+                + resources
+                  + csses
+                  + font
+                  + images
+                  + javascripts
+              + build
+                + demo
+                  + kitchen-sink
+                + textarea
+                  + images
+              + build_support
+              + demo
+                + kitchen-sink
+                  + docs
+                + r.js
+                + static-highlighter
+              + doc
+                + site
+                  + images
+                  + js
+                + template
+                  + jade
+                  + resources
+                    + csses
+                    + font
+                    + images
+                    + javascripts
+              + experiments
+              + lib
+                + ace
+                  + autocomplete
+                  + commands
+                  + css
+                  + edit_session
+                  + ext
+                    + beautify
+                    + menu_tools
+                  + keyboard
+                  + layer
+                  + lib
+                  + mode
+                    + _test
+                    + behaviour
+                    + coffee
+                    + css
+                    + folding
+                    + html
+                    + javascript
+                    + json
+                    + lua
+                    + php
+                    + xml
+                    + xquery
+                  + model
+                  + mouse
+                  + requirejs
+                  + snippets
+                  + test
+                    + asyncjs
+                  + theme
+                  + worker
+              + node_modules
+                + amd-loader\.c9
+                  + metadata
+                    + workspace
+                + asyncjs\.c9
+                  + metadata
+                    + workspace
+                + amd-loader
+                  + test
+                    + node_modules
+                + asyncjs
+                  + demo
+                    + assets
+                  + lib
+                    + plugins
+                  + test
+                    + assets
+                      + dir1
+                      + dir11
+                      + dir2
+                      + nonemptydir
+                      + symlink-dir
+                      + walk
+                        + dir1
+                        + dir2
+                          + dir22
+              + tool
+                + templates
+                + tmthemes
             + ace-builds
+              + demo
+                + kitchen-sink
+                  + docs
               + src
+                + autocomplete
+                + commands
+                + css
+                + edit_session
+                + ext
+                  + beautify
+                  + menu_tools
+                + keyboard
+                + layer
+                + lib
+                + mode
+                  + _test
+                  + behaviour
+                  + coffee
+                  + css
+                  + folding
+                  + html
+                  + javascript
+                  + json
+                  + lua
+                  + php
+                  + xml
+                  + xquery
+                + model
+                + mouse
+                + requirejs
                 + snippets
-              + src-min
-                + snippets
-              + src-min-noconflict
-                + snippets
-              + src-noconflict
-                + snippets
+                + test
+                  + asyncjs
+                + theme
+                + worker
               + textarea
+                + images
                 + src
             + bootstrap
               + dist
@@ -4173,596 +5638,476 @@ CurrentlyWorkingOn.vpj=20170620181813532
                   + Traits
             + tests
               + Support
-scroll:269
+scroll:0
 [State]
-SCREEN: 1920 1080 318 1169 652 333 0 0 M 0 0 0 0 1561 921
-CWD: G:\swish-with-filesystem-interaction
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\gitty.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\history.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\links.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=14 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\login.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\modal.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\navbar.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\notebook.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\pane.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\preferences.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\prolog.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\query.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\require.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\runner.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\search.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\storage.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\term.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\utils.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\jquery.jsdoc"
+SCREEN: 1920 1080 323 1169 652 333 0 0 M 0 0 0 0 1561 921
+CWD: D:\Office\SlickEdit - Copy\win
+BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\lib\page.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.23732 CL=72 LE=0 CX=71 CY=46 WI=5 BI=95 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\lib\dashboard.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.760 CL=84 LE=0 CX=83 CY=21 WI=5 BI=89 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_isa.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.7183 CL=1 LE=0 CX=0 CY=23 WI=5 BI=88 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\lib\examples.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2581 CL=66 LE=0 CX=65 CY=18 WI=5 BI=96 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_core.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.67712 CL=20 LE=0 CX=19 CY=4 WI=5 BI=64 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_core.next"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\conf.json"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\README.md"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\tabbed.js.next"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\.gitignore"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=38 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\answer.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.67743 CL=1 LE=0 CX=0 CY=20 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="multivar\prolog\multivar.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.5590 CL=19 LE=0 CX=18 CY=20 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prologmud\prolog\prologmud\actions\help.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4422 CL=4 LE=0 CX=3 CY=16 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prologmud\prolog\prologmud\mud_builtin.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
 VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\chat.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.748 CL=103 LE=0 CX=102 CY=19 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\chatroom.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\diff.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=43 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\difflib.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\diffview.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=45 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\download.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=46 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\empty.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=48 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\form.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=49 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\options.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=51 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\key_events.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=50 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\drop_events.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=52 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\legacy.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=53 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\main.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=54 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\fromTextArea.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=55 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\global_events.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=56 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\deleteNearSelection.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=57 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\utils.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=58 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\methods.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=59 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\mouse_events.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=60 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\CodeMirror.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=61 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\commands.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=62 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\d3\d3.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.311 CL=96 LE=0 CX=95 CY=10 WI=5 BI=63 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\swish_debug.pl"
+BUFFER: BN="prologmud\prolog\prologmud\parsing\parser_imperative.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=65 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\replay.pl"
+VIEW: LN=.1895 CL=56 LE=0 CX=55 CY=20 WI=5 BI=38 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prologmud\prolog\prologmud\mud_footer.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=66 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\form.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prologmud\prolog\prologmud\mud_header.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=67 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\gitty_tools.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prologmud\prolog\prologmud\mud_loader.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=68 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\include.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prologmud\prolog\prologmud\mud_startup.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=69 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\noble_avatar.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=70 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\gitty_driver_bdb.pl"
+VIEW: LN=.24647 CL=1 LE=0 CX=0 CY=25 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="file_scope\prolog\file_scope.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=71 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\render.pl"
+VIEW: LN=.6790 CL=5 LE=0 CX=4 CY=25 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_header.pro"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.7569 CL=1 LE=0 CX=0 CY=19 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_header.pi"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=73 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\search.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_common.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=74 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\dashboard.pl"
+VIEW: LN=.6449 CL=76 LE=0 CX=75 CY=18 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_loader.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=75 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\procps.pl"
+VIEW: LN=.39717 CL=30 LE=0 CX=29 CY=20 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="hook_hybrid\prolog\hook_hybrid.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=76 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\r_swish.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=77 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\replay_cm.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=78 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\authenticate.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=79 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\ssl_certificate.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=80 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\swish_csv.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=82 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\examples.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=83 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\pep.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=84 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\markdown.pl"
+VIEW: LN=.30158 CL=12 LE=0 CX=11 CY=20 WI=5 BI=86 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_wff.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
 VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=85 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\avatar.pl"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_naming.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=86 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\filesystem.pl.hide"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=83 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_prolog_file.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_autoexec.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.3882 CL=1 LE=0 CX=0 CY=20 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_userkb.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.6064 CL=21 LE=0 CX=20 CY=20 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\bugger.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.46219 CL=3 LE=0 CX=2 CY=21 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="predicate_streams\prolog\predicate_streams.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.451 CL=32 LE=0 CX=31 CY=10 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc_toplevel.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.231 CL=58 LE=0 CX=57 CY=10 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_genls.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=45 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_domains.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_constraints.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=43 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_common.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.15407 CL=47 LE=0 CX=46 CY=15 WI=5 BI=49 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_base.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\dmsg.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.6198 CL=40 LE=0 CX=39 CY=20 WI=5 BI=63 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_structs.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4369 CL=1 LE=0 CX=0 CY=21 WI=5 BI=62 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_swish.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.571 CL=42 LE=0 CX=41 CY=20 WI=5 BI=61 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_swilib.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=60 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_ctx_frame.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=80 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_engines.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=79 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_dra.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=78 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_terms.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=55 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_strings.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.31941 CL=45 LE=0 CX=44 CY=20 WI=5 BI=58 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_startup.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8050 CL=49 LE=0 CX=48 CY=10 WI=5 BI=54 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_bb_env.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=76 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_bb_gvar.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=77 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="gvar_syntax\prolog\gvar_syntax.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.7731 CL=1 LE=0 CX=0 CY=18 WI=5 BI=47 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_at_box.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.10228 CL=40 LE=0 CX=39 CY=22 WI=5 BI=48 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="dictoo\prolog\dictoo.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.10748 CL=1 LE=0 CX=0 CY=22 WI=5 BI=46 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_kb_ops.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.47562 CL=1 LE=0 CX=0 CY=22 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\rtrace.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4414 CL=23 LE=0 CX=22 CY=20 WI=5 BI=53 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_singleValued.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.288 CL=35 LE=0 CX=34 CY=17 WI=5 BI=52 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_mdefault.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=51 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfclib\system_if_missing.pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=50 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc_dcg.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_constraints.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=84 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="xlisting\prolog\xlisting.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.12560 CL=23 LE=0 CX=22 CY=22 WI=5 BI=67 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\first.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.25692 CL=10 LE=0 CX=9 CY=25 WI=5 BI=66 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="xlisting\prolog\listing_vars.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=65 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\dumpst.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.19988 CL=17 LE=0 CX=16 CY=24 WI=5 BI=59 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="hook_hybrid\prolog\virtualize_source.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1406 CL=24 LE=0 CX=23 CY=19 WI=5 BI=57 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\logicmoo_user.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1160 CL=20 LE=0 CX=19 CY=20 WI=5 BI=56 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="loop_check\prolog\old_loop_check.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=75 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="loop_check\prolog\loop_check_unused.txt"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=87 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\profiles.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=74 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="loop_check\prolog\loop_check.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=88 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\patch.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=73 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\block3.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=89 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\cp_authenticate.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=72 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\frames.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=90 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\jquery.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=71 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\must_trace.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=91 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\projection.pl"
+VIEW: LN=.1005 CL=1 LE=0 CX=0 CY=25 WI=5 BI=70 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\ucatch.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=69 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="must_trace\prolog\util_supp.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=93 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\logging.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=68 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_agenda.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=95 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\download.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_args.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=96 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\swish_chr.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=82 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_listing.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=98 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\messages.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=99 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\flags.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.211 CL=91 LE=0 CX=90 CY=8 WI=5 BI=100 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\web\js\tabbed.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.14527 CL=5 LE=0 CX=4 CY=47 WI=5 BI=104 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\editor.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2773 CL=57 LE=0 CX=56 CY=15 WI=5 BI=47 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="prologmud_samples\prolog\prologmud_sample_games\run.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=101 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="prologmud_samples\prolog\prologmud_sample_games\passwd"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=81 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="logicmoo_base\prolog\.buildpath"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=103 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\paths.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prologmud_samples\prolog\prologmud_sample_games\remote_swish.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2230 CL=23 LE=0 CX=22 CY=19 WI=5 BI=92 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\mkjsbuild.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.158 CL=22 LE=0 CX=21 CY=9 WI=5 BI=4 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\jswish.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.19102 CL=90 LE=0 CX=89 CY=18 WI=5 BI=13 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\lib\filesystems.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.4686 CL=8 LE=0 CX=7 CY=19 WI=5 BI=102 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\page.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.20726 CL=31 LE=8 CX=22 CY=0 WI=5 BI=105 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\filesystems.html"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=HTML	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.173 CL=27 LE=0 CX=26 CY=3 WI=5 BI=110 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\swish.html"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=HTML	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=107 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\filesystems.pl"
+VIEW: LN=.11143 CL=3 LE=0 CX=2 CY=19 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_expansion.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.6199 CL=66 LE=0 CX=65 CY=51 WI=5 BI=64 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\chatstore.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.4730 CL=111 LE=0 CX=110 CY=22 WI=5 BI=81 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\help.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2853 CL=1 LE=0 CX=0 CY=34 WI=5 BI=94 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\config.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1674 CL=19 LE=0 CX=18 CY=19 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\config.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2585 CL=44 LE=0 CX=43 CY=19 WI=5 BI=72 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\build.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.878 CL=72 LE=0 CX=71 CY=21 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\swish.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2630 CL=8 LE=0 CX=7 CY=11 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\tabbed.js"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
-WINDOW: 234 234 1275 573 -1 -1 N  WF=0 WT=94 "Default Fixed Font,14,0,1"
-BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\web\js\tabbed.js"
-VIEW: LN=.14527 CL=1 LE=0 CX=0 CY=1 WI=277 BI=104 HT=0 HN=0 HF=0 HC=4
-WINDOW: 208 208 1249 639 -1 -1 N  WF=0 WT=99 ",,,"
-BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\web\js\tabbed.js"
-VIEW: LN=.14527 CL=5 LE=0 CX=4 CY=47 WI=244 BI=104 HT=0 HN=0 HF=0 HC=4
-WINDOW: 130 130 1275 573 -1 -1 N  WF=0 WT=19 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\tabbed.js"
-VIEW: LN=.25535 CL=1 LE=0 CX=0 CY=23 WI=111 BI=35 HT=0 HN=0 HF=0 HC=4
-WINDOW: 104 104 1275 573 -1 -1 N  WF=0 WT=18 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\swish.js"
-VIEW: LN=.3221 CL=110 LE=0 CX=109 CY=28 WI=116 BI=22 HT=0 HN=0 HF=0 HC=4
-WINDOW: 52 52 1275 573 -1 -1 N  WF=0 WT=97 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\filesystems.html"
-VIEW: LN=.162 CL=20 LE=0 CX=19 CY=5 WI=245 BI=110 HT=0 HN=0 HF=0 HC=4
-WINDOW: 208 208 1275 573 -1 -1 N  WF=0 WT=82 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\paths.pl"
-VIEW: LN=.2230 CL=23 LE=0 CX=22 CY=19 WI=217 BI=92 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1275 573 -1 -1 N  WF=0 WT=87 "Default Fixed Font,14,0,1"
-BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\lib\filesystems.pl"
-VIEW: LN=.4686 CL=8 LE=0 CX=7 CY=19 WI=297 BI=102 HT=0 HN=0 HF=0 HC=4
-WINDOW: 286 286 1275 573 -1 -1 N  WF=0 WT=37 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\editor.js"
-VIEW: LN=.2773 CL=1 LE=0 CX=0 CY=15 WI=145 BI=47 HT=0 HN=0 HF=0 HC=4
-WINDOW: 26 26 1275 573 -1 -1 N  WF=0 WT=93 ",,,"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\page.pl"
-VIEW: LN=.20726 CL=31 LE=8 CX=22 CY=0 WI=237 BI=105 HT=0 HN=0 HF=0 HC=4
-WINDOW: 286 286 1275 573 -1 -1 N  WF=0 WT=96 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\swish.html"
-VIEW: LN=.634 CL=56 LE=0 CX=55 CY=18 WI=229 BI=107 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1275 573 -1 -1 N  WF=0 WT=26 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\mkjsbuild.pl"
-VIEW: LN=.158 CL=22 LE=0 CX=21 CY=9 WI=11 BI=4 HT=0 HN=0 HF=0 HC=4
-WINDOW: 104 104 1275 573 -1 -1 N  WF=0 WT=90 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\flags.pl"
-VIEW: LN=.211 CL=91 LE=0 CX=90 CY=8 WI=226 BI=100 HT=0 HN=0 HF=0 HC=4
-WINDOW: 78 78 1275 573 -1 -1 N  WF=0 WT=29 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\build.js"
-VIEW: LN=.878 CL=72 LE=0 CX=71 CY=21 WI=129 BI=39 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1275 573 -1 -1 N  WF=0 WT=62 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\config.pl"
-VIEW: LN=.2585 CL=50 LE=0 CX=49 CY=19 WI=196 BI=72 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 260 1275 573 -1 -1 N  WF=0 WT=84 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\help.pl"
-VIEW: LN=.2853 CL=1 LE=0 CX=0 CY=22 WI=221 BI=94 HT=0 HN=0 HF=0 HC=4
-WINDOW: 130 130 1275 573 -1 -1 N  WF=0 WT=55 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\filesystems.pl"
-VIEW: LN=.6071 CL=1 LE=0 CX=0 CY=8 WI=183 BI=64 HT=0 HN=0 HF=0 HC=4
-WINDOW: 156 156 1275 573 -1 -1 N  WF=0 WT=32 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\config.js"
-VIEW: LN=.1674 CL=19 LE=0 CX=18 CY=7 WI=135 BI=42 HT=0 HN=0 HF=0 HC=4
-WINDOW: 234 234 1275 573 -1 -1 N  WF=0 WT=71 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\chatstore.pl"
-VIEW: LN=.4730 CL=111 LE=0 CX=110 CY=22 WI=208 BI=81 HT=0 HN=0 HF=0 HC=4
-WINDOW: 182 182 1275 573 -1 -1 N  WF=0 WT=92 "Default Fixed Font,14,0,1"
-BUFFER: BN="prologmud_samples\prolog\prologmud_sample_games\passwd"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=231 BI=103 HT=0 HN=0 HF=0 HC=4
-WINDOW: 156 156 1275 573 -1 -1 N  WF=0 WT=91 "Default Fixed Font,14,0,1"
-BUFFER: BN="prologmud_samples\prolog\prologmud_sample_games\run.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=230 BI=101 HT=0 HN=0 HF=0 HC=4
-WINDOW: 78 78 1275 573 -1 -1 N  WF=0 WT=89 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\messages.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=180 BI=99 HT=0 HN=0 HF=0 HC=4
-WINDOW: 52 52 1275 573 -1 -1 N  WF=0 WT=88 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\swish_chr.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=225 BI=98 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1275 573 -1 -1 N  WF=0 WT=86 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\download.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=223 BI=96 HT=0 HN=0 HF=0 HC=4
-WINDOW: 286 286 1275 573 -1 -1 N  WF=0 WT=85 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\logging.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=222 BI=95 HT=0 HN=0 HF=0 HC=4
-WINDOW: 234 234 1275 573 -1 -1 N  WF=0 WT=83 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\projection.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=220 BI=93 HT=0 HN=0 HF=0 HC=4
-WINDOW: 182 182 1275 573 -1 -1 N  WF=0 WT=81 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\jquery.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=219 BI=91 HT=0 HN=0 HF=0 HC=4
-WINDOW: 156 156 1275 573 -1 -1 N  WF=0 WT=80 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\cp_authenticate.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=218 BI=90 HT=0 HN=0 HF=0 HC=4
-WINDOW: 130 130 1275 573 -1 -1 N  WF=0 WT=79 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\patch.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=216 BI=89 HT=0 HN=0 HF=0 HC=4
-WINDOW: 104 104 1275 573 -1 -1 N  WF=0 WT=78 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\profiles.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=215 BI=88 HT=0 HN=0 HF=0 HC=4
-WINDOW: 78 78 1275 573 -1 -1 N  WF=0 WT=77 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\filesystem.pl.hide"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=214 BI=87 HT=0 HN=0 HF=0 HC=4
-WINDOW: 52 52 1275 573 -1 -1 N  WF=0 WT=76 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\avatar.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=213 BI=86 HT=0 HN=0 HF=0 HC=4
-WINDOW: 26 26 1275 573 -1 -1 N  WF=0 WT=75 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\markdown.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=212 BI=85 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1275 573 -1 -1 N  WF=0 WT=74 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\pep.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=209 BI=84 HT=0 HN=0 HF=0 HC=4
-WINDOW: 286 286 1275 573 -1 -1 N  WF=0 WT=73 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\examples.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=211 BI=83 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 260 1275 573 -1 -1 N  WF=0 WT=72 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\swish_csv.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=210 BI=82 HT=0 HN=0 HF=0 HC=4
-WINDOW: 208 208 1275 573 -1 -1 N  WF=0 WT=70 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\ssl_certificate.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=207 BI=80 HT=0 HN=0 HF=0 HC=4
-WINDOW: 182 182 1275 573 -1 -1 N  WF=0 WT=69 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\authenticate.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=206 BI=79 HT=0 HN=0 HF=0 HC=4
-WINDOW: 156 156 1275 573 -1 -1 N  WF=0 WT=68 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\replay_cm.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=205 BI=78 HT=0 HN=0 HF=0 HC=4
-WINDOW: 130 130 1275 573 -1 -1 N  WF=0 WT=67 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\r_swish.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=202 BI=77 HT=0 HN=0 HF=0 HC=4
-WINDOW: 104 104 1275 573 -1 -1 N  WF=0 WT=66 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\procps.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=204 BI=76 HT=0 HN=0 HF=0 HC=4
-WINDOW: 78 78 1275 573 -1 -1 N  WF=0 WT=65 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\dashboard.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=203 BI=75 HT=0 HN=0 HF=0 HC=4
-WINDOW: 52 52 1275 573 -1 -1 N  WF=0 WT=64 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\search.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=200 BI=74 HT=0 HN=0 HF=0 HC=4
-WINDOW: 26 26 1275 573 -1 -1 N  WF=0 WT=63 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\render.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=198 BI=73 HT=0 HN=0 HF=0 HC=4
-WINDOW: 286 286 1275 573 -1 -1 N  WF=0 WT=61 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\gitty_driver_bdb.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=194 BI=71 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 260 1275 573 -1 -1 N  WF=0 WT=60 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\noble_avatar.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=192 BI=70 HT=0 HN=0 HF=0 HC=4
-WINDOW: 234 234 1275 573 -1 -1 N  WF=0 WT=59 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\include.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=190 BI=69 HT=0 HN=0 HF=0 HC=4
-WINDOW: 208 208 1275 573 -1 -1 N  WF=0 WT=58 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\gitty_tools.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=188 BI=68 HT=0 HN=0 HF=0 HC=4
-WINDOW: 182 182 1275 573 -1 -1 N  WF=0 WT=57 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\form.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=186 BI=67 HT=0 HN=0 HF=0 HC=4
-WINDOW: 156 156 1275 573 -1 -1 N  WF=0 WT=56 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\replay.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=182 BI=66 HT=0 HN=0 HF=0 HC=4
-WINDOW: 104 104 1275 573 -1 -1 N  WF=0 WT=54 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\swish_debug.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=181 BI=65 HT=0 HN=0 HF=0 HC=4
-WINDOW: 78 78 1275 573 -1 -1 N  WF=0 WT=53 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\d3\d3.js"
-VIEW: LN=.311 CL=96 LE=0 CX=95 CY=10 WI=177 BI=63 HT=0 HN=0 HF=0 HC=4
-WINDOW: 52 52 1275 573 -1 -1 N  WF=0 WT=52 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\commands.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=175 BI=62 HT=0 HN=0 HF=0 HC=4
-WINDOW: 26 26 1275 573 -1 -1 N  WF=0 WT=51 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\CodeMirror.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=173 BI=61 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1275 573 -1 -1 N  WF=0 WT=50 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\mouse_events.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=171 BI=60 HT=0 HN=0 HF=0 HC=4
-WINDOW: 286 286 1275 573 -1 -1 N  WF=0 WT=49 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\methods.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=169 BI=59 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 260 1275 573 -1 -1 N  WF=0 WT=48 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\utils.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=167 BI=58 HT=0 HN=0 HF=0 HC=4
-WINDOW: 234 234 1275 573 -1 -1 N  WF=0 WT=47 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\deleteNearSelection.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=165 BI=57 HT=0 HN=0 HF=0 HC=4
-WINDOW: 208 208 1275 573 -1 -1 N  WF=0 WT=46 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\global_events.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=163 BI=56 HT=0 HN=0 HF=0 HC=4
-WINDOW: 182 182 1275 573 -1 -1 N  WF=0 WT=45 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\fromTextArea.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=161 BI=55 HT=0 HN=0 HF=0 HC=4
-WINDOW: 156 156 1275 573 -1 -1 N  WF=0 WT=44 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\main.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=159 BI=54 HT=0 HN=0 HF=0 HC=4
-WINDOW: 130 130 1275 573 -1 -1 N  WF=0 WT=43 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\legacy.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=157 BI=53 HT=0 HN=0 HF=0 HC=4
-WINDOW: 104 104 1275 573 -1 -1 N  WF=0 WT=42 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\drop_events.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=155 BI=52 HT=0 HN=0 HF=0 HC=4
-WINDOW: 78 78 1275 573 -1 -1 N  WF=0 WT=41 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\key_events.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=153 BI=50 HT=0 HN=0 HF=0 HC=4
-WINDOW: 52 52 1275 573 -1 -1 N  WF=0 WT=40 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\bower_components\codemirror\src\edit\options.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=152 BI=51 HT=0 HN=0 HF=0 HC=4
-WINDOW: 26 26 1275 573 -1 -1 N  WF=0 WT=39 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\form.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=149 BI=49 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1275 573 -1 -1 N  WF=0 WT=38 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\empty.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=147 BI=48 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 260 1275 573 -1 -1 N  WF=0 WT=36 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\download.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=143 BI=46 HT=0 HN=0 HF=0 HC=4
-WINDOW: 234 234 1275 573 -1 -1 N  WF=0 WT=35 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\diffview.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=141 BI=45 HT=0 HN=0 HF=0 HC=4
-WINDOW: 208 208 1275 573 -1 -1 N  WF=0 WT=34 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\difflib.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=139 BI=44 HT=0 HN=0 HF=0 HC=4
-WINDOW: 182 182 1275 573 -1 -1 N  WF=0 WT=33 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\diff.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=137 BI=43 HT=0 HN=0 HF=0 HC=4
-WINDOW: 130 130 1275 573 -1 -1 N  WF=0 WT=31 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\chatroom.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=133 BI=41 HT=0 HN=0 HF=0 HC=4
-WINDOW: 104 104 1275 573 -1 -1 N  WF=0 WT=30 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\chat.js"
-VIEW: LN=.748 CL=103 LE=0 CX=102 CY=19 WI=131 BI=40 HT=0 HN=0 HF=0 HC=4
-WINDOW: 52 52 1275 573 -1 -1 N  WF=0 WT=28 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\answer.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=127 BI=37 HT=0 HN=0 HF=0 HC=4
-WINDOW: 26 26 1275 573 -1 -1 N  WF=0 WT=27 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\.gitignore"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=126 BI=38 HT=0 HN=0 HF=0 HC=4
-WINDOW: 286 286 1275 573 -1 -1 N  WF=0 WT=25 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\tabbed.js.next"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=102 BI=24 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 260 1275 573 -1 -1 N  WF=0 WT=24 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\README.md"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=110 BI=27 HT=0 HN=0 HF=0 HC=4
-WINDOW: 234 234 1275 573 -1 -1 N  WF=0 WT=23 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\conf.json"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=115 BI=31 HT=0 HN=0 HF=0 HC=4
-WINDOW: 208 208 1275 573 -1 -1 N  WF=0 WT=22 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\jquery.jsdoc"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=106 BI=21 HT=0 HN=0 HF=0 HC=4
-WINDOW: 182 182 1275 573 -1 -1 N  WF=0 WT=21 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\utils.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=108 BI=25 HT=0 HN=0 HF=0 HC=4
-WINDOW: 156 156 1275 573 -1 -1 N  WF=0 WT=20 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\term.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=114 BI=32 HT=0 HN=0 HF=0 HC=4
-WINDOW: 78 78 1275 573 -1 -1 N  WF=0 WT=17 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\storage.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=119 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 52 52 1275 573 -1 -1 N  WF=0 WT=16 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\search.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=101 BI=29 HT=0 HN=0 HF=0 HC=4
-WINDOW: 26 26 1275 573 -1 -1 N  WF=0 WT=15 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\runner.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=118 BI=18 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1275 573 -1 -1 N  WF=0 WT=14 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\require.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=107 BI=26 HT=0 HN=0 HF=0 HC=4
-WINDOW: 286 286 1275 573 -1 -1 N  WF=0 WT=13 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\query.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=104 BI=19 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 260 1275 573 -1 -1 N  WF=0 WT=12 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\prolog.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=120 BI=16 HT=0 HN=0 HF=0 HC=4
-WINDOW: 234 234 1275 573 -1 -1 N  WF=0 WT=11 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\preferences.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=112 BI=36 HT=0 HN=0 HF=0 HC=4
-WINDOW: 208 208 1275 573 -1 -1 N  WF=0 WT=10 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\pane.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=103 BI=20 HT=0 HN=0 HF=0 HC=4
-WINDOW: 182 182 1275 573 -1 -1 N  WF=0 WT=9 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\notebook.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=121 BI=15 HT=0 HN=0 HF=0 HC=4
-WINDOW: 156 156 1275 573 -1 -1 N  WF=0 WT=8 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\navbar.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=124 BI=30 HT=0 HN=0 HF=0 HC=4
-WINDOW: 130 130 1275 573 -1 -1 N  WF=0 WT=7 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\modal.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=109 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 104 104 1275 573 -1 -1 N  WF=0 WT=6 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\login.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=105 BI=34 HT=0 HN=0 HF=0 HC=4
-WINDOW: 78 78 1275 573 -1 -1 N  WF=0 WT=5 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\links.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=122 BI=14 HT=0 HN=0 HF=0 HC=4
-WINDOW: 26 26 1275 573 -1 -1 N  WF=0 WT=3 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\history.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=117 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1275 573 -1 -1 N  WF=0 WT=2 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\gitty.js"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=113 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 78 78 1275 573 -1 -1 N  WF=0 WT=98 ",,,"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\jswish.js"
-VIEW: LN=.19102 CL=90 LE=0 CX=89 CY=18 WI=281 BI=13 HT=0 HN=0 HF=0 HC=4
-WINDOW: 52 52 1275 573 -1 -1 N  WF=0 WT=4 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\web\js\jswish.js"
-VIEW: LN=.19102 CL=90 LE=0 CX=89 CY=18 WI=123 BI=13 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 260 1275 573 -1 -1 M  WF=0 WT=95 "Default Fixed Font,14,0,1"
-BUFFER: BN="G:\swish-with-filesystem-interaction\lib\page.pl"
-VIEW: LN=.3724 CL=13 LE=8 CX=4 CY=20 WI=256 BI=105 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.59421 CL=37 LE=0 CX=36 CY=21 WI=5 BI=87 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1275 635 -1 -1 N  WF=0 WT=130 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\ucatch.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=210 BI=69 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1275 635 -1 -1 N  WF=0 WT=125 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\must_trace.pl"
+VIEW: LN=.1005 CL=1 LE=0 CX=0 CY=25 WI=209 BI=70 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1275 635 -1 -1 N  WF=0 WT=131 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\frames.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=208 BI=71 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1275 635 -1 -1 N  WF=0 WT=136 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\block3.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=207 BI=72 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1275 635 -1 -1 N  WF=0 WT=137 "Default Fixed Font,14,0,1"
+BUFFER: BN="loop_check\prolog\loop_check.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=206 BI=73 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1275 635 -1 -1 N  WF=0 WT=138 "Default Fixed Font,14,0,1"
+BUFFER: BN="loop_check\prolog\loop_check_unused.txt"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=205 BI=74 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1275 635 -1 -1 N  WF=0 WT=139 "Default Fixed Font,14,0,1"
+BUFFER: BN="loop_check\prolog\old_loop_check.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=204 BI=75 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1275 635 -1 -1 N  WF=0 WT=108 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_user.pl"
+VIEW: LN=.1160 CL=20 LE=0 CX=19 CY=20 WI=203 BI=56 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1275 635 -1 -1 N  WF=0 WT=126 "Default Fixed Font,14,0,1"
+BUFFER: BN="hook_hybrid\prolog\virtualize_source.pl"
+VIEW: LN=.1406 CL=24 LE=0 CX=23 CY=19 WI=202 BI=57 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1275 635 -1 -1 N  WF=0 WT=133 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\dumpst.pl"
+VIEW: LN=.19988 CL=17 LE=0 CX=16 CY=24 WI=201 BI=59 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1275 635 -1 -1 N  WF=0 WT=148 "Default Fixed Font,14,0,1"
+BUFFER: BN="xlisting\prolog\listing_vars.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=200 BI=65 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1275 635 -1 -1 N  WF=0 WT=132 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\first.pl"
+VIEW: LN=.25692 CL=10 LE=0 CX=9 CY=25 WI=199 BI=66 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1275 635 -1 -1 N  WF=0 WT=149 "Default Fixed Font,14,0,1"
+BUFFER: BN="xlisting\prolog\xlisting.pl"
+VIEW: LN=.12560 CL=23 LE=0 CX=22 CY=22 WI=198 BI=67 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1275 635 -1 -1 N  WF=0 WT=150 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_constraints.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=197 BI=84 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1275 635 -1 -1 N  WF=0 WT=151 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc_dcg.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=196 BI=20 HT=0 HN=0 HF=0 HC=4
+WINDOW: 286 286 1275 635 -1 -1 N  WF=0 WT=159 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_if_missing.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=195 BI=50 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1275 635 -1 -1 N  WF=0 WT=160 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_mdefault.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=194 BI=51 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1275 635 -1 -1 N  WF=0 WT=161 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_singleValued.pfc.pl"
+VIEW: LN=.288 CL=35 LE=0 CX=34 CY=17 WI=193 BI=52 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1275 635 -1 -1 N  WF=0 WT=129 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\rtrace.pl"
+VIEW: LN=.4414 CL=23 LE=0 CX=22 CY=20 WI=192 BI=53 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1275 635 -1 -1 N  WF=0 WT=112 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_kb_ops.pl"
+VIEW: LN=.47562 CL=1 LE=0 CX=0 CY=22 WI=191 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1275 635 -1 -1 N  WF=0 WT=162 "Default Fixed Font,14,0,1"
+BUFFER: BN="dictoo\prolog\dictoo.pl"
+VIEW: LN=.10748 CL=1 LE=0 CX=0 CY=22 WI=190 BI=46 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1275 635 -1 -1 N  WF=0 WT=121 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_at_box.pl"
+VIEW: LN=.10228 CL=40 LE=0 CX=39 CY=22 WI=189 BI=48 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1275 635 -1 -1 N  WF=0 WT=163 "Default Fixed Font,14,0,1"
+BUFFER: BN="gvar_syntax\prolog\gvar_syntax.pl"
+VIEW: LN=.7731 CL=1 LE=0 CX=0 CY=18 WI=188 BI=47 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1275 635 -1 -1 N  WF=0 WT=141 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_bb_gvar.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=187 BI=77 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1275 635 -1 -1 N  WF=0 WT=140 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_bb_env.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=186 BI=76 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1275 635 -1 -1 N  WF=0 WT=127 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_startup.pl"
+VIEW: LN=.8050 CL=49 LE=0 CX=48 CY=10 WI=185 BI=54 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1275 635 -1 -1 N  WF=0 WT=145 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_strings.pl"
+VIEW: LN=.31941 CL=45 LE=0 CX=44 CY=20 WI=184 BI=58 HT=0 HN=0 HF=0 HC=4
+WINDOW: 286 286 1275 635 -1 -1 N  WF=0 WT=147 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_terms.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=183 BI=55 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1275 635 -1 -1 N  WF=0 WT=143 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_dra.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=182 BI=78 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1275 635 -1 -1 N  WF=0 WT=144 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_engines.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=181 BI=79 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1275 635 -1 -1 N  WF=0 WT=165 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_ctx_frame.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=180 BI=80 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1275 635 -1 -1 N  WF=0 WT=166 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_swilib.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=179 BI=60 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1275 635 -1 -1 N  WF=0 WT=167 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\logicmoo_swish.pl"
+VIEW: LN=.571 CL=42 LE=0 CX=41 CY=20 WI=178 BI=61 HT=0 HN=0 HF=0 HC=4
+WINDOW: 260 260 1275 635 -1 -1 N  WF=0 WT=146 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_structs.pl"
+VIEW: LN=.4369 CL=1 LE=0 CX=0 CY=21 WI=177 BI=62 HT=0 HN=0 HF=0 HC=4
+WINDOW: 260 260 1275 635 -1 -1 N  WF=0 WT=134 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\dmsg.pl"
+VIEW: LN=.6198 CL=40 LE=0 CX=39 CY=20 WI=176 BI=63 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1275 635 -1 -1 N  WF=0 WT=154 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_base.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=175 BI=42 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1275 635 -1 -1 N  WF=0 WT=155 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_common.pfc.pl"
+VIEW: LN=.15407 CL=47 LE=0 CX=46 CY=15 WI=174 BI=49 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1275 635 -1 -1 N  WF=0 WT=156 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_constraints.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=173 BI=43 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1275 635 -1 -1 N  WF=0 WT=157 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_domains.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=172 BI=44 HT=0 HN=0 HF=0 HC=4
+WINDOW: 260 260 1275 635 -1 -1 N  WF=0 WT=158 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_genls.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=171 BI=45 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1275 635 -1 -1 N  WF=0 WT=152 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc_toplevel.pl"
+VIEW: LN=.231 CL=58 LE=0 CX=57 CY=10 WI=170 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1275 635 -1 -1 N  WF=0 WT=168 "Default Fixed Font,14,0,1"
+BUFFER: BN="predicate_streams\prolog\predicate_streams.pl"
+VIEW: LN=.451 CL=32 LE=0 CX=31 CY=10 WI=169 BI=41 HT=0 HN=0 HF=0 HC=4
+WINDOW: 286 286 1275 635 -1 -1 N  WF=0 WT=135 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\bugger.pl"
+VIEW: LN=.46219 CL=3 LE=0 CX=2 CY=21 WI=168 BI=25 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1275 635 -1 -1 N  WF=0 WT=119 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_userkb.pl"
+VIEW: LN=.6064 CL=21 LE=0 CX=20 CY=20 WI=167 BI=26 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1275 635 -1 -1 N  WF=0 WT=153 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfclib\system_autoexec.pfc.pl"
+VIEW: LN=.3882 CL=1 LE=0 CX=0 CY=20 WI=166 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 286 286 1275 635 -1 -1 N  WF=0 WT=170 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_prolog_file.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=165 BI=40 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1275 635 -1 -1 N  WF=0 WT=117 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_naming.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=164 BI=83 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1275 635 -1 -1 N  WF=0 WT=118 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_wff.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=163 BI=85 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1275 635 -1 -1 N  WF=0 WT=171 "Default Fixed Font,14,0,1"
+BUFFER: BN="hook_hybrid\prolog\hook_hybrid.pl"
+VIEW: LN=.30158 CL=12 LE=0 CX=11 CY=20 WI=162 BI=86 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1275 635 -1 -1 N  WF=0 WT=173 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_loader.pl"
+VIEW: LN=.39717 CL=30 LE=0 CX=29 CY=20 WI=161 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1275 635 -1 -1 N  WF=0 WT=142 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_utils\prolog\logicmoo_util_common.pl"
+VIEW: LN=.6449 CL=76 LE=0 CX=75 CY=18 WI=160 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1275 635 -1 -1 N  WF=0 WT=114 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_loader.pl"
+VIEW: LN=.39717 CL=30 LE=0 CX=29 CY=20 WI=159 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 260 260 1275 635 -1 -1 N  WF=0 WT=169 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_header.pi"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=158 BI=39 HT=0 HN=0 HF=0 HC=4
+WINDOW: 286 286 1275 635 -1 -1 N  WF=0 WT=111 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_header.pro"
+VIEW: LN=.7569 CL=1 LE=0 CX=0 CY=19 WI=157 BI=27 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1275 635 -1 -1 N  WF=0 WT=172 "Default Fixed Font,14,0,1"
+BUFFER: BN="file_scope\prolog\file_scope.pl"
+VIEW: LN=.6790 CL=5 LE=0 CX=4 CY=25 WI=156 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1275 635 -1 -1 N  WF=0 WT=120 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc.pl"
+VIEW: LN=.24647 CL=1 LE=0 CX=0 CY=25 WI=155 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1275 635 -1 -1 N  WF=0 WT=175 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud\prolog\prologmud\mud_startup.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=154 BI=33 HT=0 HN=0 HF=0 HC=4
+WINDOW: 130 130 1275 635 -1 -1 N  WF=0 WT=176 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud\prolog\prologmud\mud_loader.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=153 BI=34 HT=0 HN=0 HF=0 HC=4
+WINDOW: 156 156 1275 635 -1 -1 N  WF=0 WT=177 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud\prolog\prologmud\mud_header.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=152 BI=35 HT=0 HN=0 HF=0 HC=4
+WINDOW: 182 182 1275 635 -1 -1 N  WF=0 WT=178 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud\prolog\prologmud\mud_footer.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=151 BI=36 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1275 635 -1 -1 N  WF=0 WT=180 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud\prolog\prologmud\parsing\parser_imperative.pl"
+VIEW: LN=.1895 CL=56 LE=0 CX=55 CY=20 WI=150 BI=38 HT=0 HN=0 HF=0 HC=4
+WINDOW: 208 208 1275 635 -1 -1 N  WF=0 WT=179 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud\prolog\prologmud\mud_builtin.pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=149 BI=37 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1275 635 -1 -1 N  WF=0 WT=174 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud\prolog\prologmud\actions\help.pfc.pl"
+VIEW: LN=.4422 CL=4 LE=0 CX=3 CY=16 WI=148 BI=30 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1275 635 -1 -1 N  WF=0 WT=164 "Default Fixed Font,14,0,1"
+BUFFER: BN="multivar\prolog\multivar.pl"
+VIEW: LN=.5590 CL=19 LE=0 CX=18 CY=20 WI=147 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 260 260 1275 635 -1 -1 N  WF=0 WT=122 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_core.next"
+VIEW: LN=.67743 CL=1 LE=0 CX=0 CY=20 WI=146 BI=32 HT=0 HN=0 HF=0 HC=4
+WINDOW: 286 286 1275 635 -1 -1 N  WF=0 WT=123 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_core.pl"
+VIEW: LN=.67712 CL=20 LE=0 CX=19 CY=4 WI=145 BI=64 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1275 635 -1 -1 N  WF=0 WT=124 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_expansion.pl"
+VIEW: LN=.59421 CL=37 LE=0 CX=36 CY=21 WI=144 BI=87 HT=0 HN=0 HF=0 HC=4
+WINDOW: 260 260 1275 635 -1 -1 N  WF=0 WT=181 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\lib\examples.pl"
+VIEW: LN=.2581 CL=66 LE=0 CX=65 CY=18 WI=143 BI=96 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1275 635 -1 -1 N  WF=0 WT=116 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_isa.pl"
+VIEW: LN=.7183 CL=1 LE=0 CX=0 CY=23 WI=142 BI=88 HT=0 HN=0 HF=0 HC=4
+WINDOW: 286 286 1271 624 -1 -1 N  WF=0 WT=93 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\lib\dashboard.pl"
+VIEW: LN=.760 CL=84 LE=0 CX=83 CY=21 WI=141 BI=89 HT=0 HN=0 HF=0 HC=4
+WINDOW: 52 52 1275 635 -1 -1 N  WF=0 WT=100 "Default Fixed Font,14,0,1"
+BUFFER: BN="prologmud_samples\prolog\prologmud_sample_games\remote_swish.pl"
+VIEW: LN=.10930 CL=116 LE=4 CX=111 CY=10 WI=216 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 234 234 1275 635 -1 -1 N  WF=0 WT=109 "Default Fixed Font,14,0,1"
+BUFFER: BN="logicmoo_base\prolog\.buildpath"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=215 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 26 26 1275 635 -1 -1 N  WF=0 WT=113 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_listing.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=214 BI=81 HT=0 HN=0 HF=0 HC=4
+WINDOW: 78 78 1275 635 -1 -1 N  WF=0 WT=115 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_type_args.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=213 BI=82 HT=0 HN=0 HF=0 HC=4
+WINDOW: 260 260 1275 635 -1 -1 N  WF=0 WT=110 "Default Fixed Font,14,0,1"
+BUFFER: BN="pfc\prolog\pfc2.0\mpred_agenda.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=212 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 104 104 1275 635 -1 -1 N  WF=0 WT=128 "Default Fixed Font,14,0,1"
+BUFFER: BN="must_trace\prolog\util_supp.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=211 BI=68 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1275 635 -1 -1 M  WF=0 WT=73 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\..\elFinder\files\swish-with-filesystem-interaction\lib\page.pl"
+VIEW: LN=.24136 CL=70 LE=0 CX=69 CY=18 WI=140 BI=95 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-G:\swish-with-filesystem-interaction\web\swish.html
-..\..\elFinder\files\swish-with-filesystem-interaction\lib\page.pl
-..\..\elFinder\files\swish-with-filesystem-interaction\lib\filesystems.pl
-G:\swish-with-filesystem-interaction\web\js\filesystems.html
-..\..\elFinder\elfinder.swish.html
-G:\swish-with-filesystem-interaction\web\js\swish.js
-G:\swish-with-filesystem-interaction\web\js\tabbed.js
+pfc\prolog\pfc2.0\mpred_type_isa.pl
+prologmud\prolog\prologmud\actions\help.pfc.pl
+multivar\prolog\multivar.pl
+pfc\prolog\pfc2.0\mpred_core.pl
+..\..\elFinder\files\swish-with-filesystem-interaction\lib\examples.pl
 G:\swish-with-filesystem-interaction\lib\page.pl
 ..\..\elFinder\files\swish-with-filesystem-interaction\web\js\tabbed.js
+..\..\elFinder\files\swish-with-filesystem-interaction\lib\dashboard.pl
+..\..\elFinder\files\swish-with-filesystem-interaction\lib\page.pl

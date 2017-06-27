@@ -244,7 +244,7 @@ quant_op(less,X,Y,X<Y).
 quant_op(more,X,Y,X>Y).
 
 value(wh(Type-X),Type,X).
-value(nb(X),_,X).
+value(nquant(X),_,X).
 
 all(all).
 all(every).

@@ -9,6 +9,12 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
+:- dynamic_multifile_exported(in_continent/2).
+:- multifile(baseKB:expect_file_mpreds/1).
+:- dynamic(baseKB:expect_file_mpreds/1).
+% :- source_location(File, _)-> asserta(baseKB:expect_file_mpreds(File)).
+:- prolog_load_context(source, File)-> asserta(baseKB:expect_file_mpreds(File)).
+
 /*
 
  _________________________________________________________________________
@@ -39,7 +45,7 @@
 :-discontiguous(noun_form_db/3).
 :-discontiguous(loc_pred_prep_db/3).
 
-:- dynamic_multifile_exported hook:fact_always_true/1.
+%:- dynamic_multifile_exported hook:fact_always_true/1.
 
 :- style_check(+discontiguous).
 :- style_check(-discontiguous).
@@ -100,7 +106,7 @@ adverb_db(Quickly):-plt,talk_db(adv,Quickly),not_ccw(Quickly).
 
 conj_db(and).
 conj_db(or).
-conj_db(But):-partOfSpeech(_,'CoordinatingConjunction',But).
+conj_db(But):- cycQuery80(partOfSpeech(_,'CoordinatingConjunction',But)).
 
 int_pron_db(what,undef).
 int_pron_db(which,undef).
@@ -123,13 +129,13 @@ det_db(no,_,no,indef).
 
 det_db(Det):-det_db(Det,_,_,_).
 det_db(W):-det_db0(W),not(det_db(W,_,_,_)),dif(CCW,'Determiner'),not(ccw_db(W,CCW)).
-det_db0(W):- ('determinerStrings'(_,W);cyckb_t('determinerStrings',_,W)),atom(W).
+det_db0(W):- (cycQuery80('determinerStrings'(_,W));cyckb_t('determinerStrings',_,W)),atom(W).
 
 number_db(W,I,Nb) :-
    tr_number(W,I),
    ag_number(I,Nb).
 
-tr_number(nb(I),I).
+tr_number(nquant(I),I).
 tr_number(one,1).
 tr_number(two,2).
 tr_number(three,3).
@@ -268,14 +274,15 @@ pers_pron_db(them,_,3,pl,compl(_)).
 
 how_many_db([how,many]).
 
-pronoun_LF(_Argree2B,_C,_MoreIn,_X,_Y,_MoreOut,PronounType):-fail.
+pronoun_LF(_Argree2B,_C,_MoreIn,_X,_Y,_MoreOut,_PronounType):-fail.
 pronoun_LF(Argree2B,FemMasc,MoreIn,X,Y,[adj(Argree2B)|MoreIn],typeOf(FemMasc,Argree2B,X,Y)):-!,fail,trace.
 
 % =================================================================
 % PROPER INSTANCES OF
 % =================================================================
 % should inhereit from e2c
-% meetsForm80(String,RootString,form80(MainPlusTrans,main+tv)):-!,fail,nop((String,RootString,form80(MainPlusTrans,main+tv))).
+
+meetsForm80(String,RootString,form80(MainPlusTrans,main+tv)):-!,fail,nop((String,RootString,form80(MainPlusTrans,main+tv))).
 
 noun_plu_db(places,place).
 
@@ -340,6 +347,7 @@ sea(persian_gulf).
 sea(red_sea).
 
 river(R) :- river_pathlist(R,_L).
+
 
 in_continent(north_america, america).
 
@@ -418,9 +426,9 @@ maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 %  chat80("how are you?").
 % test_chat80("you flow").
 
-test_chat80(U):- w_tl(t_l:chat80_interactive, must(chat80(U))).
+test_chat80(U):- locally(t_l:chat80_interactive, must(chat80(U))).
 
-t11:- 
+t10:- 
    test_chat80("how many postures are there?"),
    test_chat80("what are the postures?"),
    test_chat80("how many oceans are seas?"),
@@ -450,7 +458,7 @@ hasPropertyOrValueISA(T,PorV):- isa(PorV,T).
 
 hasProperty(Type,P):-no_repeats((Type-P),hasPropertyValueSVO(Type,P,_)).
 
-hasPropertyValueSVO(SomeType,P,SomeVType):-mpred_arity(P,A),A>=2,argIsa_call(P,1,SomeType),argIsa_call(P,A,SomeVType).
+hasPropertyValueSVO(SomeType,P,SomeVType):-mpred_arity(P,A),A>=2, cycQuery80(argIsa(P,1,SomeType)),cycQuery80(argIsa(P,A,SomeVType)).
 hasPropertyValueSVO(Type,P,Area) :- subj_obj_LF(property,Area,_Measure&Area,_X,feature&TYPELIST,_Y,Pred),deepestType(TYPELIST,Type),get_1st_order_functor(Pred,P),deepestType(TYPELIST,Type).
 
 get_1st_order_functor(Pred,P):-not(compound(Pred)),!,P=Pred.
@@ -494,7 +502,7 @@ type_allowed0(TypeM&_,Type):- Type==TypeM,!.
 % =================================================================
 % Having Referant Proper nouns
 % =================================================================
-:-export(name_template_db/2).
+:- parser_chat80:export(baseKB:name_template_db/2).
 name_db([black,sea],black_sea).
 name_db([upper,volta],upper_volta).
 name_db([Name],Name) :-
@@ -543,7 +551,7 @@ ccw_db1(W,'Preposition'):-prep_db(W),not(ccw_db1(W,'Determiner')).
 ccw_db1(W,'Pronoun'):-pron_db(W).
 ccw_db1(W,'Conjunction'):-conj_db(W).
 ccw_db1(W,'Determiner'):-det_db(W).
-ccw_db1(W,'Conjunction'):-no_repeats(W,partOfSpeech(_,'SubordinatingConjunction',W)).
+ccw_db1(W,'Conjunction'):-no_repeats(W,cycQuery80(partOfSpeech(_,'SubordinatingConjunction',W))).
 ccw_db1(W,'Pronoun'):-no_repeats(W,cyckb_t('pronounStrings',_,W)).
 ccw_db2(W,'Preposition'):-no_repeats(W,talk_db(preposition,W)).
 ccw_db3(W,C):-ccw_db4(W,C),not(loop_check(adj_db(W,_))),not_ccw(W).
@@ -571,13 +579,13 @@ ocw_db1(W,C):-ocw_db2(W,C),not_ccw(W).
 ocw_db2(W,'Noun'):-noun_plu_db(W,_).
 ocw_db2(W,'Adjective'):-adj_db(W,_).
 ocw_db2(W,'Noun'):-noun_plu_db(_,W).
-ocw_db3(W,SPOS):- 'suffixString'(CycWord,String),String\='',atom_concat(_First,String,W),'derivationalAffixResultPOS'(CycWord,POS),simplePOS(POS,SPOS).
+ocw_db3(W,SPOS):-  cycQuery80('suffixString'(CycWord,String)),String\='',atom_concat(_First,String,W),cycQuery80('derivationalAffixResultPOS'(CycWord,POS)),simplePOS(POS,SPOS).
 
 simplePOS(POS,SIMP):-posName(SIMP),atom_concat(_,SIMP,POS).
 
 
 subject_LF(restriction,AdjNounEan,feature&_,X,adjIsa(X,AdjNounEan)):- plt, adj_db(AdjNounEan,restr),not_ccw(AdjNounEan).
-adjIsa(E,C):- call_mpred(isa_backchaing(E,C)).
+adjIsa(E,C):- call_u(isa_backchaing(E,C)).
 adj_db(AdjNounEan,restr):- plt,talk_db(adj,AdjNounEan),talk_db(noun1,AdjNounEan,_).
 adj_db(AdjRestr,restr):-plt,talk_db(adj,AdjRestr),not(adj_db(AdjRestr,quant)),not(adverb_db(AdjRestr)).
 adj_db(AdjRestr,restr):-meetsForm80(AdjRestr,AdjRestr,form80(adj+restr)).
@@ -730,7 +738,7 @@ context_pron_db(at,time,when).
 
 adjunction_lf(in,feature&_-X,feature&place&_-Y,in_ploc(X,Y)).
 
-:-export(in_ploc/2).
+:- parser_chat80:export(baseKB:in_ploc/2).
 in_ploc(X,Y) :- var(X), nonvar(Y), !, contains80(Y,X).
 in_ploc(X,Y) :- in_01(X,W), ( W=Y ; in_ploc(W,Y) ).
 
@@ -771,9 +779,9 @@ verb_form_db(draining,drain,pres+part,_).
 verb_type_db_0(drain,main+iv).
 intrans_LF(drain,feature&river,X,drains(X,Y), [slot(prep(into),feature&place&_,Y,_,free)],_).
 
-drains(R,S) :- river_pathlist(R,L), first(L,S).
+drains(R,S) :- river_pathlist(R,L), lists_first(L,S).
 
-
+lists_first([F|_],F).
 
 verb_root_db(flow).
 regular_pres_db(flow).
@@ -980,12 +988,15 @@ chat80 you flow to the ocean
 
 current_dcg_predicate(F/A):-current_predicate(F/A).
 
-toDCPred(Type,Pred,In,Out):-compound(Type),!,functor(Type,F,A),A2 is A + 2,current_dcg_predicate(F/A2),once((length(Args,A),Type=..[F|Args],append(Args,[In,Out],Dargs))),Pred=..[F|Dargs].
+toDCPred(Type,Pred,In,Out):-compound(Type),!,functor(Type,F,A),A2 is A + 2,current_dcg_predicate(F/A2),
+   once((length(Args,A),Type=..[F|Args],append(Args,[In,Out],Dargs))),Pred=..[F|Dargs].
 
-toDCPred(Type,Pred,In,Out):-atom(F),current_dcg_predicate(F/A2),A is A2 - 2,once((length(Args,A),Type=..[F|Args],append(Args,[In,Out],Dargs))),Pred=..[F|Dargs].
+toDCPred(Type,Pred,In,Out):- current_dcg_predicate(F/A2),A is A2 - 2,
+   once((length(Args,A),Type=..[F|Args],append(Args,[In,Out],Dargs))),Pred=..[F|Dargs].
 
-probeDCG(Left,Content,Right,Type):-length_between(0,1,Left),length_between(0,1,Right),append(Left,Content,Fisrt),append(Fisrt,Right,In),toDCPred(Type,Pred,In,[]),Pred.
-:-export(ph/2).
+probeDCG(Left,Content,Right,Type):-length_between(0,1,Left),length_between(0,1,Right),append(Left,Content,First),append(First,Right,In),
+  toDCPred(Type,Pred,In,[]),Pred.
+:-parser_chat80:export(baseKB:ph/2).
 ph(Type,Content):-show_call(probeDCG(_,Content,_,Type)).
 
 length_between(S,E,Left):-between(S,E,X),length(Left,X).
@@ -1015,21 +1026,21 @@ must_test_801([how, many, countries, does, the, danube, flow, through, ?], [sent
 answers([6])],[time(0.0010000000000000009)]).
 must_test_801([what, is, the, average, area, of, the, countries, in, each, continent, ?], [sent([what, is, the, average, area, of, the, countries, in, each, continent, ?]), parse(whq(A-C, s(np(3+sg, wh(A-C), []), verb(be, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(det(the(sg)), [adj(average)], area), [pp(prep(of), np(3+pl, np_head(det(the(pl)), [], country), [pp(prep(in), np(3+sg, np_head(det(each), [], continent), []))]))]))], []))), sem((answer80([B, E]):-continent(B), [ (0--ksqmiles):[andorra], (0--ksqmiles):[liechtenstein], (0--ksqmiles):[malta], (0--ksqmiles):[monaco], (0--ksqmiles):[san_marino], (1--ksqmiles):[luxembourg], (4--ksqmiles):[cyprus], (11--ksqmiles):[albania], (12--ksqmiles):[belgium], (14--ksqmiles):[netherlands], (16--ksqmiles):[switzerland], (17--ksqmiles):[denmark], (27--ksqmiles):[eire], (32--ksqmiles):[austria], (35--ksqmiles):[portugal], (36--ksqmiles):[hungary], (40--ksqmiles):[iceland], (41--ksqmiles):[east_germany], (43--ksqmiles):[bulgaria], (49--ksqmiles):[czechoslovakia], (51--ksqmiles):[greece], (92--ksqmiles):[romania], (94--ksqmiles):[united_kingdom], (96--ksqmiles):[west_germany], (99--ksqmiles):[yugoslavia], (116--ksqmiles):[italy], (120--ksqmiles):[poland], (125--ksqmiles):[norway], (130--ksqmiles):[finland], (174--ksqmiles):[sweden], (195--ksqmiles):[spain], (213--ksqmiles):[france]]^ (setof(D:[C], (area(C, D), country(C), in_ploc(C, B)), [ (0--ksqmiles):[andorra], (0--ksqmiles):[liechtenstein], (0--ksqmiles):[malta], (0--ksqmiles):[monaco], (0--ksqmiles):[san_marino], (1--ksqmiles):[luxembourg], (4--ksqmiles):[cyprus], (11--ksqmiles):[albania], (12--ksqmiles):[belgium], (14--ksqmiles):[netherlands], (16--ksqmiles):[switzerland], (17--ksqmiles):[denmark], (27--ksqmiles):[eire], (32--ksqmiles):[austria], (35--ksqmiles):[portugal], (36--ksqmiles):[hungary], (40--ksqmiles):[iceland], (41--ksqmiles):[east_germany], (43--ksqmiles):[bulgaria], (49--ksqmiles):[czechoslovakia], (51--ksqmiles):[greece], (92--ksqmiles):[romania], (94--ksqmiles):[united_kingdom], (96--ksqmiles):[west_germany], (99--ksqmiles):[yugoslavia], (116--ksqmiles):[italy], (120--ksqmiles):[poland], (125--ksqmiles):[norway], (130--ksqmiles):[finland], (174--ksqmiles):[sweden], (195--ksqmiles):[spain], (213--ksqmiles):[france]]), aggregate80(average, [ (0--ksqmiles):[andorra], (0--ksqmiles):[liechtenstein], (0--ksqmiles):[malta], (0--ksqmiles):[monaco], (0--ksqmiles):[san_marino], (1--ksqmiles):[luxembourg], (4--ksqmiles):[cyprus], (11--ksqmiles):[albania], (12--ksqmiles):[belgium], (14--ksqmiles):[netherlands], (16--ksqmiles):[switzerland], (17--ksqmiles):[denmark], (27--ksqmiles):[eire], (32--ksqmiles):[austria], (35--ksqmiles):[portugal], (36--ksqmiles):[hungary], (40--ksqmiles):[iceland], (41--ksqmiles):[east_germany], (43--ksqmiles):[bulgaria], (49--ksqmiles):[czechoslovakia], (51--ksqmiles):[greece], (92--ksqmiles):[romania], (94--ksqmiles):[united_kingdom], (96--ksqmiles):[west_germany], (99--ksqmiles):[yugoslavia], (116--ksqmiles):[italy], (120--ksqmiles):[poland], (125--ksqmiles):[norway], (130--ksqmiles):[finland], (174--ksqmiles):[sweden], (195--ksqmiles):[spain], (213--ksqmiles):[france]], E)))), qplan((answer80([F, J]):-continent(F), I^ (setof(H:[G], (area(G, H), country(G), in_ploc(G, F)), I), aggregate80(average, I, J)))), 
 answers([[europe, 58.84375--ksqmiles]])],[time(0.0040000000000000036)]).
-must_test_801([is, there, more, than, one, country, in, each, continent, ?], [sent([is, there, more, than, one, country, in, each, continent, ?]), parse(q(s(there, verb(be, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(quant(more, nb(1)), [], country), [pp(prep(in), np(3+sg, np_head(det(each), [], continent), []))]))], []))), sem((answer80([]):- \+A^ (continent(A), \+C^ (numberof(B, (country(B), in_ploc(B, A)), C), C>1)))), qplan((answer80([]):- \+D^ (continent(D), \+F^ (numberof(E, (country(E), in_ploc(E, D)), F), F>1)))), 
+must_test_801([is, there, more, than, one, country, in, each, continent, ?], [sent([is, there, more, than, one, country, in, each, continent, ?]), parse(q(s(there, verb(be, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(quant(more, nquant(1)), [], country), [pp(prep(in), np(3+sg, np_head(det(each), [], continent), []))]))], []))), sem((answer80([]):- \+A^ (continent(A), \+C^ (numberof(B, (country(B), in_ploc(B, A)), C), C>1)))), qplan((answer80([]):- \+D^ (continent(D), \+F^ (numberof(E, (country(E), in_ploc(E, D)), F), F>1)))), 
 answers([false])],[time(0.0010000000000000009)]).
 must_test_801([is, there, some, ocean, that, does, not, border, any, country, ?], [sent([is, there, some, ocean, that, does, not, border, any, country, ?]), parse(q(s(there, verb(be, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(det(some), [], ocean), [rel(feature&place&seamass-B, s(np(3+sg, wh(feature&place&seamass-B), []), verb(border, active, pres+fin, [], neg(_)), [varg(dir, np(3+sg, np_head(det(any), [], country), []))], []))]))], []))), sem((answer80([]):-A^ (ocean(A), \+B^ (country(B), borders(A, B))))), qplan((answer80([]):-A^{ocean(A), {\+B^ (borders(A, B), {country(B)})}})), 
 answers([true])],[time(0.0010000000000000009)]).
 must_test_801([what, are, the, countries, from, which, a, river, flows, into, the, black_sea, ?], [sent([what, are, the, countries, from, which, a, river, flows, into, the, black_sea, ?]), parse(whq(feature&place&country-B, s(np(3+pl, wh(feature&place&country-B), []), verb(be, active, pres+fin, [], pos(_)), [varg(dir, np(3+pl, np_head(det(the(pl)), [], country), [rel(feature&place&country-D, s(np(3+sg, np_head(det(a), [], river), []), verb(flow, active, pres+fin, [], pos(_)), [], [pp(prep(from), np(3+pl, wh(feature&place&country-D), [])), pp(prep(into), np(3+sg, name(black_sea), []))]))]))], []))), sem((answer80([A]):-setof(B, (country(B), C^ (river(C), flows(C, B, black_sea))), A))), qplan((answer80([C]):-setof(B, A^ (flows(A, B, black_sea), {country(B)}, {river(A)}), C))), 
 answers([[romania]])],[time(0.0010000000000000009)]).
-must_test_801([which, countries, have, a, population, exceeding, nb(10), million, ?], [sent([which, countries, have, a, population, exceeding, nb(10), million, ?]), parse(whq(feature&place&country-B, s(np(3+pl, np_head(int_det(feature&place&country-B), [], country), []), verb(have, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(det(a), [], population), [reduced_rel(measure&countables-C, s(np(3+sg, wh(measure&countables-C), []), verb(exceed, active, inf, [prog], pos(_)), [varg(dir, np(3+pl, np_head(quant(same, nb(10)), [], million), []))], []))]))], []))), sem((answer80([A]):-country(A), B^ (exceeds(B, 10--million), population(A, B)))), qplan((answer80([A]):-B^ (country(A), {population(A, B), {exceeds(B, 10--million)}}))), 
+must_test_801([which, countries, have, a, population, exceeding, nquant(10), million, ?], [sent([which, countries, have, a, population, exceeding, nquant(10), million, ?]), parse(whq(feature&place&country-B, s(np(3+pl, np_head(int_det(feature&place&country-B), [], country), []), verb(have, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(det(a), [], population), [reduced_rel(measure&countables-C, s(np(3+sg, wh(measure&countables-C), []), verb(exceed, active, inf, [prog], pos(_)), [varg(dir, np(3+pl, np_head(quant(same, nquant(10)), [], million), []))], []))]))], []))), sem((answer80([A]):-country(A), B^ (exceeds(B, 10--million), population(A, B)))), qplan((answer80([A]):-B^ (country(A), {population(A, B), {exceeds(B, 10--million)}}))), 
 answers([malaysia, uganda])],[time(0.0010000000000000009)]).
-must_test_801([which, countries, with, a, population, exceeding, nb(10), million, border, the, atlantic, ?], [sent([which, countries, with, a, population, exceeding, nb(10), million, border, the, atlantic, ?]), parse(whq(feature&place&country-B, s(np(3+pl, np_head(int_det(feature&place&country-B), [], country), [pp(prep(with), np(3+sg, np_head(det(a), [], population), [reduced_rel(measure&countables-C, s(np(3+sg, wh(measure&countables-C), []), verb(exceed, active, inf, [prog], pos(_)), [varg(dir, np(3+pl, np_head(quant(same, nb(10)), [], million), []))], []))]))]), verb(border, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, name(atlantic), []))], []))), sem((answer80([A]):-B^ (population(A, B), exceeds(B, 10--million), country(A)), borders(A, atlantic))), qplan((answer80([A]):-B^ (borders(A, atlantic), {population(A, B), {exceeds(B, 10--million)}}, {country(A)}))), 
+must_test_801([which, countries, with, a, population, exceeding, nquant(10), million, border, the, atlantic, ?], [sent([which, countries, with, a, population, exceeding, nquant(10), million, border, the, atlantic, ?]), parse(whq(feature&place&country-B, s(np(3+pl, np_head(int_det(feature&place&country-B), [], country), [pp(prep(with), np(3+sg, np_head(det(a), [], population), [reduced_rel(measure&countables-C, s(np(3+sg, wh(measure&countables-C), []), verb(exceed, active, inf, [prog], pos(_)), [varg(dir, np(3+pl, np_head(quant(same, nquant(10)), [], million), []))], []))]))]), verb(border, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, name(atlantic), []))], []))), sem((answer80([A]):-B^ (population(A, B), exceeds(B, 10--million), country(A)), borders(A, atlantic))), qplan((answer80([A]):-B^ (borders(A, atlantic), {population(A, B), {exceeds(B, 10--million)}}, {country(A)}))), 
 answers([venezuela])],[time(0.0010000000000000009)]).
-must_test_801([what, percentage, of, countries, border, each, ocean, ?], [sent([what, percentage, of, countries, border, each, ocean, ?]), parse(whq(A-C, s(np(3+pl, np_head(int_det(A-C), [], percentage), [pp(prep(of), np(3+pl, np_head(generic, [], country), []))]), verb(border, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(det(each), [], ocean), []))], []))), sem((answer80([B, E]):-ocean(B), [afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe]^ (setof(C, country(C), [afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe]), 4^ (numberof(D, (one_of([afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe], D), borders(D, B)), 4), 156^ (card([afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe], 156), ratio(4, 156, E)))))), qplan((answer80([F, L]):-ocean(F), H^ (setof(G, country(G), H), J^ (numberof(I, (one_of(H, I), borders(I, F)), J), K^ (card(H, K), ratio(J, K, L)))))), 
-answers([[arctic_ocean, 2.5641025641025643]])],[time(0.0020000000000000018)]).
+
 must_test_801([what, countries, are, there, in, europe, ?], [sent([what, countries, are, there, in, europe, ?]), parse(whq(feature&place&country-B, s(np(3+pl, np_head(int_det(feature&place&country-B), [], country), []), verb(be, active, pres+fin, [], pos(_)), [void], [pp(prep(in), np(3+sg, name(europe), []))]))), sem((answer80([A]):-country(A), in_ploc(A, europe))), qplan((answer80([A]):-in_ploc(A, europe), {country(A)})), 
 answers([albania, andorra, austria, belgium, bulgaria, cyprus, czechoslovakia, denmark, east_germany, eire, finland, france, greece, hungary, iceland, italy, liechtenstein, luxembourg, malta, monaco, netherlands, norway, poland, portugal, romania, san_marino, spain, sweden, switzerland, united_kingdom, west_germany, yugoslavia])],[time(0.0010000000000000009)]).
 
+must_test_801(U,R,O):-must_test_804(U,R,O).
 must_test_801(U,R,O):-must_test_802(U,R,O).
 must_test_801(U,R,O):-must_test_803(U,R,O).
 
@@ -1038,7 +1049,7 @@ answers([0--ksqmiles])],[time(0.0)]).
 must_test_802([what, is, the, total, area, of, countries, south, of, the, equator, and, not, in, australasia, ?], [sent([what, is, the, total, area, of, countries, south, of, the, equator, and, not, in, australasia, ?]), parse(whq(A-B, s(np(3+sg, wh(A-B), []), verb(be, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(det(the(sg)), [adj(total)], area), [pp(prep(of), np(3+pl, np_head(generic, [], country), [conj(and, reduced_rel(feature&place&country-F, s(np(3+pl, wh(feature&place&country-F), []), verb(be, active, pres+fin, [], pos(_)), [varg(pred, pp(prep(southof), np(3+sg, name(equator), [])))], [])), reduced_rel(feature&place&country-F, s(np(3+pl, wh(feature&place&country-F), []), verb(be, active, pres+fin, [], neg(_)), [varg(pred, pp(prep(in), np(3+sg, name(australasia), [])))], [])))]))]))], []))), sem((answer80([A]):-B^ (setof(C:[D], (area(D, C), country(D), southof(D, equator), \+in_ploc(D, australasia)), B), aggregate80(total, B, A)))), 
 qplan((answer80([E]):-D^ (setof(C:[B], (southof(B, equator), area(B, C), {country(B)}, {\+in_ploc(B, australasia)}), D), aggregate80(total, D, E)))), 
 answers([10239--ksqmiles])],[time(0.0010000000000000009)]).
-must_test_802([which, countries, are, bordered, by, two, seas, ?], [sent([which, countries, are, bordered, by, two, seas, ?]), parse(whq(feature&place&country-B, s(np(3+pl, np_head(int_det(feature&place&country-B), [], country), []), verb(border, passive, pres+fin, [], pos(_)), [], [pp(prep(by), np(3+pl, np_head(quant(same, nb(2)), [], sea), []))]))), 
+must_test_802([which, countries, are, bordered, by, two, seas, ?], [sent([which, countries, are, bordered, by, two, seas, ?]), parse(whq(feature&place&country-B, s(np(3+pl, np_head(int_det(feature&place&country-B), [], country), []), verb(border, passive, pres+fin, [], pos(_)), [], [pp(prep(by), np(3+pl, np_head(quant(same, nquant(2)), [], sea), []))]))), 
 sem((answer80([A]):-country(A), numberof(B, (sea(B), borders(B, A)), 2))), 
 qplan((answer80([B]):-numberof(A, (sea(A), borders(A, B)), 2), {country(B)})), 
 answers([egypt, iran, israel, saudi_arabia, turkey])],[time(0.0)]).
@@ -1049,15 +1060,28 @@ answers([turkey])],[time(0.0020000000000000018)]).
 must_test_803([which, country, '\'', s, capital, is, london, ?], [sent([which, country, '\'', s, capital, is, london, ?]), parse(whq(feature&place&country-B, s(np(3+sg, np_head(det(the(sg)), [], capital), [pp(poss, np(3+sg, np_head(int_det(feature&place&country-B), [], country), []))]), verb(be, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, name(london), []))], []))), sem((answer80([A]):-country(A), capital(A, london))), 
 qplan((answer80([A]):-capital(A, london), {country(A)})), 
 answers([united_kingdom])],[time(0.0010000000000000009)]).
-must_test_803([what, are, the, continents, no, country, in, which, contains, more, than, two, cities, whose, population, exceeds, nb(1), million, ?], [sent([what, are, the, continents, no, country, in, which, contains, more, than, two, cities, whose, population, exceeds, nb(1), million, ?]), parse(whq(feature&place&continent-B, s(np(3+pl, wh(feature&place&continent-B), []), verb(be, active, pres+fin, [], pos(_)), [varg(dir, np(3+pl, np_head(det(the(pl)), [], continent), [rel(feature&place&continent-D, s(np(3+sg, np_head(det(no), [], country), [pp(prep(in), np(3+pl, wh(feature&place&continent-D), []))]), verb(contain, active, pres+fin, [], pos(_)), [varg(dir, np(3+pl, np_head(quant(more, nb(2)), [], city), [rel(feature&city-G, s(np(3+sg, np_head(det(the(sg)), [], population), [pp(poss, np(3+pl, wh(feature&city-G), []))]), verb(exceed, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(quant(same, nb(1)), [], million), []))], []))]))], []))]))], []))), 
+must_test_803([what, are, the, continents, no, country, in, which, contains, more, than, two, cities, whose, population, exceeds, nquant(1), million, ?], [sent([what, are, the, continents, no, country, in, which, contains, more, than, two, cities, whose, population, exceeds, nquant(1), million, ?]), parse(whq(feature&place&continent-B, s(np(3+pl, wh(feature&place&continent-B), []), verb(be, active, pres+fin, [], pos(_)), [varg(dir, np(3+pl, np_head(det(the(pl)), [], continent), [rel(feature&place&continent-D, s(np(3+sg, np_head(det(no), [], country), [pp(prep(in), np(3+pl, wh(feature&place&continent-D), []))]), verb(contain, active, pres+fin, [], pos(_)), [varg(dir, np(3+pl, np_head(quant(more, nquant(2)), [], city), [rel(feature&city-G, s(np(3+sg, np_head(det(the(sg)), [], population), [pp(poss, np(3+pl, wh(feature&city-G), []))]), verb(exceed, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(quant(same, nquant(1)), [], million), []))], []))]))], []))]))], []))), 
 sem((answer80([F]):-setof(A, (continent(A), \+B^ (country(B), in_ploc(B, A), E^ (numberof(C, (city(C), D^ (population(C, D), exceeds(D, 1--million)), in_ploc(C, B)), E), E>2))), F))), qplan((answer80([L]):-setof(G, (continent(G), \+H^ (country(H), in_ploc(H, G), K^ (numberof(I, (city(I), J^ (population(I, J), exceeds(J, 1--million)), in_ploc(I, H)), K), K>2))), L))), 
 answers([[africa, america, antarctica, asia, australasia, europe]])],[time(0.05499999999999999)]).
 
+must_test_804([what, percentage, of, countries, border, each, ocean, ?], [sent([what, percentage, of, countries, border, each, ocean, ?]), parse(whq(A-C, s(np(3+pl, np_head(int_det(A-C), [], percentage), [pp(prep(of), np(3+pl, np_head(generic, [], country), []))]), verb(border, active, pres+fin, [], pos(_)), [varg(dir, np(3+sg, np_head(det(each), [], ocean), []))], []))), sem((answer80([B, E]):-ocean(B), [afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe]^ (setof(C, country(C), [afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe]), 4^ (numberof(D, (one_of([afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe], D), borders(D, B)), 4), 156^ (card([afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe], 156), ratio(4, 156, E)))))), qplan((answer80([F, L]):-ocean(F), H^ (setof(G, country(G), H), J^ (numberof(I, (one_of(H, I), borders(I, F)), J), K^ (card(H, K), ratio(J, K, L)))))), 
+answers([[arctic_ocean,2.5641025641025643], [atlantic,35.2564], [indian_ocean,14.1026] , 
+  [pacific,20.5128]])],[time(0.0020000000000000018)]).
+% answers([[arctic_ocean, 2.5641025641025643]])],[time(0.0020000000000000018)]).
 
-:-export((t1/0,t12/0,t13/0)).
-t1:- with_no_assertions(lmconf:use_cyc_database,w_tl(t_l:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
-t12:- with_no_assertions(lmconf:use_cyc_database,w_tl(t_l:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
-t13:- with_no_assertions(lmconf:use_cyc_database,w_tl(t_l:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+:- parser_chat80:export(baseKB:(t1/0,t12/0,t13/0)).
+t11:- locally_hide(lmconf:use_cyc_database,locally(t_l:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t12:- locally_hide(lmconf:use_cyc_database,locally(t_l:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t13:- locally_hide(lmconf:use_cyc_database,locally(t_l:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t14:- locally_hide(lmconf:use_cyc_database,locally(t_l:tracing80, forall(must_test_804(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
 
 
-
+answer804([OCEAN, RATIO]):-
+ ocean(OCEAN),
+  satisfy((
+      ALL^(setof(C, country(C), ALL), 
+        COUNT_BORDER^(numberof(BC,  (one_of(ALL, BC), borders(BC, OCEAN)), COUNT_BORDER),
+            COUNT_ALL^(card(ALL, COUNT_ALL), 
+      ratio(COUNT_BORDER, COUNT_ALL, RATIO))))
+      )).
+t15:- forall(answer804([OCEAN, RATIO]),wdmsg(answer804([OCEAN, RATIO]))).

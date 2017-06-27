@@ -34,7 +34,7 @@
 :-discontiguous(verb_root_db/1).
 :-discontiguous(verb_form_db/4).
 :-discontiguous(trans_LF/9).
-:-dynamic_multifile_exported(ditrans_LF/13).
+:-kb_shared(ditrans_LF/13).
 :-discontiguous(regular_pres_db/1).
 :-discontiguous(regular_past_db/2).
 :-discontiguous(noun_form_db/3).
@@ -44,10 +44,10 @@
 % :- ensure_loaded(library(dra/tabling3/swi_toplevel)).
 
 
-:- dynamic_multifile_exported((contains0/2,country/8,city/3,borders/2,in_continent/2)).
-%:- dynamic_multifile_exported contains/2.
+:- kb_shared((contains0/2,country/8,city/3,borders/2,in_continent/2)).
+%:- kb_shared contains/2.
 
-% :- dynamic_multifile_exported fact_always_true/1.
+% :- kb_shared fact_always_true/1.
 
 :- style_check(+discontiguous).
 :- style_check(-discontiguous).
@@ -57,7 +57,7 @@
 :- op(300,fx,(('`'))).
 :- op(200,xfx,((--))).
 
-:- dynamic_multifile_exported((trans_LF/9)).
+:- kb_shared((trans_LF/9)).
 
 :-retractall(nldata_BRN_WSJ_LEXICON:text_bpos(the,nn)).
 
@@ -1218,7 +1218,7 @@ ph(Type,Content):-show_call(probeDCG(_,Content,_,Type)).
 length_between(S,E,Left):-between(S,E,X),length(Left,X).
 
 
-:-dynamic_multifile_exported(must_test_801/3).
+:-kb_shared(must_test_801/3).
 
 must_test_801([what, rivers, are, there, ?], [sent([what, rivers, are, there, ?]), parse(whq(feature&river-B, s(np(3+pl, np_head(int_det(feature&river-B), [], river), []), verb(be, active, pres+fin, [], pos), [void], []))), sem((answer80([A]):-river(A), A^true)), qplan((answer80([B]):-river(B), B^true)), 
 answers([amazon, amu_darya, amur, brahmaputra, colorado, congo_river, cubango, danube, don, elbe, euphrates, ganges, hwang_ho, indus, irrawaddy, lena, limpopo, mackenzie, mekong, mississippi, murray, niger_river, nile, ob, oder, orange, orinoco, parana, rhine, rhone, rio_grande, salween, senegal_river, tagus, vistula, volga, volta, yangtze, yenisei, yukon, zambesi])],[time(0.0)]).

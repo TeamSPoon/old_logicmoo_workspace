@@ -35,10 +35,10 @@ user:agent_call_command(_Gent,curt80(StringM)):- curt80(StringM).
 % CURT80 REPL
 % ===========================================================
 :-thread_local t_l:curt80_interactive/0.
-curt80 :- w_tl(tracing80,
-           w_tl(t_l:curt80_interactive,
-            w_tl(t_l:useOnlyExternalDBs,
-             w_tl(lmconf:use_cyc_database,
+curt80 :- locally(tracing80,
+           locally(t_l:curt80_interactive,
+            locally(t_l:useOnlyExternalDBs,
+             locally(lmconf:use_cyc_database,
               (told, repeat, prompt_read('CURT80> ',U),  
                             to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];((mmake,curt80(WL,State),State==stop))))))))).
 

@@ -151,6 +151,7 @@ plvar:attr_unify_hook(Var,Val):- mv_peek1(Var,Was)->Val=Was;mv_set1(Var,Val).
 
 
 % Maybe Variables entering the clause database
+:- meta_predicate multivar_call(1,0).
 multivar_call(Type,Goal):-term_variables(Goal,Vars),maplist(Type,Vars),call(Goal).
 
 

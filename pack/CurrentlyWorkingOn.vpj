@@ -5221,6 +5221,11 @@
 			</Folder>
 			<F N="matrix/pack.pl"/>
 		</Folder>
+		<Folder Name="multimodal_dcg">
+			<Folder Name="prolog">
+				<F N="multimodal_dcg/prolog/multimodal_dcg.pl"/>
+			</Folder>
+		</Folder>
 		<Folder Name="multivar">
 			<Folder Name="prolog">
 				<F N="multivar/prolog/answer_sources.pl"/>
@@ -5450,6 +5455,22 @@
 			<F N="plweb/update.pl"/>
 			<F N="plweb/wiki.pl"/>
 			<F N="plweb/wiki_edit.pl"/>
+		</Folder>
+		<Folder Name="predicate_streams">
+			<Folder Name="prolog">
+				<F N="predicate_streams/prolog/broadcast_streams.pl"/>
+				<F N="predicate_streams/prolog/concatenated_input_streams.pl"/>
+				<F N="predicate_streams/prolog/INDEX.pl"/>
+				<F N="predicate_streams/prolog/predicate_streams.pl"/>
+			</Folder>
+			<Folder Name="t">
+				<F N="predicate_streams/t/sanity_tests.pl"/>
+				<F N="predicate_streams/t/test123.pl"/>
+			</Folder>
+			<F N="predicate_streams/.gitignore"/>
+			<F N="predicate_streams/LICENSE.md"/>
+			<F N="predicate_streams/pack.pl"/>
+			<F N="predicate_streams/README.md"/>
 		</Folder>
 		<Folder Name="prologmud">
 			<Folder Name="prolog">

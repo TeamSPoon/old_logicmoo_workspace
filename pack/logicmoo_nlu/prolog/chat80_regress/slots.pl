@@ -27,7 +27,7 @@
 :- op(300,fx,(('`'))).
 :- op(200,xfx,((--))).
 
-no_repeats_must(Call):-one_must(gripe_time(0.5,no_repeats(Call)),(fail,(dmsg(warn(show_call_failure(Call))),!,fail))).
+no_repeats_must(Call):-one_must(gripe_time(0.5,no_repeats(Call)),(fail,(dmsg(warn(show_failure(Call))),!,fail))).
 
 i_sentence(q(S),question([],P)) :- !,
    i_s(S,P,[],0).
@@ -284,7 +284,7 @@ i_sup_op(least,min).
 i_sup_op(most,max).
 
 pos_conversion_db(wh(Type-X),same,Type,X,id(_Why)).
-pos_conversion_db(nb(N),Op,_,N,Op).
+pos_conversion_db(nquant(N),Op,_,N,Op).
 
 noun_template(Noun,TypeV,V,'`'(P),
       [slot(poss,TypeO,O,Os,index)|Slots]) :-

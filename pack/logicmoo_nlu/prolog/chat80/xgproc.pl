@@ -1,7 +1,8 @@
 /* Translation of XGs */
 
- :- op(1001,xfy,...).
-:- op(1200,xfx,'--->').
+:- op(1001,xfy,( ... )).
+:- op(1200,xfx,( '--->')).
+
 
 :-thread_local tlxgproc:current_xg_module/1.
 :-thread_local tlxgproc:current_xg_filename/1.
@@ -40,22 +41,24 @@ xg_process_te_clone((L --> R),Mode,((P :- Q))) :- !,xg_process_te_clone(L,R,Mode
 
 chat80_term_expansion(In,Out):- compound(In),functor(In,'-->',_),  must(xg_process_te_clone(In,+,Out)).
 chat80_term_expansion((H ... T ---> R),((P :- Q))) :- must( xg_process_te_clone((H ... T),R,+,P,Q)).
-chat80_term_expansion((L ---> R),((P :- Q))) :- must(xg_process_te_clone(L,R,+,P,Q)).
+chat80_term_expansion((L ---> R), ((P :- Q))) :- must(xg_process_te_clone(L,R,+,P,Q)).
 
-system:term_expansion(H,O):- processing_xg,current_predicate(logicmoo_bugger_loaded/0),chat80_term_expansion(H,O).
+chat80_term_expansion_now(H,':-'(ain(O))):- chat80_term_expansion(H,O),!.
+
+system:term_expansion(H, O):- processing_xg->chat80_term_expansion_now(H,O).
 
 
-load_plus_xg_file(CM,F) :- w_tl(tlxgproc:current_xg_module(CM),w_tl(tlxgproc:do_xg_process_te,ensure_loaded(F))),!.
+load_plus_xg_file(CM,F) :- locally(tlxgproc:current_xg_module(CM),locally(tlxgproc:do_xg_process_te,ensure_loaded(F))),!.
 % was +(F).
 load_plus_xg_file(CM,F) :-
    see(user),
-   w_tl(tlxgproc:current_xg_module(CM),consume0(F,+)),
+   locally(tlxgproc:current_xg_module(CM),consume0(F,+)),
    seen.
 
 % was -(F).
 load_minus_xg_file(CM,F) :-
    see(user),
-   w_tl(tlxgproc:current_xg_module(CM),consume0(F,-)),
+   locally(tlxgproc:current_xg_module(CM),consume0(F,-)),
    seen.
 
 
@@ -67,7 +70,7 @@ consume0(F0,Mode) :-
     absolute_file_name(F0,F),
    see(F),
    abolish_xg(xg_source=F),
-   w_tl(tlxgproc:current_xg_filename(F),tidy_consume(F,Mode)),
+   locally(tlxgproc:current_xg_filename(F),tidy_consume(F,Mode)),
  ( (seeing(User2),User2=user), !; seen ),
    see(Old),
 %   statistics(heap,[H,Hf]),

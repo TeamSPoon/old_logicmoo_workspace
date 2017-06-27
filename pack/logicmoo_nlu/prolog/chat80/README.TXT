@@ -133,8 +133,8 @@ newtop.pl
 demo
 	Sample queries. To run in batch mode, type
 
-		hi(demo)
+		hi80(demo)
 
 	to the Prolog toplevel after loading Chat-80.
 log
-	Output expected from `hi(demo).'
+	Output expected from `hi80(demo).'

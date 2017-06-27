@@ -45,7 +45,7 @@ pl([A|As],I) :- !,
    pl(As,I).
 
 as_is(V):-var(V).
-as_is('$VAR'(_)).
+as_is(F):- functor(F,'$VAR',_).
 as_is(A) :- atomic(A), !.
 as_is('_'(_)) :- !.
 as_is(X) :-

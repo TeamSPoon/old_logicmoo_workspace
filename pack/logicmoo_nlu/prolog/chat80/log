@@ -593,7 +593,7 @@ whq
          np
             3+pl
             np_head
-               quant(same,nb(2))
+               quant(same,nquant(2))
                []
                sea
             []
@@ -829,7 +829,7 @@ q
          np
             3+sg
             np_head
-               quant(more,nb(1))
+               quant(more,nquant(1))
                []
                country
             pp
@@ -1042,7 +1042,7 @@ whq
                      np
                         3+pl
                         np_head
-                           quant(more,nb(2))
+                           quant(more,nquant(2))
                            []
                            city
                         rel
@@ -1067,7 +1067,7 @@ whq
                                  np
                                     3+sg
                                     np_head
-                                       quant(same,nb(1))
+                                       quant(same,nquant(1))
                                        []
                                        million
                                     []
@@ -1276,7 +1276,7 @@ whq
                      np
                         3+pl
                         np_head
-                           quant(same,nb(10))
+                           quant(same,nquant(10))
                            []
                            million
                         []
@@ -1338,7 +1338,7 @@ whq
                         np
                            3+pl
                            np_head
-                              quant(same,nb(10))
+                              quant(same,nquant(10))
                               []
                               million
                            []

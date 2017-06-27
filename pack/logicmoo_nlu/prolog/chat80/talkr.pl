@@ -30,6 +30,8 @@ write_tree(T):-
    fail.
 write_tree(_).
 
+wt(T,_D):- wdmsg(T),!.
+
 wt((P:-Q),L) :- !, L1 is L+3,
    write(P), tab(1), write((:-)), nl,
    tab(L1), wt(Q,L1).
