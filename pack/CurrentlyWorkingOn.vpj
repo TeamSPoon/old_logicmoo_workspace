@@ -545,6 +545,12 @@
 						<F N="logicmoo_base/prolog/logicmoo/pfc/autoexec.pfc.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/pfc/mpred_unused.txt"/>
 						<F N="logicmoo_base/prolog/logicmoo/pfc/README.md"/>
+						<F N="logicmoo_base/prolog/logicmoo/pfc/system_basic.pfc.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/pfc/system_common.pfc.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/pfc/system_constraints.pfc.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/pfc/system_domains.pfc.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/pfc/system_genls.pfc.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/pfc/system_if_missing.pfc.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/pfc/user_relationAllExists.pfc.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/pfc/user_transitiveViaArg.pfc.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/pfc/user_type_barriers.pfc.pl"/>
@@ -570,6 +576,19 @@
 						<F N="logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_statics.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_testing.pl"/>
 						<F N="logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_unused.pl"/>
+					</Folder>
+					<Folder Name="typesystem">
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_agenda.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_hooks.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_props.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_storage.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_stubs.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_type_args.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_type_constraints.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_type_isa.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_type_naming.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_type_wff.pl"/>
+						<F N="logicmoo_base/prolog/logicmoo/typesystem/mpred_userkb.pl"/>
 					</Folder>
 					<Folder Name="xray">
 						<F N="logicmoo_base/prolog/logicmoo/xray/base.swi"/>
@@ -599,8 +618,11 @@
 				<F N="logicmoo_base/prolog/logicmoo_cliop.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_cyc_exec.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_cycqlf.pl"/>
+				<F N="logicmoo_base/prolog/logicmoo_lib.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_motel.pl"/>
+				<F N="logicmoo_base/prolog/logicmoo_packs.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_plarkc.pl"/>
+				<F N="logicmoo_base/prolog/logicmoo_pldoc.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_plweb.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_pttp.pl"/>
 				<F N="logicmoo_base/prolog/logicmoo_repl.pl"/>
@@ -5212,6 +5234,152 @@
 				<F N="loop_check/prolog/old_loop_check.pl"/>
 			</Folder>
 		</Folder>
+		<Folder Name="lps_corner">
+			<Folder Name="doc">
+				<F N="lps_corner/doc/CLOUT_workshop_21Jan2017.pptx"/>
+				<F N="lps_corner/doc/Opening_lpsdemo.png"/>
+				<F N="lps_corner/doc/OpeningSWISH.png"/>
+			</Folder>
+			<Folder Name="engine">
+				<F N="lps_corner/engine/interpreter.P"/>
+			</Folder>
+			<Folder Name="examples">
+				<Folder Name="CLOUT_workshop">
+					<F N="lps_corner/examples/CLOUT_workshop/badlight.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/badlight.pl_.P.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/bankTransfer.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/bankTransfer.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/bubbleSort.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/bubbleSort.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/burning.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/concurrent_towers.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/concurrentTowers.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/d_test.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/diningPhilosophers.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/diningPhilosophers.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/fire_recurrent.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/fireRecurrent.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/fireSimple.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/fireSimple.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/First_steps_with_LPS.swinb"/>
+					<F N="lps_corner/examples/CLOUT_workshop/firststeps1.swinb"/>
+					<F N="lps_corner/examples/CLOUT_workshop/firststeps2.swinb"/>
+					<F N="lps_corner/examples/CLOUT_workshop/firststeps3.swinb"/>
+					<F N="lps_corner/examples/CLOUT_workshop/firststeps4.swinb"/>
+					<F N="lps_corner/examples/CLOUT_workshop/index.json"/>
+					<F N="lps_corner/examples/CLOUT_workshop/life.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/life.pl_.P.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/lpsExamples.swinb"/>
+					<F N="lps_corner/examples/CLOUT_workshop/mapColouring.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/mapColouring.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/prisoners.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/prisoners.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/quicksort.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/quicksort.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/trash.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/trash.pl.lpst"/>
+					<F N="lps_corner/examples/CLOUT_workshop/turingTest.pl"/>
+					<F N="lps_corner/examples/CLOUT_workshop/turingTest.pl.lpst"/>
+				</Folder>
+				<Folder Name="forTesting">
+					<F N="lps_corner/examples/forTesting/backtrackExample1.lpsw"/>
+					<F N="lps_corner/examples/forTesting/backtrackExample1.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/backtrackExample2.lpsw"/>
+					<F N="lps_corner/examples/forTesting/backtrackExample2.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/backtrackExample3.lpsw"/>
+					<F N="lps_corner/examples/forTesting/backtrackExample3.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/badlight2.lps"/>
+					<F N="lps_corner/examples/forTesting/badlight2.lps_.P.lpst"/>
+					<F N="lps_corner/examples/forTesting/bank account.lpsw"/>
+					<F N="lps_corner/examples/forTesting/bank account.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/bankTransfer1.lps"/>
+					<F N="lps_corner/examples/forTesting/bankTransfer1.lps_.P.lpst"/>
+					<F N="lps_corner/examples/forTesting/bankTransfer1.pl"/>
+					<F N="lps_corner/examples/forTesting/bankTransfer2.lps"/>
+					<F N="lps_corner/examples/forTesting/bankTransfer2.lps_.P.lpst"/>
+					<F N="lps_corner/examples/forTesting/bubble sort.lpsw"/>
+					<F N="lps_corner/examples/forTesting/bubble sort.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/fluentInCompositeEvent.lps"/>
+					<F N="lps_corner/examples/forTesting/fluentInCompositeEvent.lps_.P.lpst"/>
+					<F N="lps_corner/examples/forTesting/manual_minimal.lps"/>
+					<F N="lps_corner/examples/forTesting/mapColouring.lps"/>
+					<F N="lps_corner/examples/forTesting/mapColouring.lps_.P.lpst"/>
+					<F N="lps_corner/examples/forTesting/prisoners-dilemma-latest.lpsw"/>
+					<F N="lps_corner/examples/forTesting/prisoners-dilemma-latest.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/quicksort.lpsw"/>
+					<F N="lps_corner/examples/forTesting/quicksort.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/simple_example1.lpsw"/>
+					<F N="lps_corner/examples/forTesting/simple_example1.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/testlevent.lpsw"/>
+					<F N="lps_corner/examples/forTesting/testlevent.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/trash_disposal.lpsw"/>
+					<F N="lps_corner/examples/forTesting/trash_disposal.lpsw.lpst"/>
+					<F N="lps_corner/examples/forTesting/trash_forall.lps"/>
+					<F N="lps_corner/examples/forTesting/trash_forall.lps_.P.lpst"/>
+					<F N="lps_corner/examples/forTesting/trash_two_locked.lps"/>
+					<F N="lps_corner/examples/forTesting/trash_two_locked.lps_.P.lpst"/>
+					<F N="lps_corner/examples/forTesting/variant_clauses.lpsw"/>
+					<F N="lps_corner/examples/forTesting/variant_clauses.lpsw.lpst"/>
+				</Folder>
+				<Folder Name="survival_game">
+					<F N="lps_corner/examples/survival_game/Survival Melee.lpsw"/>
+					<F N="lps_corner/examples/survival_game/SurvivalPanel.java"/>
+				</Folder>
+				<F N="lps_corner/examples/bank account_terse.lps"/>
+				<F N="lps_corner/examples/bank account_terse.lps_.P.lpst"/>
+				<F N="lps_corner/examples/binaryChop.lps"/>
+				<F N="lps_corner/examples/binaryChop2.lps"/>
+				<F N="lps_corner/examples/dining_philosophers_terse.lps"/>
+				<F N="lps_corner/examples/dining_philosophers_terse.lps_.P.lpst"/>
+				<F N="lps_corner/examples/goat.lps"/>
+				<F N="lps_corner/examples/goat.lps_.P.lpst"/>
+				<F N="lps_corner/examples/just rains.lps"/>
+				<F N="lps_corner/examples/just rains.lps_.P.lpst"/>
+				<F N="lps_corner/examples/lamport_clock.lps"/>
+				<F N="lps_corner/examples/oneprisoner.lps"/>
+				<F N="lps_corner/examples/party.lps"/>
+				<F N="lps_corner/examples/party.lps_.P.lpst"/>
+				<F N="lps_corner/examples/party_minimal.lps"/>
+				<F N="lps_corner/examples/party_minimal.lps_.P.lpst"/>
+				<F N="lps_corner/examples/restaurant.lpsw"/>
+				<F N="lps_corner/examples/simple-smart-contract.lps"/>
+				<F N="lps_corner/examples/tictactoe.lps"/>
+				<F N="lps_corner/examples/tictactoe.lps_.P.lpst"/>
+			</Folder>
+			<Folder Name="swish">
+				<Folder Name="profiles">
+					<F N="lps_corner/swish/profiles/40-LPS.pl"/>
+					<F N="lps_corner/swish/profiles/40-LPS.swinb"/>
+				</Folder>
+				<Folder Name="upstart">
+					<F N="lps_corner/swish/upstart/lps.conf"/>
+				</Folder>
+				<Folder Name="web">
+					<Folder Name="lps">
+						<F N="lps_corner/swish/web/lps/INSTALL.sh"/>
+						<F N="lps_corner/swish/web/lps/lps.css"/>
+					</Folder>
+				</Folder>
+				<F N="lps_corner/swish/2dWord.md"/>
+				<F N="lps_corner/swish/INSTALL_server.md"/>
+				<F N="lps_corner/swish/lps_2d_renderer.pl"/>
+				<F N="lps_corner/swish/lps_timeline_renderer.pl"/>
+				<F N="lps_corner/swish/user_module_file.pl"/>
+			</Folder>
+			<Folder Name="utils">
+				<F N="lps_corner/utils/api.P"/>
+				<F N="lps_corner/utils/psyntax.P"/>
+				<F N="lps_corner/utils/visualizer.P"/>
+			</Folder>
+			<Folder Name="Wei-engine">
+				<F N="lps_corner/Wei-engine/db.P"/>
+				<F N="lps_corner/Wei-engine/interpreter.P"/>
+			</Folder>
+			<F N="lps_corner/.gitignore"/>
+			<F N="lps_corner/INSTALL.md"/>
+			<F N="lps_corner/README.md"/>
+			<F N="lps_corner/RoadMap.md"/>
+		</Folder>
 		<Folder Name="matrix">
 			<Folder Name="prolog">
 				<Folder Name="examples">
@@ -5265,42 +5433,28 @@
 		<Folder Name="pfc">
 			<Folder Name="prolog">
 				<Folder Name="pfc2.0">
-					<F N="pfc/prolog/pfc2.0/mpred_agenda.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_at_box.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_core.next"/>
 					<F N="pfc/prolog/pfc2.0/mpred_core.pl"/>
+					<F N="pfc/prolog/pfc2.0/mpred_database.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_expansion.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_header.pi"/>
 					<F N="pfc/prolog/pfc2.0/mpred_header.pro"/>
-					<F N="pfc/prolog/pfc2.0/mpred_hooks.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_kb_ops.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_listing.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_loader.pl"/>
 					<F N="pfc/prolog/pfc2.0/mpred_prolog_file.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_props.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_storage.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_stubs.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_type_args.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_type_constraints.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_type_isa.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_type_naming.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_type_wff.pl"/>
-					<F N="pfc/prolog/pfc2.0/mpred_userkb.pl"/>
+					<F N="pfc/prolog/pfc2.0/mpred_terms.pl"/>
 				</Folder>
 				<Folder Name="pfclib">
 					<F N="pfc/prolog/pfclib/system_autoexec.pfc.pl"/>
 					<F N="pfc/prolog/pfclib/system_base.pfc.pl"/>
-					<F N="pfc/prolog/pfclib/system_common.pfc.pl"/>
-					<F N="pfc/prolog/pfclib/system_constraints.pfc.pl"/>
-					<F N="pfc/prolog/pfclib/system_domains.pfc.pl"/>
-					<F N="pfc/prolog/pfclib/system_genls.pfc.pl"/>
-					<F N="pfc/prolog/pfclib/system_if_missing.pfc.pl"/>
 					<F N="pfc/prolog/pfclib/system_mdefault.pfc.pl"/>
 					<F N="pfc/prolog/pfclib/system_singleValued.pfc.pl"/>
 				</Folder>
 				<F N="pfc/prolog/INDEX.pl"/>
 				<F N="pfc/prolog/pfc.pl"/>
 				<F N="pfc/prolog/pfc_dcg.pl"/>
+				<F N="pfc/prolog/pfc_lib.pl"/>
 				<F N="pfc/prolog/pfc_toplevel.pl"/>
 			</Folder>
 			<Folder Name="t">
@@ -5319,6 +5473,7 @@
 					<F N="pfc/t/sanity_base/attvar_10.pfc"/>
 					<F N="pfc/t/sanity_base/attvar_11.pfc"/>
 					<F N="pfc/t/sanity_base/attvar_12.pfc"/>
+					<F N="pfc/t/sanity_base/baseKB"/>
 					<F N="pfc/t/sanity_base/bc_01.pfc"/>
 					<F N="pfc/t/sanity_base/bc_02.pfc"/>
 					<F N="pfc/t/sanity_base/conan_01.pfc.pl"/>
@@ -5339,6 +5494,7 @@
 					<F N="pfc/t/sanity_base/fc_03.pfc"/>
 					<F N="pfc/t/sanity_base/fc_03a.pfc"/>
 					<F N="pfc/t/sanity_base/fc_04.pfc"/>
+					<F N="pfc/t/sanity_base/fc_04_user.pfc"/>
 					<F N="pfc/t/sanity_base/fc_05.pfc"/>
 					<F N="pfc/t/sanity_base/fc_06.pfc"/>
 					<F N="pfc/t/sanity_base/fc_07.pfc"/>
@@ -5368,10 +5524,12 @@
 					<F N="pfc/t/sanity_base/mt_01d.pl"/>
 					<F N="pfc/t/sanity_base/mt_01e.pl"/>
 					<F N="pfc/t/sanity_base/mt_02.pl"/>
+					<F N="pfc/t/sanity_base/mt_02a_03.pfc"/>
 					<F N="pfc/t/sanity_base/mt_03.pl"/>
 					<F N="pfc/t/sanity_base/mt_04.pl"/>
 					<F N="pfc/t/sanity_base/mt_05.pl"/>
 					<F N="pfc/t/sanity_base/mt_06.pl"/>
+					<F N="pfc/t/sanity_base/mt_06_a.pfc"/>
 					<F N="pfc/t/sanity_base/mt_07.pl"/>
 					<F N="pfc/t/sanity_base/mt_09.pl"/>
 					<F N="pfc/t/sanity_base/nd_01.pl"/>
@@ -5383,9 +5541,16 @@
 					<F N="pfc/t/sanity_base/nd_06.pfc"/>
 					<F N="pfc/t/sanity_base/nd_07.pfc"/>
 					<F N="pfc/t/sanity_base/nd_08.pfc"/>
+					<F N="pfc/t/sanity_base/nd_09_rule.pfc"/>
 					<F N="pfc/t/sanity_base/pl_01.pfc"/>
 					<F N="pfc/t/sanity_base/shift_01.pl"/>
 					<F N="pfc/t/sanity_base/shift_02.pl"/>
+					<F N="pfc/t/sanity_base/test_prolog.sh"/>
+					<F N="pfc/t/sanity_base/unrelated.pl"/>
+					<F N="pfc/t/sanity_base/y_p_x.pfc"/>
+					<F N="pfc/t/sanity_base/y_p_x_16.pfc"/>
+					<F N="pfc/t/sanity_base/y_p_x_bwc.pfc"/>
+					<F N="pfc/t/sanity_base/y_p_x_bwc_t.pfc"/>
 				</Folder>
 				<F N="pfc/t/try_logicmoo_examples.pl"/>
 			</Folder>
@@ -5886,6 +6051,7 @@
 					<F N="prologmud_samples/prolog/prologmud_sample_games/ansi2html.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/bootstrap.ttl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/clear_putty.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/clio_swish_test.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/commitpush.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/daemon.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/debug_once.sh"/>
@@ -5896,6 +6062,7 @@
 					<F N="prologmud_samples/prolog/prologmud_sample_games/kb7166.prc"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/killchilds.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/mud.ttl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/openid.db"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/passwd"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/pbranch.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/preconfig.sh"/>
@@ -5908,6 +6075,7 @@
 					<F N="prologmud_samples/prolog/prologmud_sample_games/Run_Loop.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/run_mud_server.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/run_swish.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/sanity_pfc_modules.plt"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/server.pl"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/settings.db"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/startGame.sh"/>
