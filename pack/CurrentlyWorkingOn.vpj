@@ -5449,6 +5449,7 @@
 					<F N="pfc/prolog/pfclib/system_autoexec.pfc.pl"/>
 					<F N="pfc/prolog/pfclib/system_base.pfc.pl"/>
 					<F N="pfc/prolog/pfclib/system_mdefault.pfc.pl"/>
+					<F N="pfc/prolog/pfclib/system_module_inheritance.pfc.pl"/>
 					<F N="pfc/prolog/pfclib/system_singleValued.pfc.pl"/>
 				</Folder>
 				<F N="pfc/prolog/INDEX.pl"/>
@@ -5459,98 +5460,11 @@
 			</Folder>
 			<Folder Name="t">
 				<Folder Name="sanity_base">
-					<F N="pfc/t/sanity_base/ALL.log.html"/>
-					<F N="pfc/t/sanity_base/attvar_01.pl"/>
-					<F N="pfc/t/sanity_base/attvar_02.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_02_in_user.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_03.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_04.pl"/>
-					<F N="pfc/t/sanity_base/attvar_05.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_06.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_07.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_08.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_09.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_10.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_11.pfc"/>
-					<F N="pfc/t/sanity_base/attvar_12.pfc"/>
-					<F N="pfc/t/sanity_base/baseKB"/>
-					<F N="pfc/t/sanity_base/bc_01.pfc"/>
-					<F N="pfc/t/sanity_base/bc_02.pfc"/>
-					<F N="pfc/t/sanity_base/conan_01.pfc.pl"/>
-					<F N="pfc/t/sanity_base/df_01.pfc"/>
-					<F N="pfc/t/sanity_base/df_02.pfc"/>
-					<F N="pfc/t/sanity_base/df_03.pfc"/>
-					<F N="pfc/t/sanity_base/df_04.pfc"/>
-					<F N="pfc/t/sanity_base/df_05.pfc"/>
-					<F N="pfc/t/sanity_base/df_06.pfc"/>
-					<F N="pfc/t/sanity_base/df_include.pfc"/>
-					<F N="pfc/t/sanity_base/df_include.pi"/>
-					<F N="pfc/t/sanity_base/df_include_1.pfc"/>
-					<F N="pfc/t/sanity_base/dl_01.pfc"/>
-					<F N="pfc/t/sanity_base/dmost_01.pfc"/>
-					<F N="pfc/t/sanity_base/dmost_02.pfc"/>
-					<F N="pfc/t/sanity_base/fc_01.pfc"/>
-					<F N="pfc/t/sanity_base/fc_02.pfc"/>
-					<F N="pfc/t/sanity_base/fc_03.pfc"/>
-					<F N="pfc/t/sanity_base/fc_03a.pfc"/>
-					<F N="pfc/t/sanity_base/fc_04.pfc"/>
-					<F N="pfc/t/sanity_base/fc_04_user.pfc"/>
-					<F N="pfc/t/sanity_base/fc_05.pfc"/>
-					<F N="pfc/t/sanity_base/fc_06.pfc"/>
-					<F N="pfc/t/sanity_base/fc_07.pfc"/>
-					<F N="pfc/t/sanity_base/fc_08.pfc"/>
-					<F N="pfc/t/sanity_base/fc_09.pfc"/>
-					<F N="pfc/t/sanity_base/fc_10.pfc"/>
-					<F N="pfc/t/sanity_base/fc_11.pfc"/>
-					<F N="pfc/t/sanity_base/fc_12.pfc"/>
-					<F N="pfc/t/sanity_base/file_01.pfc"/>
-					<F N="pfc/t/sanity_base/file_02.pfc"/>
-					<F N="pfc/t/sanity_base/file_03.pfc"/>
-					<F N="pfc/t/sanity_base/hard_mt_04a.pfc"/>
-					<F N="pfc/t/sanity_base/if_missing_01.pfc"/>
-					<F N="pfc/t/sanity_base/if_missing_01a.pfc"/>
-					<F N="pfc/t/sanity_base/if_missing_02.pfc"/>
-					<F N="pfc/t/sanity_base/if_missing_03.pfc"/>
-					<F N="pfc/t/sanity_base/if_missing_04.pfc"/>
-					<F N="pfc/t/sanity_base/if_missing_05.pfc"/>
-					<F N="pfc/t/sanity_base/mpred_pfc_test_01.pl"/>
-					<F N="pfc/t/sanity_base/mpred_pfc_test_02.pl"/>
-					<F N="pfc/t/sanity_base/mpred_pfc_test_03.pl"/>
-					<F N="pfc/t/sanity_base/mpred_pfc_test_04.pl"/>
-					<F N="pfc/t/sanity_base/mt_01.pl"/>
-					<F N="pfc/t/sanity_base/mt_01a.pl"/>
-					<F N="pfc/t/sanity_base/mt_01b.pl"/>
-					<F N="pfc/t/sanity_base/mt_01c.pl"/>
-					<F N="pfc/t/sanity_base/mt_01d.pl"/>
-					<F N="pfc/t/sanity_base/mt_01e.pl"/>
-					<F N="pfc/t/sanity_base/mt_02.pl"/>
-					<F N="pfc/t/sanity_base/mt_02a_03.pfc"/>
-					<F N="pfc/t/sanity_base/mt_03.pl"/>
-					<F N="pfc/t/sanity_base/mt_04.pl"/>
-					<F N="pfc/t/sanity_base/mt_05.pl"/>
-					<F N="pfc/t/sanity_base/mt_06.pl"/>
-					<F N="pfc/t/sanity_base/mt_06_a.pfc"/>
-					<F N="pfc/t/sanity_base/mt_07.pl"/>
-					<F N="pfc/t/sanity_base/mt_09.pl"/>
-					<F N="pfc/t/sanity_base/nd_01.pl"/>
-					<F N="pfc/t/sanity_base/nd_02.pfc"/>
-					<F N="pfc/t/sanity_base/nd_02a.pfc"/>
-					<F N="pfc/t/sanity_base/nd_03.pfc"/>
-					<F N="pfc/t/sanity_base/nd_04.pfc"/>
-					<F N="pfc/t/sanity_base/nd_05.pfc"/>
-					<F N="pfc/t/sanity_base/nd_06.pfc"/>
-					<F N="pfc/t/sanity_base/nd_07.pfc"/>
-					<F N="pfc/t/sanity_base/nd_08.pfc"/>
-					<F N="pfc/t/sanity_base/nd_09_rule.pfc"/>
-					<F N="pfc/t/sanity_base/pl_01.pfc"/>
-					<F N="pfc/t/sanity_base/shift_01.pl"/>
-					<F N="pfc/t/sanity_base/shift_02.pl"/>
-					<F N="pfc/t/sanity_base/test_prolog.sh"/>
-					<F N="pfc/t/sanity_base/unrelated.pl"/>
-					<F N="pfc/t/sanity_base/y_p_x.pfc"/>
-					<F N="pfc/t/sanity_base/y_p_x_16.pfc"/>
-					<F N="pfc/t/sanity_base/y_p_x_bwc.pfc"/>
-					<F N="pfc/t/sanity_base/y_p_x_bwc_t.pfc"/>
+					<F
+						N="pfc/t/sanity_base/*.*"
+						Recurse="1"
+						Refilter="0"
+						Excludes=""/>
 				</Folder>
 				<F N="pfc/t/try_logicmoo_examples.pl"/>
 			</Folder>
@@ -7868,5 +7782,6 @@
 			</Folder>
 		</Folder>
 		<F N="bump_packs.sh"/>
+		<F N="file_hybrid_01a.pfc"/>
 	</Files>
 </Project>
