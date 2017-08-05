@@ -7985,6 +7985,7 @@
 					<F N="logicmoo_nlu/prolog/e2c/sublisp-cl.lisp"/>
 					<F N="logicmoo_nlu/prolog/e2c/trace.lisp"/>
 				</Folder>
+				
 				<Folder Name="Parser_SUPPLE">
 					<Folder Name="classes">
 						<Folder Name="shef">
