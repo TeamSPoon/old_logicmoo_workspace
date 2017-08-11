@@ -4337,6 +4337,13 @@
 				Refilter="1"
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
+		<Folder Name="financial-planning">
+			<F
+				N="financial-planning/prolog/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>		
 		<Folder Name="ref_unused">
 			<Folder Name="notatroot">
 				<F N="ref_unused/notatroot/pack.pl"/>

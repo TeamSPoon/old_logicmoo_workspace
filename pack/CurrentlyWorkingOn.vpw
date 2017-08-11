@@ -3,4 +3,5 @@
 	<Projects>
 		<Project File="CurrentlyWorkingOn.vpj"/>
 	</Projects>
+	<Environment/>
 </Workspace>
