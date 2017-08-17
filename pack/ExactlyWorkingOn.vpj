@@ -1,0 +1,350 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+	Version="10.0"
+	VendorName="SlickEdit"
+	WorkingDir=".">
+	<Config
+		Name="Release"
+		OutputFile=""
+		CompilerConfigName="Latest Version">
+		<Menu>
+			<Target
+				Name="Compile"
+				MenuCaption="&amp;Compile"
+				CaptureOutputWith="ProcessBuffer"
+				ShowOnMenu="Never"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec CmdLine='npasm %in -elf -o TeamSPoon @"%lf"'/>
+			</Target>
+			<Target
+				Name="Build"
+				MenuCaption="&amp;Build"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" make "%w" "%r" -cppmake'/>
+			</Target>
+			<Target
+				Name="Rebuild"
+				MenuCaption="&amp;Rebuild"
+				CaptureOutputWith="ProcessBuffer"
+				ShowOnMenu="Never"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Debug"
+				MenuCaption="&amp;Debug"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec CmdLine="npscope"/>
+			</Target>
+			<Target
+				Name="Execute"
+				MenuCaption="E&amp;xecute"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec CmdLine=""/>
+			</Target>
+			<Target
+				Name="Generate Test Case"
+				MenuCaption="&amp;Generate Test Case"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw">
+				<Exec CmdLine='nptest -f "%f"'/>
+			</Target>
+			<Target
+				Name="Profile"
+				MenuCaption="&amp;Profile"
+				RunFromDir="%rw">
+				<Exec CmdLine="npprofile.bat"/>
+			</Target>
+			<Target
+				Name="Syntax Check"
+				MenuCaption="&amp;Syntax Check"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw">
+				<Exec CmdLine='npasm %in "%f"'/>
+			</Target>
+			<Target
+				Name="Link"
+				MenuCaption="&amp;Link"
+				ShowOnMenu="Never"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw"/>
+		</Menu>
+	</Config>
+	<Config
+		Name="Debug"
+		OutputFile=""
+		CompilerConfigName="Latest Version">
+		<Menu>
+			<Target
+				Name="Compile"
+				MenuCaption="&amp;Compile"
+				CaptureOutputWith="ProcessBuffer"
+				ShowOnMenu="Never"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec CmdLine='npasm %in -elf -l -g -o TeamSPoon @"%lf"'/>
+			</Target>
+			<Target
+				Name="Build"
+				MenuCaption="&amp;Build"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" make "%w" "%r" -cppmake'/>
+			</Target>
+			<Target
+				Name="Rebuild"
+				MenuCaption="&amp;Rebuild"
+				CaptureOutputWith="ProcessBuffer"
+				ShowOnMenu="Never"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Debug"
+				MenuCaption="&amp;Debug"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec CmdLine="npscope"/>
+			</Target>
+			<Target
+				Name="Execute"
+				MenuCaption="E&amp;xecute"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec CmdLine=""/>
+			</Target>
+			<Target
+				Name="Generate Test Case"
+				MenuCaption="&amp;Generate Test Case"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw">
+				<Exec CmdLine='nptest -f "%f"'/>
+			</Target>
+			<Target
+				Name="Profile"
+				MenuCaption="&amp;Profile"
+				RunFromDir="%rw">
+				<Exec CmdLine="npprofile.bat"/>
+			</Target>
+			<Target
+				Name="Syntax Check"
+				MenuCaption="&amp;Syntax Check"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw">
+				<Exec CmdLine='npasm %in "%f"'/>
+			</Target>
+			<Target
+				Name="Link"
+				MenuCaption="&amp;Link"
+				ShowOnMenu="Never"
+				CaptureOutputWith="ProcessBuffer"
+				RunFromDir="%rw"/>
+		</Menu>
+	</Config>
+	<CustomFolders>
+		<Folder
+			Name="Source Files"
+			Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl">
+		</Folder>
+		<Folder
+			Name="Header Files"
+			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
+		</Folder>
+		<Folder
+			Name="Resource Files"
+			Filters="*.ico;*.cur;*.dlg"/>
+		<Folder
+			Name="Bitmaps"
+			Filters="*.bmp"/>
+		<Folder
+			Name="Other Files"
+			Filters="">
+		</Folder>
+	</CustomFolders>
+	<Files AutoFolders="DirectoryView">
+		<Folder Name="clause_attvars">
+			<F
+				N="clause_attvars/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="dictoo">
+			<F
+				N="dictoo/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="each_call_cleanup">
+			<F
+				N="each_call_cleanup/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="eggdrop">
+			<F
+				N="eggdrop/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="file_scope">
+			<F
+				N="file_scope/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="gvar_syntax">
+			<F
+				N="gvar_syntax/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="hilog">
+			<F
+				N="hilog/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="hook_hybrid">
+			<F
+				N="hook_hybrid/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="instant_prolog_docs">
+			<F
+				N="instant_prolog_docs/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="lib_atts">
+			<F
+				N="lib_atts/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="logicmoo_base">
+			<F
+				N="logicmoo_base/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes=".HIDE~/,pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="logicmoo_utils">
+			<F
+				N="logicmoo_utils/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="loop_check">
+			<F
+				N="loop_check/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="multimodal_dcg">
+			<F
+				N="multimodal_dcg/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="multivar">
+			<F
+				N="multivar/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="must_trace">
+			<F
+				N="must_trace/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="no_repeats">
+			<F
+				N="no_repeats/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="pfc">
+			<F
+				N="pfc/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="predicate_streams">
+			<F
+				N="predicate_streams/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="s_expression">
+			<F
+				N="s_expression/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="subclause_expansion">
+			<F
+				N="subclause_expansion/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="with_open_options">
+			<F
+				N="with_open_options/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="with_thread_local">
+			<F
+				N="with_thread_local/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="xlisting">
+			<F
+				N="xlisting/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="xlisting_web">
+			<F
+				N="xlisting_web/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<F N="project_files.pl"/>
+	</Files>
+</Project>
