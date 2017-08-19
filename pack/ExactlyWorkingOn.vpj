@@ -170,180 +170,732 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
+		<Folder Name="aleph">
+			<Folder Name="prolog">
+				<Folder Name="examples">
+					<Folder Name="abduce">
+						<F N="aleph/prolog/examples/abduce/gp.b"/>
+						<F N="aleph/prolog/examples/abduce/gp.f"/>
+						<F N="aleph/prolog/examples/abduce/gp.n"/>
+						<F N="aleph/prolog/examples/abduce/typescript"/>
+					</Folder>
+					<Folder Name="constraints">
+						<F N="aleph/prolog/examples/constraints/fam.b"/>
+						<F N="aleph/prolog/examples/constraints/typescript"/>
+					</Folder>
+					<Folder Name="features">
+						<F N="aleph/prolog/examples/features/train.b"/>
+						<F N="aleph/prolog/examples/features/train.f"/>
+						<F N="aleph/prolog/examples/features/train.n"/>
+						<F N="aleph/prolog/examples/features/typescript"/>
+					</Folder>
+					<Folder Name="gcws">
+						<F N="aleph/prolog/examples/gcws/cal.b"/>
+						<F N="aleph/prolog/examples/gcws/cal.f"/>
+						<F N="aleph/prolog/examples/gcws/cal.n"/>
+						<F N="aleph/prolog/examples/gcws/typescript"/>
+					</Folder>
+					<Folder Name="good">
+						<F N="aleph/prolog/examples/good/train.b"/>
+						<F N="aleph/prolog/examples/good/train.f"/>
+						<F N="aleph/prolog/examples/good/train.n"/>
+						<F N="aleph/prolog/examples/good/typescript"/>
+					</Folder>
+					<Folder Name="interactive">
+						<F N="aleph/prolog/examples/interactive/animals.b"/>
+						<F N="aleph/prolog/examples/interactive/animals.f"/>
+						<F N="aleph/prolog/examples/interactive/mem.b"/>
+						<F N="aleph/prolog/examples/interactive/typescript"/>
+					</Folder>
+					<Folder Name="modes">
+						<F N="aleph/prolog/examples/modes/train.b"/>
+						<F N="aleph/prolog/examples/modes/train.f"/>
+						<F N="aleph/prolog/examples/modes/train.n"/>
+						<F N="aleph/prolog/examples/modes/typescript"/>
+					</Folder>
+					<Folder Name="numbers">
+						<F N="aleph/prolog/examples/numbers/guess.b"/>
+						<F N="aleph/prolog/examples/numbers/guess.f"/>
+						<F N="aleph/prolog/examples/numbers/guess.n"/>
+						<F N="aleph/prolog/examples/numbers/ineq.b"/>
+						<F N="aleph/prolog/examples/numbers/ineq.f"/>
+						<F N="aleph/prolog/examples/numbers/ineq.n"/>
+						<F N="aleph/prolog/examples/numbers/line.b"/>
+						<F N="aleph/prolog/examples/numbers/line.f"/>
+						<F N="aleph/prolog/examples/numbers/line.n"/>
+						<F N="aleph/prolog/examples/numbers/miline.b"/>
+						<F N="aleph/prolog/examples/numbers/miline.f"/>
+						<F N="aleph/prolog/examples/numbers/miline.n"/>
+						<F N="aleph/prolog/examples/numbers/mut.b"/>
+						<F N="aleph/prolog/examples/numbers/typescript"/>
+					</Folder>
+					<Folder Name="portray">
+						<F N="aleph/prolog/examples/portray/portray_hypothesis.pl"/>
+						<F N="aleph/prolog/examples/portray/portray_literals.pl"/>
+						<F N="aleph/prolog/examples/portray/portray_search.pl"/>
+						<F N="aleph/prolog/examples/portray/train.b"/>
+						<F N="aleph/prolog/examples/portray/train.f"/>
+						<F N="aleph/prolog/examples/portray/train.n"/>
+						<F N="aleph/prolog/examples/portray/typescript"/>
+					</Folder>
+					<Folder Name="posonly">
+						<F N="aleph/prolog/examples/posonly/animals.b"/>
+						<F N="aleph/prolog/examples/posonly/animals.f"/>
+						<F N="aleph/prolog/examples/posonly/typescript"/>
+					</Folder>
+					<Folder Name="recursion">
+						<F N="aleph/prolog/examples/recursion/mem.b"/>
+						<F N="aleph/prolog/examples/recursion/mem.f"/>
+						<F N="aleph/prolog/examples/recursion/mem.n"/>
+						<F N="aleph/prolog/examples/recursion/typescript"/>
+					</Folder>
+					<Folder Name="refine">
+						<F N="aleph/prolog/examples/refine/train.b"/>
+						<F N="aleph/prolog/examples/refine/train.f"/>
+						<F N="aleph/prolog/examples/refine/train.n"/>
+						<F N="aleph/prolog/examples/refine/typescript"/>
+					</Folder>
+					<Folder Name="trains">
+						<F N="aleph/prolog/examples/trains/train.b"/>
+						<F N="aleph/prolog/examples/trains/train.f"/>
+						<F N="aleph/prolog/examples/trains/train.n"/>
+						<F N="aleph/prolog/examples/trains/trains.eps"/>
+						<F N="aleph/prolog/examples/trains/trains.jpg"/>
+						<F N="aleph/prolog/examples/trains/typescript"/>
+					</Folder>
+					<Folder Name="tree">
+						<F N="aleph/prolog/examples/tree/animals.b"/>
+						<F N="aleph/prolog/examples/tree/animals.f"/>
+						<F N="aleph/prolog/examples/tree/typescript"/>
+						<F N="aleph/prolog/examples/tree/weather.b"/>
+						<F N="aleph/prolog/examples/tree/weather.f"/>
+						<F N="aleph/prolog/examples/tree/wedge.b"/>
+						<F N="aleph/prolog/examples/tree/wedge.f"/>
+					</Folder>
+					<F N="aleph/prolog/examples/readme"/>
+				</Folder>
+				<F N="aleph/prolog/aleph.pl"/>
+				<F N="aleph/prolog/aleph.pl.dmiles"/>
+				<F N="aleph/prolog/aleph_orig.pl"/>
+			</Folder>
+		</Folder>
+		<Folder Name="ccprism">
+			<Folder Name="prolog">
+				<Folder Name="ccprism">
+					<F N="ccprism/prolog/ccprism/autodiff2.pl"/>
+					<F N="ccprism/prolog/ccprism/display.pl"/>
+					<F N="ccprism/prolog/ccprism/effects.pl"/>
+					<F N="ccprism/prolog/ccprism/graph.pl"/>
+					<F N="ccprism/prolog/ccprism/handlers.pl"/>
+					<F N="ccprism/prolog/ccprism/kbest.pl"/>
+					<F N="ccprism/prolog/ccprism/lazymath.pl"/>
+					<F N="ccprism/prolog/ccprism/learn.pl"/>
+					<F N="ccprism/prolog/ccprism/machines.pl"/>
+					<F N="ccprism/prolog/ccprism/macros.pl"/>
+					<F N="ccprism/prolog/ccprism/mcmc.pl"/>
+					<F N="ccprism/prolog/ccprism/switches.pl"/>
+				</Folder>
+				<F N="ccprism/prolog/autodiff2.pl"/>
+				<F N="ccprism/prolog/ccprism.pl"/>
+			</Folder>
+		</Folder>
+		<Folder Name="ciao">
+			<Folder Name="prolog">
+				<Folder Name="dialect">
+					<Folder Name="ciao">
+						<Folder Name="engine">
+							<F N="ciao/prolog/dialect/ciao/engine/attributes.pl"/>
+							<F N="ciao/prolog/dialect/ciao/engine/basic_props.pl"/>
+							<F N="ciao/prolog/dialect/ciao/engine/basiccontrol.pl"/>
+							<F N="ciao/prolog/dialect/ciao/engine/exceptions.pl"/>
+							<F N="ciao/prolog/dialect/ciao/engine/exceptions_db.pl"/>
+							<F N="ciao/prolog/dialect/ciao/engine/hiord_rt.pl"/>
+							<F N="ciao/prolog/dialect/ciao/engine/internals.pl"/>
+							<F N="ciao/prolog/dialect/ciao/engine/io_aux.pl"/>
+						</Folder>
+						<Folder Name="regtypes">
+							<F N="ciao/prolog/dialect/ciao/regtypes/regtypes_tr.pl"/>
+						</Folder>
+						<F N="ciao/prolog/dialect/ciao/aggregates.pl"/>
+						<F N="ciao/prolog/dialect/ciao/assertions.pl"/>
+						<F N="ciao/prolog/dialect/ciao/basicmodes.pl"/>
+						<F N="ciao/prolog/dialect/ciao/classic.pl"/>
+						<F N="ciao/prolog/dialect/ciao/dcg.pl"/>
+						<F N="ciao/prolog/dialect/ciao/file_utils.pl"/>
+						<F N="ciao/prolog/dialect/ciao/format.pl"/>
+						<F N="ciao/prolog/dialect/ciao/freeze.pl"/>
+						<F N="ciao/prolog/dialect/ciao/hiord.pl"/>
+						<F N="ciao/prolog/dialect/ciao/hiordlib.pl"/>
+						<F N="ciao/prolog/dialect/ciao/iso_misc.pl"/>
+						<F N="ciao/prolog/dialect/ciao/isomodes.pl"/>
+						<F N="ciao/prolog/dialect/ciao/lists.pl"/>
+						<F N="ciao/prolog/dialect/ciao/llists.pl"/>
+						<F N="ciao/prolog/dialect/ciao/nativeprops.pl"/>
+						<F N="ciao/prolog/dialect/ciao/nortchecks.pl"/>
+						<F N="ciao/prolog/dialect/ciao/odd.pl"/>
+						<F N="ciao/prolog/dialect/ciao/prolog_flags.pl"/>
+						<F N="ciao/prolog/dialect/ciao/read.pl"/>
+						<F N="ciao/prolog/dialect/ciao/regtypes.pl"/>
+						<F N="ciao/prolog/dialect/ciao/sockets.pl"/>
+						<F N="ciao/prolog/dialect/ciao/sort.pl"/>
+						<F N="ciao/prolog/dialect/ciao/streams.pl"/>
+						<F N="ciao/prolog/dialect/ciao/strings.pl"/>
+						<F N="ciao/prolog/dialect/ciao/system.pl"/>
+						<F N="ciao/prolog/dialect/ciao/terms.pl"/>
+						<F N="ciao/prolog/dialect/ciao/terms_check.pl"/>
+						<F N="ciao/prolog/dialect/ciao/terms_vars.pl"/>
+						<F N="ciao/prolog/dialect/ciao/unittestdecls.pl"/>
+						<F N="ciao/prolog/dialect/ciao/unittestprops.pl"/>
+						<F N="ciao/prolog/dialect/ciao/write.pl"/>
+					</Folder>
+					<F N="ciao/prolog/dialect/ciao.pl"/>
+				</Folder>
+			</Folder>
+			<F N="ciao/pack.pl"/>
+			<F N="ciao/README.md"/>
+		</Folder>
 		<Folder Name="clause_attvars">
 			<F
 				N="clause_attvars/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="dictoo">
 			<F
 				N="dictoo/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="each_call_cleanup">
 			<F
 				N="each_call_cleanup/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="eggdrop">
 			<F
 				N="eggdrop/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="file_scope">
 			<F
 				N="file_scope/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="gvar_syntax">
 			<F
 				N="gvar_syntax/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="hilog">
 			<F
 				N="hilog/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="hook_hybrid">
 			<F
 				N="hook_hybrid/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="instant_prolog_docs">
 			<F
 				N="instant_prolog_docs/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="lib_atts">
 			<F
 				N="lib_atts/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="logicmoo_base">
 			<F
 				N="logicmoo_base/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes=".HIDE~/,pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="logicmoo_nlu">
+			<Folder Name="prolog">
+				<Folder Name="AceRules">
+					<Folder Name="engine">
+						<Folder Name="court_interpreter">
+							<F N="logicmoo_nlu/prolog/AceRules/engine/court_interpreter/answerset_generator.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/court_interpreter/court_interpreter.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/court_interpreter/cycle_checker.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/court_interpreter/eliminate_small_cycles.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/court_interpreter/transform_naf.pl"/>
+						</Folder>
+						<Folder Name="parser">
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/check_grouping.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/collect_templates.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/condense_drs.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/double_implication.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/drs_checker.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/generate_drs.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/group_predicates.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/meta_preprocess.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/parser.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/priority_handler.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/rule_creator.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/parser/skolemize_drs.pl"/>
+						</Folder>
+						<Folder Name="skolemizer">
+							<F N="logicmoo_nlu/prolog/AceRules/engine/skolemizer/skolemizer.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/skolemizer/unskolemizer.pl"/>
+						</Folder>
+						<Folder Name="stable_interpreter">
+							<F N="logicmoo_nlu/prolog/AceRules/engine/stable_interpreter/atom_map.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/stable_interpreter/get_stable_models.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/stable_interpreter/poor_to_rich.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/stable_interpreter/rich_to_poor.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/stable_interpreter/stable_checker.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/stable_interpreter/stable_interpreter.pl"/>
+						</Folder>
+						<Folder Name="verbalizer">
+							<F N="logicmoo_nlu/prolog/AceRules/engine/verbalizer/attach_var_lists.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/verbalizer/clean_propernames.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/verbalizer/drs_generator.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/verbalizer/expand_drs.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/verbalizer/verbalizer.pl"/>
+						</Folder>
+						<Folder Name="webservice">
+							<F N="logicmoo_nlu/prolog/AceRules/engine/webservice/acerules_server.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/webservice/get_results.pl"/>
+							<F N="logicmoo_nlu/prolog/AceRules/engine/webservice/soap_utils.pl"/>
+						</Folder>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/acerules_processor.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/debug_output.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/ground_rules.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/list_utils.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/logger.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/op_defs.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/parameters.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/rule_ops.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/run_acerules.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/run_testcases.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/simple_rules.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/ulex_handler.pl"/>
+						<F N="logicmoo_nlu/prolog/AceRules/engine/utils.pl"/>
+					</Folder>
+				</Folder>
+				<Folder Name="candc">
+					<Folder Name="src">
+						<Folder Name="data">
+							<Folder Name="italian">
+								<Folder Name="prolog">
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/binarise.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/ccg.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/idioms.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/pp.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/printCCG.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/printError.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/printTree.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/printTUT.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/slashes.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/data/italian/prolog/tut2ccg.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="vpe">
+								<F N="logicmoo_nlu/prolog/candc/src/data/vpe/annotate.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/data/vpe/antecedent.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/data/vpe/eval.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/data/vpe/transform.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/data/vpe/type.pl"/>
+							</Folder>
+						</Folder>
+						<Folder Name="prolog">
+							<Folder Name="boxer">
+								<Folder Name="knowledge">
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/amrmfs.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/antecedent.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/dates.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/nationality.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/ne.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/negprefix.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/negsuffix.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/ontology.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/punctuation.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/relations.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/role91.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/roles.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/title.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/verbalization-list-v1.01.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/knowledge/wiki.pl"/>
+								</Folder>
+								<Folder Name="lex">
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/lex/determiners.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/lex/framenet.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/lex/n.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/lex/pp.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/lex/tense.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/lex/verbnet.pl"/>
+									<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/lex/verbs.pl"/>
+								</Folder>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/alphaConversionDRT.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/betaConversionDRT.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/bindingViolation.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/boxer.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/categories.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/ccg2drs.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/closure.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/coordination.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/drs2fdrs.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/drs2xml.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/evaluation.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/freeVarCheck.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/input.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/lexicon.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/mergeDRT.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/morpha.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/noncomp.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/output.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/ppDrs.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/presupDRT.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/printCCG.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/printDrs.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/relation.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/resolveDRT.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/sdrt.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/slashes.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/sortalCheck.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/string2digit.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/transform.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/tuples.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/typechange.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/version.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/vpe.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/xdrs2html.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/boxer/xdrs2xml.pl"/>
+							</Folder>
+							<Folder Name="lib">
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/abbreviations.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/der.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/der2tex.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/drs2amr.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/drs2fol.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/drs2tacitus.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/drs2tex.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/errors.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/gen-wordnet.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/lex2tex.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/options.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/pdrs2drs.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/semlex.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/verbnet2boxer.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/verbnet2gmb.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/verbnet2patterns.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/lib/verbnet2prolog.pl"/>
+							</Folder>
+							<Folder Name="nutcracker">
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/axioms.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/callInference.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/counting.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/eDRT.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/estimate.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/fol2bliksem.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/fol2otter.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/fol2tptp.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/input.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/interfaceTPandMB.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/miniFrameNet.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/miniWordNet.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/ntokkie.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/nutcracker.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/para.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/startTPandMB.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/tokkie.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/prolog/nutcracker/version.pl"/>
+							</Folder>
+						</Folder>
+						<Folder Name="scripts">
+							<Folder Name="ccg">
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/ccg/compare_deps.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/ccg/convert_jdeps.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/ccg/evaluateDeps.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/ccg/evaluateDepsCCGbank.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/ccg/evaluateTagger.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/ccg/evaluateTaggerKbest.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/ccg/merge_rcounts.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/ccg/partial_deps.pl"/>
+							</Folder>
+							<Folder Name="memex">
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/memex/conll2system.pl"/>
+								<F N="logicmoo_nlu/prolog/candc/src/scripts/memex/system2conll.pl"/>
+							</Folder>
+						</Folder>
+					</Folder>
+					<F N="logicmoo_nlu/prolog/candc/copy_parser_boxer.pl"/>
+					<F N="logicmoo_nlu/prolog/candc/parser_boxer.pl"/>
+				</Folder>
+				<Folder Name="CURT">
+					<Folder Name="bb0">
+						<F N="logicmoo_nlu/prolog/CURT/bb0/acceptabilityConstraints.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/acDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/alphaConversion.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/alphaConversion2.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/anldp.exe"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/auxlib.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/babyCurt.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/betaConversion.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/betaConversion2.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/betaConversion3.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/betaConversionTestSuite.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/bindingDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/callInference.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/callModelBuilder.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/callTheoremProver.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/cleverCurt.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/clientBliksem.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/clientCurt.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/clientMace.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/clientOtter.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/cnf.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/cnfTestSuite.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/comsemOperators.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/comsemPredicates.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/cooperStorage.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/curtDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/curtServer.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/discourseGrammar.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/discourseTestSuite.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/drs2fol.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/drsPredicates.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/drsTools.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/englishGrammar.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/englishLexicon.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/exampleModels.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/experiment1.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/experiment2.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/experiment3-1.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/experiment3.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/fol2bliksem.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/fol2otter.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/folTestSuite.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/freeVarTabl.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/holeSemantics.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/holeSemanticsDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/index.html"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/index2.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/kellerStorage.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/knowledgeableCurt.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/laconicCurt.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/lambda.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/lambdaDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/MACE.exe"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/mainPronounsDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/mainPronounsDRTfragment.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/mainPronounsDRTtrace.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/matchDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/modelChecker1.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/modelChecker2.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/modelCheckerDRT1.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/modelCheckerDRT2.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/modelCheckerTestSuite.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/modelCheckerTestSuiteDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/montague.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/otter-in"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/otter-out"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/otter.exe"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/pluggingAlgorithm.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/presupDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/presupScoreDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/printDrs.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/propResolution.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/propTableaux.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/propTableaux2.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/propTestSuite.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/readLine.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/resolvePresup.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/resolvePresupScore.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/semOntology.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/semOntology1.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/sensitiveCurt.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/sentenceTestSuite.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/startClientCurt.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/superCurt.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/threadingDRT.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/threadingDRT1.pl"/>
+						<F N="logicmoo_nlu/prolog/CURT/bb0/usrPredicates.pl"/>
+					</Folder>
+				</Folder>
+			</Folder>
+		</Folder>
+		<Folder Name="logicmoo_packages">
+			<F
+				N="logicmoo_packages/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="logicmoo_utils">
 			<F
 				N="logicmoo_utils/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="loop_check">
 			<F
 				N="loop_check/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="multimodal_dcg">
 			<F
 				N="multimodal_dcg/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="multivar">
 			<F
 				N="multivar/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="must_trace">
 			<F
 				N="must_trace/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="no_repeats">
 			<F
 				N="no_repeats/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="pfc">
 			<F
 				N="pfc/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="predicate_streams">
 			<F
 				N="predicate_streams/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="s_expression">
 			<F
 				N="s_expression/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="subclause_expansion">
 			<F
 				N="subclause_expansion/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="tabling_dra">
+			<Folder Name="prolog">
+				<F N="tabling_dra/prolog/assert_db_dra.pl"/>
+				<F N="tabling_dra/prolog/dra.pl"/>
+				<F N="tabling_dra/prolog/record_db_dra.pl"/>
+			</Folder>
+			<Folder Name="t">
+				<Folder Name="examples">
+					<Folder Name="LTL">
+						<F N="tabling_dra/t/examples/LTL/bwd_future_and_fail.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/bwd_future_and_fail_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/bwd_next_global.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/bwd_next_global_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/bwd_once_bitten.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/bwd_once_bitten_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/coind_example.pl"/>
+						<F N="tabling_dra/t/examples/LTL/coind_example.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/coind_example_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/consistency_checker.pl"/>
+						<F N="tabling_dra/t/examples/LTL/errors.pl"/>
+						<F N="tabling_dra/t/examples/LTL/errors.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/example.pl"/>
+						<F N="tabling_dra/t/examples/LTL/example.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/example2.pl"/>
+						<F N="tabling_dra/t/examples/LTL/example2.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/example2_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/example3.pl"/>
+						<F N="tabling_dra/t/examples/LTL/example3.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/example3_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/example4.pl"/>
+						<F N="tabling_dra/t/examples/LTL/example4.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/example4_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/example_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/looping_prefix.pl"/>
+						<F N="tabling_dra/t/examples/LTL/microwave.pl"/>
+						<F N="tabling_dra/t/examples/LTL/microwave.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/microwave2.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/microwave_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/normalize.pl"/>
+						<F N="tabling_dra/t/examples/LTL/operators.pl"/>
+						<F N="tabling_dra/t/examples/LTL/partition_graph.pl"/>
+						<F N="tabling_dra/t/examples/LTL/README"/>
+						<F N="tabling_dra/t/examples/LTL/simple.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/small_example.pl"/>
+						<F N="tabling_dra/t/examples/LTL/small_example.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/small_example_v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/two_loops.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/v.pl"/>
+						<F N="tabling_dra/t/examples/LTL/verifier.clp"/>
+						<F N="tabling_dra/t/examples/LTL/verifier.tlp"/>
+						<F N="tabling_dra/t/examples/LTL/verifier2.tlp"/>
+					</Folder>
+				</Folder>
+			</Folder>
 		</Folder>
 		<Folder Name="with_open_options">
 			<F
 				N="with_open_options/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="with_thread_local">
 			<F
 				N="with_thread_local/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="xlisting">
 			<F
 				N="xlisting/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="xlisting_web">
 			<F
 				N="xlisting_web/*.*"
 				Recurse="1"
 				Refilter="1"
-				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<F N="project_files.pl"/>
 	</Files>
