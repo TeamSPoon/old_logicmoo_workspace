@@ -1,7 +1,5 @@
 diff --git a/boot/attvar.pl b/boot/attvar.pl
-old mode 100644
-new mode 100755
-index aa5f29a..9b6a969
+index aa5f29a..9b6a969 100644
 --- a/boot/attvar.pl
 +++ b/boot/attvar.pl
 @@ -52,13 +52,27 @@ in pl-attvar.c
@@ -33,12 +31,10 @@ index aa5f29a..9b6a969
      uhook(Module, AttVal, Value),
      call_all_attr_uhooks(Rest, Value).
 diff --git a/boot/toplevel.pl b/boot/toplevel.pl
-old mode 100644
-new mode 100755
-index 511cb0e..61c5b54
+index cd6bcfe..6f3f901 100644
 --- a/boot/toplevel.pl
 +++ b/boot/toplevel.pl
-@@ -1004,6 +1004,7 @@ toplevel_call(Goal) :-
+@@ -1072,6 +1072,7 @@ toplevel_call(Goal) :-
      no_lco.
  
  no_lco.
@@ -46,139 +42,11 @@ index 511cb0e..61c5b54
  
  %!  write_bindings(+Bindings, +ResidueVars, +Deterministic) is semidet.
  %
-diff --git a/library/dif.pl b/library/dif.pl
-old mode 100644
-new mode 100755
-index 6001711..90abe1a
---- a/library/dif.pl
-+++ b/library/dif.pl
-@@ -36,7 +36,7 @@
-           [ dif/2                               % +Term1, +Term2
-           ]).
- :- use_module(library(lists)).
--:- set_prolog_flag(generate_debug_info, false).
-+:- set_prolog_flag(generate_debug_info, true).
- 
- /** <module> The dif/2 constraint
- */
-diff --git a/library/listing.pl b/library/listing.pl
-old mode 100644
-new mode 100755
-index c2e9910..c6a0fc16
---- a/library/listing.pl
-+++ b/library/listing.pl
-@@ -44,7 +44,7 @@
- :- use_module(library(settings)).
- :- use_module(library(option)).
- :- use_module(library(error)).
--:- set_prolog_flag(generate_debug_info, false).
-+:- set_prolog_flag(generate_debug_info, true).
- 
- :- module_transparent
-     listing/0.
-diff --git a/library/make.pl b/library/make.pl
-old mode 100644
-new mode 100755
-index d094a73..f60d3f9
---- a/library/make.pl
-+++ b/library/make.pl
-@@ -40,7 +40,7 @@
- :- use_module(library(lists)).
- :- use_module(library(option)).
- :- use_module(library(debug)).
--:- set_prolog_flag(generate_debug_info, false).
-+:- set_prolog_flag(generate_debug_info, true).
- 
- /** <module>  Reload modified source files
- 
-diff --git a/library/pure_input.pl b/library/pure_input.pl
-old mode 100644
-new mode 100755
-index 74ae795..59fe477
---- a/library/pure_input.pl
-+++ b/library/pure_input.pl
-@@ -45,7 +45,7 @@
-             lazy_list_character_count//1 % -CharacterCount
-           ]).
- :- use_module(library(error)).
--:- set_prolog_flag(generate_debug_info, false).
-+:- set_prolog_flag(generate_debug_info, true).
- 
- /** <module> Pure Input from files and streams
- 
-diff --git a/library/qsave.pl b/library/qsave.pl
-old mode 100644
-new mode 100755
-index 6836310..c8f8bb2
---- a/library/qsave.pl
-+++ b/library/qsave.pl
-@@ -70,7 +70,7 @@ also used by the commandline sequence below.
-                        emulator(atom)
-                      ]).
- 
--:- set_prolog_flag(generate_debug_info, false).
-+:- set_prolog_flag(generate_debug_info, true).
- 
- :- dynamic verbose/1.
- :- volatile verbose/1.                  % contains a stream-handle
-diff --git a/library/tabling.pl b/library/tabling.pl
-old mode 100644
-new mode 100755
-index 0877b0a..150e58e
---- a/library/tabling.pl
-+++ b/library/tabling.pl
-@@ -43,7 +43,7 @@
-             op(1150, fx, table)
-           ]).
- :- use_module(library(error)).
--:- set_prolog_flag(generate_debug_info, false).
-+:- set_prolog_flag(generate_debug_info, true).
- 
- :- meta_predicate
-     start_tabling(+, 0),
-diff --git a/library/when.pl b/library/when.pl
-old mode 100644
-new mode 100755
-index b7f2628..3584d22
---- a/library/when.pl
-+++ b/library/when.pl
-@@ -35,7 +35,7 @@
- :- module(when,
-           [ when/2                      % +Condition, :Goal
-           ]).
--:- set_prolog_flag(generate_debug_info, false).
-+:- set_prolog_flag(generate_debug_info, true).
- 
- :- meta_predicate
-     when(+, 0),
-diff --git a/library/writef.pl b/library/writef.pl
-old mode 100644
-new mode 100755
-index 655f1ba..0baad44
---- a/library/writef.pl
-+++ b/library/writef.pl
-@@ -39,7 +39,7 @@
-             swritef/2,                  % -String, +Format
-             swritef/3                   % -String, +Format, +Args
-           ]).
--:- set_prolog_flag(generate_debug_info, false).
-+:- set_prolog_flag(generate_debug_info, true).
- 
- /** <module> Old-style formatted write
- 
-diff --git a/packages/jpl b/packages/jpl
---- a/packages/jpl
-+++ b/packages/jpl
-@@ -1 +1 @@
--Subproject commit 60a83dcbd5393814ec7f3373311fc4029c6af07b
-+Subproject commit 60a83dcbd5393814ec7f3373311fc4029c6af07b-dirty
 diff --git a/src/ATOMS b/src/ATOMS
-old mode 100644
-new mode 100755
-index 56e8de3..ab648ae
+index 0e200d7..afbd5c4 100644
 --- a/src/ATOMS
 +++ b/src/ATOMS
-@@ -762,6 +762,7 @@ A var_prefix		"var_prefix"
+@@ -768,6 +768,7 @@ A var_prefix		"var_prefix"
  A variable		"variable"
  A variable_names	"variable_names"
  A variables		"variables"
@@ -186,21 +54,23 @@ index 56e8de3..ab648ae
  A very_deep		"very_deep"
  A vmi			"vmi"
  A volatile		"volatile"
-@@ -1054,3 +1055,7 @@ F warning		3
- F xor			2
- F xpceref		1
- F xpceref		2
-+F variant		3
+@@ -1062,6 +1063,9 @@ F undefinterc		4
+ F unify_determined	2
+ F uninstantiation_error	1
+ F var			1
 +F references		3
 +F unify		3
-+
++F variant		3
+ F wakeup		3
+ F warning		3
+ F write_errors		1
 diff --git a/src/pl-attvar.c b/src/pl-attvar.c
 old mode 100644
 new mode 100755
-index a95e3f2..d6d89a6
+index f570309..54ddd12
 --- a/src/pl-attvar.c
 +++ b/src/pl-attvar.c
-@@ -99,8 +99,8 @@ which must run in constant space.
+@@ -99,16 +99,15 @@ which must run in constant space.
  SHIFT-SAFE: Caller must ensure 6 global and 4 trail-cells
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
  
@@ -210,8 +80,8 @@ index a95e3f2..d6d89a6
 +registerWakeup(word functor, Word name, Word value ARG_LD)
  { Word wake;
    Word tail = valTermRef(LD->attvar.tail);
- 
-@@ -108,7 +108,7 @@ registerWakeup(Word name, Word value ARG_LD)
+-
+   assert(gTop+6 <= gMax && tTop+4 <= tMax);
  
    wake = gTop;
    gTop += 4;
@@ -220,8 +90,8 @@ index a95e3f2..d6d89a6
    wake[1] = needsRef(*name) ? makeRef(name) : *name;
    wake[2] = needsRef(*value) ? makeRef(value) : *value;
    wake[3] = ATOM_nil;
-@@ -170,20 +170,34 @@ assignAttVar(Word av, Word value ARG_LD)
- 	  Sdprintf("assignAttVar(%s)\n", var_name_ptr(av, buf));
+@@ -178,20 +177,30 @@ assignAttVar(Word av, Word value ARG_LD)
+ 		   print_addr(av, buf2));
  	});
  
 -  if ( isAttVar(*value) )
@@ -248,14 +118,10 @@ index a95e3f2..d6d89a6
    }
 +        return;
 +   }}
++ 
  
-+  if (both && value > av )
-+    {    assignAttVar(value, av PASS_LD);
-+      return;
-+  }
    a = valPAttVar(*av);
 -  registerWakeup(a, value PASS_LD);
-+
 +  registerWakeup(FUNCTOR_wakeup3, a, value PASS_LD);
  
    TrailAssignment(av);
@@ -264,7 +130,7 @@ index a95e3f2..d6d89a6
    { DEBUG(1, Sdprintf("Unifying two attvars\n"));
      *av = makeRef(value);
    } else
-@@ -316,7 +330,7 @@ list is invalid.
+@@ -324,7 +333,7 @@ list is invalid.
  Caller must ensure 4 cells space on global stack.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
  
@@ -273,9 +139,9 @@ index a95e3f2..d6d89a6
  find_attr(Word av, atom_t name, Word *vp ARG_LD)
  { Word l;
  
-@@ -1378,6 +1392,33 @@ PRED_IMPL("$call_residue_vars_end", 0, call_residue_vars_end, 0)
- #endif /*O_CALL_RESIDUE*/
+@@ -1389,6 +1398,33 @@ PRED_IMPL("$call_residue_vars_end", 0, call_residue_vars_end, 0)
  
+ #endif /*O_CALL_RESIDUE*/
  
 +/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 + attv_bind_trail(+AttVar, +Value, +NilOrTrail) is det.  
@@ -304,10 +170,10 @@ index a95e3f2..d6d89a6
 +  return TRUE;
 +}
 +
+ 
  		 /*******************************
  		 *	    REGISTRATION	*
- 		 *******************************/
-@@ -1398,6 +1439,7 @@ BeginPredDefs(attvar)
+@@ -1410,6 +1446,7 @@ BeginPredDefs(attvar)
    PRED_DEF("$call_residue_vars_start", 0, call_residue_vars_start, 0)
    PRED_DEF("$call_residue_vars_end", 0, call_residue_vars_end, 0)
  #endif
@@ -316,9 +182,7 @@ index a95e3f2..d6d89a6
  
  #endif /*O_ATTVAR*/
 diff --git a/src/pl-funcs.h b/src/pl-funcs.h
-old mode 100644
-new mode 100755
-index 4ce9295..81bd97c
+index eb5ffab..d54c314 100644
 --- a/src/pl-funcs.h
 +++ b/src/pl-funcs.h
 @@ -43,6 +43,8 @@ symbol lookup and relocations.
@@ -331,9 +195,7 @@ index 4ce9295..81bd97c
  COMMON(int)		saveWakeup(wakeup_state *state, int forceframe ARG_LD);
  COMMON(void)		restoreWakeup(wakeup_state *state ARG_LD);
 diff --git a/src/pl-variant.c b/src/pl-variant.c
-old mode 100644
-new mode 100755
-index 5526605..71ecdfd
+index 5526605..fc1d8ad 100644
 --- a/src/pl-variant.c
 +++ b/src/pl-variant.c
 @@ -204,6 +204,11 @@ reset_terms(node * r)
@@ -348,7 +210,7 @@ index 5526605..71ecdfd
  /* isomorphic (==) */
  
  static int
-@@ -239,6 +244,16 @@ isomorphic(argPairs *a, int i, int j, Buffer buf ARG_LD)
+@@ -239,6 +244,17 @@ isomorphic(argPairs *a, int i, int j, Buffer buf ARG_LD)
      wl = *l;
      wr = *r;
  
@@ -361,11 +223,12 @@ index 5526605..71ecdfd
 +      wl = *l;
 +      wr = *r;
 +    } else /*skip difference tests */
++
 +#endif
      if ( tag(wl) != tag(wr) )
        return FALSE;
  
-@@ -249,7 +264,21 @@ isomorphic(argPairs *a, int i, int j, Buffer buf ARG_LD)
+@@ -249,7 +265,21 @@ isomorphic(argPairs *a, int i, int j, Buffer buf ARG_LD)
      }
  
      if ( tag(wl) == TAG_ATTVAR )
@@ -388,24 +251,20 @@ index 5526605..71ecdfd
        r = valPAttVar(wr);
        goto attvar;
      }
-@@ -325,6 +354,16 @@ variant(argPairs *agenda, Buffer buf ARG_LD)
+@@ -325,6 +355,12 @@ variant(argPairs *agenda, Buffer buf ARG_LD)
     wl = *l;
     wr = *r;
  
-+
 +   if(tag(*r) == TAG_ATTVAR) 
 +   {
 +     Word swap0 = l;
-+     l = r;
-+     r = swap0;
-+
-+        wl = *l;
-+        wr = *r;
++     l = r; wl = *l;
++     r = swap0; wr = *r;         
 +   } else /*skip difference tests */
     if ( tag(wl) != tag(wr) )
       return FALSE;
  
-@@ -356,7 +395,20 @@ variant(argPairs *agenda, Buffer buf ARG_LD)
+@@ -356,7 +392,20 @@ variant(argPairs *agenda, Buffer buf ARG_LD)
      }
  
      if ( tag(wl) == TAG_ATTVAR )
@@ -427,7 +286,7 @@ index 5526605..71ecdfd
        r = valPAttVar(wr);
        goto attvar;
      }
-@@ -429,21 +481,45 @@ PRED_IMPL("=@=", 2, variant, 0)
+@@ -429,21 +478,41 @@ PRED_IMPL("=@=", 2, variant, 0)
    Word p2 = valTermRef(A2);
    node new = {NULL, 0, 0, 0};   /* dummy node as 0-th element*/
  
@@ -438,20 +297,16 @@ index 5526605..71ecdfd
  
    if ( *p1 == *p2 )                     /* same term */
      return TRUE;
-+
-+
 +  if(tag(*p2) == TAG_ATTVAR) 
 +  {
 +    Word swap0 = p2;
 +    p2 = p1;
 +    p1 = swap0;
 +  } else /*skip difference tests */
-+
    if ( tag(*p1) != tag(*p2) )           /* different type */
      return FALSE;
 -again:
-+
-+ //again:
++/*again: not gone to anymore*/
    switch(tag(*p1))                      /* quick tests */
    { case TAG_VAR:
        return TRUE;

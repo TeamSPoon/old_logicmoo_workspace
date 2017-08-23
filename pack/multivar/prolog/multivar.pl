@@ -42,6 +42,11 @@
 :- meta_predicate user:attvar_variant(0,0).
 :- use_module(library(option),[dict_options/2,option/2]).
 
+:- set_prolog_flag(access_level,system).
+:- set_prolog_flag(gc,false).
+
+% use_module(library(multivar)),call(multivar(X)),trace,X=2.
+
 mdwq(Q):- format(user_error,'~NMWQ: ~q~n',[Q]).
 
 :- meta_predicate mdwq_call(:).
@@ -56,12 +61,20 @@ mdwq_call(Q):- call(Q) *-> mdwq(success:Q); (mdwq(failed:Q),!,fail).
 'unify':attr_unify_hook(_,_).  % OR tracing with 'unify':attr_unify_hook(N,Var):- mdwq(meta_unify_hook(N,Var)).
 
 user:meta_unify(Var,Rest,Val):-
+    mv_add1(Var,Val),
     mdwq_call('$attvar':call_all_attr_uhooks(Rest, Val)),
 	mv_add1(Var,Val).
 
-multivar(Var):- put_attr(Var,unify,Var).
-is_mv(Var):- attvar(Var),get_attr(Var,unify,Var).
+% multivar(Var):- put_attr(Var,unify,Var).
+multivar(Var):- put_attr(Var,'$VAR$',Var).
+% is_mv(Var):- attvar(Var),get_attr(Var,unify,Waz),var(Waz).
+is_mv(Var):- attvar(Var),get_attr(Var,'$VAR$',Waz),var(Waz).
 
+% ==========================================
+% ATOM_dvard override TODO
+% ==========================================
+
+'$VAR$':attr_unify_hook(_,_).
 
 % ==========================================
 % Variant override TODO
@@ -69,6 +82,13 @@ is_mv(Var):- attvar(Var),get_attr(Var,unify,Var).
 
 'variant':attr_unify_hook(_,_).
 user:attvar_variant(N,Var):- (N==Var -> true ;  mdwq_call( \+ \+ =(N,Var) )).
+
+% ==========================================
+% reference override TODO
+% ==========================================
+
+'references':attr_unify_hook(_,_).
+user:attvar_references(N,Var):- (N==Var -> true ;  mdwq_call( \+ \+ =(N,Var) )).
 
 
 % ==========================================

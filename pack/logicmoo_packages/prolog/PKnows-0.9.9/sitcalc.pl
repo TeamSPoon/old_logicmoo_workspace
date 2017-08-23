@@ -68,7 +68,7 @@ make_cknows_fml(F,CK) :-
 adp_fluent(F,A,C) :-
     var(A), !,
     (bagof(Ft,adp_fluent_bagof(F,A,Ft),Fts) ->
-        joinlist((|),Fts,Ftmp),
+        joinlist(('|'),Fts,Ftmp),
         simplify(Ftmp,C)
     ;
         C=F
@@ -113,8 +113,8 @@ regression(F,A,Fr) :-
 regression(F,A,Fr) :-
     var(A),
     (bagof(Ft,B^regression_bagof(F,A,B,Ft),Fts) ->
-        joinlist((|),Fts,Ftmp),
-        simplify(Ftmp | ((A=nil) & F),Fr)
+        joinlist(('|'),Fts,Ftmp),
+        simplify((Ftmp | ((A=nil) & F)),Fr)
     ;
         Fr=F
     ).

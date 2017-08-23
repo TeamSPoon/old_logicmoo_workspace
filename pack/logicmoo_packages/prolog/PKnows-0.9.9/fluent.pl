@@ -179,11 +179,13 @@ contradictory(F1,F2) :-
     free_vars(F1,Vars1), member(V1,Vars1),
     free_vars(F2,Vars2), member(V2,Vars2),
     V1 == V2,
-    var_given_value(V1,F1,B), var_given_value(V2,F2,C),
+    really_var_given_value(V1,F1,B), 
+    really_var_given_value(V2,F2,C),
     (\+ unifiable(B,C,_)) -> true
     ;
     fail.
 
+really_var_given_value(A,B,C):- call(call,var_given_value(A,B,C)).
 %
 %  fml_compare  -  provide a standard order over formula terms
 %
@@ -230,7 +232,7 @@ ncontains_var(A,V:_) :-
 %  into a list (A,B,C,D,E).
 %
 
-:- index(flatten_op(0,1,0)).
+% :- index(flatten_op(0,1,0)).
 
 flatten_op(_,[],[]).
 flatten_op(O,[T|Ts],Res) :-
@@ -304,7 +306,7 @@ vdelete([H|T],E,Res) :-
         vdelete(T,E,T2)
     ).
 
-:- index(vdelete_list(0,1,0)).
+% :- index(vdelete_list(0,1,0)).
 
 vdelete_list(L,[],L).
 vdelete_list(L,[H|T],L2) :-
@@ -673,8 +675,10 @@ simplify1_disjunction_acc([F|FmlsIn],FmlsAcc,FmlsOut) :-
 %  must be lifted to outermost scope.
 %
 
-:- index(var_given_value(0,1,0,0)).
-:- index(var_given_value_list(0,1,0,0)).
+/*
+% :- index(var_given_value(0,1,0,0)).
+% :- index(var_given_value_list(0,1,0,0)).
+*/
 
 var_given_value(X,A=B,V,true) :-
     ( X == A ->
@@ -763,9 +767,9 @@ vgv_subtract_helper([V|Vs],X,Vs2) :-
 %                           inserted.
 %
 
-:- index(var_valuated(0,1,0)).
-:- index(var_valuated_list(0,1,0)).
-:- index(var_valuated_distribute(0,1,0,0)).
+% :- index(var_valuated(0,1,0)).
+% :- index(var_valuated_list(0,1,0)).
+% :- index(var_valuated_distribute(0,1,0,0)).
 
 % In the base case, X is given a single value throughout the entire formula.
 var_valuated(X,P,Q) :-

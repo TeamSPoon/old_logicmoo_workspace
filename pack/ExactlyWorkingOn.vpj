@@ -738,6 +738,9 @@
 			</Folder>
 		</Folder>
 		<Folder Name="logicmoo_packages">
+			<Folder Name="prolog">
+				<F N="logicmoo_packages/prolog/scheme_on_prolog.pl"/>
+			</Folder>
 			<F
 				N="logicmoo_packages/*.*"
 				Recurse="1"
