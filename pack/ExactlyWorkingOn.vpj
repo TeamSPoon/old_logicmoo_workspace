@@ -803,6 +803,203 @@
 				Refilter="1"
 				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
+		<Folder Name="prologmud">
+			<Folder Name="hMUD">
+				<Folder Name="bridge">
+					<F N="prologmud/hMUD/bridge/AnsiToHtml.hx"/>
+					<F N="prologmud/hMUD/bridge/compile.hxml"/>
+					<F N="prologmud/hMUD/bridge/hmud-bridge.swf"/>
+					<F N="prologmud/hMUD/bridge/HMUD_Bridge.hx"/>
+				</Folder>
+				<Folder Name="flashpolicyd_v0.6">
+					<Folder Name="Perl_xinetd">
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Perl_xinetd/flashpolicyd.xinet"/>
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Perl_xinetd/in.flashpolicyd.pl"/>
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Perl_xinetd/install.sh"/>
+					</Folder>
+					<Folder Name="Python_init">
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Python_init/flashpolicyd.init"/>
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Python_init/flashpolicyd.py"/>
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Python_init/install.sh"/>
+					</Folder>
+					<Folder Name="Python_xinetd">
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Python_xinetd/flashpolicyd.xinet"/>
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Python_xinetd/in.flashpolicyd.py"/>
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Python_xinetd/install.sh"/>
+					</Folder>
+					<Folder Name="Standalone">
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Standalone/flashpolicyd.pl"/>
+						<F N="prologmud/hMUD/flashpolicyd_v0.6/Standalone/flashpolicyd.py"/>
+					</Folder>
+					<F N="prologmud/hMUD/flashpolicyd_v0.6/flashpolicy.xml"/>
+					<F N="prologmud/hMUD/flashpolicyd_v0.6/README.txt"/>
+				</Folder>
+				<Folder Name="swfobject">
+					<Folder Name="src">
+						<F N="prologmud/hMUD/swfobject/src/expressInstall.as"/>
+						<F N="prologmud/hMUD/swfobject/src/expressInstall.fla"/>
+						<F N="prologmud/hMUD/swfobject/src/swfobject.js"/>
+					</Folder>
+					<F N="prologmud/hMUD/swfobject/expressInstall.swf"/>
+					<F N="prologmud/hMUD/swfobject/index.html"/>
+					<F N="prologmud/hMUD/swfobject/index_dynamic.html"/>
+					<F N="prologmud/hMUD/swfobject/swfobject.js"/>
+					<F N="prologmud/hMUD/swfobject/test.swf"/>
+				</Folder>
+				<F N="prologmud/hMUD/browser-detect.js"/>
+				<F N="prologmud/hMUD/Button-icon-off.gif"/>
+				<F N="prologmud/hMUD/Button-icon.gif"/>
+				<F N="prologmud/hMUD/client.js"/>
+				<F N="prologmud/hMUD/config.js"/>
+				<F N="prologmud/hMUD/cookies.js"/>
+				<F N="prologmud/hMUD/favicon.ico"/>
+				<F N="prologmud/hMUD/guide.js"/>
+				<F N="prologmud/hMUD/hmud.html"/>
+				<F N="prologmud/hMUD/index.html"/>
+				<F N="prologmud/hMUD/INSTALL"/>
+				<F N="prologmud/hMUD/LICENSE"/>
+				<F N="prologmud/hMUD/messages.en.js"/>
+				<F N="prologmud/hMUD/messages.js"/>
+				<F N="prologmud/hMUD/messages.pt.js"/>
+				<F N="prologmud/hMUD/policyd"/>
+				<F N="prologmud/hMUD/README"/>
+				<F N="prologmud/hMUD/Rune-icon.gif"/>
+				<F N="prologmud/hMUD/TODO"/>
+				<F N="prologmud/hMUD/Treasure-icon.gif"/>
+				<F N="prologmud/hMUD/ui.js"/>
+			</Folder>
+			<Folder Name="prolog">
+				<Folder Name="prologmud">
+					<Folder Name="actions">
+						<F N="prologmud/prolog/prologmud/actions/actions_conf.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/actions_db.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/any.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/as_agent.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/attack.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/chat.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/climb.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/create.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/drink.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/drop.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/eat.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/get_set.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/help.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/inventory.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/kiss.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/logon.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/look.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/move.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/planner.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/push.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/put_at.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/scansrc.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/showdebug.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/sit.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/stats.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/take.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/teleport.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/use.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/actions/where.pfc.pl"/>
+					</Folder>
+					<Folder Name="mobs">
+						<Folder Name="affordance">
+							<F N="prologmud/prolog/prologmud/mobs/affordance/improve.pfc.pl"/>
+							<F N="prologmud/prolog/prologmud/mobs/affordance/simbots.pfc.pl"/>
+						</Folder>
+						<F N="prologmud/prolog/prologmud/mobs/explorer.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/mobs_conf.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/monster.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/pddl_agent.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/predator.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/prey.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/mobs/vacuum.pfc.pl"/>
+					</Folder>
+					<Folder Name="objs">
+						<F N="prologmud/prolog/prologmud/objs/basic_objs.pfc.pl"/>
+					</Folder>
+					<Folder Name="parsing">
+						<F N="prologmud/prolog/prologmud/parsing/parser_imperative.pl"/>
+						<F N="prologmud/prolog/prologmud/parsing/simple_decl_parser.pl"/>
+					</Folder>
+					<Folder Name="server">
+						<F N="prologmud/prolog/prologmud/server/mud_http_hmud.pl"/>
+						<F N="prologmud/prolog/prologmud/server/mud_irc.pl"/>
+						<F N="prologmud/prolog/prologmud/server/mud_telnet.pl"/>
+						<F N="prologmud/prolog/prologmud/server/mud_testing.pl"/>
+					</Folder>
+					<Folder Name="vworld">
+						<F N="prologmud/prolog/prologmud/vworld/world.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_2d.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_agent.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_effects.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_events.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_npc.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_text.pfc.pl"/>
+						<F N="prologmud/prolog/prologmud/vworld/world_text_output.pfc.pl"/>
+					</Folder>
+					<F N="prologmud/prolog/prologmud/mud_builtin.pfc.pl"/>
+					<F N="prologmud/prolog/prologmud/mud_footer.pl"/>
+					<F N="prologmud/prolog/prologmud/mud_header.pl"/>
+					<F N="prologmud/prolog/prologmud/mud_loader.pl"/>
+					<F N="prologmud/prolog/prologmud/mud_startup.pl"/>
+				</Folder>
+				<Folder Name="prologmud_web">
+					<Folder Name="src_assets">
+						<F N="prologmud/prolog/prologmud_web/src_assets/README.txt"/>
+					</Folder>
+					<Folder Name="src_webui">
+						<Folder Name="assetsources">
+							<F N="prologmud/prolog/prologmud_web/src_webui/assetsources/favicon.png"/>
+							<F N="prologmud/prolog/prologmud_web/src_webui/assetsources/favicon.psd"/>
+						</Folder>
+						<Folder Name="http">
+							<Folder Name="web">
+								<Folder Name="css">
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/css/mudconsole.css"/>
+								</Folder>
+								<Folder Name="icons">
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/icons/favicon.ico"/>
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/icons/foo.png"/>
+								</Folder>
+								<Folder Name="js">
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/js/jquery-1.7.1.js"/>
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/js/jquery.form.js"/>
+									<F N="prologmud/prolog/prologmud_web/src_webui/http/web/js/mudconsole.js"/>
+								</Folder>
+							</Folder>
+							<F N="prologmud/prolog/prologmud_web/src_webui/http/user_page.pl"/>
+						</Folder>
+						<Folder Name="model">
+							<F N="prologmud/prolog/prologmud_web/src_webui/model/substance.pl"/>
+						</Folder>
+						<Folder Name="mudconsole">
+							<F N="prologmud/prolog/prologmud_web/src_webui/mudconsole/mudconsole.pl"/>
+							<F N="prologmud/prolog/prologmud_web/src_webui/mudconsole/mudconsolestart.pl"/>
+						</Folder>
+						<F N="prologmud/prolog/prologmud_web/src_webui/cliopatria_binding.pl"/>
+						<F N="prologmud/prolog/prologmud_web/src_webui/launchcliopatria.pl"/>
+						<F N="prologmud/prolog/prologmud_web/src_webui/testwebconsole.pl"/>
+					</Folder>
+				</Folder>
+			</Folder>
+			<Folder Name="t">
+				<F N="prologmud/t/sanity_tests.pl"/>
+			</Folder>
+			<F N="prologmud/.gitignore"/>
+			<F N="prologmud/.gitmodules"/>
+			<F N="prologmud/LICENSE.md"/>
+			<F N="prologmud/pack.pl"/>
+			<F N="prologmud/PrologMUD.vpj"/>
+			<F N="prologmud/README.md"/>
+		</Folder>
+		<Folder Name="prologmud_samples">
+			<Folder Name="prolog">
+				<Folder Name="prologmud_sample_games">
+					<F N="prologmud_samples/prolog/prologmud_sample_games/init_mud_server.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/run_mud_server.pl"/>
+				</Folder>
+			</Folder>
+		</Folder>
 		<Folder Name="s_expression">
 			<F
 				N="s_expression/*.*"
