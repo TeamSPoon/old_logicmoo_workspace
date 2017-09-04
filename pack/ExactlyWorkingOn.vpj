@@ -995,8 +995,19 @@
 		<Folder Name="prologmud_samples">
 			<Folder Name="prolog">
 				<Folder Name="prologmud_sample_games">
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_domainEnglishFormat_kif.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_english_format_kif.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_Merge_kif.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_Mid-level-ontology_kif.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/__ontologyportal_sumo_Translations_relations-en_txt.tmp"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/clio_swish_test.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/commitpush.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/init_mud_server.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/Run_Loop.sh"/>
 					<F N="prologmud_samples/prolog/prologmud_sample_games/run_mud_server.pl"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/sanity_pfc_modules.plt"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/startGame.sh"/>
+					<F N="prologmud_samples/prolog/prologmud_sample_games/test_release.pl"/>
 				</Folder>
 			</Folder>
 		</Folder>
