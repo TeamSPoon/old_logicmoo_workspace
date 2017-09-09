@@ -171,6 +171,9 @@
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
 		<Folder Name="aleph">
+			<Folder Name="doc">
+				<F N="aleph/doc/manual.html"/>
+			</Folder>
 			<Folder Name="prolog">
 				<Folder Name="examples">
 					<Folder Name="abduce">
@@ -277,6 +280,16 @@
 				<F N="aleph/prolog/aleph.pl"/>
 				<F N="aleph/prolog/aleph.pl.dmiles"/>
 				<F N="aleph/prolog/aleph_orig.pl"/>
+			</Folder>
+			<F N="aleph/pack.pl"/>
+			<F N="aleph/README.md"/>
+		</Folder>
+		<Folder Name="auc">
+			<Folder Name="prolog">
+				<Folder Name="examples">
+					<F N="auc/prolog/examples/exauc.pl"/>
+				</Folder>
+				<F N="auc/prolog/auc.pl"/>
 			</Folder>
 		</Folder>
 		<Folder Name="ccprism">
@@ -760,6 +773,12 @@
 				Recurse="1"
 				Refilter="1"
 				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="lps_corner">
+			<Folder Name="Wei-engine">
+				<F N="lps_corner/Wei-engine/db.P"/>
+				<F N="lps_corner/Wei-engine/interpreter.P"/>
+			</Folder>
 		</Folder>
 		<Folder Name="multimodal_dcg">
 			<F

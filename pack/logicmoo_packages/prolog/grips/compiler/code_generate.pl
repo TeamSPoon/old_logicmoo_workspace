@@ -4,7 +4,7 @@
 code_generate( 'PROG'(Name,Declarations,Body) ) <-
     'CODE'( Code, InitialStore )
     where
-    ( 'ENV'( _, _, VarEnv ) = environment( Declarations ) and
+    ( 'ENV'( _, _, VarEnv ) = environment( Declarations ) and          
       Code = fixup( cg( Name, E , Body ) ) and
       InitialStore = fill( VarEnv )
     ).

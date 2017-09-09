@@ -2941,6 +2941,410 @@
 				Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="logicmoo_packages">
+			<Folder Name="prolog">
+				<Folder Name="interps">
+					<Folder Name="aminePlatform8">
+						<Folder Name="aminePlatform8Release">
+							<Folder Name="classes">
+								<Folder Name="aminePlatform">
+									<Folder Name="samples">
+										<Folder Name="ontology">
+											<Folder Name="ontBasedOnACEOntology">
+												<F N="logicmoo_packages/prolog/interps/aminePlatform8/aminePlatform8Release/classes/aminePlatform/samples/ontology/ontBasedOnACEOntology/aceOntDom_clex.pl"/>
+											</Folder>
+										</Folder>
+										<Folder Name="prologPlusCG">
+											<Folder Name="samplesProlog">
+												<F N="logicmoo_packages/prolog/interps/aminePlatform8/aminePlatform8Release/classes/aminePlatform/samples/prologPlusCG/samplesProlog/likes.pl"/>
+											</Folder>
+										</Folder>
+									</Folder>
+								</Folder>
+							</Folder>
+						</Folder>
+					</Folder>
+					<Folder Name="artint.info">
+						<Folder Name="code">
+							<Folder Name="ailog">
+								<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog/ailog2.pl"/>
+								<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog/ailog21.pl"/>
+							</Folder>
+							<Folder Name="ailog1">
+								<Folder Name="__MACOSX">
+									<Folder Name="ailog">
+										<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/__MACOSX/ailog/._ailog21.pl"/>
+										<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/__MACOSX/ailog/._fixhtml.pl"/>
+										<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/__MACOSX/ailog/._nrev.pl"/>
+										<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/__MACOSX/ailog/._test.pl"/>
+										<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/__MACOSX/ailog/._workflow0.pl"/>
+										<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/__MACOSX/ailog/._workflow1.pl"/>
+									</Folder>
+								</Folder>
+								<Folder Name="ailog">
+									<Folder Name="ailog_code">
+										<Folder Name="ch12">
+											<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/ailog_code/ch12/video.pl"/>
+											<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/ailog_code/ch12/video2.pl"/>
+											<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/ailog_code/ch12/video3.pl"/>
+											<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/ailog_code/ch12/video4.pl"/>
+										</Folder>
+									</Folder>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/ailog2.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/ailog21.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/ailog236.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/ailog237.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/ailog24.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/anVH.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/fixhtml.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/nrev.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/test.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/workflow0.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/ailog1/ailog/workflow1.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="Prolog">
+								<Folder Name="ch12">
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/Prolog/ch12/cfg_simple.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/Prolog/ch12/nl_interface.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/Prolog/ch12/nl_numbera.pl"/>
+									<F N="logicmoo_packages/prolog/interps/artint.info/code/Prolog/ch12/trans.pl"/>
+								</Folder>
+							</Folder>
+						</Folder>
+					</Folder>
+					<Folder Name="code_icl">
+						<Folder Name="code_icl">
+							<F N="logicmoo_packages/prolog/interps/code_icl/code_icl/dtp.pl"/>
+						</Folder>
+					</Folder>
+					<Folder Name="OLED">
+						<Folder Name="datasets">
+							<Folder Name="RevealTwitterData">
+								<Folder Name="AlephRuns">
+									<F N="logicmoo_packages/prolog/interps/OLED/datasets/RevealTwitterData/AlephRuns/aleph.pl"/>
+								</Folder>
+							</Folder>
+						</Folder>
+					</Folder>
+					<Folder Name="ssardina-indigolog-0e832c3d3faa">
+						<Folder Name="ssardina-indigolog-0e832c3d3faa">
+							<Folder Name="Doc">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Doc/license.pl"/>
+							</Folder>
+							<Folder Name="Env">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/dev_managers.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/env_clima.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/env_gen.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/env_int.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/env_int_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/env_man.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/env_mess.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/env_rcx.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/env_sim.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/env_wumpus.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/lego_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/legorcx.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/mess_server.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Env/rcx_swi.pl"/>
+							</Folder>
+							<Folder Name="Eval">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Eval/eval_know.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Eval/evalbat.pl"/>
+							</Folder>
+							<Folder Name="Examples">
+								<Folder Name="CLIMA">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/CLIMA/agent_bat.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/CLIMA/agent_kbat.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/CLIMA/main_swi.pl"/>
+								</Folder>
+								<Folder Name="Delivery-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Delivery-BAT/delivery.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Delivery-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="Elevator-Vanilla">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/example1.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/example2.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/example3.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/example4.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/example5.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/main1_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/main2_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/main3_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/main4_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/main5_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Elevator-Vanilla/main5_swi.pl"/>
+								</Folder>
+								<Folder Name="ElevatorLego-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/ElevatorLego-BAT/elevator.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/ElevatorLego-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="ElevatorSim-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/ElevatorSim-BAT/elevator.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/ElevatorSim-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="Wumpus-KBAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Wumpus-KBAT/main_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Wumpus-KBAT/statwumpus.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Examples/Wumpus-KBAT/wumpus.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="Interpreters">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Interpreters/indigolog-vanilla.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Interpreters/indigolog-vanilla_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Interpreters/indigolog.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Interpreters/transfinal-bdi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Interpreters/transfinal-congolog.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Interpreters/transfinal-ext.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Interpreters/transfinal-search.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Interpreters/transfinal.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/Interpreters/wscplan.pl"/>
+							</Folder>
+							<Folder Name="lib">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/alpha_star.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/common.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/eclipse_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/http_open.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/internet.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/libgraph.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/statdebug.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/streampool.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/systemvar.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/tools_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-0e832c3d3faa/ssardina-indigolog-0e832c3d3faa/lib/wscplan.pl"/>
+							</Folder>
+						</Folder>
+					</Folder>
+					<Folder Name="ssardina-indigolog-70c2adaf5bc6">
+						<Folder Name="ssardina-indigolog-70c2adaf5bc6">
+							<Folder Name="Doc">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Doc/license.pl"/>
+							</Folder>
+							<Folder Name="Env">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/dev_managers.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_clima.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_er1.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_er1_ecl.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_gen.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_int.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_int_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_java_swing.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_java_swing_id.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_man.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_mess.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_rcx.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_sim.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/env_wumpus.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/lego_ecl.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/lego_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/legorcx.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/mess_server.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/rcx_ecl.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Env/rcx_swi.pl"/>
+							</Folder>
+							<Folder Name="Eval">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Eval/eval_know.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Eval/evalbat.pl"/>
+							</Folder>
+							<Folder Name="Examples">
+								<Folder Name="CLIMA">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/CLIMA/agent_bat.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/CLIMA/agent_kbat.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/CLIMA/main_swi.pl"/>
+								</Folder>
+								<Folder Name="Delivery-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Delivery-BAT/delivery.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Delivery-BAT/main_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Delivery-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="Elevator-Vanilla">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/example1.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/example2.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/example3.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/example4.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/example5.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main1_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main1_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main2_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main2_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main3_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main3_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main4_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main4_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main5_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Elevator-Vanilla/main5_swi.pl"/>
+								</Folder>
+								<Folder Name="ElevatorLego-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/ElevatorLego-BAT/elevator.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/ElevatorLego-BAT/main_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/ElevatorLego-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="ElevatorSim-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/ElevatorSim-BAT/elevator.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/ElevatorSim-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="ER1Test-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/ER1Test-BAT/er1test.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/ER1Test-BAT/main_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/ER1Test-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="Wumpus-FLUX">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Wumpus-FLUX/main_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Wumpus-FLUX/wumpus.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Wumpus-FLUX/wumpus_simulator.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Wumpus-FLUX/wumpus_testbed.pl"/>
+								</Folder>
+								<Folder Name="Wumpus-KBAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Wumpus-KBAT/main_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Wumpus-KBAT/statwumpus.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Examples/Wumpus-KBAT/wumpus.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="Interpreters">
+								<Folder Name="flux">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/flux/fluent.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/flux/flux.pl"/>
+								</Folder>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/indigolog-vanilla.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/indigolog-vanilla_ecl.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/indigolog-vanilla_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/indigolog.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/transfinal-bdi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/transfinal-congolog.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/transfinal-ext.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/transfinal-search.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/transfinal.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/Interpreters/wscplan.pl"/>
+							</Folder>
+							<Folder Name="lib">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/alpha_star.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/common.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/eclipse_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/er1-actions.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/http_open.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/internet.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/libgraph.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/statdebug.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/streampool.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/systemvar.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/tools_ecl.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/tools_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-70c2adaf5bc6/ssardina-indigolog-70c2adaf5bc6/lib/wscplan.pl"/>
+							</Folder>
+						</Folder>
+					</Folder>
+					<Folder Name="ssardina-indigolog-eba38d247f77">
+						<Folder Name="ssardina-indigolog-eba38d247f77">
+							<Folder Name="Doc">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Doc/license.pl"/>
+							</Folder>
+							<Folder Name="Env">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/dev_managers.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/env_clima.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/env_gen.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/env_int.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/env_int_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/env_man.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/env_mess.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/env_rcx.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/env_sim.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/env_wumpus.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/lego_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/legorcx.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/mess_server.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Env/rcx_swi.pl"/>
+							</Folder>
+							<Folder Name="Eval">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Eval/eval_know.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Eval/evalbat.pl"/>
+							</Folder>
+							<Folder Name="Examples">
+								<Folder Name="CLIMA">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/CLIMA/agent_bat.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/CLIMA/agent_kbat.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/CLIMA/main_swi.pl"/>
+								</Folder>
+								<Folder Name="Delivery-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Delivery-BAT/delivery.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Delivery-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="Elevator-Vanilla">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/example1.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/example2.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/example3.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/example4.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/example5.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/main1_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/main2_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/main3_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/main4_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/main5_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Elevator-Vanilla/main5_swi.pl"/>
+								</Folder>
+								<Folder Name="ElevatorLego-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/ElevatorLego-BAT/elevator.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/ElevatorLego-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="ElevatorSim-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/ElevatorSim-BAT/elevator.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/ElevatorSim-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="ER1Test-BAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/ER1Test-BAT/er1test.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/ER1Test-BAT/main_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/ER1Test-BAT/main_swi.pl"/>
+								</Folder>
+								<Folder Name="Wumpus-FLUX">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Wumpus-FLUX/main_ecl.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Wumpus-FLUX/wumpus.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Wumpus-FLUX/wumpus_simulator.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Wumpus-FLUX/wumpus_testbed.pl"/>
+								</Folder>
+								<Folder Name="Wumpus-KBAT">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Wumpus-KBAT/main_swi.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Wumpus-KBAT/statwumpus.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Examples/Wumpus-KBAT/wumpus.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="Interpreters">
+								<Folder Name="flux">
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/flux/fluent.pl"/>
+									<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/flux/flux.pl"/>
+								</Folder>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/indigolog-vanilla.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/indigolog-vanilla_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/indigolog.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/transfinal-bdi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/transfinal-congolog.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/transfinal-ext.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/transfinal-search.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/transfinal.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/Interpreters/wscplan.pl"/>
+							</Folder>
+							<Folder Name="lib">
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/alpha_star.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/common.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/eclipse_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/http_open.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/internet.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/libgraph.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/statdebug.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/streampool.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/systemvar.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/tools_swi.pl"/>
+								<F N="logicmoo_packages/prolog/interps/ssardina-indigolog-eba38d247f77/ssardina-indigolog-eba38d247f77/lib/wscplan.pl"/>
+							</Folder>
+						</Folder>
+					</Folder>
+					<F
+						N="logicmoo_packages/prolog/interps/*.*"
+						Recurse="1"
+						Refilter="1"
+						Excludes="pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*;*.pdf;*.gz;*.z;*.ps"/>
+					<F N="logicmoo_packages/prolog/interps/ailog2.pl"/>
+					<F N="logicmoo_packages/prolog/interps/spratt_sp.pl"/>
+					<F N="logicmoo_packages/prolog/interps/spratt_sp_lm.pl"/>
+				</Folder>
+			</Folder>
 			<F
 				N="logicmoo_packages/*.*"
 				Recurse="1"
