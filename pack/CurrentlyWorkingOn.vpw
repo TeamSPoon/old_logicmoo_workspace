@@ -4,6 +4,7 @@
 	<Projects>
 		<Project File="CurrentlyWorkingOn.vpj"/>
 		<Project File="ExactlyWorkingOn.vpj"/>
+		<Project File="../../../SWI-DEVEL-UNSTABLE.vpj"/>
 		<Project File="/opt/swipl-hacking/swipl.vpj"/>
 	</Projects>
 </Workspace>

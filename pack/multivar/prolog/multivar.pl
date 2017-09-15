@@ -25,6 +25,10 @@
 
 :- module(multivar,
  [
+   test_case_1/0,
+   test_case_2/0,
+   test_case_3/0,
+   test_case_4/0
   /* mdwq/1, 
 		  plvar/1,
           nb_var/1, nb_var/2,
@@ -54,16 +58,102 @@ mdwq_call(Q):- !, call(Q).
 mdwq_call(Q):- call(Q) *-> mdwq(success:Q); (mdwq(failed:Q),!,fail).
 :- export(mdwq_call/1).
 
+
+
+
+%-----------------------------------------------------------------
+% Blugened in version of verify_attributes/3
+
+user:attr_pre_unify_hook(IDVar, Value, _):- \+ attvar(IDVar),!,IDVar=Value.
+
+/*
+user:attr_pre_unify_hook(IDVar, Value, Attrs):-
+  call_verify_attributes(Attrs, Value, IDVar, [], Goals),
+  nop(attv_bind(IDVar, Value)),
+  maplist(call,Goals).
+*/
+
+%user:attr_pre_unify_hook(IDVar, Value, Attrs):-  '$attvar':call_all_attr_uhooks(att('$VAR$',IDVar,Attrs),Value).
+%user:meta_unify(Var,Rest,Val):-
+user:attr_pre_unify_hook(Var,Val,Rest):- 
+  mdwq_call('$attvar':call_all_attr_uhooks(Rest, Val)),
+  mv_add1(Var,Val).
+
+
+
+call_verify_attributes([], _, _) --> [].
+call_verify_attributes(att(Module, _, Rest), Value, IDVar) -->
+    { Module:verify_attributes(IDVar, Value, Goals) }, 
+    Goals,
+    call_verify_attributes(Rest, Value, IDVar).
+
+% make code us verify_attributes/3 instead of attr_unify_hook/2
+use_va(Var):-
+  put_attr(Var,'$VAR$',Var).
+
+%-----------------------------------------------------------------
+
+verify_attributes(Var, _, Goals) :-
+   get_attr(Var, multivar, Info), !,
+   \+ contains_var(Var,Info),
+  Goals=[].
+
+verify_attributes(_, _, []).
+
+
+% Swi-pre-unify Case#1  not able to emulate in SWI  due to "Identity"
+
+swiu_case_1 :-
+ use_va(Y), put_attr(Y, multivar, a(Y)),
+ Y = 4201.
+
+% must fail
+test_case_1 :-  \+  swiu_case_1.
+
+
+%-----------------------------------------------------------------
+
+% Swi-pre-unify Case#2   "Identity"
+
+swiu_case_2 :-
+   use_va(Y), put_attr(Y, multivar, al(Y,a(X))),
+   X = 420,
+   Y = 420.
+
+% must fail
+test_case_2 :-  \+  swiu_case_2.
+
+
+% -----------------------------------------------------------------
+% Swi-pre-unify Case #3   "Identity" (fixed from last email)
+
+swiu_case_3 :-
+  use_va(Y), put_attr(Y,multivar, a(420)),
+  Y = 420.
+
+% must Succeed
+test_case_3 :-  swiu_case_3.
+
+
+
+%-----------------------------------------------------------------
+% Swi-pre-unify Case #4  more "Identity"
+
+swiu_case_4 :-
+ use_va(Y), put_attr(Y,multivar,a(X)),
+ X = 420,
+ Y = 420.
+
+% must succeed
+test_case_4 :-  swiu_case_4.
+
+
 % ==========================================
 %  Unify hook
 % ==========================================
 
-'unify':attr_unify_hook(_,_).  % OR tracing with 'unify':attr_unify_hook(N,Var):- mdwq(meta_unify_hook(N,Var)).
+% 'unify':attr_unify_hook(_,_).  % OR tracing with 'unify':attr_unify_hook(N,Var):- mdwq(meta_unify_hook(N,Var)).
 
-user:meta_unify(Var,Rest,Val):-
-    mv_add1(Var,Val),
-    mdwq_call('$attvar':call_all_attr_uhooks(Rest, Val)),
-	mv_add1(Var,Val).
 
 % multivar(Var):- put_attr(Var,unify,Var).
 multivar(Var):- put_attr(Var,'$VAR$',Var).
@@ -96,11 +186,11 @@ user:attvar_references(N,Var):- (N==Var -> true ;  mdwq_call( \+ \+ =(N,Var) )).
 % ==========================================
 
 '$value':attr_unify_hook(_,_).
-mv_set(Var,Values):- put_attr(Var,'$value',v(Var,Values)).
-mv_set1(Var,Val):- put_attr(Var,'$value',v(Var,[Val])).
+mv_set_list(Var,Values):- put_attr(Var,'$value',lst(Var,Values)).
+mv_set1(Var,Val):- put_attr(Var,'$value',lst(Var,[Val])).
 mv_add1(Var,NewValue):-mv_prepend1(Var,'$value',NewValue).
 
-mv_prepend1(Var,Mod,Val):- get_attr(Var,Mod,v(Var,Was))->(prepend_val(Val,Was,New)->put_attr(Var,Mod,v(Var,New)));put_attr(Var,Mod,v(Var,[Val])).
+mv_prepend1(Var,Mod,Val):- get_attr(Var,Mod,lst(Var,Was))->(prepend_val(Val,Was,New)->put_attr(Var,Mod,lst(Var,New)));put_attr(Var,Mod,lst(Var,[Val])).
 
 prepend_val(Val,[],[Val]).
 prepend_val(Val,Was,[Val|NewList]):-delete_identical(Was,Val,NewList).
@@ -110,13 +200,13 @@ delete_identical([Elem0|NewList],Elem1,NewList):-Elem1==Elem0,!.
 delete_identical([ElemKeep|List],Elem1,[ElemKeep|NewList]):-delete_identical(List,Elem1,NewList).
 
 % faster than mv_prepend1 - might use?
-mv_prepend(Var,Mod,Val):- get_attr(Var,Mod,v(Var,Was))->put_attr(Var,Mod,v(Var,[Val|Was]));put_attr(Var,Mod,v(Var,[Val])).
+mv_prepend(Var,Mod,Val):- get_attr(Var,Mod,lst(Var,Was))->put_attr(Var,Mod,lst(Var,[Val|Was]));put_attr(Var,Mod,lst(Var,[Val])).
 
 % ==========================================
 % Peeks values
 % ==========================================
 
-mv_peek(Var,Val):- mv_get_attr(Var,'$value',Val).
+mv_peek(Var,Val):- mv_members(Var,'$value',Val).
 mv_peek1(Var,Val):- mv_peek(Var,Val),!.
 
 
@@ -125,8 +215,8 @@ mv_peek1(Var,Val):- mv_peek(Var,Val),!.
 % Peeks any
 % ==========================================
 
-mv_get_attr(Var,Mod,Val):- get_attr(Var,Mod,v(_,Values)),member(Val,Values).
-mv_get_attr1(Var,Mod,Val):- mv_get_attr(Var,Mod,Val),!.
+mv_members(Var,Mod,Val):- get_attr(Var,Mod,lst(_,Values)),!,member(Val,Values).
+% mv_get_attr1(Var,Mod,Val):- mv_members(Var,Mod,Val),!.
 
 
 % ==========================================
@@ -134,14 +224,14 @@ mv_get_attr1(Var,Mod,Val):- mv_get_attr(Var,Mod,Val),!.
 % ==========================================
 
 mv_allow(Var,Allow):-mv_prepend(Var,'$allow',Allow).
-'$allow':attr_unify_hook(v(Var,Allow),Val):- memberchk(Val,Allow)->true;get_attr(Var,ic_text,_).
+'$allow':attr_unify_hook(lst(Var,Allow),Val):- memberchk(Val,Allow)->true;get_attr(Var,ic_text,_).
 
 % ==========================================
 % Label values
 % ==========================================
 
-un_mv(Var):-del_attr(Var,unify),mv_peek(Var,Val)*->Var=Val;true.
-un_mv1(Var):-del_attr(Var,unify),ignore(mv_peek1(Var,Var)).
+un_mv(Var):-del_attr(Var,'$VAR$'),!,(mv_peek(Var,Val)*->Var=Val;true).
+un_mv1(Var):-del_attr(Var,'$VAR$'),ignore(mv_peek1(Var,Var)).
 
 
 % ==========================================
@@ -179,12 +269,12 @@ multivar_call(Type,Goal):-term_variables(Goal,Vars),maplist(Type,Vars),call(Goal
 % Symbol-Like Global vars
 % ==========================================
 nb_var(Var):- gensym(nb_var_,Symbol),nb_var(Symbol, Var).
-nb_var(Symbol, Var):- multivar(Var), put_attr(Var,nb_var,v(Var,Symbol)), nb_linkval(Symbol,Var).
+nb_var(Symbol, Var):- multivar(Var), put_attr(Var,nb_var,lst(Var,Symbol)), nb_linkval(Symbol,Var).
 
 % This should pretend to be be value1 slot instead
 % so that we extext mv_peek1/2 and mv_set1/2
 % to stroe things in GVAR in the case of a nb_var
-nb_var:attr_unify_hook(v(_Var,Symbol),Val):-
+nb_var:attr_unify_hook(lst(_Var,Symbol),Val):-
        nb_getval(Symbol,Prev),
        ( % This is how we produce a binding for +multivar "iterator"
           (var(Val),nonvar(Prev)) ->  Val=Prev;
@@ -221,10 +311,11 @@ merge_dicts(Dict1,Dict2,Combined):- dicts_to_same_keys([Dict1,Dict2],dict_fill(_
 % ==========================================
 
 ic_text(Var):- multivar(Var),put_attr(Var,ic_text,Var).
-ic_text:attr_unify_hook(Var,Val):- (mv_get_attr(Var,'$allow',One)*->ic_unify(One,Val); (mv_peek1(Var,One)->ic_unify(One,Val);true)).
+ic_text:attr_unify_hook(Var,Val):- 
+ (mv_members(Var,'$allow',One)*-> ic_unify(One,Val); (mv_peek1(Var,One)->ic_unify(One,Val);true)).
 
 
-ic_unify(One,Val):-term_upcase(One,UC1),term_upcase(Val,UC2),UC1==UC2.
+ic_unify(One,Val):- (One=Val -> true ; (term_upcase(One,UC1),term_upcase(Val,UC2),UC1==UC2)).
 
 term_upcase(Val,UC2):-catch(string_upper(Val,UC2),_,(format(string(UC1),'~w',Val),string_upper(UC1,UC2))).
 
