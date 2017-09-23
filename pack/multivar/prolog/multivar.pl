@@ -34,7 +34,7 @@
           nb_var/1, nb_var/2,
           vdict/1, vdict/2,
 		  un_mv/1, un_mv1/1,
-		  mv_peek/2,mv_peek1/2,
+		  mv_peek_value/2,mv_peek_value1/2,
 		  mv_set/2,mv_set1/2,
 		  mv_add1/2,mv_allow/2,
 		  ic_text/1,
@@ -74,10 +74,10 @@ user:attr_pre_unify_hook(IDVar, Value, Attrs):-
 */
 
 %user:attr_pre_unify_hook(IDVar, Value, Attrs):-  '$attvar':call_all_attr_uhooks(att('$VAR$',IDVar,Attrs),Value).
-%user:meta_unify(Var,Rest,Val):-
-user:attr_pre_unify_hook(Var,Val,Rest):- 
-  mdwq_call('$attvar':call_all_attr_uhooks(Rest, Val)),
-  mv_add1(Var,Val).
+%user:meta_unify(Var,Rest,Value):-
+user:attr_pre_unify_hook(Var,Value,Rest):- 
+  mdwq_call('$attvar':call_all_attr_uhooks(Rest, Value)),
+  mv_add1(Var,Value).
 
 
 
@@ -165,7 +165,7 @@ is_mv(Var):- attvar(Var),get_attr(Var,'$VAR$',Waz),var(Waz).
 % ==========================================
 
 '$VAR$':attr_unify_hook(_,_).
-
+'$VAR$':attribute_goals(Var) --> [multivar(Var)].
 % ==========================================
 % Variant override TODO
 % ==========================================
@@ -186,28 +186,29 @@ user:attvar_references(N,Var):- (N==Var -> true ;  mdwq_call( \+ \+ =(N,Var) )).
 % ==========================================
 
 '$value':attr_unify_hook(_,_).
-mv_set_list(Var,Values):- put_attr(Var,'$value',lst(Var,Values)).
-mv_set1(Var,Val):- put_attr(Var,'$value',lst(Var,[Val])).
+'$value':attribute_goals(Var)--> {get_attr(Var,'$value',lst(Var,Values))},[mv_set_values(Var,Values)].
+mv_set_values(Var,Values):- put_attr(Var,'$value',lst(Var,Values)).
+mv_set1(Var,Value):- put_attr(Var,'$value',lst(Var,[Value])).
 mv_add1(Var,NewValue):-mv_prepend1(Var,'$value',NewValue).
 
-mv_prepend1(Var,Mod,Val):- get_attr(Var,Mod,lst(Var,Was))->(prepend_val(Val,Was,New)->put_attr(Var,Mod,lst(Var,New)));put_attr(Var,Mod,lst(Var,[Val])).
+mv_prepend1(Var,Mod,Value):- get_attr(Var,Mod,lst(Var,Was))->(prepend_val(Value,Was,New)->put_attr(Var,Mod,lst(Var,New)));put_attr(Var,Mod,lst(Var,[Value])).
 
-prepend_val(Val,[],[Val]).
-prepend_val(Val,Was,[Val|NewList]):-delete_identical(Was,Val,NewList).
+prepend_val(Value,[],[Value]).
+prepend_val(Value,Was,[Value|NewList]):-delete_identical(Was,Value,NewList).
 
 delete_identical([],_,[]).
 delete_identical([Elem0|NewList],Elem1,NewList):-Elem1==Elem0,!.
 delete_identical([ElemKeep|List],Elem1,[ElemKeep|NewList]):-delete_identical(List,Elem1,NewList).
 
 % faster than mv_prepend1 - might use?
-mv_prepend(Var,Mod,Val):- get_attr(Var,Mod,lst(Var,Was))->put_attr(Var,Mod,lst(Var,[Val|Was]));put_attr(Var,Mod,lst(Var,[Val])).
+mv_prepend(Var,Mod,Value):- get_attr(Var,Mod,lst(Var,Was))->put_attr(Var,Mod,lst(Var,[Value|Was]));put_attr(Var,Mod,lst(Var,[Value])).
 
 % ==========================================
 % Peeks values
 % ==========================================
 
-mv_peek(Var,Val):- mv_members(Var,'$value',Val).
-mv_peek1(Var,Val):- mv_peek(Var,Val),!.
+mv_peek_value(Var,Value):- mv_members(Var,'$value',Value).
+mv_peek_value1(Var,Value):- mv_peek_value(Var,Value),!.
 
 
 
@@ -215,31 +216,54 @@ mv_peek1(Var,Val):- mv_peek(Var,Val),!.
 % Peeks any
 % ==========================================
 
-mv_members(Var,Mod,Val):- get_attr(Var,Mod,lst(_,Values)),!,member(Val,Values).
-% mv_get_attr1(Var,Mod,Val):- mv_members(Var,Mod,Val),!.
+mv_members(Var,Mod,Value):- get_attr(Var,Mod,lst(_,Values)),!,member(Value,Values).
+% mv_get_attr1(Var,Mod,Value):- mv_members(Var,Mod,Value),!.
 
 
 % ==========================================
 % Allow values
 % ==========================================
 
+check_allow(Var,Value):- get_attr(Var,'$allow',lst(Var,Disallow)), memberchk_variant(Value,Disallow).
 mv_allow(Var,Allow):-mv_prepend(Var,'$allow',Allow).
-'$allow':attr_unify_hook(lst(Var,Allow),Val):- memberchk(Val,Allow)->true;get_attr(Var,ic_text,_).
+'$allow':attr_unify_hook(lst(Var,Allow),Value):- memberchk_variant(Value,Allow)->true;get_attr(Var,ic_text,_).
+'$allow':attribute_goals(Var)--> {get_attr(Var,'$allow',Allow)},[mv_allow(Var,Allow)].
+
+% ==========================================
+% Disallow values
+% ==========================================
+
+check_disallow(Var,Value):- get_attr(Var,'$disallow',lst(Var,Disallow)),\+ memberchk_variant(Value,Disallow).
+mv_disallow(Var,Disallow):-mv_prepend(Var,'$disallow',Disallow).
+'$disallow':attr_unify_hook(lst(_Var,Disallow),Value):- \+ memberchk_variant(Value,Disallow).
+'$disallow':attribute_goals(Var)--> {get_attr(Var,'$disallow',Disallow)},[mv_disallow(Var,Disallow)].
+
+%% memberchk_variant( ?X, :TermY0) is semidet.
+%
+% Memberchk based on == for Vars else =@= .
+%
+memberchk_variant(X, List) :- is_list(List),!, \+ atomic(List), C=..[v|List],(var(X)-> (arg(_,C,YY),X==YY) ; (arg(_,C,YY),X =@= YY)),!.
+memberchk_variant(X, Ys) :-  nonvar(Ys), var(X)->memberchk_variant0(X, Ys);memberchk_variant1(X,Ys).
+memberchk_variant0(X, [Y|Ys]) :-  X==Y  ; (nonvar(Ys),memberchk_variant0(X, Ys)).
+memberchk_variant1(X, [Y|Ys]) :-  X =@= Y ; (nonvar(Ys),memberchk_variant1(X, Ys)).
+
+
 
 % ==========================================
 % Label values
 % ==========================================
 
-un_mv(Var):-del_attr(Var,'$VAR$'),!,(mv_peek(Var,Val)*->Var=Val;true).
-un_mv1(Var):-del_attr(Var,'$VAR$'),ignore(mv_peek1(Var,Var)).
+un_mv(Var):-del_attr(Var,'$VAR$'),!,(mv_peek_value(Var,Value)*->Var=Value;true).
+un_mv1(Var):-del_attr(Var,'$VAR$'),ignore(mv_peek_value1(Var,Var)).
 
 
 % ==========================================
 % Examples
 % ==========================================
-
+/*
 
 % ?- multivar(X),X=1,X=2,un_mv(X),writeq(X).
+% ?- multivar(X),X=x(X),mv_allow(X,hello),mv_allow(X,hi), X=hello,X=hi,mv_peek_value(X,V)
 % ?- multivar(X),mv_allow(X,hello),mv_allow(X,hi), X=hello,X=hi,writeq(X).
 % ?- multivar(X),mv_allow(X,hello),mv_allow(X,hi),X=hello,X=hi,X=hello,un_mv(X).
 % ?- multivar(X),mv_allow(X,hello),mv_allow(X,hi),X=hello,X=hi,X=hello,!,un_mv(X)
@@ -253,11 +277,17 @@ un_mv1(Var):-del_attr(Var,'$VAR$'),ignore(mv_peek1(Var,Var)).
 % ?- ic_text(X),mv_allow(X,"GOOD"),mv_allow(X,"BAD"),X=good,X=baD.
 % ?- \+ (ic_text(X),mv_allow(X,"GOOD"),mv_allow(X,"BAD"),X=good,X=one).
 
+?- multivar(X),mv_disallow(X,1),mv_disallow(X,3).
+multivar(X),
+mv_disallow(X, lst(X, [3, 1])).
+
+*/
 % ==========================================
 % Prolog-Like vars
 % ==========================================
 plvar(Var):- multivar(Var), put_attr(Var,plvar,Var).
-plvar:attr_unify_hook(Var,Val):- mv_peek1(Var,Was)->Val=Was;mv_set1(Var,Val).
+plvar:attr_unify_hook(Var,Value):- mv_peek_value1(Var,Was)->Value=Was;mv_set1(Var,Value).
+'plvar':attribute_goals(Var)--> {get_attr(Var,'plvar',Var)},[plvar(Var)].
 
 
 % Maybe Variables entering the clause database
@@ -272,16 +302,16 @@ nb_var(Var):- gensym(nb_var_,Symbol),nb_var(Symbol, Var).
 nb_var(Symbol, Var):- multivar(Var), put_attr(Var,nb_var,lst(Var,Symbol)), nb_linkval(Symbol,Var).
 
 % This should pretend to be be value1 slot instead
-% so that we extext mv_peek1/2 and mv_set1/2
+% so that we extext mv_peek_value1/2 and mv_set1/2
 % to stroe things in GVAR in the case of a nb_var
-nb_var:attr_unify_hook(lst(_Var,Symbol),Val):-
+nb_var:attr_unify_hook(lst(_Var,Symbol),Value):-
        nb_getval(Symbol,Prev),
        ( % This is how we produce a binding for +multivar "iterator"
-          (var(Val),nonvar(Prev)) ->  Val=Prev;
+          (var(Value),nonvar(Prev)) ->  Value=Prev;
          % same binding (effectively)
-             Val==Prev->true;
+             Value==Prev->true;
          % On unification we will update the internal '$value'
-             Val=Prev->nb_setval(Symbol,Prev)).
+             Value=Prev->nb_setval(Symbol,Prev)).
 
 % ==========================================
 % Hashmap-Like vars
@@ -289,19 +319,19 @@ nb_var:attr_unify_hook(lst(_Var,Symbol),Val):-
 
 
 vdict(Var):- multivar(Var), put_attr(Var,vdict,Var).
-vdict(Val,Var):- vdict(Var),Var=Val.
-vdict:attr_unify_hook(Var,OValue):- to_dict(OValue,Val)-> mv_peek(Var,Prev), merge_dicts(Prev,Val,Result)-> mv_set1(Var,Result).
+vdict(Value,Var):- vdict(Var),Var=Value.
+vdict:attr_unify_hook(Var,OValue):- to_dict(OValue,Value)-> mv_peek_value(Var,Prev), merge_dicts(Prev,Value,Result)-> mv_set1(Var,Result).
 
 
-to_dict(Val,Val):- is_dict(Val),!.
-to_dict(OValue,Val):- is_list(OValue),!,dict_options(Val,OValue).
-to_dict(OValue,Val):- compound(OValue),!,option(OValue,[MValue]),!,dict_options(Val,[MValue]).
-to_dict(OValue,Val):- option('$value'=OValue,[MValue]),!,dict_options(Val,[MValue]).
+to_dict(Value,Value):- is_dict(Value),!.
+to_dict(OValue,Value):- is_list(OValue),!,dict_options(Value,OValue).
+to_dict(OValue,Value):- compound(OValue),!,option(OValue,[MValue]),!,dict_options(Value,[MValue]).
+to_dict(OValue,Value):- option('$value'=OValue,[MValue]),!,dict_options(Value,[MValue]).
 
 
-merge_dicts(Val,Val,Val).
-merge_dicts(Prev,Val,Prev):- Val :< Prev.
-merge_dicts(Val,Prev,Prev):- Val :< Prev.
+merge_dicts(Value,Value,Value).
+merge_dicts(Prev,Value,Prev):- Value :< Prev.
+merge_dicts(Value,Prev,Prev):- Value :< Prev.
 merge_dicts(Dict1,Dict2,Combined):- dicts_to_same_keys([Dict1,Dict2],dict_fill(_),[Combined,Combined]).
 
 
@@ -311,13 +341,14 @@ merge_dicts(Dict1,Dict2,Combined):- dicts_to_same_keys([Dict1,Dict2],dict_fill(_
 % ==========================================
 
 ic_text(Var):- multivar(Var),put_attr(Var,ic_text,Var).
-ic_text:attr_unify_hook(Var,Val):- 
- (mv_members(Var,'$allow',One)*-> ic_unify(One,Val); (mv_peek1(Var,One)->ic_unify(One,Val);true)).
+ic_text:attr_unify_hook(Var,Value):- check_disallow(Var,Value),
+ (mv_members(Var,'$allow',One)*-> ic_unify(One,Value); (mv_peek_value1(Var,One)->ic_unify(One,Value);true)).
+'ic_text':attribute_goals(Var)--> {get_attr(Var,'ic_text',Var)},[ic_text(Var)].
 
 
-ic_unify(One,Val):- (One=Val -> true ; (term_upcase(One,UC1),term_upcase(Val,UC2),UC1==UC2)).
+ic_unify(One,Value):- (One=Value -> true ; (term_upcase(One,UC1),term_upcase(Value,UC2),UC1==UC2)).
 
-term_upcase(Val,UC2):-catch(string_upper(Val,UC2),_,(format(string(UC1),'~w',Val),string_upper(UC1,UC2))).
+term_upcase(Value,UC2):-catch(string_upper(Value,UC2),_,(format(string(UC1),'~w',Value),string_upper(UC1,UC2))).
 
 :-
  source_location(S,_), prolog_load_context(module,LC),

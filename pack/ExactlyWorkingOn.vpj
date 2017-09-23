@@ -1779,6 +1779,13 @@
 				Refilter="1"
 				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
+		<F N="aliases.sh"/>
+		<F N="bump_packs.sh"/>
+		<F N="file_hybrid_01a.pfc"/>
+		<F N="mutlvar_example.pl.odd"/>
 		<F N="project_files.pl"/>
+		<F N="rsync.sh"/>
+		<F N="sortme.txt"/>
+		<F N="swish.vpj"/>
 	</Files>
 </Project>
