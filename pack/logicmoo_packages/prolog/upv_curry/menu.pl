@@ -27,7 +27,7 @@ process_then(InputS1, Main):-
               ; command_cd( Input )
               ; command_pwd( Input )
               ; command_exit( Input )
-              ; nopass,command_solve( Input ) ), 
+              ; (nopass,command_solve( Input ) )), 
              !,Main ))
         ,Main)
         .
@@ -38,6 +38,7 @@ prompt( Input ) :-
          ;Input = [X|Input2], prompt(Input2) ).
 
 command_solve( `` ) :- !.
+command_solve( [] ) :- !.
 command_solve( Input ) :- %No known command accepted
         ( sappend( `:load `,  _, Input )
          ;sappend( `:l `,     _, Input )
@@ -91,7 +92,7 @@ command_deftree( Input ) :-
          ;Name=Function ),
         name(F,Name),
         (  dt(F,_,DT),!, format(`~a:\n`,[F]), write2(DT), nl
-         ; \+(dt(F,_,DT)), format(`There is no definitional tree\n`,[]) ).
+         ; (\+(dt(F,_,_ /*DT*/ )), format(`There is no definitional tree\n`,[]) )).
 
 command_type( Input ) :-
         ( sappend( `:type `, ExpS, Input )

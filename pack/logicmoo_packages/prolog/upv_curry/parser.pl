@@ -603,10 +603,10 @@ basictypeExpr( elem(typevar(N)) ) --> {ini},variableID(N),!.
 
 % Forward expression
 basictypeExpr( TypeExpr ) -->
-        id(ID), {sicstus_atom_chars(Type,ID), \+(type(Type,N))},!,
-        ( typeExprL(Vars), !, {length(Vars,N)},
-          {TypeExpr=elem(forward(Type,N,Vars))}
-        ; {N=0},!, % Type with 0-arity
+        id(ID), {sicstus_atom_chars(Type,ID), \+(type(Type,_N))},!,
+        ( typeExprL(Vars), !, {length(Vars,Num)},
+          ({TypeExpr=elem(forward(Type,Num,Vars))}; {Num=0}),
+          !, % Type with 0-arity
           {TypeExpr=elem(forward(Type,0,[]))} ).
 
 typeExprL( [TypeExpr|TypeExprs] ) -->

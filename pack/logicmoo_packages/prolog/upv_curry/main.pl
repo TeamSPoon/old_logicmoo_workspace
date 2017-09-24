@@ -17,7 +17,7 @@
    (user:file_search_path(DirFor,Dir);asserta(user:file_search_path(DirFor,Dir))) ->
    (user:file_search_path(pack,Y);asserta(user:file_search_path(pack,Y))) -> attach_packs.
 :- initialization(attach_packs).
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- user:ensure_loaded(library(logicmoo_utils)).
 % =========================================================================
 :- expects_dialect(sicstus).
 :- thread_local(current_prolog_flag_double_quotes/1).
@@ -25,6 +25,7 @@
 :- set_prolog_flag(double_quotes, codes).
 
 is_cdl(A,A):-var(A),!.
+is_cdl(A,B):- sicstus_atom_chars(A,B),!. 
 is_cdl(A,B):-string(A),!,show_call(string_codes(A,B)).
 is_cdl(A,A):-must(is_list(A)),!.
 
