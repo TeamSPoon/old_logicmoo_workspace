@@ -60,21 +60,20 @@ mdwq_call(Q):- call(Q) *-> mdwq(success:Q); (mdwq(failed:Q),!,fail).
 
 
 
+user:meta_unify(Var,Rest,Value):-user:attr_pre_unify_hook(Var,Value,Rest).
 
 %-----------------------------------------------------------------
 % Blugened in version of verify_attributes/3
 
-user:attr_pre_unify_hook(IDVar, Value, _):- \+ attvar(IDVar),!,IDVar=Value.
 
+user:attr_pre_unify_hook(IDVar, Value, _):- \+ attvar(IDVar),!, IDVar=Value.
 /*
 user:attr_pre_unify_hook(IDVar, Value, Attrs):-
   call_verify_attributes(Attrs, Value, IDVar, [], Goals),
   nop(attv_bind(IDVar, Value)),
   maplist(call,Goals).
 */
-
 %user:attr_pre_unify_hook(IDVar, Value, Attrs):-  '$attvar':call_all_attr_uhooks(att('$VAR$',IDVar,Attrs),Value).
-%user:meta_unify(Var,Rest,Value):-
 user:attr_pre_unify_hook(Var,Value,Rest):- 
   mdwq_call('$attvar':call_all_attr_uhooks(Rest, Value)),
   mv_add1(Var,Value).
