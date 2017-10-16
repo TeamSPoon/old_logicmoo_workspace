@@ -64,24 +64,29 @@ mdwq_call(Q):- call(Q) *-> mdwq(success:Q); (mdwq(failed:Q),!,fail).
 :- if(true).
 :- '$set_source_module'('$attvar').
 
+:- module_transparent(system : = /2).
+:- module_transparent(wakeup/2).
+:- module_transparent('$wakeup'/1).
 wakeup(wakeup(Attribute, Value, Rest),M) :- !,
     begin_call_all_attr_uhooks(Attribute, Value, M),
     '$wakeup'(Rest).
 wakeup(_,_).
 
 :- import(user:attr_pre_unify_hook/3).
-
+:- module_transparent(user:attr_pre_unify_hook/3).
 begin_call_all_attr_uhooks(att('$VAR$', IDVar, Attrs),Value, M) :- !,
     M:attr_pre_unify_hook(IDVar, Value, Attrs).
 
 begin_call_all_attr_uhooks(Attribute, Value, M) :-
     call_all_attr_uhooks(Attribute, Value, M).
 
+:- module_transparent(call_all_attr_uhooks/3).
 call_all_attr_uhooks(att(Module, AttVal, Rest), Value, M) :- !,
     uhook(Module, AttVal, Value, M),
     call_all_attr_uhooks(Rest, Value, M).
 call_all_attr_uhooks(_, _, _).
 
+:- module_transparent(uhook/4).
 uhook(freeze, Goal, Y, M) :-
  M:(
     !,
@@ -90,24 +95,27 @@ uhook(freeze, Goal, Y, M) :-
         ->  put_attr(Y, freeze, '$and'(G2, Goal))
         ;   put_attr(Y, freeze, Goal)
         )
-    ;   unfreeze(Goal)
+    ;   '$attvar':unfreeze(Goal)
     )).
 
 uhook(Module, AttVal, Value, M) :-
-    M:((@((Module:attr_unify_hook(AttVal, Value)),M))).
+  M:(
+    true,
+    Module:attr_unify_hook(AttVal, Value)).
 
 
 :- ((abolish('$wakeup'/1),'$attvar':asserta('$wakeup'(M:G):-wakeup(G,M)))).
 :- meta_predicate('$wakeup'(:)).
 
-:- fixup_exports.
+:- all_source_file_predicates_are_transparent.
 
 :- '$set_source_module'('multivar').
 
+:- module_transparent(attr_pre_unify_hook_m/4).
 attr_pre_unify_hook_m(IDVar, Value, _, M):- \+ attvar(IDVar),!, M:(IDVar=Value).
 attr_pre_unify_hook_m(Var,Value,Rest, M):- 
   mdwq_call('$attvar':call_all_attr_uhooks(Rest, Value, M)),
-  M:mv_add1(Var,Value).
+  nop(M:mv_add1(Var,Value)).
 
 user:attr_pre_unify_hook(Var,Value,Rest):- strip_module(Rest,M,_), attr_pre_unify_hook_m(Var,Value,Rest,M).
            
@@ -116,6 +124,8 @@ user:attr_pre_unify_hook(Var,Value,Rest):- strip_module(Rest,M,_), attr_pre_unif
 :- else.
 
 
+
+:- module_transparent(user:meta_unify/3).
 user:meta_unify(Var,Rest,Value):- user:attr_pre_unify_hook(Var,Value,Rest).
 
 %-----------------------------------------------------------------
@@ -132,7 +142,7 @@ user:attr_pre_unify_hook(IDVar, Value, Attrs):-
 %user:attr_pre_unify_hook(IDVar, Value, Attrs):-  '$attvar':call_all_attr_uhooks(att('$VAR$',IDVar,Attrs),Value).
 user:attr_pre_unify_hook(Var,Value,Rest):- 
   mdwq_call('$attvar':call_all_attr_uhooks(Rest, Value)),
-  mv_add1(Var,Value).
+  nop(mv_add1(Var,Value)).
 
 :- endif.
 
@@ -215,7 +225,7 @@ test_case_4 :-  swiu_case_4.
 % multivar(Var):- put_attr(Var,unify,Var).
 % multivar(Var):- put_attr(Var,'$VAR$',Var).
 
-multivar(Var):- 
+xvarx(Var):- 
    get_attr(Var,'$VAR$',MV)-> var(MV) ; 
    get_attrs(Var,Attrs) -> put_attrs(Var,att('$VAR$',Var,Attrs)) ;
    true -> put_attrs(Var,att('$VAR$',Var,[])).
@@ -230,10 +240,10 @@ is_mv(Var):- attvar(Var),get_attr(Var,'$VAR$',Waz),var(Waz).
 % ==========================================
 
 '$VAR$':attr_unify_hook(_,_).
-'$VAR$':attribute_goals(Var) --> {is_implied_mv(Var)}->[] ; [multivar(Var)].
+'$VAR$':attribute_goals(Var) --> {is_implied_xvarx(Var)}->[] ; [xvarx(Var)].
 
-is_implied_mv(MV):- get_attrs(MV,ATTS),is_implied_mv(MV,ATTS).
-is_implied_mv(MV,att(M,Val,ATTS)):- ((Val==MV, \+ atom_concat('$',_,M)) -> true ; is_implied_mv(MV,ATTS)).
+is_implied_xvarx(MV):- get_attrs(MV,ATTS),is_implied_xvarx(MV,ATTS).
+is_implied_xvarx(MV,att(M,Val,ATTS)):- ((Val==MV, \+ atom_concat('$',_,M)) -> true ; is_implied_xvarx(MV,ATTS)).
 % ==========================================
 % Variant override TODO
 % ==========================================
@@ -252,9 +262,10 @@ user:attvar_references(N,Var):- (N==Var -> true ;  mdwq_call( \+ \+ =(N,Var) )).
 % ==========================================
 % Sets values
 % ==========================================
-
+multivar(Var):- xvarx(Var),get_attr(Var,'$value',lst(Var,_))->true; put_attr(Var,'$value',lst(Var,[])).
 '$value':attr_unify_hook(lst(Was,Values),Becoming):- var(Was),attvar(Becoming),!,mv_add_values(Becoming,Values).
-'$value':attr_unify_hook(_,_).
+'$value':attr_unify_hook(lst(Var,_Values),Value):- mv_add1(Var,Value).
+%'$value':attribute_goals(_)-->!.
 '$value':attribute_goals(Var)--> {get_attr(Var,'$value',lst(Var,Values))},[mv_set_values(Var,Values)].
 mv_set_values(Var,Values):- put_attr(Var,'$value',lst(Var,Values)).
 mv_set1(Var,Value):- put_attr(Var,'$value',lst(Var,[Value])).
@@ -297,9 +308,9 @@ mv_members(Var,Mod,Value):- get_attr(Var,Mod,lst(_,Values)),!,member(Value,Value
 % Allow values
 % ==========================================
 
-check_allow(Var,Value):- get_attr(Var,'$allow',lst(Var,Disallow)), memberchk_variant(Value,Disallow).
+check_allow(Var,Value):- get_attr(Var,'$allow',lst(Var,Disallow)), memberchk_variant_mv(Value,Disallow).
 mv_allow(Var,Allow):-mv_prepend(Var,'$allow',Allow).
-'$allow':attr_unify_hook(lst(Var,Allow),Value):- \+ ((memberchk_variant(Value,Allow)->true;get_attr(Var,ic_text,_))),!,fail.
+'$allow':attr_unify_hook(lst(Var,Allow),Value):- \+ ((memberchk_variant_mv(Value,Allow)->true;get_attr(Var,ic_text,_))),!,fail.
 '$allow':attr_unify_hook(lst(Was,Values),Becoming):- var(Was),attvar(Becoming),!,mv_prepend_values(Becoming,'$allow',Values).
 '$allow':attribute_goals(Var)--> {get_attr(Var,'$allow',Allow)},[mv_allow(Var,Allow)].
 
@@ -307,18 +318,18 @@ mv_allow(Var,Allow):-mv_prepend(Var,'$allow',Allow).
 % Disallow values
 % ==========================================
 
-check_disallow(Var,Value):- get_attr(Var,'$disallow',lst(Var,Disallow)),\+ memberchk_variant(Value,Disallow).
+check_disallow(Var,Value):- dumpST,get_attr(Var,'$disallow',lst(Var,Disallow)),\+ memberchk_variant_mv(Value,Disallow).
 mv_disallow(Var,Disallow):-mv_prepend(Var,'$disallow',Disallow).
-'$disallow':attr_unify_hook(lst(_Var,Disallow),Value):-  memberchk_variant(Value,Disallow),!,fail.
+'$disallow':attr_unify_hook(lst(_Var,Disallow),Value):-  memberchk_variant_mv(Value,Disallow),!,fail.
 '$disallow':attr_unify_hook(lst(Was,Values),Becoming):- var(Was),attvar(Becoming),!,mv_prepend_values(Becoming,'$disallow',Values).
 '$disallow':attribute_goals(Var)--> {get_attr(Var,'$disallow',Disallow)},[mv_disallow(Var,Disallow)].
 
-%% memberchk_variant( ?X, :TermY0) is semidet.
+%% memberchk_variant_mv( ?X, :TermY0) is semidet.
 %
 % Memberchk based on == for Vars else =@= .
 %
-memberchk_variant(X, List) :- is_list(List),!, \+ atomic(List), C=..[v|List],(var(X)-> (arg(_,C,YY),X==YY) ; (arg(_,C,YY),X =@= YY)),!.
-memberchk_variant(X, Ys) :-  nonvar(Ys), var(X)->memberchk_variant0(X, Ys);memberchk_variant1(X,Ys).
+memberchk_variant_mv(X, List) :- is_list(List),!, \+ atomic(List), C=..[v|List],(var(X)-> (arg(_,C,YY),X==YY) ; (arg(_,C,YY),X =@= YY)),!.
+memberchk_variant_mv(X, Ys) :-  nonvar(Ys), var(X)->memberchk_variant0(X, Ys);memberchk_variant1(X,Ys).
 memberchk_variant0(X, [Y|Ys]) :-  X==Y  ; (nonvar(Ys),memberchk_variant0(X, Ys)).
 memberchk_variant1(X, [Y|Ys]) :-  X =@= Y ; (nonvar(Ys),memberchk_variant1(X, Ys)).
 
@@ -416,15 +427,16 @@ merge_dicts(Dict1,Dict2,Combined):- dicts_to_same_keys([Dict1,Dict2],dict_fill(_
 % ==========================================
 
 ic_text(Var):- multivar(Var),put_attr(Var,ic_text,Var).
+/*
 ic_text:attr_unify_hook(Var,Value):- check_disallow(Var,Value),
  (mv_members(Var,'$allow',One)*-> ic_unify(One,Value); (mv_peek_value1(Var,One)->ic_unify(One,Value);true)).
 'ic_text':attribute_goals(Var)--> {get_attr(Var,'ic_text',Var)},[ic_text(Var)].
-
+*/
 
 ic_unify(One,Value):- (One=Value -> true ; (term_upcase(One,UC1),term_upcase(Value,UC2),UC1==UC2)).
 
 term_upcase(Value,UC2):-catch(string_upper(Value,UC2),_,(format(string(UC1),'~w',Value),string_upper(UC1,UC2))).
-
+/*
 :-
  source_location(S,_), prolog_load_context(module,LC),
  forall(source_file(M:H,S),
@@ -433,5 +445,6 @@ term_upcase(Value,UC2):-catch(string_upper(Value,UC2),_,(format(string(UC1),'~w'
   \+ atom_concat('__aux',_,F),debug(modules,'~N:- module_transparent((~q)/~q).~n',[F,A])))),
     ignore(((\+ atom_concat('$',_,F),\+ atom_concat('__aux',_,F),LC:export(M:F/A), 
   (current_predicate('system':F/A)->true; 'system':import(M:F/A))))))).
+*/
 
-
+:- fixup_exports.

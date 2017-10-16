@@ -1461,6 +1461,11 @@
 				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
 		<Folder Name="pfc">
+			<Folder Name="prolog">
+				<Folder Name="pfc2.0">
+					<F N="pfc/prolog/pfc2.0/mpred_header.pro"/>
+				</Folder>
+			</Folder>
 			<F
 				N="pfc/*.*"
 				Recurse="1"
