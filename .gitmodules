@@ -97,3 +97,6 @@
 [submodule "pack/plweb"]
 	path = pack/plweb
 	url = https://github.com/swi-prolog/plweb
+[submodule "swipl-devel-unstable"]
+	path = swipl-devel-unstable
+	url = https://github.com/logicmoo/swipl-devel-unstable

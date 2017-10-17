@@ -374,6 +374,64 @@
 				Refilter="1"
 				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 		</Folder>
+		<Folder Name="daydreamer">
+			<F
+				N="daydreamer/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes=""/>
+			<F N="daydreamer/compat.cl"/>
+			<F N="daydreamer/cyc.lisp"/>
+			<F N="daydreamer/d.lisp"/>
+			<F N="daydreamer/d_compile.lisp"/>
+			<F N="daydreamer/daydream.pl"/>
+			<F N="daydreamer/dd.cl"/>
+			<F N="daydreamer/dd_cntrl.cl"/>
+			<F N="daydreamer/dd_compile.cl"/>
+			<F N="daydreamer/dd_epis.cl"/>
+			<F N="daydreamer/dd_gen.cl"/>
+			<F N="daydreamer/dd_get.cl"/>
+			<F N="daydreamer/dd_kb.cl"/>
+			<F N="daydreamer/dd_macros.cl"/>
+			<F N="daydreamer/dd_mutation.cl"/>
+			<F N="daydreamer/dd_night.cl"/>
+			<F N="daydreamer/dd_reversal.cl"/>
+			<F N="daydreamer/dd_ri.cl"/>
+			<F N="daydreamer/dd_rule1.cl"/>
+			<F N="daydreamer/dd_rule2.cl"/>
+			<F N="daydreamer/dd_utils.cl"/>
+			<F N="daydreamer/gate_compile.cl"/>
+			<F N="daydreamer/gate_cx.cl"/>
+			<F N="daydreamer/gate_get.cl"/>
+			<F N="daydreamer/gate_instan.cl"/>
+			<F N="daydreamer/gate_macros.cl"/>
+			<F N="daydreamer/gate_main.cl"/>
+			<F N="daydreamer/gate_obs.cl"/>
+			<F N="daydreamer/gate_prove.cl"/>
+			<F N="daydreamer/gate_read_pr.cl"/>
+			<F N="daydreamer/gate_test.cl"/>
+			<F N="daydreamer/gate_ty.cl"/>
+			<F N="daydreamer/gate_unify.cl"/>
+			<F N="daydreamer/gate_utils.cl"/>
+			<F N="daydreamer/hello_world.cl"/>
+			<F N="daydreamer/ide.lisp"/>
+			<F N="daydreamer/inputemployment1.txt"/>
+			<F N="daydreamer/inputlovers1.txt"/>
+			<F N="daydreamer/inputlovers2.txt"/>
+			<F N="daydreamer/inputlovers3.txt"/>
+			<F N="daydreamer/inputrecovery3.txt"/>
+			<F N="daydreamer/INSTALL"/>
+			<F N="daydreamer/km.lisp"/>
+			<F N="daydreamer/LICENSE"/>
+			<F N="daydreamer/local.lisp"/>
+			<F N="daydreamer/loop.cl"/>
+			<F N="daydreamer/outputhelloworld.txt"/>
+			<F N="daydreamer/outputlovers1.txt"/>
+			<F N="daydreamer/outputtest.txt"/>
+			<F N="daydreamer/README.md"/>
+			<F N="daydreamer/test-suite.km"/>
+			<F N="daydreamer/testj.lisp"/>
+		</Folder>
 		<Folder Name="dictoo">
 			<F
 				N="dictoo/*.*"
@@ -440,6 +498,13 @@
 		<Folder Name="logicmoo_base">
 			<F
 				N="logicmoo_base/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
+		</Folder>
+		<Folder Name="logicmoo_interps">
+			<F
+				N="logicmoo_interps/*.*"
 				Recurse="1"
 				Refilter="1"
 				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
